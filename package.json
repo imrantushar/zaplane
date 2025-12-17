@@ -1,0 +1,72 @@
+{
+  "name": "zaplane",
+  "version": "1.0.0",
+  "description": "A Simple WordPress Quiz Plugin",
+  "main": "index.js",
+  "scripts": {
+    "build": "wp-scripts build",
+    "check-engines": "wp-scripts check-engines",
+    "check-licenses": "wp-scripts check-licenses",
+    "format": "wp-scripts format",
+    "lint:css": "wp-scripts lint-style",
+    "lint:js": "wp-scripts lint-js",
+    "lint:md:docs": "wp-scripts lint-md-docs",
+    "lint:md:js": "wp-scripts lint-md-js",
+    "lint:pkg-json": "wp-scripts lint-pkg-json",
+    "packages-update": "wp-scripts packages-update",
+    "plugin-zip": "wp-scripts plugin-zip",
+    "start": "wp-scripts start",
+    "test:e2e": "wp-scripts test-e2e",
+    "test:unit": "wp-scripts test-unit-js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/imrantushar/quizpress.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/imrantushar/quizpress/issues"
+  },
+  "homepage": "https://github.com/imrantushar/quizpress#readme",
+  "dependencies": {
+    "@babel/plugin-proposal-class-properties": "^7.18.6",
+    "@chakra-ui/react": "^3.27.0",
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/sortable": "^10.0.0",
+    "@reduxjs/toolkit": "^2.9.0",
+    "@wordpress/components": "^30.0.0",
+    "@wordpress/hooks": "^4.27.0",
+    "@wordpress/i18n": "^6.0.0",
+    "@wordpress/scripts": "^30.20.0",
+    "array-move": "^4.0.0",
+    "axios": "^1.12.2",
+    "babel-loader": "^10.0.0",
+    "classnames": "^2.5.1",
+    "formik": "^2.2.9",
+    "formik-wizard-form": "^2.1.0",
+    "just-debounce-it": "^3.2.0",
+    "lodash": "^4.17.21",
+    "moment-timezone": "^0.6.0",
+    "react": "^18.3.1",
+    "react-data-table-component": "^7.4.7",
+    "react-dom": "^18.3.1",
+    "react-modal": "^3.16.3",
+    "react-redux": "^9.2.0",
+    "react-router-dom": "^6.30.1",
+    "react-select": "^5.10.2",
+    "react-sortable-hoc": "^2.0.0",
+    "recharts": "^3.2.1",
+    "styled-components": "^5.3.5",
+    "yup": "^0.32.11"
+  },
+  "devDependencies": {
+    "@wordpress/eslint-plugin": "^22.13.0",
+    "babel-plugin-module-resolver": "^5.0.2",
+    "clean-webpack-plugin": "^4.0.0",
+    "redux-logger": "^3.0.6",
+    "sass-loader": "^13.3.2",
+    "webpack": "^5.100.2",
+    "webpack-cli": "^6.0.1"
+  }
+}

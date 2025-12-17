@@ -7,7 +7,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 use Zaplane\Classes\IntegrationBase;
 
-class Core extends IntegrationBase {
+class Wordpress extends IntegrationBase {
 
     public static function get_slug(): string {
         return 'wordpress';

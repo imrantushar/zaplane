@@ -1,0 +1,10 @@
+/vendor/
+.DS_Store
+node_modules/
+vendor/
+package-lock.json
+assets/js/*.txt
+.git
+**/*.map
+assets/css/backend-dist.css
+assets/css/frontend-dist.css

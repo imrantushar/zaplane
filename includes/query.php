@@ -91,7 +91,7 @@ class Query {
                 'trigger_node_id' => $node['id'],
                 'trigger_data'    => wp_json_encode( $payload ),
                 'status'          => 'running',
-                'created_at'      => current_time( 'mysql' ),
+                // 'created_at'      => current_time( 'mysql' ),
             ]
         );
 
@@ -148,96 +148,96 @@ class Query {
      * Execute a node (called by Action Scheduler)
      */
     public static function execute_node( int $run_id, int $node_id ): void {
-    global $wpdb;
+        global $wpdb;
 
-    // Load run
-    $run = $wpdb->get_row(
-        $wpdb->prepare(
-            "SELECT * FROM {$wpdb->prefix}zaplane_runs WHERE id = %d",
-            $run_id
-        ),
-        ARRAY_A
-    );
-
-    if ( ! $run || (int) $run['attempts'] >= 3 ) {
-        return;
-    }
-
-    // Load node
-    $node = $wpdb->get_row(
-        $wpdb->prepare(
-            "SELECT * FROM {$wpdb->prefix}zaplane_nodes WHERE id = %d",
-            $node_id
-        ),
-        ARRAY_A
-    );
-
-    if ( ! $node ) {
-        return;
-    }
-
-    // Resolve integration
-    $integration = IntegrationLoader::get( $node['app'] );
-
-    if ( ! $integration ) {
-        return;
-    }
-
-    // Prepare input
-    $input = json_decode( $run['trigger_data'], true ) ?: [];
-    $input['_run_id'] = $run_id;
-
-    try {
-
-        // Execute integration node
-        $result = $integration::execute_node( $node, $input );
-
-        // Log execution
-        do_action(
-            'zaplane_node_executed',
-            $run_id,
-            $node_id,
-            'success',
-            $result
+        // Load run
+        $run = $wpdb->get_row(
+            $wpdb->prepare(
+                "SELECT * FROM {$wpdb->prefix}zaplane_runs WHERE id = %d",
+                $run_id
+            ),
+            ARRAY_A
         );
 
-        if ( empty( $result['port'] ) ) {
+        if ( ! $run || (int) $run['attempts'] >= 3 ) {
             return;
         }
 
-        // Schedule next nodes
-        self::schedule_next_nodes(
-            $run_id,
-            $node_id,
-            $result['port'],
-            $result['data'] ?? []
+        // Load node
+        $node = $wpdb->get_row(
+            $wpdb->prepare(
+                "SELECT * FROM {$wpdb->prefix}zaplane_nodes WHERE id = %d",
+                $node_id
+            ),
+            ARRAY_A
         );
 
-    } catch ( \Throwable $e ) {
+        if ( ! $node ) {
+            return;
+        }
 
-        // Update run error
-        $wpdb->update(
-            $wpdb->prefix . 'zaplane_runs',
-            [
-                'attempts'  => (int) $run['attempts'] + 1,
-                'last_error'=> $e->getMessage(),
-                'status'    => 'failed',
-            ],
-            [ 'id' => $run_id ]
-        );
+        // Resolve integration
+        $integration = IntegrationLoader::get( $node['app'] );
 
-        // Retry after 60s
-        self::schedule_node( $run_id, $node_id, 60 );
+        if ( ! $integration ) {
+            return;
+        }
 
-        do_action(
-            'zaplane_node_executed',
-            $run_id,
-            $node_id,
-            'failed',
-            [ 'error' => $e->getMessage() ]
-        );
+        // Prepare input
+        $input = json_decode( $run['trigger_data'], true ) ?: [];
+        $input['_run_id'] = $run_id;
+
+        try {
+
+            // Execute integration node
+            $result = $integration::execute_node( $node, $input );
+
+            // Log execution
+            do_action(
+                'zaplane_node_executed',
+                $run_id,
+                $node_id,
+                'success',
+                $result
+            );
+
+            if ( empty( $result['port'] ) ) {
+                return;
+            }
+
+            // Schedule next nodes
+            self::schedule_next_nodes(
+                $run_id,
+                $node_id,
+                $result['port'],
+                $result['data'] ?? []
+            );
+
+        } catch ( \Throwable $e ) {
+
+            // Update run error
+            $wpdb->update(
+                $wpdb->prefix . 'zaplane_runs',
+                [
+                    'attempts'  => (int) $run['attempts'] + 1,
+                    'last_error'=> $e->getMessage(),
+                    'status'    => 'failed',
+                ],
+                [ 'id' => $run_id ]
+            );
+
+            // Retry after 60s
+            self::schedule_node( $run_id, $node_id, 60 );
+
+            do_action(
+                'zaplane_node_executed',
+                $run_id,
+                $node_id,
+                'failed',
+                [ 'error' => $e->getMessage() ]
+            );
+        }
     }
-}
 
 
 

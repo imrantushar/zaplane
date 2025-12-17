@@ -18,6 +18,14 @@ class IntegrationLoader {
             return;
         }
 
+        self::register(\Zaplane\Integration\Wordpress::class);
+        self::register(\Zaplane\Integration\Woo::class);
+        self::register(\Zaplane\Integration\Slack::class);
+        self::register(\Zaplane\Integration\Gmail::class);
+        self::register(\Zaplane\Integration\Trello::class);
+        self::register(\Zaplane\Integration\Stripe::class);
+        self::register(\Zaplane\Integration\Mailerlite::class);
+
         /**
          * Allow integrations to self-register
          */
@@ -41,6 +49,7 @@ class IntegrationLoader {
      * Get integration by slug
      */
     public static function get( string $slug ): ?string {
+        error_log(print_r(self::$integrations, true));
         return self::$integrations[ $slug ] ?? null;
     }
 

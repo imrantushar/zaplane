@@ -6,12 +6,6 @@ if (!defined('WP_CLI')) {
 
 class Zaplane_CLI_Command {
 
-    /**
-     * Insert demo n8n-style workflow
-     *
-     * ## EXAMPLES
-     * wp automation demo
-     */
     public function demo() {
         global $wpdb;
 
@@ -20,46 +14,34 @@ class Zaplane_CLI_Command {
         // 1. Create Workflow
         $wpdb->insert($wpdb->prefix . ZAPLANE_PLUGIN_SLUG . '_workflows', [
             'user_id' => 1,
-            'name'    => 'Demo: Post Publish Flow',
+            'name'    => 'Demo: Post Publish → MailerLite',
             'status'  => 'active',
         ]);
-
         $workflow_id = $wpdb->insert_id;
 
         WP_CLI::success("Workflow created (ID: $workflow_id)");
 
         // 2. Nodes
         $nodes = [];
-        $nodes['trigger'] = $this->insert_node($workflow_id, 'trigger', 'wordpress', 'Post Published');
-        $nodes['if']      = $this->insert_node($workflow_id, 'logic', 'if', 'Check Post Status');
-        $nodes['slack']   = $this->insert_node($workflow_id, 'action', 'slack', 'Send Slack Message');
-        $nodes['email']   = $this->insert_node($workflow_id, 'action', 'email', 'Send Email');
+        $nodes['trigger']     = $this->insert_node($workflow_id, 'trigger', 'wordpress', 'Post Published', 'publish_post');
+        $nodes['mailerlite']  = $this->insert_node($workflow_id, 'action', 'mailerlite', 'Add Subscriber to MailerLite');
 
         // 3. Ports
         $ports = [];
+        $ports['trigger_out']    = $this->insert_port($nodes['trigger'], 'output', 'main');
+        $ports['mailerlite_in']  = $this->insert_port($nodes['mailerlite'], 'input', 'main');
 
-        $ports['trigger_out'] = $this->insert_port($nodes['trigger'], 'output', 'main');
+        // 4. Connect Trigger → MailerLite
+        $this->insert_edge($workflow_id, $ports['trigger_out'], $ports['mailerlite_in']);
 
-        $ports['if_in']       = $this->insert_port($nodes['if'], 'input', 'main');
-        $ports['if_true']     = $this->insert_port($nodes['if'], 'output', 'true');
-        $ports['if_false']    = $this->insert_port($nodes['if'], 'output', 'false');
-
-        $ports['slack_in']    = $this->insert_port($nodes['slack'], 'input', 'main');
-        $ports['email_in']    = $this->insert_port($nodes['email'], 'input', 'main');
-
-        // 4. Edges
-        $this->insert_edge($workflow_id, $ports['trigger_out'], $ports['if_in']);
-        $this->insert_edge($workflow_id, $ports['if_true'], $ports['slack_in']);
-        $this->insert_edge($workflow_id, $ports['if_false'], $ports['email_in']);
-
-        WP_CLI::success('✅ Demo workflow graph inserted successfully!');
+        WP_CLI::success('✅ Demo workflow with MailerLite inserted successfully!');
     }
 
     // ------------------------
     // Helper Methods
     // ------------------------
 
-    private function insert_node($workflow_id, $type, $app, $name) {
+    private function insert_node($workflow_id, $type, $app, $name, $event = '') {
         global $wpdb;
 
         $wpdb->insert($wpdb->prefix . ZAPLANE_PLUGIN_SLUG . '_nodes', [
@@ -67,12 +49,11 @@ class Zaplane_CLI_Command {
             'node_type'   => $type,
             'app'         => $app,
             'name'        => $name,
-            'event'        => 'publish_post',
+            'event'       => $event,
             'config'      => json_encode(['post_type' => 'post'])
         ]);
 
         WP_CLI::log("Node created: $name");
-
         return $wpdb->insert_id;
     }
 
@@ -86,7 +67,6 @@ class Zaplane_CLI_Command {
         ]);
 
         WP_CLI::log("Port created: $type::$label");
-
         return $wpdb->insert_id;
     }
 
