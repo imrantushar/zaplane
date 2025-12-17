@@ -13,9 +13,14 @@ class CreateRunsTable {
             workflow_id BIGINT UNSIGNED NOT NULL,
             trigger_node_id BIGINT UNSIGNED NOT NULL,
             trigger_data JSON,
-            status ENUM('pending','running','success','failed') DEFAULT 'pending',
+            status ENUM('running','paused','completed','failed') DEFAULT 'running',
+            attempts INT DEFAULT 0,
+            last_error TEXT NULL,
+            current_node_id BIGINT NULL,
+            resume_at DATETIME NULL,
             started_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             finished_at DATETIME NULL,
+            
 
             INDEX (workflow_id),
             INDEX (status)
