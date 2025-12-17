@@ -1,5 +1,5 @@
 import axios from 'axios';
-export const {active_plugin_lists, zenreset_nonce, ajaxurl} = window.ZenResetGlobal;
+export const {active_plugin_lists, zaplane_nonce, ajaxurl} = window.ZaplaneGlobal;
 
 export const makeRequest = async (
     action,
@@ -8,9 +8,9 @@ export const makeRequest = async (
     suffix = ''
 ) => {
     let form_data = new FormData(); // eslint-disable-line
-    form_data.append( 'action', `zenreset${ suffix }/${ action }` );
+    form_data.append( 'action', `zaplane${ suffix }/${ action }` );
     if ( ! payload.security ) {
-        form_data.append( 'security', zenreset_nonce );
+        form_data.append( 'security', zaplane_nonce );
     }
     Object.entries( payload ).forEach( ( [ key, value ] ) => {
         if ( ! isRaw && typeof value === 'object' && value !== null ) {

@@ -7,6 +7,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class Admin { 
     public static function init(){
-
+        Admin\Menu::init();
     }
 }
