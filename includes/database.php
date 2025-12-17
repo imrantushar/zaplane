@@ -51,9 +51,10 @@ class Database {
          * Conditional paths
          * Loops (if you allow them)
          */
-		Database\CreateEdgesTable::up( $prefix, $charset_collate );
+		Database\CreateWorkflowConnectionsTable::up( $prefix, $charset_collate );
 		Database\CreateConnectionsTable::up( $prefix, $charset_collate );
 		Database\CreateRunsTable::up( $prefix, $charset_collate );
+		Database\CreateRunLogsTable::up( $prefix, $charset_collate );
 		Database\CreateNodeRunsTable::up( $prefix, $charset_collate );
 		Database\CreateNodeLogsTable::up( $prefix, $charset_collate );
 		Database\CreateQueueTable::up( $prefix, $charset_collate );

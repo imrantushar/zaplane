@@ -33,11 +33,10 @@ class Automation {
         add_action('zaplane_node_executed', [$self, 'log_node_execution'], 10, 4);
         add_action('zaplane_workflow_updated', [$self, 'reload_triggers']);
         // Ensure Action Scheduler hook is always registered
-        add_action('zaplane_execute_node', function ($args) {
-            error_log(print_r($args, true));
-            if (empty($args['run_id']) || empty($args['node_id'])) return;
-            \Zaplane\Query::execute_node((int)$args['run_id'], (int)$args['node_id']);
-        });
+        add_action('zaplane_execute_node', function ($run_id, $node_id) {
+            if (empty($run_id) || empty($node_id)) return;
+            \Zaplane\Query::execute_node((int)$run_id, (int)$node_id);
+        }, 10, 2);
     }
 
     /**

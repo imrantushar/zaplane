@@ -255,9 +255,9 @@ class Query {
         $connections = $wpdb->get_results(
             $wpdb->prepare("
                 SELECT to_node_id, delay
-                FROM {$wpdb->prefix}zaplane_connections
+                FROM {$wpdb->prefix}zaplane_workflow_connections
                 WHERE from_node_id = %d
-                  AND from_port = %s
+                AND from_port = %s
             ", $node_id, $port ),
             ARRAY_A
         );
