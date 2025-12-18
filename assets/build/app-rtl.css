@@ -1,4 +1,188 @@
-/*!*****************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/@wordpress/scripts/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./dev_zaplane/app.scss ***!
-  \*****************************************************************************************************************************************************************************************************************************************************************************/
+/*!*********************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/@wordpress/scripts/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./assets/scss/backend.scss ***!
+  \*********************************************************************************************************************************************************************************************************************************************************************************/
+:root {
+  --zaplane-font: "Roboto", sans-serif;
+  --zaplane-primary: #006BFF;
+  --zaplane-second-primary: #8F7EE7;
+  --zaplane-border-color: #CBD1D7;
+  --zaplane-body-background: #F6F7F8;
+  --zaplane-background: #FFFFFF;
+  --zaplane-font-color: #0A2540;
+  --zaplane-secondary: #738496;
+  --zaplane-warn-muted: #738496;
+  --zaplane-placing: #F15B50;
+  --zaplane-warning: #FDB022;
+  --zaplane-placeholder: #A2ADB9;
+  --zaplane-shadow: 0px 0px 1px 0px rgba(20, 26, 36, 0.2), 0px 1px 2px 0px rgba(20, 26, 36, 0.1);
+  --zaplane-shadow-2: 0px 0px 1px 0px rgba(16, 24, 40, 0.15), 0px 8px 16px 0px rgba(20, 26, 36, 0.1);
+  --zaplane-gray: #F6F7F8;
+}
 
+#wpbody-content {
+  padding: 0;
+}
+
+#wpcontent {
+  padding: 0;
+}
+
+.zaplane-select--width-full {
+  width: 100%;
+}
+
+.zaplane-select--120 {
+  width: 120px;
+}
+
+.zaplane-select--136 {
+  width: 136px;
+}
+
+.zaplane-select--140 {
+  width: 140px;
+}
+
+.zaplane-select--150 {
+  width: 150px;
+}
+
+.zaplane-select--164 {
+  width: 164px;
+}
+
+.zaplane-select--214 {
+  width: 214px;
+}
+
+.zaplane-select--200 {
+  width: 200px;
+}
+
+.zaplane-select--250 {
+  width: 250px;
+}
+
+.zaplane-select--300 {
+  width: 300px;
+}
+
+.zaplane-select {
+  font-size: 14px;
+}
+
+.zaplane-select .zaplane-select__control {
+  border: 1px solid #CBD1D7;
+  background: #FFF;
+  border-radius: 4px;
+  box-shadow: none;
+}
+
+.zaplane-select .zaplane-select__control .zaplane-select__input-container .zaplane-select__input {
+  box-shadow: none;
+  height: 100%;
+  min-height: unset;
+}
+
+.zaplane-select .zaplane-select__control:hover {
+  border: 1px solid #CBD1D7;
+}
+
+.zaplane-select--transparent .zaplane-select__control {
+  border: none;
+}
+
+.zaplane-select--transparent .zaplane-select__placeholder {
+  font-size: 14px;
+  color: var(--zaplane-font-color);
+  font-weight: 500;
+}
+
+.zaplane-select--transparent .zaplane-select__indicator-separator {
+  display: none;
+}
+
+.zaplane-select--transparent .zaplane-select__dropdown-indicator {
+  padding: 8px 0 8px 8px;
+  color: var(--zaplane-font-color);
+  font-weight: 500;
+}
+
+.zaplane-radio-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.zaplane-radio-input {
+  -webkit-appearance: none;
+     -moz-appearance: none;
+          appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--zaplane-border-color);
+  border-radius: 50%;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.zaplane-radio-input:checked {
+  border-color: var(--zaplane-primary-color);
+  background-color: var(--zaplane-primary-color);
+}
+
+.zaplane-radio-input:checked::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 50%;
+  transform: translate(50%, -50%);
+  width: 8px;
+  height: 8px;
+  background-color: white;
+  border-radius: 50%;
+}
+
+.zaplane-radio-input:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+}
+
+.zaplane-radio-input:hover {
+  border-color: var(--zaplane-primary-color);
+}
+
+.zaplane-radio-label {
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+}
+
+.zaplane-radio-option {
+  color: var(--zaplane-gray-color);
+}
+
+.zaplane-radio-option.active {
+  color: var(--zaplane-primary-color);
+}
+
+.zaplane-radio-option.active .zaplane-radio-label {
+  color: var(--zaplane-primary-color);
+}
+
+@media (max-width: 768px) {
+  .zaplane-ticket-table td > p {
+    width: -moz-fit-content;
+    width: fit-content;
+  }
+  .zaplane-ticket-table table td, .zaplane-ticket-table table tr {
+    display: revert;
+  }
+}

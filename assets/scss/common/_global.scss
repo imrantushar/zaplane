@@ -18,6 +18,9 @@
 #wpbody-content{
     padding: 0
 }
+#wpcontent{
+    padding: 0
+}
 .zaplane-select {
     &--width-full {
         width: 100%;
@@ -216,4 +219,3 @@
         display: revert;
     }
 }
-@import "./classesLibrary";

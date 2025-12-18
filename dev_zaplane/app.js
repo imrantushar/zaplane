@@ -1,7 +1,7 @@
 import { createPortal } from '@wordpress/element';
 import { createRoot } from 'react-dom/client';
 import { ChakraProvider, createSystem, defaultConfig } from '@chakra-ui/react';
-import './app.scss';
+import '../assets/scss/backend.scss';
 import { Provider } from 'react-redux';
 import { BrowserRouter as Router } from 'react-router-dom';
 import BackendDashboard from './containers/BackendDashboard';
@@ -31,7 +31,6 @@ document.addEventListener('DOMContentLoaded', () => {
 		const menuPage = document.getElementById('toplevel_page_zaplane');
 		function MenuPortal({ children }) {
 			menuPage.innerHTML = '';
-			console.log('iam ');
 			return createPortal(children, menuPage);
 		}
 		root.render(
