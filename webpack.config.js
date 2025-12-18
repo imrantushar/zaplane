@@ -6,7 +6,7 @@ const path = require( 'path' );
 const config = {
 	...defaultConfig,
 	entry: {
-		app: path.resolve( __dirname, 'dev_zaplane/backend.js' ),
+		app: path.resolve( __dirname, 'dev_zaplane/app.js' ),
 	},
 	output: {
 		filename: '[name].js',

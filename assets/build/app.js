@@ -527,8 +527,7 @@ const {
   zaplane_nonce,
   user_id,
   is_plain_permalink
-} = window?.zaplaneGlobal;
-console.log('hj', nonce);
+} = window?.ZaplaneGlobal;
 const reactDebounce = (callback, wait) => {
   let timeout;
   return (...args) => {
@@ -73098,9 +73097,9 @@ var __webpack_exports__ = {};
 // This entry needs to be wrapped in an IIFE because it needs to be in strict mode.
 (() => {
 "use strict";
-/*!********************************!*\
-  !*** ./dev_zaplane/backend.js ***!
-  \********************************/
+/*!****************************!*\
+  !*** ./dev_zaplane/app.js ***!
+  \****************************/
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @wordpress/element */ "@wordpress/element");
 /* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__);
