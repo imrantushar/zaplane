@@ -6,7 +6,7 @@ const path = require( 'path' );
 const config = {
 	...defaultConfig,
 	entry: {
-		app: path.resolve( __dirname, 'dev_zaplane/app.js' ),
+		app: path.resolve( __dirname, 'dev_zaplane/backend.js' ),
 	},
 	output: {
 		filename: '[name].js',
@@ -16,13 +16,13 @@ const config = {
 	resolve: {
 		alias: {
 			...defaultConfig.resolve.alias,
-			'@ZAPComponents': path.resolve( __dirname, 'src/components/' ),
-			'@ZAPContainers': path.resolve( __dirname, 'src/containers/' ),
-			'@ZAPPages': path.resolve( __dirname, 'src/containers/pages/' ),
-			'@ZAPCustomizer': path.resolve( __dirname, 'src/customizer/' ),
-			'@ZAPGlobal': path.resolve( __dirname, 'src/global/' ),
-			'@ZAPRedux': path.resolve( __dirname, 'src/redux/' ),
-			'@ZAPUtils': path.resolve( __dirname, 'src/utils/' ),
+			'@ZAPComponents': path.resolve( __dirname, 'dev_zaplane/components/' ),
+			'@ZAPContainers': path.resolve( __dirname, 'dev_zaplane/containers/' ),
+			'@ZAPPages': path.resolve( __dirname, 'dev_zaplane/containers/pages/' ),
+			'@ZAPCustomizer': path.resolve( __dirname, 'dev_zaplane/customizer/' ),
+			'@ZAPGlobal': path.resolve( __dirname, 'dev_zaplane/global/' ),
+			'@ZAPRedux': path.resolve( __dirname, 'dev_zaplane/redux/' ),
+			'@ZAPUtils': path.resolve( __dirname, 'dev_zaplane/utils/' ),
 		},
 	},
 };
