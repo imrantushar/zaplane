@@ -1,5 +1,6 @@
 import { useQuery } from '@ZAPUtils/helper';
 import React, { useEffect } from 'react';
+import Workflows from './pages/workflows';
 
 
 const renderSwitch = (page, id, action, path) => {
@@ -8,24 +9,18 @@ const renderSwitch = (page, id, action, path) => {
 	switch (page) {
 		case 'zaplane':
 			return <>Zaplane Dashboard</>;
-		// case 'gamify-points':
-		// 	if(path === "points-types"){
-        //      return <PointType />;
-		// 	}
-		// 	if ( action || id ) {
-		// 		return <PointType action={ action } id={ id } />;
-		// 	}
-		// 	return <Points />;
-		// case 'gamify-logs':
+		case 'zaplane-workflows':
+			return <Workflows />;
+		// case 'zaplane-logs':
 		// 	return <Logs />;
 
-		// case 'gamify-settings':
+		// case 'zaplane-settings':
 		// 	return <Settings />;
 
 		// case 'point-type':
 		// 	return <PointType />;
 
-		// case 'gamify-achievements':
+		// case 'zaplane-achievements':
 		// 	if(path === 'achievements-type'){
 		// 		return <AchievementsType />
 		// 	}
@@ -34,12 +29,12 @@ const renderSwitch = (page, id, action, path) => {
 		// 	}
 		// 	return <Achievements />;
 
-		// case 'gamify-levels':
+		// case 'zaplane-levels':
 		// 	if(path === 'levels-types'){
 		// 		return <LevelType />;
 		// 	}
 		// 	return <Levels />;
-		// case 'gamify-leaderboards':
+		// case 'zaplane-leaderboards':
 		// 	return <Leaderboards />;
 
 		default:
@@ -51,7 +46,7 @@ export default function BackendDashboard() {
 	const query = useQuery();
 	
 	return (
-		<div className="gamify-admin-content">
+		<div className="zaplane-admin-content">
 			{renderSwitch(
 				query.get('page'),
 				parseInt(query.get('id')),

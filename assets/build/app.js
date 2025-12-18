@@ -1,6 +1,19 @@
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
+/***/ "./assets/scss/backend.scss"
+/*!**********************************!*\
+  !*** ./assets/scss/backend.scss ***!
+  \**********************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+// extracted by mini-css-extract-plugin
+
+
+/***/ },
+
 /***/ "./assets/scss/chakra/theme.js"
 /*!*************************************!*\
   !*** ./assets/scss/chakra/theme.js ***!
@@ -61,19 +74,6 @@ const theme = (0,_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.createSystem)(_ch
     }
   }
 });
-
-/***/ },
-
-/***/ "./dev_zaplane/app.scss"
-/*!******************************!*\
-  !*** ./dev_zaplane/app.scss ***!
-  \******************************/
-(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-// extracted by mini-css-extract-plugin
-
 
 /***/ },
 
@@ -238,8 +238,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @ZAPUtils/helper */ "./dev_zaplane/utils/helper.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react */ "react");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _pages_workflows__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./pages/workflows */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/index.js");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__);
+
 
 
 
@@ -247,27 +249,21 @@ const renderSwitch = (page, id, action, path) => {
   console.log(page, 'page');
   switch (page) {
     case 'zaplane':
-      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.Fragment, {
+      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.Fragment, {
         children: "Zaplane Dashboard"
       });
-    // case 'gamify-points':
-    // 	if(path === "points-types"){
-    //      return <PointType />;
-    // 	}
-    // 	if ( action || id ) {
-    // 		return <PointType action={ action } id={ id } />;
-    // 	}
-    // 	return <Points />;
-    // case 'gamify-logs':
+    case 'zaplane-workflows':
+      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_pages_workflows__WEBPACK_IMPORTED_MODULE_2__["default"], {});
+    // case 'zaplane-logs':
     // 	return <Logs />;
 
-    // case 'gamify-settings':
+    // case 'zaplane-settings':
     // 	return <Settings />;
 
     // case 'point-type':
     // 	return <PointType />;
 
-    // case 'gamify-achievements':
+    // case 'zaplane-achievements':
     // 	if(path === 'achievements-type'){
     // 		return <AchievementsType />
     // 	}
@@ -276,27 +272,53 @@ const renderSwitch = (page, id, action, path) => {
     // 	}
     // 	return <Achievements />;
 
-    // case 'gamify-levels':
+    // case 'zaplane-levels':
     // 	if(path === 'levels-types'){
     // 		return <LevelType />;
     // 	}
     // 	return <Levels />;
-    // case 'gamify-leaderboards':
+    // case 'zaplane-leaderboards':
     // 	return <Leaderboards />;
 
     default:
-      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.Fragment, {
+      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.Fragment, {
         children: "No page found"
       });
   }
 };
 function BackendDashboard() {
   const query = (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_0__.useQuery)();
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("div", {
-    className: "gamify-admin-content",
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
+    className: "zaplane-admin-content",
     children: renderSwitch(query.get('page'), parseInt(query.get('id')), query.get('action'), query.get('path'))
   });
 }
+
+/***/ },
+
+/***/ "./dev_zaplane/containers/BackendDashboard/pages/workflows/index.js"
+/*!**************************************************************************!*\
+  !*** ./dev_zaplane/containers/BackendDashboard/pages/workflows/index.js ***!
+  \**************************************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__);
+
+
+const Workflows = () => {
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("div", {
+    children: "Workflows"
+  });
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Workflows);
 
 /***/ },
 
@@ -73105,7 +73127,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var react_dom_client__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-dom/client */ "./node_modules/react-dom/client.js");
 /* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/styled-system/provider.js");
-/* harmony import */ var _app_scss__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./app.scss */ "./dev_zaplane/app.scss");
+/* harmony import */ var _assets_scss_backend_scss__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../assets/scss/backend.scss */ "./assets/scss/backend.scss");
 /* harmony import */ var react_redux__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/dist/react-redux.mjs");
 /* harmony import */ var react_router_dom__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! react-router-dom */ "./node_modules/react-router-dom/dist/index.js");
 /* harmony import */ var _containers_BackendDashboard__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./containers/BackendDashboard */ "./dev_zaplane/containers/BackendDashboard/index.js");
@@ -73149,7 +73171,6 @@ document.addEventListener('DOMContentLoaded', () => {
       children
     }) {
       menuPage.innerHTML = '';
-      console.log('iam ');
       return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createPortal)(children, menuPage);
     }
     root.render(/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(react_redux__WEBPACK_IMPORTED_MODULE_4__.Provider, {
