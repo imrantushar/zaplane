@@ -73107,7 +73107,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/styled-system/provider.js");
 /* harmony import */ var _app_scss__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./app.scss */ "./dev_zaplane/app.scss");
 /* harmony import */ var react_redux__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/dist/react-redux.mjs");
-/* harmony import */ var react_router_dom__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! react-router-dom */ "./node_modules/react-router/dist/index.js");
+/* harmony import */ var react_router_dom__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! react-router-dom */ "./node_modules/react-router-dom/dist/index.js");
 /* harmony import */ var _containers_BackendDashboard__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./containers/BackendDashboard */ "./dev_zaplane/containers/BackendDashboard/index.js");
 /* harmony import */ var _ZAPContainers_BackendDashboard_AdminMenu__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @ZAPContainers/BackendDashboard/AdminMenu */ "./dev_zaplane/containers/BackendDashboard/AdminMenu/index.js");
 /* harmony import */ var _assets_scss_chakra_theme__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../assets/scss/chakra/theme */ "./assets/scss/chakra/theme.js");
@@ -73156,7 +73156,7 @@ document.addEventListener('DOMContentLoaded', () => {
       store: _ZAPRedux_store__WEBPACK_IMPORTED_MODULE_9__.store,
       children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.ChakraProvider, {
         value: _assets_scss_chakra_theme__WEBPACK_IMPORTED_MODULE_8__.theme,
-        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxs)(react_router_dom__WEBPACK_IMPORTED_MODULE_5__.Router, {
+        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxs)(react_router_dom__WEBPACK_IMPORTED_MODULE_5__.BrowserRouter, {
           children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(MenuPortal, {
             children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_ZAPContainers_BackendDashboard_AdminMenu__WEBPACK_IMPORTED_MODULE_7__["default"], {})
           }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_containers_BackendDashboard__WEBPACK_IMPORTED_MODULE_6__["default"], {})]

@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { ChakraProvider, createSystem, defaultConfig } from '@chakra-ui/react';
 import './app.scss';
 import { Provider } from 'react-redux';
-import { Router } from 'react-router-dom';
+import { BrowserRouter as Router } from 'react-router-dom';
 import BackendDashboard from './containers/BackendDashboard';
 import AdminMenu from '@ZAPContainers/BackendDashboard/AdminMenu';
 import { theme } from '../assets/scss/chakra/theme';
