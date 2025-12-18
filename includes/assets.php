@@ -31,6 +31,9 @@ class Assets {
                 'site_url'              => site_url(),
                 'admin_url'				=> admin_url(),
                 'route_path'            => wp_parse_url(admin_url(), PHP_URL_PATH),
+                'plugin_root_url'       => ZAPLANE_PLUGIN_ROOT_URI,
+                'menu'                  => wp_json_encode( Helper::get_admin_menu_list() ),
+
             ]);
 			wp_set_script_translations('zaplane-app-scripts', 'zaplane', ZAPLANE_ROOT_DIR_PATH . 'languages/');
         }
