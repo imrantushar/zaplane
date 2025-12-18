@@ -107,4 +107,19 @@ abstract class IntegrationBase {
     public static function get_rate_limit(): int {
         return 0; // requests per minute, 0 = unlimited
     }
+
+
+    /**
+     * Schema for trigger config UI
+     */
+    public static function get_trigger_config_schema( string $trigger ): array {
+        return [];
+    }
+
+    /**
+     * Schema for action config UI
+     */
+    public static function get_action_config_schema( string $action ): array {
+        return [];
+    }
 }
