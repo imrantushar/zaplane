@@ -18,6 +18,8 @@ class IntegrationLoader {
             return;
         }
 
+        error_log(print_r('Run Integration Loader', true));
+
         self::register(\Zaplane\Integration\Wordpress::class);
         self::register(\Zaplane\Integration\Woo::class);
         self::register(\Zaplane\Integration\Slack::class);

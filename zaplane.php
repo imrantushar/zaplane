@@ -95,6 +95,7 @@ final class Zaplane {
 		Zaplane\Migration::init();
 		Zaplane\Assets::init();
 		Zaplane\Admin::init();
+		Zaplane\API::init();
 		Zaplane\Automation::init();
 	}
 
