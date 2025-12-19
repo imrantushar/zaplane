@@ -452,12 +452,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _xyflow_react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @xyflow/react */ "./node_modules/@xyflow/system/dist/esm/index.js");
 /* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/box/index.js");
 /* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/text/index.js");
-/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/icon/icon.js");
-/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/stack/h-stack.js");
-/* harmony import */ var react_icons_ri__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! react-icons/ri */ "./node_modules/react-icons/ri/index.mjs");
-/* harmony import */ var react_icons_fa__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! react-icons/fa */ "./node_modules/react-icons/fa/index.mjs");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__);
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/badge/badge.js");
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/button/button.js");
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/icon/icon.js");
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/stack/h-stack.js");
+/* harmony import */ var react_icons_ri__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! react-icons/ri */ "./node_modules/react-icons/ri/index.mjs");
+/* harmony import */ var react_icons_fa__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! react-icons/fa */ "./node_modules/react-icons/fa/index.mjs");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__);
 
 
 
@@ -468,24 +470,24 @@ function CustomNode({
   data
 }) {
   const [hovered, setHovered] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Box, {
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Box, {
     position: "relative",
     onMouseEnter: () => setHovered(true),
     onMouseLeave: () => setHovered(false),
-    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.NodeToolbar, {
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.NodeToolbar, {
       isVisible: true,
       position: _xyflow_react__WEBPACK_IMPORTED_MODULE_2__.Position.Top,
       align: "start",
       offset: 10,
-      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_6__.HStack, {
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Text, {
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_8__.HStack, {
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Text, {
           borderRadius: "full",
           p: "4px 8px",
           fontWeight: "medium",
           background: "#E6F4FF",
           margin: 0,
           children: data.action || 'Action'
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Text, {
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Text, {
           borderRadius: "full",
           fontSize: "sm",
           fontWeight: "medium",
@@ -493,12 +495,12 @@ function CustomNode({
           children: data.order || 1
         })]
       })
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.NodeToolbar, {
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.NodeToolbar, {
       isVisible: hovered,
       position: _xyflow_react__WEBPACK_IMPORTED_MODULE_2__.Position.Bottom,
       align: "end",
       offset: -3,
-      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_6__.HStack, {
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_8__.HStack, {
         bg: "gray.800",
         color: "white",
         px: 3,
@@ -509,15 +511,15 @@ function CustomNode({
         pointerEvents: "auto",
         onMouseEnter: () => setHovered(true),
         onMouseLeave: () => setHovered(false),
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.Icon, {
-          as: react_icons_ri__WEBPACK_IMPORTED_MODULE_7__.RiDeleteBin7Line,
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_7__.Icon, {
+          as: react_icons_ri__WEBPACK_IMPORTED_MODULE_9__.RiDeleteBin7Line,
           boxSize: 4
-        }), !data?.action && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.Icon, {
-          as: react_icons_fa__WEBPACK_IMPORTED_MODULE_8__.FaRegCopy,
+        }), !data?.action && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_7__.Icon, {
+          as: react_icons_fa__WEBPACK_IMPORTED_MODULE_10__.FaRegCopy,
           boxSize: 4
         })]
       })
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Box, {
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Box, {
       bg: "white",
       border: "1px solid",
       borderColor: "gray.300",
@@ -527,7 +529,7 @@ function CustomNode({
       minW: "100px",
       textAlign: "center",
       boxShadow: "sm",
-      children: [!data?.action && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.Handle, {
+      children: [data?.action !== 'Trigger' && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.Handle, {
         type: "target",
         position: _xyflow_react__WEBPACK_IMPORTED_MODULE_2__.Position.Left,
         style: {
@@ -537,12 +539,51 @@ function CustomNode({
           background: "#3182ce",
           border: "2px solid white"
         }
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Text, {
+      }), data.conditions ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.Fragment, {
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Text, {
+          margin: 0,
+          fontSize: "sm",
+          fontWeight: "bold",
+          mb: 2,
+          children: "Conditions / Filters"
+        }), data.conditions?.map(cond => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_8__.HStack, {
+          justify: "space-between",
+          bg: "white",
+          p: 2,
+          mb: 1,
+          borderRadius: "md",
+          boxShadow: "sm",
+          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Text, {
+            margin: 0,
+            fontSize: "sm",
+            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.Badge, {
+              mr: 2,
+              children: cond.id
+            }), cond.title]
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_8__.HStack, {
+            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_7__.Icon, {
+              as: react_icons_fa__WEBPACK_IMPORTED_MODULE_10__.FaRegCopy,
+              cursor: "pointer",
+              onClick: () => data.onEditCondition(cond.id)
+            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_7__.Icon, {
+              as: react_icons_ri__WEBPACK_IMPORTED_MODULE_9__.RiDeleteBin7Line,
+              cursor: "pointer",
+              onClick: () => data.onDeleteCondition(cond.id)
+            })]
+          })]
+        }, cond.id)), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_6__.Button, {
+          size: "sm",
+          w: "100%",
+          mt: 2,
+          onClick: data.onAddCondition,
+          children: "+"
+        })]
+      }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Text, {
         m: 0,
         fontSize: "sm",
         fontWeight: "medium",
         children: data.label
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.Handle, {
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.Handle, {
         type: "source",
         position: _xyflow_react__WEBPACK_IMPORTED_MODULE_2__.Position.Right,
         style: {
@@ -587,9 +628,6 @@ __webpack_require__.r(__webpack_exports__);
 
 let id = 0;
 const getId = () => `dndnode_${id++}`;
-const nodeTypes = {
-  custom: _CustomNode__WEBPACK_IMPORTED_MODULE_4__["default"]
-};
 function FlowCanvas() {
   const [nodes, setNodes, onNodesChange] = (0,_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.useNodesState)([{
     id: '123',
@@ -659,7 +697,16 @@ function FlowCanvas() {
       position: newNodePosition,
       data: {
         label: "New Node",
-        order: nodes.length + 1
+        order: nodes.length + 1,
+        action: "Condition",
+        conditions: [{
+          id: `${nodes.length + 1}.1`,
+          title: "Untitled Condition 1"
+        }, {
+          id: "0",
+          title: "No Condition Matched",
+          permanent: true
+        }]
       }
     };
     const newEdges = [...edges.filter(e => e.id !== edgeId), {
@@ -675,6 +722,63 @@ function FlowCanvas() {
     }];
     setNodes(nds => nds.concat(newNode));
     setEdges(newEdges);
+  };
+  const addCondition = nodeId => {
+    setNodes(nds => nds.map(node => {
+      if (node.id !== nodeId) return node;
+      const count = node.data.conditions?.length || 0;
+      return {
+        ...node,
+        data: {
+          ...node.data,
+          conditions: [...(node.data.conditions || []), {
+            id: `${node.data.order}.${count + 1}`,
+            title: `Untitled Condition ${count + 1}`
+          }]
+        }
+      };
+    }));
+  };
+  const deleteCondition = (nodeId, conditionId) => {
+    setNodes(nds => nds.map(node => {
+      if (node.id !== nodeId) return node;
+      return {
+        ...node,
+        data: {
+          ...node.data,
+          conditions: node.data.conditions.filter(c => c.id !== conditionId)
+        }
+      };
+    }));
+  };
+  const updateCondition = (nodeId, conditionId, value) => {
+    setNodes(nds => nds.map(node => {
+      if (node.id !== nodeId) return node;
+      return {
+        ...node,
+        data: {
+          ...node.data,
+          conditions: node.data.conditions.map(c => c.id === conditionId ? {
+            ...c,
+            title: value
+          } : c)
+        }
+      };
+    }));
+  };
+  const nodeTypes = {
+    custom: props => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_CustomNode__WEBPACK_IMPORTED_MODULE_4__["default"], {
+      ...props,
+      data: {
+        ...props.data,
+        onAddCondition: () => addCondition(props.id),
+        onDeleteCondition: cid => deleteCondition(props.id, cid),
+        onEditCondition: cid => {
+          const title = prompt("Edit Condition");
+          if (title) updateCondition(props.id, cid, title);
+        }
+      }
+    })
   };
   const edgeTypes = {
     custom: props => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_CustomEdge__WEBPACK_IMPORTED_MODULE_5__["default"], {
@@ -2014,6 +2118,37 @@ const AbsoluteCenter = (0,_styled_system_factory_js__WEBPACK_IMPORTED_MODULE_0__
   }
 });
 AbsoluteCenter.displayName = "AbsoluteCenter";
+
+
+
+
+/***/ },
+
+/***/ "./node_modules/@chakra-ui/react/dist/esm/components/badge/badge.js"
+/*!**************************************************************************!*\
+  !*** ./node_modules/@chakra-ui/react/dist/esm/components/badge/badge.js ***!
+  \**************************************************************************/
+(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   Badge: () => (/* binding */ Badge),
+/* harmony export */   BadgePropsProvider: () => (/* binding */ BadgePropsProvider),
+/* harmony export */   PropsProvider: () => (/* binding */ PropsProvider),
+/* harmony export */   withContext: () => (/* binding */ withContext)
+/* harmony export */ });
+/* harmony import */ var _styled_system_create_recipe_context_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../styled-system/create-recipe-context.js */ "./node_modules/@chakra-ui/react/dist/esm/styled-system/create-recipe-context.js");
+
+"use client";
+
+
+const { PropsProvider, withContext } = (0,_styled_system_create_recipe_context_js__WEBPACK_IMPORTED_MODULE_0__.createRecipeContext)({
+  key: "badge"
+});
+const Badge = withContext("span");
+Badge.displayName = "Badge";
+const BadgePropsProvider = PropsProvider;
 
 
 

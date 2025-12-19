@@ -60,13 +60,11 @@ export default function CustomNode({ data }) {
                 >
                     <Icon as={RiDeleteBin7Line} boxSize={4} />
                     {!data?.action && (
-                    <Icon as={FaRegCopy} boxSize={4} />
+                        <Icon as={FaRegCopy} boxSize={4} />
                     )}
-                    
+
                 </HStack>
             </NodeToolbar>
-
-            {/* 🔹 NODE BODY */}
             <Box
                 bg="white"
                 border="1px solid"
@@ -78,7 +76,7 @@ export default function CustomNode({ data }) {
                 textAlign="center"
                 boxShadow="sm"
             >
-                {!data?.action && (<Handle
+                {data?.action !== 'Trigger' && (<Handle
                     type="target"
                     position={Position.Left}
                     style={{
@@ -90,10 +88,59 @@ export default function CustomNode({ data }) {
                     }}
                 />)}
 
+               {data.conditions ? (
+               <>
+                    <Text margin={0} fontSize="sm" fontWeight="bold" mb={2}>
+                        Conditions / Filters
+                    </Text>
 
-                <Text m={0} fontSize="sm" fontWeight="medium">
+                    {data.conditions?.map((cond) => (
+                        <HStack
+                            key={cond.id}
+                            justify="space-between"
+                            bg="white"
+                            p={2}
+                            mb={1}
+                            borderRadius="md"
+                            boxShadow="sm"
+                        >
+                            <Text margin={0} fontSize="sm">
+                                <Badge mr={2}>{cond.id}</Badge>
+                                {cond.title}
+                            </Text>
+
+                            <HStack>
+                                <Icon
+                                    as={FaRegCopy}
+                                    cursor="pointer"
+                                    onClick={() =>
+                                        data.onEditCondition(cond.id)
+                                    }
+                                />
+                                <Icon
+                                    as={RiDeleteBin7Line}
+                                    cursor="pointer"
+                                    onClick={() =>
+                                        data.onDeleteCondition(cond.id)
+                                    }
+                                />
+                            </HStack>
+                        </HStack>
+                    ))}
+
+                    <Button
+                        size="sm"
+                        w="100%"
+                        mt={2}
+                        onClick={data.onAddCondition}
+                    >
+                        +
+                    </Button>
+                </>
+            ) :<Text m={0} fontSize="sm" fontWeight="medium">
                     {data.label}
-                </Text>
+                </Text>}
+                
 
                 <Handle
                     type="source"
@@ -107,6 +154,8 @@ export default function CustomNode({ data }) {
                     }}
                 />
             </Box>
+
+
         </Box>
     );
 }

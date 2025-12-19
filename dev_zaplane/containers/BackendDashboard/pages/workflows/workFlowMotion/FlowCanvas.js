@@ -16,16 +16,14 @@ import CustomEdge from "./CustomEdge";
 let id = 0;
 const getId = () => `dndnode_${id++}`;
 
-const nodeTypes = {
-    custom: CustomNode,
-};
+
 
 export default function FlowCanvas() {
     const [nodes, setNodes, onNodesChange] = useNodesState([
         {
             id: '123',
             type: 'custom',
-            data: { id: "123", label: "Select an app", icon: "",action:'Trigger' },
+            data: { id: "123", label: "Select an app", icon: "", action: 'Trigger' },
             position: { x: 125, y: 500 },
         }
     ]);
@@ -100,9 +98,22 @@ export default function FlowCanvas() {
             position: newNodePosition,
             data: {
                 label: "New Node",
-                order: nodes.length + 1
+                order: nodes.length + 1,
+                action:"Condition",
+                conditions: [
+                    {
+                        id: `${nodes.length + 1}.1`,
+                        title: "Untitled Condition 1",
+                    },
+                    {
+                    id: "0",
+                    title: "No Condition Matched",
+                    permanent: true, 
+                },
+                ],
             },
         };
+
 
         const newEdges = [
             ...edges.filter((e) => e.id !== edgeId),
@@ -123,17 +134,97 @@ export default function FlowCanvas() {
         setNodes((nds) => nds.concat(newNode));
         setEdges(newEdges);
     };
+    const addCondition = (nodeId) => {
+        setNodes((nds) =>
+            nds.map((node) => {
+                if (node.id !== nodeId) return node;
 
-    const edgeTypes = {
-        custom: (props) => (
-            <CustomEdge
-                {...props}
-                onEdgeDelete={onEdgeDelete}
-                onAddNode={onAddNode}
-            />
-        ),
+                const count = node.data.conditions?.length || 0;
+
+                return {
+                    ...node,
+                    data: {
+                        ...node.data,
+                        conditions: [
+                            ...(node.data.conditions || []),
+                            {
+                                id: `${node.data.order}.${count + 1}`,
+                                title: `Untitled Condition ${count + 1}`,
+                            },
+                             
+                        ],
+                    },
+                };
+            })
+        );
     };
 
+    const deleteCondition = (nodeId, conditionId) => {
+        setNodes((nds) =>
+            nds.map((node) => {
+                if (node.id !== nodeId) return node;
+
+                return {
+                    ...node,
+                    data: {
+                        ...node.data,
+                        conditions: node.data.conditions.filter(
+                            (c) => c.id !== conditionId
+                        ),
+                    },
+                };
+            })
+        );
+    };
+
+    const updateCondition = (nodeId, conditionId, value) => {
+        setNodes((nds) =>
+            nds.map((node) => {
+                if (node.id !== nodeId) return node;
+
+                return {
+                    ...node,
+                    data: {
+                        ...node.data,
+                        conditions: node.data.conditions.map((c) =>
+                            c.id === conditionId
+                                ? { ...c, title: value }
+                                : c
+                        ),
+                    },
+                };
+            })
+        );
+    };
+
+
+const nodeTypes = {
+    custom: (props) => (
+        <CustomNode
+            {...props}
+            data={{
+                ...props.data,
+                onAddCondition: () => addCondition(props.id),
+                onDeleteCondition: (cid) =>
+                    deleteCondition(props.id, cid),
+                onEditCondition: (cid) => {
+                    const title = prompt("Edit Condition");
+                    if (title)
+                        updateCondition(props.id, cid, title);
+                },
+            }}
+        />
+    ),
+};
+const edgeTypes = {
+    custom: (props) => (
+        <CustomEdge
+            {...props}
+            onEdgeDelete={onEdgeDelete}
+            onAddNode={onAddNode}
+        />
+    ),
+};
     return (
         <div style={{ flex: 1, height: "100vh" }}>
             <ReactFlow
