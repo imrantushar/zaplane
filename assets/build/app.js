@@ -355,7 +355,8 @@ const CustomEdge = ({
   targetPosition,
   style = {},
   markerEnd,
-  onEdgeDelete
+  onEdgeDelete,
+  onAddNode // new callback
 }) => {
   const [edgePath] = (0,_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.getBezierPath)({
     sourceX,
@@ -385,7 +386,7 @@ const CustomEdge = ({
       width: 24,
       height: 24,
       x: centerX - 12,
-      y: centerY - 12,
+      y: centerY - 20,
       style: {
         overflow: "visible"
       },
@@ -402,6 +403,29 @@ const CustomEdge = ({
         title: "Delete edge",
         children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(react_icons_fa__WEBPACK_IMPORTED_MODULE_2__.FaTimes, {
           color: "red"
+        })
+      })
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("foreignObject", {
+      width: 24,
+      height: 24,
+      x: centerX - 12,
+      y: centerY + 4,
+      style: {
+        overflow: "visible"
+      },
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
+        style: {
+          width: "24px",
+          height: "24px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          cursor: "pointer"
+        },
+        onClick: () => onAddNode(id),
+        title: "Add node",
+        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(react_icons_fa__WEBPACK_IMPORTED_MODULE_2__.FaPlus, {
+          color: "green"
         })
       })
     })]
@@ -460,13 +484,13 @@ function CustomNode({
           fontWeight: "medium",
           background: "#E6F4FF",
           margin: 0,
-          children: "Action"
+          children: data.action || 'Action'
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Text, {
           borderRadius: "full",
           fontSize: "sm",
           fontWeight: "medium",
           margin: 0,
-          children: data.order
+          children: data.order || 1
         })]
       })
     }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.NodeToolbar, {
@@ -488,7 +512,7 @@ function CustomNode({
         children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.Icon, {
           as: react_icons_ri__WEBPACK_IMPORTED_MODULE_7__.RiDeleteBin7Line,
           boxSize: 4
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.Icon, {
+        }), !data?.action && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.Icon, {
           as: react_icons_fa__WEBPACK_IMPORTED_MODULE_8__.FaRegCopy,
           boxSize: 4
         })]
@@ -503,7 +527,7 @@ function CustomNode({
       minW: "100px",
       textAlign: "center",
       boxShadow: "sm",
-      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.Handle, {
+      children: [!data?.action && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.Handle, {
         type: "target",
         position: _xyflow_react__WEBPACK_IMPORTED_MODULE_2__.Position.Left,
         style: {
@@ -568,9 +592,18 @@ const nodeTypes = {
 };
 function FlowCanvas() {
   const [nodes, setNodes, onNodesChange] = (0,_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.useNodesState)([{
-    id: "123form",
-    label: "123FormBuilder",
-    icon: "🧾"
+    id: '123',
+    type: 'custom',
+    data: {
+      id: "123",
+      label: "Select an app",
+      icon: "",
+      action: 'Trigger'
+    },
+    position: {
+      x: 125,
+      y: 500
+    }
   }]);
   const [edges, setEdges, onEdgesChange] = (0,_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.useEdgesState)([]);
   const {
@@ -598,7 +631,7 @@ function FlowCanvas() {
       }
     };
     setNodes(nds => nds.concat(newNode));
-  }, [screenToFlowPosition, setNodes, nodes]);
+  }, [screenToFlowPosition, setNodes]);
   const onDragOver = event => {
     event.preventDefault();
     event.dataTransfer.dropEffect = "move";
@@ -609,10 +642,45 @@ function FlowCanvas() {
   const onEdgeDelete = edgeId => {
     setEdges(eds => eds.filter(e => e.id !== edgeId));
   };
+  const onAddNode = edgeId => {
+    const edge = edges.find(e => e.id === edgeId);
+    if (!edge) return;
+    const sourceNode = nodes.find(n => n.id === edge.source);
+    const targetNode = nodes.find(n => n.id === edge.target);
+    if (!sourceNode || !targetNode) return;
+    const newNodePosition = {
+      x: (sourceNode.position.x + targetNode.position.x) / 2,
+      y: (sourceNode.position.y + targetNode.position.y) / 2
+    };
+    const newNodeId = getId();
+    const newNode = {
+      id: newNodeId,
+      type: "custom",
+      position: newNodePosition,
+      data: {
+        label: "New Node",
+        order: nodes.length + 1
+      }
+    };
+    const newEdges = [...edges.filter(e => e.id !== edgeId), {
+      id: `edge-${edge.source}-${newNodeId}`,
+      source: edge.source,
+      target: newNodeId,
+      type: "custom"
+    }, {
+      id: `edge-${newNodeId}-${edge.target}`,
+      source: newNodeId,
+      target: edge.target,
+      type: "custom"
+    }];
+    setNodes(nds => nds.concat(newNode));
+    setEdges(newEdges);
+  };
   const edgeTypes = {
     custom: props => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_CustomEdge__WEBPACK_IMPORTED_MODULE_5__["default"], {
       ...props,
-      onEdgeDelete: onEdgeDelete
+      onEdgeDelete: onEdgeDelete,
+      onAddNode: onAddNode
     })
   };
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("div", {

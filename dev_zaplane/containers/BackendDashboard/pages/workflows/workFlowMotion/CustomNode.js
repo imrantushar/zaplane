@@ -26,9 +26,9 @@ export default function CustomNode({ data }) {
                         fontWeight="medium"
                         background='#E6F4FF'
                         margin={0}
-                      
+
                     >
-                        Action
+                        {data.action || 'Action'}
                     </Text>
                     <Text
                         borderRadius="full"
@@ -36,7 +36,7 @@ export default function CustomNode({ data }) {
                         fontWeight="medium"
                         margin={0}
                     >
-                        {data.order}
+                        {data.order || 1}
                     </Text>
                 </HStack>
             </NodeToolbar>
@@ -59,7 +59,10 @@ export default function CustomNode({ data }) {
                     onMouseLeave={() => setHovered(false)}
                 >
                     <Icon as={RiDeleteBin7Line} boxSize={4} />
+                    {!data?.action && (
                     <Icon as={FaRegCopy} boxSize={4} />
+                    )}
+                    
                 </HStack>
             </NodeToolbar>
 
@@ -75,7 +78,7 @@ export default function CustomNode({ data }) {
                 textAlign="center"
                 boxShadow="sm"
             >
-                <Handle
+                {!data?.action && (<Handle
                     type="target"
                     position={Position.Left}
                     style={{
@@ -85,7 +88,8 @@ export default function CustomNode({ data }) {
                         background: "#3182ce",
                         border: "2px solid white",
                     }}
-                />
+                />)}
+
 
                 <Text m={0} fontSize="sm" fontWeight="medium">
                     {data.label}
