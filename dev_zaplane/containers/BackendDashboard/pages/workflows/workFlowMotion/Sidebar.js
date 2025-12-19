@@ -1,44 +1,90 @@
-import React from "react";
+import React, { useState } from "react";
+import {
+  Box,
+  Flex,
+  Text,
+  Input,
+  Button,
+  VStack,
+  HStack,
+} from "@chakra-ui/react";
 
-const items = Array.from({ length: 10 }, (_, i) => ({
-  id: `node-${i + 1}`,
-  label: `Node ${i + 1}`,
-}));
+const items = [
+  { id: "123form", label: "123FormBuilder", icon: "🧾" },
+  { id: "academy", label: "Academy LMS", icon: "🎓" },
+  { id: "acpt", label: "ACPT", icon: "📦" },
+  { id: "activecampaign", label: "ActiveCampaign", icon: "📨" },
+  { id: "activepieces", label: "ActivePieces", icon: "🧩" },
+  { id: "affiliatewp", label: "Affiliate WP", icon: "🔗" },
+  { id: "aidaform", label: "AidaForm", icon: "📝" },
+  { id: "airtable", label: "Airtable", icon: "🗂️" },
+  { id: "albato", label: "Albato", icon: "🔄" },
+  { id: "amelia", label: "Amelia Booking", icon: "📅" },
+];
 
 export default function Sidebar() {
+  const [search, setSearch] = useState("");
+
   const onDragStart = (event, nodeType) => {
     event.dataTransfer.setData("application/reactflow", nodeType);
     event.dataTransfer.effectAllowed = "move";
   };
 
-  return (
-    <div
-      style={{
-        width: 200,
-        borderRight: "1px solid #ddd",
-        padding: 10,
-        background: "#f9f9f9",
-      }}
-    >
-      <h4>Sidebar</h4>
+  const filteredItems = items.filter((item) =>
+    item.label.toLowerCase().includes(search.toLowerCase())
+  );
 
-      {items.map((item) => (
-        <div
-          key={item.id}
-          draggable
-          onDragStart={(e) => onDragStart(e, item.label)}
-          style={{
-            padding: "8px",
-            marginBottom: "6px",
-            background: "#fff",
-            border: "1px solid #ccc",
-            cursor: "grab",
-          }}
-        >
-          {item.label}
-        </div>
-      ))}
-    </div>
+  return (
+    <Box
+      w="280px"
+      h="100vh"
+      borderRight="1px solid"
+      borderColor="gray.200"
+      bg="gray.50"
+      p={3}
+    >
+      <Text fontWeight="semibold" mb={3}>
+        Untitled Flow
+      </Text>
+      <Input
+        placeholder="Search"
+        size="sm"
+        mb={3}
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        bg="white"
+      />
+      <HStack mb={3} spacing={2}>
+        <Button size="sm" colorScheme="blue" variant="solid">
+          Apps
+        </Button>
+        <Button size="sm" variant="ghost">
+          Tools
+        </Button>
+      </HStack>
+      <VStack spacing={3} align="stretch" overflowY="auto">
+        {filteredItems.map((item) => (
+          <Flex
+            key={item.id}
+            draggable
+            onDragStart={(e) => onDragStart(e, item.label)}
+            align="center"
+            gap={3}
+            p={3}
+            bg="white"
+            border="1px solid"
+            borderColor="gray.200"
+            borderRadius="lg"
+            cursor="grab"
+            _hover={{ bg: "gray.100" }}
+          >
+            <Box fontSize="xl">{item.icon}</Box>
+            <Text fontSize="sm" fontWeight="medium">
+              {item.label}
+            </Text>
+          </Flex>
+        ))}
+      </VStack>
+    </Box>
   );
 }
-

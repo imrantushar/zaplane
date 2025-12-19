@@ -10,17 +10,17 @@ export default function CustomNode({ data }) {
         background: "#fff",
         minWidth: 80,
         textAlign: "center",
-        width: "30px"
+        width: "auto"
       }}
     >
       <Handle
         type="target"
-        position={Position.Top}
+        position={Position.Left}
       />
       {data.label}
       <Handle
         type="source"
-        position={Position.Bottom}
+        position={Position.Right}
       />
     </div>
   );
