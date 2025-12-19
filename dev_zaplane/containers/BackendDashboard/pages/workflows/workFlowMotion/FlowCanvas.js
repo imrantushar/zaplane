@@ -45,13 +45,16 @@ export default function FlowCanvas() {
             const newNode = {
                 id: getId(),
                 position,
-                data: { label: type },
+                data: { label: type ,
+                    order: nodes.length + 1,
+                },
                 type: "custom",
+                
             };
 
             setNodes((nds) => nds.concat(newNode));
         },
-        [screenToFlowPosition]
+        [screenToFlowPosition,setNodes,nodes]
     );
 
     const onDragOver = (event) => {
@@ -73,6 +76,7 @@ export default function FlowCanvas() {
         return true;
     };
     console.log(edges);
+    console.log(nodes);
 
     return (
         <div style={{ flex: 1 }}>

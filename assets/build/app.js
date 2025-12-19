@@ -357,11 +357,33 @@ function CustomNode({
   data
 }) {
   const [hovered, setHovered] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
+  console.log(data);
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Box, {
     position: "relative",
     onMouseEnter: () => setHovered(true),
     onMouseLeave: () => setHovered(false),
     children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.NodeToolbar, {
+      isVisible: true,
+      position: _xyflow_react__WEBPACK_IMPORTED_MODULE_2__.Position.Top,
+      align: "start",
+      offset: 10,
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_6__.HStack, {
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Text, {
+          borderRadius: "full",
+          p: "4px 8px",
+          fontWeight: "medium",
+          background: "#E6F4FF",
+          margin: 0,
+          children: "Action"
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Text, {
+          borderRadius: "full",
+          fontSize: "sm",
+          fontWeight: "medium",
+          margin: 0,
+          children: data.order
+        })]
+      })
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.NodeToolbar, {
       isVisible: hovered,
       position: _xyflow_react__WEBPACK_IMPORTED_MODULE_2__.Position.Bottom,
       align: "end",
@@ -397,7 +419,14 @@ function CustomNode({
       boxShadow: "sm",
       children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.Handle, {
         type: "target",
-        position: _xyflow_react__WEBPACK_IMPORTED_MODULE_2__.Position.Left
+        position: _xyflow_react__WEBPACK_IMPORTED_MODULE_2__.Position.Left,
+        style: {
+          width: 10,
+          height: 10,
+          borderRadius: "50%",
+          background: "#3182ce",
+          border: "2px solid white"
+        }
       }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Text, {
         m: 0,
         fontSize: "sm",
@@ -405,7 +434,14 @@ function CustomNode({
         children: data.label
       }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.Handle, {
         type: "source",
-        position: _xyflow_react__WEBPACK_IMPORTED_MODULE_2__.Position.Right
+        position: _xyflow_react__WEBPACK_IMPORTED_MODULE_2__.Position.Right,
+        style: {
+          width: 10,
+          height: 10,
+          borderRadius: "50%",
+          background: "#3182ce",
+          border: "2px solid white"
+        }
       })]
     })]
   });
@@ -461,12 +497,13 @@ function FlowCanvas() {
       id: getId(),
       position,
       data: {
-        label: type
+        label: type,
+        order: nodes.length + 1
       },
       type: "custom"
     };
     setNodes(nds => nds.concat(newNode));
-  }, [screenToFlowPosition]);
+  }, [screenToFlowPosition, setNodes, nodes]);
   const onDragOver = event => {
     event.preventDefault();
     event.dataTransfer.dropEffect = "move";
@@ -484,6 +521,7 @@ function FlowCanvas() {
     return true;
   };
   console.log(edges);
+  console.log(nodes);
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("div", {
     style: {
       flex: 1
