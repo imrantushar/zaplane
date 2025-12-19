@@ -11,5 +11,5 @@
         "@ZAPUtils/*": ["utils/*"],
       }
     },
-    "include": ["dev_zaplane"]
+    "include": ["dev_zaplane", "dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/index.js"]
   }

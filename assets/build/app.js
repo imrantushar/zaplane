@@ -309,38 +309,166 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
 /* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/flex/flex.js");
-/* harmony import */ var _workFlowMotion__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./workFlowMotion */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/index.js");
-/* harmony import */ var _sidebar__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./sidebar */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/sidebar/index.js");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__);
-
-
-
+/* harmony import */ var _workFlowMotion___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./workFlowMotion/ */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/index.js");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__);
 
 
 
 const Workflows = () => {
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.Fragment, {
-    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Flex, {
-      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_sidebar__WEBPACK_IMPORTED_MODULE_3__["default"], {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_workFlowMotion__WEBPACK_IMPORTED_MODULE_2__["default"], {})]
-    })
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.Fragment, {
+    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)(_workFlowMotion___WEBPACK_IMPORTED_MODULE_1__["default"], {})
   });
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Workflows);
 
 /***/ },
 
-/***/ "./dev_zaplane/containers/BackendDashboard/pages/workflows/sidebar/index.js"
-/*!**********************************************************************************!*\
-  !*** ./dev_zaplane/containers/BackendDashboard/pages/workflows/sidebar/index.js ***!
-  \**********************************************************************************/
+/***/ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/CustomNode.js"
+/*!**********************************************************************************************!*\
+  !*** ./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/CustomNode.js ***!
+  \**********************************************************************************************/
 (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */   "default": () => (/* binding */ CustomNode)
+/* harmony export */ });
+/* harmony import */ var _xyflow_react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @xyflow/react */ "./node_modules/@xyflow/react/dist/esm/index.js");
+/* harmony import */ var _xyflow_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @xyflow/react */ "./node_modules/@xyflow/system/dist/esm/index.js");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__);
+
+
+function CustomNode({
+  data
+}) {
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("div", {
+    style: {
+      padding: 10,
+      border: "1px solid #555",
+      borderRadius: 4,
+      background: "#fff",
+      minWidth: 80,
+      textAlign: "center",
+      width: "30px"
+    },
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_0__.Handle, {
+      type: "target",
+      position: _xyflow_react__WEBPACK_IMPORTED_MODULE_1__.Position.Top
+    }), data.label, /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_0__.Handle, {
+      type: "source",
+      position: _xyflow_react__WEBPACK_IMPORTED_MODULE_1__.Position.Bottom
+    })]
+  });
+}
+
+/***/ },
+
+/***/ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/FlowCanvas.js"
+/*!**********************************************************************************************!*\
+  !*** ./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/FlowCanvas.js ***!
+  \**********************************************************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ FlowCanvas)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _xyflow_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @xyflow/react */ "./node_modules/@xyflow/react/dist/esm/index.js");
+/* harmony import */ var _xyflow_react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @xyflow/react */ "./node_modules/@xyflow/system/dist/esm/index.js");
+/* harmony import */ var _xyflow_react_dist_base_css__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @xyflow/react/dist/base.css */ "./node_modules/@xyflow/react/dist/base.css");
+/* harmony import */ var _CustomNode__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./CustomNode */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/CustomNode.js");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__);
+
+
+
+
+
+let id = 0;
+const getId = () => `dndnode_${id++}`;
+const nodeTypes = {
+  custom: _CustomNode__WEBPACK_IMPORTED_MODULE_4__["default"]
+};
+function FlowCanvas() {
+  const [nodes, setNodes, onNodesChange] = (0,_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.useNodesState)([]);
+  const [edges, setEdges, onEdgesChange] = (0,_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.useEdgesState)([]);
+  const {
+    screenToFlowPosition
+  } = (0,_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.useReactFlow)();
+  const onConnect = (0,react__WEBPACK_IMPORTED_MODULE_0__.useCallback)(params => setEdges(eds => (0,_xyflow_react__WEBPACK_IMPORTED_MODULE_2__.addEdge)(params, eds)), []);
+  const onDrop = (0,react__WEBPACK_IMPORTED_MODULE_0__.useCallback)(event => {
+    event.preventDefault();
+    const type = event.dataTransfer.getData("application/reactflow");
+    if (!type) return;
+    const position = screenToFlowPosition({
+      x: event.clientX,
+      y: event.clientY
+    });
+    const newNode = {
+      id: getId(),
+      position,
+      data: {
+        label: type
+      },
+      type: "custom"
+    };
+    setNodes(nds => nds.concat(newNode));
+  }, [screenToFlowPosition]);
+  const onDragOver = event => {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "move";
+  };
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("div", {
+    style: {
+      flex: 1
+    },
+    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsxs)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.ReactFlow, {
+      nodes: nodes,
+      nodeTypes: nodeTypes,
+      edges: edges,
+      onNodesChange: onNodesChange,
+      onEdgesChange: onEdgesChange,
+      onConnect: onConnect,
+      onDrop: onDrop,
+      onDragOver: onDragOver,
+      proOptions: {
+        devTools: true
+      },
+      fitView: true,
+      fitViewOnInit: true,
+      panOnDrag: true,
+      preventScrolling: true,
+      nodesDraggable: true,
+      nodesConnectable: true,
+      elementsSelectable: true,
+      selectNodesOnDrag: true,
+      zoomOnScroll: true,
+      zoomOnDoubleClick: true,
+      minZoom: 1,
+      panOnScroll: true,
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.Background, {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.Controls, {})]
+    })
+  });
+}
+
+/***/ },
+
+/***/ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/Sidebar.js"
+/*!*******************************************************************************************!*\
+  !*** ./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/Sidebar.js ***!
+  \*******************************************************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ Sidebar)
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
@@ -348,134 +476,40 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__);
 
 
-const Sidebar = () => {
-  const nodesList = [{
-    type: "automation",
-    title: "Automation Node 1"
-  }, {
-    type: "automation",
-    title: "Automation Node 2"
-  }, {
-    type: "automation",
-    title: "Automation Node 3"
-  }, {
-    type: "automation",
-    title: "Automation Node 4"
-  }, {
-    type: "automation",
-    title: "Automation Node 5"
-  }, {
-    type: "automation",
-    title: "Automation Node 6"
-  }, {
-    type: "automation",
-    title: "Automation Node 7"
-  }, {
-    type: "automation",
-    title: "Automation Node 8"
-  }, {
-    type: "automation",
-    title: "Automation Node 9"
-  }, {
-    type: "automation",
-    title: "Automation Node 10"
-  }];
-  const onDragStart = (event, node) => {
-    event.dataTransfer.setData("application/reactflow", JSON.stringify(node));
+const items = Array.from({
+  length: 10
+}, (_, i) => ({
+  id: `node-${i + 1}`,
+  label: `Node ${i + 1}`
+}));
+function Sidebar() {
+  const onDragStart = (event, nodeType) => {
+    event.dataTransfer.setData("application/reactflow", nodeType);
     event.dataTransfer.effectAllowed = "move";
   };
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("aside", {
-    className: "sidebar",
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxs)("div", {
     style: {
-      padding: "10px",
-      width: "200px",
-      background: "#f0f0f0"
+      width: 200,
+      borderRight: "1px solid #ddd",
+      padding: 10,
+      background: "#f9f9f9"
     },
-    children: nodesList.map((node, index) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("div", {
-      onDragStart: e => onDragStart(e, node),
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("h4", {
+      children: "Sidebar"
+    }), items.map(item => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("div", {
       draggable: true,
+      onDragStart: e => onDragStart(e, item.label),
       style: {
         padding: "8px",
-        margin: "5px",
+        marginBottom: "6px",
         background: "#fff",
+        border: "1px solid #ccc",
         cursor: "grab"
       },
-      children: node.title
-    }, index))
+      children: item.label
+    }, item.id))]
   });
-};
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Sidebar);
-
-/***/ },
-
-/***/ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/AutomationNode.js"
-/*!**************************************************************************************************!*\
-  !*** ./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/AutomationNode.js ***!
-  \**************************************************************************************************/
-(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _xyflow_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @xyflow/react */ "./node_modules/@xyflow/react/dist/esm/index.js");
-/* harmony import */ var _xyflow_react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @xyflow/react */ "./node_modules/@xyflow/system/dist/esm/index.js");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__);
-
-
-
-const AutomationNode = ({
-  data,
-  id,
-  parentNode
-}) => {
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("div", {
-    className: "auto-node",
-    style: {
-      border: data.borderColor ? `2px solid ${data.borderColor}` : "1px solid #e0e0e0",
-      borderRadius: "6px",
-      position: "relative",
-      background: "white"
-    },
-    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("div", {
-      className: "auto-node-header",
-      style: {
-        backgroundColor: data.headerColor || "#e3e7ff",
-        borderRadius: data.isContainer ? "6px" : "6px 6px 0 0",
-        padding: "8px 10px"
-      },
-      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
-        className: "auto-node-title",
-        children: data.title
-      }), data.buttonText && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("button", {
-        className: "auto-node-btn",
-        onClick: data.onClick,
-        children: data.buttonText
-      })]
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
-      className: "auto-node-body",
-      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
-        className: "auto-node-desc",
-        children: data.description
-      })
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.Fragment, {
-      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.Handle, {
-        type: "target",
-        position: _xyflow_react__WEBPACK_IMPORTED_MODULE_2__.Position.Top,
-        className: "auto-handle"
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.Handle, {
-        type: "source",
-        position: _xyflow_react__WEBPACK_IMPORTED_MODULE_2__.Position.Bottom,
-        className: "auto-handle"
-      })]
-    })]
-  });
-};
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (AutomationNode);
+}
 
 /***/ },
 
@@ -488,122 +522,31 @@ const AutomationNode = ({
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */   "default": () => (/* binding */ Workflows)
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _xyflow_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @xyflow/react */ "./node_modules/@xyflow/react/dist/esm/index.js");
-/* harmony import */ var _xyflow_react_dist_base_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @xyflow/react/dist/base.css */ "./node_modules/@xyflow/react/dist/base.css");
-/* harmony import */ var _styles_scss__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./styles.scss */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/styles.scss");
-/* harmony import */ var _AutomationNode__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./AutomationNode */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/AutomationNode.js");
-/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
-/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_5__);
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__);
+/* harmony import */ var _Sidebar__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Sidebar */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/Sidebar.js");
+/* harmony import */ var _FlowCanvas__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./FlowCanvas */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/FlowCanvas.js");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__);
 
 
 
 
 
-
-
-const nodeTypes = {
-  automation: _AutomationNode__WEBPACK_IMPORTED_MODULE_4__["default"]
-};
-const WorkflowMotion = () => {
-  const [nodes, setNodes] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)([{
-    id: "hello",
-    type: "automation",
-    position: {
-      x: 10,
-      y: 20
-    },
-    data: {
-      title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_5__.__)("Hello", "zencrm"),
-      buttonText: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_5__.__)("Set Lists", "zencrm"),
-      headerColor: "#e3e7ff"
-    }
-  }, {
-    id: "applyTagNode",
-    type: "automation",
-    position: {
-      x: 10,
-      y: 200
-    },
-    data: {
-      title: "Apply Tag",
-      description: "Template",
-      headerColor: "#fff",
-      onDelete: () => deleteNode("yesBranchContainer", "applyTagNode")
-    }
-  }]);
-  const [edges, setEdges] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)([{
-    id: "e0",
-    source: "hello",
-    target: "applyTagNode"
-  }]);
-  const onDrop = (0,react__WEBPACK_IMPORTED_MODULE_0__.useCallback)(event => {
-    event.preventDefault();
-    const reactFlowBounds = event.currentTarget.getBoundingClientRect();
-    const nodeData = JSON.parse(event.dataTransfer.getData("application/reactflow"));
-    if (!nodeData) return;
-    const position = {
-      x: event.clientX - reactFlowBounds.left,
-      y: event.clientY - reactFlowBounds.top
-    };
-    const newNode = {
-      id: `node_${+new Date()}`,
-      type: nodeData.type,
-      position,
-      data: {
-        title: nodeData.title,
-        headerColor: "#e3e7ff"
-      }
-    };
-    setNodes(nds => nds.concat(newNode));
-  }, [setNodes]);
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.Fragment, {
-    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("div", {
+function Workflows() {
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.ReactFlowProvider, {
+    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)("div", {
       style: {
-        height: "850px",
-        width: "100%"
+        display: "flex",
+        height: "100vh"
       },
-      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.ReactFlow, {
-        nodes: nodes,
-        edges: edges,
-        nodeTypes: nodeTypes,
-        fitView: true,
-        panOnDrag: true,
-        preventScrolling: true,
-        nodesDraggable: true,
-        nodesConnectable: true,
-        elementsSelectable: true,
-        selectNodesOnDrag: true,
-        zoomOnScroll: true,
-        zoomOnDoubleClick: true,
-        minZoom: 1,
-        panOnScroll: true,
-        proOptions: {
-          devTools: true
-        }
-      })
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_Sidebar__WEBPACK_IMPORTED_MODULE_2__["default"], {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_FlowCanvas__WEBPACK_IMPORTED_MODULE_3__["default"], {})]
     })
   });
-};
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (WorkflowMotion);
-
-/***/ },
-
-/***/ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/styles.scss"
-/*!********************************************************************************************!*\
-  !*** ./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/styles.scss ***!
-  \********************************************************************************************/
-(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-// extracted by mini-css-extract-plugin
-
+}
 
 /***/ },
 
@@ -1453,66 +1396,6 @@ const listboxAnatomy = _ark_ui_react_listbox__WEBPACK_IMPORTED_MODULE_10__.listb
 
 /***/ },
 
-/***/ "./node_modules/@chakra-ui/react/dist/esm/components/flex/flex.js"
-/*!************************************************************************!*\
-  !*** ./node_modules/@chakra-ui/react/dist/esm/components/flex/flex.js ***!
-  \************************************************************************/
-(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   Flex: () => (/* binding */ Flex)
-/* harmony export */ });
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react */ "react");
-/* harmony import */ var _styled_system_factory_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../styled-system/factory.js */ "./node_modules/@chakra-ui/react/dist/esm/styled-system/factory.js");
-
-"use client";
-
-
-
-
-const Flex = (0,react__WEBPACK_IMPORTED_MODULE_1__.forwardRef)(
-  function Flex2(props, ref) {
-    const {
-      direction,
-      align,
-      justify,
-      wrap,
-      basis,
-      grow,
-      shrink,
-      inline,
-      ...rest
-    } = props;
-    return /* @__PURE__ */ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(
-      _styled_system_factory_js__WEBPACK_IMPORTED_MODULE_2__.chakra.div,
-      {
-        ref,
-        ...rest,
-        css: {
-          display: inline ? "inline-flex" : "flex",
-          flexDirection: direction,
-          alignItems: align,
-          justifyContent: justify,
-          flexWrap: wrap,
-          flexBasis: basis,
-          flexGrow: grow,
-          flexShrink: shrink,
-          ...props.css
-        }
-      }
-    );
-  }
-);
-Flex.displayName = "Flex";
-
-
-
-
-/***/ },
-
 /***/ "./node_modules/@chakra-ui/react/dist/esm/create-context.js"
 /*!******************************************************************!*\
   !*** ./node_modules/@chakra-ui/react/dist/esm/create-context.js ***!
@@ -1556,121 +1439,6 @@ function createContext(options = {}) {
     return context;
   }
   return [Context.Provider, useContext$1, Context];
-}
-
-
-
-
-/***/ },
-
-/***/ "./node_modules/@chakra-ui/react/dist/esm/merge-props.js"
-/*!***************************************************************!*\
-  !*** ./node_modules/@chakra-ui/react/dist/esm/merge-props.js ***!
-  \***************************************************************/
-(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   mergeProps: () => (/* binding */ mergeProps)
-/* harmony export */ });
-/* harmony import */ var _utils_call_all_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./utils/call-all.js */ "./node_modules/@chakra-ui/react/dist/esm/utils/call-all.js");
-
-
-
-const clsx = (...args) => args.map((str) => str?.trim?.()).filter(Boolean).join(" ");
-const eventRegex = /^on[A-Z]/;
-function mergeProps(...args) {
-  let result = {};
-  for (let props of args) {
-    for (let key in result) {
-      if (eventRegex.test(key) && typeof result[key] === "function" && typeof props[key] === "function") {
-        result[key] = (0,_utils_call_all_js__WEBPACK_IMPORTED_MODULE_0__.callAll)(result[key], props[key]);
-        continue;
-      }
-      if (key === "className" || key === "class") {
-        result[key] = clsx(result[key], props[key]);
-        continue;
-      }
-      if (key === "style") {
-        result[key] = Object.assign({}, result[key] ?? {}, props[key] ?? {});
-        continue;
-      }
-      result[key] = props[key] !== void 0 ? props[key] : result[key];
-    }
-    for (let key in props) {
-      if (result[key] === void 0) {
-        result[key] = props[key];
-      }
-    }
-  }
-  return result;
-}
-
-
-
-
-/***/ },
-
-/***/ "./node_modules/@chakra-ui/react/dist/esm/merge-refs.js"
-/*!**************************************************************!*\
-  !*** ./node_modules/@chakra-ui/react/dist/esm/merge-refs.js ***!
-  \**************************************************************/
-(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   assignRef: () => (/* binding */ assignRef),
-/* harmony export */   mergeRefs: () => (/* binding */ mergeRefs)
-/* harmony export */ });
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
-
-
-
-const majorVersion = parseInt(react__WEBPACK_IMPORTED_MODULE_0__.version.split(".")[0], 10);
-const shouldReturnCleanup = majorVersion >= 19;
-function assignRef(ref, value) {
-  if (ref == null) return;
-  if (typeof ref === "function") {
-    return ref(value);
-  }
-  try {
-    ref.current = value;
-  } catch (error) {
-    throw new Error(`Cannot assign value '${value}' to ref '${ref}'`);
-  }
-}
-function mergeRefs(...refs) {
-  const availableRefs = refs.filter((ref) => ref != null);
-  if (shouldReturnCleanup) {
-    const cleanupMap = /* @__PURE__ */ new Map();
-    return (node) => {
-      availableRefs.forEach((ref) => {
-        const cleanup = assignRef(ref, node);
-        if (cleanup) {
-          cleanupMap.set(ref, cleanup);
-        }
-      });
-      return () => {
-        availableRefs.forEach((ref) => {
-          const cleanup = cleanupMap.get(ref);
-          if (cleanup && typeof cleanup === "function") {
-            cleanup();
-          } else {
-            assignRef(ref, null);
-          }
-        });
-        cleanupMap.clear();
-      };
-    };
-  } else {
-    return (node) => {
-      availableRefs.forEach((ref) => {
-        assignRef(ref, node);
-      });
-    };
-  }
 }
 
 
@@ -3628,283 +3396,6 @@ const cssVarParser = (str) => {
 
 /***/ },
 
-/***/ "./node_modules/@chakra-ui/react/dist/esm/styled-system/factory.js"
-/*!*************************************************************************!*\
-  !*** ./node_modules/@chakra-ui/react/dist/esm/styled-system/factory.js ***!
-  \*************************************************************************/
-(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   chakra: () => (/* binding */ chakra)
-/* harmony export */ });
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
-/* harmony import */ var _emotion_is_prop_valid__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @emotion/is-prop-valid */ "./node_modules/@emotion/is-prop-valid/dist/emotion-is-prop-valid.esm.js");
-/* harmony import */ var _emotion_react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @emotion/react */ "./node_modules/@emotion/react/dist/emotion-element-489459f2.browser.development.esm.js");
-/* harmony import */ var _emotion_serialize__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @emotion/serialize */ "./node_modules/@emotion/serialize/dist/emotion-serialize.development.esm.js");
-/* harmony import */ var _emotion_use_insertion_effect_with_fallbacks__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @emotion/use-insertion-effect-with-fallbacks */ "./node_modules/@emotion/use-insertion-effect-with-fallbacks/dist/emotion-use-insertion-effect-with-fallbacks.browser.esm.js");
-/* harmony import */ var _emotion_utils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @emotion/utils */ "./node_modules/@emotion/utils/dist/emotion-utils.browser.esm.js");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! react */ "react");
-/* harmony import */ var _merge_props_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../merge-props.js */ "./node_modules/@chakra-ui/react/dist/esm/merge-props.js");
-/* harmony import */ var _merge_refs_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../merge-refs.js */ "./node_modules/@chakra-ui/react/dist/esm/merge-refs.js");
-/* harmony import */ var _utils_compact_js__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../utils/compact.js */ "./node_modules/@chakra-ui/react/dist/esm/utils/compact.js");
-/* harmony import */ var _utils_cx_js__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../utils/cx.js */ "./node_modules/@chakra-ui/react/dist/esm/utils/cx.js");
-/* harmony import */ var _utils_interop_js__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ../utils/interop.js */ "./node_modules/@chakra-ui/react/dist/esm/utils/interop.js");
-/* harmony import */ var _utils_ref_js__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ../utils/ref.js */ "./node_modules/@chakra-ui/react/dist/esm/utils/ref.js");
-/* harmony import */ var _utils_uniq_js__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ../utils/uniq.js */ "./node_modules/@chakra-ui/react/dist/esm/utils/uniq.js");
-/* harmony import */ var _provider_js__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./provider.js */ "./node_modules/@chakra-ui/react/dist/esm/styled-system/provider.js");
-/* harmony import */ var _use_resolved_props_js__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./use-resolved-props.js */ "./node_modules/@chakra-ui/react/dist/esm/styled-system/use-resolved-props.js");
-
-"use client";
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-const isPropValid = (0,_utils_interop_js__WEBPACK_IMPORTED_MODULE_11__.interopDefault)(_emotion_is_prop_valid__WEBPACK_IMPORTED_MODULE_1__["default"]);
-const testOmitPropsOnStringTag = isPropValid;
-const testOmitPropsOnComponent = (key) => key !== "theme";
-const composeShouldForwardProps = (tag, options, isReal) => {
-  let shouldForwardProp;
-  if (options) {
-    const optionsShouldForwardProp = options.shouldForwardProp;
-    shouldForwardProp = tag.__emotion_forwardProp && optionsShouldForwardProp ? (propName) => tag.__emotion_forwardProp(propName) && optionsShouldForwardProp(propName) : optionsShouldForwardProp;
-  }
-  if (typeof shouldForwardProp !== "function" && isReal) {
-    shouldForwardProp = tag.__emotion_forwardProp;
-  }
-  return shouldForwardProp;
-};
-let isBrowser = typeof document !== "undefined";
-const Insertion = ({ cache: cache2, serialized, isStringTag }) => {
-  (0,_emotion_utils__WEBPACK_IMPORTED_MODULE_5__.registerStyles)(cache2, serialized, isStringTag);
-  const rules = (0,_emotion_use_insertion_effect_with_fallbacks__WEBPACK_IMPORTED_MODULE_4__.useInsertionEffectAlwaysWithSyncFallback)(
-    () => (0,_emotion_utils__WEBPACK_IMPORTED_MODULE_5__.insertStyles)(cache2, serialized, isStringTag)
-  );
-  if (!isBrowser && rules !== void 0) {
-    let serializedNames = serialized.name;
-    let next = serialized.next;
-    while (next !== void 0) {
-      serializedNames = (0,_utils_cx_js__WEBPACK_IMPORTED_MODULE_10__.cx)(serializedNames, next.name);
-      next = next.next;
-    }
-    return /* @__PURE__ */ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(
-      "style",
-      {
-        ...{
-          [`data-emotion`]: (0,_utils_cx_js__WEBPACK_IMPORTED_MODULE_10__.cx)(cache2.key, serializedNames),
-          dangerouslySetInnerHTML: { __html: rules },
-          nonce: cache2.sheet.nonce
-        }
-      }
-    );
-  }
-  return null;
-};
-const exceptionPropMap = {
-  path: ["d"],
-  text: ["x", "y"],
-  circle: ["cx", "cy", "r"],
-  rect: ["width", "height", "x", "y", "rx", "ry"],
-  ellipse: ["cx", "cy", "rx", "ry"],
-  g: ["transform"],
-  stop: ["offset", "stopOpacity"]
-};
-const hasProp = (obj, prop) => {
-  return Object.prototype.hasOwnProperty.call(obj, prop);
-};
-const createStyled = (tag, configOrCva = {}, options = {}) => {
-  if (true) {
-    if (tag === void 0) {
-      throw new Error(
-        "You are trying to create a styled element with an undefined component.\nYou may have forgotten to import it."
-      );
-    }
-  }
-  if (hasProp(exceptionPropMap, tag)) {
-    options.forwardProps || (options.forwardProps = []);
-    const props = exceptionPropMap[tag];
-    options.forwardProps = (0,_utils_uniq_js__WEBPACK_IMPORTED_MODULE_13__.uniq)([...options.forwardProps, ...props]);
-  }
-  const isReal = tag.__emotion_real === tag;
-  const baseTag = isReal && tag.__emotion_base || tag;
-  let identifierName;
-  let targetClassName;
-  if (options !== void 0) {
-    identifierName = options.label;
-    targetClassName = options.target;
-  }
-  let styles = [];
-  const Styled = (0,_emotion_react__WEBPACK_IMPORTED_MODULE_2__.w)((inProps, cache2, ref) => {
-    const { cva, isValidProperty } = (0,_provider_js__WEBPACK_IMPORTED_MODULE_14__.useChakraContext)();
-    const cvaFn = configOrCva.__cva__ ? configOrCva : cva(configOrCva);
-    const cvaRecipe = mergeCva(tag.__emotion_cva, cvaFn);
-    const createShouldForwardProps = (props2) => {
-      return (prop, variantKeys) => {
-        if (props2.includes(prop)) return true;
-        return !variantKeys?.includes(prop) && !isValidProperty(prop);
-      };
-    };
-    if (!options.shouldForwardProp && options.forwardProps) {
-      options.shouldForwardProp = createShouldForwardProps(options.forwardProps);
-    }
-    const fallbackShouldForwardProp = (prop, variantKeys) => {
-      const emotionSfp = typeof tag === "string" && tag.charCodeAt(0) > 96 ? testOmitPropsOnStringTag : testOmitPropsOnComponent;
-      const chakraSfp = !variantKeys?.includes(prop) && !isValidProperty(prop);
-      return emotionSfp(prop) && chakraSfp;
-    };
-    const shouldForwardProp = composeShouldForwardProps(tag, options, isReal) || fallbackShouldForwardProp;
-    const propsWithDefault = react__WEBPACK_IMPORTED_MODULE_6__.useMemo(
-      () => Object.assign({}, options.defaultProps, (0,_utils_compact_js__WEBPACK_IMPORTED_MODULE_9__.compact)(inProps)),
-      [inProps]
-    );
-    const { props, styles: styleProps } = (0,_use_resolved_props_js__WEBPACK_IMPORTED_MODULE_15__.useResolvedProps)(
-      propsWithDefault,
-      cvaRecipe,
-      shouldForwardProp
-    );
-    let className = "";
-    let classInterpolations = [styleProps];
-    let mergedProps = props;
-    if (props.theme == null) {
-      mergedProps = {};
-      for (let key in props) {
-        mergedProps[key] = props[key];
-      }
-      mergedProps.theme = react__WEBPACK_IMPORTED_MODULE_6__.useContext(_emotion_react__WEBPACK_IMPORTED_MODULE_2__.T);
-    }
-    if (typeof props.className === "string") {
-      className = (0,_emotion_utils__WEBPACK_IMPORTED_MODULE_5__.getRegisteredStyles)(
-        cache2.registered,
-        classInterpolations,
-        props.className
-      );
-    } else if (props.className != null) {
-      className = (0,_utils_cx_js__WEBPACK_IMPORTED_MODULE_10__.cx)(className, props.className);
-    }
-    const serialized = (0,_emotion_serialize__WEBPACK_IMPORTED_MODULE_3__.serializeStyles)(
-      styles.concat(classInterpolations),
-      cache2.registered,
-      mergedProps
-    );
-    if (serialized.styles) {
-      className = (0,_utils_cx_js__WEBPACK_IMPORTED_MODULE_10__.cx)(className, `${cache2.key}-${serialized.name}`);
-    }
-    if (targetClassName !== void 0) {
-      className = (0,_utils_cx_js__WEBPACK_IMPORTED_MODULE_10__.cx)(className, targetClassName);
-    }
-    const shouldUseAs = !shouldForwardProp("as");
-    let FinalTag = shouldUseAs && props.as || baseTag;
-    let finalProps = {};
-    for (let prop in props) {
-      if (shouldUseAs && prop === "as") continue;
-      if ((0,_use_resolved_props_js__WEBPACK_IMPORTED_MODULE_15__.isHtmlProp)(prop)) {
-        const nativeProp = prop.replace("html", "").toLowerCase();
-        finalProps[nativeProp] = props[prop];
-        continue;
-      }
-      if (shouldForwardProp(prop)) {
-        finalProps[prop] = props[prop];
-      }
-    }
-    let classNameToUse = className.trim();
-    if (classNameToUse) {
-      finalProps.className = classNameToUse;
-    } else {
-      Reflect.deleteProperty(finalProps, "className");
-    }
-    finalProps.ref = ref;
-    const forwardAsChild = options.forwardAsChild || options.forwardProps?.includes("asChild");
-    if (props.asChild && !forwardAsChild) {
-      const child = react__WEBPACK_IMPORTED_MODULE_6__.isValidElement(props.children) ? react__WEBPACK_IMPORTED_MODULE_6__.Children.only(props.children) : react__WEBPACK_IMPORTED_MODULE_6__.Children.toArray(props.children).find(react__WEBPACK_IMPORTED_MODULE_6__.isValidElement);
-      if (!child) {
-        throw new Error("[chakra-ui > factory] No valid child found");
-      }
-      FinalTag = child.type;
-      finalProps.children = null;
-      Reflect.deleteProperty(finalProps, "asChild");
-      finalProps = (0,_merge_props_js__WEBPACK_IMPORTED_MODULE_7__.mergeProps)(finalProps, child.props);
-      finalProps.ref = (0,_merge_refs_js__WEBPACK_IMPORTED_MODULE_8__.mergeRefs)(ref, (0,_utils_ref_js__WEBPACK_IMPORTED_MODULE_12__.getElementRef)(child));
-    }
-    if (finalProps.as && forwardAsChild) {
-      finalProps.as = void 0;
-      return /* @__PURE__ */ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)(react__WEBPACK_IMPORTED_MODULE_6__.Fragment, { children: [
-        /* @__PURE__ */ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(
-          Insertion,
-          {
-            cache: cache2,
-            serialized,
-            isStringTag: typeof FinalTag === "string"
-          }
-        ),
-        /* @__PURE__ */ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(FinalTag, { asChild: true, ...finalProps, children: /* @__PURE__ */ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(props.as, { children: finalProps.children }) })
-      ] });
-    }
-    return /* @__PURE__ */ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)(react__WEBPACK_IMPORTED_MODULE_6__.Fragment, { children: [
-      /* @__PURE__ */ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(
-        Insertion,
-        {
-          cache: cache2,
-          serialized,
-          isStringTag: typeof FinalTag === "string"
-        }
-      ),
-      /* @__PURE__ */ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(FinalTag, { ...finalProps })
-    ] });
-  });
-  Styled.displayName = identifierName !== void 0 ? identifierName : `chakra(${typeof baseTag === "string" ? baseTag : baseTag.displayName || baseTag.name || "Component"})`;
-  Styled.__emotion_real = Styled;
-  Styled.__emotion_base = baseTag;
-  Styled.__emotion_forwardProp = options.shouldForwardProp;
-  Styled.__emotion_cva = configOrCva;
-  Object.defineProperty(Styled, "toString", {
-    value() {
-      if (targetClassName === void 0 && "development" !== "production") {
-        return "NO_COMPONENT_SELECTOR";
-      }
-      return `.${targetClassName}`;
-    }
-  });
-  return Styled;
-};
-const styledFn = createStyled.bind();
-const cache = /* @__PURE__ */ new Map();
-const chakraImpl = new Proxy(styledFn, {
-  apply(_, __, args) {
-    return styledFn(...args);
-  },
-  get(_, el) {
-    if (!cache.has(el)) {
-      cache.set(el, styledFn(el));
-    }
-    return cache.get(el);
-  }
-});
-const chakra = chakraImpl;
-const mergeCva = (cvaA, cvaB) => {
-  if (cvaA && !cvaB) return cvaA;
-  if (!cvaA && cvaB) return cvaB;
-  return cvaA.merge(cvaB);
-};
-
-
-
-
-/***/ },
-
 /***/ "./node_modules/@chakra-ui/react/dist/esm/styled-system/layers.js"
 /*!************************************************************************!*\
   !*** ./node_modules/@chakra-ui/react/dist/esm/styled-system/layers.js ***!
@@ -5740,90 +5231,6 @@ function toRem(value = "") {
     return `${parseFloat(value) / BASE_FONT_SIZE}${UNIT_REM}`;
   }
 }
-
-
-
-
-/***/ },
-
-/***/ "./node_modules/@chakra-ui/react/dist/esm/styled-system/use-resolved-props.js"
-/*!************************************************************************************!*\
-  !*** ./node_modules/@chakra-ui/react/dist/esm/styled-system/use-resolved-props.js ***!
-  \************************************************************************************/
-(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   isHtmlProp: () => (/* binding */ isHtmlProp),
-/* harmony export */   useResolvedProps: () => (/* binding */ useResolvedProps)
-/* harmony export */ });
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
-/* harmony import */ var _utils_split_props_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../utils/split-props.js */ "./node_modules/@chakra-ui/react/dist/esm/utils/split-props.js");
-/* harmony import */ var _provider_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./provider.js */ "./node_modules/@chakra-ui/react/dist/esm/styled-system/provider.js");
-
-
-
-
-
-const htmlProps = /* @__PURE__ */ new Set([
-  "htmlWidth",
-  "htmlHeight",
-  "htmlSize",
-  "htmlTranslate"
-]);
-function isHtmlProp(prop) {
-  return typeof prop === "string" && htmlProps.has(prop);
-}
-function useResolvedProps(inProps, cvaRecipe, shouldForwardProps) {
-  const { css, isValidProperty } = (0,_provider_js__WEBPACK_IMPORTED_MODULE_2__.useChakraContext)();
-  const { children, ...props } = inProps;
-  const result = (0,react__WEBPACK_IMPORTED_MODULE_0__.useMemo)(() => {
-    const [forwardedProps, restProps_B] = (0,_utils_split_props_js__WEBPACK_IMPORTED_MODULE_1__.splitProps)(
-      props,
-      (key) => shouldForwardProps(key, cvaRecipe.variantKeys)
-    );
-    const [variantProps, restProps_C] = (0,_utils_split_props_js__WEBPACK_IMPORTED_MODULE_1__.splitProps)(
-      restProps_B,
-      cvaRecipe.variantKeys
-    );
-    const [styleProps, elementProps] = (0,_utils_split_props_js__WEBPACK_IMPORTED_MODULE_1__.splitProps)(restProps_C, isValidProperty);
-    return {
-      forwardedProps,
-      variantProps,
-      styleProps,
-      elementProps
-    };
-  }, [cvaRecipe.variantKeys, shouldForwardProps, props, isValidProperty]);
-  const { css: cssStyles, ...propStyles } = result.styleProps;
-  const cvaStyles = (0,react__WEBPACK_IMPORTED_MODULE_0__.useMemo)(() => {
-    const variantProps = { ...result.variantProps };
-    const hasColorPalette = cvaRecipe.variantKeys.includes("colorPalette");
-    const hasOrientation = cvaRecipe.variantKeys.includes("orientation");
-    if (!hasColorPalette) {
-      variantProps.colorPalette = props.colorPalette;
-    }
-    if (!hasOrientation) {
-      variantProps.orientation = props.orientation;
-    }
-    return cvaRecipe(variantProps);
-  }, [cvaRecipe, result.variantProps, props.colorPalette, props.orientation]);
-  const styles = (0,react__WEBPACK_IMPORTED_MODULE_0__.useMemo)(() => {
-    return css(cvaStyles, ...toArray(cssStyles), propStyles);
-  }, [css, cvaStyles, cssStyles, propStyles]);
-  return {
-    styles,
-    props: {
-      ...result.forwardedProps,
-      ...result.elementProps,
-      children
-    }
-  };
-}
-const toArray = (val) => {
-  const res = Array.isArray(val) ? val : [val];
-  return res.filter(Boolean).flat();
-};
 
 
 
@@ -17703,29 +17110,6 @@ const zIndices = _styled_system_config_js__WEBPACK_IMPORTED_MODULE_0__.defineTok
 
 /***/ },
 
-/***/ "./node_modules/@chakra-ui/react/dist/esm/utils/call-all.js"
-/*!******************************************************************!*\
-  !*** ./node_modules/@chakra-ui/react/dist/esm/utils/call-all.js ***!
-  \******************************************************************/
-(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   callAll: () => (/* binding */ callAll)
-/* harmony export */ });
-
-function callAll(...fns) {
-  return function mergedFn(...args) {
-    fns.forEach((fn) => fn?.(...args));
-  };
-}
-
-
-
-
-/***/ },
-
 /***/ "./node_modules/@chakra-ui/react/dist/esm/utils/clone.js"
 /*!***************************************************************!*\
   !*** ./node_modules/@chakra-ui/react/dist/esm/utils/clone.js ***!
@@ -17881,27 +17265,6 @@ function flatten(values, stop) {
     { stop }
   );
   return result;
-}
-
-
-
-
-/***/ },
-
-/***/ "./node_modules/@chakra-ui/react/dist/esm/utils/interop.js"
-/*!*****************************************************************!*\
-  !*** ./node_modules/@chakra-ui/react/dist/esm/utils/interop.js ***!
-  \*****************************************************************/
-(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   interopDefault: () => (/* binding */ interopDefault)
-/* harmony export */ });
-
-function interopDefault(mod) {
-  return mod.default || mod;
 }
 
 
@@ -18084,35 +17447,6 @@ function omit(object, keysToOmit = []) {
     }
   }
   return clone;
-}
-
-
-
-
-/***/ },
-
-/***/ "./node_modules/@chakra-ui/react/dist/esm/utils/ref.js"
-/*!*************************************************************!*\
-  !*** ./node_modules/@chakra-ui/react/dist/esm/utils/ref.js ***!
-  \*************************************************************/
-(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   getElementRef: () => (/* binding */ getElementRef)
-/* harmony export */ });
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
-/* harmony import */ var _is_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./is.js */ "./node_modules/@chakra-ui/react/dist/esm/utils/is.js");
-
-
-
-
-function getElementRef(el) {
-  const version = react__WEBPACK_IMPORTED_MODULE_0__.version;
-  if (!(0,_is_js__WEBPACK_IMPORTED_MODULE_1__.isString)(version)) return el?.ref;
-  if (version.startsWith("18.")) return el?.ref;
-  return el?.props?.ref;
 }
 
 
@@ -18928,38 +18262,6 @@ function murmur2(str) {
   (h & 0xffff) * 0x5bd1e995 + ((h >>> 16) * 0xe995 << 16);
   return ((h ^ h >>> 15) >>> 0).toString(36);
 }
-
-
-
-
-/***/ },
-
-/***/ "./node_modules/@emotion/is-prop-valid/dist/emotion-is-prop-valid.esm.js"
-/*!*******************************************************************************!*\
-  !*** ./node_modules/@emotion/is-prop-valid/dist/emotion-is-prop-valid.esm.js ***!
-  \*******************************************************************************/
-(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (/* binding */ isPropValid)
-/* harmony export */ });
-/* harmony import */ var _emotion_memoize__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @emotion/memoize */ "./node_modules/@emotion/memoize/dist/emotion-memoize.esm.js");
-
-
-// eslint-disable-next-line no-undef
-var reactPropsRegex = /^((children|dangerouslySetInnerHTML|key|ref|autoFocus|defaultValue|defaultChecked|innerHTML|suppressContentEditableWarning|suppressHydrationWarning|valueLink|abbr|accept|acceptCharset|accessKey|action|allow|allowUserMedia|allowPaymentRequest|allowFullScreen|allowTransparency|alt|async|autoComplete|autoPlay|capture|cellPadding|cellSpacing|challenge|charSet|checked|cite|classID|className|cols|colSpan|content|contentEditable|contextMenu|controls|controlsList|coords|crossOrigin|data|dateTime|decoding|default|defer|dir|disabled|disablePictureInPicture|disableRemotePlayback|download|draggable|encType|enterKeyHint|fetchpriority|fetchPriority|form|formAction|formEncType|formMethod|formNoValidate|formTarget|frameBorder|headers|height|hidden|high|href|hrefLang|htmlFor|httpEquiv|id|inputMode|integrity|is|keyParams|keyType|kind|label|lang|list|loading|loop|low|marginHeight|marginWidth|max|maxLength|media|mediaGroup|method|min|minLength|multiple|muted|name|nonce|noValidate|open|optimum|pattern|placeholder|playsInline|popover|popoverTarget|popoverTargetAction|poster|preload|profile|radioGroup|readOnly|referrerPolicy|rel|required|reversed|role|rows|rowSpan|sandbox|scope|scoped|scrolling|seamless|selected|shape|size|sizes|slot|span|spellCheck|src|srcDoc|srcLang|srcSet|start|step|style|summary|tabIndex|target|title|translate|type|useMap|value|width|wmode|wrap|about|datatype|inlist|prefix|property|resource|typeof|vocab|autoCapitalize|autoCorrect|autoSave|color|incremental|fallback|inert|itemProp|itemScope|itemType|itemID|itemRef|on|option|results|security|unselectable|accentHeight|accumulate|additive|alignmentBaseline|allowReorder|alphabetic|amplitude|arabicForm|ascent|attributeName|attributeType|autoReverse|azimuth|baseFrequency|baselineShift|baseProfile|bbox|begin|bias|by|calcMode|capHeight|clip|clipPathUnits|clipPath|clipRule|colorInterpolation|colorInterpolationFilters|colorProfile|colorRendering|contentScriptType|contentStyleType|cursor|cx|cy|d|decelerate|descent|diffuseConstant|direction|display|divisor|dominantBaseline|dur|dx|dy|edgeMode|elevation|enableBackground|end|exponent|externalResourcesRequired|fill|fillOpacity|fillRule|filter|filterRes|filterUnits|floodColor|floodOpacity|focusable|fontFamily|fontSize|fontSizeAdjust|fontStretch|fontStyle|fontVariant|fontWeight|format|from|fr|fx|fy|g1|g2|glyphName|glyphOrientationHorizontal|glyphOrientationVertical|glyphRef|gradientTransform|gradientUnits|hanging|horizAdvX|horizOriginX|ideographic|imageRendering|in|in2|intercept|k|k1|k2|k3|k4|kernelMatrix|kernelUnitLength|kerning|keyPoints|keySplines|keyTimes|lengthAdjust|letterSpacing|lightingColor|limitingConeAngle|local|markerEnd|markerMid|markerStart|markerHeight|markerUnits|markerWidth|mask|maskContentUnits|maskUnits|mathematical|mode|numOctaves|offset|opacity|operator|order|orient|orientation|origin|overflow|overlinePosition|overlineThickness|panose1|paintOrder|pathLength|patternContentUnits|patternTransform|patternUnits|pointerEvents|points|pointsAtX|pointsAtY|pointsAtZ|preserveAlpha|preserveAspectRatio|primitiveUnits|r|radius|refX|refY|renderingIntent|repeatCount|repeatDur|requiredExtensions|requiredFeatures|restart|result|rotate|rx|ry|scale|seed|shapeRendering|slope|spacing|specularConstant|specularExponent|speed|spreadMethod|startOffset|stdDeviation|stemh|stemv|stitchTiles|stopColor|stopOpacity|strikethroughPosition|strikethroughThickness|string|stroke|strokeDasharray|strokeDashoffset|strokeLinecap|strokeLinejoin|strokeMiterlimit|strokeOpacity|strokeWidth|surfaceScale|systemLanguage|tableValues|targetX|targetY|textAnchor|textDecoration|textRendering|textLength|to|transform|u1|u2|underlinePosition|underlineThickness|unicode|unicodeBidi|unicodeRange|unitsPerEm|vAlphabetic|vHanging|vIdeographic|vMathematical|values|vectorEffect|version|vertAdvY|vertOriginX|vertOriginY|viewBox|viewTarget|visibility|widths|wordSpacing|writingMode|x|xHeight|x1|x2|xChannelSelector|xlinkActuate|xlinkArcrole|xlinkHref|xlinkRole|xlinkShow|xlinkTitle|xlinkType|xmlBase|xmlns|xmlnsXlink|xmlLang|xmlSpace|y|y1|y2|yChannelSelector|z|zoomAndPan|for|class|autofocus)|(([Dd][Aa][Tt][Aa]|[Aa][Rr][Ii][Aa]|x)-.*))$/; // https://esbench.com/bench/5bfee68a4cd7e6009ef61d23
-
-var isPropValid = /* #__PURE__ */(0,_emotion_memoize__WEBPACK_IMPORTED_MODULE_0__["default"])(function (prop) {
-  return reactPropsRegex.test(prop) || prop.charCodeAt(0) === 111
-  /* o */
-  && prop.charCodeAt(1) === 110
-  /* n */
-  && prop.charCodeAt(2) < 91;
-}
-/* Z+1 */
-);
 
 
 
