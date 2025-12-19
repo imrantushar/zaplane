@@ -324,6 +324,93 @@ const Workflows = () => {
 
 /***/ },
 
+/***/ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/CustomEdge.js"
+/*!**********************************************************************************************!*\
+  !*** ./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/CustomEdge.js ***!
+  \**********************************************************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _xyflow_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @xyflow/react */ "./node_modules/@xyflow/system/dist/esm/index.js");
+/* harmony import */ var react_icons_fa__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react-icons/fa */ "./node_modules/react-icons/fa/index.mjs");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__);
+
+
+
+
+const CustomEdge = ({
+  id,
+  sourceX,
+  sourceY,
+  targetX,
+  targetY,
+  sourcePosition,
+  targetPosition,
+  style = {},
+  markerEnd,
+  onEdgeDelete
+}) => {
+  const [edgePath] = (0,_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.getBezierPath)({
+    sourceX,
+    sourceY,
+    sourcePosition,
+    targetX,
+    targetY,
+    targetPosition
+  });
+  const [centerX, centerY] = (0,_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.getEdgeCenter)({
+    sourceX,
+    sourceY,
+    targetX,
+    targetY
+  });
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.Fragment, {
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("path", {
+      id: id,
+      style: {
+        ...style,
+        pointerEvents: "none"
+      },
+      className: "react-flow__edge-path",
+      d: edgePath,
+      markerEnd: markerEnd
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("foreignObject", {
+      width: 24,
+      height: 24,
+      x: centerX - 12,
+      y: centerY - 12,
+      style: {
+        overflow: "visible"
+      },
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
+        style: {
+          width: "24px",
+          height: "24px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          cursor: "pointer"
+        },
+        onClick: () => onEdgeDelete(id),
+        title: "Delete edge",
+        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(react_icons_fa__WEBPACK_IMPORTED_MODULE_2__.FaTimes, {
+          color: "red"
+        })
+      })
+    })]
+  });
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (CustomEdge);
+
+/***/ },
+
 /***/ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/CustomNode.js"
 /*!**********************************************************************************************!*\
   !*** ./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/CustomNode.js ***!
@@ -357,7 +444,6 @@ function CustomNode({
   data
 }) {
   const [hovered, setHovered] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
-  console.log(data);
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Box, {
     position: "relative",
     onMouseEnter: () => setHovered(true),
@@ -466,8 +552,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _xyflow_react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @xyflow/react */ "./node_modules/@xyflow/system/dist/esm/index.js");
 /* harmony import */ var _xyflow_react_dist_base_css__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @xyflow/react/dist/base.css */ "./node_modules/@xyflow/react/dist/base.css");
 /* harmony import */ var _CustomNode__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./CustomNode */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/CustomNode.js");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var _CustomEdge__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./CustomEdge */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/CustomEdge.js");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__);
+
 
 
 
@@ -479,12 +567,19 @@ const nodeTypes = {
   custom: _CustomNode__WEBPACK_IMPORTED_MODULE_4__["default"]
 };
 function FlowCanvas() {
-  const [nodes, setNodes, onNodesChange] = (0,_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.useNodesState)([]);
+  const [nodes, setNodes, onNodesChange] = (0,_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.useNodesState)([{
+    id: "123form",
+    label: "123FormBuilder",
+    icon: "🧾"
+  }]);
   const [edges, setEdges, onEdgesChange] = (0,_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.useEdgesState)([]);
   const {
     screenToFlowPosition
   } = (0,_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.useReactFlow)();
-  const onConnect = (0,react__WEBPACK_IMPORTED_MODULE_0__.useCallback)(params => setEdges(eds => (0,_xyflow_react__WEBPACK_IMPORTED_MODULE_2__.addEdge)(params, eds)), []);
+  const onConnect = (0,react__WEBPACK_IMPORTED_MODULE_0__.useCallback)(params => setEdges(eds => (0,_xyflow_react__WEBPACK_IMPORTED_MODULE_2__.addEdge)({
+    ...params,
+    type: "custom"
+  }, eds)), []);
   const onDrop = (0,react__WEBPACK_IMPORTED_MODULE_0__.useCallback)(event => {
     event.preventDefault();
     const type = event.dataTransfer.getData("application/reactflow");
@@ -496,11 +591,11 @@ function FlowCanvas() {
     const newNode = {
       id: getId(),
       position,
+      type: "custom",
       data: {
         label: type,
         order: nodes.length + 1
-      },
-      type: "custom"
+      }
     };
     setNodes(nds => nds.concat(newNode));
   }, [screenToFlowPosition, setNodes, nodes]);
@@ -509,49 +604,43 @@ function FlowCanvas() {
     event.dataTransfer.dropEffect = "move";
   };
   const isValidConnection = connection => {
-    const {
-      source,
-      target
-    } = connection;
-    const sourceHasEdge = edges.some(edge => edge.source === source);
-    const targetHasEdge = edges.some(edge => edge.target === target);
-    if (sourceHasEdge || targetHasEdge) {
-      return false;
-    }
-    return true;
+    return !edges.some(edge => edge.source === connection.source && edge.target === connection.target);
   };
-  console.log(edges);
-  console.log(nodes);
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("div", {
+  const onEdgeDelete = edgeId => {
+    setEdges(eds => eds.filter(e => e.id !== edgeId));
+  };
+  const edgeTypes = {
+    custom: props => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_CustomEdge__WEBPACK_IMPORTED_MODULE_5__["default"], {
+      ...props,
+      onEdgeDelete: onEdgeDelete
+    })
+  };
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("div", {
     style: {
-      flex: 1
+      flex: 1,
+      height: "100vh"
     },
-    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsxs)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.ReactFlow, {
+    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.ReactFlow, {
       nodes: nodes,
-      nodeTypes: nodeTypes,
       edges: edges,
+      nodeTypes: nodeTypes,
+      edgeTypes: edgeTypes,
       isValidConnection: isValidConnection,
       onNodesChange: onNodesChange,
       onEdgesChange: onEdgesChange,
       onConnect: onConnect,
       onDrop: onDrop,
       onDragOver: onDragOver,
-      proOptions: {
-        devTools: true
-      },
       fitView: true,
       fitViewOnInit: true,
       panOnDrag: true,
-      preventScrolling: true,
+      zoomOnScroll: true,
+      zoomOnDoubleClick: true,
       nodesDraggable: true,
       nodesConnectable: true,
       elementsSelectable: true,
-      selectNodesOnDrag: true,
-      zoomOnScroll: true,
-      zoomOnDoubleClick: true,
-      minZoom: 1,
-      panOnScroll: true,
-      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.Background, {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.Controls, {})]
+      minZoom: 0.5,
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.Background, {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.Controls, {})]
     })
   });
 }

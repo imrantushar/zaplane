@@ -1,113 +1,104 @@
 import React, { useCallback } from "react";
 import {
-    ReactFlow,
-    addEdge,
-    useNodesState,
-    useEdgesState,
-    Controls,
-    Background,
-    useReactFlow,
+  ReactFlow,
+  addEdge,
+  useNodesState,
+  useEdgesState,
+  Controls,
+  Background,
+  useReactFlow,
 } from "@xyflow/react";
 import "@xyflow/react/dist/base.css";
 
-
 import CustomNode from "./CustomNode";
+import CustomEdge from "./CustomEdge";
 
 let id = 0;
 const getId = () => `dndnode_${id++}`;
+
 const nodeTypes = {
-    custom: CustomNode,
+  custom: CustomNode,
 };
+
 export default function FlowCanvas() {
-    const [nodes, setNodes, onNodesChange] = useNodesState([]);
-    const [edges, setEdges, onEdgesChange] = useEdgesState([]);
-    const { screenToFlowPosition } = useReactFlow();
+  const [nodes, setNodes, onNodesChange] = useNodesState([
+    { id: "123form", label: "123FormBuilder", icon: "🧾" },
+  ]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const { screenToFlowPosition } = useReactFlow();
+  const onConnect = useCallback(
+    (params) => setEdges((eds) => addEdge({ ...params, type: "custom" }, eds)),
+    []
+  );
+  const onDrop = useCallback(
+    (event) => {
+      event.preventDefault();
+      const type = event.dataTransfer.getData("application/reactflow");
+      if (!type) return;
 
-    const onConnect = useCallback(
-        (params) => setEdges((eds) => addEdge(params, eds)),
-        []
+      const position = screenToFlowPosition({
+        x: event.clientX,
+        y: event.clientY,
+      });
+
+      const newNode = {
+        id: getId(),
+        position,
+        type: "custom",
+        data: { label: type, order: nodes.length + 1 },
+      };
+
+      setNodes((nds) => nds.concat(newNode));
+    },
+    [screenToFlowPosition, setNodes, nodes]
+  );
+
+  const onDragOver = (event) => {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "move";
+  };
+
+  const isValidConnection = (connection) => {
+    return !edges.some(
+      (edge) =>
+        edge.source === connection.source && edge.target === connection.target
     );
+  };
 
-    const onDrop = useCallback(
-        (event) => {
-            event.preventDefault();
+  const onEdgeDelete = (edgeId) => {
+    setEdges((eds) => eds.filter((e) => e.id !== edgeId));
+  };
 
-            const type = event.dataTransfer.getData(
-                "application/reactflow"
-            );
-            if (!type) return;
+  const edgeTypes = {
+    custom: (props) => <CustomEdge {...props} onEdgeDelete={onEdgeDelete} />,
+  };
 
-            const position = screenToFlowPosition({
-                x: event.clientX,
-                y: event.clientY,
-            });
-
-            const newNode = {
-                id: getId(),
-                position,
-                data: { label: type ,
-                    order: nodes.length + 1,
-                },
-                type: "custom",
-                
-            };
-
-            setNodes((nds) => nds.concat(newNode));
-        },
-        [screenToFlowPosition,setNodes,nodes]
-    );
-
-    const onDragOver = (event) => {
-        event.preventDefault();
-        event.dataTransfer.dropEffect = "move";
-    };
-    const isValidConnection = (connection) => {
-        const { source, target } = connection;
-        const sourceHasEdge = edges.some(
-            (edge) => edge.source === source
-        );
-        const targetHasEdge = edges.some(
-            (edge) => edge.target === target
-        );
-        if (sourceHasEdge || targetHasEdge) {
-            return false;
-        }
-
-        return true;
-    };
-    console.log(edges);
-    console.log(nodes);
-
-    return (
-        <div style={{ flex: 1 }}>
-            <ReactFlow
-                nodes={nodes}
-                nodeTypes={nodeTypes}
-                edges={edges}
-                isValidConnection={isValidConnection}
-                onNodesChange={onNodesChange}
-                onEdgesChange={onEdgesChange}
-                onConnect={onConnect}
-                onDrop={onDrop}
-                onDragOver={onDragOver}
-                proOptions={{ devTools: true }}
-                fitView
-                fitViewOnInit
-                panOnDrag={true}
-                preventScrolling={true}
-                nodesDraggable={true}
-                nodesConnectable={true}
-                elementsSelectable={true}
-                selectNodesOnDrag={true}
-                zoomOnScroll={true}
-                zoomOnDoubleClick={true}
-                minZoom={1}
-                panOnScroll={true}
-
-            >
-                <Background />
-                <Controls />
-            </ReactFlow>
-        </div>
-    );
+  return (
+    <div style={{ flex: 1, height: "100vh" }}>
+      <ReactFlow
+        nodes={nodes}
+        edges={edges}
+        nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
+        isValidConnection={isValidConnection}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
+        onConnect={onConnect}
+        onDrop={onDrop}
+        onDragOver={onDragOver}
+        fitView
+        fitViewOnInit
+        panOnDrag
+        zoomOnScroll
+        zoomOnDoubleClick
+        nodesDraggable
+        nodesConnectable
+        elementsSelectable
+        minZoom={0.5}
+      >
+        <Background />
+        <Controls />
+      </ReactFlow>
+    </div>
+  );
 }

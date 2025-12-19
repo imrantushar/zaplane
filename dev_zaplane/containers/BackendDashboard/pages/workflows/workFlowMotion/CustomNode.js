@@ -6,8 +6,6 @@ import { FaRegCopy } from "react-icons/fa";
 
 export default function CustomNode({ data }) {
     const [hovered, setHovered] = useState(false);
-    console.log(data);
-
     return (
         <Box
             position="relative"
