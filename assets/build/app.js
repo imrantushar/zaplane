@@ -902,6 +902,7 @@ function Sidebar() {
     children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
       fontWeight: "semibold",
       mb: 3,
+      margin: 0,
       children: "Untitled Flow"
     }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.Input, {
       placeholder: "Search",
@@ -945,6 +946,7 @@ function Sidebar() {
           fontSize: "xl",
           children: item.icon
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
+          margin: 0,
           fontSize: "sm",
           fontWeight: "medium",
           children: item.label

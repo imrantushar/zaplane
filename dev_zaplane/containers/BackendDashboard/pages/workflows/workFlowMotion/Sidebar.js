@@ -43,7 +43,7 @@ export default function Sidebar() {
       bg="gray.50"
       p={3}
     >
-      <Text fontWeight="semibold" mb={3}>
+      <Text fontWeight="semibold" mb={3} margin={0}>
         Untitled Flow
       </Text>
       <Input
@@ -79,7 +79,7 @@ export default function Sidebar() {
             _hover={{ bg: "gray.100" }}
           >
             <Box fontSize="xl">{item.icon}</Box>
-            <Text fontSize="sm" fontWeight="medium">
+            <Text margin={0} fontSize="sm" fontWeight="medium">
               {item.label}
             </Text>
           </Flex>
