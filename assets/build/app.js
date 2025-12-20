@@ -546,21 +546,36 @@ function CustomNode({
           fontWeight: "bold",
           mb: 2,
           children: "Conditions / Filters"
-        }), data.conditions?.map(cond => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_8__.HStack, {
+        }), data.conditions.map((cond, index) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_8__.HStack, {
+          position: "relative",
           justify: "space-between",
           bg: "white",
           p: 2,
           mb: 1,
           borderRadius: "md",
           boxShadow: "sm",
-          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Text, {
+          children: [console.log(cond.id === `${cond}0`), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Text, {
             margin: 0,
             fontSize: "sm",
             children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.Badge, {
               mr: 2,
               children: cond.id
             }), cond.title]
-          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_8__.HStack, {
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.Handle, {
+            type: "source",
+            id: `condition-${cond.id}`,
+            position: _xyflow_react__WEBPACK_IMPORTED_MODULE_2__.Position.Right,
+            style: {
+              right: "-22px",
+              top: "50%",
+              transform: "translateY(-50%)",
+              width: 10,
+              height: 10,
+              background: "#38A169",
+              border: "2px solid white",
+              borderRadius: "50%"
+            }
+          }), index !== 0 && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_8__.HStack, {
             children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_7__.Icon, {
               as: react_icons_fa__WEBPACK_IMPORTED_MODULE_10__.FaRegCopy,
               cursor: "pointer",
@@ -583,7 +598,7 @@ function CustomNode({
         fontSize: "sm",
         fontWeight: "medium",
         children: data.label
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.Handle, {
+      }), !data.conditions && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.Handle, {
         type: "source",
         position: _xyflow_react__WEBPACK_IMPORTED_MODULE_2__.Position.Right,
         style: {
@@ -700,12 +715,12 @@ function FlowCanvas() {
         order: nodes.length + 1,
         action: "Condition",
         conditions: [{
-          id: `${nodes.length + 1}.1`,
-          title: "Untitled Condition 1"
-        }, {
-          id: "0",
+          id: `${nodes.length + 1}.0`,
           title: "No Condition Matched",
           permanent: true
+        }, {
+          id: `${nodes.length + 1}.1`,
+          title: "Untitled Condition 1"
         }]
       }
     };

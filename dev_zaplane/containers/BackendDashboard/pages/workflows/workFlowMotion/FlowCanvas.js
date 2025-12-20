@@ -99,17 +99,18 @@ export default function FlowCanvas() {
             data: {
                 label: "New Node",
                 order: nodes.length + 1,
-                action:"Condition",
+                action: "Condition",
                 conditions: [
+                     {
+                        id: `${nodes.length + 1}.0`,
+                        title: "No Condition Matched",
+                        permanent: true,
+                    },
                     {
                         id: `${nodes.length + 1}.1`,
                         title: "Untitled Condition 1",
                     },
-                    {
-                    id: "0",
-                    title: "No Condition Matched",
-                    permanent: true, 
-                },
+                   
                 ],
             },
         };
@@ -151,7 +152,7 @@ export default function FlowCanvas() {
                                 id: `${node.data.order}.${count + 1}`,
                                 title: `Untitled Condition ${count + 1}`,
                             },
-                             
+
                         ],
                     },
                 };
@@ -198,33 +199,33 @@ export default function FlowCanvas() {
     };
 
 
-const nodeTypes = {
-    custom: (props) => (
-        <CustomNode
-            {...props}
-            data={{
-                ...props.data,
-                onAddCondition: () => addCondition(props.id),
-                onDeleteCondition: (cid) =>
-                    deleteCondition(props.id, cid),
-                onEditCondition: (cid) => {
-                    const title = prompt("Edit Condition");
-                    if (title)
-                        updateCondition(props.id, cid, title);
-                },
-            }}
-        />
-    ),
-};
-const edgeTypes = {
-    custom: (props) => (
-        <CustomEdge
-            {...props}
-            onEdgeDelete={onEdgeDelete}
-            onAddNode={onAddNode}
-        />
-    ),
-};
+    const nodeTypes = {
+        custom: (props) => (
+            <CustomNode
+                {...props}
+                data={{
+                    ...props.data,
+                    onAddCondition: () => addCondition(props.id),
+                    onDeleteCondition: (cid) =>
+                        deleteCondition(props.id, cid),
+                    onEditCondition: (cid) => {
+                        const title = prompt("Edit Condition");
+                        if (title)
+                            updateCondition(props.id, cid, title);
+                    },
+                }}
+            />
+        ),
+    };
+    const edgeTypes = {
+        custom: (props) => (
+            <CustomEdge
+                {...props}
+                onEdgeDelete={onEdgeDelete}
+                onAddNode={onAddNode}
+            />
+        ),
+    };
     return (
         <div style={{ flex: 1, height: "100vh" }}>
             <ReactFlow
