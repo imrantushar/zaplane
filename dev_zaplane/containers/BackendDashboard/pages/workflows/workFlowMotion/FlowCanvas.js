@@ -28,10 +28,10 @@ export default function FlowCanvas() {
             position: { x: 125, y: 500 },
         }
     ]);
-
     const [edges, setEdges, onEdgesChange] = useEdgesState([]);
     const [drawerOpen, setDrawerOpen] = useState(false);
     const [selectedNode, setSelectedNode] = useState(null);
+    const [activeEdgeId, setActiveEdgeId] = useState(null);
 
     const { screenToFlowPosition } = useReactFlow();
     const openDrawerForNode = (node) => {
@@ -86,6 +86,11 @@ export default function FlowCanvas() {
     };
 
     const onAddNode = (edgeId) => {
+        setActiveEdgeId(edgeId);
+        setDrawerOpen(true);
+    };
+    const createConditionNode = () => {
+        const edgeId = activeEdgeId;
         const edge = edges.find((e) => e.id === edgeId);
         if (!edge) return;
 
@@ -141,6 +146,7 @@ export default function FlowCanvas() {
 
         setNodes((nds) => nds.concat(newNode));
         setEdges(newEdges);
+        
     };
     const addCondition = (nodeId) => {
         setNodes((nds) =>
@@ -206,6 +212,7 @@ export default function FlowCanvas() {
     };
 
 
+
     const nodeTypes = {
         custom: (props) => (
             <CustomNode
@@ -262,8 +269,12 @@ export default function FlowCanvas() {
             </ReactFlow>
             <ActionDrawer
                 open={drawerOpen}
-                onClose={() => setDrawerOpen(false)}
+                onClose={() => {setDrawerOpen(false)
+                    setActiveEdgeId(null);
+                }}
                 node={selectedNode}
+                onCreateCondition={createConditionNode}
+                edge={activeEdgeId ? edges.find(e => e.id === activeEdgeId) : null}
             />
         </div>
     );

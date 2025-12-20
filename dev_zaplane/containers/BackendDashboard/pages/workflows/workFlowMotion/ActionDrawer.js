@@ -1,58 +1,84 @@
-import React from "react";
 import {
-  Button,
-  CloseButton,
-  Drawer,
-  Portal,
-  Text,
+    Drawer,
+    Portal,
+    Button,
+    CloseButton,
+    VStack,
+    Text,
 } from "@chakra-ui/react";
+import { useState } from "react";
 
-const ActionDrawer = ({ open, onClose, node }) => {
-  return (
-    <Drawer.Root open={open} onOpenChange={(e) => !e.open && onClose()}>
-      <Portal>
-        <Drawer.Backdrop />
-        <Drawer.Positioner>
-          <Drawer.Content>
-            <Drawer.Header>
-              <Drawer.Title>Node Details</Drawer.Title>
-            </Drawer.Header>
+const ActionDrawer = ({ open, onClose, onCreateCondition, node, edge }) => {
+    const [step, setStep] = useState("root"); // root | tools
 
-            <Drawer.Body>
-              {node ? (
-                <>
-                  <Text><b>ID:</b> {node.id}</Text>
-                  <Text><b>Label:</b> {node.data?.label}</Text>
-                  <Text><b>Action:</b> {node.data?.action}</Text>
+    const closeAll = () => {
+        setStep("root");
+        onClose();
+    };
+    if (edge) {
+        console.log("Edge clicked:", edge);
+    }
+    if (node) {
+        console.log("Node clicked:", node);
+    }
 
-                  {node.data?.conditions && (
-                    <>
-                      <Text mt={3}><b>Conditions:</b></Text>
-                      {node.data.conditions.map((c) => (
-                        <Text key={c.id}>• {c.title}</Text>
-                      ))}
-                    </>
-                  )}
-                </>
-              ) : (
-                <Text>No node selected</Text>
-              )}
-            </Drawer.Body>
+    return (
+        <Drawer.Root open={open} onOpenChange={(e) => !e.open && closeAll()}>
+            <Portal>
+                <Drawer.Backdrop />
+                <Drawer.Positioner>
+                    <Drawer.Content>
+                        <Drawer.Header>
+                            <Drawer.Title>
+                                {step === "root" ? "Select App & Action" : "Tools"}
+                            </Drawer.Title>
+                            <Drawer.CloseTrigger asChild>
+                                <CloseButton />
+                            </Drawer.CloseTrigger>
+                        </Drawer.Header>
 
-            <Drawer.Footer>
-              <Button variant="outline" onClick={onClose}>
-                Close
-              </Button>
-            </Drawer.Footer>
+                        <Drawer.Body>
+                            {!edge ? <>
+                                <Text><b>ID:</b> {node?.id}</Text>
+                                <Text><b>Label:</b> {node?.data?.label}</Text>
+                                <Text><b>Action:</b> {node?.data?.action}</Text>
 
-            <Drawer.CloseTrigger asChild>
-              <CloseButton size="sm" />
-            </Drawer.CloseTrigger>
-          </Drawer.Content>
-        </Drawer.Positioner>
-      </Portal>
-    </Drawer.Root>
-  );
+                                {node?.data?.conditions && (
+                                    <>
+                                        <Text mt={3}><b>Conditions:</b></Text>
+                                        {node?.data?.conditions.map((c) => (
+                                            <Text key={c.id}>• {c.title}</Text>
+                                        ))}
+                                    </>
+                                )}
+                            </> : <>  {step === "root" && (
+                                <VStack align="stretch">
+                                    <Button onClick={() => setStep("apps")}>Apps</Button>
+                                    <Button onClick={() => setStep("tools")}>Tools</Button>
+                                </VStack>
+                            )}
+
+                                {step === "tools" && (
+                                    <VStack align="stretch">
+                                        <Button
+                                            onClick={() => {
+                                                onCreateCondition();
+                                                closeAll();
+                                            }}
+                                        >
+                                            Condition
+                                        </Button>
+
+                                        <Button disabled>Router</Button>
+                                    </VStack>
+                                )}</>}
+
+                        </Drawer.Body>
+                    </Drawer.Content>
+                </Drawer.Positioner>
+            </Portal>
+        </Drawer.Root>
+    );
 };
 
 export default ActionDrawer;

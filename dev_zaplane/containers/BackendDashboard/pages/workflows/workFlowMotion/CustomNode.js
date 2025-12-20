@@ -106,7 +106,6 @@ export default function CustomNode({ data }) {
                 borderRadius="md"
                 boxShadow="sm"
               >
-                {console.log(cond.id === `${cond}0`)}
                 <Text margin={0} fontSize="sm">
                   <Badge mr={2}>{cond.id}</Badge>
                   {cond.title}
