@@ -1,11 +1,15 @@
-import React from 'react';
+import { __ } from "@wordpress/i18n";
+import WorkflowMotion from "./workFlowMotion/";
+
+
+
 
 const Workflows = () => {
-    return (
-        <div>
-            Workflows
-        </div>
-    );
-};
 
-export default Workflows;
+  return (
+    <>
+        <WorkflowMotion />
+    </>
+  );
+};
+      export default Workflows;
