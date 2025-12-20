@@ -75,6 +75,7 @@ export default function CustomNode({ data }) {
         minW="100px"
         textAlign="center"
         boxShadow="sm"
+          onClick={data.onOpenDrawer}
       >
         {data?.action !== 'Trigger' && (<Handle
           type="target"

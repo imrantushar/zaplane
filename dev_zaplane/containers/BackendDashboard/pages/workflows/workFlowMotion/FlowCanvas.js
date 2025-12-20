@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import {
     ReactFlow,
     addEdge,
@@ -12,6 +12,7 @@ import "@xyflow/react/dist/base.css";
 
 import CustomNode from "./CustomNode";
 import CustomEdge from "./CustomEdge";
+import ActionDrawer from "./ActionDrawer";
 
 let id = 0;
 const getId = () => `dndnode_${id++}`;
@@ -29,8 +30,14 @@ export default function FlowCanvas() {
     ]);
 
     const [edges, setEdges, onEdgesChange] = useEdgesState([]);
-    const { screenToFlowPosition } = useReactFlow();
+    const [drawerOpen, setDrawerOpen] = useState(false);
+    const [selectedNode, setSelectedNode] = useState(null);
 
+    const { screenToFlowPosition } = useReactFlow();
+    const openDrawerForNode = (node) => {
+        setSelectedNode(node);
+        setDrawerOpen(true);
+    };
     const onConnect = useCallback(
         (params) => setEdges((eds) => addEdge({ ...params, type: "custom" }, eds)),
         []
@@ -101,7 +108,7 @@ export default function FlowCanvas() {
                 order: nodes.length + 1,
                 action: "Condition",
                 conditions: [
-                     {
+                    {
                         id: `${nodes.length + 1}.0`,
                         title: "No Condition Matched",
                         permanent: true,
@@ -110,7 +117,7 @@ export default function FlowCanvas() {
                         id: `${nodes.length + 1}.1`,
                         title: "Untitled Condition 1",
                     },
-                   
+
                 ],
             },
         };
@@ -205,6 +212,7 @@ export default function FlowCanvas() {
                 {...props}
                 data={{
                     ...props.data,
+                    onOpenDrawer: () => openDrawerForNode(props),
                     onAddCondition: () => addCondition(props.id),
                     onDeleteCondition: (cid) =>
                         deleteCondition(props.id, cid),
@@ -252,6 +260,11 @@ export default function FlowCanvas() {
                 <Background />
                 <Controls />
             </ReactFlow>
+            <ActionDrawer
+                open={drawerOpen}
+                onClose={() => setDrawerOpen(false)}
+                node={selectedNode}
+            />
         </div>
     );
 }
