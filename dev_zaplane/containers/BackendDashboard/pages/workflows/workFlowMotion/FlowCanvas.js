@@ -53,7 +53,7 @@ export default function FlowCanvas() {
                 x: event.clientX,
                 y: event.clientY,
             });
-
+ console.log(nodes.length + 1);
             const newNode = {
                 id: getId(),
                 position,
@@ -66,7 +66,7 @@ export default function FlowCanvas() {
 
             setNodes((nds) => nds.concat(newNode));
         },
-        [screenToFlowPosition, setNodes]
+        [screenToFlowPosition, setNodes, nodes.length]
     );
 
     const onDragOver = (event) => {
@@ -211,7 +211,7 @@ export default function FlowCanvas() {
         );
     };
 
-
+console.log(nodes);
 
     const nodeTypes = {
         custom: (props) => (

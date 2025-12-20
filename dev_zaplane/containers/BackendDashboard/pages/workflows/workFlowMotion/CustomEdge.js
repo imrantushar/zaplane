@@ -13,7 +13,7 @@ const CustomEdge = ({
   style = {},
   markerEnd,
   onEdgeDelete,
-  onAddNode, // new callback
+  onAddNode, 
 }) => {
   const [edgePath] = getBezierPath({
     sourceX,

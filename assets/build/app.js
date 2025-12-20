@@ -470,7 +470,7 @@ const CustomEdge = ({
   style = {},
   markerEnd,
   onEdgeDelete,
-  onAddNode // new callback
+  onAddNode
 }) => {
   const [edgePath] = (0,_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.getBezierPath)({
     sourceX,
@@ -798,6 +798,7 @@ function FlowCanvas() {
       x: event.clientX,
       y: event.clientY
     });
+    console.log(nodes.length + 1);
     const newNode = {
       id: getId(),
       position,
@@ -808,7 +809,7 @@ function FlowCanvas() {
       }
     };
     setNodes(nds => nds.concat(newNode));
-  }, [screenToFlowPosition, setNodes]);
+  }, [screenToFlowPosition, setNodes, nodes.length]);
   const onDragOver = event => {
     event.preventDefault();
     event.dataTransfer.dropEffect = "move";
@@ -910,6 +911,7 @@ function FlowCanvas() {
       };
     }));
   };
+  console.log(nodes);
   const nodeTypes = {
     custom: props => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_CustomNode__WEBPACK_IMPORTED_MODULE_4__["default"], {
       ...props,
