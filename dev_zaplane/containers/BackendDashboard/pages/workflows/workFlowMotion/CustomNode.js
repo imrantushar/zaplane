@@ -16,10 +16,8 @@ export default function CustomNode({ id, data, xPos, yPos }) {
   const { getEdges } = useReactFlow();
   const edges = getEdges();
 
-  // ✅ check outgoing edge
   const hasOutgoingEdge = edges.some((e) => e.source === id);
 
-  // ✅ node size adjust (important)
   const NODE_WIDTH = 160;
   const NODE_HEIGHT = 48;
 
@@ -32,7 +30,6 @@ export default function CustomNode({ id, data, xPos, yPos }) {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      {/* ---------- TOP TOOLBAR ---------- */}
       <NodeToolbar
         isVisible={true}
         position={Position.Top}
@@ -54,8 +51,6 @@ export default function CustomNode({ id, data, xPos, yPos }) {
           </Text>
         </HStack>
       </NodeToolbar>
-
-      {/* ---------- BOTTOM TOOLBAR ---------- */}
       <NodeToolbar
         isVisible={hovered}
         position={Position.Bottom}
@@ -76,8 +71,6 @@ export default function CustomNode({ id, data, xPos, yPos }) {
           {!data?.action && <Icon as={FaRegCopy} boxSize={4} />}
         </HStack>
       </NodeToolbar>
-
-      {/* ---------- NODE BODY ---------- */}
       <Box
         bg="white"
         border="1px solid"
@@ -90,7 +83,6 @@ export default function CustomNode({ id, data, xPos, yPos }) {
         boxShadow="sm"
         onClick={data.onOpenDrawer}
       >
-        {/* TARGET HANDLE */}
         {data?.action !== "Trigger" && (
           <Handle
             type="target"
@@ -105,7 +97,6 @@ export default function CustomNode({ id, data, xPos, yPos }) {
           />
         )}
 
-        {/* CONDITIONS */}
         {data.conditions ? (
           <>
             <Text margin={0} fontSize="sm" fontWeight="bold" mb={2}>
@@ -170,8 +161,6 @@ export default function CustomNode({ id, data, xPos, yPos }) {
             {data.label}
           </Text>
         )}
-
-        {/* DEFAULT SOURCE HANDLE */}
         {!data.conditions && (
           <Handle
             type="source"
@@ -186,13 +175,11 @@ export default function CustomNode({ id, data, xPos, yPos }) {
           />
         )}
       </Box>
-
-      {/* ---------- FLOATING EDGE (NO CONNECTION) ---------- */}
       {!hasOutgoingEdge && !data.conditions && (
         <FloatingEdge
           sourceX={sourceX}
           sourceY={sourceY}
-          onOpenDrawer={data.onOpenDrawer}
+          openDrawerFromAdd={data.openDrawerFromAdd}
         />
       )}
     </Box>

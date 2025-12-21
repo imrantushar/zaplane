@@ -1,7 +1,7 @@
 import { getBezierPath } from "@xyflow/react";
 import { FaPlus } from "react-icons/fa";
 
-const FloatingEdge = ({ sourceX, sourceY, onOpenDrawer }) => {
+const FloatingEdge = ({ sourceX, sourceY, openDrawerFromAdd }) => {
   const targetX = sourceX + 140;
   const targetY = sourceY;
 
@@ -13,7 +13,6 @@ const FloatingEdge = ({ sourceX, sourceY, onOpenDrawer }) => {
     sourcePosition: "right",
     targetPosition: "left",
   });
-console.log(onOpenDrawer,'onOpenDrawerrrrrrrrr');
   return (
     <>
       <path
@@ -31,7 +30,7 @@ console.log(onOpenDrawer,'onOpenDrawerrrrrrrrr');
         y={targetY - 16}
       >
         <div
-          onClick={onOpenDrawer}
+          onClick={openDrawerFromAdd}
           style={{
             width: 32,
             height: 32,

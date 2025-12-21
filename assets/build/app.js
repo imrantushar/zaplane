@@ -383,17 +383,24 @@ const ActionDrawer = ({
   open,
   onClose,
   onCreateCondition,
-  node,
-  edge,
-  onSelectAction // 🔥 edge data save callback
+  onSelectAction,
+  context,
+  createRouterNode
 }) => {
-  const [step, setStep] = (0,react__WEBPACK_IMPORTED_MODULE_6__.useState)("root"); // root | apps | actions | tools
+  const {
+    source,
+    node,
+    edge
+  } = context;
+  console.log(node, 'node');
+  const [step, setStep] = (0,react__WEBPACK_IMPORTED_MODULE_6__.useState)("root");
   const [selectedApp, setSelectedApp] = (0,react__WEBPACK_IMPORTED_MODULE_6__.useState)(null);
   const closeAll = () => {
     setStep("root");
     setSelectedApp(null);
     onClose();
   };
+  console.log(context, 'context', source === 'edge');
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.DrawerRoot, {
     open: open,
     onOpenChange: e => !e.open && closeAll(),
@@ -408,17 +415,17 @@ const ActionDrawer = ({
               children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.CloseButton, {})
             })]
           }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.DrawerBody, {
-            children: [!edge && node && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.Fragment, {
+            children: [source === 'node' && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.Fragment, {
               children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
                 children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)("b", {
                   children: "ID:"
-                }), " ", node.id]
+                }), " ", node?.id]
               }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
                 children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)("b", {
                   children: "Label:"
-                }), " ", node.data?.label]
+                }), " ", node?.data?.label]
               })]
-            }), edge && step === "root" && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.VStack, {
+            }), (source === 'edge' || source === 'add') && step === "root" && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.VStack, {
               align: "stretch",
               children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Button, {
                 onClick: () => setStep("apps"),
@@ -467,7 +474,10 @@ const ActionDrawer = ({
                 },
                 children: "Condition"
               }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Button, {
-                disabled: true,
+                onClick: () => {
+                  createRouterNode();
+                  closeAll();
+                },
                 children: "Router"
               })]
             })]
@@ -636,11 +646,7 @@ function CustomNode({
     getEdges
   } = (0,_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.useReactFlow)();
   const edges = getEdges();
-
-  // ✅ check outgoing edge
   const hasOutgoingEdge = edges.some(e => e.source === id);
-
-  // ✅ node size adjust (important)
   const NODE_WIDTH = 160;
   const NODE_HEIGHT = 48;
   const sourceX = xPos + NODE_WIDTH;
@@ -786,7 +792,7 @@ function CustomNode({
     }), !hasOutgoingEdge && !data.conditions && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_FloatingEdge__WEBPACK_IMPORTED_MODULE_11__["default"], {
       sourceX: sourceX,
       sourceY: sourceY,
-      onOpenDrawer: data.onOpenDrawer
+      openDrawerFromAdd: data.openDrawerFromAdd
     })]
   });
 }
@@ -814,7 +820,7 @@ __webpack_require__.r(__webpack_exports__);
 const FloatingEdge = ({
   sourceX,
   sourceY,
-  onOpenDrawer
+  openDrawerFromAdd
 }) => {
   const targetX = sourceX + 140;
   const targetY = sourceY;
@@ -826,7 +832,6 @@ const FloatingEdge = ({
     sourcePosition: "right",
     targetPosition: "left"
   });
-  console.log(onOpenDrawer, 'onOpenDrawerrrrrrrrr');
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.Fragment, {
     children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("path", {
       d: edgePath,
@@ -840,7 +845,7 @@ const FloatingEdge = ({
       x: targetX - 16,
       y: targetY - 16,
       children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("div", {
-        onClick: onOpenDrawer,
+        onClick: openDrawerFromAdd,
         style: {
           width: 32,
           height: 32,
@@ -913,11 +918,39 @@ function FlowCanvas() {
   const [drawerOpen, setDrawerOpen] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
   const [selectedNode, setSelectedNode] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(null);
   const [activeEdgeId, setActiveEdgeId] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(null);
+  const [drawerContext, setDrawerContext] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)({
+    source: null,
+    node: null,
+    edge: null
+  });
   const {
     screenToFlowPosition
   } = (0,_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.useReactFlow)();
   const openDrawerForNode = node => {
-    setSelectedNode(node);
+    setDrawerContext({
+      source: "node",
+      node,
+      edge: null
+    });
+    setDrawerOpen(true);
+  };
+  const onAddNode = edgeId => {
+    setActiveEdgeId(edgeId);
+    const edge = edges.find(e => e.id === edgeId);
+    setDrawerContext({
+      source: "edge",
+      node: null,
+      edge
+    });
+    setDrawerOpen(true);
+  };
+  const openDrawerFromAdd = node => {
+    console.log('iam clik');
+    setDrawerContext({
+      source: "add",
+      node: node,
+      edge: null
+    });
     setDrawerOpen(true);
   };
   const onConnect = (0,react__WEBPACK_IMPORTED_MODULE_0__.useCallback)(params => setEdges(eds => (0,_xyflow_react__WEBPACK_IMPORTED_MODULE_2__.addEdge)({
@@ -954,20 +987,105 @@ function FlowCanvas() {
   const onEdgeDelete = edgeId => {
     setEdges(eds => eds.filter(e => e.id !== edgeId));
   };
-  const onAddNode = edgeId => {
-    setActiveEdgeId(edgeId);
-    setDrawerOpen(true);
-  };
-  const createConditionNode = () => {
-    const edgeId = activeEdgeId;
-    const edge = edges.find(e => e.id === edgeId);
-    if (!edge) return;
-    const sourceNode = nodes.find(n => n.id === edge.source);
-    const targetNode = nodes.find(n => n.id === edge.target);
-    if (!sourceNode || !targetNode) return;
-    const newNodePosition = {
+  const createRouterNode = () => {
+    const {
+      edge,
+      node
+    } = drawerContext;
+    let sourceNode = null;
+    let targetNode = null;
+
+    // ---------- CASE 1: EDGE ----------
+    if (edge) {
+      sourceNode = nodes.find(n => n.id === edge.source);
+      targetNode = nodes.find(n => n.id === edge.target);
+      if (!sourceNode || !targetNode) return;
+    }
+
+    // ---------- CASE 2: NODE ----------
+    if (!edge && node) {
+      sourceNode = nodes.find(n => n.id === node.id);
+      if (!sourceNode) return;
+    }
+
+    // ---------- POSITION ----------
+    const position = edge ? {
       x: (sourceNode.position.x + targetNode.position.x) / 2,
       y: (sourceNode.position.y + targetNode.position.y) / 2
+    } : {
+      x: sourceNode.position.x + 220,
+      y: sourceNode.position.y
+    };
+    const routerId = getId();
+
+    // ---------- ROUTER NODE ----------
+    const routerNode = {
+      id: routerId,
+      type: "custom",
+      position,
+      data: {
+        label: "Router",
+        action: "Router",
+        order: nodes.length + 1,
+        routes: [{
+          id: "1",
+          title: "Route 1"
+        }]
+      }
+    };
+
+    // ---------- EDGE LOGIC ----------
+    let updatedEdges = [...edges];
+
+    // EDGE → split
+    if (edge) {
+      updatedEdges = [...edges.filter(e => e.id !== edge.id), {
+        id: `edge-${edge.source}-${routerId}`,
+        source: edge.source,
+        target: routerId,
+        type: "custom"
+      }, {
+        id: `edge-${routerId}-${edge.target}`,
+        source: routerId,
+        target: edge.target,
+        type: "custom"
+      }];
+    }
+
+    // NODE → append
+    if (!edge && sourceNode) {
+      updatedEdges = [...edges, {
+        id: `edge-${sourceNode.id}-${routerId}`,
+        source: sourceNode.id,
+        target: routerId,
+        type: "custom"
+      }];
+    }
+    setNodes(nds => nds.concat(routerNode));
+    setEdges(updatedEdges);
+  };
+  const createConditionNode = () => {
+    const {
+      edge,
+      node
+    } = drawerContext;
+    let sourceNode = null;
+    let targetNode = null;
+    if (edge) {
+      sourceNode = nodes.find(n => n.id === edge.source);
+      targetNode = nodes.find(n => n.id === edge.target);
+      if (!sourceNode || !targetNode) return;
+    }
+    if (!edge && node) {
+      sourceNode = nodes.find(n => n.id === node.id);
+      if (!sourceNode) return;
+    }
+    const newNodePosition = edge ? {
+      x: (sourceNode.position.x + targetNode.position.x) / 2,
+      y: (sourceNode.position.y + targetNode.position.y) / 2
+    } : {
+      x: sourceNode.position.x + 220,
+      y: sourceNode.position.y
     };
     const newNodeId = getId();
     const newNode = {
@@ -975,7 +1093,7 @@ function FlowCanvas() {
       type: "custom",
       position: newNodePosition,
       data: {
-        label: "New Node",
+        label: "Condition",
         order: nodes.length + 1,
         action: "Condition",
         conditions: [{
@@ -988,17 +1106,28 @@ function FlowCanvas() {
         }]
       }
     };
-    const newEdges = [...edges.filter(e => e.id !== edgeId), {
-      id: `edge-${edge.source}-${newNodeId}`,
-      source: edge.source,
-      target: newNodeId,
-      type: "custom"
-    }, {
-      id: `edge-${newNodeId}-${edge.target}`,
-      source: newNodeId,
-      target: edge.target,
-      type: "custom"
-    }];
+    let newEdges = [...edges];
+    if (edge) {
+      newEdges = [...edges.filter(e => e.id !== edge.id), {
+        id: `edge-${edge.source}-${newNodeId}`,
+        source: edge.source,
+        target: newNodeId,
+        type: "custom"
+      }, {
+        id: `edge-${newNodeId}-${edge.target}`,
+        source: newNodeId,
+        target: edge.target,
+        type: "custom"
+      }];
+    }
+    if (!edge && sourceNode) {
+      newEdges = [...edges, {
+        id: `edge-${sourceNode.id}-${newNodeId}`,
+        source: sourceNode.id,
+        target: newNodeId,
+        type: "custom"
+      }];
+    }
     setNodes(nds => nds.concat(newNode));
     setEdges(newEdges);
   };
@@ -1052,6 +1181,7 @@ function FlowCanvas() {
       data: {
         ...props.data,
         onOpenDrawer: () => openDrawerForNode(props),
+        openDrawerFromAdd: () => openDrawerFromAdd(props),
         onAddCondition: () => addCondition(props.id),
         onDeleteCondition: cid => deleteCondition(props.id, cid),
         onEditCondition: cid => {
@@ -1099,10 +1229,16 @@ function FlowCanvas() {
       onClose: () => {
         setDrawerOpen(false);
         setActiveEdgeId(null);
+        setDrawerContext({
+          source: null,
+          node: null,
+          edge: null
+        });
       },
       node: selectedNode,
       onCreateCondition: createConditionNode,
-      edge: activeEdgeId ? edges.find(e => e.id === activeEdgeId) : null
+      context: drawerContext,
+      createRouterNode: createRouterNode
     })]
   });
 }

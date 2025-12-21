@@ -38,11 +38,13 @@ const ActionDrawer = ({
     open,
     onClose,
     onCreateCondition,
-    node,
-    edge,
-    onSelectAction, // 🔥 edge data save callback
+    onSelectAction, 
+    context,
+    createRouterNode
 }) => {
-    const [step, setStep] = useState("root"); // root | apps | actions | tools
+    const { source,node,edge } = context;
+    console.log(node,'node');
+    const [step, setStep] = useState("root");
     const [selectedApp, setSelectedApp] = useState(null);
 
     const closeAll = () => {
@@ -50,7 +52,7 @@ const ActionDrawer = ({
         setSelectedApp(null);
         onClose();
     };
-
+   console.log(context,'context',source === 'edge');
     return (
         <Drawer.Root open={open} onOpenChange={(e) => !e.open && closeAll()}>
             <Portal>
@@ -71,13 +73,13 @@ const ActionDrawer = ({
                         </Drawer.Header>
 
                         <Drawer.Body>
-                            {!edge && node && (
+                            {source === 'node' && (
                                 <>
-                                    <Text><b>ID:</b> {node.id}</Text>
-                                    <Text><b>Label:</b> {node.data?.label}</Text>
+                                    <Text><b>ID:</b> {node?.id}</Text>
+                                    <Text><b>Label:</b> {node?.data?.label}</Text>
                                 </>
                             )}
-                            {edge && step === "root" && (
+                            {(source === 'edge' || source === 'add') && step === "root" && (
                                 <VStack align="stretch">
                                     <Button onClick={() => setStep("apps")}>
                                         Apps
@@ -146,7 +148,10 @@ const ActionDrawer = ({
                                         Condition
                                     </Button>
 
-                                    <Button disabled>Router</Button>
+                                    <Button  onClick={() => {
+                                            createRouterNode();
+                                            closeAll();
+                                        }} >Router</Button>
                                 </VStack>
                             )}
                         </Drawer.Body>
