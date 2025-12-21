@@ -10,13 +10,8 @@ export default function Workflows() {
       <div style={{ display: "flex", height: "100vh" }}>
         <Sidebar />
         <Formik
-          initialValues={{
-            name: "",
-            email: "",
-            address: {
-              city: "",
-              country: "",
-            },
+          initialValues={
+          {
           }}
 
           onSubmit={(values) => {

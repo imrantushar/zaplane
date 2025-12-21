@@ -514,6 +514,7 @@ export default function FlowCanvas() {
                 createRouterNode={createRouterNode}
                 createActionNode={createActionNode}
                 updateTriggerNode={updateTriggerNode}
+                
             />
         </div>
     );

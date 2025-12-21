@@ -401,7 +401,8 @@ function ActionDrawer({
   const [connection, setConnection] = (0,react__WEBPACK_IMPORTED_MODULE_12__.useState)("");
   const {
     values,
-    setFieldValue
+    setFieldValue,
+    resetForm
   } = (0,formik__WEBPACK_IMPORTED_MODULE_11__.useFormikContext)();
   console.log(values, 'valuessssssss');
   const [data, setData] = (0,react__WEBPACK_IMPORTED_MODULE_12__.useState)({
@@ -413,7 +414,7 @@ function ActionDrawer({
   });
   const [conditions, setConditions] = (0,react__WEBPACK_IMPORTED_MODULE_12__.useState)([{
     id: crypto.randomUUID(),
-    type: "OR",
+    type: "AND",
     rules: [{
       id: crypto.randomUUID(),
       field: "",
@@ -476,7 +477,7 @@ function ActionDrawer({
         operator: "",
         value: ""
       }]
-    }]);
+    }]), resetForm();
   };
   const LIST = mode === "app" && APPS;
   const handleContinue = () => {
@@ -487,20 +488,20 @@ function ActionDrawer({
     } else if (step === "test") {
       if (selectedItem.id === "condition") {
         createConditionNode({
-          conditions // 👈 FULL LOGIC DATA
+          conditions
         });
         resetAll();
         return;
       }
       const payload = {
         label: selectedItem.name,
-        eventType: data.eventType,
-        api_access_key: data.api_access_key,
-        api_access_url: data.api_access_url,
-        connection_title: data.connection_title,
-        connection: data.connection
+        eventType: values.eventType,
+        api_access_key: values.api_access_key,
+        api_access_url: values.api_access_url,
+        connection_title: values.connection_title,
+        connection: values.connection
       };
-      if (context?.source === "node" && context.node?.data?.action === "Trigger") {
+      if (context?.source === "node" && context.node?.values?.action === "Trigger") {
         updateTriggerNode(payload);
       } else {
         createActionNode(payload);
@@ -604,11 +605,8 @@ function ActionDrawer({
                         value: "delete",
                         label: "Delete Event"
                       }],
-                      onChange: opt => setData(prev => ({
-                        ...prev,
-                        eventType: opt.value
-                      }))
-                    }), data.eventType && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.Fragment, {
+                      onChange: opt => setFieldValue('eventType', opt.value)
+                    }), values?.eventType && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.Fragment, {
                       children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Box, {
                         children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
                           margin: 0,
@@ -616,11 +614,8 @@ function ActionDrawer({
                           children: "Title for this connection**"
                         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_7__.Input, {
                           size: "sm",
-                          value: data.connection_title,
-                          onChange: e => setData(prev => ({
-                            ...prev,
-                            connection_title: e.target.value
-                          })),
+                          value: values?.connection_title,
+                          onChange: e => setFieldValue('connection_title', e.target.value),
                           placeholder: "Update API connection"
                         })]
                       }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Box, {
@@ -630,11 +625,8 @@ function ActionDrawer({
                           children: "API Access Key*"
                         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_7__.Input, {
                           size: "sm",
-                          value: data.api_access_key,
-                          onChange: e => setData(prev => ({
-                            ...prev,
-                            api_access_key: e.target.value
-                          })),
+                          value: values.api_access_key,
+                          onChange: e => setFieldValue("api_access_key", e.target.value),
                           placeholder: "Update API connection"
                         })]
                       }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Box, {
@@ -644,11 +636,8 @@ function ActionDrawer({
                           children: "API Access Key*"
                         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_7__.Input, {
                           size: "sm",
-                          value: data.api_access_url,
-                          onChange: e => setData(prev => ({
-                            ...prev,
-                            api_access_url: e.target.value
-                          })),
+                          value: values.api_access_url,
+                          onChange: e => setFieldValue("api_access_url", e.target.value),
                           placeholder: "Update API connection"
                         })]
                       })]
@@ -724,11 +713,8 @@ function ActionDrawer({
                       children: "Connection*"
                     }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_7__.Input, {
                       size: "sm",
-                      value: data.connection,
-                      onChange: e => setData(prev => ({
-                        ...prev,
-                        connection: e.target.value
-                      })),
+                      value: values.connection,
+                      onChange: e => setFieldValue('connection', e.target.value),
                       placeholder: "Update API connection"
                     })]
                   })
@@ -1780,14 +1766,7 @@ function Workflows() {
         height: "100vh"
       },
       children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(_Sidebar__WEBPACK_IMPORTED_MODULE_2__["default"], {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(formik__WEBPACK_IMPORTED_MODULE_4__.Formik, {
-        initialValues: {
-          name: "",
-          email: "",
-          address: {
-            city: "",
-            country: ""
-          }
-        },
+        initialValues: {},
         onSubmit: values => {
           console.log("Final Values", values);
         },

@@ -11,7 +11,7 @@ import {
     Tabs,
     Flex,
 } from "@chakra-ui/react";
-import { useFormikContext } from "formik";
+import {  useFormikContext } from "formik";
 import { useState } from "react";
 import Select from "react-select";
 const APPS = [
@@ -41,14 +41,14 @@ const TOOLS = [
     },
 ];
 
-export default function ActionDrawer({ open, context, onClose, updateTriggerNode, createActionNode, createConditionNode }) {
+export default function ActionDrawer({ open, context, onClose, updateTriggerNode, createActionNode, createConditionNode, }) {
     const { source, node } = context
     const [mode, setMode] = useState(null);
     const [step, setStep] = useState("select");
     const [selectedItem, setSelectedItem] = useState(null);
     const [eventType, setEventType] = useState(null);
     const [connection, setConnection] = useState("");
-    const {values,setFieldValue} = useFormikContext()
+    const {values,setFieldValue,resetForm} = useFormikContext()
     console.log(values,'valuessssssss');
     const [data, setData] = useState({
         eventType: "",
@@ -61,7 +61,7 @@ export default function ActionDrawer({ open, context, onClose, updateTriggerNode
     const [conditions, setConditions] = useState([
         {
             id: crypto.randomUUID(),
-            type: "OR",
+            type: "AND",
             rules: [
                 {
                     id: crypto.randomUUID(),
@@ -154,7 +154,8 @@ export default function ActionDrawer({ open, context, onClose, updateTriggerNode
                     value: "",
                 },
             ],
-        },])
+        },]),
+        resetForm()
     };
 
     const LIST = mode === "app" && APPS;
@@ -167,7 +168,7 @@ export default function ActionDrawer({ open, context, onClose, updateTriggerNode
         } else if (step === "test") {
             if (selectedItem.id === "condition") {
                 createConditionNode({
-                    conditions, // 👈 FULL LOGIC DATA
+                    conditions,
                 });
 
                 resetAll();
@@ -175,14 +176,14 @@ export default function ActionDrawer({ open, context, onClose, updateTriggerNode
             }
             const payload = {
                 label: selectedItem.name,
-                eventType: data.eventType,
-                api_access_key: data.api_access_key,
-                api_access_url: data.api_access_url,
-                connection_title: data.connection_title,
-                connection: data.connection,
+                eventType: values.eventType,
+                api_access_key: values.api_access_key,
+                api_access_url: values.api_access_url,
+                connection_title: values.connection_title,
+                connection: values.connection,
 
             };
-            if (context?.source === "node" && context.node?.data?.action === "Trigger") {
+            if (context?.source === "node" && context.node?.values?.action === "Trigger") {
                 updateTriggerNode(payload);
             } else {
                 createActionNode(payload);
@@ -281,25 +282,18 @@ export default function ActionDrawer({ open, context, onClose, updateTriggerNode
                                                             { value: "delete", label: "Delete Event" },
                                                         ]}
                                                         onChange={(opt) =>
-                                                            setData((prev) => ({
-                                                                ...prev,
-                                                                eventType: opt.value,
-                                                            }))
+                                                            setFieldValue('eventType',opt.value)
                                                         }
                                                     />
-                                                    {data.eventType && (
+                                                    {values?.eventType && (
                                                         <>
                                                             <Box>
                                                                 <Text margin={0} fontSize="sm">Title for this connection**</Text>
                                                                 <Input
                                                                     size="sm"
-                                                                    value={data.connection_title}
+                                                                    value={values?.connection_title}
                                                                     onChange={(e) =>
-                                                                        setData((prev) => ({
-                                                                            ...prev,
-                                                                            connection_title: e.target.value,
-
-                                                                        }))
+                                                                        setFieldValue('connection_title',e.target.value)
                                                                     }
                                                                     placeholder="Update API connection"
                                                                 />
@@ -308,12 +302,9 @@ export default function ActionDrawer({ open, context, onClose, updateTriggerNode
                                                                 <Text margin={0} fontSize="sm">API Access Key*</Text>
                                                                 <Input
                                                                     size="sm"
-                                                                    value={data.api_access_key}
+                                                                    value={values.api_access_key}
                                                                     onChange={(e) =>
-                                                                        setData((prev) => ({
-                                                                            ...prev,
-                                                                            api_access_key: e.target.value,
-                                                                        }))
+                                                                        setFieldValue("api_access_key",e.target.value)
                                                                     }
                                                                     placeholder="Update API connection"
                                                                 />
@@ -322,12 +313,9 @@ export default function ActionDrawer({ open, context, onClose, updateTriggerNode
                                                                 <Text margin={0} fontSize="sm">API Access Key*</Text>
                                                                 <Input
                                                                     size="sm"
-                                                                    value={data.api_access_url}
+                                                                    value={values.api_access_url}
                                                                     onChange={(e) =>
-                                                                        setData((prev) => ({
-                                                                            ...prev,
-                                                                            api_access_url: e.target.value
-                                                                        }))
+                                                                        setFieldValue("api_access_url",e.target.value)
                                                                     }
                                                                     placeholder="Update API connection"
                                                                 />
@@ -439,12 +427,8 @@ export default function ActionDrawer({ open, context, onClose, updateTriggerNode
                                                     <Text margin={0} fontSize="sm">Connection*</Text>
                                                     <Input
                                                         size="sm"
-                                                        value={data.connection}
-                                                        onChange={(e) =>
-                                                            setData((prev) => ({
-                                                                ...prev,
-                                                                connection: e.target.value,
-                                                            }))
+                                                        value={values.connection}
+                                                        onChange={(e) => setFieldValue('connection',e.target.value)
                                                         }
                                                         placeholder="Update API connection"
                                                     /></>
