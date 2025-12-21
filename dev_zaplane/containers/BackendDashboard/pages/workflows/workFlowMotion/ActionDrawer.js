@@ -45,8 +45,6 @@ export default function ActionDrawer({ open, context, onClose, updateTriggerNode
     const [mode, setMode] = useState(null);
     const [step, setStep] = useState("select");
     const [selectedItem, setSelectedItem] = useState(null);
-    console.log(selectedItem, 'selectedItem');
-
     const [eventType, setEventType] = useState(null);
     const [connection, setConnection] = useState("");
     const [data, setData] = useState({
@@ -71,7 +69,6 @@ export default function ActionDrawer({ open, context, onClose, updateTriggerNode
             ],
         },
     ]);
-    console.log(conditions, 'conditionssssss');
     const addAndCondition = (groupId) => {
         setConditions((prev) =>
             prev.map((g) =>
@@ -157,7 +154,7 @@ export default function ActionDrawer({ open, context, onClose, updateTriggerNode
         },])
     };
 
-    const LIST = mode === "app" ? APPS : TOOLS;
+    const LIST = mode === "app" && APPS;
 
     const handleContinue = () => {
         if (step === "select") {
@@ -223,12 +220,23 @@ export default function ActionDrawer({ open, context, onClose, updateTriggerNode
                         <Drawer.Body>
                             {!mode && (
                                 <VStack spacing={4}>
-                                    <Button w="100%" onClick={() => setMode("app")}>
+                                    <Button w="100%" justifyContent='left' onClick={() => setMode("app")}>
                                         Apps
                                     </Button>
-                                    <Button w="100%" onClick={() => setMode("tool")}>
-                                        Tools
-                                    </Button>
+                                    {TOOLS.map((item) => (
+                                        <Button
+                                            width="100%"
+                                            key={item.id}
+                                            justifyContent="space-between"
+                                            onClick={() => {
+                                                setSelectedItem(item);
+                                                setStep("select");
+                                                setMode("tools")
+                                            }}
+                                        >
+                                            {item.name}
+                                        </Button>
+                                    ))}
                                 </VStack>
                             )}
                             {mode && !selectedItem && (

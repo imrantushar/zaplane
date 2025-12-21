@@ -395,7 +395,6 @@ function ActionDrawer({
   const [mode, setMode] = (0,react__WEBPACK_IMPORTED_MODULE_11__.useState)(null);
   const [step, setStep] = (0,react__WEBPACK_IMPORTED_MODULE_11__.useState)("select");
   const [selectedItem, setSelectedItem] = (0,react__WEBPACK_IMPORTED_MODULE_11__.useState)(null);
-  console.log(selectedItem, 'selectedItem');
   const [eventType, setEventType] = (0,react__WEBPACK_IMPORTED_MODULE_11__.useState)(null);
   const [connection, setConnection] = (0,react__WEBPACK_IMPORTED_MODULE_11__.useState)("");
   const [data, setData] = (0,react__WEBPACK_IMPORTED_MODULE_11__.useState)({
@@ -415,7 +414,6 @@ function ActionDrawer({
       value: ""
     }]
   }]);
-  console.log(conditions, 'conditionssssss');
   const addAndCondition = groupId => {
     setConditions(prev => prev.map(g => g.id === groupId ? {
       ...g,
@@ -473,7 +471,7 @@ function ActionDrawer({
       }]
     }]);
   };
-  const LIST = mode === "app" ? APPS : TOOLS;
+  const LIST = mode === "app" && APPS;
   const handleContinue = () => {
     if (step === "select") {
       setStep("configure");
@@ -533,13 +531,19 @@ function ActionDrawer({
               spacing: 4,
               children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Button, {
                 w: "100%",
+                justifyContent: "left",
                 onClick: () => setMode("app"),
                 children: "Apps"
-              }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Button, {
-                w: "100%",
-                onClick: () => setMode("tool"),
-                children: "Tools"
-              })]
+              }), TOOLS.map(item => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Button, {
+                width: "100%",
+                justifyContent: "space-between",
+                onClick: () => {
+                  setSelectedItem(item);
+                  setStep("select");
+                  setMode("tools");
+                },
+                children: item.name
+              }, item.id))]
             }), mode && !selectedItem && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_9__.VStack, {
               align: "stretch",
               children: [LIST.map(item => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Button, {
