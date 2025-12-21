@@ -476,16 +476,26 @@ function ActionDrawer({
                 w: "100%",
                 onClick: () => setMode("app"),
                 children: "Apps"
-              }), LIST.map(item => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Button, {
-                width: "100%",
+              }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Button, {
+                w: "100%",
+                onClick: () => setMode("tool"),
+                children: "Tools"
+              })]
+            }), mode && !selectedItem && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_9__.VStack, {
+              align: "stretch",
+              children: [LIST.map(item => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Button, {
                 justifyContent: "space-between",
                 onClick: () => {
                   setSelectedItem(item);
                   setStep("select");
-                  setMode("tools");
                 },
-                children: item.name
-              }, item.id))]
+                children: [item.name, " \u2192"]
+              }, item.id)), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Button, {
+                size: "sm",
+                variant: "ghost",
+                onClick: () => setMode(null),
+                children: "\u2190 Back"
+              })]
             }), selectedItem && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_10__.TabsRoot, {
               value: step,
               isManual: true,

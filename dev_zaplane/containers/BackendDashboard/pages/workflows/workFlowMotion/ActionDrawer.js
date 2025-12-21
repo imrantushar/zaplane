@@ -130,21 +130,28 @@ export default function ActionDrawer({ open, context, onClose, updateTriggerNode
                                     <Button w="100%" onClick={() => setMode("app")}>
                                         Apps
                                     </Button>
+                                    <Button w="100%" onClick={() => setMode("tool")}>
+                                        Tools
+                                    </Button>
+                                </VStack>
+                            )}
+                            {mode && !selectedItem && (
+                                <VStack align="stretch">
                                     {LIST.map((item) => (
                                         <Button
-                                        width="100%"
                                             key={item.id}
                                             justifyContent="space-between"
                                             onClick={() => {
                                                 setSelectedItem(item);
                                                 setStep("select");
-                                                setMode("tools");
-                                               
                                             }}
                                         >
-                                            {item.name}
+                                            {item.name} →
                                         </Button>
                                     ))}
+                                    <Button size="sm" variant="ghost" onClick={() => setMode(null)}>
+                                        ← Back
+                                    </Button>
                                 </VStack>
                             )}
                             {selectedItem && (
