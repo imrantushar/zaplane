@@ -11,6 +11,7 @@ import {
     Tabs,
     Flex,
 } from "@chakra-ui/react";
+import { useFormikContext } from "formik";
 import { useState } from "react";
 import Select from "react-select";
 const APPS = [
@@ -47,6 +48,8 @@ export default function ActionDrawer({ open, context, onClose, updateTriggerNode
     const [selectedItem, setSelectedItem] = useState(null);
     const [eventType, setEventType] = useState(null);
     const [connection, setConnection] = useState("");
+    const {values,setFieldValue} = useFormikContext()
+    console.log(values,'valuessssssss');
     const [data, setData] = useState({
         eventType: "",
         api_access_key: "",

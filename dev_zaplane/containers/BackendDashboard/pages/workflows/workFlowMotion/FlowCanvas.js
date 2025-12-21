@@ -13,6 +13,7 @@ import "@xyflow/react/dist/base.css";
 import CustomNode from "./CustomNode";
 import CustomEdge from "./CustomEdge";
 import ActionDrawer from "./ActionDrawer";
+import { useFormikContext } from "formik";
 
 let id = 0;
 const getId = () => `dndnode_${id++}`;
@@ -34,6 +35,8 @@ export default function FlowCanvas() {
     const [activeEdgeId, setActiveEdgeId] = useState(null);
     const [selectedApp, setSelectedApp] = useState(null);
     const [selectedEvent, setSelectedEvent] = useState(null);
+     const {values,setFieldValue} = useFormikContext()
+        console.log(values,'v');
 
     const [drawerContext, setDrawerContext] = useState({
         source: null,
