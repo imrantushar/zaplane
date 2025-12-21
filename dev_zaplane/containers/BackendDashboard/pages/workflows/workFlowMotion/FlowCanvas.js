@@ -13,6 +13,7 @@ import "@xyflow/react/dist/base.css";
 import CustomNode from "./CustomNode";
 import CustomEdge from "./CustomEdge";
 import ActionDrawer from "./ActionDrawer";
+import { useFormikContext } from "formik";
 
 let id = 0;
 const getId = () => `dndnode_${id++}`;
@@ -32,10 +33,44 @@ export default function FlowCanvas() {
     const [drawerOpen, setDrawerOpen] = useState(false);
     const [selectedNode, setSelectedNode] = useState(null);
     const [activeEdgeId, setActiveEdgeId] = useState(null);
+    const [selectedApp, setSelectedApp] = useState(null);
+    const [selectedEvent, setSelectedEvent] = useState(null);
+     const {values,setFieldValue} = useFormikContext()
+        console.log(values,'v');
+
+    const [drawerContext, setDrawerContext] = useState({
+        source: null,
+        node: null,
+        edge: null,
+    });
+
 
     const { screenToFlowPosition } = useReactFlow();
     const openDrawerForNode = (node) => {
-        setSelectedNode(node);
+        setDrawerContext({
+            source: "node",
+            node,
+            edge: null,
+        });
+        setDrawerOpen(true);
+    };
+    const onAddNode = (edgeId) => {
+        setActiveEdgeId(edgeId);
+        const edge = edges.find((e) => e.id === edgeId);
+        setDrawerContext({
+            source: "edge",
+            node: null,
+            edge,
+        })
+        setDrawerOpen(true);
+    };
+    const openDrawerFromAdd = (node) => {
+        ;
+        setDrawerContext({
+            source: "add",
+            node: node,
+            edge: null,
+        });
         setDrawerOpen(true);
     };
     const onConnect = useCallback(
@@ -53,7 +88,7 @@ export default function FlowCanvas() {
                 x: event.clientX,
                 y: event.clientY,
             });
- console.log(nodes.length + 1);
+            console.log(nodes.length + 1);
             const newNode = {
                 id: getId(),
                 position,
@@ -84,70 +119,268 @@ export default function FlowCanvas() {
     const onEdgeDelete = (edgeId) => {
         setEdges((eds) => eds.filter((e) => e.id !== edgeId));
     };
+    const createRouterNode = () => {
+        const { edge, node } = drawerContext;
 
-    const onAddNode = (edgeId) => {
-        setActiveEdgeId(edgeId);
-        setDrawerOpen(true);
-    };
-    const createConditionNode = () => {
-        const edgeId = activeEdgeId;
-        const edge = edges.find((e) => e.id === edgeId);
-        if (!edge) return;
+        let sourceNode = null;
+        let targetNode = null;
+        if (edge) {
+            sourceNode = nodes.find((n) => n.id === edge.source);
+            targetNode = nodes.find((n) => n.id === edge.target);
+            if (!sourceNode || !targetNode) return;
+        }
+        if (!edge && node) {
+            sourceNode = nodes.find((n) => n.id === node.id);
+            if (!sourceNode) return;
+        }
+        const position = edge
+            ? {
+                x: (sourceNode.position.x + targetNode.position.x) / 2,
+                y: (sourceNode.position.y + targetNode.position.y) / 2,
+            }
+            : {
+                x: sourceNode.position.x + 220,
+                y: sourceNode.position.y,
+            };
 
-        const sourceNode = nodes.find((n) => n.id === edge.source);
-        const targetNode = nodes.find((n) => n.id === edge.target);
-
-        if (!sourceNode || !targetNode) return;
-        const newNodePosition = {
-            x: (sourceNode.position.x + targetNode.position.x) / 2,
-            y: (sourceNode.position.y + targetNode.position.y) / 2,
-        };
-
-        const newNodeId = getId();
-        const newNode = {
-            id: newNodeId,
+        const routerId = getId();
+        const routerNode = {
+            id: routerId,
             type: "custom",
-            position: newNodePosition,
+            position,
             data: {
-                label: "New Node",
+                label: "Router",
+                action: "Router",
                 order: nodes.length + 1,
-                action: "Condition",
-                conditions: [
+                routes: [
                     {
-                        id: `${nodes.length + 1}.0`,
-                        title: "No Condition Matched",
-                        permanent: true,
+                        id: "1",
+                        title: "Route 1",
                     },
-                    {
-                        id: `${nodes.length + 1}.1`,
-                        title: "Untitled Condition 1",
-                    },
-
                 ],
             },
         };
+        let updatedEdges = [...edges];
 
+        if (edge) {
+            updatedEdges = [
+                ...edges.filter((e) => e.id !== edge.id),
+                {
+                    id: `edge-${edge.source}-${routerId}`,
+                    source: edge.source,
+                    target: routerId,
+                    type: "custom",
+                },
+                {
+                    id: `edge-${routerId}-${edge.target}`,
+                    source: routerId,
+                    target: edge.target,
+                    type: "custom",
+                },
+            ];
+        }
+        if (!edge && sourceNode) {
+            updatedEdges = [
+                ...edges,
+                {
+                    id: `edge-${sourceNode.id}-${routerId}`,
+                    source: sourceNode.id,
+                    target: routerId,
+                    type: "custom",
+                },
+            ];
+        }
 
-        const newEdges = [
-            ...edges.filter((e) => e.id !== edgeId),
-            {
-                id: `edge-${edge.source}-${newNodeId}`,
-                source: edge.source,
-                target: newNodeId,
-                type: "custom",
+        setNodes((nds) => nds.concat(routerNode));
+        setEdges(updatedEdges);
+    };
+    const createConditionNode = ({ conditions }) => {
+        console.log(conditions,'in');
+        const { edge, node } = drawerContext;
+
+        let sourceNode = null;
+        let targetNode = null;
+
+        if (edge) {
+            sourceNode = nodes.find((n) => n.id === edge.source);
+            targetNode = nodes.find((n) => n.id === edge.target);
+            if (!sourceNode || !targetNode) return;
+        }
+
+        if (!edge && node) {
+            sourceNode = nodes.find((n) => n.id === node.id);
+            if (!sourceNode) return;
+        }
+
+        const position = edge
+            ? {
+                x: (sourceNode.position.x + targetNode.position.x) / 2,
+                y: (sourceNode.position.y + targetNode.position.y) / 2,
+            }
+            : {
+                x: sourceNode.position.x + 220,
+                y: sourceNode.position.y,
+            };
+
+        const newNodeId = getId();
+
+        const newNode = {
+            id: newNodeId,
+            type: "custom",
+            position,
+            data: {
+                label: "Condition",
+                action: "Condition",
+                order: nodes.length + 1,
+                logic: {
+                    groups: conditions.map((group) => ({
+                        id: group.id,
+                         type: group.type,
+                        rules: group.rules.map((rule) => ({
+                            id: rule.id,
+                            field: rule.field,
+                            operator: rule.operator,
+                            value: rule.value,
+                        })),
+                    })),
+                },
             },
-            {
-                id: `edge-${newNodeId}-${edge.target}`,
-                source: newNodeId,
-                target: edge.target,
-                type: "custom",
-            },
-        ];
+        };
+
+        let newEdges = [...edges];
+
+        if (edge) {
+            newEdges = [
+                ...edges.filter((e) => e.id !== edge.id),
+                {
+                    id: `edge-${edge.source}-${newNodeId}`,
+                    source: edge.source,
+                    target: newNodeId,
+                    type: "custom",
+                },
+                {
+                    id: `edge-${newNodeId}-${edge.target}`,
+                    source: newNodeId,
+                    target: edge.target,
+                    type: "custom",
+                },
+            ];
+        }
+
+        if (!edge && sourceNode) {
+            newEdges = [
+                ...edges,
+                {
+                    id: `edge-${sourceNode.id}-${newNodeId}`,
+                    source: sourceNode.id,
+                    target: newNodeId,
+                    type: "custom",
+                },
+            ];
+        }
 
         setNodes((nds) => nds.concat(newNode));
         setEdges(newEdges);
-        
     };
+
+    const createActionNode = (actionData) => {
+        const { edge, node } = drawerContext;
+        let sourceNode = null;
+        let targetNode = null;
+        if (edge) {
+            sourceNode = nodes.find((n) => n.id === edge.source);
+            targetNode = nodes.find((n) => n.id === edge.target);
+            if (!sourceNode || !targetNode) return;
+        }
+        if (!edge && node) {
+            sourceNode = nodes.find((n) => n.id === node.id);
+            if (!sourceNode) return;
+        }
+        const position = edge
+            ? {
+                x: (sourceNode.position.x + targetNode.position.x) / 2,
+                y: (sourceNode.position.y + targetNode.position.y) / 2,
+            }
+            : {
+                x: sourceNode.position.x + 220,
+                y: sourceNode.position.y,
+            };
+
+        const newNodeId = getId();
+
+        const newNode = {
+            id: newNodeId,
+            type: "custom",
+            position,
+            data: {
+                label: actionData.actionName,
+                action: "Action",
+                order: nodes.length + 1,
+                ...actionData,
+            },
+        };
+
+        let newEdges = [...edges];
+        if (edge) {
+            newEdges = [
+                ...edges.filter((e) => e.id !== edge.id),
+                {
+                    id: `edge-${edge.source}-${newNodeId}`,
+                    source: edge.source,
+                    target: newNodeId,
+                    type: "custom",
+                },
+                {
+                    id: `edge-${newNodeId}-${edge.target}`,
+                    source: newNodeId,
+                    target: edge.target,
+                    type: "custom",
+                },
+            ];
+        }
+
+        // -------- NODE / ADD --------
+        if (!edge && sourceNode) {
+            newEdges = [
+                ...edges,
+                {
+                    id: `edge-${sourceNode.id}-${newNodeId}`,
+                    source: sourceNode.id,
+                    target: newNodeId,
+                    type: "custom",
+                },
+            ];
+        }
+
+        setNodes((nds) => nds.concat(newNode));
+        setEdges(newEdges);
+    };
+    const updateTriggerNode = (triggerData) => {
+        ;
+        setNodes((nds) =>
+            nds.map((node) => {
+                if (
+                    drawerContext.source === "node" &&
+                    node.id === drawerContext.node.id &&
+                    node.data.action === "Trigger"
+                ) {
+                    return {
+                        ...node,
+                        data: {
+                            ...node.data,
+                            label: triggerData.label,
+                            eventType: triggerData.eventType,
+                            event: triggerData.event,
+                            connection: triggerData.connection,
+                            app: triggerData.app,
+                        },
+                    };
+                }
+                return node;
+            })
+        );
+    };
+
     const addCondition = (nodeId) => {
         setNodes((nds) =>
             nds.map((node) => {
@@ -211,7 +444,7 @@ export default function FlowCanvas() {
         );
     };
 
-console.log(nodes);
+    console.log(nodes, 'selectedNode');
 
     const nodeTypes = {
         custom: (props) => (
@@ -220,6 +453,7 @@ console.log(nodes);
                 data={{
                     ...props.data,
                     onOpenDrawer: () => openDrawerForNode(props),
+                    openDrawerFromAdd: () => openDrawerFromAdd(props),
                     onAddCondition: () => addCondition(props.id),
                     onDeleteCondition: (cid) =>
                         deleteCondition(props.id, cid),
@@ -269,12 +503,18 @@ console.log(nodes);
             </ReactFlow>
             <ActionDrawer
                 open={drawerOpen}
-                onClose={() => {setDrawerOpen(false)
+                onClose={() => {
+                    setDrawerOpen(false)
                     setActiveEdgeId(null);
+                    setDrawerContext({ source: null, node: null, edge: null });
                 }}
-                node={selectedNode}
-                onCreateCondition={createConditionNode}
-                edge={activeEdgeId ? edges.find(e => e.id === activeEdgeId) : null}
+                setSelectedNode={setSelectedNode}
+                createConditionNode={createConditionNode}
+                context={drawerContext}
+                createRouterNode={createRouterNode}
+                createActionNode={createActionNode}
+                updateTriggerNode={updateTriggerNode}
+                
             />
         </div>
     );

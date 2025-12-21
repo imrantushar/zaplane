@@ -1,11 +1,29 @@
 import { useState } from "react";
-import { Handle, Position, NodeToolbar } from "@xyflow/react";
+import {
+  Handle,
+  Position,
+  NodeToolbar,
+  useReactFlow,
+} from "@xyflow/react";
 import { Box, Text, HStack, Icon, Badge, Button } from "@chakra-ui/react";
 import { RiDeleteBin7Line } from "react-icons/ri";
 import { FaRegCopy } from "react-icons/fa";
+import FloatingEdge from "./FloatingEdge"; 
 
-export default function CustomNode({ data }) {
+export default function CustomNode({ id, data, xPos, yPos }) {
   const [hovered, setHovered] = useState(false);
+
+  const { getEdges } = useReactFlow();
+  const edges = getEdges();
+
+  const hasOutgoingEdge = edges.some((e) => e.source === id);
+
+  const NODE_WIDTH = 160;
+  const NODE_HEIGHT = 48;
+
+  const sourceX = xPos + NODE_WIDTH;
+  const sourceY = yPos + NODE_HEIGHT / 2;
+
   return (
     <Box
       position="relative"
@@ -18,24 +36,17 @@ export default function CustomNode({ data }) {
         align="start"
         offset={10}
       >
-        <HStack
-        >
+        <HStack>
           <Text
             borderRadius="full"
-            p='4px 8px'
+            p="4px 8px"
             fontWeight="medium"
-            background='#E6F4FF'
+            background="#E6F4FF"
             margin={0}
-
           >
-            {data.action || 'Action'}
+            {data.action || "Action"}
           </Text>
-          <Text
-            borderRadius="full"
-            fontSize="sm"
-            fontWeight="medium"
-            margin={0}
-          >
+          <Text borderRadius="full" fontSize="sm" fontWeight="medium" margin={0}>
             {data.order || 1}
           </Text>
         </HStack>
@@ -55,14 +66,9 @@ export default function CustomNode({ data }) {
           boxShadow="md"
           cursor="pointer"
           pointerEvents="auto"
-          onMouseEnter={() => setHovered(true)}
-          onMouseLeave={() => setHovered(false)}
         >
           <Icon as={RiDeleteBin7Line} boxSize={4} />
-          {!data?.action && (
-            <Icon as={FaRegCopy} boxSize={4} />
-          )}
-
+          {!data?.action && <Icon as={FaRegCopy} boxSize={4} />}
         </HStack>
       </NodeToolbar>
       <Box
@@ -72,22 +78,24 @@ export default function CustomNode({ data }) {
         borderRadius="md"
         px={4}
         py={2}
-        minW="100px"
+        minW="160px"
         textAlign="center"
         boxShadow="sm"
-          onClick={data.onOpenDrawer}
+        onClick={data.onOpenDrawer}
       >
-        {data?.action !== 'Trigger' && (<Handle
-          type="target"
-          position={Position.Left}
-          style={{
-            width: 10,
-            height: 10,
-            borderRadius: "50%",
-            background: "#3182ce",
-            border: "2px solid white",
-          }}
-        />)}
+        {data?.action !== "Trigger" && (
+          <Handle
+            type="target"
+            position={Position.Left}
+            style={{
+              width: 10,
+              height: 10,
+              borderRadius: "50%",
+              background: "#3182ce",
+              border: "2px solid white",
+            }}
+          />
+        )}
 
         {data.conditions ? (
           <>
@@ -98,18 +106,19 @@ export default function CustomNode({ data }) {
             {data.conditions.map((cond, index) => (
               <HStack
                 key={cond.id}
-                position="relative"
                 justify="space-between"
                 bg="white"
                 p={2}
                 mb={1}
                 borderRadius="md"
                 boxShadow="sm"
+                position="relative"
               >
                 <Text margin={0} fontSize="sm">
                   <Badge mr={2}>{cond.id}</Badge>
                   {cond.title}
                 </Text>
+
                 <Handle
                   type="source"
                   id={`condition-${cond.id}`}
@@ -125,6 +134,7 @@ export default function CustomNode({ data }) {
                     borderRadius: "50%",
                   }}
                 />
+
                 {index !== 0 && (
                   <HStack>
                     <Icon
@@ -139,17 +149,10 @@ export default function CustomNode({ data }) {
                     />
                   </HStack>
                 )}
-
-
               </HStack>
             ))}
 
-            <Button
-              size="sm"
-              w="100%"
-              mt={2}
-              onClick={data.onAddCondition}
-            >
+            <Button size="sm" w="100%" mt={2} onClick={data.onAddCondition}>
               +
             </Button>
           </>
@@ -158,23 +161,27 @@ export default function CustomNode({ data }) {
             {data.label}
           </Text>
         )}
-
-        {!data.conditions && <Handle
-          type="source"
-          position={Position.Right}
-          style={{
-            width: 10,
-            height: 10,
-            borderRadius: "50%",
-            background: "#3182ce",
-            border: "2px solid white",
-          }}
-        />}
-
-
+        {!data.conditions && (
+          <Handle
+            type="source"
+            position={Position.Right}
+            style={{
+              width: 10,
+              height: 10,
+              borderRadius: "50%",
+              background: "#3182ce",
+              border: "2px solid white",
+            }}
+          />
+        )}
       </Box>
-
-
+      {!hasOutgoingEdge && !data.conditions && (
+        <FloatingEdge
+          sourceX={sourceX}
+          sourceY={sourceY}
+          openDrawerFromAdd={data.openDrawerFromAdd}
+        />
+      )}
     </Box>
   );
 }
