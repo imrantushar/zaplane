@@ -32,6 +32,9 @@ export default function FlowCanvas() {
     const [drawerOpen, setDrawerOpen] = useState(false);
     const [selectedNode, setSelectedNode] = useState(null);
     const [activeEdgeId, setActiveEdgeId] = useState(null);
+    const [selectedApp, setSelectedApp] = useState(null);
+    const [selectedEvent, setSelectedEvent] = useState(null);
+
     const [drawerContext, setDrawerContext] = useState({
         source: null,
         node: null,
@@ -58,8 +61,7 @@ export default function FlowCanvas() {
         })
         setDrawerOpen(true);
     };
-    const openDrawerFromAdd = (node) => {
-        console.log('iam clik');
+    const openDrawerFromAdd = (node) => {;
         setDrawerContext({
             source: "add",
             node: node,
@@ -279,24 +281,17 @@ export default function FlowCanvas() {
     };
     const createActionNode = (actionData) => {
         const { edge, node } = drawerContext;
-
         let sourceNode = null;
         let targetNode = null;
-
-        // -------- CASE 1: EDGE --------
         if (edge) {
             sourceNode = nodes.find((n) => n.id === edge.source);
             targetNode = nodes.find((n) => n.id === edge.target);
             if (!sourceNode || !targetNode) return;
         }
-
-        // -------- CASE 2: NODE / ADD --------
         if (!edge && node) {
             sourceNode = nodes.find((n) => n.id === node.id);
             if (!sourceNode) return;
         }
-
-        // -------- POSITION --------
         const position = edge
             ? {
                 x: (sourceNode.position.x + targetNode.position.x) / 2,
@@ -316,16 +311,12 @@ export default function FlowCanvas() {
             data: {
                 label: actionData.actionName,
                 action: "Action",
-                appId: actionData.appId,
-                appName: actionData.appName,
-                actionId: actionData.actionId,
                 order: nodes.length + 1,
+                ...actionData,
             },
         };
 
         let newEdges = [...edges];
-
-        // -------- EDGE SPLIT --------
         if (edge) {
             newEdges = [
                 ...edges.filter((e) => e.id !== edge.id),
@@ -359,6 +350,30 @@ export default function FlowCanvas() {
 
         setNodes((nds) => nds.concat(newNode));
         setEdges(newEdges);
+    };
+    const updateTriggerNode = (triggerData) => {;
+        setNodes((nds) =>
+            nds.map((node) => {
+                if (
+                    drawerContext.source === "node" &&
+                    node.id === drawerContext.node.id &&
+                    node.data.action === "Trigger"
+                ) {
+                    return {
+                        ...node,
+                        data: {
+                            ...node.data,
+                            label: triggerData.label,
+                            eventType: triggerData.eventType,
+                            event: triggerData.event,
+                            connection: triggerData.connection,
+                            app: triggerData.app,
+                        },
+                    };
+                }
+                return node;
+            })
+        );
     };
 
     const addCondition = (nodeId) => {
@@ -424,7 +439,7 @@ export default function FlowCanvas() {
         );
     };
 
-    console.log(selectedNode, 'selectedNode');
+    console.log(nodes, 'selectedNode');
 
     const nodeTypes = {
         custom: (props) => (
@@ -492,7 +507,8 @@ export default function FlowCanvas() {
                 onCreateCondition={createConditionNode}
                 context={drawerContext}
                 createRouterNode={createRouterNode}
-                onSelectAction={createActionNode}
+                createActionNode={createActionNode}
+                 updateTriggerNode={updateTriggerNode}
             />
         </div>
     );
