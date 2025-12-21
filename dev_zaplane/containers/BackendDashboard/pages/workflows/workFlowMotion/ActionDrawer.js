@@ -49,15 +49,7 @@ export default function ActionDrawer({ open, context, onClose, updateTriggerNode
     const [eventType, setEventType] = useState(null);
     const [connection, setConnection] = useState("");
     const {values,setFieldValue,resetForm} = useFormikContext()
-    console.log(values,'valuessssssss');
-    const [data, setData] = useState({
-        eventType: "",
-        api_access_key: "",
-        api_access_url: "",
-        connection_title: "",
-        connection: "",
-
-    });
+  
     const [conditions, setConditions] = useState([
         {
             id: crypto.randomUUID(),
@@ -135,14 +127,13 @@ export default function ActionDrawer({ open, context, onClose, updateTriggerNode
             )
         );
     };
-    console.log(data, 'data');
+
     const resetAll = () => {
         setMode(null);
         setStep("select");
         setSelectedItem(null);
         setEventType(null);
         setConnection("");
-        setData({});
         onClose();
         setConditions([{
             id: crypto.randomUUID(),
@@ -203,7 +194,7 @@ export default function ActionDrawer({ open, context, onClose, updateTriggerNode
         }
         return false;
     };
-    console.log(selectedItem);
+
     return (
         <Drawer.Root open={open} size="md" onOpenChange={(e) => !e.open && resetAll()}>
             <Portal>

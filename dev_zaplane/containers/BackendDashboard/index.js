@@ -5,7 +5,7 @@ import Workflows from './pages/workflows';
 
 
 const renderSwitch = (page, id, action, path) => {
-	console.log(page,'page');
+
 
 	switch (page) {
 		case 'zaplane':

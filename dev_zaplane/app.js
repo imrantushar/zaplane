@@ -10,24 +10,11 @@ import { theme } from '../assets/scss/chakra/theme';
 import { store } from '@ZAPRedux/store';
 
 
-// document.addEventListener( 'DOMContentLoaded', () => {
-// 	const container = document.getElementById( 'zaplane-app' );
-// 	if ( container ) {
-// 		const root = createRoot( container );
-// 		root.render(
-//             <ChakraProvider value={theme}>
-//                 <h1>Welcome to Zaplane</h1>
-			
-//             </ChakraProvider>
-// 		);
-// 	}
-// } );
+
 document.addEventListener('DOMContentLoaded', () => {
-	console.log('room load');
 	const container = document.getElementById('zaplane-app');
 	if (container) {
 		const root = createRoot(container);
-		console.log(root);
 		const menuPage = document.getElementById('toplevel_page_zaplane');
 		function MenuPortal({ children }) {
 			menuPage.innerHTML = '';

@@ -36,7 +36,6 @@ export default function FlowCanvas() {
     const [selectedApp, setSelectedApp] = useState(null);
     const [selectedEvent, setSelectedEvent] = useState(null);
      const {values,setFieldValue} = useFormikContext()
-        console.log(values,'v');
 
     const [drawerContext, setDrawerContext] = useState({
         source: null,
@@ -88,7 +87,7 @@ export default function FlowCanvas() {
                 x: event.clientX,
                 y: event.clientY,
             });
-            console.log(nodes.length + 1);
+          
             const newNode = {
                 id: getId(),
                 position,
@@ -195,7 +194,6 @@ export default function FlowCanvas() {
         setEdges(updatedEdges);
     };
     const createConditionNode = ({ conditions }) => {
-        console.log(conditions,'in');
         const { edge, node } = drawerContext;
 
         let sourceNode = null;
@@ -444,7 +442,8 @@ export default function FlowCanvas() {
         );
     };
 
-    console.log(nodes, 'selectedNode');
+    console.log(nodes, 'all nodes');
+    console.log(edges, 'all edges');
 
     const nodeTypes = {
         custom: (props) => (

@@ -246,7 +246,6 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const renderSwitch = (page, id, action, path) => {
-  console.log(page, 'page');
   switch (page) {
     case 'zaplane':
       return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.Fragment, {
@@ -404,14 +403,6 @@ function ActionDrawer({
     setFieldValue,
     resetForm
   } = (0,formik__WEBPACK_IMPORTED_MODULE_11__.useFormikContext)();
-  console.log(values, 'valuessssssss');
-  const [data, setData] = (0,react__WEBPACK_IMPORTED_MODULE_12__.useState)({
-    eventType: "",
-    api_access_key: "",
-    api_access_url: "",
-    connection_title: "",
-    connection: ""
-  });
   const [conditions, setConditions] = (0,react__WEBPACK_IMPORTED_MODULE_12__.useState)([{
     id: crypto.randomUUID(),
     type: "AND",
@@ -460,14 +451,12 @@ function ActionDrawer({
       rules: g.rules.filter(r => r.id !== ruleId)
     } : g));
   };
-  console.log(data, 'data');
   const resetAll = () => {
     setMode(null);
     setStep("select");
     setSelectedItem(null);
     setEventType(null);
     setConnection("");
-    setData({});
     onClose();
     setConditions([{
       id: crypto.randomUUID(),
@@ -518,7 +507,6 @@ function ActionDrawer({
     }
     return false;
   };
-  console.log(selectedItem);
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.DrawerRoot, {
     open: open,
     size: "md",
@@ -1190,7 +1178,6 @@ function FlowCanvas() {
     values,
     setFieldValue
   } = (0,formik__WEBPACK_IMPORTED_MODULE_7__.useFormikContext)();
-  console.log(values, 'v');
   const [drawerContext, setDrawerContext] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)({
     source: null,
     node: null,
@@ -1238,7 +1225,6 @@ function FlowCanvas() {
       x: event.clientX,
       y: event.clientY
     });
-    console.log(nodes.length + 1);
     const newNode = {
       id: getId(),
       position,
@@ -1326,7 +1312,6 @@ function FlowCanvas() {
   const createConditionNode = ({
     conditions
   }) => {
-    console.log(conditions, 'in');
     const {
       edge,
       node
@@ -1521,7 +1506,8 @@ function FlowCanvas() {
       };
     }));
   };
-  console.log(nodes, 'selectedNode');
+  console.log(nodes, 'all nodes');
+  console.log(edges, 'all edges');
   const nodeTypes = {
     custom: props => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_CustomNode__WEBPACK_IMPORTED_MODULE_4__["default"], {
       ...props,
@@ -124552,25 +124538,10 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-// document.addEventListener( 'DOMContentLoaded', () => {
-// 	const container = document.getElementById( 'zaplane-app' );
-// 	if ( container ) {
-// 		const root = createRoot( container );
-// 		root.render(
-//             <ChakraProvider value={theme}>
-//                 <h1>Welcome to Zaplane</h1>
-
-//             </ChakraProvider>
-// 		);
-// 	}
-// } );
-
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('room load');
   const container = document.getElementById('zaplane-app');
   if (container) {
     const root = (0,react_dom_client__WEBPACK_IMPORTED_MODULE_1__.createRoot)(container);
-    console.log(root);
     const menuPage = document.getElementById('toplevel_page_zaplane');
     function MenuPortal({
       children
