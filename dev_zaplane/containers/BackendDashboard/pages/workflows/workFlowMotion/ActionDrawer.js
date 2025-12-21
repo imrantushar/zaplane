@@ -38,12 +38,13 @@ const ActionDrawer = ({
     open,
     onClose,
     onCreateCondition,
-    onSelectAction, 
+    onSelectAction,
     context,
-    createRouterNode
+    createRouterNode,
+    setSelectedNode
 }) => {
-    const { source,node,edge } = context;
-    console.log(node,'node');
+    const { source, node, edge } = context;
+    console.log(node, 'node');
     const [step, setStep] = useState("root");
     const [selectedApp, setSelectedApp] = useState(null);
 
@@ -52,7 +53,7 @@ const ActionDrawer = ({
         setSelectedApp(null);
         onClose();
     };
-   console.log(context,'context',source === 'edge');
+    console.log(context, 'context', source === 'edge');
     return (
         <Drawer.Root open={open} onOpenChange={(e) => !e.open && closeAll()}>
             <Portal>
@@ -129,6 +130,7 @@ const ActionDrawer = ({
                                         </Button>
                                     ))}
 
+
                                     <Button
                                         variant="ghost"
                                         onClick={() => setStep("apps")}
@@ -148,10 +150,10 @@ const ActionDrawer = ({
                                         Condition
                                     </Button>
 
-                                    <Button  onClick={() => {
-                                            createRouterNode();
-                                            closeAll();
-                                        }} >Router</Button>
+                                    <Button onClick={() => {
+                                        createRouterNode();
+                                        closeAll();
+                                    }} >Router</Button>
                                 </VStack>
                             )}
                         </Drawer.Body>

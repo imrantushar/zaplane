@@ -118,21 +118,15 @@ export default function FlowCanvas() {
 
         let sourceNode = null;
         let targetNode = null;
-
-        // ---------- CASE 1: EDGE ----------
         if (edge) {
             sourceNode = nodes.find((n) => n.id === edge.source);
             targetNode = nodes.find((n) => n.id === edge.target);
             if (!sourceNode || !targetNode) return;
         }
-
-        // ---------- CASE 2: NODE ----------
         if (!edge && node) {
             sourceNode = nodes.find((n) => n.id === node.id);
             if (!sourceNode) return;
         }
-
-        // ---------- POSITION ----------
         const position = edge
             ? {
                 x: (sourceNode.position.x + targetNode.position.x) / 2,
@@ -144,8 +138,6 @@ export default function FlowCanvas() {
             };
 
         const routerId = getId();
-
-        // ---------- ROUTER NODE ----------
         const routerNode = {
             id: routerId,
             type: "custom",
@@ -162,11 +154,8 @@ export default function FlowCanvas() {
                 ],
             },
         };
-
-        // ---------- EDGE LOGIC ----------
         let updatedEdges = [...edges];
 
-        // EDGE → split
         if (edge) {
             updatedEdges = [
                 ...edges.filter((e) => e.id !== edge.id),
@@ -184,8 +173,6 @@ export default function FlowCanvas() {
                 },
             ];
         }
-
-        // NODE → append
         if (!edge && sourceNode) {
             updatedEdges = [
                 ...edges,
@@ -290,6 +277,89 @@ export default function FlowCanvas() {
         setNodes((nds) => nds.concat(newNode));
         setEdges(newEdges);
     };
+    const createActionNode = (actionData) => {
+        const { edge, node } = drawerContext;
+
+        let sourceNode = null;
+        let targetNode = null;
+
+        // -------- CASE 1: EDGE --------
+        if (edge) {
+            sourceNode = nodes.find((n) => n.id === edge.source);
+            targetNode = nodes.find((n) => n.id === edge.target);
+            if (!sourceNode || !targetNode) return;
+        }
+
+        // -------- CASE 2: NODE / ADD --------
+        if (!edge && node) {
+            sourceNode = nodes.find((n) => n.id === node.id);
+            if (!sourceNode) return;
+        }
+
+        // -------- POSITION --------
+        const position = edge
+            ? {
+                x: (sourceNode.position.x + targetNode.position.x) / 2,
+                y: (sourceNode.position.y + targetNode.position.y) / 2,
+            }
+            : {
+                x: sourceNode.position.x + 220,
+                y: sourceNode.position.y,
+            };
+
+        const newNodeId = getId();
+
+        const newNode = {
+            id: newNodeId,
+            type: "custom",
+            position,
+            data: {
+                label: actionData.actionName,
+                action: "Action",
+                appId: actionData.appId,
+                appName: actionData.appName,
+                actionId: actionData.actionId,
+                order: nodes.length + 1,
+            },
+        };
+
+        let newEdges = [...edges];
+
+        // -------- EDGE SPLIT --------
+        if (edge) {
+            newEdges = [
+                ...edges.filter((e) => e.id !== edge.id),
+                {
+                    id: `edge-${edge.source}-${newNodeId}`,
+                    source: edge.source,
+                    target: newNodeId,
+                    type: "custom",
+                },
+                {
+                    id: `edge-${newNodeId}-${edge.target}`,
+                    source: newNodeId,
+                    target: edge.target,
+                    type: "custom",
+                },
+            ];
+        }
+
+        // -------- NODE / ADD --------
+        if (!edge && sourceNode) {
+            newEdges = [
+                ...edges,
+                {
+                    id: `edge-${sourceNode.id}-${newNodeId}`,
+                    source: sourceNode.id,
+                    target: newNodeId,
+                    type: "custom",
+                },
+            ];
+        }
+
+        setNodes((nds) => nds.concat(newNode));
+        setEdges(newEdges);
+    };
 
     const addCondition = (nodeId) => {
         setNodes((nds) =>
@@ -354,7 +424,7 @@ export default function FlowCanvas() {
         );
     };
 
-    console.log(nodes);
+    console.log(selectedNode, 'selectedNode');
 
     const nodeTypes = {
         custom: (props) => (
@@ -418,10 +488,11 @@ export default function FlowCanvas() {
                     setActiveEdgeId(null);
                     setDrawerContext({ source: null, node: null, edge: null });
                 }}
-                node={selectedNode}
+                setSelectedNode={setSelectedNode}
                 onCreateCondition={createConditionNode}
                 context={drawerContext}
                 createRouterNode={createRouterNode}
+                onSelectAction={createActionNode}
             />
         </div>
     );
