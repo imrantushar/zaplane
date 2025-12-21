@@ -375,25 +375,18 @@ const APPS = [{
 }];
 const TOOLS = [{
   id: "condition",
-  name: "Condition",
-  actions: [{
-    id: "if_else",
-    name: "If / Else"
-  }]
+  name: "Condition"
 }, {
   id: "router",
-  name: "Router",
-  actions: [{
-    id: "route",
-    name: "Create Route"
-  }]
+  name: "Router"
 }];
 function ActionDrawer({
   open,
   context,
   onClose,
   updateTriggerNode,
-  createActionNode
+  createActionNode,
+  createConditionNode
 }) {
   const {
     source,
@@ -402,6 +395,7 @@ function ActionDrawer({
   const [mode, setMode] = (0,react__WEBPACK_IMPORTED_MODULE_11__.useState)(null);
   const [step, setStep] = (0,react__WEBPACK_IMPORTED_MODULE_11__.useState)("select");
   const [selectedItem, setSelectedItem] = (0,react__WEBPACK_IMPORTED_MODULE_11__.useState)(null);
+  console.log(selectedItem, 'selectedItem');
   const [eventType, setEventType] = (0,react__WEBPACK_IMPORTED_MODULE_11__.useState)(null);
   const [connection, setConnection] = (0,react__WEBPACK_IMPORTED_MODULE_11__.useState)("");
   const [data, setData] = (0,react__WEBPACK_IMPORTED_MODULE_11__.useState)({
@@ -411,6 +405,55 @@ function ActionDrawer({
     connection_title: "",
     connection: ""
   });
+  const [conditions, setConditions] = (0,react__WEBPACK_IMPORTED_MODULE_11__.useState)([{
+    id: crypto.randomUUID(),
+    type: "OR",
+    rules: [{
+      id: crypto.randomUUID(),
+      field: "",
+      operator: "",
+      value: ""
+    }]
+  }]);
+  console.log(conditions, 'conditionssssss');
+  const addAndCondition = groupId => {
+    setConditions(prev => prev.map(g => g.id === groupId ? {
+      ...g,
+      rules: [...g.rules, {
+        id: crypto.randomUUID(),
+        field: "",
+        operator: "",
+        value: ""
+      }]
+    } : g));
+  };
+  const addOrGroup = () => {
+    setConditions(prev => [...prev, {
+      id: crypto.randomUUID(),
+      type: "OR",
+      rules: [{
+        id: crypto.randomUUID(),
+        field: "",
+        operator: "",
+        value: ""
+      }]
+    }]);
+  };
+  const updateRule = (groupId, ruleId, key, value) => {
+    setConditions(prev => prev.map(g => g.id === groupId ? {
+      ...g,
+      rules: g.rules.map(r => r.id === ruleId ? {
+        ...r,
+        [key]: value
+      } : r)
+    } : g));
+  };
+  const removeRule = (groupId, ruleId) => {
+    setConditions(prev => prev.map(g => g.id === groupId ? {
+      ...g,
+      rules: g.rules.filter(r => r.id !== ruleId)
+    } : g));
+  };
   console.log(data, 'data');
   const resetAll = () => {
     setMode(null);
@@ -420,6 +463,15 @@ function ActionDrawer({
     setConnection("");
     setData({});
     onClose();
+    setConditions([{
+      id: crypto.randomUUID(),
+      rules: [{
+        id: crypto.randomUUID(),
+        field: "",
+        operator: "",
+        value: ""
+      }]
+    }]);
   };
   const LIST = mode === "app" ? APPS : TOOLS;
   const handleContinue = () => {
@@ -428,6 +480,13 @@ function ActionDrawer({
     } else if (step === "configure") {
       setStep("test");
     } else if (step === "test") {
+      if (selectedItem.id === "condition") {
+        createConditionNode({
+          conditions // 👈 FULL LOGIC DATA
+        });
+        resetAll();
+        return;
+      }
       const payload = {
         label: selectedItem.name,
         eventType: data.eventType,
@@ -513,92 +572,155 @@ function ActionDrawer({
                 }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_10__.TabsIndicator, {})]
               }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_10__.TabsContent, {
                 value: "select",
-                children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_6__.Flex, {
-                  direction: "column",
-                  gap: 4,
-                  children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
-                    margin: 0,
-                    fontSize: "sm",
-                    children: "Select Event"
-                  }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(react_select__WEBPACK_IMPORTED_MODULE_12__["default"], {
-                    options: [{
-                      value: "create",
-                      label: "Create Event"
-                    }, {
-                      value: "update",
-                      label: "Update Event"
-                    }, {
-                      value: "delete",
-                      label: "Delete Event"
-                    }],
-                    onChange: opt => setData(prev => ({
-                      ...prev,
-                      eventType: opt.value
-                    }))
-                  }), data.eventType && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.Fragment, {
-                    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Box, {
-                      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
-                        margin: 0,
-                        fontSize: "sm",
-                        children: "Title for this connection**"
-                      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_7__.Input, {
-                        size: "sm",
-                        value: data.connection_title,
-                        onChange: e => setData(prev => ({
-                          ...prev,
-                          connection_title: e.target.value
-                        })),
-                        placeholder: "Update API connection"
-                      })]
-                    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Box, {
-                      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
-                        margin: 0,
-                        fontSize: "sm",
-                        children: "API Access Key*"
-                      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_7__.Input, {
-                        size: "sm",
-                        value: data.api_access_key,
-                        onChange: e => setData(prev => ({
-                          ...prev,
-                          api_access_key: e.target.value
-                        })),
-                        placeholder: "Update API connection"
-                      })]
-                    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Box, {
-                      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
-                        margin: 0,
-                        fontSize: "sm",
-                        children: "API Access Key*"
-                      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_7__.Input, {
-                        size: "sm",
-                        value: data.api_access_url,
-                        onChange: e => setData(prev => ({
-                          ...prev,
-                          api_access_url: e.target.value
-                        })),
-                        placeholder: "Update API connection"
+                children: selectedItem.id === "condition" ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.Fragment, {
+                  children: "condition"
+                }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.Fragment, {
+                  children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_6__.Flex, {
+                    direction: "column",
+                    gap: 4,
+                    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
+                      margin: 0,
+                      fontSize: "sm",
+                      children: "Select Event"
+                    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(react_select__WEBPACK_IMPORTED_MODULE_12__["default"], {
+                      options: [{
+                        value: "create",
+                        label: "Create Event"
+                      }, {
+                        value: "update",
+                        label: "Update Event"
+                      }, {
+                        value: "delete",
+                        label: "Delete Event"
+                      }],
+                      onChange: opt => setData(prev => ({
+                        ...prev,
+                        eventType: opt.value
+                      }))
+                    }), data.eventType && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.Fragment, {
+                      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Box, {
+                        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
+                          margin: 0,
+                          fontSize: "sm",
+                          children: "Title for this connection**"
+                        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_7__.Input, {
+                          size: "sm",
+                          value: data.connection_title,
+                          onChange: e => setData(prev => ({
+                            ...prev,
+                            connection_title: e.target.value
+                          })),
+                          placeholder: "Update API connection"
+                        })]
+                      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Box, {
+                        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
+                          margin: 0,
+                          fontSize: "sm",
+                          children: "API Access Key*"
+                        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_7__.Input, {
+                          size: "sm",
+                          value: data.api_access_key,
+                          onChange: e => setData(prev => ({
+                            ...prev,
+                            api_access_key: e.target.value
+                          })),
+                          placeholder: "Update API connection"
+                        })]
+                      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Box, {
+                        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
+                          margin: 0,
+                          fontSize: "sm",
+                          children: "API Access Key*"
+                        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_7__.Input, {
+                          size: "sm",
+                          value: data.api_access_url,
+                          onChange: e => setData(prev => ({
+                            ...prev,
+                            api_access_url: e.target.value
+                          })),
+                          placeholder: "Update API connection"
+                        })]
                       })]
                     })]
-                  })]
+                  })
                 })
               }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_10__.TabsContent, {
                 value: "configure",
-                children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_9__.VStack, {
+                children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_9__.VStack, {
                   align: "stretch",
                   gap: 4,
-                  children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
-                    margin: 0,
-                    fontSize: "sm",
-                    children: "Connection*"
-                  }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_7__.Input, {
-                    size: "sm",
-                    value: data.connection,
-                    onChange: e => setData(prev => ({
-                      ...prev,
-                      connection: e.target.value
-                    })),
-                    placeholder: "Update API connection"
-                  })]
+                  children: selectedItem.id === "condition" ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.Fragment, {
+                    children: ["  ", conditions.map((group, gi) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Box, {
+                      border: "1px solid #E2E8F0",
+                      p: 3,
+                      rounded: "md",
+                      children: [group.rules.map(rule => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_8__.HStack, {
+                        mb: 2,
+                        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Box, {
+                          width: "35%",
+                          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_7__.Input, {
+                            placeholder: "Condition",
+                            value: rule.field,
+                            onChange: e => updateRule(group.id, rule.id, "field", e.target.value)
+                          })
+                        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Box, {
+                          width: "35%",
+                          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(react_select__WEBPACK_IMPORTED_MODULE_12__["default"], {
+                            placeholder: "Operator",
+                            options: [{
+                              value: "equals",
+                              label: "Equals"
+                            }, {
+                              value: "contains",
+                              label: "Contains"
+                            }],
+                            onChange: opt => updateRule(group.id, rule.id, "operator", opt.value)
+                          })
+                        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Box, {
+                          width: "35%",
+                          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_7__.Input, {
+                            placeholder: "Value",
+                            value: rule.value,
+                            onChange: e => updateRule(group.id, rule.id, "value", e.target.value)
+                          })
+                        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Button, {
+                          size: "sm",
+                          colorScheme: "red",
+                          onClick: () => removeRule(group.id, rule.id),
+                          children: "\u2715"
+                        })]
+                      }, rule.id)), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Button, {
+                        size: "sm",
+                        variant: "outline",
+                        onClick: () => addAndCondition(group.id),
+                        children: "+ And"
+                      }), gi !== conditions.length - 1 && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
+                        textAlign: "center",
+                        my: 2,
+                        fontSize: "sm",
+                        color: "gray.500",
+                        children: "OR"
+                      })]
+                    }, group.id)), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Button, {
+                      variant: "outline",
+                      onClick: addOrGroup,
+                      children: "+ Or Group"
+                    })]
+                  }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.Fragment, {
+                    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
+                      margin: 0,
+                      fontSize: "sm",
+                      children: "Connection*"
+                    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_7__.Input, {
+                      size: "sm",
+                      value: data.connection,
+                      onChange: e => setData(prev => ({
+                        ...prev,
+                        connection: e.target.value
+                      })),
+                      placeholder: "Update API connection"
+                    })]
+                  })
                 })
               }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_10__.TabsContent, {
                 value: "test",
@@ -1197,7 +1319,10 @@ function FlowCanvas() {
     setNodes(nds => nds.concat(routerNode));
     setEdges(updatedEdges);
   };
-  const createConditionNode = () => {
+  const createConditionNode = ({
+    conditions
+  }) => {
+    console.log(conditions, 'in');
     const {
       edge,
       node
@@ -1213,7 +1338,7 @@ function FlowCanvas() {
       sourceNode = nodes.find(n => n.id === node.id);
       if (!sourceNode) return;
     }
-    const newNodePosition = edge ? {
+    const position = edge ? {
       x: (sourceNode.position.x + targetNode.position.x) / 2,
       y: (sourceNode.position.y + targetNode.position.y) / 2
     } : {
@@ -1224,19 +1349,23 @@ function FlowCanvas() {
     const newNode = {
       id: newNodeId,
       type: "custom",
-      position: newNodePosition,
+      position,
       data: {
         label: "Condition",
-        order: nodes.length + 1,
         action: "Condition",
-        conditions: [{
-          id: `${nodes.length + 1}.0`,
-          title: "No Condition Matched",
-          permanent: true
-        }, {
-          id: `${nodes.length + 1}.1`,
-          title: "Untitled Condition 1"
-        }]
+        order: nodes.length + 1,
+        logic: {
+          groups: conditions.map(group => ({
+            id: group.id,
+            type: group.type,
+            rules: group.rules.map(rule => ({
+              id: rule.id,
+              field: rule.field,
+              operator: rule.operator,
+              value: rule.value
+            }))
+          }))
+        }
       }
     };
     let newEdges = [...edges];
@@ -1450,7 +1579,7 @@ function FlowCanvas() {
         });
       },
       setSelectedNode: setSelectedNode,
-      onCreateCondition: createConditionNode,
+      createConditionNode: createConditionNode,
       context: drawerContext,
       createRouterNode: createRouterNode,
       createActionNode: createActionNode,

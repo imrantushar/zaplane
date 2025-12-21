@@ -61,7 +61,8 @@ export default function FlowCanvas() {
         })
         setDrawerOpen(true);
     };
-    const openDrawerFromAdd = (node) => {;
+    const openDrawerFromAdd = (node) => {
+        ;
         setDrawerContext({
             source: "add",
             node: node,
@@ -190,9 +191,8 @@ export default function FlowCanvas() {
         setNodes((nds) => nds.concat(routerNode));
         setEdges(updatedEdges);
     };
-
-
-    const createConditionNode = () => {
+    const createConditionNode = ({ conditions }) => {
+        console.log(conditions,'in');
         const { edge, node } = drawerContext;
 
         let sourceNode = null;
@@ -209,8 +209,7 @@ export default function FlowCanvas() {
             if (!sourceNode) return;
         }
 
-
-        const newNodePosition = edge
+        const position = edge
             ? {
                 x: (sourceNode.position.x + targetNode.position.x) / 2,
                 y: (sourceNode.position.y + targetNode.position.y) / 2,
@@ -225,22 +224,23 @@ export default function FlowCanvas() {
         const newNode = {
             id: newNodeId,
             type: "custom",
-            position: newNodePosition,
+            position,
             data: {
                 label: "Condition",
-                order: nodes.length + 1,
                 action: "Condition",
-                conditions: [
-                    {
-                        id: `${nodes.length + 1}.0`,
-                        title: "No Condition Matched",
-                        permanent: true,
-                    },
-                    {
-                        id: `${nodes.length + 1}.1`,
-                        title: "Untitled Condition 1",
-                    },
-                ],
+                order: nodes.length + 1,
+                logic: {
+                    groups: conditions.map((group) => ({
+                        id: group.id,
+                         type: group.type,
+                        rules: group.rules.map((rule) => ({
+                            id: rule.id,
+                            field: rule.field,
+                            operator: rule.operator,
+                            value: rule.value,
+                        })),
+                    })),
+                },
             },
         };
 
@@ -279,6 +279,7 @@ export default function FlowCanvas() {
         setNodes((nds) => nds.concat(newNode));
         setEdges(newEdges);
     };
+
     const createActionNode = (actionData) => {
         const { edge, node } = drawerContext;
         let sourceNode = null;
@@ -351,7 +352,8 @@ export default function FlowCanvas() {
         setNodes((nds) => nds.concat(newNode));
         setEdges(newEdges);
     };
-    const updateTriggerNode = (triggerData) => {;
+    const updateTriggerNode = (triggerData) => {
+        ;
         setNodes((nds) =>
             nds.map((node) => {
                 if (
@@ -504,11 +506,11 @@ export default function FlowCanvas() {
                     setDrawerContext({ source: null, node: null, edge: null });
                 }}
                 setSelectedNode={setSelectedNode}
-                onCreateCondition={createConditionNode}
+                createConditionNode={createConditionNode}
                 context={drawerContext}
                 createRouterNode={createRouterNode}
                 createActionNode={createActionNode}
-                 updateTriggerNode={updateTriggerNode}
+                updateTriggerNode={updateTriggerNode}
             />
         </div>
     );
