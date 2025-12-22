@@ -1346,7 +1346,7 @@ function FlowCanvas() {
         logic: {
           groups: conditions.map(group => ({
             id: group.id,
-            type: group.type,
+            type: group.type || 'AND',
             rules: group.rules.map(rule => ({
               id: rule.id,
               field: rule.field,
@@ -1431,8 +1431,6 @@ function FlowCanvas() {
         type: "custom"
       }];
     }
-
-    // -------- NODE / ADD --------
     if (!edge && sourceNode) {
       newEdges = [...edges, {
         id: `edge-${sourceNode.id}-${newNodeId}`,

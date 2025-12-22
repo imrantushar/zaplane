@@ -233,7 +233,7 @@ export default function FlowCanvas() {
                 logic: {
                     groups: conditions.map((group) => ({
                         id: group.id,
-                         type: group.type,
+                         type: group.type || 'AND',
                         rules: group.rules.map((rule) => ({
                             id: rule.id,
                             field: rule.field,
@@ -337,7 +337,6 @@ export default function FlowCanvas() {
             ];
         }
 
-        // -------- NODE / ADD --------
         if (!edge && sourceNode) {
             newEdges = [
                 ...edges,
