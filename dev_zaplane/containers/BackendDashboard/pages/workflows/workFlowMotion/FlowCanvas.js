@@ -9,11 +9,30 @@ import {
     useReactFlow,
 } from "@xyflow/react";
 import "@xyflow/react/dist/base.css";
+import { __ } from '@wordpress/i18n';
 
 import CustomNode from "./CustomNode";
 import CustomEdge from "./CustomEdge";
 import ActionDrawer from "./ActionDrawer";
 import { useFormikContext } from "formik";
+import TopBar from "@ZAPComponents/TopBar";
+import { FaChevronRight } from "react-icons/fa";
+import {
+    Box,
+    Flex,
+    Text,
+    Button,
+    IconButton,
+    HStack,
+    Badge,
+    Checkbox,
+} from "@chakra-ui/react";
+import {
+    FiArrowLeft,
+    FiRefreshCw,
+    FiHelpCircle,
+} from "react-icons/fi";
+;
 
 let id = 0;
 const getId = () => `dndnode_${id++}`;
@@ -35,7 +54,7 @@ export default function FlowCanvas() {
     const [activeEdgeId, setActiveEdgeId] = useState(null);
     const [selectedApp, setSelectedApp] = useState(null);
     const [selectedEvent, setSelectedEvent] = useState(null);
-     const {values,setFieldValue} = useFormikContext()
+    const { values, setFieldValue } = useFormikContext()
 
     const [drawerContext, setDrawerContext] = useState({
         source: null,
@@ -87,7 +106,7 @@ export default function FlowCanvas() {
                 x: event.clientX,
                 y: event.clientY,
             });
-          
+
             const newNode = {
                 id: getId(),
                 position,
@@ -233,7 +252,7 @@ export default function FlowCanvas() {
                 logic: {
                     groups: conditions.map((group) => ({
                         id: group.id,
-                         type: group.type || 'AND',
+                        type: group.type || 'AND',
                         rules: group.rules.map((rule) => ({
                             id: rule.id,
                             field: rule.field,
@@ -475,6 +494,48 @@ export default function FlowCanvas() {
     };
     return (
         <div style={{ flex: 1, height: "100vh" }}>
+            <TopBar
+                leftContent={() => (
+                    <>
+                        <Button variant="outline">
+                            <FiArrowLeft />
+                        </Button>
+                        <Text fontSize="md" fontWeight="medium">
+                            cvcv
+                        </Text>
+                    </>
+                )}
+                rightContent={() => (
+                    <>
+                        <Checkbox.Root
+                            padding="7px 9px"
+                            borderRadius="4px"
+                            border="1px solid var(--zaplane-border-color)"
+                        >
+                            <Checkbox.HiddenInput />
+                            <Checkbox.Control />
+                            <Checkbox.Label>show runs</Checkbox.Label>
+                        </Checkbox.Root>
+                        <Button size="sm" variant="outline">
+                            {__("inactive", "zaplane")}
+                        </Button>
+                        <Button size="sm" variant="outline">
+                            {__("Save Draft", "zaplane")}
+                        </Button>
+                        <Button
+                            size="sm"
+                            bg="black"
+                            color="white"
+                            _hover={{ bg: "gray.800" }}
+                        >
+                            {__("Publish", "zaplane")}
+                        </Button>
+                    </>
+                )}
+            />
+            <Box>
+
+            </Box>
             <ReactFlow
                 nodes={nodes}
                 edges={edges}
@@ -512,7 +573,7 @@ export default function FlowCanvas() {
                 createRouterNode={createRouterNode}
                 createActionNode={createActionNode}
                 updateTriggerNode={updateTriggerNode}
-                
+
             />
         </div>
     );

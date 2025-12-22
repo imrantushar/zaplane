@@ -8,7 +8,7 @@ export default function Workflows() {
   return (
     <ReactFlowProvider>
       <div style={{ display: "flex", height: "100vh" }}>
-        <Sidebar />
+        {/* <Sidebar /> */}
         <Formik
           initialValues={
           {
