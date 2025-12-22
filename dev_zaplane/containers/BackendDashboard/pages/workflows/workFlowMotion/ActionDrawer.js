@@ -174,7 +174,7 @@ export default function ActionDrawer({ open, context, onClose, updateTriggerNode
                 connection: values.connection,
 
             };
-            if (context?.source === "node" && context.node?.values?.action === "Trigger") {
+            if (context?.source === "node" && context.node?.data?.action === "Trigger") {
                 updateTriggerNode(payload);
             } else {
                 createActionNode(payload);

@@ -490,7 +490,7 @@ function ActionDrawer({
         connection_title: values.connection_title,
         connection: values.connection
       };
-      if (context?.source === "node" && context.node?.values?.action === "Trigger") {
+      if (context?.source === "node" && context.node?.data?.action === "Trigger") {
         updateTriggerNode(payload);
       } else {
         createActionNode(payload);
