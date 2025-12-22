@@ -4,7 +4,7 @@ namespace Zaplane\API;
 use WP_REST_Controller;
 use Zaplane\Classes\IntegrationLoader;
 use Zaplane\API\Schema\WorkflowsSchema;
-use Zaplane\Query\WorkFlows as WorkFlowsQuery;
+use Zaplane\Query\Workflows as WorkflowsQuery;
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
@@ -108,7 +108,7 @@ class WorkflowsController extends WP_REST_Controller {
 	 */
 	public function get_items( $request ) {
 		$data = WorkflowsQuery::get_all();
-		$total = WorkFlowsQuery::count();
+		$total = WorkflowsQuery::count();
 		rest_ensure_response( $data );
 		$response = rest_ensure_response( $data );
 		$response->header( 'x-wp-total', $total );
