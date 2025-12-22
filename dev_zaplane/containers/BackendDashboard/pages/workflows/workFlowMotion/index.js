@@ -4,7 +4,7 @@ import Sidebar from "./Sidebar";
 import FlowCanvas from "./FlowCanvas";
 import { Form, Formik } from "formik";
 
-export default function Workflows() {
+export default function Workflows({id}) {
   return (
     <ReactFlowProvider>
       <div style={{ display: "flex", height: "100vh" }}>

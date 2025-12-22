@@ -1,17 +1,23 @@
 import { useQuery } from '@ZAPUtils/helper';
 import React, { useEffect } from 'react';
-import Workflows from './pages/workflows';
+
+import CreateWorkflows from './pages/workflows';
+import Workflows from './pages/workflows/workFlowMotion';
 
 
 
 const renderSwitch = (page, id, action, path) => {
+	console.log(page,id,action,path);
 
 
 	switch (page) {
 		case 'zaplane':
 			return <>Zaplane Dashboard</>;
 		case 'zaplane-workflows':
-			return <Workflows />;
+			if ( action || id ) {
+				return <Workflows id={ id } />;
+			}
+			return <CreateWorkflows />;
 		// case 'zaplane-logs':
 		// 	return <Logs />;
 

@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
     ReactFlow,
     addEdge,
@@ -26,12 +26,17 @@ import {
     HStack,
     Badge,
     Checkbox,
+    useSelect,
 } from "@chakra-ui/react";
 import {
     FiArrowLeft,
     FiRefreshCw,
     FiHelpCircle,
 } from "react-icons/fi";
+import { useNavigate } from "react-router-dom";
+import { createWorkflows, getWorkFlow } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { use } from "react";
 ;
 
 let id = 0;
@@ -48,6 +53,8 @@ export default function FlowCanvas() {
             position: { x: 125, y: 500 },
         }
     ]);
+    const dispatch = useDispatch();
+    const navigate = useNavigate()
     const [edges, setEdges, onEdgesChange] = useEdgesState([]);
     const [drawerOpen, setDrawerOpen] = useState(false);
     const [selectedNode, setSelectedNode] = useState(null);
@@ -55,13 +62,39 @@ export default function FlowCanvas() {
     const [selectedApp, setSelectedApp] = useState(null);
     const [selectedEvent, setSelectedEvent] = useState(null);
     const { values, setFieldValue } = useFormikContext()
+    const workflowTitle = useSelector((state) => state.workflows.workflow_Title);
+    console.log(workflowTitle,"hiiii");
 
     const [drawerContext, setDrawerContext] = useState({
         source: null,
         node: null,
         edge: null,
     });
+    const { data } = useSelector((state) => state.workflows);
 
+	useEffect(() => {
+		dispatch(getWorkFlow());
+	}, [dispatch]);
+     console.log(data);
+	const payload = {
+		title: workflowTitle || 'Test Workflow',
+		name: 'test',
+		status: 'active',
+		flow_json: JSON.stringify({ nodes, edges }),
+	}
+
+
+   dispatch(createWorkflows(payload))
+	.unwrap()
+	.then((response) => {
+		console.log('success:', response);
+	})
+	.catch((error) => {
+		console.error('error:', error);
+	})
+	.finally(() => {
+		console.log('final');
+	});
 
     const { screenToFlowPosition } = useReactFlow();
     const openDrawerForNode = (node) => {
@@ -497,11 +530,11 @@ export default function FlowCanvas() {
             <TopBar
                 leftContent={() => (
                     <>
-                        <Button variant="outline">
+                        <Button variant="outline" onClick={() => navigate(-1)}>
                             <FiArrowLeft />
                         </Button>
                         <Text fontSize="md" fontWeight="medium">
-                            cvcv
+                            {workflowTitle || __("Untitled Workflow", "zaplane")}
                         </Text>
                     </>
                 )}
