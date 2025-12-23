@@ -3,6 +3,7 @@ import React, { useEffect } from 'react';
 
 import CreateWorkflows from './pages/workflows';
 import Workflows from './pages/workflows/workFlowMotion';
+import Notification from '@ZAPComponents/Notification';
 
 
 
@@ -54,6 +55,7 @@ export default function BackendDashboard() {
 	
 	return (
 		<div className="zaplane-admin-content">
+			<Notification />
 			{renderSwitch(
 				query.get('page'),
 				parseInt(query.get('id')),

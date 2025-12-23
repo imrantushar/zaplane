@@ -63,38 +63,38 @@ export default function FlowCanvas() {
     const [selectedEvent, setSelectedEvent] = useState(null);
     const { values, setFieldValue } = useFormikContext()
     const workflowTitle = useSelector((state) => state.workflows.workflow_Title);
-    console.log(workflowTitle,"hiiii");
+    console.log(workflowTitle, "hiiii");
 
     const [drawerContext, setDrawerContext] = useState({
         source: null,
         node: null,
         edge: null,
     });
-    // const { data } = useSelector((state) => state.workflows);
+    const { data } = useSelector((state) => state.workflows);
+    console.log(data, 'dataaaaaaaaaaaaaaaa');
+    useEffect(() => {
+        dispatch(getWorkFlow());
+    }, [dispatch]);
+    console.log(data);
+    const payload = {
+        title: workflowTitle || 'Test Workflow',
+        name: 'test',
+        status: 'active',
+        flow_json: JSON.stringify({ nodes, edges }),
+    }
 
-	// useEffect(() => {
-	// 	dispatch(getWorkFlow());
-	// }, [dispatch]);
-    //  console.log(data);
-	const payload = {
-		title: workflowTitle || 'Test Workflow',
-		name: 'test',
-		status: 'active',
-		flow_json: JSON.stringify({ nodes, edges }),
-	}
 
-
-   dispatch(createWorkflows(payload))
-	.unwrap()
-	.then((response) => {
-		console.log('success:', response);
-	})
-	.catch((error) => {
-		console.error('error:', error);
-	})
-	.finally(() => {
-		console.log('final');
-	});
+    dispatch(createWorkflows(payload))
+        .unwrap()
+        .then((response) => {
+            console.log('success:', response);
+        })
+        .catch((error) => {
+            // console.error('error:', error);
+        })
+        .finally(() => {
+            console.log('final');
+        });
 
     const { screenToFlowPosition } = useReactFlow();
     const openDrawerForNode = (node) => {

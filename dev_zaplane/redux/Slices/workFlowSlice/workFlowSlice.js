@@ -15,35 +15,33 @@ export const createWorkflows = createAsyncThunk(
 	async ( payload, thunkAPI ) => {
 		return await API.post( namespace + 'workflows', payload )
 			.then( ( res ) => {
-				if ( res.status === 201 ) {
-					handleSliceSuccess( thunkAPI, res.data.message );
+
+					handleSliceSuccess( thunkAPI,"data fetched successfully" );
 					return res.data;
-				}
 			} )
 			.catch( ( err ) => {
-				return handleSliceError( thunkAPI, err );
+				return handleSliceError( thunkAPI, "Data fetching failed" );
 			} );
 	}
 );
 
 export const getWorkFlow = createAsyncThunk(
-	'zaplane/getWorkFlow',
-	async (thunkAPI ) => {
-		return await API.get(
-			namespace + "workflows"
-		)
-			.then( ( res ) => {
-				if ( res.status === 200 ) {
-					console.log(res,'res in slice');
-					return res.data;
-				}
-			} )
-			.catch( ( err ) => {
-				return handleSliceError( thunkAPI, err );
-			} );
-	}
+    'zaplane/getWorkFlow',
+    async (ID, thunkAPI) => {
+        try {
+            const res = await API.get(namespace + "workflows");
+            console.log(res)
+        } catch (e) {
+            thunkAPI.dispatch(
+                showNotification({
+                    message: e,
+                    isShow: true,
+                    type: 'error',
+                })
+            );
+        }
+    }
 );
-
 
 
 const workflowsSlice = createSlice( {

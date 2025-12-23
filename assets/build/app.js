@@ -465,6 +465,112 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ },
 
+/***/ "./dev_zaplane/components/Notification/index.js"
+/*!******************************************************!*\
+  !*** ./dev_zaplane/components/Notification/index.js ***!
+  \******************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var react_redux__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/dist/react-redux.mjs");
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! react-dom */ "react-dom");
+/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(react_dom__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/button/button.js");
+/* harmony import */ var _ZAPRedux_Slices_notificationSlice_notificationSlice__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @ZAPRedux/Slices/notificationSlice/notificationSlice */ "./dev_zaplane/redux/Slices/notificationSlice/notificationSlice.js");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__);
+
+
+
+
+
+
+
+const iconType = type => {
+  switch (type) {
+    case 'error':
+      return 'badge-alert';
+    case 'info':
+      return 'info';
+    case 'warning':
+      return 'circle-alert';
+    default:
+      return 'round-checkmark';
+  }
+};
+const Notification = () => {
+  const notificationRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
+  const targetElement = document.querySelector('#zaplanesswrap') || document.querySelector('#zaplanessFrontendWrap');
+  const notification = (0,react_redux__WEBPACK_IMPORTED_MODULE_1__.useSelector)(state => state.notification);
+  const dispatch = (0,react_redux__WEBPACK_IMPORTED_MODULE_1__.useDispatch)();
+  const isShowNotification = notification?.showNotification || notification?.isShow;
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    if (isShowNotification && targetElement) {
+      notificationRef.current.style.position = 'fixed';
+      notificationRef.current.style.left = `50%`; // Adjust left position as needed
+      notificationRef.current.style.transform = 'translateX(-50%)';
+      notificationRef.current.style.bottom = `50px`; // Place it at the bottom
+      document.body.appendChild(notificationRef.current);
+    } else if (notificationRef.current && notificationRef.current.parentNode === document.body) {
+      document.body.removeChild(notificationRef.current);
+    }
+    return () => {
+      if (notificationRef.current && notificationRef.current.parentNode === document.body) {
+        document.body.removeChild(notificationRef?.current);
+      }
+    };
+  }, [isShowNotification]);
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    if (isShowNotification) {
+      const timeout_id = setTimeout(() => {
+        closeHandler();
+      }, 6000);
+      return () => clearTimeout(timeout_id);
+    }
+  }, [isShowNotification]);
+  const closeHandler = () => {
+    dispatch((0,_ZAPRedux_Slices_notificationSlice_notificationSlice__WEBPACK_IMPORTED_MODULE_5__.showNotification)({
+      message: '',
+      isShow: false
+    }));
+  };
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.Fragment, {
+    children: isShowNotification && (0,react_dom__WEBPACK_IMPORTED_MODULE_3__.createPortal)(/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("div", {
+      className: `zaplaness-notification ${notification.type && `zaplaness-notification--${notification.type}`}`,
+      ref: notificationRef,
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("div", {
+        className: "zaplaness-notification__message",
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("span", {
+          className: `zaplaness-icon zaplaness-icon--${iconType(notification.type)} has-zaplaness-blue-bg`,
+          "aria-hidden": true
+        }), notification.isHtml ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("div", {
+          dangerouslySetInnerHTML: {
+            __html: notification.message
+          }
+        }) : notification.message]
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Button, {
+        bg: "transparent",
+        onClick: closeHandler,
+        "aria-label": (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Close notification', 'zaplaness'),
+        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("span", {
+          className: "zaplaness-icon zaplaness-icon--close has-zaplaness-blue-bg"
+        })
+      })]
+    }), document.body)
+  });
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Notification);
+
+/***/ },
+
 /***/ "./dev_zaplane/components/TopBar/index.js"
 /*!************************************************!*\
   !*** ./dev_zaplane/components/TopBar/index.js ***!
@@ -733,8 +839,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _pages_workflows__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./pages/workflows */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/index.js");
 /* harmony import */ var _pages_workflows_workFlowMotion__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./pages/workflows/workFlowMotion */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/index.js");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var _ZAPComponents_Notification__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @ZAPComponents/Notification */ "./dev_zaplane/components/Notification/index.js");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__);
+
 
 
 
@@ -744,16 +852,16 @@ const renderSwitch = (page, id, action, path) => {
   console.log(page, id, action, path);
   switch (page) {
     case 'zaplane':
-      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.Fragment, {
+      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.Fragment, {
         children: "Zaplane Dashboard"
       });
     case 'zaplane-workflows':
       if (action || id) {
-        return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_pages_workflows_workFlowMotion__WEBPACK_IMPORTED_MODULE_3__["default"], {
+        return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(_pages_workflows_workFlowMotion__WEBPACK_IMPORTED_MODULE_3__["default"], {
           id: id
         });
       }
-      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_pages_workflows__WEBPACK_IMPORTED_MODULE_2__["default"], {});
+      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(_pages_workflows__WEBPACK_IMPORTED_MODULE_2__["default"], {});
     // case 'zaplane-logs':
     // 	return <Logs />;
 
@@ -781,16 +889,16 @@ const renderSwitch = (page, id, action, path) => {
     // 	return <Leaderboards />;
 
     default:
-      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.Fragment, {
+      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.Fragment, {
         children: "No page found"
       });
   }
 };
 function BackendDashboard() {
   const query = (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_0__.useQuery)();
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("div", {
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsxs)("div", {
     className: "zaplane-admin-content",
-    children: renderSwitch(query.get('page'), parseInt(query.get('id')), query.get('action'), query.get('path'))
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(_ZAPComponents_Notification__WEBPACK_IMPORTED_MODULE_4__["default"], {}), renderSwitch(query.get('page'), parseInt(query.get('id')), query.get('action'), query.get('path'))]
   });
 }
 
@@ -1829,12 +1937,14 @@ function FlowCanvas() {
     node: null,
     edge: null
   });
-  // const { data } = useSelector((state) => state.workflows);
-
-  // useEffect(() => {
-  // 	dispatch(getWorkFlow());
-  // }, [dispatch]);
-  //  console.log(data);
+  const {
+    data
+  } = (0,react_redux__WEBPACK_IMPORTED_MODULE_17__.useSelector)(state => state.workflows);
+  console.log(data, 'dataaaaaaaaaaaaaaaa');
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_16__.getWorkFlow)());
+  }, [dispatch]);
+  console.log(data);
   const payload = {
     title: workflowTitle || 'Test Workflow',
     name: 'test',
@@ -1847,7 +1957,7 @@ function FlowCanvas() {
   dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_16__.createWorkflows)(payload)).unwrap().then(response => {
     console.log('success:', response);
   }).catch(error => {
-    console.error('error:', error);
+    // console.error('error:', error);
   }).finally(() => {
     console.log('final');
   });
@@ -2646,23 +2756,23 @@ __webpack_require__.r(__webpack_exports__);
 const namespace = 'zaplane/v1/';
 const createWorkflows = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyncThunk)('zaplane/createWorkflows', async (payload, thunkAPI) => {
   return await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_1__.API.post(namespace + 'workflows', payload).then(res => {
-    if (res.status === 201) {
-      (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_1__.handleSliceSuccess)(thunkAPI, res.data.message);
-      return res.data;
-    }
+    (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_1__.handleSliceSuccess)(thunkAPI, "data fetched successfully");
+    return res.data;
   }).catch(err => {
-    return (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_1__.handleSliceError)(thunkAPI, err);
+    return (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_1__.handleSliceError)(thunkAPI, "Data fetching failed");
   });
 });
-const getWorkFlow = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyncThunk)('zaplane/getWorkFlow', async thunkAPI => {
-  return await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_1__.API.get(namespace + "workflows").then(res => {
-    if (res.status === 200) {
-      console.log(res, 'res in slice');
-      return res.data;
-    }
-  }).catch(err => {
-    return (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_1__.handleSliceError)(thunkAPI, err);
-  });
+const getWorkFlow = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyncThunk)('zaplane/getWorkFlow', async (ID, thunkAPI) => {
+  try {
+    const res = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_1__.API.get(namespace + "workflows");
+    console.log(res);
+  } catch (e) {
+    thunkAPI.dispatch(showNotification({
+      message: e,
+      isShow: true,
+      type: 'error'
+    }));
+  }
 });
 const workflowsSlice = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createSlice)({
   name: 'workflows',
@@ -2767,6 +2877,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
 /* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! axios */ "./node_modules/axios/lib/axios.js");
+/* harmony import */ var _ZAPRedux_Slices_notificationSlice_notificationSlice__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @ZAPRedux/Slices/notificationSlice/notificationSlice */ "./dev_zaplane/redux/Slices/notificationSlice/notificationSlice.js");
+
 
 
 
@@ -2797,7 +2909,7 @@ const useQuery = () => {
 };
 const handleSliceError = (thunkAPI, error) => {
   var _ref, _error$response$data$;
-  thunkAPI.dispatch(showNotification({
+  thunkAPI.dispatch((0,_ZAPRedux_Slices_notificationSlice_notificationSlice__WEBPACK_IMPORTED_MODULE_3__.showNotification)({
     message: (_ref = (_error$response$data$ = error?.response.data.message) !== null && _error$response$data$ !== void 0 ? _error$response$data$ : error?.response?.message) !== null && _ref !== void 0 ? _ref : error?.message,
     isShow: true,
     type: 'error'
@@ -2806,7 +2918,7 @@ const handleSliceError = (thunkAPI, error) => {
   return thunkAPI.rejectWithValue(error.message);
 };
 const handleSliceSuccess = (thunkAPI, message) => {
-  thunkAPI.dispatch(showNotification({
+  thunkAPI.dispatch((0,_ZAPRedux_Slices_notificationSlice_notificationSlice__WEBPACK_IMPORTED_MODULE_3__.showNotification)({
     message: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)(message, 'zaplane'),
     isShow: true,
     type: 'success'
