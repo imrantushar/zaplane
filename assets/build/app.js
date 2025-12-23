@@ -508,7 +508,7 @@ const iconType = type => {
 };
 const Notification = () => {
   const notificationRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
-  const targetElement = document.querySelector('#zaplanesswrap') || document.querySelector('#zaplanessFrontendWrap');
+  const targetElement = document.querySelector('#zaplane-app');
   const notification = (0,react_redux__WEBPACK_IMPORTED_MODULE_1__.useSelector)(state => state.notification);
   const dispatch = (0,react_redux__WEBPACK_IMPORTED_MODULE_1__.useDispatch)();
   const isShowNotification = notification?.showNotification || notification?.isShow;
