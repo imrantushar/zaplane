@@ -1944,23 +1944,20 @@ function FlowCanvas() {
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
     dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_16__.getWorkFlow)());
   }, [dispatch]);
-  console.log(data);
-  const payload = {
-    title: workflowTitle || 'Test Workflow',
-    name: 'test',
-    status: 'active',
-    flow_json: JSON.stringify({
-      nodes,
-      edges
-    })
-  };
-  dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_16__.createWorkflows)(payload)).unwrap().then(response => {
-    console.log('success:', response);
-  }).catch(error => {
-    // console.error('error:', error);
-  }).finally(() => {
-    console.log('final');
-  });
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    // if (!workflowTitle || hasCreated) return;
+
+    const payload = {
+      title: workflowTitle || "Untitled Workflow",
+      name: 'test',
+      status: 'active',
+      flow_json: JSON.stringify({
+        nodes,
+        edges
+      })
+    };
+    dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_16__.createWorkflows)(payload)).unwrap().then(res => console.log(res, 'resssssss'));
+  }, [workflowTitle, nodes, edges]);
   const {
     screenToFlowPosition
   } = (0,_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.useReactFlow)();
