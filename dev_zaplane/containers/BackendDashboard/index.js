@@ -8,8 +8,6 @@ import Notification from '@ZAPComponents/Notification';
 
 
 const renderSwitch = (page, id, action, path) => {
-	console.log(page,id,action,path);
-
 
 	switch (page) {
 		case 'zaplane':

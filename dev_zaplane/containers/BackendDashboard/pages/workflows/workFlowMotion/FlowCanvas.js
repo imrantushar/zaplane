@@ -70,7 +70,7 @@ export default function FlowCanvas({ id }) {
     const singleData =data[0]
     const flowObj = parseFlowJson(data[0]?.flow_json,);
     const isFlowLoaded = useRef(false);
-    console.log(data, 'flowB');
+
 
     useEffect(() => {
         if (!flowObj || isFlowLoaded.current) return;

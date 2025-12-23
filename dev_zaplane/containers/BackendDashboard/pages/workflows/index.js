@@ -54,8 +54,6 @@ const CreateWorkflows = () => {
   // Redux code untouched
   const {data} = useSelector((state) => state.workflows);
 
-console.log(data,'create data');
-
   useEffect(() => {
     dispatch(getWorkFlow());
   }, [dispatch]);
@@ -73,7 +71,6 @@ console.log(data,'create data');
     )
       .unwrap()
       .then((res) => {
-        console.log(res,'resData');
         navigate(
            `${route_path}admin.php?page=zaplane-workflows&action=edit&id=${res.id}`
         );
@@ -83,7 +80,6 @@ console.log(data,'create data');
     setIsModalOpen(false);
   };
 const workflowDeleteHandler = ( id ) => {
-  console.log("id",id);
 		if (
 			window.confirm(
 				__(

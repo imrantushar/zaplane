@@ -17,8 +17,6 @@ export const createWorkflows = createAsyncThunk(
 	async ( payload, thunkAPI ) => {
 		return await API.post( namespace + 'workflows', payload )
 			.then( ( res ) => {
-				console.log(res,'response');
-
 					handleSliceSuccess( thunkAPI,"data fetched successfully" );
 					return res.data;
 			} )
@@ -75,7 +73,6 @@ export const updateWorkFlow = createAsyncThunk(
 export const getSingleWorkFlow = createAsyncThunk(
 	'zaplane/getSingleWorkFlow',
 	async (id, thunkAPI) => {
-		console.log(id,'form slices');
 		try {
 			const res = await API.post(
 				namespace + "workflows/" + parseInt(id) , {
@@ -92,34 +89,6 @@ export const getSingleWorkFlow = createAsyncThunk(
 		}
 	}
 );
-// 	'zaplane/deleteWorkFlow',
-// 	async ( id , thunkAPI) => {
-// 		try {
-// 			await API.delete(
-// 				namespace + "workflows/" + parseInt(id),
-// 				{ data: { force: true } },
-// 				{ headers: { 'X-HTTP-Method-Override': 'DELETE' } }
-// 			);
-// 			thunkAPI.dispatch(
-// 				showNotification({
-// 					message: __('workflow Deleted', 'zaplane'),
-// 					isShow: true,
-// 					type: 'success',
-// 				})
-// 			);
-// 			return id;
-// 		} 
-// 		catch (e) {
-// 			thunkAPI.dispatch(
-// 				showNotification({
-// 					message: e,
-// 					isShow: true,
-// 					type: 'error',
-// 				})
-// 			);
-// 		}
-// 	}
-// );
 export const deleteWorkFlow = createAsyncThunk(
   'zaplane/deleteWorkFlow',
   async (id, thunkAPI) => {

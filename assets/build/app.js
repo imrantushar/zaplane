@@ -849,7 +849,6 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const renderSwitch = (page, id, action, path) => {
-  console.log(page, id, action, path);
   switch (page) {
     case 'zaplane':
       return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.Fragment, {
@@ -973,7 +972,6 @@ const CreateWorkflows = () => {
   const {
     data
   } = (0,react_redux__WEBPACK_IMPORTED_MODULE_14__.useSelector)(state => state.workflows);
-  console.log(data, 'create data');
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
     dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_17__.getWorkFlow)());
   }, [dispatch]);
@@ -985,14 +983,12 @@ const CreateWorkflows = () => {
       status: "active",
       flow_json: JSON.stringify()
     })).unwrap().then(res => {
-      console.log(res, 'resData');
       navigate(`${_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_13__.route_path}admin.php?page=zaplane-workflows&action=edit&id=${res.id}`);
     });
     setWorkflowName("");
     setIsModalOpen(false);
   };
   const workflowDeleteHandler = id => {
-    console.log("id", id);
     if (window.confirm((0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Are you sure you want to permanently delete ?', 'zaplane'))) {
       dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_17__.deleteWorkFlow)(id));
     }
@@ -2042,7 +2038,6 @@ function FlowCanvas({
   const singleData = data[0];
   const flowObj = (0,_helper__WEBPACK_IMPORTED_MODULE_19__.parseFlowJson)(data[0]?.flow_json);
   const isFlowLoaded = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(false);
-  console.log(data, 'flowB');
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
     if (!flowObj || isFlowLoaded.current) return;
     if (Array.isArray(flowObj.nodes)) {
@@ -2912,7 +2907,6 @@ __webpack_require__.r(__webpack_exports__);
 const namespace = 'zaplane/v1/';
 const createWorkflows = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyncThunk)('zaplane/createWorkflows', async (payload, thunkAPI) => {
   return await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.post(namespace + 'workflows', payload).then(res => {
-    console.log(res, 'response');
     (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.handleSliceSuccess)(thunkAPI, "data fetched successfully");
     return res.data;
   }).catch(err => {
@@ -2952,7 +2946,6 @@ const updateWorkFlow = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAs
   }
 });
 const getSingleWorkFlow = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyncThunk)('zaplane/getSingleWorkFlow', async (id, thunkAPI) => {
-  console.log(id, 'form slices');
   try {
     const res = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.post(namespace + "workflows/" + parseInt(id), {});
     return res.data;
@@ -2964,34 +2957,6 @@ const getSingleWorkFlow = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.creat
     }));
   }
 });
-// 	'zaplane/deleteWorkFlow',
-// 	async ( id , thunkAPI) => {
-// 		try {
-// 			await API.delete(
-// 				namespace + "workflows/" + parseInt(id),
-// 				{ data: { force: true } },
-// 				{ headers: { 'X-HTTP-Method-Override': 'DELETE' } }
-// 			);
-// 			thunkAPI.dispatch(
-// 				showNotification({
-// 					message: __('workflow Deleted', 'zaplane'),
-// 					isShow: true,
-// 					type: 'success',
-// 				})
-// 			);
-// 			return id;
-// 		} 
-// 		catch (e) {
-// 			thunkAPI.dispatch(
-// 				showNotification({
-// 					message: e,
-// 					isShow: true,
-// 					type: 'error',
-// 				})
-// 			);
-// 		}
-// 	}
-// );
 const deleteWorkFlow = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyncThunk)('zaplane/deleteWorkFlow', async (id, thunkAPI) => {
   try {
     const res = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.delete(namespace + "workflows/" + parseInt(id), {
