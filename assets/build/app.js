@@ -1944,23 +1944,20 @@ function FlowCanvas() {
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
     dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_16__.getWorkFlow)());
   }, [dispatch]);
-  console.log(data);
-  const payload = {
-    title: workflowTitle || 'Test Workflow',
-    name: 'test',
-    status: 'active',
-    flow_json: JSON.stringify({
-      nodes,
-      edges
-    })
-  };
-  dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_16__.createWorkflows)(payload)).unwrap().then(response => {
-    console.log('success:', response);
-  }).catch(error => {
-    // console.error('error:', error);
-  }).finally(() => {
-    console.log('final');
-  });
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    // if (!workflowTitle || hasCreated) return;
+
+    const payload = {
+      title: workflowTitle || "Untitled Workflow",
+      name: 'test',
+      status: 'active',
+      flow_json: JSON.stringify({
+        nodes,
+        edges
+      })
+    };
+    dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_16__.createWorkflows)(payload)).unwrap().then(res => console.log(res, 'resssssss'));
+  }, [workflowTitle, nodes, edges]);
   const {
     screenToFlowPosition
   } = (0,_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.useReactFlow)();
@@ -2756,6 +2753,7 @@ __webpack_require__.r(__webpack_exports__);
 const namespace = 'zaplane/v1/';
 const createWorkflows = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyncThunk)('zaplane/createWorkflows', async (payload, thunkAPI) => {
   return await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_1__.API.post(namespace + 'workflows', payload).then(res => {
+    console.log(res, 'response');
     (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_1__.handleSliceSuccess)(thunkAPI, "data fetched successfully");
     return res.data;
   }).catch(err => {
@@ -2789,10 +2787,9 @@ const workflowsSlice = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createSl
     builder.addCase(createWorkflows.fulfilled, (state, action) => {
       state.data = [action.payload, ...state.data];
     }).addCase(getWorkFlow.fulfilled, (state, action) => {
-      const {
-        data
-      } = action.payload;
-      state.data = data;
+      // console.log(action,'action');
+      // const { data } =action.payload;
+      // state.data = data;
     });
   }
 });

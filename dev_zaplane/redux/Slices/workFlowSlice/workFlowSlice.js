@@ -15,6 +15,7 @@ export const createWorkflows = createAsyncThunk(
 	async ( payload, thunkAPI ) => {
 		return await API.post( namespace + 'workflows', payload )
 			.then( ( res ) => {
+				console.log(res,'response');
 
 					handleSliceSuccess( thunkAPI,"data fetched successfully" );
 					return res.data;
@@ -64,8 +65,9 @@ const workflowsSlice = createSlice( {
 			} )
 
 			.addCase( getWorkFlow.fulfilled, ( state, action ) => {
-				const { data } =action.payload;
-				state.data = data;
+				// console.log(action,'action');
+				// const { data } =action.payload;
+				// state.data = data;
 				
 			} )
 
