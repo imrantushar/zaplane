@@ -67,9 +67,11 @@ export default function FlowCanvas({ id }) {
     const workflowTitle = useSelector((state) => state.workflows.workflow_Title);
     const [loading, setLoading] = useState(false);
     const { data } = useSelector((state) => state.workflows);
+    const singleData =data[0]
     const flowObj = parseFlowJson(data[0]?.flow_json,);
     const isFlowLoaded = useRef(false);
-    console.log(flowObj, 'flowB');
+    console.log(data, 'flowB');
+
     useEffect(() => {
         if (!flowObj || isFlowLoaded.current) return;
 
@@ -100,7 +102,7 @@ export default function FlowCanvas({ id }) {
     }, [id]);
     const onSubmitHandler = async () => {
         const payload = {
-            title: 'hy',
+            title: singleData?.title,
             name: "test",
             status: "active",
             flow_json: JSON.stringify({ nodes, edges }),
@@ -558,7 +560,7 @@ export default function FlowCanvas({ id }) {
                             <FiArrowLeft />
                         </Button>
                         <Text fontSize="md" fontWeight="medium">
-                            {workflowTitle || __("Untitled Workflow", "zaplane")}
+                            {singleData?.title || __("Untitled Workflow", "zaplane")}
                         </Text>
                     </>
                 )}

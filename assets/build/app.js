@@ -2039,9 +2039,10 @@ function FlowCanvas({
   const {
     data
   } = (0,react_redux__WEBPACK_IMPORTED_MODULE_17__.useSelector)(state => state.workflows);
+  const singleData = data[0];
   const flowObj = (0,_helper__WEBPACK_IMPORTED_MODULE_19__.parseFlowJson)(data[0]?.flow_json);
   const isFlowLoaded = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(false);
-  console.log(flowObj, 'flowB');
+  console.log(data, 'flowB');
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
     if (!flowObj || isFlowLoaded.current) return;
     if (Array.isArray(flowObj.nodes)) {
@@ -2063,7 +2064,7 @@ function FlowCanvas({
   }, [id]);
   const onSubmitHandler = async () => {
     const payload = {
-      title: 'hy',
+      title: singleData?.title,
       name: "test",
       status: "active",
       flow_json: JSON.stringify({
@@ -2445,7 +2446,7 @@ function FlowCanvas({
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_20__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Text, {
           fontSize: "md",
           fontWeight: "medium",
-          children: workflowTitle || (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("Untitled Workflow", "zaplane")
+          children: singleData?.title || (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("Untitled Workflow", "zaplane")
         })]
       }),
       rightContent: () => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_20__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_20__.Fragment, {
@@ -2900,27 +2901,30 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   updateWorkFlow: () => (/* binding */ updateWorkFlow)
 /* harmony export */ });
 /* harmony import */ var _reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @reduxjs/toolkit */ "./node_modules/@reduxjs/toolkit/dist/redux-toolkit.modern.mjs");
-/* harmony import */ var _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @ZAPUtils/helper */ "./dev_zaplane/utils/helper.js");
-/* harmony import */ var _notificationSlice_notificationSlice__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../notificationSlice/notificationSlice */ "./dev_zaplane/redux/Slices/notificationSlice/notificationSlice.js");
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @ZAPUtils/helper */ "./dev_zaplane/utils/helper.js");
+/* harmony import */ var _notificationSlice_notificationSlice__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../notificationSlice/notificationSlice */ "./dev_zaplane/redux/Slices/notificationSlice/notificationSlice.js");
+
 
 
 
 const namespace = 'zaplane/v1/';
 const createWorkflows = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyncThunk)('zaplane/createWorkflows', async (payload, thunkAPI) => {
-  return await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_1__.API.post(namespace + 'workflows', payload).then(res => {
+  return await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.post(namespace + 'workflows', payload).then(res => {
     console.log(res, 'response');
-    (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_1__.handleSliceSuccess)(thunkAPI, "data fetched successfully");
+    (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.handleSliceSuccess)(thunkAPI, "data fetched successfully");
     return res.data;
   }).catch(err => {
-    return (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_1__.handleSliceError)(thunkAPI, "Data fetching failed");
+    return (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.handleSliceError)(thunkAPI, "Data fetching failed");
   });
 });
 const getWorkFlow = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyncThunk)('zaplane/getWorkFlow', async (ID, thunkAPI) => {
   try {
-    const res = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_1__.API.get(namespace + "workflows");
+    const res = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.get(namespace + "workflows");
     return res.data;
   } catch (e) {
-    thunkAPI.dispatch((0,_notificationSlice_notificationSlice__WEBPACK_IMPORTED_MODULE_2__.showNotification)({
+    thunkAPI.dispatch((0,_notificationSlice_notificationSlice__WEBPACK_IMPORTED_MODULE_3__.showNotification)({
       message: e,
       isShow: true,
       type: 'error'
@@ -2932,15 +2936,15 @@ const updateWorkFlow = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAs
   payload
 }, thunkAPI) => {
   try {
-    const res = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_1__.API.post(namespace + "workflows/" + parseInt(id), payload);
-    thunkAPI.dispatch((0,_notificationSlice_notificationSlice__WEBPACK_IMPORTED_MODULE_2__.showNotification)({
-      message: __('Updated Orders Successfully', 'workflow'),
+    const res = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.post(namespace + "workflows/" + parseInt(id), payload);
+    thunkAPI.dispatch((0,_notificationSlice_notificationSlice__WEBPACK_IMPORTED_MODULE_3__.showNotification)({
+      message: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Updated Orders Successfully', 'workflow'),
       isShow: true,
       type: 'success'
     }));
     return res.data;
   } catch (e) {
-    thunkAPI.dispatch((0,_notificationSlice_notificationSlice__WEBPACK_IMPORTED_MODULE_2__.showNotification)({
+    thunkAPI.dispatch((0,_notificationSlice_notificationSlice__WEBPACK_IMPORTED_MODULE_3__.showNotification)({
       message: e,
       isShow: true,
       type: 'error'
@@ -2950,10 +2954,10 @@ const updateWorkFlow = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAs
 const getSingleWorkFlow = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyncThunk)('zaplane/getSingleWorkFlow', async (id, thunkAPI) => {
   console.log(id, 'form slices');
   try {
-    const res = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_1__.API.post(namespace + "workflows/" + parseInt(id), {});
+    const res = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.post(namespace + "workflows/" + parseInt(id), {});
     return res.data;
   } catch (e) {
-    thunkAPI.dispatch((0,_notificationSlice_notificationSlice__WEBPACK_IMPORTED_MODULE_2__.showNotification)({
+    thunkAPI.dispatch((0,_notificationSlice_notificationSlice__WEBPACK_IMPORTED_MODULE_3__.showNotification)({
       message: e,
       isShow: true,
       type: 'error'
@@ -2990,7 +2994,7 @@ const getSingleWorkFlow = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.creat
 // );
 const deleteWorkFlow = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyncThunk)('zaplane/deleteWorkFlow', async (id, thunkAPI) => {
   try {
-    const res = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_1__.API.delete(namespace + "workflows/" + parseInt(id), {
+    const res = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.delete(namespace + "workflows/" + parseInt(id), {
       data: {
         force: true
       },
@@ -2998,7 +3002,7 @@ const deleteWorkFlow = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAs
         'X-HTTP-Method-Override': 'DELETE'
       }
     });
-    thunkAPI.dispatch((0,_notificationSlice_notificationSlice__WEBPACK_IMPORTED_MODULE_2__.showNotification)({
+    thunkAPI.dispatch((0,_notificationSlice_notificationSlice__WEBPACK_IMPORTED_MODULE_3__.showNotification)({
       message: 'workflow Deleted',
       isShow: true,
       type: 'success'
@@ -3006,7 +3010,7 @@ const deleteWorkFlow = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAs
     return res?.data?.data?.odd?.id || id;
   } catch (e) {
     console.error('DELETE workflow error:', e?.response || e);
-    thunkAPI.dispatch((0,_notificationSlice_notificationSlice__WEBPACK_IMPORTED_MODULE_2__.showNotification)({
+    thunkAPI.dispatch((0,_notificationSlice_notificationSlice__WEBPACK_IMPORTED_MODULE_3__.showNotification)({
       message: e?.response?.data?.message || 'Delete failed',
       isShow: true,
       type: 'error'

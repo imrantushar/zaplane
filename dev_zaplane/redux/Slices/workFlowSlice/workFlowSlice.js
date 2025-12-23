@@ -1,4 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { __ } from '@wordpress/i18n';
 
 import {
 	API,
