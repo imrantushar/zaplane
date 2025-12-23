@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
     ReactFlow,
     addEdge,
@@ -34,10 +34,11 @@ import {
     FiHelpCircle,
 } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
-import { createWorkflows, getWorkFlow, updateWorkFlow } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
+import { createWorkflows, getSingleWorkFlow, getWorkFlow, updateWorkFlow } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { use } from "react";
 import { showNotification } from "@ZAPRedux/Slices/notificationSlice/notificationSlice";
+import { parseFlowJson } from "./helper";
 ;
 
 let id = 0;
@@ -64,24 +65,50 @@ export default function FlowCanvas({ id }) {
     const [selectedEvent, setSelectedEvent] = useState(null);
     const { values, setFieldValue } = useFormikContext()
     const workflowTitle = useSelector((state) => state.workflows.workflow_Title);
-    console.log(workflowTitle, "hiiii");
+    const [loading, setLoading] = useState(false);
+    const { data } = useSelector((state) => state.workflows);
+    const flowObj = parseFlowJson(data[0]?.flow_json,);
+    const isFlowLoaded = useRef(false);
+    console.log(flowObj, 'flowB');
+    useEffect(() => {
+        if (!flowObj || isFlowLoaded.current) return;
+
+        if (Array.isArray(flowObj.nodes)) {
+            setNodes(flowObj.nodes);
+        }
+
+        if (Array.isArray(flowObj.edges)) {
+            setEdges(flowObj.edges);
+        }
+
+        isFlowLoaded.current = true;
+    }, [flowObj]);
+
+
+
+
 
     const [drawerContext, setDrawerContext] = useState({
         source: null,
         node: null,
         edge: null,
     });
+    useEffect(() => {
+        setLoading(true);
+        dispatch(getSingleWorkFlow(id)).finally(() => setLoading(false));
+
+    }, [id]);
     const onSubmitHandler = async () => {
         const payload = {
             title: 'hy',
             name: "test",
             status: "active",
-            flow_json: JSON.stringify({nodes,edges}),
+            flow_json: JSON.stringify({ nodes, edges }),
         }
 
         if (id) {
             const { payload: data } = await dispatch(
-                updateWorkFlow({ id,  payload })
+                updateWorkFlow({ id, payload })
             );
             dispatch(
                 showNotification({
@@ -90,7 +117,7 @@ export default function FlowCanvas({ id }) {
                     type: 'success',
                 })
             );
-           
+
         }
     };
     const { screenToFlowPosition } = useReactFlow();
@@ -557,7 +584,7 @@ export default function FlowCanvas({ id }) {
                             bg="black"
                             color="white"
                             _hover={{ bg: "gray.800" }}
-                            onClick={()=>onSubmitHandler()}
+                            onClick={() => onSubmitHandler()}
                         >
                             {__("Publish", "zaplane")}
                         </Button>

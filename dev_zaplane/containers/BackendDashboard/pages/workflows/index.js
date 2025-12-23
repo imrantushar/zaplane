@@ -19,6 +19,7 @@ import LabeledInput from "@ZAPComponents/LabeledInput";
 import WPModal from "@ZAPComponents/Modal/WPModal";
 import {
   createWorkflows,
+  deleteWorkFlow,
   getWorkFlow,
 } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
 
@@ -52,9 +53,8 @@ const CreateWorkflows = () => {
 
   // Redux code untouched
   const {data} = useSelector((state) => state.workflows);
-  if(!data) return <div>loading</div>
 
-
+console.log(data,'create data');
 
   useEffect(() => {
     dispatch(getWorkFlow());
@@ -82,7 +82,19 @@ const CreateWorkflows = () => {
     setWorkflowName("");
     setIsModalOpen(false);
   };
-
+const workflowDeleteHandler = ( id ) => {
+  console.log("id",id);
+		if (
+			window.confirm(
+				__(
+					'Are you sure you want to permanently delete ?',
+					'zaplane'
+				)
+			)
+		) {
+			dispatch( deleteWorkFlow(id) );
+		}
+	};
   return (
     <>
       {/* ================= HEADER ================= */}
@@ -151,7 +163,7 @@ const CreateWorkflows = () => {
             </Table.Header>
 
             <Table.Body>
-              {data?.map((item) => (
+              {Array.isArray(data) && data?.map((item) => (
                 <Table.Row key={item.id} _hover={{ bg: "gray.50" }}>
                   <Table.Cell>
                     <Text fontWeight="500">{item.title}</Text>
@@ -188,6 +200,7 @@ const CreateWorkflows = () => {
                         size="xs"
                         colorScheme="red"
                         variant="ghost"
+                        onClick={()=>workflowDeleteHandler(item.id)}
                       >
                         Delete
                       </Button>

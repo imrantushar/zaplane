@@ -8,6 +8,7 @@ import {
 	handleSliceSuccess,
 	handleSliceError,
 } from '@ZAPUtils/helper';
+import { showNotification } from '../notificationSlice/notificationSlice';
 const namespace = 'zaplane/v1/';
 
 export const createWorkflows = createAsyncThunk(
@@ -70,19 +71,99 @@ export const updateWorkFlow = createAsyncThunk(
 		}
 	}
 );
+export const getSingleWorkFlow = createAsyncThunk(
+	'zaplane/getSingleWorkFlow',
+	async (id, thunkAPI) => {
+		console.log(id,'form slices');
+		try {
+			const res = await API.post(
+				namespace + "workflows/" + parseInt(id) , {
+			});
+			return res.data;
+		} catch (e) {
+			thunkAPI.dispatch(
+				showNotification({
+					message: e,
+					isShow: true,
+					type: 'error',
+				})
+			);
+		}
+	}
+);
+// 	'zaplane/deleteWorkFlow',
+// 	async ( id , thunkAPI) => {
+// 		try {
+// 			await API.delete(
+// 				namespace + "workflows/" + parseInt(id),
+// 				{ data: { force: true } },
+// 				{ headers: { 'X-HTTP-Method-Override': 'DELETE' } }
+// 			);
+// 			thunkAPI.dispatch(
+// 				showNotification({
+// 					message: __('workflow Deleted', 'zaplane'),
+// 					isShow: true,
+// 					type: 'success',
+// 				})
+// 			);
+// 			return id;
+// 		} 
+// 		catch (e) {
+// 			thunkAPI.dispatch(
+// 				showNotification({
+// 					message: e,
+// 					isShow: true,
+// 					type: 'error',
+// 				})
+// 			);
+// 		}
+// 	}
+// );
+export const deleteWorkFlow = createAsyncThunk(
+  'zaplane/deleteWorkFlow',
+  async (id, thunkAPI) => {
+    try {
+      const res = await API.delete(
+        namespace + "workflows/" + parseInt(id),
+        {
+          data: { force: true },
+          headers: {
+            'X-HTTP-Method-Override': 'DELETE',
+          },
+        }
+      );
 
+      thunkAPI.dispatch(
+        showNotification({
+          message: 'workflow Deleted',
+          isShow: true,
+          type: 'success',
+        })
+      );
+      return res?.data?.data?.odd?.id || id;
+    } catch (e) {
+      console.error('DELETE workflow error:', e?.response || e);
+
+      thunkAPI.dispatch(
+        showNotification({
+          message: e?.response?.data?.message || 'Delete failed',
+          isShow: true,
+          type: 'error',
+        })
+      );
+
+      return thunkAPI.rejectWithValue(e?.response?.data);
+    }
+  }
+);
 
 const workflowsSlice = createSlice( {
 	name: 'workflows',
 	initialState: {
      data:[],
-	workflow_Title: '',
 		
 	},
 	reducers: {
-		createWorkflowTitle: ( state, action ) => {
-			state.workflow_Title = action.payload;
-		}
 		
 	},
 	extraReducers: ( builder ) => {
@@ -90,12 +171,13 @@ const workflowsSlice = createSlice( {
 			.addCase( createWorkflows.fulfilled, ( state, action ) => {
 				state.data=action.payload;
 			} )
-
 			.addCase( getWorkFlow.fulfilled, ( state, action ) => {
-				console.log(action,'action',state);
 				state.data = action.payload;
-				
 			} )
+			.addCase(getSingleWorkFlow.fulfilled, (state, action) => {
+				if(!action.payload) return;
+				state.data = [action.payload];
+			})
 			.addCase(updateWorkFlow.fulfilled, (state, action) => {
 				state.data = state.data.map((item) => {
 					if (parseInt(item.id) === parseInt(action.payload.id)) {
@@ -103,6 +185,11 @@ const workflowsSlice = createSlice( {
 					}
 					return item;
 				});
+			})
+			.addCase(deleteWorkFlow.fulfilled, (state, action) => {
+				state.data = state.data.filter(
+					(item) => parseInt(item.id) !== parseInt(action.payload)
+				);
 			})
 
 			
