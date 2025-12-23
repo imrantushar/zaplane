@@ -47,8 +47,8 @@ class WorkflowsController extends WP_REST_Controller {
 		}
 
         register_rest_route(
-			$this->namespace,
-			'/' . $this->rest_base . '/(?P<id>[\d]+)',
+			$namespace,
+			'/' . $rest_base . '/(?P<id>[\d]+)',
 			array(
 				'args'   => array(
 					'id' => array(
