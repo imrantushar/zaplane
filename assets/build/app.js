@@ -1829,13 +1829,12 @@ function FlowCanvas() {
     node: null,
     edge: null
   });
-  const {
-    data
-  } = (0,react_redux__WEBPACK_IMPORTED_MODULE_17__.useSelector)(state => state.workflows);
-  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
-    dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_16__.getWorkFlow)());
-  }, [dispatch]);
-  console.log(data);
+  // const { data } = useSelector((state) => state.workflows);
+
+  // useEffect(() => {
+  // 	dispatch(getWorkFlow());
+  // }, [dispatch]);
+  //  console.log(data);
   const payload = {
     title: workflowTitle || 'Test Workflow',
     name: 'test',

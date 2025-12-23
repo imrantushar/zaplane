@@ -70,12 +70,12 @@ export default function FlowCanvas() {
         node: null,
         edge: null,
     });
-    const { data } = useSelector((state) => state.workflows);
+    // const { data } = useSelector((state) => state.workflows);
 
-	useEffect(() => {
-		dispatch(getWorkFlow());
-	}, [dispatch]);
-     console.log(data);
+	// useEffect(() => {
+	// 	dispatch(getWorkFlow());
+	// }, [dispatch]);
+    //  console.log(data);
 	const payload = {
 		title: workflowTitle || 'Test Workflow',
 		name: 'test',
