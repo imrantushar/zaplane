@@ -1,101 +1,204 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { __ } from "@wordpress/i18n";
 import {
-  Button,
-  Menu,
-  Portal,
   Box,
   Flex,
   Heading,
   Text,
-  Stack
+  Button,
+  Badge,
+  Table,
+  Stack,
+  Menu,
+  Portal,
 } from "@chakra-ui/react";
-import LabeledInput from "@ZAPComponents/LabeledInput";
-import WPModal from "@ZAPComponents/Modal/WPModal";
 import { useNavigate } from "react-router-dom";
 import { route_path } from "@ZAPUtils/helper";
-import { useDispatch } from "react-redux";
-import { createWorkflowTitle } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
+import { useDispatch, useSelector } from "react-redux";
+import LabeledInput from "@ZAPComponents/LabeledInput";
+import WPModal from "@ZAPComponents/Modal/WPModal";
+import {
+  createWorkflows,
+  getWorkFlow,
+} from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
+
+const staticWorkflows = [
+  {
+    id: 1,
+    title: "User Signup Automation",
+    name: "signup_flow",
+    status: "active",
+  },
+  {
+    id: 2,
+    title: "Order Completed",
+    name: "order_complete",
+    status: "inactive",
+  },
+  {
+    id: 3,
+    title: "Email Notification",
+    name: "email_notify",
+    status: "active",
+  },
+];
 
 const CreateWorkflows = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [workflowName, setWorkflowName] = useState("");
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  // Redux code untouched
+  const {data} = useSelector((state) => state.workflows);
+  console.log(data);
+
+  useEffect(() => {
+    dispatch(getWorkFlow());
+  }, [dispatch]);
 
   const handleCreate = () => {
     if (!workflowName.trim()) return;
 
-    navigate(
-      `${route_path}admin.php?page=zaplane-workflows&action=edit&id=${Date.now()}`
-    );
-     dispatch(createWorkflowTitle(workflowName));
+    dispatch(
+      createWorkflows({
+        title: workflowName,
+        name: "test",
+        status: "active",
+        flow_json: JSON.stringify(),
+      })
+    )
+      .unwrap()
+      .then((res) => {
+        console.log(res,'res');
+        navigate(
+          `${route_path}admin.php?page=zaplane-workflows&action=edit&id=${Date.now()}`
+        );
+      });
+
     setWorkflowName("");
     setIsModalOpen(false);
   };
 
   return (
     <>
+      {/* ================= HEADER ================= */}
       <Flex
-        minH="calc(100vh - 60px)"
-        align="center"
-        justify="center"
-        bg="gray.50"
         px={6}
+        py={4}
+        align="center"
+        justify="space-between"
+        borderBottom="1px solid"
+        borderColor="gray.200"
+        bg="white"
       >
+        <Box>
+          <Heading size="md">{__("Workflows", "zaplane")}</Heading>
+          <Text fontSize="sm" color="gray.500">
+            {__("Automate actions between your apps", "zaplane")}
+          </Text>
+        </Box>
+
+        <Menu.Root>
+          <Menu.Trigger asChild>
+            <Button colorScheme="blue">
+              {__("Create Workflow", "zaplane")}
+            </Button>
+          </Menu.Trigger>
+          <Portal>
+            <Menu.Positioner>
+              <Menu.Content>
+                <Menu.Item onClick={() => setIsModalOpen(true)}>
+                  {__("Create from Scratch", "zaplane")}
+                </Menu.Item>
+                <Menu.Item>
+                  {__("Create with AI", "zaplane")}
+                </Menu.Item>
+              </Menu.Content>
+            </Menu.Positioner>
+          </Portal>
+        </Menu.Root>
+      </Flex>
+
+      {/* ================= TABLE CARD ================= */}
+      <Box p={6} bg="gray.50" minH="calc(100vh - 80px)">
         <Box
-          maxW="520px"
-          w="100%"
           bg="white"
-          borderRadius="lg"
-          boxShadow="sm"
           border="1px solid"
           borderColor="gray.200"
-          p={8}
-          textAlign="center"
+          borderRadius="lg"
+          boxShadow="sm"
         >
-          <Stack spacing={4}>
-            <Text fontSize="3xl">⚡</Text>
-
-            <Heading size="md">
-              {__("Create your first workflow", "zaplane")}
+          <Box px={5} py={4} borderBottom="1px solid" borderColor="gray.200">
+            <Heading size="sm">
+              {__("Workflow List", "zaplane")}
             </Heading>
+          </Box>
 
-            <Text fontSize="sm" color="gray.600">
-              {__(
-                "Workflows let you automate actions between apps. Get started by creating a new workflow.",
-                "zaplane"
-              )}
-            </Text>
+          <Table.Root size="sm">
+            <Table.Header bg="gray.50">
+              <Table.Row>
+                <Table.ColumnHeader>Title</Table.ColumnHeader>
+                <Table.ColumnHeader>Name</Table.ColumnHeader>
+                <Table.ColumnHeader>Status</Table.ColumnHeader>
+                <Table.ColumnHeader textAlign="end">
+                  Actions
+                </Table.ColumnHeader>
+              </Table.Row>
+            </Table.Header>
 
-            {/* ===== Menu Trigger ===== */}
-            <Menu.Root >
-              <Menu.Trigger asChild>
-                <Button colorScheme="blue" size="md">
-                  {__("Create Work Flow", "zaplane")}
-                </Button>
-              </Menu.Trigger>
-
-              <Portal>
-                <Menu.Positioner>
-                  <Menu.Content width="460px">
-                    <Menu.Item
-                      value="new-scratch"
-                      onClick={() => setIsModalOpen(true)}
+            <Table.Body>
+              {data?.map((item) => (
+                <Table.Row key={item.id} _hover={{ bg: "gray.50" }}>
+                  <Table.Cell>
+                    <Text fontWeight="500">{item.title}</Text>
+                  </Table.Cell>
+                  <Table.Cell color="gray.600">
+                    {item.name}
+                  </Table.Cell>
+                  <Table.Cell>
+                    <Badge
+                      px={2}
+                      py={1}
+                      borderRadius="md"
+                      colorScheme={
+                        item.status === "active" ? "green" : "gray"
+                      }
                     >
-                      {__("Create New Scratch", "zaplane")}
-                    </Menu.Item>
-
-                    <Menu.Item value="ai">
-                      {__("Create with AI", "zaplane")}
-                    </Menu.Item>
-                  </Menu.Content>
-                </Menu.Positioner>
-              </Portal>
-            </Menu.Root>
-          </Stack>
+                      {item.status}
+                    </Badge>
+                  </Table.Cell>
+                  <Table.Cell textAlign="end">
+                    <Stack direction="row" spacing={2} justify="flex-end">
+                      <Button
+                        size="xs"
+                        variant="outline"
+                        onClick={() =>
+                          navigate(
+                            `${route_path}admin.php?page=zaplane-workflows&action=edit&id=${item.id}`
+                          )
+                        }
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        size="xs"
+                        colorScheme="red"
+                        variant="ghost"
+                      >
+                        Delete
+                      </Button>
+                    </Stack>
+                  </Table.Cell>
+                </Table.Row>
+              ))}
+            </Table.Body>
+          </Table.Root>
         </Box>
-      </Flex>
+      </Box>
+
+      {/* ================= MODAL ================= */}
       <WPModal
         title={__("Create Workflow", "zaplane")}
         isOpen={isModalOpen}
@@ -103,25 +206,17 @@ const CreateWorkflows = () => {
         size="medium"
       >
         <Box px={4}>
-          <Box mb={4}>
-            <LabeledInput
-              label={__("Workflow Name", "zaplane")}
-              placeholder={__("Enter workflow name", "zaplane")}
-              value={workflowName}
-              onChange={(e) => setWorkflowName(e.target.value)}
-              style={{ width: "100%" }}
-            />
-          </Box>
+          <LabeledInput
+            label={__("Workflow Name", "zaplane")}
+            placeholder={__("Enter workflow name", "zaplane")}
+            value={workflowName}
+            onChange={(e) => setWorkflowName(e.target.value)}
+          />
 
-          <Flex justifyContent="flex-end">
-            <Button
-              variant="ghost"
-              mr={3}
-              onClick={() => setIsModalOpen(false)}
-            >
+          <Flex justify="flex-end" mt={5}>
+            <Button variant="ghost" mr={3} onClick={() => setIsModalOpen(false)}>
               {__("Cancel", "zaplane")}
             </Button>
-
             <Button
               colorScheme="blue"
               onClick={handleCreate}

@@ -52,7 +52,7 @@ class Workflows {
 	public static function get_all( ) {
 		global $wpdb;
 
-		return $wpdb->get_row(
+		return $wpdb->get_results(
 			$wpdb->prepare(
 				"SELECT * FROM " . self::table()
 			)

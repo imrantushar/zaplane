@@ -70,25 +70,6 @@ export default function FlowCanvas() {
         node: null,
         edge: null,
     });
-    const { data } = useSelector((state) => state.workflows);
-    console.log(data, 'dataaaaaaaaaaaaaaaa');
-    useEffect(() => {
-        dispatch(getWorkFlow());
-    }, [dispatch]);
-   useEffect(() => {
-    // if (!workflowTitle || hasCreated) return;
-
-    const payload = {
-        title: workflowTitle || "Untitled Workflow",
-        name: 'test',
-        status: 'active',
-        flow_json: JSON.stringify({ nodes, edges }),
-    };
-
-    dispatch(createWorkflows(payload))
-        .unwrap()
-        .then((res) =>console.log(res,'resssssss')) ;
-}, [workflowTitle,nodes,edges]); 
     const { screenToFlowPosition } = useReactFlow();
     const openDrawerForNode = (node) => {
         setDrawerContext({

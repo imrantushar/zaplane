@@ -31,7 +31,7 @@ export const getWorkFlow = createAsyncThunk(
     async (ID, thunkAPI) => {
         try {
             const res = await API.get(namespace + "workflows");
-            console.log(res)
+           return res.data
         } catch (e) {
             thunkAPI.dispatch(
                 showNotification({
@@ -61,13 +61,12 @@ const workflowsSlice = createSlice( {
 	extraReducers: ( builder ) => {
 		builder
 			.addCase( createWorkflows.fulfilled, ( state, action ) => {
-				state.data = [ action.payload, ...state.data ];
+				state.data=action.payload;
 			} )
 
 			.addCase( getWorkFlow.fulfilled, ( state, action ) => {
-				// console.log(action,'action');
-				// const { data } =action.payload;
-				// state.data = data;
+				console.log(action,'action',state);
+				state.data = action.payload;
 				
 			} )
 
