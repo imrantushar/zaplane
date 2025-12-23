@@ -34,9 +34,10 @@ import {
     FiHelpCircle,
 } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
-import { createWorkflows, getWorkFlow } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
+import { createWorkflows, getWorkFlow, updateWorkFlow } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { use } from "react";
+import { showNotification } from "@ZAPRedux/Slices/notificationSlice/notificationSlice";
 ;
 
 let id = 0;
@@ -44,7 +45,7 @@ const getId = () => `dndnode_${id++}`;
 
 
 
-export default function FlowCanvas() {
+export default function FlowCanvas({ id }) {
     const [nodes, setNodes, onNodesChange] = useNodesState([
         {
             id: '123',
@@ -70,6 +71,28 @@ export default function FlowCanvas() {
         node: null,
         edge: null,
     });
+    const onSubmitHandler = async () => {
+        const payload = {
+            title: 'hy',
+            name: "test",
+            status: "active",
+            flow_json: JSON.stringify({nodes,edges}),
+        }
+
+        if (id) {
+            const { payload: data } = await dispatch(
+                updateWorkFlow({ id,  payload })
+            );
+            dispatch(
+                showNotification({
+                    message: __('Update Order Successfully', 'zaplane'),
+                    isShow: true,
+                    type: 'success',
+                })
+            );
+           
+        }
+    };
     const { screenToFlowPosition } = useReactFlow();
     const openDrawerForNode = (node) => {
         setDrawerContext({
@@ -534,6 +557,7 @@ export default function FlowCanvas() {
                             bg="black"
                             color="white"
                             _hover={{ bg: "gray.800" }}
+                            onClick={()=>onSubmitHandler()}
                         >
                             {__("Publish", "zaplane")}
                         </Button>

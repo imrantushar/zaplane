@@ -20,7 +20,7 @@ export default function Workflows({id}) {
           {(formik) => (
             <Form style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
               <div style={{ flex: 1 }}>
-                <FlowCanvas formik={formik} />
+                <FlowCanvas formik={formik} id={id}  />
               </div>
 
             </Form>

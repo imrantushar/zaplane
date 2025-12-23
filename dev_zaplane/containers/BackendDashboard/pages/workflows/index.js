@@ -52,7 +52,9 @@ const CreateWorkflows = () => {
 
   // Redux code untouched
   const {data} = useSelector((state) => state.workflows);
-  console.log(data);
+  if(!data) return <div>loading</div>
+
+
 
   useEffect(() => {
     dispatch(getWorkFlow());
@@ -71,9 +73,9 @@ const CreateWorkflows = () => {
     )
       .unwrap()
       .then((res) => {
-        console.log(res,'res');
+        console.log(res,'resData');
         navigate(
-          `${route_path}admin.php?page=zaplane-workflows&action=edit&id=${Date.now()}`
+           `${route_path}admin.php?page=zaplane-workflows&action=edit&id=${res.id}`
         );
       });
 

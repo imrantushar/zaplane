@@ -43,6 +43,33 @@ export const getWorkFlow = createAsyncThunk(
         }
     }
 );
+export const updateWorkFlow = createAsyncThunk(
+	'zaplane/updateWorkFlow',
+	async ({ id, payload }, thunkAPI) => {
+		try {
+			const res = await API.post(
+				namespace + "workflows/" + parseInt(id),
+				payload
+			);
+			thunkAPI.dispatch(
+				showNotification({
+					message: __('Updated Orders Successfully', 'workflow'),
+					isShow: true,
+					type: 'success',
+				})
+			);
+			return res.data;
+		} catch (e) {
+			thunkAPI.dispatch(
+				showNotification({
+					message: e,
+					isShow: true,
+					type: 'error',
+				})
+			);
+		}
+	}
+);
 
 
 const workflowsSlice = createSlice( {
@@ -69,6 +96,14 @@ const workflowsSlice = createSlice( {
 				state.data = action.payload;
 				
 			} )
+			.addCase(updateWorkFlow.fulfilled, (state, action) => {
+				state.data = state.data.map((item) => {
+					if (parseInt(item.id) === parseInt(action.payload.id)) {
+						return { ...item, ...action.payload };
+					}
+					return item;
+				});
+			})
 
 			
 	},

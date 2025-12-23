@@ -973,7 +973,9 @@ const CreateWorkflows = () => {
   const {
     data
   } = (0,react_redux__WEBPACK_IMPORTED_MODULE_14__.useSelector)(state => state.workflows);
-  console.log(data);
+  if (!data) return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)("div", {
+    children: "loading"
+  });
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
     dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_17__.getWorkFlow)());
   }, [dispatch]);
@@ -985,8 +987,8 @@ const CreateWorkflows = () => {
       status: "active",
       flow_json: JSON.stringify()
     })).unwrap().then(res => {
-      console.log(res, 'res');
-      navigate(`${_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_13__.route_path}admin.php?page=zaplane-workflows&action=edit&id=${Date.now()}`);
+      console.log(res, 'resData');
+      navigate(`${_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_13__.route_path}admin.php?page=zaplane-workflows&action=edit&id=${res.id}`);
     });
     setWorkflowName("");
     setIsModalOpen(false);
@@ -1972,8 +1974,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react_router_dom__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! react-router-dom */ "./node_modules/react-router/dist/index.js");
 /* harmony import */ var _ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! @ZAPRedux/Slices/workFlowSlice/workFlowSlice */ "./dev_zaplane/redux/Slices/workFlowSlice/workFlowSlice.js");
 /* harmony import */ var react_redux__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/dist/react-redux.mjs");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__);
+/* harmony import */ var _ZAPRedux_Slices_notificationSlice_notificationSlice__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! @ZAPRedux/Slices/notificationSlice/notificationSlice */ "./dev_zaplane/redux/Slices/notificationSlice/notificationSlice.js");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__);
+
 
 
 
@@ -1994,7 +1998,9 @@ __webpack_require__.r(__webpack_exports__);
 ;
 let id = 0;
 const getId = () => `dndnode_${id++}`;
-function FlowCanvas() {
+function FlowCanvas({
+  id
+}) {
   const [nodes, setNodes, onNodesChange] = (0,_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.useNodesState)([{
     id: '123',
     type: 'custom',
@@ -2028,6 +2034,30 @@ function FlowCanvas() {
     node: null,
     edge: null
   });
+  const onSubmitHandler = async () => {
+    const payload = {
+      title: 'hy',
+      name: "test",
+      status: "active",
+      flow_json: JSON.stringify({
+        nodes,
+        edges
+      })
+    };
+    if (id) {
+      const {
+        payload: data
+      } = await dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_16__.updateWorkFlow)({
+        id,
+        payload
+      }));
+      dispatch((0,_ZAPRedux_Slices_notificationSlice_notificationSlice__WEBPACK_IMPORTED_MODULE_18__.showNotification)({
+        message: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)('Update Order Successfully', 'zaplane'),
+        isShow: true,
+        type: 'success'
+      }));
+    }
+  };
   const {
     screenToFlowPosition
   } = (0,_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.useReactFlow)();
@@ -2352,7 +2382,7 @@ function FlowCanvas() {
   console.log(nodes, 'all nodes');
   console.log(edges, 'all edges');
   const nodeTypes = {
-    custom: props => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_CustomNode__WEBPACK_IMPORTED_MODULE_5__["default"], {
+    custom: props => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_CustomNode__WEBPACK_IMPORTED_MODULE_5__["default"], {
       ...props,
       data: {
         ...props.data,
@@ -2368,56 +2398,57 @@ function FlowCanvas() {
     })
   };
   const edgeTypes = {
-    custom: props => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_CustomEdge__WEBPACK_IMPORTED_MODULE_6__["default"], {
+    custom: props => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_CustomEdge__WEBPACK_IMPORTED_MODULE_6__["default"], {
       ...props,
       onEdgeDelete: onEdgeDelete,
       onAddNode: onAddNode
     })
   };
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsxs)("div", {
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsxs)("div", {
     style: {
       flex: 1,
       height: "100vh"
     },
-    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_ZAPComponents_TopBar__WEBPACK_IMPORTED_MODULE_9__["default"], {
-      leftContent: () => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.Fragment, {
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_12__.Button, {
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_ZAPComponents_TopBar__WEBPACK_IMPORTED_MODULE_9__["default"], {
+      leftContent: () => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.Fragment, {
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_12__.Button, {
           variant: "outline",
           onClick: () => navigate(-1),
-          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(react_icons_fi__WEBPACK_IMPORTED_MODULE_14__.FiArrowLeft, {})
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Text, {
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(react_icons_fi__WEBPACK_IMPORTED_MODULE_14__.FiArrowLeft, {})
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Text, {
           fontSize: "md",
           fontWeight: "medium",
           children: workflowTitle || (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("Untitled Workflow", "zaplane")
         })]
       }),
-      rightContent: () => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.Fragment, {
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_13__.CheckboxRoot, {
+      rightContent: () => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.Fragment, {
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_13__.CheckboxRoot, {
           padding: "7px 9px",
           borderRadius: "4px",
           border: "1px solid var(--zaplane-border-color)",
-          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_13__.CheckboxHiddenInput, {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_13__.CheckboxControl, {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_13__.CheckboxLabel, {
+          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_13__.CheckboxHiddenInput, {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_13__.CheckboxControl, {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_13__.CheckboxLabel, {
             children: "show runs"
           })]
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_12__.Button, {
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_12__.Button, {
           size: "sm",
           variant: "outline",
           children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("inactive", "zaplane")
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_12__.Button, {
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_12__.Button, {
           size: "sm",
           variant: "outline",
           children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("Save Draft", "zaplane")
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_12__.Button, {
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_12__.Button, {
           size: "sm",
           bg: "black",
           color: "white",
           _hover: {
             bg: "gray.800"
           },
+          onClick: () => onSubmitHandler(),
           children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("Publish", "zaplane")
         })]
       })
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_10__.Box, {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsxs)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.ReactFlow, {
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_10__.Box, {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsxs)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.ReactFlow, {
       nodes: nodes,
       edges: edges,
       nodeTypes: nodeTypes,
@@ -2437,8 +2468,8 @@ function FlowCanvas() {
       nodesConnectable: true,
       elementsSelectable: true,
       minZoom: 0.5,
-      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.Background, {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.Controls, {})]
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_ActionDrawer__WEBPACK_IMPORTED_MODULE_7__["default"], {
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.Background, {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.Controls, {})]
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_ActionDrawer__WEBPACK_IMPORTED_MODULE_7__["default"], {
       open: drawerOpen,
       onClose: () => {
         setDrawerOpen(false);
@@ -2650,7 +2681,8 @@ function Workflows({
               flex: 1
             },
             children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(_FlowCanvas__WEBPACK_IMPORTED_MODULE_3__["default"], {
-              formik: formik
+              formik: formik,
+              id: id
             })
           })
         })
@@ -2814,7 +2846,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   createWorkflowTitle: () => (/* binding */ createWorkflowTitle),
 /* harmony export */   createWorkflows: () => (/* binding */ createWorkflows),
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__),
-/* harmony export */   getWorkFlow: () => (/* binding */ getWorkFlow)
+/* harmony export */   getWorkFlow: () => (/* binding */ getWorkFlow),
+/* harmony export */   updateWorkFlow: () => (/* binding */ updateWorkFlow)
 /* harmony export */ });
 /* harmony import */ var _reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @reduxjs/toolkit */ "./node_modules/@reduxjs/toolkit/dist/redux-toolkit.modern.mjs");
 /* harmony import */ var _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @ZAPUtils/helper */ "./dev_zaplane/utils/helper.js");
@@ -2842,6 +2875,26 @@ const getWorkFlow = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsync
     }));
   }
 });
+const updateWorkFlow = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyncThunk)('zaplane/updateWorkFlow', async ({
+  id,
+  payload
+}, thunkAPI) => {
+  try {
+    const res = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_1__.API.post(namespace + "workflows/" + parseInt(id), payload);
+    thunkAPI.dispatch(showNotification({
+      message: __('Updated Orders Successfully', 'workflow'),
+      isShow: true,
+      type: 'success'
+    }));
+    return res.data;
+  } catch (e) {
+    thunkAPI.dispatch(showNotification({
+      message: e,
+      isShow: true,
+      type: 'error'
+    }));
+  }
+});
 const workflowsSlice = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createSlice)({
   name: 'workflows',
   initialState: {
@@ -2859,6 +2912,16 @@ const workflowsSlice = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createSl
     }).addCase(getWorkFlow.fulfilled, (state, action) => {
       console.log(action, 'action', state);
       state.data = action.payload;
+    }).addCase(updateWorkFlow.fulfilled, (state, action) => {
+      state.data = state.data.map(item => {
+        if (parseInt(item.id) === parseInt(action.payload.id)) {
+          return {
+            ...item,
+            ...action.payload
+          };
+        }
+        return item;
+      });
     });
   }
 });
