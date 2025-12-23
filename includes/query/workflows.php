@@ -22,7 +22,7 @@ class Workflows {
 		global $wpdb;
 
 		$defaults = [
-			'user_id'   => 0,
+			'user_id'   => get_current_user_id(),
 			'title'     => '',
 			'name'      => '',
 			'status'    => 'draft',
