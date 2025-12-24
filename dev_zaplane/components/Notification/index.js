@@ -69,7 +69,7 @@ const Notification = () => {
 			} )
 		);
 	};
-
+console.log(isShowNotification,'isShowNotification');
 	return (
 		<>
 			{ isShowNotification &&

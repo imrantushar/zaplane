@@ -101,7 +101,6 @@ const CreateWorkflows = () => {
 
   return (
     <>
-      {/* ================= HEADER ================= */}
       <Flex
         px={6}
         py={4}
@@ -138,8 +137,6 @@ const CreateWorkflows = () => {
           </Portal>
         </Menu.Root>
       </Flex>
-
-      {/* ================= TABLE CARD ================= */}
       <Box p={6} bg="gray.50" minH="calc(100vh - 80px)">
         <Box
           bg="white"
@@ -176,16 +173,6 @@ const CreateWorkflows = () => {
                     {item.name}
                   </Table.Cell>
                   <Table.Cell>
-                    {/* <Badge
-                      px={2}
-                      py={1}
-                      borderRadius="md"
-                      colorScheme={
-                        item.status === "active" ? "green" : "gray"
-                      }
-                    >
-                      {item.status}
-                    </Badge> */}
                     <Box w='109px'>
                       <Select
                         options={statusOptions}
@@ -228,8 +215,6 @@ const CreateWorkflows = () => {
           </Table.Root>
         </Box>
       </Box>
-
-      {/* ================= MODAL ================= */}
       <WPModal
         title={__("Create Workflow", "zaplane")}
         isOpen={isModalOpen}
