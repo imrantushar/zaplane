@@ -20,8 +20,7 @@ const iconType = ( type ) => {
 
 const Notification = () => {
 	const notificationRef = useRef( null );
-	const targetElement = document.querySelector( '#zaplane-app' ) 
-	
+	const targetElement = document.querySelector('#zaplane-app') 
 	const notification = useSelector( ( state ) => state.notification );
 	const dispatch = useDispatch();
 

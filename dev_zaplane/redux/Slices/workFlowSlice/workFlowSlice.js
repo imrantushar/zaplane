@@ -14,34 +14,34 @@ const namespace = 'zaplane/v1/';
 
 export const createWorkflows = createAsyncThunk(
 	'zaplane/createWorkflows',
-	async ( payload, thunkAPI ) => {
-		return await API.post( namespace + 'workflows', payload )
-			.then( ( res ) => {
-					handleSliceSuccess( thunkAPI,"data fetched successfully" );
-					return res.data;
-			} )
-			.catch( ( err ) => {
-				return handleSliceError( thunkAPI, "Data fetching failed" );
-			} );
+	async (payload, thunkAPI) => {
+		return await API.post(namespace + 'workflows', payload)
+			.then((res) => {
+				handleSliceSuccess(thunkAPI, "data fetched successfully");
+				return res.data;
+			})
+			.catch((err) => {
+				return handleSliceError(thunkAPI, "Data fetching failed");
+			});
 	}
 );
 
 export const getWorkFlow = createAsyncThunk(
-    'zaplane/getWorkFlow',
-    async (ID, thunkAPI) => {
-        try {
-            const res = await API.get(namespace + "workflows");
-           return res.data
-        } catch (e) {
-            thunkAPI.dispatch(
-                showNotification({
-                    message: e,
-                    isShow: true,
-                    type: 'error',
-                })
-            );
-        }
-    }
+	'zaplane/getWorkFlow',
+	async (ID, thunkAPI) => {
+		try {
+			const res = await API.get(namespace + "workflows");
+			return res.data
+		} catch (e) {
+			thunkAPI.dispatch(
+				showNotification({
+					message: e,
+					isShow: true,
+					type: 'error',
+				})
+			);
+		}
+	}
 );
 export const updateWorkFlow = createAsyncThunk(
 	'zaplane/updateWorkFlow',
@@ -75,7 +75,7 @@ export const getSingleWorkFlow = createAsyncThunk(
 	async (id, thunkAPI) => {
 		try {
 			const res = await API.post(
-				namespace + "workflows/" + parseInt(id) , {
+				namespace + "workflows/" + parseInt(id), {
 			});
 			return res.data;
 		} catch (e) {
@@ -90,62 +90,62 @@ export const getSingleWorkFlow = createAsyncThunk(
 	}
 );
 export const deleteWorkFlow = createAsyncThunk(
-  'zaplane/deleteWorkFlow',
-  async (id, thunkAPI) => {
-    try {
-      const res = await API.delete(
-        namespace + "workflows/" + parseInt(id),
-        {
-          data: { force: true },
-          headers: {
-            'X-HTTP-Method-Override': 'DELETE',
-          },
-        }
-      );
+	'zaplane/deleteWorkFlow',
+	async (id, thunkAPI) => {
+		try {
+			const res = await API.delete(
+				namespace + "workflows/" + parseInt(id),
+				{
+					data: { force: true },
+					headers: {
+						'X-HTTP-Method-Override': 'DELETE',
+					},
+				}
+			);
 
-      thunkAPI.dispatch(
-        showNotification({
-          message: 'workflow Deleted',
-          isShow: true,
-          type: 'success',
-        })
-      );
-      return res?.data?.data?.odd?.id || id;
-    } catch (e) {
-      console.error('DELETE workflow error:', e?.response || e);
+			thunkAPI.dispatch(
+				showNotification({
+					message: 'workflow Deleted',
+					isShow: true,
+					type: 'success',
+				})
+			);
+			return res?.data?.data?.odd?.id || id;
+		} catch (e) {
 
-      thunkAPI.dispatch(
-        showNotification({
-          message: e?.response?.data?.message || 'Delete failed',
-          isShow: true,
-          type: 'error',
-        })
-      );
+			thunkAPI.dispatch(
+				showNotification({
+					message: e?.response?.data?.message || 'Delete failed',
+					isShow: true,
+					type: 'error',
+				})
+			);
 
-      return thunkAPI.rejectWithValue(e?.response?.data);
-    }
-  }
+			return thunkAPI.rejectWithValue(e?.response?.data);
+		}
+	}
 );
 
-const workflowsSlice = createSlice( {
+const workflowsSlice = createSlice({
 	name: 'workflows',
 	initialState: {
-     data:[],
-		
+		data: [],
+
 	},
 	reducers: {
-		
+
 	},
-	extraReducers: ( builder ) => {
+	extraReducers: (builder) => {
 		builder
-			.addCase( createWorkflows.fulfilled, ( state, action ) => {
-				state.data=action.payload;
-			} )
-			.addCase( getWorkFlow.fulfilled, ( state, action ) => {
+			.addCase(createWorkflows.fulfilled, (state, action) => {
 				state.data = action.payload;
-			} )
+			})
+			.addCase(getWorkFlow.fulfilled, (state, action) => {
+				state.data = [...action.payload].reverse();
+			})
+
 			.addCase(getSingleWorkFlow.fulfilled, (state, action) => {
-				if(!action.payload) return;
+				if (!action.payload) return;
 				state.data = [action.payload];
 			})
 			.addCase(updateWorkFlow.fulfilled, (state, action) => {
@@ -162,9 +162,9 @@ const workflowsSlice = createSlice( {
 				);
 			})
 
-			
+
 	},
-} );
+});
 
 export const { createWorkflowTitle } = workflowsSlice.actions;
 export default workflowsSlice.reducer;

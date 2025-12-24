@@ -11,38 +11,23 @@ import {
   Stack,
   Menu,
   Portal,
+
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import { route_path } from "@ZAPUtils/helper";
 import { useDispatch, useSelector } from "react-redux";
 import LabeledInput from "@ZAPComponents/LabeledInput";
 import WPModal from "@ZAPComponents/Modal/WPModal";
+import Select from "react-select";
 import {
   createWorkflows,
   deleteWorkFlow,
   getWorkFlow,
+  updateWorkFlow,
 } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
+import { FiMoreVertical } from "react-icons/fi";
+import { showNotification } from "@ZAPRedux/Slices/notificationSlice/notificationSlice";
 
-const staticWorkflows = [
-  {
-    id: 1,
-    title: "User Signup Automation",
-    name: "signup_flow",
-    status: "active",
-  },
-  {
-    id: 2,
-    title: "Order Completed",
-    name: "order_complete",
-    status: "inactive",
-  },
-  {
-    id: 3,
-    title: "Email Notification",
-    name: "email_notify",
-    status: "active",
-  },
-];
 
 const CreateWorkflows = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -52,7 +37,7 @@ const CreateWorkflows = () => {
   const dispatch = useDispatch();
 
   // Redux code untouched
-  const {data} = useSelector((state) => state.workflows);
+  const { data } = useSelector((state) => state.workflows);
 
   useEffect(() => {
     dispatch(getWorkFlow());
@@ -72,25 +57,62 @@ const CreateWorkflows = () => {
       .unwrap()
       .then((res) => {
         navigate(
-           `${route_path}admin.php?page=zaplane-workflows&action=edit&id=${res.id}`
+          `${route_path}admin.php?page=zaplane-workflows&action=edit&id=${res.id}`
         );
       });
 
     setWorkflowName("");
     setIsModalOpen(false);
   };
-const workflowDeleteHandler = ( id ) => {
-		if (
-			window.confirm(
-				__(
-					'Are you sure you want to permanently delete ?',
-					'zaplane'
-				)
-			)
-		) {
-			dispatch( deleteWorkFlow(id) );
-		}
-	};
+  const workflowDeleteHandler = (id) => {
+    if (
+      window.confirm(
+        __(
+          'Are you sure you want to permanently delete ?',
+          'zaplane'
+        )
+      )
+    ) {
+      dispatch(deleteWorkFlow(id));
+    }
+  };
+  const statusOptions = [
+    { value: "active", label: "Active" },
+    { value: "paused", label: "Paused" },
+    { value: "draft", label: "draft" },
+  ];
+  const onSubmitHandler = async (item, status) => {
+    if (!item?.id || !status) return;
+
+    const payload = {
+      title: item.title,
+      name: item.name,
+      status: status,
+      flow_json: item.flow_json ?? null,
+    };
+
+    try {
+      await dispatch(updateWorkFlow({ id: item.id, payload })).unwrap();
+
+      dispatch(
+        showNotification({
+          message: __('Status updated successfully', 'zaplane'),
+          isShow: true,
+          type: 'success',
+        })
+      );
+    } catch (error) {
+      dispatch(
+        showNotification({
+          message: __('Status update failed', 'zaplane'),
+          isShow: true,
+          type: 'error',
+        })
+      );
+    }
+  };
+
+
   return (
     <>
       {/* ================= HEADER ================= */}
@@ -149,10 +171,10 @@ const workflowDeleteHandler = ( id ) => {
           <Table.Root size="sm">
             <Table.Header bg="gray.50">
               <Table.Row>
-                <Table.ColumnHeader>Title</Table.ColumnHeader>
-                <Table.ColumnHeader>Name</Table.ColumnHeader>
-                <Table.ColumnHeader>Status</Table.ColumnHeader>
-                <Table.ColumnHeader textAlign="end">
+                <Table.ColumnHeader width="25%">Title</Table.ColumnHeader>
+                <Table.ColumnHeader width="25%">Name</Table.ColumnHeader>
+                <Table.ColumnHeader width="25%">Status</Table.ColumnHeader>
+                <Table.ColumnHeader width="25%" textAlign="end">
                   Actions
                 </Table.ColumnHeader>
               </Table.Row>
@@ -168,7 +190,7 @@ const workflowDeleteHandler = ( id ) => {
                     {item.name}
                   </Table.Cell>
                   <Table.Cell>
-                    <Badge
+                    {/* <Badge
                       px={2}
                       py={1}
                       borderRadius="md"
@@ -177,7 +199,19 @@ const workflowDeleteHandler = ( id ) => {
                       }
                     >
                       {item.status}
-                    </Badge>
+                    </Badge> */}
+                    <Box w='109px'>
+                      <Select
+                        options={statusOptions}
+                        value={statusOptions.find(opt => opt.value === item.status)}
+                        onChange={(selected) =>
+                          onSubmitHandler(item, selected.value)
+                        }
+                        isClearable={false}
+                        isSearchable={false}
+                        placeholder="Select status"
+                      />
+                    </Box>
                   </Table.Cell>
                   <Table.Cell textAlign="end">
                     <Stack direction="row" spacing={2} justify="flex-end">
@@ -196,7 +230,7 @@ const workflowDeleteHandler = ( id ) => {
                         size="xs"
                         colorScheme="red"
                         variant="ghost"
-                        onClick={()=>workflowDeleteHandler(item.id)}
+                        onClick={() => workflowDeleteHandler(item.id)}
                       >
                         Delete
                       </Button>
