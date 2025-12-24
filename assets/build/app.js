@@ -996,7 +996,7 @@ const CreateWorkflows = () => {
     if (!item?.id || !status) return;
     const payload = {
       title: item.title,
-      name: item.name,
+      name: item.title,
       status: status,
       flow_json: (_item$flow_json = item.flow_json) !== null && _item$flow_json !== void 0 ? _item$flow_json : null
     };
@@ -2087,8 +2087,8 @@ function FlowCanvas({
   const onSubmitHandler = async () => {
     const payload = {
       title: singleData?.title,
-      name: "test",
-      status: "active",
+      name: singleData?.name,
+      status: singleData?.status,
       flow_json: JSON.stringify({
         nodes,
         edges

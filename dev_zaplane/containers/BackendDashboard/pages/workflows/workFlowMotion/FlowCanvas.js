@@ -108,8 +108,8 @@ export default function FlowCanvas({ id }) {
     const onSubmitHandler = async () => {
         const payload = {
             title: singleData?.title,
-            name: "test",
-            status: "active",
+            name: singleData?.name,
+            status: singleData?.status,
             flow_json: JSON.stringify({ nodes, edges }),
         }
 

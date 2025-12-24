@@ -86,7 +86,7 @@ const CreateWorkflows = () => {
 
     const payload = {
       title: item.title,
-      name: item.name,
+      name: item.title,
       status: status,
       flow_json: item.flow_json ?? null,
     };
