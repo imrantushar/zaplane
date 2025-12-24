@@ -542,7 +542,6 @@ const Notification = () => {
       isShow: false
     }));
   };
-  console.log(isShowNotification, 'isShowNotification');
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.Fragment, {
     children: isShowNotification && (0,react_dom__WEBPACK_IMPORTED_MODULE_3__.createPortal)(/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("div", {
       className: `zaplaness-notification ${notification.type && `zaplaness-notification--${notification.type}`}`,
