@@ -28,18 +28,12 @@ export const createWorkflows = createAsyncThunk(
 
 export const getWorkFlow = createAsyncThunk(
 	'zaplane/getWorkFlow',
-	async (ID, thunkAPI) => {
+	async (thunkAPI) => {
 		try {
 			const res = await API.get(namespace + "workflows");
 			return res.data
 		} catch (e) {
-			thunkAPI.dispatch(
-				showNotification({
-					message: e,
-					isShow: true,
-					type: 'error',
-				})
-			);
+			return handleSliceError( thunkAPI, e )
 		}
 	}
 );
@@ -51,22 +45,10 @@ export const updateWorkFlow = createAsyncThunk(
 				namespace + "workflows/" + parseInt(id),
 				payload
 			);
-			thunkAPI.dispatch(
-				showNotification({
-					message: __('Updated Orders Successfully', 'workflow'),
-					isShow: true,
-					type: 'success',
-				})
-			);
+			handleSliceSuccess( thunkAPI, __('Updated workflow Successfully', 'workflow') );
 			return res.data;
 		} catch (e) {
-			thunkAPI.dispatch(
-				showNotification({
-					message: e,
-					isShow: true,
-					type: 'error',
-				})
-			);
+			handleSliceError( thunkAPI, e )
 		}
 	}
 );
@@ -79,13 +61,7 @@ export const getSingleWorkFlow = createAsyncThunk(
 			});
 			return res.data;
 		} catch (e) {
-			thunkAPI.dispatch(
-				showNotification({
-					message: e,
-					isShow: true,
-					type: 'error',
-				})
-			);
+	           return	handleSliceError( thunkAPI, e )
 		}
 	}
 );
@@ -113,15 +89,7 @@ export const deleteWorkFlow = createAsyncThunk(
 			return res?.data?.data?.odd?.id || id;
 		} catch (e) {
 
-			thunkAPI.dispatch(
-				showNotification({
-					message: e?.response?.data?.message || 'Delete failed',
-					isShow: true,
-					type: 'error',
-				})
-			);
-
-			return thunkAPI.rejectWithValue(e?.response?.data);
+			return handleSliceError( thunkAPI, e );
 		}
 	}
 );

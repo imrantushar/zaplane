@@ -1005,17 +1005,8 @@ const CreateWorkflows = () => {
         id: item.id,
         payload
       })).unwrap();
-      dispatch((0,_ZAPRedux_Slices_notificationSlice_notificationSlice__WEBPACK_IMPORTED_MODULE_18__.showNotification)({
-        message: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Status updated successfully', 'zaplane'),
-        isShow: true,
-        type: 'success'
-      }));
     } catch (error) {
-      dispatch((0,_ZAPRedux_Slices_notificationSlice_notificationSlice__WEBPACK_IMPORTED_MODULE_18__.showNotification)({
-        message: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Status update failed', 'zaplane'),
-        isShow: true,
-        type: 'error'
-      }));
+      console.log(error);
     }
   };
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.Fragment, {
@@ -2110,11 +2101,6 @@ function FlowCanvas({
         id,
         payload
       }));
-      dispatch((0,_ZAPRedux_Slices_notificationSlice_notificationSlice__WEBPACK_IMPORTED_MODULE_18__.showNotification)({
-        message: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)('Update Order Successfully', 'zaplane'),
-        isShow: true,
-        type: 'success'
-      }));
     }
   };
   const {
@@ -2949,16 +2935,12 @@ const createWorkflows = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createA
     return (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.handleSliceError)(thunkAPI, "Data fetching failed");
   });
 });
-const getWorkFlow = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyncThunk)('zaplane/getWorkFlow', async (ID, thunkAPI) => {
+const getWorkFlow = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyncThunk)('zaplane/getWorkFlow', async thunkAPI => {
   try {
     const res = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.get(namespace + "workflows");
     return res.data;
   } catch (e) {
-    thunkAPI.dispatch((0,_notificationSlice_notificationSlice__WEBPACK_IMPORTED_MODULE_3__.showNotification)({
-      message: e,
-      isShow: true,
-      type: 'error'
-    }));
+    return (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.handleSliceError)(thunkAPI, e);
   }
 });
 const updateWorkFlow = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyncThunk)('zaplane/updateWorkFlow', async ({
@@ -2967,18 +2949,10 @@ const updateWorkFlow = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAs
 }, thunkAPI) => {
   try {
     const res = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.post(namespace + "workflows/" + parseInt(id), payload);
-    thunkAPI.dispatch((0,_notificationSlice_notificationSlice__WEBPACK_IMPORTED_MODULE_3__.showNotification)({
-      message: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Updated Orders Successfully', 'workflow'),
-      isShow: true,
-      type: 'success'
-    }));
+    (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.handleSliceSuccess)(thunkAPI, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Updated workflow Successfully', 'workflow'));
     return res.data;
   } catch (e) {
-    thunkAPI.dispatch((0,_notificationSlice_notificationSlice__WEBPACK_IMPORTED_MODULE_3__.showNotification)({
-      message: e,
-      isShow: true,
-      type: 'error'
-    }));
+    (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.handleSliceError)(thunkAPI, e);
   }
 });
 const getSingleWorkFlow = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyncThunk)('zaplane/getSingleWorkFlow', async (id, thunkAPI) => {
@@ -2986,11 +2960,7 @@ const getSingleWorkFlow = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.creat
     const res = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.post(namespace + "workflows/" + parseInt(id), {});
     return res.data;
   } catch (e) {
-    thunkAPI.dispatch((0,_notificationSlice_notificationSlice__WEBPACK_IMPORTED_MODULE_3__.showNotification)({
-      message: e,
-      isShow: true,
-      type: 'error'
-    }));
+    return (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.handleSliceError)(thunkAPI, e);
   }
 });
 const deleteWorkFlow = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyncThunk)('zaplane/deleteWorkFlow', async (id, thunkAPI) => {
@@ -3010,12 +2980,7 @@ const deleteWorkFlow = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAs
     }));
     return res?.data?.data?.odd?.id || id;
   } catch (e) {
-    thunkAPI.dispatch((0,_notificationSlice_notificationSlice__WEBPACK_IMPORTED_MODULE_3__.showNotification)({
-      message: e?.response?.data?.message || 'Delete failed',
-      isShow: true,
-      type: 'error'
-    }));
-    return thunkAPI.rejectWithValue(e?.response?.data);
+    return (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.handleSliceError)(thunkAPI, e);
   }
 });
 const workflowsSlice = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createSlice)({

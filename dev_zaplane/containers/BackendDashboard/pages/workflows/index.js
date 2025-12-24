@@ -93,22 +93,8 @@ const CreateWorkflows = () => {
 
     try {
       await dispatch(updateWorkFlow({ id: item.id, payload })).unwrap();
-
-      dispatch(
-        showNotification({
-          message: __('Status updated successfully', 'zaplane'),
-          isShow: true,
-          type: 'success',
-        })
-      );
     } catch (error) {
-      dispatch(
-        showNotification({
-          message: __('Status update failed', 'zaplane'),
-          isShow: true,
-          type: 'error',
-        })
-      );
+    console.log(error);
     }
   };
 

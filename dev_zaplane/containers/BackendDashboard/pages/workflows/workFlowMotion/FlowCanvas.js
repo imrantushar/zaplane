@@ -117,13 +117,7 @@ export default function FlowCanvas({ id }) {
             const { payload: data } = await dispatch(
                 updateWorkFlow({ id, payload })
             );
-            dispatch(
-                showNotification({
-                    message: __('Update Order Successfully', 'zaplane'),
-                    isShow: true,
-                    type: 'success',
-                })
-            );
+          
 
         }
     };
