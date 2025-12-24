@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
     ReactFlow,
     addEdge,
@@ -9,41 +9,118 @@ import {
     useReactFlow,
 } from "@xyflow/react";
 import "@xyflow/react/dist/base.css";
+import { __ } from '@wordpress/i18n';
 
 import CustomNode from "./CustomNode";
 import CustomEdge from "./CustomEdge";
 import ActionDrawer from "./ActionDrawer";
 import { useFormikContext } from "formik";
+import TopBar from "@ZAPComponents/TopBar";
+import { FaChevronRight } from "react-icons/fa";
+import {
+    Box,
+    Flex,
+    Text,
+    Button,
+    IconButton,
+    HStack,
+    Badge,
+    Checkbox,
+    useSelect,
+} from "@chakra-ui/react";
+import {
+    FiArrowLeft,
+    FiRefreshCw,
+    FiHelpCircle,
+} from "react-icons/fi";
+import { useNavigate } from "react-router-dom";
+import { createWorkflows, getSingleWorkFlow, getWorkFlow, updateWorkFlow } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { use } from "react";
+import { showNotification } from "@ZAPRedux/Slices/notificationSlice/notificationSlice";
+import { parseFlowJson } from "./helper";
+;
 
-let id = 0;
-const getId = () => `dndnode_${id++}`;
 
 
 
-export default function FlowCanvas() {
+
+
+
+export default function FlowCanvas({ id }) {
+    
+  const nodeIdRef = useRef(0);
+    const getNewNodeId = () => {
+        nodeIdRef.current += 1;
+        return `node_${nodeIdRef.current}`;
+    };
     const [nodes, setNodes, onNodesChange] = useNodesState([
         {
-            id: '123',
+            id: getNewNodeId(),
             type: 'custom',
             data: { id: "123", label: "Select an app", icon: "", action: 'Trigger' },
             position: { x: 125, y: 500 },
         }
     ]);
+    const dispatch = useDispatch();
+    const navigate = useNavigate()
     const [edges, setEdges, onEdgesChange] = useEdgesState([]);
     const [drawerOpen, setDrawerOpen] = useState(false);
     const [selectedNode, setSelectedNode] = useState(null);
     const [activeEdgeId, setActiveEdgeId] = useState(null);
     const [selectedApp, setSelectedApp] = useState(null);
     const [selectedEvent, setSelectedEvent] = useState(null);
-     const {values,setFieldValue} = useFormikContext()
+    const { values, setFieldValue } = useFormikContext()
+    const workflowTitle = useSelector((state) => state.workflows.workflow_Title);
+    const [loading, setLoading] = useState(false);
+    const { data } = useSelector((state) => state.workflows);
+    const singleData = data[0]
+    const flowObj = parseFlowJson(data[0]?.flow_json,);
+    const isFlowLoaded = useRef(false);
+  
+
+
+    useEffect(() => {
+        if (!flowObj || isFlowLoaded.current) return;
+
+        if (Array.isArray(flowObj.nodes)) {
+            setNodes(flowObj.nodes);
+        }
+
+        if (Array.isArray(flowObj.edges)) {
+            setEdges(flowObj.edges);
+        }
+
+        isFlowLoaded.current = true;
+    }, [flowObj]);
+
 
     const [drawerContext, setDrawerContext] = useState({
         source: null,
         node: null,
         edge: null,
     });
+    useEffect(() => {
+        setLoading(true);
+        dispatch(getSingleWorkFlow(id)).finally(() => setLoading(false));
 
+    }, [id]);
+    const onSubmitHandler = async () => {
+        const payload = {
+            title: singleData?.title,
+            name: "test",
+            status: "active",
+            flow_json: JSON.stringify({ nodes, edges }),
+        }
 
+        if (id) {
+            const { payload: data } = await dispatch(
+                updateWorkFlow({ id, payload })
+            );
+          
+
+        }
+    };
     const { screenToFlowPosition } = useReactFlow();
     const openDrawerForNode = (node) => {
         setDrawerContext({
@@ -87,9 +164,9 @@ export default function FlowCanvas() {
                 x: event.clientX,
                 y: event.clientY,
             });
-          
+
             const newNode = {
-                id: getId(),
+                id: getNewNodeId(),
                 position,
                 type: "custom",
                 data: {
@@ -142,7 +219,7 @@ export default function FlowCanvas() {
                 y: sourceNode.position.y,
             };
 
-        const routerId = getId();
+        const routerId = getNewNodeId();
         const routerNode = {
             id: routerId,
             type: "custom",
@@ -220,7 +297,7 @@ export default function FlowCanvas() {
                 y: sourceNode.position.y,
             };
 
-        const newNodeId = getId();
+        const newNodeId = getNewNodeId();
 
         const newNode = {
             id: newNodeId,
@@ -233,7 +310,7 @@ export default function FlowCanvas() {
                 logic: {
                     groups: conditions.map((group) => ({
                         id: group.id,
-                         type: group.type || 'AND',
+                        type: group.type || 'AND',
                         rules: group.rules.map((rule) => ({
                             id: rule.id,
                             field: rule.field,
@@ -304,7 +381,7 @@ export default function FlowCanvas() {
                 y: sourceNode.position.y,
             };
 
-        const newNodeId = getId();
+        const newNodeId = getNewNodeId();
 
         const newNode = {
             id: newNodeId,
@@ -475,6 +552,49 @@ export default function FlowCanvas() {
     };
     return (
         <div style={{ flex: 1, height: "100vh" }}>
+            <TopBar
+                leftContent={() => (
+                    <>
+                        <Button variant="outline" onClick={() => navigate(-1)}>
+                            <FiArrowLeft />
+                        </Button>
+                        <Text fontSize="md" fontWeight="medium">
+                            {singleData?.title || __("Untitled Workflow", "zaplane")}
+                        </Text>
+                    </>
+                )}
+                rightContent={() => (
+                    <>
+                        <Checkbox.Root
+                            padding="7px 9px"
+                            borderRadius="4px"
+                            border="1px solid var(--zaplane-border-color)"
+                        >
+                            <Checkbox.HiddenInput />
+                            <Checkbox.Control />
+                            <Checkbox.Label>show runs</Checkbox.Label>
+                        </Checkbox.Root>
+                        <Button size="sm" variant="outline">
+                            {__("inactive", "zaplane")}
+                        </Button>
+                        <Button size="sm" variant="outline">
+                            {__("Save Draft", "zaplane")}
+                        </Button>
+                        <Button
+                            size="sm"
+                            bg="black"
+                            color="white"
+                            _hover={{ bg: "gray.800" }}
+                            onClick={() => onSubmitHandler()}
+                        >
+                            {__("Publish", "zaplane")}
+                        </Button>
+                    </>
+                )}
+            />
+            <Box>
+
+            </Box>
             <ReactFlow
                 nodes={nodes}
                 edges={edges}
@@ -512,7 +632,7 @@ export default function FlowCanvas() {
                 createRouterNode={createRouterNode}
                 createActionNode={createActionNode}
                 updateTriggerNode={updateTriggerNode}
-                
+
             />
         </div>
     );

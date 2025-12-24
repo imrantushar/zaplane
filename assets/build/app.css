@@ -186,6 +186,178 @@
     display: revert;
   }
 }
+
+.zaplaness-notification {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 10px 16px;
+  box-shadow: 0px 12px 72px -8px rgba(16, 24, 40, 0.25);
+  border-radius: 4px;
+  min-width: 400px;
+  z-index: 99999;
+  background: #fff;
+}
+
+.zaplaness-notification--success {
+  background: #00AD6B;
+  color: #fff;
+}
+
+.zaplaness-notification--dashboard {
+  position: fixed;
+  left: 40%;
+  transform: translateX(-50%);
+  bottom: 35px;
+}
+
+.zaplaness-notification--dashboard .zaplaness-btn {
+  background: transparent;
+}
+
+.zaplaness-notification--lesson {
+  position: fixed;
+  left: 40%;
+  transform: translateX(-50%);
+  bottom: 35px;
+  padding: 20px 32px;
+}
+
+.zaplaness-notification--lesson .zaplaness-btn--bg-red {
+  padding: 4px !important;
+}
+
+.zaplaness-notification--info {
+  background: #7B68EE;
+  color: #fff;
+}
+
+.zaplaness-notification--warning {
+  background: #FDB022;
+  color: #fff;
+}
+
+.zaplaness-notification--error {
+  background: #FF4D4D;
+  color: #fff;
+}
+
+.zaplaness-notification .zaplaness-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.zaplaness-notification .zaplaness-icon--check {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.zaplaness-notification .zaplaness-icon--check::before {
+  font-size: 20px;
+  color: #f8f8f8;
+}
+
+.zaplaness-notification .zaplaness-icon--success {
+  background: #00AD6B;
+}
+
+.zaplaness-notification .zaplaness-icon--info {
+  background: #7B68EE;
+}
+
+.zaplaness-notification .zaplaness-icon--warning {
+  background: #FDB022;
+}
+
+.zaplaness-notification .zaplaness-icon--error {
+  background: #FFEDED;
+}
+
+.zaplaness-notification .zaplaness-icon--notification {
+  font-size: 25px;
+}
+
+.zaplaness-notification .zaplaness-icon--information {
+  font-size: 22px;
+}
+
+.zaplaness-notification .zaplaness-icon--information::before {
+  color: #fff;
+}
+
+.zaplaness-notification .zaplaness-icon--information-error {
+  font-size: 22px;
+}
+
+.zaplaness-notification .zaplaness-btn {
+  padding: 12px 0;
+}
+
+.zaplaness-notification .zaplaness-btn .zaplaness-icon--close {
+  background: transparent;
+}
+
+.zaplaness-notification .zaplaness-btn .zaplaness-icon--close::before {
+  color: #fff;
+}
+
+.zaplaness-notification__message {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 21px;
+  margin: 0;
+}
+
+@media screen and (max-width: 485px) {
+  .zaplaness-notification {
+    min-width: 90%;
+  }
+}
+
+.zaplaness-status {
+  align-items: center;
+  border-radius: 45px;
+  display: flex;
+  font-size: 14px;
+  font-weight: 400;
+  gap: 10px;
+  justify-content: center;
+  line-height: 16px;
+  min-width: 50px;
+  padding: 8px 20px;
+  text-align: center;
+  text-transform: capitalize;
+}
+
+.zaplaness-status--passed {
+  background: rgba(22, 163, 74, 0.1);
+  color: #16A34A;
+}
+
+.zaplaness-status--failed {
+  background: rgba(220, 38, 38, 0.1);
+  color: #DC2626;
+}
+
+.zaplaness-status--pending {
+  background: rgba(234, 179, 8, 0.1);
+  color: #EAB308;
+}
+/*!*************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/@wordpress/scripts/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./dev_zaplane/components/Modal/styles.scss ***!
+  \*************************************************************************************************************************************************************************************************************************************************************************************************/
+.zaplane-wp-modal {
+  width: 600px;
+}
 /*!**********************************************************************************************************************************************************************************************!*\
   !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[2].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[2].use[2]!./node_modules/@xyflow/react/dist/base.css ***!
   \**********************************************************************************************************************************************************************************************/
@@ -694,5 +866,13 @@ svg.react-flow__connectionline {
   top: 100%;
 }
 
+/*!**************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/@wordpress/scripts/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./dev_zaplane/components/TopBar/styles.scss ***!
+  \**************************************************************************************************************************************************************************************************************************************************************************************************/
+.zaplane-topbar-logo {
+  background: #E2E0FF;
+  padding: 6px;
+  border-radius: 50%;
+}
 
 /*# sourceMappingURL=app.css.map*/

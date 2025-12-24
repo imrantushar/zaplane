@@ -3,6 +3,7 @@ import { configureStore } from '@reduxjs/toolkit';
 // Import all the reducers you have created
 import appReducer from './Slices/appSlice/appSlice';
 import menuReducer from './Slices/menuSlice/menuSlice';
+import workflowsReducer from './Slices/workFlowSlice/workFlowSlice';
 
 import logger from 'redux-logger'
 /**
@@ -17,6 +18,7 @@ export const store = configureStore({
         // Register the reducer from each slice here
         adminmenu: menuReducer,
         app: appReducer,
+        workflows: workflowsReducer,
         // Future reducers will be added here (e.g., points, settings)
     },
     middleware: (getDefaultMiddleware) =>

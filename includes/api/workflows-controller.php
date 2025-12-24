@@ -47,8 +47,8 @@ class WorkflowsController extends WP_REST_Controller {
 		}
 
         register_rest_route(
-			$this->namespace,
-			'/' . $this->rest_base . '/(?P<id>[\d]+)',
+			$namespace,
+			'/' . $rest_base . '/(?P<id>[\d]+)',
 			array(
 				'args'   => array(
 					'id' => array(
@@ -137,7 +137,11 @@ class WorkflowsController extends WP_REST_Controller {
 	}
 
 	public function update_item( $request ) {
-		
+		$prepared_workflow = (array) $this->prepare_item_for_database( $request );
+		$ID = (int) $request->get_param( 'id' );
+		WorkflowsQuery::update($ID, $prepared_workflow);
+		$data = WorkflowsQuery::get($ID);
+		return rest_ensure_response( $data );
 	}
 	public function delete_item( $request ) {
 		$ID = (int) $request->get_param( 'id' );
