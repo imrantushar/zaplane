@@ -41,15 +41,22 @@ import { showNotification } from "@ZAPRedux/Slices/notificationSlice/notificatio
 import { parseFlowJson } from "./helper";
 ;
 
-let id = 0;
-const getId = () => `dndnode_${id++}`;
+
+
+
 
 
 
 export default function FlowCanvas({ id }) {
+    
+  const nodeIdRef = useRef(0);
+    const getNewNodeId = () => {
+        nodeIdRef.current += 1;
+        return `node_${nodeIdRef.current}`;
+    };
     const [nodes, setNodes, onNodesChange] = useNodesState([
         {
-            id: '123',
+            id: getNewNodeId(),
             type: 'custom',
             data: { id: "123", label: "Select an app", icon: "", action: 'Trigger' },
             position: { x: 125, y: 500 },
@@ -67,9 +74,10 @@ export default function FlowCanvas({ id }) {
     const workflowTitle = useSelector((state) => state.workflows.workflow_Title);
     const [loading, setLoading] = useState(false);
     const { data } = useSelector((state) => state.workflows);
-    const singleData =data[0]
+    const singleData = data[0]
     const flowObj = parseFlowJson(data[0]?.flow_json,);
     const isFlowLoaded = useRef(false);
+  
 
 
     useEffect(() => {
@@ -85,9 +93,6 @@ export default function FlowCanvas({ id }) {
 
         isFlowLoaded.current = true;
     }, [flowObj]);
-
-
-
 
 
     const [drawerContext, setDrawerContext] = useState({
@@ -167,7 +172,7 @@ export default function FlowCanvas({ id }) {
             });
 
             const newNode = {
-                id: getId(),
+                id: getNewNodeId(),
                 position,
                 type: "custom",
                 data: {
@@ -220,7 +225,7 @@ export default function FlowCanvas({ id }) {
                 y: sourceNode.position.y,
             };
 
-        const routerId = getId();
+        const routerId = getNewNodeId();
         const routerNode = {
             id: routerId,
             type: "custom",
@@ -298,7 +303,7 @@ export default function FlowCanvas({ id }) {
                 y: sourceNode.position.y,
             };
 
-        const newNodeId = getId();
+        const newNodeId = getNewNodeId();
 
         const newNode = {
             id: newNodeId,
@@ -382,7 +387,7 @@ export default function FlowCanvas({ id }) {
                 y: sourceNode.position.y,
             };
 
-        const newNodeId = getId();
+        const newNodeId = getNewNodeId();
 
         const newNode = {
             id: newNodeId,

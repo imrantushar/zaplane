@@ -2032,13 +2032,16 @@ __webpack_require__.r(__webpack_exports__);
 
 
 ;
-let id = 0;
-const getId = () => `dndnode_${id++}`;
 function FlowCanvas({
   id
 }) {
+  const nodeIdRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(0);
+  const getNewNodeId = () => {
+    nodeIdRef.current += 1;
+    return `node_${nodeIdRef.current}`;
+  };
   const [nodes, setNodes, onNodesChange] = (0,_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.useNodesState)([{
-    id: '123',
+    id: getNewNodeId(),
     type: 'custom',
     data: {
       id: "123",
@@ -2157,7 +2160,7 @@ function FlowCanvas({
       y: event.clientY
     });
     const newNode = {
-      id: getId(),
+      id: getNewNodeId(),
       position,
       type: "custom",
       data: {
@@ -2200,7 +2203,7 @@ function FlowCanvas({
       x: sourceNode.position.x + 220,
       y: sourceNode.position.y
     };
-    const routerId = getId();
+    const routerId = getNewNodeId();
     const routerNode = {
       id: routerId,
       type: "custom",
@@ -2265,7 +2268,7 @@ function FlowCanvas({
       x: sourceNode.position.x + 220,
       y: sourceNode.position.y
     };
-    const newNodeId = getId();
+    const newNodeId = getNewNodeId();
     const newNode = {
       id: newNodeId,
       type: "custom",
@@ -2336,7 +2339,7 @@ function FlowCanvas({
       x: sourceNode.position.x + 220,
       y: sourceNode.position.y
     };
-    const newNodeId = getId();
+    const newNodeId = getNewNodeId();
     const newNode = {
       id: newNodeId,
       type: "custom",
