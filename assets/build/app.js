@@ -967,7 +967,7 @@ const CreateWorkflows = () => {
     if (!workflowName.trim()) return;
     dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_17__.createWorkflows)({
       title: workflowName,
-      name: "test",
+      name: workflowName,
       status: "active",
       flow_json: JSON.stringify()
     })).unwrap().then(res => {

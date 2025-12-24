@@ -49,7 +49,7 @@ const CreateWorkflows = () => {
     dispatch(
       createWorkflows({
         title: workflowName,
-        name: "test",
+        name: workflowName,
         status: "active",
         flow_json: JSON.stringify(),
       })
