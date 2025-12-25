@@ -26,6 +26,7 @@ class Assets {
 			wp_localize_script('zaplane-app-scripts', 'ZaplaneGlobal', [
                 'nonce'                 => wp_create_nonce('wp_rest'),
                 'zaplane_nonce'        => wp_create_nonce('zaplane_nonce'),
+                'namespace'             => ZAPLANE_PLUGIN_SLUG . '/v1/',
                 'rest_url'              => rest_url(),
                 'ajaxurl'               => esc_url(admin_url('admin-ajax.php')),
                 'site_url'              => site_url(),
