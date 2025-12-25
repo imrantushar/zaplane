@@ -2042,7 +2042,7 @@ function FlowCanvas({
     },
     position: {
       x: 125,
-      y: 500
+      y: 300
     }
   }]);
   const dispatch = (0,react_redux__WEBPACK_IMPORTED_MODULE_17__.useDispatch)();
@@ -2057,7 +2057,6 @@ function FlowCanvas({
     values,
     setFieldValue
   } = (0,formik__WEBPACK_IMPORTED_MODULE_8__.useFormikContext)();
-  const workflowTitle = (0,react_redux__WEBPACK_IMPORTED_MODULE_17__.useSelector)(state => state.workflows.workflow_Title);
   const [loading, setLoading] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
   const {
     data
@@ -2065,6 +2064,7 @@ function FlowCanvas({
   const singleData = data[0];
   const flowObj = (0,_helper__WEBPACK_IMPORTED_MODULE_19__.parseFlowJson)(data[0]?.flow_json);
   const isFlowLoaded = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(false);
+  const GAP = 220;
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
     if (!flowObj || isFlowLoaded.current) return;
     if (Array.isArray(flowObj.nodes)) {
@@ -2247,18 +2247,16 @@ function FlowCanvas({
       sourceNode = nodes.find(n => n.id === node.id);
       if (!sourceNode) return;
     }
-    const position = edge ? {
-      x: (sourceNode.position.x + targetNode.position.x) / 2,
-      y: (sourceNode.position.y + targetNode.position.y) / 2
-    } : {
-      x: sourceNode.position.x + 220,
-      y: sourceNode.position.y
-    };
+    const newX = sourceNode.position.x + GAP;
+    const newY = sourceNode.position.y;
     const newNodeId = getNewNodeId();
     const newNode = {
       id: newNodeId,
       type: "custom",
-      position,
+      position: {
+        x: newX,
+        y: newY
+      },
       data: {
         label: "Condition",
         action: "Condition",
@@ -2266,7 +2264,7 @@ function FlowCanvas({
         logic: {
           groups: conditions.map(group => ({
             id: group.id,
-            type: group.type || 'AND',
+            type: group.type || "AND",
             rules: group.rules.map(rule => ({
               id: rule.id,
               field: rule.field,
@@ -2277,6 +2275,18 @@ function FlowCanvas({
         }
       }
     };
+    const updatedNodes = nodes.map(n => {
+      if (n.position.x >= newX) {
+        return {
+          ...n,
+          position: {
+            ...n.position,
+            x: n.position.x + GAP
+          }
+        };
+      }
+      return n;
+    });
     let newEdges = [...edges];
     if (edge) {
       newEdges = [...edges.filter(e => e.id !== edge.id), {
@@ -2290,8 +2300,7 @@ function FlowCanvas({
         target: edge.target,
         type: "custom"
       }];
-    }
-    if (!edge && sourceNode) {
+    } else {
       newEdges = [...edges, {
         id: `edge-${sourceNode.id}-${newNodeId}`,
         source: sourceNode.id,
@@ -2299,7 +2308,7 @@ function FlowCanvas({
         type: "custom"
       }];
     }
-    setNodes(nds => nds.concat(newNode));
+    setNodes([...updatedNodes, newNode]);
     setEdges(newEdges);
   };
   const createActionNode = actionData => {
@@ -2318,18 +2327,16 @@ function FlowCanvas({
       sourceNode = nodes.find(n => n.id === node.id);
       if (!sourceNode) return;
     }
-    const position = edge ? {
-      x: (sourceNode.position.x + targetNode.position.x) / 2,
-      y: (sourceNode.position.y + targetNode.position.y) / 2
-    } : {
-      x: sourceNode.position.x + 220,
-      y: sourceNode.position.y
-    };
+    const newX = sourceNode.position.x + GAP;
+    const newY = sourceNode.position.y;
     const newNodeId = getNewNodeId();
     const newNode = {
       id: newNodeId,
       type: "custom",
-      position,
+      position: {
+        x: newX,
+        y: newY
+      },
       data: {
         label: actionData.actionName,
         action: "Action",
@@ -2337,6 +2344,20 @@ function FlowCanvas({
         ...actionData
       }
     };
+
+    // ✅ position-based shift (NO overlap)
+    const updatedNodes = nodes.map(n => {
+      if (n.position.x >= newX) {
+        return {
+          ...n,
+          position: {
+            ...n.position,
+            x: n.position.x + GAP
+          }
+        };
+      }
+      return n;
+    });
     let newEdges = [...edges];
     if (edge) {
       newEdges = [...edges.filter(e => e.id !== edge.id), {
@@ -2350,8 +2371,7 @@ function FlowCanvas({
         target: edge.target,
         type: "custom"
       }];
-    }
-    if (!edge && sourceNode) {
+    } else {
       newEdges = [...edges, {
         id: `edge-${sourceNode.id}-${newNodeId}`,
         source: sourceNode.id,
@@ -2359,7 +2379,7 @@ function FlowCanvas({
         type: "custom"
       }];
     }
-    setNodes(nds => nds.concat(newNode));
+    setNodes([...updatedNodes, newNode]);
     setEdges(newEdges);
   };
   const updateTriggerNode = triggerData => {
@@ -2503,9 +2523,10 @@ function FlowCanvas({
       onEdgesChange: onEdgesChange,
       onConnect: onConnect,
       onDrop: onDrop,
-      onDragOver: onDragOver,
-      fitView: true,
-      fitViewOnInit: true,
+      onDragOver: onDragOver
+      // fitView
+      // fitViewOnInit
+      ,
       panOnDrag: true,
       zoomOnScroll: true,
       zoomOnDoubleClick: true,
