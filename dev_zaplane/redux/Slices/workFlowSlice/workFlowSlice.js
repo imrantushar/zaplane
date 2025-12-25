@@ -8,10 +8,9 @@ import {
 	is_admin,
 	handleSliceSuccess,
 	handleSliceError,
+	namespace,
 } from '@ZAPUtils/helper';
 import { showNotification } from '../notificationSlice/notificationSlice';
-const namespace = 'zaplane/v1/';
-
 export const createWorkflows = createAsyncThunk(
 	'zaplane/createWorkflows',
 	async (payload, thunkAPI) => {
