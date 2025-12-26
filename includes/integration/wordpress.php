@@ -1,11 +1,9 @@
 <?php
 namespace Zaplane\Integration;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
-
 use Zaplane\Classes\IntegrationBase;
+
+if ( ! defined( 'ABSPATH' ) ) exit;
 
 class Wordpress extends IntegrationBase {
 
@@ -19,64 +17,41 @@ class Wordpress extends IntegrationBase {
 
     public static function get_triggers(): array {
         return [
-            'publish_post'       => ['label' => 'Post Published', 'hook' => 'publish_post'],
-            'post_updated'       => ['label' => 'Post Updated', 'hook' => 'post_updated'],
-            'before_delete_post' => ['label' => 'Post Deleted', 'hook' => 'before_delete_post'],
-            'user_register'      => ['label' => 'User Registered', 'hook' => 'user_register'],
-            'profile_update'     => ['label' => 'User Updated', 'hook' => 'profile_update'],
-            'comment_post'       => ['label' => 'Comment Added', 'hook' => 'comment_post'],
-            'edit_comment'       => ['label' => 'Comment Updated', 'hook' => 'edit_comment'],
-            'delete_comment'     => ['label' => 'Comment Deleted', 'hook' => 'delete_comment'],
-            'update_option'      => ['label' => 'Option Updated', 'hook' => 'update_option'],
+            'publish_post'  => ['label' => 'Post Published', 'hook' => 'publish_post'],
+            'post_updated'  => ['label' => 'Post Updated',   'hook' => 'post_updated'],
+            'user_register' => ['label' => 'User Registered','hook' => 'user_register'],
+            'comment_post'  => ['label' => 'Comment Added',  'hook' => 'comment_post'],
         ];
     }
 
     /**
-     * 🔧 Trigger Config Schema (UI ONLY)
+     * Trigger UI Schema
      */
     public static function get_trigger_config_schema( string $trigger ): array {
 
-        switch ( $trigger ) {
-
-            case 'publish_post':
-            case 'post_updated':
-                return [
-                    [
-                        'key'      => 'post_type',
-                        'label'    => 'Post Type',
-                        'type'     => 'select',
-                        'options'  => self::get_post_type_options(),
-                        'required' => true,
+        if ( in_array( $trigger, ['publish_post','post_updated'], true ) ) {
+            return [
+                [
+                    'key'   => 'post_type',
+                    'label' => 'Post Type',
+                    'type'  => 'select',
+                    'dynamic' => [
+                        'integration' => 'wordpress',
+                        'query'       => 'post_types',
+                        'select'      => ['name','label'],
                     ],
-                    [
-                        'key'     => 'post_status',
-                        'label'   => 'Post Status',
-                        'type'    => 'select',
-                        'options' => [
-                            ['label' => 'Publish', 'value' => 'publish'],
-                            ['label' => 'Draft', 'value' => 'draft'],
-                        ],
-                    ],
-                ];
-
-            case 'user_register':
-                return [
-                    [
-                        'key'   => 'role',
-                        'label' => 'User Role',
-                        'type'  => 'select',
-                        'options' => self::get_user_roles(),
-                    ],
-                ];
-
-            case 'comment_post':
-                return [
-                    [
-                        'key'   => 'post_id',
-                        'label' => 'Post ID (optional)',
-                        'type'  => 'expression',
-                    ],
-                ];
+                    'required' => true,
+                ],
+                [
+                    'key'   => 'post_status',
+                    'label' => 'Post Status',
+                    'type'  => 'select',
+                    'options' => [
+                        ['label'=>'Publish','value'=>'publish'],
+                        ['label'=>'Draft','value'=>'draft'],
+                    ]
+                ]
+            ];
         }
 
         return [];
@@ -86,42 +61,46 @@ class Wordpress extends IntegrationBase {
      * TRIGGER PAYLOAD
      * ===================================================== */
 
-    public static function resolve_trigger(array $node, array $args) {
+    public static function resolve_trigger( array $node, array $args ) {
 
-        // You may optionally FILTER here using $node['config']
-
-        switch ($node['event']) {
+        switch ( $node['event'] ) {
 
             case 'publish_post':
             case 'post_updated':
-            case 'before_delete_post':
-                $post = get_post($args[0] ?? 0);
-                if (!$post) return false;
 
-                // Example config filter
-                if (!empty($node['config']['post_type']) && $post->post_type !== $node['config']['post_type']) {
+                $post = get_post( $args[0] ?? 0 );
+                if ( ! $post ) return false;
+
+                // Apply trigger filters
+                if ( ! empty($node['config']['post_type']) && $post->post_type !== $node['config']['post_type'] ) {
+                    return false;
+                }
+                if ( ! empty($node['config']['post_status']) && $post->post_status !== $node['config']['post_status'] ) {
                     return false;
                 }
 
                 return [
                     'post_id'    => $post->ID,
-                    'title'      => $post->post_title,
+                    'post_title' => $post->post_title,
                     'post_type'  => $post->post_type,
+                    'status'     => $post->post_status,
                 ];
 
             case 'user_register':
-                $user = get_userdata($args[0] ?? 0);
-                if (!$user) return false;
+
+                $user = get_userdata( $args[0] ?? 0 );
+                if ( ! $user ) return false;
 
                 return [
-                    'user_id'   => $user->ID,
-                    'email'     => $user->user_email,
-                    'role'      => $user->roles[0] ?? '',
+                    'user_id' => $user->ID,
+                    'email'   => $user->user_email,
+                    'role'    => $user->roles[0] ?? '',
                 ];
 
             case 'comment_post':
-                $comment = get_comment($args[0] ?? 0);
-                if (!$comment) return false;
+
+                $comment = get_comment( $args[0] ?? 0 );
+                if ( ! $comment ) return false;
 
                 return [
                     'comment_id' => $comment->comment_ID,
@@ -139,62 +118,57 @@ class Wordpress extends IntegrationBase {
 
     public static function get_actions(): array {
         return [
-            'create_post'    => ['label' => 'Create Post'],
-            'update_post'    => ['label' => 'Update Post'],
-            'delete_post'    => ['label' => 'Delete Post'],
-            'create_user'    => ['label' => 'Create User'],
-            'update_user'    => ['label' => 'Update User'],
-            'delete_user'    => ['label' => 'Delete User'],
-            'add_comment'    => ['label' => 'Add Comment'],
-            'update_option'  => ['label' => 'Update Option'],
+            'create_post'   => ['label'=>'Create Post'],
+            'update_option' => ['label'=>'Update Option'],
         ];
     }
 
     /**
-     * 🔧 Action Config Schema (UI ONLY)
+     * Action UI Schema
      */
     public static function get_action_config_schema( string $action ): array {
 
-        switch ( $action ) {
+        if ( $action === 'create_post' ) {
+            return [
+                [
+                    'key'=>'post_title',
+                    'label'=>'Title',
+                    'type'=>'expression',
+                    'required'=>true,
+                ],
+                [
+                    'key'=>'post_content',
+                    'label'=>'Content',
+                    'type'=>'textarea',
+                ],
+                [
+                    'key'=>'post_type',
+                    'label'=>'Post Type',
+                    'type'=>'select',
+                    'dynamic'=>[
+                        'integration'=>'wordpress',
+                        'query'=>'post_types',
+                        'select'=>['name','label'],
+                    ],
+                    'required'=>true,
+                ],
+                [
+                    'key'=>'post_status',
+                    'label'=>'Status',
+                    'type'=>'select',
+                    'options'=>[
+                        ['label'=>'Draft','value'=>'draft'],
+                        ['label'=>'Publish','value'=>'publish'],
+                    ],
+                ],
+            ];
+        }
 
-            case 'create_post':
-                return [
-                    [
-                        'key'   => 'post_title',
-                        'label' => 'Post Title',
-                        'type'  => 'expression',
-                        'required' => true,
-                    ],
-                    [
-                        'key'   => 'post_content',
-                        'label' => 'Content',
-                        'type'  => 'textarea',
-                    ],
-                    [
-                        'key'   => 'post_status',
-                        'label' => 'Status',
-                        'type'  => 'select',
-                        'options' => [
-                            ['label'=>'Draft','value'=>'draft'],
-                            ['label'=>'Publish','value'=>'publish'],
-                        ],
-                    ],
-                ];
-
-            case 'update_option':
-                return [
-                    [
-                        'key'   => 'option_name',
-                        'label' => 'Option Name',
-                        'type'  => 'text',
-                        'required' => true,
-                    ],
-                    [
-                        'key'   => 'value',
-                        'label' => 'Value',
-                        'type'  => 'expression',
-                    ],
-                ];
+        if ( $action === 'update_option' ) {
+            return [
+                ['key'=>'option_name','label'=>'Option','type'=>'text','required'=>true],
+                ['key'=>'value','label'=>'Value','type'=>'expression'],
+            ];
         }
 
         return [];
@@ -204,22 +178,23 @@ class Wordpress extends IntegrationBase {
      * ACTION EXECUTION
      * ===================================================== */
 
-    public static function execute_node(array $node, array $input): array {
+    public static function execute_node( array $node, array $input ): array {
 
         $config = $node['config'] ?? [];
 
-        switch ($node['config']['action'] ?? '') {
+        switch ( $config['action'] ?? '' ) {
 
             case 'create_post':
-                $post_id = wp_insert_post([
-                    'post_title'   => $config['post_title'] ?? '',
+                $id = wp_insert_post([
+                    'post_title'   => $config['post_title'],
                     'post_content' => $config['post_content'] ?? '',
                     'post_status'  => $config['post_status'] ?? 'draft',
+                    'post_type'    => $config['post_type'],
                 ]);
-                return ['port'=>'main','data'=>['post_id'=>$post_id]];
+                return ['port'=>'main','data'=>['post_id'=>$id]];
 
             case 'update_option':
-                update_option($config['option_name'], $config['value']);
+                update_option( $config['option_name'], $config['value'] );
                 return ['port'=>'main','data'=>[]];
         }
 
@@ -227,22 +202,48 @@ class Wordpress extends IntegrationBase {
     }
 
     /* =====================================================
-     * HELPERS (UI)
+     * DYNAMIC DATA QUERIES (API)
      * ===================================================== */
 
-    protected static function get_post_type_options(): array {
-        return array_map(
-            fn($pt) => ['label' => $pt->label, 'value' => $pt->name],
-            get_post_types(['public'=>true],'objects')
-        );
+    public static function get_dynamic_queries(): array {
+        return [
+            'post_types' => [ self::class, 'query_post_types' ],
+            'posts'      => [ self::class, 'query_posts' ],
+            'users'      => [ self::class, 'query_users' ],
+        ];
     }
 
-    protected static function get_user_roles(): array {
-        global $wp_roles;
-        return array_map(
-            fn($name, $key) => ['label'=>$name,'value'=>$key],
-            $wp_roles->roles,
-            array_keys($wp_roles->roles)
-        );
+    public static function query_post_types( $q ) {
+        $types = get_post_types(['public'=>true],'objects');
+        return array_map(fn($t)=>[
+            'name'=>$t->name,
+            'label'=>$t->label
+        ], $types);
+    }
+
+    public static function query_posts( $q ) {
+
+        $args = [
+            'post_type'   => $q['where']['post_type'] ?? 'post',
+            'post_status' => $q['where']['post_status'] ?? 'publish',
+            's'           => $q['search'] ?? '',
+            'numberposts' => $q['limit'] ?? 20,
+        ];
+
+        $posts = get_posts( $args );
+
+        return array_map(fn($p)=>[
+            'ID'         => $p->ID,
+            'post_title'=> $p->post_title,
+        ], $posts);
+    }
+
+    public static function query_users( $q ) {
+        $users = get_users(['search'=>$q['search'] ?? '']);
+        return array_map(fn($u)=>[
+            'ID'=>$u->ID,
+            'name'=>$u->display_name,
+            'email'=>$u->user_email
+        ], $users);
     }
 }

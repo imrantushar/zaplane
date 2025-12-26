@@ -28,6 +28,7 @@ final class Zaplane {
 		$this->define_constants();
 		$this->set_global_settings();
 		$this->load_dependency();
+		$this->load_cli();
 		register_activation_hook( __FILE__, [ $this, 'activate' ] );
 		register_deactivation_hook( __FILE__, [ $this, 'deactivate' ] );
 		add_action( 'plugins_loaded', [ $this, 'on_plugins_loaded' ] );
@@ -103,6 +104,12 @@ final class Zaplane {
 		require_once ZAPLANE_INCLUDES_DIR_PATH . 'autoload.php';
 		require_once ZAPLANE_INCLUDES_DIR_PATH . 'dev-cli.php';
 		require_once ZAPLANE_INCLUDES_DIR_PATH . 'functions.php';
+	}
+
+	public function load_cli() {
+		if ( file_exists( ZAPLANE_ROOT_DIR_PATH . 'dev-cli.php' ) ) {
+			require_once ZAPLANE_ROOT_DIR_PATH . 'dev-cli.php';
+		}
 	}
 
 	public function set_global_settings() {

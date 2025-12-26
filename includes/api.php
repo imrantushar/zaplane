@@ -23,6 +23,30 @@ class API {
                     );
                 }
             ]);
+
+            register_rest_route('zaplane/v1', '/dynamic', [
+                'methods' => 'POST',
+                'callback' => function( $req ) {
+
+                    $integration = \Zaplane\Classes\IntegrationLoader::get(
+                        $req['integration']
+                    );
+
+                    if (! $integration) return [];
+
+                    $queries = $integration::get_dynamic_queries();
+
+                    $query = $req['query'];
+
+                    if (! isset($queries[$query])) return [];
+
+                    return call_user_func(
+                        $queries[$query],
+                        $req->get_json_params()
+                    );
+                }
+            ]);
+
         });
 
         

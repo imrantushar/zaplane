@@ -122,4 +122,15 @@ abstract class IntegrationBase {
     public static function get_action_config_schema( string $action ): array {
         return [];
     }
+
+    /**
+     * Dynamic option loaders for UI
+     * [
+     *   'posts' => callable,
+     *   'post_types' => callable
+     * ]
+     */
+    public static function get_dynamic_fields(): array {
+        return [];
+    }
 }
