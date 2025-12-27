@@ -11,6 +11,7 @@ import {
 	namespace,
 } from '@ZAPUtils/helper';
 import { showNotification } from '../notificationSlice/notificationSlice';
+import axios from 'axios';
 export const createWorkflows = createAsyncThunk(
 	'zaplane/createWorkflows',
 	async (payload, thunkAPI) => {
@@ -132,6 +133,28 @@ const workflowsSlice = createSlice({
 
 	},
 });
+
+
+export async function fetchDynamic({
+  integration,
+  query,
+  select,
+  where = {},
+  search = "",
+  limit = 20,
+}) {
+  const { data } = await API.post(namespace + "dynamic", {
+    integration,
+    query,
+    select,
+    where,
+    search,
+    limit,
+  });
+
+  return data;
+}
+
 
 export const { createWorkflowTitle } = workflowsSlice.actions;
 export default workflowsSlice.reducer;

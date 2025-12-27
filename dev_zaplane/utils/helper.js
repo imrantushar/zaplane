@@ -15,6 +15,7 @@ export const {
 	zaplane_nonce,
 	user_id,
 	is_plain_permalink,
+	integrations
 } = window?.ZaplaneGlobal;
 
 export const reactDebounce = (callback, wait) => {

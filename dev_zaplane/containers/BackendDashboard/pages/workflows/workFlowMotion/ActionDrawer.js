@@ -11,8 +11,9 @@ import {
     Tabs,
     Flex,
 } from "@chakra-ui/react";
-import {  useFormikContext } from "formik";
-import { useState } from "react";
+import { integrations } from "@ZAPUtils/helper";
+import { useFormikContext } from "formik";
+import { useEffect, useMemo, useState } from "react";
 import Select from "react-select";
 const APPS = [
     {
@@ -48,8 +49,8 @@ export default function ActionDrawer({ open, context, onClose, updateTriggerNode
     const [selectedItem, setSelectedItem] = useState(null);
     const [eventType, setEventType] = useState(null);
     const [connection, setConnection] = useState("");
-    const {values,setFieldValue,resetForm} = useFormikContext()
-  
+    const { values, setFieldValue, resetForm } = useFormikContext()
+
     const [conditions, setConditions] = useState([
         {
             id: crypto.randomUUID(),
@@ -146,7 +147,7 @@ export default function ActionDrawer({ open, context, onClose, updateTriggerNode
                 },
             ],
         },]),
-        resetForm()
+            resetForm()
     };
 
     const LIST = mode === "app" && APPS;
@@ -194,7 +195,95 @@ export default function ActionDrawer({ open, context, onClose, updateTriggerNode
         }
         return false;
     };
+    const wordpressIntegration = integrations?.integrations?.wordpress;
 
+    const actionOptions = useMemo(() => {
+    if (!selectedItem?.id) return [];
+
+    const actions =
+        integrations.integrations?.[selectedItem.id]?.actions || {};
+
+    return Object.values(actions).map((action) => ({
+        label: action.label,
+        value: action.key,
+    }));
+}, [selectedItem]);
+    console.log(actionOptions,'actionOptions', selectedItem);
+
+    // async function getPosts() {
+    //   const posts = await fetchDynamic({
+    //     integration: "wordpress",
+    //     query: "posts",
+    //     select: ["ID", "post_title"],
+    //     limit: 20,
+    //   });
+
+    //   console.log(posts,'response');
+    // }
+    // getPosts()
+    const renderField = (field, values, setFieldValue) => {
+        switch (field.type) {
+            case "text":
+            case "expression":
+                return (
+                    <Input
+                        size="sm"
+                        value={values[field.key] || ""}
+                        onChange={(e) =>
+                            setFieldValue(field.key, e.target.value)
+                        }
+                        placeholder={field.label}
+                    />
+                );
+
+            case "textarea":
+                return (
+                    <Input
+                        as="textarea"
+                        size="sm"
+                        value={values[field.key] || ""}
+                        onChange={(e) =>
+                            setFieldValue(field.key, e.target.value)
+                        }
+                        placeholder={field.label}
+                    />
+                );
+
+            case "select":
+                // static options
+                if (field.options) {
+                    return (
+                        <Select
+                            options={field.options.map((opt) => ({
+                                value: opt.value,
+                                label: opt.label,
+                            }))}
+                            onChange={(opt) =>
+                                setFieldValue(field.key, opt.value)
+                            }
+                        />
+                    );
+                }
+
+                // dynamic (API call future-proof)
+                if (field.dynamic) {
+                    return (
+                        <Select
+                            placeholder={`Load ${field.label}`}
+                            options={[]} // 👈 API থেকে আসবে
+                            onChange={(opt) =>
+                                setFieldValue(field.key, opt.value)
+                            }
+                        />
+                    );
+                }
+
+                return null;
+
+            default:
+                return null;
+        }
+    };
     return (
         <Drawer.Root open={open} size="md" onOpenChange={(e) => !e.open && resetAll()}>
             <Portal>
@@ -265,54 +354,14 @@ export default function ActionDrawer({ open, context, onClose, updateTriggerNode
                                         {selectedItem.id === "condition" ? (<>condition</>) : (
                                             <>
                                                 <Flex direction="column" gap={4}>
-                                                    <Text margin={0} fontSize="sm">Select Event</Text>
                                                     <Select
-                                                        options={[
-                                                            { value: "create", label: "Create Event" },
-                                                            { value: "update", label: "Update Event" },
-                                                            { value: "delete", label: "Delete Event" },
-                                                        ]}
+                                                          options={actionOptions}
                                                         onChange={(opt) =>
-                                                            setFieldValue('eventType',opt.value)
+                                                            setFieldValue('actionType', opt?.value)
+                                                         
+                                                            
                                                         }
                                                     />
-                                                    {values?.eventType && (
-                                                        <>
-                                                            <Box>
-                                                                <Text margin={0} fontSize="sm">Title for this connection**</Text>
-                                                                <Input
-                                                                    size="sm"
-                                                                    value={values?.connection_title}
-                                                                    onChange={(e) =>
-                                                                        setFieldValue('connection_title',e.target.value)
-                                                                    }
-                                                                    placeholder="Update API connection"
-                                                                />
-                                                            </Box>
-                                                            <Box>
-                                                                <Text margin={0} fontSize="sm">API Access Key*</Text>
-                                                                <Input
-                                                                    size="sm"
-                                                                    value={values.api_access_key}
-                                                                    onChange={(e) =>
-                                                                        setFieldValue("api_access_key",e.target.value)
-                                                                    }
-                                                                    placeholder="Update API connection"
-                                                                />
-                                                            </Box>
-                                                            <Box>
-                                                                <Text margin={0} fontSize="sm">API Access Key*</Text>
-                                                                <Input
-                                                                    size="sm"
-                                                                    value={values.api_access_url}
-                                                                    onChange={(e) =>
-                                                                        setFieldValue("api_access_url",e.target.value)
-                                                                    }
-                                                                    placeholder="Update API connection"
-                                                                />
-                                                            </Box>
-                                                        </>
-                                                    )}
                                                 </Flex></>
                                         )}
                                     </Tabs.Content>
@@ -419,7 +468,7 @@ export default function ActionDrawer({ open, context, onClose, updateTriggerNode
                                                     <Input
                                                         size="sm"
                                                         value={values.connection}
-                                                        onChange={(e) => setFieldValue('connection',e.target.value)
+                                                        onChange={(e) => setFieldValue('connection', e.target.value)
                                                         }
                                                         placeholder="Update API connection"
                                                     /></>
