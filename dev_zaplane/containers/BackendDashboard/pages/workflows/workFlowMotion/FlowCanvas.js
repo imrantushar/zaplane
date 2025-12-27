@@ -365,6 +365,7 @@ export default function FlowCanvas({ id }) {
 
     const createActionNode = (actionData) => {
         const { edge, node } = drawerContext;
+        console.log(actionData,'actionnode');
 
         let sourceNode = null;
         let targetNode = null;
@@ -394,8 +395,6 @@ export default function FlowCanvas({ id }) {
                 ...actionData,
             },
         };
-
-        // ✅ position-based shift (NO overlap)
         const updatedNodes = nodes.map((n) => {
             if (n.position.x >= newX) {
                 return {

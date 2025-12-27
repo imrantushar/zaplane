@@ -168,12 +168,11 @@ export default function ActionDrawer({ open, context, onClose, updateTriggerNode
             }
             const payload = {
                 label: selectedItem.name,
-                eventType: values.eventType,
-                api_access_key: values.api_access_key,
-                api_access_url: values.api_access_url,
-                connection_title: values.connection_title,
-                connection: values.connection,
-
+                actionType: values.actionType,
+                ...selectedActionFields.reduce((acc, field) => {
+                    acc[field.key] = values[field.key];
+                    return acc;
+                }, {}),
             };
             if (context?.source === "node" && context.node?.data?.action === "Trigger") {
                 updateTriggerNode(payload);
@@ -198,17 +197,26 @@ export default function ActionDrawer({ open, context, onClose, updateTriggerNode
     const wordpressIntegration = integrations?.integrations?.wordpress;
 
     const actionOptions = useMemo(() => {
-    if (!selectedItem?.id) return [];
+        if (!selectedItem?.id) return [];
 
-    const actions =
-        integrations.integrations?.[selectedItem.id]?.actions || {};
+        const actions =
+            integrations.integrations?.[selectedItem.id]?.actions || {};
 
-    return Object.values(actions).map((action) => ({
-        label: action.label,
-        value: action.key,
-    }));
-}, [selectedItem]);
-    console.log(actionOptions,'actionOptions', selectedItem);
+        return Object.values(actions).map((action) => ({
+            label: action.label,
+            value: action.key,
+        }));
+    }, [selectedItem]);
+    console.log(actionOptions, 'actionOptions', selectedItem);
+    const selectedActionFields = useMemo(() => {
+        if (!selectedItem?.id || !values?.actionType) return [];
+
+        const actionObj = integrations?.integrations?.[selectedItem.id]?.actions?.[values.actionType];
+        if (!actionObj) return [];
+
+        return actionObj.schema || [];
+    }, [selectedItem, values?.actionType]);
+
 
     // async function getPosts() {
     //   const posts = await fetchDynamic({
@@ -226,55 +234,57 @@ export default function ActionDrawer({ open, context, onClose, updateTriggerNode
             case "text":
             case "expression":
                 return (
-                    <Input
-                        size="sm"
-                        value={values[field.key] || ""}
-                        onChange={(e) =>
-                            setFieldValue(field.key, e.target.value)
-                        }
-                        placeholder={field.label}
-                    />
+                    <Box>
+                        <Text fontSize="sm" mb={1}>{field.label}</Text>
+                        <Input
+                            size="sm"
+                            value={values[field.key] || ""}
+                            onChange={(e) => setFieldValue(field.key, e.target.value)}
+                            placeholder={field.label}
+                        />
+                    </Box>
                 );
 
             case "textarea":
                 return (
-                    <Input
-                        as="textarea"
-                        size="sm"
-                        value={values[field.key] || ""}
-                        onChange={(e) =>
-                            setFieldValue(field.key, e.target.value)
-                        }
-                        placeholder={field.label}
-                    />
+                    <Box>
+                        <Text fontSize="sm" margin={0} mb={1}>{field.label}</Text>
+                        <Input
+                            as="textarea"
+                            size="sm"
+                            value={values[field.key] || ""}
+                            onChange={(e) => setFieldValue(field.key, e.target.value)}
+                            placeholder={field.label}
+                        />
+                    </Box>
                 );
 
             case "select":
-                // static options
                 if (field.options) {
                     return (
-                        <Select
-                            options={field.options.map((opt) => ({
-                                value: opt.value,
-                                label: opt.label,
-                            }))}
-                            onChange={(opt) =>
-                                setFieldValue(field.key, opt.value)
-                            }
-                        />
+                        <Box>
+                            <Text fontSize="sm" margin={0} mb={1}>{field.label}</Text>
+                            <Select
+                                options={field.options.map((opt) => ({
+                                    value: opt.value,
+                                    label: opt.label,
+                                }))}
+                                onChange={(opt) => setFieldValue(field.key, opt.value)}
+                            />
+                        </Box>
                     );
                 }
 
-                // dynamic (API call future-proof)
                 if (field.dynamic) {
                     return (
-                        <Select
-                            placeholder={`Load ${field.label}`}
-                            options={[]} // 👈 API থেকে আসবে
-                            onChange={(opt) =>
-                                setFieldValue(field.key, opt.value)
-                            }
-                        />
+                        <Box>
+                            <Text fontSize="sm" margin={0} mb={1}>{field.label}</Text>
+                            <Select
+                                placeholder={`Load ${field.label}`}
+                                options={[]}
+                                onChange={(opt) => setFieldValue(field.key, opt.value)}
+                            />
+                        </Box>
                     );
                 }
 
@@ -284,6 +294,7 @@ export default function ActionDrawer({ open, context, onClose, updateTriggerNode
                 return null;
         }
     };
+    console.log(values, 'valuessssssss');
     return (
         <Drawer.Root open={open} size="md" onOpenChange={(e) => !e.open && resetAll()}>
             <Portal>
@@ -354,14 +365,22 @@ export default function ActionDrawer({ open, context, onClose, updateTriggerNode
                                         {selectedItem.id === "condition" ? (<>condition</>) : (
                                             <>
                                                 <Flex direction="column" gap={4}>
-                                                    <Select
-                                                          options={actionOptions}
-                                                        onChange={(opt) =>
-                                                            setFieldValue('actionType', opt?.value)
-                                                         
-                                                            
-                                                        }
-                                                    />
+                                                    <Box>
+                                                        <Text mb={0} margin={0}>Action Type</Text>
+                                                        <Select
+                                                            options={actionOptions}
+                                                            onChange={(opt) =>
+                                                                setFieldValue('actionType', opt?.value)
+
+
+                                                            }
+                                                        />
+                                                    </Box>
+                                                    {selectedActionFields.map((field) => (
+                                                        <Box key={field.key}>
+                                                            {renderField(field, values, setFieldValue)}
+                                                        </Box>
+                                                    ))}
                                                 </Flex></>
                                         )}
                                     </Tabs.Content>
