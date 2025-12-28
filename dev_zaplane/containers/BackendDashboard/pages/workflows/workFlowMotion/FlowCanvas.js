@@ -440,27 +440,22 @@ export default function FlowCanvas({ id }) {
         setEdges(newEdges);
     };
 
-    const updateTriggerNode = (triggerData) => {
-        ;
-        setNodes((nds) =>
-            nds.map((node) => {
-                if (
-                    drawerContext.source === "node" &&
-                    node.id === drawerContext.node.id &&
-                    node.data.action === "Trigger"
-                ) {
-                    return {
-                        ...node,
-                        data: {
-                            ...node.data,
-                            ...triggerData
-                        },
-                    };
-                }
-                return node;
-            })
-        );
-    };
+  const updateNodeData = (updatedData) => {
+    setNodes((nds) =>
+        nds.map((n) => {
+            if (n.id === drawerContext.node?.id) {
+                return {
+                    ...n,
+                    data: {
+                        ...n.data,
+                        ...updatedData,
+                    },
+                };
+            }
+            return n;
+        })
+    );
+};
 
     const addCondition = (nodeId) => {
         setNodes((nds) =>
@@ -638,7 +633,7 @@ export default function FlowCanvas({ id }) {
                 context={drawerContext}
                 createRouterNode={createRouterNode}
                 createActionNode={createActionNode}
-                updateTriggerNode={updateTriggerNode}
+                updateNodeData={updateNodeData}
 
             />
         </div>

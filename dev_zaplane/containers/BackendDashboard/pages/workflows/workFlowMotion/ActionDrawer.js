@@ -33,11 +33,12 @@ export default function ActionDrawer({
     open,
     context,
     onClose,
-    updateTriggerNode,
+    updateNodeData,
     createActionNode,
     createConditionNode,
 }) {
     const { source, node } = context;
+    console.log(context,'context');
     const [mode, setMode] = useState(null);
     const [step, setStep] = useState("select");
     const [selectedItem, setSelectedItem] = useState(null);
@@ -130,7 +131,7 @@ export default function ActionDrawer({
         if (!selectedItem?.id) return [];
         const integration = integrations?.integrations?.[selectedItem.id];
         if (!integration) return [];
-        const isTriggerNode = context?.node?.data?.action === "Trigger";
+        const isTriggerNode = context?.node?.data?.action === "Trigger" && source === "node";
 
         if (isTriggerNode) {
             return Object.values(integration.triggers || {}).map((t) => ({
@@ -150,7 +151,7 @@ export default function ActionDrawer({
         const integration = integrations?.integrations?.[selectedItem.id];
         if (!integration) return [];
 
-        const isTriggerNode = context?.node?.data?.action === "Trigger";
+        const isTriggerNode = context?.node?.data?.action === "Trigger" && source === "node";
 
         if (isTriggerNode) {
             return integration.triggers?.[values.actionType]?.schema || [];
@@ -271,8 +272,8 @@ export default function ActionDrawer({
                 }, {}),
             };
 
-            if (context?.source === "node" && context.node?.data?.action === "Trigger") {
-                updateTriggerNode(payload);
+            if (context?.source === "node") {
+                updateNodeData(payload);
             } else {
                 createActionNode(payload);
             }
@@ -356,7 +357,7 @@ export default function ActionDrawer({
                                         ) : (
                                             <Flex direction="column" gap={4}>
                                                 <Box>
-                                                    <Text mb={0}>{context.node?.data?.action === "Trigger" ? "Trigger Type" : "Action Type"}</Text>
+                                                    <Text mb={0}>{context.node?.data?.action === "Trigger" && source === "node" ? "Trigger Type" : "Action Type"}</Text>
                                                     <Select
                                                         options={actionOptions}
                                                         onChange={(opt) => setFieldValue("actionType", opt?.value)}
