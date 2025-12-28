@@ -11,9 +11,10 @@ import {
     Tabs,
     Flex,
 } from "@chakra-ui/react";
+import { fetchDynamic } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
 import { integrations } from "@ZAPUtils/helper";
 import { useFormikContext } from "formik";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Select from "react-select";
 
 const APPS = [
@@ -44,6 +45,11 @@ export default function ActionDrawer({
     const [mode, setMode] = useState(null);
     const [step, setStep] = useState("select");
     const [selectedItem, setSelectedItem] = useState(null);
+    const [dynamicOptions, setDynamicOptions] = useState({});
+    const [loadingFields, setLoadingFields] = useState({});
+
+
+
     const { values, setFieldValue, resetForm } = useFormikContext();
 
     const [conditions, setConditions] = useState([
@@ -66,12 +72,12 @@ export default function ActionDrawer({
             prev.map((g) =>
                 g.id === groupId
                     ? {
-                          ...g,
-                          rules: [
-                              ...g.rules,
-                              { id: crypto.randomUUID(), field: "", operator: "", value: "" },
-                          ],
-                      }
+                        ...g,
+                        rules: [
+                            ...g.rules,
+                            { id: crypto.randomUUID(), field: "", operator: "", value: "" },
+                        ],
+                    }
                     : g
             )
         );
@@ -93,9 +99,9 @@ export default function ActionDrawer({
             prev.map((g) =>
                 g.id === groupId
                     ? {
-                          ...g,
-                          rules: g.rules.map((r) => (r.id === ruleId ? { ...r, [key]: value } : r)),
-                      }
+                        ...g,
+                        rules: g.rules.map((r) => (r.id === ruleId ? { ...r, [key]: value } : r)),
+                    }
                     : g
             )
         );
@@ -127,42 +133,65 @@ export default function ActionDrawer({
 
     const LIST = mode === "app" && APPS;
 
-  const actionOptions = useMemo(() => {
-    if (!selectedItem?.id) return [];
+    const actionOptions = useMemo(() => {
+        if (!selectedItem?.id) return [];
+        const integration = integrations?.integrations?.[selectedItem.id];
+        if (!integration) return [];
+        const isTriggerNode = context?.node?.data?.action === "Trigger";
 
-    const integration = integrations?.integrations?.[selectedItem.id];
-    if (!integration) return [];
-
-    const isTriggerNode = context?.node?.data?.action === "Trigger";
-
-    if (isTriggerNode) {
-        return Object.values(integration.triggers || {}).map((t) => ({
-            label: t.label,
-            value: t.key,
+        if (isTriggerNode) {
+            return Object.values(integration.triggers || {}).map((t) => ({
+                label: t.label,
+                value: t.key,
+            }));
+        }
+        return Object.values(integration.actions || {}).map((a) => ({
+            label: a.label,
+            value: a.key,
         }));
-    }
-    return Object.values(integration.actions || {}).map((a) => ({
-        label: a.label,
-        value: a.key,
-    }));
-}, [selectedItem, context?.node]);
+    }, [selectedItem, context?.node]);
 
-  const selectedActionFields = useMemo(() => {
-    if (!selectedItem?.id || !values?.actionType) return [];
+    const selectedActionFields = useMemo(() => {
+        if (!selectedItem?.id || !values?.actionType) return [];
 
-    const integration = integrations?.integrations?.[selectedItem.id];
-    if (!integration) return [];
+        const integration = integrations?.integrations?.[selectedItem.id];
+        if (!integration) return [];
 
-    const isTriggerNode = context?.node?.data?.action === "Trigger";
+        const isTriggerNode = context?.node?.data?.action === "Trigger";
 
-    if (isTriggerNode) {
-        return integration.triggers?.[values.actionType]?.schema || [];
-    }
+        if (isTriggerNode) {
+            return integration.triggers?.[values.actionType]?.schema || [];
+        }
 
-    return integration.actions?.[values.actionType]?.schema || [];
-}, [selectedItem, values?.actionType, context?.node]);
+        return integration.actions?.[values.actionType]?.schema || [];
+    }, [selectedItem, values?.actionType, context?.node]);
+    const getKey = (field) =>
+        `${context?.node?.data?.action}:${selectedItem?.id}:${field.key}`;
 
-  
+    const fetchDynamicOptions = async (field) => {
+        if (!field.dynamic) return;
+
+        const key = getKey(field);
+        if (dynamicOptions[key]) return;
+
+        setLoadingFields(p => ({ ...p, [key]: true }));
+
+        const res = await fetchDynamic(field.dynamic);
+
+        setDynamicOptions(p => ({
+            ...p,
+            [key]: Object.values(res).map(i => ({
+                value: i[field.dynamic.select[0]],
+                label: i[field.dynamic.select[1]],
+            })),
+        }));
+
+        setLoadingFields(p => ({ ...p, [key]: false }));
+    };
+
+
+
+
     const renderField = (field, values, setFieldValue) => {
         switch (field.type) {
             case "text":
@@ -207,13 +236,19 @@ export default function ActionDrawer({
                     );
                 }
                 if (field.dynamic) {
+                    const key = getKey(field);
                     return (
                         <Box>
-                            <Text fontSize="sm" margin='0 0 4px 0'>{field.label}</Text>
+                            <Text fontSize="sm" margin="0 0 4px 0">
+                                {field.label}
+                                {field.required && " *"}
+                            </Text>
+
                             <Select
-                                placeholder={`Load ${field.label}`}
-                                options={[]}
-                                onChange={(opt) => setFieldValue(field.key, opt.value)}
+                                options={dynamicOptions[key] || []}
+                                isLoading={loadingFields[key]}
+                                onMenuOpen={() => fetchDynamicOptions(field)}
+                                onChange={(opt) => setFieldValue(field.key, opt?.value)}
                             />
                         </Box>
                     );
@@ -257,7 +292,6 @@ export default function ActionDrawer({
         if (step === "configure") return !values.connection;
         return false;
     };
-
     return (
         <Drawer.Root open={open} size="md" onOpenChange={(e) => !e.open && resetAll()}>
             <Portal>
@@ -329,7 +363,7 @@ export default function ActionDrawer({
                                         ) : (
                                             <Flex direction="column" gap={4}>
                                                 <Box>
-                                                    <Text mb={0}>{context.node?.data?.action === "Trigger" ? "Trigger Type": "Action Type"}</Text>
+                                                    <Text mb={0}>{context.node?.data?.action === "Trigger" ? "Trigger Type" : "Action Type"}</Text>
                                                     <Select
                                                         options={actionOptions}
                                                         onChange={(opt) => setFieldValue("actionType", opt?.value)}
