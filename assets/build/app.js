@@ -1207,13 +1207,10 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-const APPS = [{
-  id: "wordpress",
-  name: "WordPress"
-}, {
-  id: "gemini",
-  name: "Gemini"
-}];
+const APPS = Object.entries(_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_12__.integrations?.integrations || {}).map(([key, value]) => ({
+  id: value.slug || key,
+  name: value.name
+}));
 const TOOLS = [{
   id: "condition",
   name: "Condition"

@@ -17,16 +17,12 @@ import { useFormikContext } from "formik";
 import { useEffect, useMemo, useState } from "react";
 import Select from "react-select";
 
-const APPS = [
-    {
-        id: "wordpress",
-        name: "WordPress",
-    },
-    {
-        id: "gemini",
-        name: "Gemini",
-    },
-];
+const APPS = Object.entries(integrations?.integrations || {}).map(
+    ([key, value]) => ({
+        id: value.slug || key,
+        name: value.name,
+    })
+);
 
 const TOOLS = [
     { id: "condition", name: "Condition" },
@@ -47,9 +43,6 @@ export default function ActionDrawer({
     const [selectedItem, setSelectedItem] = useState(null);
     const [dynamicOptions, setDynamicOptions] = useState({});
     const [loadingFields, setLoadingFields] = useState({});
-
-
-
     const { values, setFieldValue, resetForm } = useFormikContext();
 
     const [conditions, setConditions] = useState([
