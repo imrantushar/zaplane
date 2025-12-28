@@ -1222,7 +1222,7 @@ function ActionDrawer({
   open,
   context,
   onClose,
-  updateTriggerNode,
+  updateNodeData,
   createActionNode,
   createConditionNode
 }) {
@@ -1437,8 +1437,8 @@ function ActionDrawer({
           return acc;
         }, {})
       };
-      if (context?.source === "node" && context.node?.data?.action === "Trigger") {
-        updateTriggerNode(payload);
+      if (context?.source === "node") {
+        updateNodeData(payload);
       } else {
         createActionNode(payload);
       }
@@ -2431,19 +2431,18 @@ function FlowCanvas({
     setNodes([...updatedNodes, newNode]);
     setEdges(newEdges);
   };
-  const updateTriggerNode = triggerData => {
-    ;
-    setNodes(nds => nds.map(node => {
-      if (drawerContext.source === "node" && node.id === drawerContext.node.id && node.data.action === "Trigger") {
+  const updateNodeData = updatedData => {
+    setNodes(nds => nds.map(n => {
+      if (n.id === drawerContext.node?.id) {
         return {
-          ...node,
+          ...n,
           data: {
-            ...node.data,
-            ...triggerData
+            ...n.data,
+            ...updatedData
           }
         };
       }
-      return node;
+      return n;
     }));
   };
   const addCondition = nodeId => {
@@ -2596,7 +2595,7 @@ function FlowCanvas({
       context: drawerContext,
       createRouterNode: createRouterNode,
       createActionNode: createActionNode,
-      updateTriggerNode: updateTriggerNode
+      updateNodeData: updateNodeData
     })]
   });
 }

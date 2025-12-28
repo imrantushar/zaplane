@@ -33,7 +33,7 @@ export default function ActionDrawer({
     open,
     context,
     onClose,
-    updateTriggerNode,
+    updateNodeData,
     createActionNode,
     createConditionNode,
 }) {
@@ -272,8 +272,8 @@ export default function ActionDrawer({
                 }, {}),
             };
 
-            if (context?.source === "node" && context.node?.data?.action === "Trigger") {
-                updateTriggerNode(payload);
+            if (context?.source === "node") {
+                updateNodeData(payload);
             } else {
                 createActionNode(payload);
             }
