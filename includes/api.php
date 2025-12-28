@@ -13,6 +13,7 @@ class API {
 
             register_rest_route( 'zaplane/v1', '/runs/(?P<id>\d+)', [
                 'methods'  => 'GET',
+                'permission_callback' => '__return_true',
                 'callback' => function ( $req ) {
                     global $wpdb;
                     return $wpdb->get_results(
@@ -26,6 +27,7 @@ class API {
 
             register_rest_route('zaplane/v1', '/dynamic', [
                 'methods' => 'POST',
+                'permission_callback' => '__return_true',
                 'callback' => function( $req ) {
 
                     $integration = \Zaplane\Classes\IntegrationLoader::get(

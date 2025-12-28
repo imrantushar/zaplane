@@ -180,6 +180,8 @@ class Wordpress extends IntegrationBase {
 
     public static function execute_node( array $node, array $input ): array {
 
+        error_log(print_r('Run Node', true));
+
         $config = $node['config'] ?? [];
 
         switch ( $config['action'] ?? '' ) {
