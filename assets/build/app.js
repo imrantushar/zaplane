@@ -1230,6 +1230,7 @@ function ActionDrawer({
     source,
     node
   } = context;
+  console.log(context, 'context');
   const [mode, setMode] = (0,react__WEBPACK_IMPORTED_MODULE_14__.useState)(null);
   const [step, setStep] = (0,react__WEBPACK_IMPORTED_MODULE_14__.useState)("select");
   const [selectedItem, setSelectedItem] = (0,react__WEBPACK_IMPORTED_MODULE_14__.useState)(null);
@@ -1309,7 +1310,7 @@ function ActionDrawer({
     if (!selectedItem?.id) return [];
     const integration = _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_12__.integrations?.integrations?.[selectedItem.id];
     if (!integration) return [];
-    const isTriggerNode = context?.node?.data?.action === "Trigger";
+    const isTriggerNode = context?.node?.data?.action === "Trigger" && source === "node";
     if (isTriggerNode) {
       return Object.values(integration.triggers || {}).map(t => ({
         label: t.label,
@@ -1325,7 +1326,7 @@ function ActionDrawer({
     if (!selectedItem?.id || !values?.actionType) return [];
     const integration = _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_12__.integrations?.integrations?.[selectedItem.id];
     if (!integration) return [];
-    const isTriggerNode = context?.node?.data?.action === "Trigger";
+    const isTriggerNode = context?.node?.data?.action === "Trigger" && source === "node";
     if (isTriggerNode) {
       return integration.triggers?.[values.actionType]?.schema || [];
     }
@@ -1522,7 +1523,7 @@ function ActionDrawer({
                   children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
                     children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
                       mb: 0,
-                      children: context.node?.data?.action === "Trigger" ? "Trigger Type" : "Action Type"
+                      children: context.node?.data?.action === "Trigger" && source === "node" ? "Trigger Type" : "Action Type"
                     }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(react_select__WEBPACK_IMPORTED_MODULE_15__["default"], {
                       options: actionOptions,
                       onChange: opt => setFieldValue("actionType", opt?.value)
