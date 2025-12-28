@@ -1207,21 +1207,10 @@ __webpack_require__.r(__webpack_exports__);
 
 const APPS = [{
   id: "wordpress",
-  name: "WordPress",
-  actions: [{
-    id: "create_post",
-    name: "Create Post"
-  }, {
-    id: "update_post",
-    name: "Update Post"
-  }]
+  name: "WordPress"
 }, {
   id: "gemini",
-  name: "Gemini",
-  actions: [{
-    id: "generate_text",
-    name: "Generate Text"
-  }]
+  name: "Gemini"
 }];
 const TOOLS = [{
   id: "condition",
@@ -1245,8 +1234,6 @@ function ActionDrawer({
   const [mode, setMode] = (0,react__WEBPACK_IMPORTED_MODULE_13__.useState)(null);
   const [step, setStep] = (0,react__WEBPACK_IMPORTED_MODULE_13__.useState)("select");
   const [selectedItem, setSelectedItem] = (0,react__WEBPACK_IMPORTED_MODULE_13__.useState)(null);
-  const [eventType, setEventType] = (0,react__WEBPACK_IMPORTED_MODULE_13__.useState)(null);
-  const [connection, setConnection] = (0,react__WEBPACK_IMPORTED_MODULE_13__.useState)("");
   const {
     values,
     setFieldValue,
@@ -1304,8 +1291,6 @@ function ActionDrawer({
     setMode(null);
     setStep("select");
     setSelectedItem(null);
-    setEventType(null);
-    setConnection("");
     onClose();
     setConditions([{
       id: crypto.randomUUID(),
@@ -1315,15 +1300,102 @@ function ActionDrawer({
         operator: "",
         value: ""
       }]
-    }]), resetForm();
+    }]);
+    resetForm();
   };
   const LIST = mode === "app" && APPS;
+  const actionOptions = (0,react__WEBPACK_IMPORTED_MODULE_13__.useMemo)(() => {
+    if (!selectedItem?.id) return [];
+    const integration = _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_11__.integrations?.integrations?.[selectedItem.id];
+    if (!integration) return [];
+    const isTriggerNode = context?.node?.data?.action === "Trigger";
+    if (isTriggerNode) {
+      return Object.values(integration.triggers || {}).map(t => ({
+        label: t.label,
+        value: t.key
+      }));
+    }
+    return Object.values(integration.actions || {}).map(a => ({
+      label: a.label,
+      value: a.key
+    }));
+  }, [selectedItem, context?.node]);
+  const selectedActionFields = (0,react__WEBPACK_IMPORTED_MODULE_13__.useMemo)(() => {
+    if (!selectedItem?.id || !values?.actionType) return [];
+    const integration = _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_11__.integrations?.integrations?.[selectedItem.id];
+    if (!integration) return [];
+    const isTriggerNode = context?.node?.data?.action === "Trigger";
+    if (isTriggerNode) {
+      return integration.triggers?.[values.actionType]?.schema || [];
+    }
+    return integration.actions?.[values.actionType]?.schema || [];
+  }, [selectedItem, values?.actionType, context?.node]);
+  const renderField = (field, values, setFieldValue) => {
+    switch (field.type) {
+      case "text":
+      case "expression":
+        return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
+          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
+            fontSize: "sm",
+            margin: "0 0 4px 0",
+            children: field.label
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_7__.Input, {
+            size: "sm",
+            value: values[field.key] || "",
+            onChange: e => setFieldValue(field.key, e.target.value),
+            placeholder: field.label
+          })]
+        });
+      case "textarea":
+        return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
+          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
+            fontSize: "sm",
+            margin: "0 0 4px 0",
+            children: field.label
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_7__.Input, {
+            as: "textarea",
+            size: "sm",
+            value: values[field.key] || "",
+            onChange: e => setFieldValue(field.key, e.target.value),
+            placeholder: field.label
+          })]
+        });
+      case "select":
+        if (field.options) {
+          return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
+            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
+              fontSize: "sm",
+              margin: "0 0 4px 0",
+              children: field.label
+            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(react_select__WEBPACK_IMPORTED_MODULE_14__["default"], {
+              options: field.options.map(opt => ({
+                value: opt.value,
+                label: opt.label
+              })),
+              onChange: opt => setFieldValue(field.key, opt.value)
+            })]
+          });
+        }
+        if (field.dynamic) {
+          return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
+            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
+              fontSize: "sm",
+              margin: "0 0 4px 0",
+              children: field.label
+            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(react_select__WEBPACK_IMPORTED_MODULE_14__["default"], {
+              placeholder: `Load ${field.label}`,
+              options: [],
+              onChange: opt => setFieldValue(field.key, opt.value)
+            })]
+          });
+        }
+        return null;
+      default:
+        return null;
+    }
+  };
   const handleContinue = () => {
-    if (step === "select") {
-      setStep("configure");
-    } else if (step === "configure") {
-      setStep("test");
-    } else if (step === "test") {
+    if (step === "select") setStep("configure");else if (step === "configure") setStep("test");else if (step === "test") {
       if (selectedItem.id === "condition") {
         createConditionNode({
           conditions
@@ -1348,110 +1420,10 @@ function ActionDrawer({
     }
   };
   const isContinueDisabled = () => {
-    if (step === "select") {
-      return !eventType || !connection;
-    }
-    if (step === "configure") {
-      return !connection;
-    }
+    if (step === "select") return !values.actionType;
+    if (step === "configure") return !values.connection;
     return false;
   };
-  const wordpressIntegration = _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_11__.integrations?.integrations?.wordpress;
-  const actionOptions = (0,react__WEBPACK_IMPORTED_MODULE_13__.useMemo)(() => {
-    if (!selectedItem?.id) return [];
-    const actions = _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_11__.integrations.integrations?.[selectedItem.id]?.actions || {};
-    return Object.values(actions).map(action => ({
-      label: action.label,
-      value: action.key
-    }));
-  }, [selectedItem]);
-  console.log(actionOptions, 'actionOptions', selectedItem);
-  const selectedActionFields = (0,react__WEBPACK_IMPORTED_MODULE_13__.useMemo)(() => {
-    if (!selectedItem?.id || !values?.actionType) return [];
-    const actionObj = _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_11__.integrations?.integrations?.[selectedItem.id]?.actions?.[values.actionType];
-    if (!actionObj) return [];
-    return actionObj.schema || [];
-  }, [selectedItem, values?.actionType]);
-
-  // async function getPosts() {
-  //   const posts = await fetchDynamic({
-  //     integration: "wordpress",
-  //     query: "posts",
-  //     select: ["ID", "post_title"],
-  //     limit: 20,
-  //   });
-
-  //   console.log(posts,'response');
-  // }
-  // getPosts()
-  const renderField = (field, values, setFieldValue) => {
-    switch (field.type) {
-      case "text":
-      case "expression":
-        return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
-          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
-            fontSize: "sm",
-            mb: 1,
-            children: field.label
-          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_7__.Input, {
-            size: "sm",
-            value: values[field.key] || "",
-            onChange: e => setFieldValue(field.key, e.target.value),
-            placeholder: field.label
-          })]
-        });
-      case "textarea":
-        return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
-          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
-            fontSize: "sm",
-            margin: 0,
-            mb: 1,
-            children: field.label
-          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_7__.Input, {
-            as: "textarea",
-            size: "sm",
-            value: values[field.key] || "",
-            onChange: e => setFieldValue(field.key, e.target.value),
-            placeholder: field.label
-          })]
-        });
-      case "select":
-        if (field.options) {
-          return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
-            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
-              fontSize: "sm",
-              margin: 0,
-              mb: 1,
-              children: field.label
-            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(react_select__WEBPACK_IMPORTED_MODULE_14__["default"], {
-              options: field.options.map(opt => ({
-                value: opt.value,
-                label: opt.label
-              })),
-              onChange: opt => setFieldValue(field.key, opt.value)
-            })]
-          });
-        }
-        if (field.dynamic) {
-          return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
-            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
-              fontSize: "sm",
-              margin: 0,
-              mb: 1,
-              children: field.label
-            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(react_select__WEBPACK_IMPORTED_MODULE_14__["default"], {
-              placeholder: `Load ${field.label}`,
-              options: [],
-              onChange: opt => setFieldValue(field.key, opt.value)
-            })]
-          });
-        }
-        return null;
-      default:
-        return null;
-    }
-  };
-  console.log(values, 'valuessssssss');
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.DrawerRoot, {
     open: open,
     size: "md",
@@ -1518,99 +1490,94 @@ function ActionDrawer({
               }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_10__.TabsContent, {
                 value: "select",
                 children: selectedItem.id === "condition" ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.Fragment, {
-                  children: "condition"
-                }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.Fragment, {
-                  children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_6__.Flex, {
-                    direction: "column",
-                    gap: 4,
-                    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
-                      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
-                        mb: 0,
-                        margin: 0,
-                        children: "Action Type"
-                      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(react_select__WEBPACK_IMPORTED_MODULE_14__["default"], {
-                        options: actionOptions,
-                        onChange: opt => setFieldValue('actionType', opt?.value)
-                      })]
-                    }), selectedActionFields.map(field => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
-                      children: renderField(field, values, setFieldValue)
-                    }, field.key))]
-                  })
+                  children: "Condition"
+                }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_6__.Flex, {
+                  direction: "column",
+                  gap: 4,
+                  children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
+                    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
+                      mb: 0,
+                      children: context.node?.data?.action === "Trigger" ? "Trigger Type" : "Action Type"
+                    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(react_select__WEBPACK_IMPORTED_MODULE_14__["default"], {
+                      options: actionOptions,
+                      onChange: opt => setFieldValue("actionType", opt?.value)
+                    })]
+                  }), selectedActionFields.map(field => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
+                    children: renderField(field, values, setFieldValue)
+                  }, field.key))]
                 })
               }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_10__.TabsContent, {
                 value: "configure",
-                children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_9__.VStack, {
+                children: selectedItem.id === "condition" ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_9__.VStack, {
                   align: "stretch",
                   gap: 4,
-                  children: selectedItem.id === "condition" ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.Fragment, {
-                    children: ["  ", conditions.map((group, gi) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
-                      border: "1px solid #E2E8F0",
-                      p: 3,
-                      rounded: "md",
-                      children: [group.rules.map(rule => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_8__.HStack, {
-                        mb: 2,
-                        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
-                          width: "35%",
-                          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_7__.Input, {
-                            placeholder: "Condition",
-                            value: rule.field,
-                            onChange: e => updateRule(group.id, rule.id, "field", e.target.value)
-                          })
-                        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
-                          width: "35%",
-                          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(react_select__WEBPACK_IMPORTED_MODULE_14__["default"], {
-                            placeholder: "Operator",
-                            options: [{
-                              value: "equals",
-                              label: "Equals"
-                            }, {
-                              value: "contains",
-                              label: "Contains"
-                            }],
-                            onChange: opt => updateRule(group.id, rule.id, "operator", opt.value)
-                          })
-                        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
-                          width: "35%",
-                          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_7__.Input, {
-                            placeholder: "Value",
-                            value: rule.value,
-                            onChange: e => updateRule(group.id, rule.id, "value", e.target.value)
-                          })
-                        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Button, {
-                          size: "sm",
-                          colorScheme: "red",
-                          onClick: () => removeRule(group.id, rule.id),
-                          children: "\u2715"
-                        })]
-                      }, rule.id)), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Button, {
+                  children: [conditions.map((group, gi) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
+                    border: "1px solid #E2E8F0",
+                    p: 3,
+                    rounded: "md",
+                    children: [group.rules.map(rule => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_8__.HStack, {
+                      mb: 2,
+                      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
+                        width: "35%",
+                        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_7__.Input, {
+                          placeholder: "Condition",
+                          value: rule.field,
+                          onChange: e => updateRule(group.id, rule.id, "field", e.target.value)
+                        })
+                      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
+                        width: "35%",
+                        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(react_select__WEBPACK_IMPORTED_MODULE_14__["default"], {
+                          placeholder: "Operator",
+                          options: [{
+                            value: "equals",
+                            label: "Equals"
+                          }, {
+                            value: "contains",
+                            label: "Contains"
+                          }],
+                          onChange: opt => updateRule(group.id, rule.id, "operator", opt.value)
+                        })
+                      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
+                        width: "35%",
+                        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_7__.Input, {
+                          placeholder: "Value",
+                          value: rule.value,
+                          onChange: e => updateRule(group.id, rule.id, "value", e.target.value)
+                        })
+                      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Button, {
                         size: "sm",
-                        variant: "outline",
-                        onClick: () => addAndCondition(group.id),
-                        children: "+ And"
-                      }), gi !== conditions.length - 1 && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
-                        textAlign: "center",
-                        my: 2,
-                        fontSize: "sm",
-                        color: "gray.500",
-                        children: "OR"
+                        colorScheme: "red",
+                        onClick: () => removeRule(group.id, rule.id),
+                        children: "\u2715"
                       })]
-                    }, group.id)), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Button, {
-                      variant: "outline",
-                      onClick: addOrGroup,
-                      children: "+ Or Group"
-                    })]
-                  }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.Fragment, {
-                    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
-                      margin: 0,
-                      fontSize: "sm",
-                      children: "Connection*"
-                    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_7__.Input, {
+                    }, rule.id)), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Button, {
                       size: "sm",
-                      value: values.connection,
-                      onChange: e => setFieldValue('connection', e.target.value),
-                      placeholder: "Update API connection"
+                      variant: "outline",
+                      onClick: () => addAndCondition(group.id),
+                      children: "+ And"
+                    }), gi !== conditions.length - 1 && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
+                      textAlign: "center",
+                      my: 2,
+                      fontSize: "sm",
+                      color: "gray.500",
+                      children: "OR"
                     })]
-                  })
+                  }, group.id)), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Button, {
+                    variant: "outline",
+                    onClick: addOrGroup,
+                    children: "+ Or Group"
+                  })]
+                }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.Fragment, {
+                  children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
+                    margin: 0,
+                    fontSize: "sm",
+                    children: "Connection*"
+                  }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_7__.Input, {
+                    size: "sm",
+                    value: values.connection,
+                    onChange: e => setFieldValue("connection", e.target.value),
+                    placeholder: "Update API connection"
+                  })]
                 })
               }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_10__.TabsContent, {
                 value: "test",
@@ -2374,7 +2341,6 @@ function FlowCanvas({
       edge,
       node
     } = drawerContext;
-    console.log(actionData, 'actionnode');
     let sourceNode = null;
     let targetNode = null;
     if (edge) {
@@ -2447,11 +2413,7 @@ function FlowCanvas({
           ...node,
           data: {
             ...node.data,
-            label: triggerData.label,
-            eventType: triggerData.eventType,
-            event: triggerData.event,
-            connection: triggerData.connection,
-            app: triggerData.app
+            ...triggerData
           }
         };
       }

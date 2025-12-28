@@ -365,8 +365,6 @@ export default function FlowCanvas({ id }) {
 
     const createActionNode = (actionData) => {
         const { edge, node } = drawerContext;
-        console.log(actionData,'actionnode');
-
         let sourceNode = null;
         let targetNode = null;
         if (edge) {
@@ -455,11 +453,7 @@ export default function FlowCanvas({ id }) {
                         ...node,
                         data: {
                             ...node.data,
-                            label: triggerData.label,
-                            eventType: triggerData.eventType,
-                            event: triggerData.event,
-                            connection: triggerData.connection,
-                            app: triggerData.app,
+                            ...triggerData
                         },
                     };
                 }
