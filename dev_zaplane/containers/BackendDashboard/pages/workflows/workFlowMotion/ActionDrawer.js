@@ -11,45 +11,41 @@ import {
     Tabs,
     Flex,
 } from "@chakra-ui/react";
-import {  useFormikContext } from "formik";
-import { useState } from "react";
+import { fetchDynamic } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
+import { integrations } from "@ZAPUtils/helper";
+import { useFormikContext } from "formik";
+import { useEffect, useMemo, useState } from "react";
 import Select from "react-select";
-const APPS = [
-    {
-        id: "wordpress",
-        name: "WordPress",
-        actions: [
-            { id: "create_post", name: "Create Post" },
-            { id: "update_post", name: "Update Post" },
-        ],
-    },
-    {
-        id: "gemini",
-        name: "Gemini",
-        actions: [{ id: "generate_text", name: "Generate Text" }],
-    },
-];
+
+const APPS = Object.entries(integrations?.integrations || {}).map(
+    ([key, value]) => ({
+        id: value.slug || key,
+        name: value.name,
+    })
+);
 
 const TOOLS = [
-    {
-        id: "condition",
-        name: "Condition",
-    },
-    {
-        id: "router",
-        name: "Router",
-    },
+    { id: "condition", name: "Condition" },
+    { id: "router", name: "Router" },
 ];
 
-export default function ActionDrawer({ open, context, onClose, updateTriggerNode, createActionNode, createConditionNode, }) {
-    const { source, node } = context
+export default function ActionDrawer({
+    open,
+    context,
+    onClose,
+    updateNodeData,
+    createActionNode,
+    createConditionNode,
+}) {
+    const { source, node } = context;
+    console.log(context,'context');
     const [mode, setMode] = useState(null);
     const [step, setStep] = useState("select");
     const [selectedItem, setSelectedItem] = useState(null);
-    const [eventType, setEventType] = useState(null);
-    const [connection, setConnection] = useState("");
-    const {values,setFieldValue,resetForm} = useFormikContext()
-  
+    const [dynamicOptions, setDynamicOptions] = useState({});
+    const [loadingFields, setLoadingFields] = useState({});
+    const { values, setFieldValue, resetForm } = useFormikContext();
+
     const [conditions, setConditions] = useState([
         {
             id: crypto.randomUUID(),
@@ -64,6 +60,7 @@ export default function ActionDrawer({ open, context, onClose, updateTriggerNode
             ],
         },
     ]);
+
     const addAndCondition = (groupId) => {
         setConditions((prev) =>
             prev.map((g) =>
@@ -72,12 +69,7 @@ export default function ActionDrawer({ open, context, onClose, updateTriggerNode
                         ...g,
                         rules: [
                             ...g.rules,
-                            {
-                                id: crypto.randomUUID(),
-                                field: "",
-                                operator: "",
-                                value: "",
-                            },
+                            { id: crypto.randomUUID(), field: "", operator: "", value: "" },
                         ],
                     }
                     : g
@@ -91,14 +83,7 @@ export default function ActionDrawer({ open, context, onClose, updateTriggerNode
             {
                 id: crypto.randomUUID(),
                 type: "OR",
-                rules: [
-                    {
-                        id: crypto.randomUUID(),
-                        field: "",
-                        operator: "",
-                        value: "",
-                    },
-                ],
+                rules: [{ id: crypto.randomUUID(), field: "", operator: "", value: "" }],
             },
         ]);
     };
@@ -109,9 +94,7 @@ export default function ActionDrawer({ open, context, onClose, updateTriggerNode
                 g.id === groupId
                     ? {
                         ...g,
-                        rules: g.rules.map((r) =>
-                            r.id === ruleId ? { ...r, [key]: value } : r
-                        ),
+                        rules: g.rules.map((r) => (r.id === ruleId ? { ...r, [key]: value } : r)),
                     }
                     : g
             )
@@ -132,50 +115,165 @@ export default function ActionDrawer({ open, context, onClose, updateTriggerNode
         setMode(null);
         setStep("select");
         setSelectedItem(null);
-        setEventType(null);
-        setConnection("");
         onClose();
-        setConditions([{
-            id: crypto.randomUUID(),
-            rules: [
-                {
-                    id: crypto.randomUUID(),
-                    field: "",
-                    operator: "",
-                    value: "",
-                },
-            ],
-        },]),
-        resetForm()
+        setConditions([
+            {
+                id: crypto.randomUUID(),
+                rules: [{ id: crypto.randomUUID(), field: "", operator: "", value: "" }],
+            },
+        ]);
+        resetForm();
     };
 
     const LIST = mode === "app" && APPS;
 
-    const handleContinue = () => {
-        if (step === "select") {
-            setStep("configure");
-        } else if (step === "configure") {
-            setStep("test");
-        } else if (step === "test") {
-            if (selectedItem.id === "condition") {
-                createConditionNode({
-                    conditions,
-                });
+    const actionOptions = useMemo(() => {
+        if (!selectedItem?.id) return [];
+        const integration = integrations?.integrations?.[selectedItem.id];
+        if (!integration) return [];
+        const isTriggerNode = context?.node?.data?.action === "Trigger" && source === "node";
 
+        if (isTriggerNode) {
+            return Object.values(integration.triggers || {}).map((t) => ({
+                label: t.label,
+                value: t.key,
+            }));
+        }
+        return Object.values(integration.actions || {}).map((a) => ({
+            label: a.label,
+            value: a.key,
+        }));
+    }, [selectedItem, context?.node]);
+
+    const selectedActionFields = useMemo(() => {
+        if (!selectedItem?.id || !values?.actionType) return [];
+
+        const integration = integrations?.integrations?.[selectedItem.id];
+        if (!integration) return [];
+
+        const isTriggerNode = context?.node?.data?.action === "Trigger" && source === "node";
+
+        if (isTriggerNode) {
+            return integration.triggers?.[values.actionType]?.schema || [];
+        }
+
+        return integration.actions?.[values.actionType]?.schema || [];
+    }, [selectedItem, values?.actionType, context?.node]);
+    const getKey = (field) =>
+        `${context?.node?.data?.action}:${selectedItem?.id}:${field.key}`;
+
+    const fetchDynamicOptions = async (field) => {
+        if (!field.dynamic) return;
+
+        const key = getKey(field);
+        if (dynamicOptions[key]) return;
+
+        setLoadingFields(p => ({ ...p, [key]: true }));
+
+        const res = await fetchDynamic(field.dynamic);
+
+        setDynamicOptions(p => ({
+            ...p,
+            [key]: Object.values(res).map(i => ({
+                value: i[field.dynamic.select[0]],
+                label: i[field.dynamic.select[1]],
+            })),
+        }));
+
+        setLoadingFields(p => ({ ...p, [key]: false }));
+    };
+
+
+
+
+    const renderField = (field, values, setFieldValue) => {
+        switch (field.type) {
+            case "text":
+            case "expression":
+                return (
+                    <Box>
+                        <Text fontSize="sm" margin='0 0 4px 0'>{field.label}</Text>
+                        <Input
+                            size="sm"
+                            value={values[field.key] || ""}
+                            onChange={(e) => setFieldValue(field.key, e.target.value)}
+                            placeholder={field.label}
+                        />
+                    </Box>
+                );
+            case "textarea":
+                return (
+                    <Box>
+                        <Text fontSize="sm" margin='0 0 4px 0'>{field.label}</Text>
+                        <Input
+                            as="textarea"
+                            size="sm"
+                            value={values[field.key] || ""}
+                            onChange={(e) => setFieldValue(field.key, e.target.value)}
+                            placeholder={field.label}
+                        />
+                    </Box>
+                );
+            case "select":
+                if (field.options) {
+                    return (
+                        <Box>
+                            <Text fontSize="sm" margin='0 0 4px 0'>{field.label}</Text>
+                            <Select
+                                options={field.options.map((opt) => ({
+                                    value: opt.value,
+                                    label: opt.label,
+                                }))}
+                                onChange={(opt) => setFieldValue(field.key, opt.value)}
+                            />
+                        </Box>
+                    );
+                }
+                if (field.dynamic) {
+                    const key = getKey(field);
+                    return (
+                        <Box>
+                            <Text fontSize="sm" margin="0 0 4px 0">
+                                {field.label}
+                                {field.required && " *"}
+                            </Text>
+
+                            <Select
+                                options={dynamicOptions[key] || []}
+                                isLoading={loadingFields[key]}
+                                onMenuOpen={() => fetchDynamicOptions(field)}
+                                onChange={(opt) => setFieldValue(field.key, opt?.value)}
+                            />
+                        </Box>
+                    );
+                }
+                return null;
+            default:
+                return null;
+        }
+    };
+
+    const handleContinue = () => {
+        if (step === "select") setStep("configure");
+        else if (step === "configure") setStep("test");
+        else if (step === "test") {
+            if (selectedItem.id === "condition") {
+                createConditionNode({ conditions });
                 resetAll();
                 return;
             }
+
             const payload = {
                 label: selectedItem.name,
-                eventType: values.eventType,
-                api_access_key: values.api_access_key,
-                api_access_url: values.api_access_url,
-                connection_title: values.connection_title,
-                connection: values.connection,
-
+                actionType: values.actionType,
+                ...selectedActionFields.reduce((acc, field) => {
+                    acc[field.key] = values[field.key];
+                    return acc;
+                }, {}),
             };
-            if (context?.source === "node" && context.node?.data?.action === "Trigger") {
-                updateTriggerNode(payload);
+
+            if (context?.source === "node") {
+                updateNodeData(payload);
             } else {
                 createActionNode(payload);
             }
@@ -183,18 +281,11 @@ export default function ActionDrawer({ open, context, onClose, updateTriggerNode
             resetAll();
         }
     };
-
-
     const isContinueDisabled = () => {
-        if (step === "select") {
-            return !eventType || !connection;
-        }
-        if (step === "configure") {
-            return !connection;
-        }
+        if (step === "select") return !values.actionType;
+        if (step === "configure") return !values.connection;
         return false;
     };
-
     return (
         <Drawer.Root open={open} size="md" onOpenChange={(e) => !e.open && resetAll()}>
             <Portal>
@@ -215,18 +306,16 @@ export default function ActionDrawer({ open, context, onClose, updateTriggerNode
                         <Drawer.Body>
                             {!mode && (
                                 <VStack spacing={4}>
-                                    <Button w="100%" justifyContent='left' onClick={() => setMode("app")}>
-                                        Apps
-                                    </Button>
+                                    <Button w="100%" justifyContent="left" onClick={() => setMode("app")}>Apps</Button>
                                     {TOOLS.map((item) => (
                                         <Button
-                                            width="100%"
                                             key={item.id}
+                                            width="100%"
                                             justifyContent="space-between"
                                             onClick={() => {
                                                 setSelectedItem(item);
                                                 setStep("select");
-                                                setMode("tools")
+                                                setMode("tools");
                                             }}
                                         >
                                             {item.name}
@@ -234,6 +323,7 @@ export default function ActionDrawer({ open, context, onClose, updateTriggerNode
                                     ))}
                                 </VStack>
                             )}
+
                             {mode && !selectedItem && (
                                 <VStack align="stretch">
                                     {LIST.map((item) => (
@@ -248,11 +338,10 @@ export default function ActionDrawer({ open, context, onClose, updateTriggerNode
                                             {item.name} →
                                         </Button>
                                     ))}
-                                    <Button size="sm" variant="ghost" onClick={() => setMode(null)}>
-                                        ← Back
-                                    </Button>
+                                    <Button size="sm" variant="ghost" onClick={() => setMode(null)}>← Back</Button>
                                 </VStack>
                             )}
+
                             {selectedItem && (
                                 <Tabs.Root value={step} isManual>
                                     <Tabs.List mb={4}>
@@ -261,88 +350,42 @@ export default function ActionDrawer({ open, context, onClose, updateTriggerNode
                                         <Tabs.Trigger value="test">Test</Tabs.Trigger>
                                         <Tabs.Indicator />
                                     </Tabs.List>
+
                                     <Tabs.Content value="select">
-                                        {selectedItem.id === "condition" ? (<>condition</>) : (
-                                            <>
-                                                <Flex direction="column" gap={4}>
-                                                    <Text margin={0} fontSize="sm">Select Event</Text>
+                                        {selectedItem.id === "condition" ? (
+                                            <>Condition</>
+                                        ) : (
+                                            <Flex direction="column" gap={4}>
+                                                <Box>
+                                                    <Text mb={0}>{context.node?.data?.action === "Trigger" && source === "node" ? "Trigger Type" : "Action Type"}</Text>
                                                     <Select
-                                                        options={[
-                                                            { value: "create", label: "Create Event" },
-                                                            { value: "update", label: "Update Event" },
-                                                            { value: "delete", label: "Delete Event" },
-                                                        ]}
-                                                        onChange={(opt) =>
-                                                            setFieldValue('eventType',opt.value)
-                                                        }
+                                                        options={actionOptions}
+                                                        onChange={(opt) => setFieldValue("actionType", opt?.value)}
                                                     />
-                                                    {values?.eventType && (
-                                                        <>
-                                                            <Box>
-                                                                <Text margin={0} fontSize="sm">Title for this connection**</Text>
-                                                                <Input
-                                                                    size="sm"
-                                                                    value={values?.connection_title}
-                                                                    onChange={(e) =>
-                                                                        setFieldValue('connection_title',e.target.value)
-                                                                    }
-                                                                    placeholder="Update API connection"
-                                                                />
-                                                            </Box>
-                                                            <Box>
-                                                                <Text margin={0} fontSize="sm">API Access Key*</Text>
-                                                                <Input
-                                                                    size="sm"
-                                                                    value={values.api_access_key}
-                                                                    onChange={(e) =>
-                                                                        setFieldValue("api_access_key",e.target.value)
-                                                                    }
-                                                                    placeholder="Update API connection"
-                                                                />
-                                                            </Box>
-                                                            <Box>
-                                                                <Text margin={0} fontSize="sm">API Access Key*</Text>
-                                                                <Input
-                                                                    size="sm"
-                                                                    value={values.api_access_url}
-                                                                    onChange={(e) =>
-                                                                        setFieldValue("api_access_url",e.target.value)
-                                                                    }
-                                                                    placeholder="Update API connection"
-                                                                />
-                                                            </Box>
-                                                        </>
-                                                    )}
-                                                </Flex></>
+                                                </Box>
+                                                {selectedActionFields.map((field) => (
+                                                    <Box key={field.key}>
+                                                        {renderField(field, values, setFieldValue)}
+                                                    </Box>
+                                                ))}
+                                            </Flex>
                                         )}
                                     </Tabs.Content>
+
                                     <Tabs.Content value="configure">
-                                        <VStack align="stretch" gap={4}>
-                                            {selectedItem.id === "condition" ? (
-                                                <>  {conditions.map((group, gi) => (
-                                                    <Box
-                                                        key={group.id}
-                                                        border="1px solid #E2E8F0"
-                                                        p={3}
-                                                        rounded="md"
-                                                    >
+                                        {selectedItem.id === "condition" ? (
+                                            <VStack align="stretch" gap={4}>
+                                                {conditions.map((group, gi) => (
+                                                    <Box key={group.id} border="1px solid #E2E8F0" p={3} rounded="md">
                                                         {group.rules.map((rule) => (
                                                             <HStack key={rule.id} mb={2}>
                                                                 <Box width="35%">
                                                                     <Input
                                                                         placeholder="Condition"
                                                                         value={rule.field}
-                                                                        onChange={(e) =>
-                                                                            updateRule(
-                                                                                group.id,
-                                                                                rule.id,
-                                                                                "field",
-                                                                                e.target.value
-                                                                            )
-                                                                        }
+                                                                        onChange={(e) => updateRule(group.id, rule.id, "field", e.target.value)}
                                                                     />
                                                                 </Box>
-
                                                                 <Box width="35%">
                                                                     <Select
                                                                         placeholder="Operator"
@@ -350,93 +393,43 @@ export default function ActionDrawer({ open, context, onClose, updateTriggerNode
                                                                             { value: "equals", label: "Equals" },
                                                                             { value: "contains", label: "Contains" },
                                                                         ]}
-                                                                        onChange={(opt) =>
-                                                                            updateRule(
-                                                                                group.id,
-                                                                                rule.id,
-                                                                                "operator",
-                                                                                opt.value
-                                                                            )
-                                                                        }
+                                                                        onChange={(opt) => updateRule(group.id, rule.id, "operator", opt.value)}
                                                                     />
                                                                 </Box>
-
                                                                 <Box width="35%">
                                                                     <Input
                                                                         placeholder="Value"
                                                                         value={rule.value}
-                                                                        onChange={(e) =>
-                                                                            updateRule(
-                                                                                group.id,
-                                                                                rule.id,
-                                                                                "value",
-                                                                                e.target.value
-                                                                            )
-                                                                        }
+                                                                        onChange={(e) => updateRule(group.id, rule.id, "value", e.target.value)}
                                                                     />
                                                                 </Box>
-
-                                                                <Button
-                                                                    size="sm"
-                                                                    colorScheme="red"
-                                                                    onClick={() =>
-                                                                        removeRule(group.id, rule.id)
-                                                                    }
-                                                                >
-                                                                    ✕
-                                                                </Button>
+                                                                <Button size="sm" colorScheme="red" onClick={() => removeRule(group.id, rule.id)}>✕</Button>
                                                             </HStack>
                                                         ))}
-
-                                                        <Button
-                                                            size="sm"
-                                                            variant="outline"
-                                                            onClick={() => addAndCondition(group.id)}
-                                                        >
-                                                            + And
-                                                        </Button>
-
+                                                        <Button size="sm" variant="outline" onClick={() => addAndCondition(group.id)}>+ And</Button>
                                                         {gi !== conditions.length - 1 && (
-                                                            <Text
-                                                                textAlign="center"
-                                                                my={2}
-                                                                fontSize="sm"
-                                                                color="gray.500"
-                                                            >
-                                                                OR
-                                                            </Text>
+                                                            <Text textAlign="center" my={2} fontSize="sm" color="gray.500">OR</Text>
                                                         )}
                                                     </Box>
                                                 ))}
-
-                                                    <Button variant="outline" onClick={addOrGroup}>
-                                                        + Or Group
-                                                    </Button>
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <Text margin={0} fontSize="sm">Connection*</Text>
-                                                    <Input
-                                                        size="sm"
-                                                        value={values.connection}
-                                                        onChange={(e) => setFieldValue('connection',e.target.value)
-                                                        }
-                                                        placeholder="Update API connection"
-                                                    /></>
-                                            )}
-
-
-
-                                        </VStack>
+                                                <Button variant="outline" onClick={addOrGroup}>+ Or Group</Button>
+                                            </VStack>
+                                        ) : (
+                                            <>
+                                                <Text margin={0} fontSize="sm">Connection*</Text>
+                                                <Input
+                                                    size="sm"
+                                                    value={values.connection}
+                                                    onChange={(e) => setFieldValue("connection", e.target.value)}
+                                                    placeholder="Update API connection"
+                                                />
+                                            </>
+                                        )}
                                     </Tabs.Content>
 
-                                    {/* TEST */}
                                     <Tabs.Content value="test">
                                         <Text fontWeight="bold">Test Step</Text>
-                                        <Text fontSize="sm" color="gray.500">
-                                            Everything looks good. Click submit to save.
-                                        </Text>
-
+                                        <Text fontSize="sm" color="gray.500">Everything looks good. Click submit to save.</Text>
                                     </Tabs.Content>
                                 </Tabs.Root>
                             )}
@@ -444,14 +437,8 @@ export default function ActionDrawer({ open, context, onClose, updateTriggerNode
 
                         <Drawer.Footer>
                             <HStack justify="space-between" w="full">
-                                <Button variant="ghost" onClick={resetAll}>
-                                    Cancel
-                                </Button>
-                                <Button
-                                    colorScheme="blue"
-                                    onClick={handleContinue}
-                                    isDisabled={isContinueDisabled()}
-                                >
+                                <Button variant="ghost" onClick={resetAll}>Cancel</Button>
+                                <Button colorScheme="blue" onClick={handleContinue} isDisabled={isContinueDisabled()}>
                                     {step === "test" ? "Submit" : "Continue"}
                                 </Button>
                             </HStack>
