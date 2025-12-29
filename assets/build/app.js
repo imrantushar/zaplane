@@ -1420,15 +1420,28 @@ function ActionDrawer({
         return;
       }
       const payload = {
-        label: selectedItem.name,
-        actionType: values.actionType,
-        ...selectedActionFields.reduce((acc, field) => {
+        app: selectedItem.name,
+        name: selectedItem.name,
+        config: selectedActionFields.reduce((acc, field) => {
+          acc[field.key] = values[field.key];
+          return acc;
+        }, {})
+      };
+      const triggerPayload = {
+        app: selectedItem.name,
+        name: selectedItem.name,
+        event: values?.actionType,
+        config: selectedActionFields.reduce((acc, field) => {
           acc[field.key] = values[field.key];
           return acc;
         }, {})
       };
       if (context?.source === "node") {
-        updateNodeData(payload);
+        if (node?.data?.action === "Trigger") {
+          updateNodeData(triggerPayload);
+        } else {
+          updateNodeData(payload);
+        }
       } else {
         createActionNode(payload);
       }
@@ -2221,7 +2234,6 @@ function FlowCanvas({
     const newX = sourceNode.position.x + GAP;
     const newY = sourceNode.position.y;
     const newNodeId = getNewNodeId();
-    console.log(actionData, 'actionData');
     const newNode = {
       id: newNodeId,
       type: "custom",
@@ -2230,13 +2242,9 @@ function FlowCanvas({
         y: newY
       },
       data: {
-        app: actionData?.label,
-        name: actionData?.label,
         action: "Action",
         order: nodes.length + 1,
-        config: {
-          ...actionData
-        }
+        ...actionData
       }
     };
     const updatedNodes = nodes.map(n => {

@@ -260,17 +260,14 @@ export default function FlowCanvas({ id }) {
         const newY = sourceNode.position.y;
 
         const newNodeId = getNewNodeId();
-      console.log(actionData,'actionData');
         const newNode = {
             id: newNodeId,
             type: "custom",
             position: { x: newX, y: newY },
             data: {
-                app: actionData?.label,
-                name:actionData?.label,
                 action: "Action",
                 order: nodes.length + 1,
-                config:{...actionData},
+                ...actionData,
             },
         };
         const updatedNodes = nodes.map((n) => {

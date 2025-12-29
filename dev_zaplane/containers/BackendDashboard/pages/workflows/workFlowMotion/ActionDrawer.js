@@ -125,7 +125,6 @@ export default function ActionDrawer({
     };
 
     const LIST = mode === "app" && APPS;
-
     const actionOptions = useMemo(() => {
         if (!selectedItem?.id) return [];
         const integration = integrations?.integrations?.[selectedItem.id];
@@ -263,15 +262,29 @@ export default function ActionDrawer({
             }
 
             const payload = {
-                label: selectedItem.name,
-                actionType: values.actionType,
-                ...selectedActionFields.reduce((acc, field) => {
+                app: selectedItem.name,
+                name: selectedItem.name,
+                config: selectedActionFields.reduce((acc, field) => {
                     acc[field.key] = values[field.key];
                     return acc;
                 }, {}),
             };
+            const triggerPayload = {
+                app: selectedItem.name,
+                name: selectedItem.name,
+                event: values?.actionType,
+                config: selectedActionFields.reduce((acc, field) => {
+                    acc[field.key] = values[field.key];
+                    return acc;
+                }, {}),
+            };
+        
             if (context?.source === "node") {
-                updateNodeData(payload);
+                if (node?.data?.action === "Trigger") {
+                    updateNodeData(triggerPayload);
+                } else {
+                    updateNodeData(payload);
+                }
             } else {
                 createActionNode(payload);
             }
