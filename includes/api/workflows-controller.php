@@ -2,221 +2,181 @@
 namespace Zaplane\API;
 
 use WP_REST_Controller;
-use Zaplane\Classes\IntegrationLoader;
-use Zaplane\API\Schema\WorkflowsSchema;
-use Zaplane\Query\Workflows as WorkflowsQuery;
+use WP_REST_Server;
+use WP_Error;
 
-if ( ! defined( 'ABSPATH' ) ) exit;
+if (!defined('ABSPATH')) exit;
 
 class WorkflowsController extends WP_REST_Controller {
-	use WorkflowsSchema;
-    public function register_routes() {
 
+    public function register_routes() {
         $namespace = 'zaplane/v1';
         $rest_base = 'workflows';
-        
-        register_rest_route(
-			$namespace,
-			'/' . $rest_base,
-			array(
-				array(
-					'methods'             => \WP_REST_Server::READABLE,
-					'callback'            => array( $this, 'get_items' ),
-					'permission_callback' => array( $this, 'permissions_check' ),
-					'args'                => $this->get_collection_params(),
-				),
-				array(
-					'methods'             => \WP_REST_Server::CREATABLE,
-					'callback'            => array( $this, 'create_item' ),
-					'permission_callback' => array( $this, 'permissions_check' ),
-					'args'                => $this->get_item_schema(),
-				),
-				'schema' => array( $this, 'get_public_item_schema' ),
-			)
-		);
 
-		$schema        = $this->get_item_schema();
-		$get_item_args = array(
-			'context' => $this->get_context_param( array( 'default' => 'view' ) ),
-		);
-		if ( isset( $schema['properties']['password'] ) ) {
-			$get_item_args['password'] = array(
-				'description' => esc_html__( 'The password for the post if it is password protected.', 'academy' ),
-				'type'        => 'string',
-			);
-		}
+        // List & Create workflows
+        register_rest_route($namespace, '/' . $rest_base, [
+            [
+                'methods' => WP_REST_Server::READABLE,
+                'callback' => [$this, 'get_items'],
+                'permission_callback' => [$this, 'permissions_check'],
+            ],
+            [
+                'methods' => WP_REST_Server::CREATABLE,
+                'callback' => [$this, 'create_item'],
+                'permission_callback' => [$this, 'permissions_check'],
+            ],
+        ]);
 
-        register_rest_route(
-			$namespace,
-			'/' . $rest_base . '/(?P<id>[\d]+)',
-			array(
-				'args'   => array(
-					'id' => array(
-						'description' => esc_html__( 'Unique identifier for the object.', 'academy' ),
-						'type'        => 'integer',
-					),
-				),
-				array(
-					'methods'             => \WP_REST_Server::READABLE,
-					'callback'            => array( $this, 'get_item' ),
-					'permission_callback' => array( $this, 'permissions_check' ),
-					'args'                => $get_item_args,
-				),
-				array(
-					'methods'             => \WP_REST_Server::EDITABLE,
-					'callback'            => array( $this, 'update_item' ),
-					'permission_callback' => array( $this, 'permissions_check' ),
-					'args'                => $this->get_item_schema(),
-				),
-				array(
-					'methods'             => \WP_REST_Server::DELETABLE,
-					'callback'            => array( $this, 'delete_item' ),
-					'permission_callback' => array( $this, 'permissions_check' ),
-					'args'                => array(
-						'force' => array(
-							'type'        => 'boolean',
-							'default'     => false,
-							'description' => esc_html__( 'Whether to bypass Trash and force deletion.', 'academy' ),
-						),
-					),
-				),
-				'schema' => array( $this, 'get_public_item_schema' ),
-			)
-		);
+        // Get / Update / Delete workflow
+        register_rest_route($namespace, '/' . $rest_base . '/(?P<id>\d+)', [
+            [
+                'methods' => WP_REST_Server::READABLE,
+                'callback' => [$this, 'get_item'],
+                'permission_callback' => [$this, 'permissions_check'],
+            ],
+            [
+                'methods' => WP_REST_Server::EDITABLE,
+                'callback' => [$this, 'update_item'],
+                'permission_callback' => [$this, 'permissions_check'],
+            ],
+            [
+                'methods' => WP_REST_Server::DELETABLE,
+                'callback' => [$this, 'delete_item'],
+                'permission_callback' => [$this, 'permissions_check'],
+            ],
+        ]);
+
+        // Graph (React Flow)
+        register_rest_route($namespace, '/' . $rest_base . '/(?P<id>\d+)/graph', [
+            [
+                'methods' => WP_REST_Server::READABLE,
+                'callback' => [$this, 'get_graph'],
+                'permission_callback' => [$this, 'permissions_check'],
+            ],
+        ]);
     }
 
+    public function permissions_check() {
+        return current_user_can('manage_options');
+    }
 
-    public function permissions_check( $request ) {
-		if ( ! current_user_can( 'manage_options' ) ) {
-			return new \WP_Error(
-				'rest_forbidden_context',
-				esc_html__( 'Sorry, you are not allowed to edit posts in this post type.', 'academy' ),
-				array( 'status' => rest_authorization_required_code() )
-			);
-		}
-		return true;
-	}
+    // -------------------------
+    // Workflows
+    // -------------------------
 
+    public function get_items() {
+        global $wpdb;
 
-	/**
-	 * Retrieves a collection of posts.
-	 *
-	 * @since 4.7.0
-	 *
-	 * @param WP_REST_Request $request Full details about the request.
-	 * @return WP_REST_Response|WP_Error Response object on success, or \WP_Error object on failure.
-	 */
-	public function get_items( $request ) {
-		$data = WorkflowsQuery::get_all();
-		$total = WorkflowsQuery::count();
-		rest_ensure_response( $data );
-		$response = rest_ensure_response( $data );
-		$response->header( 'x-wp-total', $total );
-		return $response;
-	}
+        $rows = $wpdb->get_results("
+            SELECT * FROM {$wpdb->prefix}zaplane_workflows
+            ORDER BY id DESC
+        ");
 
-	public function get_item( $request ) {
-		$ID = (int) $request->get_param( 'id' );
-		$data = WorkflowsQuery::get($ID);
-		return rest_ensure_response( $data );
-	}
+        return rest_ensure_response($rows);
+    }
 
-	/**
-	 * Creates a single post.
-	 *
-	 * @since 4.7.0
-	 *
-	 * @param WP_REST_Request $request Full details about the request.
-	 * @return \WP_Error Response object on success, or \WP_Error object on failure.
-	 */
-	public function create_item( $request ) {
-		$prepared_workflow = (array) $this->prepare_item_for_database( $request );
-		$workflow_id = WorkflowsQuery::create($prepared_workflow);
-		$data = WorkflowsQuery::get($workflow_id);
-		return rest_ensure_response( $data );
-	}
+    public function get_item($request) {
+        global $wpdb;
 
-	public function update_item( $request ) {
-		$prepared_workflow = (array) $this->prepare_item_for_database( $request );
-		$ID = (int) $request->get_param( 'id' );
-		WorkflowsQuery::update($ID, $prepared_workflow);
-		$data = WorkflowsQuery::get($ID);
-		return rest_ensure_response( $data );
-	}
-	public function delete_item( $request ) {
-		$ID = (int) $request->get_param( 'id' );
-		$old = WorkflowsQuery::get($ID);
-		$response = WorkflowsQuery::delete($ID);
-		return rest_ensure_response( [
-			'is_deleted' => $response,
-			'old' => $old
-		] );
-	}
+        $row = $wpdb->get_row(
+            $wpdb->prepare(
+                "SELECT * FROM {$wpdb->prefix}zaplane_workflows WHERE id = %d",
+                $request['id']
+            )
+        );
 
-	protected function prepare_item_for_database( $request ) {
-		$workflow  = new \stdClass();
+        return rest_ensure_response($row);
+    }
 
-		$schema = $this->get_item_schema();
+    public function create_item($request) {
+        global $wpdb;
 
-		// ID.
-		if ( ! empty( $schema['id'] ) && isset( $request['id'] ) ) {
-			if ( is_numeric( $request['id'] ) ) {
-				$workflow->id = (int) $request['id'];
-			}
-		}
+        $wpdb->insert(
+            $wpdb->prefix . 'zaplane_workflows',
+            [
+                'user_id' => get_current_user_id(),
+                'name' => sanitize_text_field($request['name']),
+                'status' => 'draft'
+            ]
+        );
 
-		// Author.
-		if ( ! empty( $schema['user_id'] ) && isset( $request['user_id'] ) ) {
-			if ( is_string( $request['user_id'] ) ) {
-				$workflow->user_id = $request['user_id'];
-			}
-		}
+        return rest_ensure_response([
+            'id' => $wpdb->insert_id
+        ]);
+    }
 
-	
+    /**
+     * React Flow SAVE
+     * Creates a new immutable workflow version
+     */
+    public function update_item($request) {
+        global $wpdb;
 
-		// Title.
-		if ( ! empty( $schema['title'] ) && isset( $request['title'] ) ) {
-			if ( is_string( $request['title'] ) ) {
-				$workflow->title = $request['title'];
-			}
-		}
+        $workflow_id = intval($request['id']);
+        $graph = $request->get_json_params();
 
-		// Name
-		if ( ! empty( $schema['name'] ) && isset( $request['name'] ) ) {
-			if ( is_string( $request['name'] ) ) {
-				$workflow->name = $request['name'];
-			}
-		}
+        if (!isset($graph['nodes']) || !isset($graph['edges'])) {
+            return new WP_Error('invalid_graph', 'Invalid React Flow graph', ['status'=>400]);
+        }
 
-		// Content.
-		if ( ! empty( $schema['flow_json'] ) && isset( $request['flow_json'] ) ) {
-			if ( is_string( $request['flow_json'] ) ) {
-				$workflow->flow_json = $request['flow_json'];
-			}
-		}
+        $json = wp_json_encode($graph);
+        $hash = hash('sha256', $json);
 
-		// Status.
-		if ( ! empty( $schema['status'] ) && isset( $request['status'] ) ) {
-			if ( is_string( $request['status'] ) ) {
-				$workflow->status = $request['status'];
-			}
-		}
+        // deactivate previous versions
+        $wpdb->update(
+            $wpdb->prefix.'zaplane_workflow_versions',
+            ['is_active' => 0],
+            ['workflow_id' => $workflow_id]
+        );
 
-		
-		// Date Created.
-		if ( ! empty( $schema['created_at'] ) && isset( $request['created_at'] ) ) {
-			if ( is_string( $request['created_at'] ) ) {
-				$workflow->created_at = $request['created_at'];
-			}
-		}
+        // insert frozen version
+        $wpdb->insert(
+            $wpdb->prefix.'zaplane_workflow_versions',
+            [
+                'workflow_id' => $workflow_id,
+                'graph_json' => $json,
+                'graph_hash' => $hash,
+                'is_active' => 1
+            ]
+        );
 
-		// Date Modified
-		if ( ! empty( $schema['modified_at'] ) && isset( $request['modified_at'] ) ) {
-			if ( is_string( $request['modified_at'] ) ) {
-				$workflow->modified_at = $request['modified_at'];
-			}
-		}
+        return rest_ensure_response([
+            'workflow_id' => $workflow_id,
+            'version_id' => $wpdb->insert_id
+        ]);
+    }
 
-		return apply_filters( 'zaplane/api/workflows/rest_pre_insert_workflow', $workflow, $request, $schema );
-	}
+    public function delete_item($request) {
+        global $wpdb;
+
+        $wpdb->delete(
+            $wpdb->prefix.'zaplane_workflows',
+            ['id' => intval($request['id'])]
+        );
+
+        return rest_ensure_response(['deleted' => true]);
+    }
+
+    // -------------------------
+    // React Flow Graph
+    // -------------------------
+
+    public function get_graph($request) {
+        global $wpdb;
+
+        $row = $wpdb->get_row(
+            $wpdb->prepare(
+                "SELECT graph_json
+                 FROM {$wpdb->prefix}zaplane_workflow_versions
+                 WHERE workflow_id = %d AND is_active = 1",
+                $request['id']
+            )
+        );
+
+        if (!$row) {
+            return rest_ensure_response(['nodes'=>[], 'edges'=>[]]);
+        }
+
+        return rest_ensure_response(json_decode($row->graph_json, true));
+    }
 }

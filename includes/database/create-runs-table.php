@@ -9,21 +9,16 @@ class CreateRunsTable {
 	public static function up( $prefix, $charset_collate ) {
 		$table_name = $prefix . ZAPLANE_PLUGIN_SLUG . '_runs';
 		$sql        = "CREATE TABLE IF NOT EXISTS $table_name (
-            id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-            workflow_id BIGINT UNSIGNED NOT NULL,
-            trigger_node_id BIGINT UNSIGNED NOT NULL,
-            trigger_data JSON,
-            status ENUM('running','paused','completed','failed') DEFAULT 'running',
-            attempts INT DEFAULT 0,
-            last_error TEXT NULL,
-            current_node_id BIGINT NULL,
-            resume_at DATETIME NULL,
+            id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+            workflow_version_id BIGINT UNSIGNED NOT NULL,
+            status VARCHAR(20) DEFAULT 'running',
+            trigger_data LONGTEXT,
             started_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             finished_at DATETIME NULL,
-            
-
-            INDEX (workflow_id),
-            INDEX (status)
+            last_error TEXT,
+            PRIMARY KEY (id),
+            KEY workflow_version_id (workflow_version_id),
+            KEY status (status)
         ) $charset_collate;";
 		dbDelta( $sql );
 	}

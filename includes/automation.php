@@ -28,15 +28,15 @@ class Automation {
         // Load integrations dynamically
         IntegrationLoader::load();
 
-        add_action('init', [$self, 'dispatch_active_triggers']);
-        add_action('zaplane_resume_runs', [$self, 'resume_paused_runs']);
-        add_action('zaplane_node_executed', [$self, 'log_node_execution'], 10, 4);
-        add_action('zaplane_workflow_updated', [$self, 'reload_triggers']);
-        // Ensure Action Scheduler hook is always registered
-        add_action('zaplane_execute_node', function ($run_id, $node_id) {
-            if (empty($run_id) || empty($node_id)) return;
-            \Zaplane\Query::execute_node((int)$run_id, (int)$node_id);
-        }, 10, 2);
+        // add_action('init', [$self, 'dispatch_active_triggers']);
+        // add_action('zaplane_resume_runs', [$self, 'resume_paused_runs']);
+        // add_action('zaplane_node_executed', [$self, 'log_node_execution'], 10, 4);
+        // add_action('zaplane_workflow_updated', [$self, 'reload_triggers']);
+        // // Ensure Action Scheduler hook is always registered
+        // add_action('zaplane_execute_node', function ($run_id, $node_id) {
+        //     if (empty($run_id) || empty($node_id)) return;
+        //     \Zaplane\Query::execute_node((int)$run_id, (int)$node_id);
+        // }, 10, 2);
     }
 
     /**
