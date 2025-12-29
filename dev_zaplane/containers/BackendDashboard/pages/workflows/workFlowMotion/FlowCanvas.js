@@ -45,7 +45,7 @@ export default function FlowCanvas({ id }) {
     const nodeIdRef = useRef(0);
     const getNewNodeId = () => {
         nodeIdRef.current += 1;
-        return `node_${nodeIdRef.current}`;
+        return `${nodeIdRef.current}`;
     };
     const [nodes, setNodes, onNodesChange] = useNodesState([
         {
@@ -213,13 +213,13 @@ export default function FlowCanvas({ id }) {
             newEdges = [
                 ...edges.filter((e) => e.id !== edge.id),
                 {
-                    id: `edge-${edge.source}-${newNodeId}`,
+                    id: `e${edge.source}-${newNodeId}`,
                     source: edge.source,
                     target: newNodeId,
                     type: "custom",
                 },
                 {
-                    id: `edge-${newNodeId}-${edge.target}`,
+                    id: `e${newNodeId}-${edge.target}`,
                     source: newNodeId,
                     target: edge.target,
                     type: "custom",
@@ -229,7 +229,7 @@ export default function FlowCanvas({ id }) {
             newEdges = [
                 ...edges,
                 {
-                    id: `edge-${sourceNode.id}-${newNodeId}`,
+                    id: `e${sourceNode.id}-${newNodeId}`,
                     source: sourceNode.id,
                     target: newNodeId,
                     type: "custom",
@@ -289,13 +289,13 @@ export default function FlowCanvas({ id }) {
             newEdges = [
                 ...edges.filter((e) => e.id !== edge.id),
                 {
-                    id: `edge-${edge.source}-${newNodeId}`,
+                    id: `e${edge.source}-${newNodeId}`,
                     source: edge.source,
                     target: newNodeId,
                     type: "custom",
                 },
                 {
-                    id: `edge-${newNodeId}-${edge.target}`,
+                    id: `e${newNodeId}-${edge.target}`,
                     source: newNodeId,
                     target: edge.target,
                     type: "custom",
@@ -305,7 +305,7 @@ export default function FlowCanvas({ id }) {
             newEdges = [
                 ...edges,
                 {
-                    id: `edge-${sourceNode.id}-${newNodeId}`,
+                    id: `e${sourceNode.id}-${newNodeId}`,
                     source: sourceNode.id,
                     target: newNodeId,
                     type: "custom",
