@@ -81,10 +81,7 @@ const CreateWorkflows = () => {
     if (!item?.id || !status) return;
 
     const payload = {
-      title: item.title,
-      name: item.title,
       status: status,
-      flow_json: item.flow_json ?? null,
     };
 
     try {

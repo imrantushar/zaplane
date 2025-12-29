@@ -74,25 +74,22 @@ export default function FlowCanvas({ id }) {
     const [loading, setLoading] = useState(false);
     const { data } = useSelector((state) => state.workflows);
     const singleData = data[0]
-    const flowObj = parseFlowJson(data[0]?.flow_json,);
     const isFlowLoaded = useRef(false);
-     const GAP = 220;
+    const GAP = 220;
 
 
-
+    console.log(data, 'data');
     useEffect(() => {
-        if (!flowObj || isFlowLoaded.current) return;
+        if (!singleData?.nodes || isFlowLoaded.current) return;
+          if(singleData?.nodes?.length){
+          setNodes(singleData.nodes);
+         }
+        setEdges(singleData.edges || []);
 
-        if (Array.isArray(flowObj.nodes)) {
-            setNodes(flowObj.nodes);
-        }
-
-        if (Array.isArray(flowObj.edges)) {
-            setEdges(flowObj.edges);
-        }
 
         isFlowLoaded.current = true;
-    }, [flowObj]);
+    }, [singleData]);
+
 
 
     const [drawerContext, setDrawerContext] = useState({
@@ -107,10 +104,7 @@ export default function FlowCanvas({ id }) {
     }, [id]);
     const onSubmitHandler = async () => {
         const payload = {
-            title: singleData?.title,
-            name: singleData?.name,
-            status: singleData?.status,
-            flow_json: JSON.stringify({ nodes, edges }),
+            nodes, edges,
         }
 
         if (id) {
@@ -271,96 +265,96 @@ export default function FlowCanvas({ id }) {
         setNodes((nds) => nds.concat(routerNode));
         setEdges(updatedEdges);
     };
-  const createConditionNode = ({ conditions }) => {
-    const { edge, node } = drawerContext;
+    const createConditionNode = ({ conditions }) => {
+        const { edge, node } = drawerContext;
 
-    let sourceNode = null;
-    let targetNode = null;
+        let sourceNode = null;
+        let targetNode = null;
 
-    if (edge) {
-        sourceNode = nodes.find((n) => n.id === edge.source);
-        targetNode = nodes.find((n) => n.id === edge.target);
-        if (!sourceNode || !targetNode) return;
-    }
-
-    if (!edge && node) {
-        sourceNode = nodes.find((n) => n.id === node.id);
-        if (!sourceNode) return;
-    }
-
-    const newX = sourceNode.position.x + GAP;
-    const newY = sourceNode.position.y;
-
-    const newNodeId = getNewNodeId();
-
-    const newNode = {
-        id: newNodeId,
-        type: "custom",
-        position: { x: newX, y: newY },
-        data: {
-            label: "Condition",
-            action: "Condition",
-            order: nodes.length + 1,
-            logic: {
-                groups: conditions.map((group) => ({
-                    id: group.id,
-                    type: group.type || "AND",
-                    rules: group.rules.map((rule) => ({
-                        id: rule.id,
-                        field: rule.field,
-                        operator: rule.operator,
-                        value: rule.value,
-                    })),
-                })),
-            },
-        },
-    };
-    const updatedNodes = nodes.map((n) => {
-        if (n.position.x >= newX) {
-            return {
-                ...n,
-                position: {
-                    ...n.position,
-                    x: n.position.x + GAP,
-                },
-            };
+        if (edge) {
+            sourceNode = nodes.find((n) => n.id === edge.source);
+            targetNode = nodes.find((n) => n.id === edge.target);
+            if (!sourceNode || !targetNode) return;
         }
-        return n;
-    });
 
-    let newEdges = [...edges];
+        if (!edge && node) {
+            sourceNode = nodes.find((n) => n.id === node.id);
+            if (!sourceNode) return;
+        }
 
-    if (edge) {
-        newEdges = [
-            ...edges.filter((e) => e.id !== edge.id),
-            {
-                id: `edge-${edge.source}-${newNodeId}`,
-                source: edge.source,
-                target: newNodeId,
-                type: "custom",
-            },
-            {
-                id: `edge-${newNodeId}-${edge.target}`,
-                source: newNodeId,
-                target: edge.target,
-                type: "custom",
-            },
-        ];
-    } else {
-        newEdges = [
-            ...edges,
-            {
-                id: `edge-${sourceNode.id}-${newNodeId}`,
-                source: sourceNode.id,
-                target: newNodeId,
-                type: "custom",
-            },
-        ];
-    }
+        const newX = sourceNode.position.x + GAP;
+        const newY = sourceNode.position.y;
 
-    setNodes([...updatedNodes, newNode]);
-    setEdges(newEdges);
-};
+        const newNodeId = getNewNodeId();
+
+        const newNode = {
+            id: newNodeId,
+            type: "custom",
+            position: { x: newX, y: newY },
+            data: {
+                label: "Condition",
+                action: "Condition",
+                order: nodes.length + 1,
+                logic: {
+                    groups: conditions.map((group) => ({
+                        id: group.id,
+                        type: group.type || "AND",
+                        rules: group.rules.map((rule) => ({
+                            id: rule.id,
+                            field: rule.field,
+                            operator: rule.operator,
+                            value: rule.value,
+                        })),
+                    })),
+                },
+            },
+        };
+        const updatedNodes = nodes.map((n) => {
+            if (n.position.x >= newX) {
+                return {
+                    ...n,
+                    position: {
+                        ...n.position,
+                        x: n.position.x + GAP,
+                    },
+                };
+            }
+            return n;
+        });
+
+        let newEdges = [...edges];
+
+        if (edge) {
+            newEdges = [
+                ...edges.filter((e) => e.id !== edge.id),
+                {
+                    id: `edge-${edge.source}-${newNodeId}`,
+                    source: edge.source,
+                    target: newNodeId,
+                    type: "custom",
+                },
+                {
+                    id: `edge-${newNodeId}-${edge.target}`,
+                    source: newNodeId,
+                    target: edge.target,
+                    type: "custom",
+                },
+            ];
+        } else {
+            newEdges = [
+                ...edges,
+                {
+                    id: `edge-${sourceNode.id}-${newNodeId}`,
+                    source: sourceNode.id,
+                    target: newNodeId,
+                    type: "custom",
+                },
+            ];
+        }
+
+        setNodes([...updatedNodes, newNode]);
+        setEdges(newEdges);
+    };
 
 
     const createActionNode = (actionData) => {
@@ -440,22 +434,22 @@ export default function FlowCanvas({ id }) {
         setEdges(newEdges);
     };
 
-  const updateNodeData = (updatedData) => {
-    setNodes((nds) =>
-        nds.map((n) => {
-            if (n.id === drawerContext.node?.id) {
-                return {
-                    ...n,
-                    data: {
-                        ...n.data,
-                        ...updatedData,
-                    },
-                };
-            }
-            return n;
-        })
-    );
-};
+    const updateNodeData = (updatedData) => {
+        setNodes((nds) =>
+            nds.map((n) => {
+                if (n.id === drawerContext.node?.id) {
+                    return {
+                        ...n,
+                        data: {
+                            ...n.data,
+                            ...updatedData,
+                        },
+                    };
+                }
+                return n;
+            })
+        );
+    };
 
     const addCondition = (nodeId) => {
         setNodes((nds) =>

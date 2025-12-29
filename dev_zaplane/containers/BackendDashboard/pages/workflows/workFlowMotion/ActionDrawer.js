@@ -38,7 +38,6 @@ export default function ActionDrawer({
     createConditionNode,
 }) {
     const { source, node } = context;
-    console.log(context,'context');
     const [mode, setMode] = useState(null);
     const [step, setStep] = useState("select");
     const [selectedItem, setSelectedItem] = useState(null);

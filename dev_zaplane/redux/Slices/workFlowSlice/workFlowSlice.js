@@ -40,7 +40,7 @@ export const updateWorkFlow = createAsyncThunk(
 	'zaplane/updateWorkFlow',
 	async ({ id, payload }, thunkAPI) => {
 		try {
-			const res = await API.post(
+			const res = await API.put(
 				namespace + "workflows/" + parseInt(id),
 				payload
 			);
@@ -55,8 +55,8 @@ export const getSingleWorkFlow = createAsyncThunk(
 	'zaplane/getSingleWorkFlow',
 	async (id, thunkAPI) => {
 		try {
-			const res = await API.post(
-				namespace + "workflows/" + parseInt(id), {
+			const res = await API.get(
+				namespace + "workflows/" + parseInt(id) + "/graph", {
 			});
 			return res.data;
 		} catch (e) {
