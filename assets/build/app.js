@@ -2162,7 +2162,7 @@ function FlowCanvas({
         y: newY
       },
       data: {
-        label: "Condition",
+        app: "Condition",
         action: "Condition",
         order: nodes.length + 1,
         logic: {

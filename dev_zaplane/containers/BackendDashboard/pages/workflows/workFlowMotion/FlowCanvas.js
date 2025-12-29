@@ -177,7 +177,7 @@ export default function FlowCanvas({ id }) {
             type: "custom",
             position: { x: newX, y: newY },
             data: {
-                label: "Condition",
+                app: "Condition",
                 action: "Condition",
                 order: nodes.length + 1,
                 logic: {
