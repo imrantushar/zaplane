@@ -519,6 +519,17 @@ export default function FlowCanvas({ id }) {
             })
         );
     };
+    const deleteNode = useCallback((nodeId) => {
+        console.log(nodeId,'nodeid');
+    setNodes((nds) => nds.filter((n) => n.id !== nodeId));
+
+    setEdges((eds) =>
+        eds.filter(
+            (e) => e.source !== nodeId && e.target !== nodeId
+        )
+    );
+}, []);
+
 
     console.log(nodes, 'all nodes');
     console.log(edges, 'all edges');
@@ -539,6 +550,7 @@ export default function FlowCanvas({ id }) {
                         if (title)
                             updateCondition(props.id, cid, title);
                     },
+                    deleteNode: () => deleteNode(props.id),
                 }}
             />
         ),

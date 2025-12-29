@@ -416,20 +416,14 @@ export default function ActionDrawer({
                                             </VStack>
                                         ) : (
                                             <>
-                                                <Text margin={0} fontSize="sm">Connection*</Text>
-                                                <Input
-                                                    size="sm"
-                                                    value={values.connection}
-                                                    onChange={(e) => setFieldValue("connection", e.target.value)}
-                                                    placeholder="Update API connection"
-                                                />
+                                            <Text margin='0'>There have no configure</Text>
                                             </>
                                         )}
                                     </Tabs.Content>
 
                                     <Tabs.Content value="test">
-                                        <Text fontWeight="bold">Test Step</Text>
-                                        <Text fontSize="sm" color="gray.500">Everything looks good. Click submit to save.</Text>
+                                        <Text margin='0' fontWeight="bold">Test Step</Text>
+                                        <Text margin='0' fontSize="sm" color="gray.500">Everything looks good. Click submit to save.</Text>
                                     </Tabs.Content>
                                 </Tabs.Root>
                             )}

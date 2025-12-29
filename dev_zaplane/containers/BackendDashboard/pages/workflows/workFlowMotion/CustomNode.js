@@ -8,7 +8,7 @@ import {
 import { Box, Text, HStack, Icon, Badge, Button } from "@chakra-ui/react";
 import { RiDeleteBin7Line } from "react-icons/ri";
 import { FaRegCopy } from "react-icons/fa";
-import FloatingEdge from "./FloatingEdge"; 
+import FloatingEdge from "./FloatingEdge";
 
 export default function CustomNode({ id, data, xPos, yPos }) {
   const [hovered, setHovered] = useState(false);
@@ -23,7 +23,6 @@ export default function CustomNode({ id, data, xPos, yPos }) {
 
   const sourceX = xPos + NODE_WIDTH;
   const sourceY = yPos + NODE_HEIGHT / 2;
-
   return (
     <Box
       position="relative"
@@ -51,26 +50,29 @@ export default function CustomNode({ id, data, xPos, yPos }) {
           </Text>
         </HStack>
       </NodeToolbar>
-      <NodeToolbar
-        isVisible={hovered}
-        position={Position.Bottom}
-        align="end"
-        offset={-3}
-      >
-        <HStack
-          bg="gray.800"
-          color="white"
-          px={3}
-          py={1}
-          borderRadius="md"
-          boxShadow="md"
-          cursor="pointer"
-          pointerEvents="auto"
+      {data?.action !== 'Trigger' && (
+        <NodeToolbar
+          isVisible={hovered}
+          position={Position.Bottom}
+          align="end"
+          offset={-3}
         >
-          <Icon as={RiDeleteBin7Line} boxSize={4} />
-          {!data?.action && <Icon as={FaRegCopy} boxSize={4} />}
-        </HStack>
-      </NodeToolbar>
+          <HStack
+            bg="gray.800"
+            color="white"
+            px={3}
+            py={1}
+            borderRadius="md"
+            boxShadow="md"
+            cursor="pointer"
+            pointerEvents="auto"
+          >
+            <Icon as={RiDeleteBin7Line} boxSize={4} onClick={() => data?.deleteNode(id)} />
+            {/* <Icon as={FaRegCopy} boxSize={4} /> */}
+          </HStack>
+        </NodeToolbar>
+      )}
+
       <Box
         bg="white"
         border="1px solid"

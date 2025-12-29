@@ -1593,24 +1593,20 @@ function ActionDrawer({
                     onClick: addOrGroup,
                     children: "+ Or Group"
                   })]
-                }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.Fragment, {
-                  children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
-                    margin: 0,
-                    fontSize: "sm",
-                    children: "Connection*"
-                  }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_7__.Input, {
-                    size: "sm",
-                    value: values.connection,
-                    onChange: e => setFieldValue("connection", e.target.value),
-                    placeholder: "Update API connection"
-                  })]
+                }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.Fragment, {
+                  children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
+                    margin: "0",
+                    children: "There have no configure"
+                  })
                 })
               }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_10__.TabsContent, {
                 value: "test",
                 children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
+                  margin: "0",
                   fontWeight: "bold",
                   children: "Test Step"
                 }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
+                  margin: "0",
                   fontSize: "sm",
                   color: "gray.500",
                   children: "Everything looks good. Click submit to save."
@@ -1826,12 +1822,12 @@ function CustomNode({
           children: data.order || 1
         })]
       })
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.NodeToolbar, {
+    }), data?.action !== 'Trigger' && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.NodeToolbar, {
       isVisible: hovered,
       position: _xyflow_react__WEBPACK_IMPORTED_MODULE_2__.Position.Bottom,
       align: "end",
       offset: -3,
-      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_8__.HStack, {
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_8__.HStack, {
         bg: "gray.800",
         color: "white",
         px: 3,
@@ -1840,13 +1836,11 @@ function CustomNode({
         boxShadow: "md",
         cursor: "pointer",
         pointerEvents: "auto",
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_7__.Icon, {
+        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_7__.Icon, {
           as: react_icons_ri__WEBPACK_IMPORTED_MODULE_9__.RiDeleteBin7Line,
-          boxSize: 4
-        }), !data?.action && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_7__.Icon, {
-          as: react_icons_fa__WEBPACK_IMPORTED_MODULE_10__.FaRegCopy,
-          boxSize: 4
-        })]
+          boxSize: 4,
+          onClick: () => data?.deleteNode(id)
+        })
       })
     }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Box, {
       bg: "white",
@@ -2488,6 +2482,11 @@ function FlowCanvas({
       };
     }));
   };
+  const deleteNode = (0,react__WEBPACK_IMPORTED_MODULE_0__.useCallback)(nodeId => {
+    console.log(nodeId, 'nodeid');
+    setNodes(nds => nds.filter(n => n.id !== nodeId));
+    setEdges(eds => eds.filter(e => e.source !== nodeId && e.target !== nodeId));
+  }, []);
   console.log(nodes, 'all nodes');
   console.log(edges, 'all edges');
   const nodeTypes = {
@@ -2502,7 +2501,8 @@ function FlowCanvas({
         onEditCondition: cid => {
           const title = prompt("Edit Condition");
           if (title) updateCondition(props.id, cid, title);
-        }
+        },
+        deleteNode: () => deleteNode(props.id)
       }
     })
   };
