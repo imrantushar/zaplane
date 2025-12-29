@@ -95,6 +95,7 @@ class WorkflowsController extends WP_REST_Controller {
             $wpdb->prefix . 'zaplane_workflows',
             [
                 'user_id' => get_current_user_id(),
+                'title' => sanitize_text_field($request['title']),
                 'name' => sanitize_text_field($request['name']),
                 'status' => 'draft'
             ]
