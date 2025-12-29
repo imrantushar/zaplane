@@ -270,7 +270,6 @@ export default function ActionDrawer({
                     return acc;
                 }, {}),
             };
-
             if (context?.source === "node") {
                 updateNodeData(payload);
             } else {

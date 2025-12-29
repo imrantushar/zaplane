@@ -8,7 +8,7 @@ import {
 import { Box, Text, HStack, Icon, Badge, Button } from "@chakra-ui/react";
 import { RiDeleteBin7Line } from "react-icons/ri";
 import { FaRegCopy } from "react-icons/fa";
-import FloatingEdge from "./FloatingEdge"; 
+import FloatingEdge from "./FloatingEdge";
 
 export default function CustomNode({ id, data, xPos, yPos }) {
   const [hovered, setHovered] = useState(false);
@@ -97,70 +97,9 @@ export default function CustomNode({ id, data, xPos, yPos }) {
           />
         )}
 
-        {data.conditions ? (
-          <>
-            <Text margin={0} fontSize="sm" fontWeight="bold" mb={2}>
-              Conditions / Filters
-            </Text>
-
-            {data.conditions.map((cond, index) => (
-              <HStack
-                key={cond.id}
-                justify="space-between"
-                bg="white"
-                p={2}
-                mb={1}
-                borderRadius="md"
-                boxShadow="sm"
-                position="relative"
-              >
-                <Text margin={0} fontSize="sm">
-                  <Badge mr={2}>{cond.id}</Badge>
-                  {cond.title}
-                </Text>
-
-                <Handle
-                  type="source"
-                  id={`condition-${cond.id}`}
-                  position={Position.Right}
-                  style={{
-                    right: "-22px",
-                    top: "50%",
-                    transform: "translateY(-50%)",
-                    width: 10,
-                    height: 10,
-                    background: "#38A169",
-                    border: "2px solid white",
-                    borderRadius: "50%",
-                  }}
-                />
-
-                {index !== 0 && (
-                  <HStack>
-                    <Icon
-                      as={FaRegCopy}
-                      cursor="pointer"
-                      onClick={() => data.onEditCondition(cond.id)}
-                    />
-                    <Icon
-                      as={RiDeleteBin7Line}
-                      cursor="pointer"
-                      onClick={() => data.onDeleteCondition(cond.id)}
-                    />
-                  </HStack>
-                )}
-              </HStack>
-            ))}
-
-            <Button size="sm" w="100%" mt={2} onClick={data.onAddCondition}>
-              +
-            </Button>
-          </>
-        ) : (
-          <Text m={0} fontSize="sm" fontWeight="medium">
-            {data.label}
-          </Text>
-        )}
+        <Text m={0} fontSize="sm" fontWeight="medium">
+          {data.app}
+        </Text>
         {!data.conditions && (
           <Handle
             type="source"
