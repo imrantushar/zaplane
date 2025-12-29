@@ -955,8 +955,6 @@ const CreateWorkflows = () => {
   const [workflowName, setWorkflowName] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)("");
   const navigate = (0,react_router_dom__WEBPACK_IMPORTED_MODULE_11__.useNavigate)();
   const dispatch = (0,react_redux__WEBPACK_IMPORTED_MODULE_13__.useDispatch)();
-
-  // Redux code untouched
   const {
     data
   } = (0,react_redux__WEBPACK_IMPORTED_MODULE_13__.useSelector)(state => state.workflows);
@@ -966,10 +964,7 @@ const CreateWorkflows = () => {
   const handleCreate = () => {
     if (!workflowName.trim()) return;
     dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_17__.createWorkflows)({
-      title: workflowName,
-      name: workflowName,
-      status: "active",
-      flow_json: JSON.stringify()
+      title: workflowName
     })).unwrap().then(res => {
       navigate(`${_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_12__.route_path}admin.php?page=zaplane-workflows&action=edit&id=${res.id}`);
     });
@@ -2992,11 +2987,10 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-
 const createWorkflows = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyncThunk)('zaplane/createWorkflows', async (payload, thunkAPI) => {
   return await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.post(_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.namespace + 'workflows', payload).then(res => {
     (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.handleSliceSuccess)(thunkAPI, "data fetched successfully");
-    return res.data;
+    return res?.data;
   }).catch(err => {
     return (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.handleSliceError)(thunkAPI, "Data fetching failed");
   });

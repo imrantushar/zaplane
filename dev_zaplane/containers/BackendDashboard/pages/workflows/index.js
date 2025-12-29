@@ -36,7 +36,6 @@ const CreateWorkflows = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  // Redux code untouched
   const { data } = useSelector((state) => state.workflows);
 
   useEffect(() => {
@@ -49,9 +48,6 @@ const CreateWorkflows = () => {
     dispatch(
       createWorkflows({
         title: workflowName,
-        name: workflowName,
-        status: "active",
-        flow_json: JSON.stringify(),
       })
     )
       .unwrap()

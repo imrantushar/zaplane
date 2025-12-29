@@ -11,14 +11,13 @@ import {
 	namespace,
 } from '@ZAPUtils/helper';
 import { showNotification } from '../notificationSlice/notificationSlice';
-import axios from 'axios';
 export const createWorkflows = createAsyncThunk(
 	'zaplane/createWorkflows',
 	async (payload, thunkAPI) => {
 		return await API.post(namespace + 'workflows', payload)
 			.then((res) => {
 				handleSliceSuccess(thunkAPI, "data fetched successfully");
-				return res.data;
+				return res?.data;
 			})
 			.catch((err) => {
 				return handleSliceError(thunkAPI, "Data fetching failed");
@@ -33,7 +32,7 @@ export const getWorkFlow = createAsyncThunk(
 			const res = await API.get(namespace + "workflows");
 			return res.data
 		} catch (e) {
-			return handleSliceError( thunkAPI, e )
+			return handleSliceError(thunkAPI, e)
 		}
 	}
 );
@@ -45,10 +44,10 @@ export const updateWorkFlow = createAsyncThunk(
 				namespace + "workflows/" + parseInt(id),
 				payload
 			);
-			handleSliceSuccess( thunkAPI, __('Updated workflow Successfully', 'workflow') );
+			handleSliceSuccess(thunkAPI, __('Updated workflow Successfully', 'workflow'));
 			return res.data;
 		} catch (e) {
-			handleSliceError( thunkAPI, e )
+			handleSliceError(thunkAPI, e)
 		}
 	}
 );
@@ -61,7 +60,7 @@ export const getSingleWorkFlow = createAsyncThunk(
 			});
 			return res.data;
 		} catch (e) {
-	           return	handleSliceError( thunkAPI, e )
+			return handleSliceError(thunkAPI, e)
 		}
 	}
 );
@@ -89,7 +88,7 @@ export const deleteWorkFlow = createAsyncThunk(
 			return res?.data?.data?.odd?.id || id;
 		} catch (e) {
 
-			return handleSliceError( thunkAPI, e );
+			return handleSliceError(thunkAPI, e);
 		}
 	}
 );
@@ -136,23 +135,23 @@ const workflowsSlice = createSlice({
 
 
 export async function fetchDynamic({
-  integration,
-  query,
-  select,
-  where = {},
-  search = "",
-  limit = 20,
+	integration,
+	query,
+	select,
+	where = {},
+	search = "",
+	limit = 20,
 }) {
-  const { data } = await API.post(namespace + "dynamic", {
-    integration,
-    query,
-    select,
-    where,
-    search,
-    limit,
-  });
+	const { data } = await API.post(namespace + "dynamic", {
+		integration,
+		query,
+		select,
+		where,
+		search,
+		limit,
+	});
 
-  return data;
+	return data;
 }
 
 
