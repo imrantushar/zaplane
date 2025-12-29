@@ -17,7 +17,7 @@ class WorkflowsController extends WP_REST_Controller {
         register_rest_route($namespace, '/' . $rest_base, [
             [
                 'methods' => WP_REST_Server::READABLE,
-                'callback' => [$this, 'get_items'],
+                'callback' => [$this, 'get_workflow_items'],
                 'permission_callback' => [$this, 'permissions_check'],
             ],
             [
@@ -31,7 +31,7 @@ class WorkflowsController extends WP_REST_Controller {
         register_rest_route($namespace, '/' . $rest_base . '/(?P<id>\d+)', [
             [
                 'methods' => WP_REST_Server::READABLE,
-                'callback' => [$this, 'get_item'],
+                'callback' => [$this, 'get_workflow_item'],
                 'permission_callback' => [$this, 'permissions_check'],
             ],
             [
@@ -64,7 +64,7 @@ class WorkflowsController extends WP_REST_Controller {
     // Workflows
     // -------------------------
 
-    public function get_items() {
+    public function get_workflow_items() {
         global $wpdb;
 
         $rows = $wpdb->get_results("
@@ -75,7 +75,7 @@ class WorkflowsController extends WP_REST_Controller {
         return rest_ensure_response($rows);
     }
 
-    public function get_item($request) {
+    public function get_workflow_item($request) {
         global $wpdb;
 
         $row = $wpdb->get_row(
