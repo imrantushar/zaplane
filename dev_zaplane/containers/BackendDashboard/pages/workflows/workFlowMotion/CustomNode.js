@@ -46,9 +46,9 @@ export default function CustomNode({ id, data, xPos, yPos }) {
           >
             {data.action || "Action"}
           </Text>
-          <Text borderRadius="full" fontSize="sm" fontWeight="medium" margin={0}>
+          {/* <Text borderRadius="full" fontSize="sm" fontWeight="medium" margin={0}>
             {data.order || 1}
-          </Text>
+          </Text> */}
         </HStack>
       </NodeToolbar>
       <NodeToolbar

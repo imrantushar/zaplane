@@ -1811,21 +1811,15 @@ function CustomNode({
       position: _xyflow_react__WEBPACK_IMPORTED_MODULE_2__.Position.Top,
       align: "start",
       offset: 10,
-      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_6__.HStack, {
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Text, {
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_6__.HStack, {
+        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Text, {
           borderRadius: "full",
           p: "4px 8px",
           fontWeight: "medium",
           background: "#E6F4FF",
           margin: 0,
           children: data.action || "Action"
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Text, {
-          borderRadius: "full",
-          fontSize: "sm",
-          fontWeight: "medium",
-          margin: 0,
-          children: data.order || 1
-        })]
+        })
       })
     }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.NodeToolbar, {
       isVisible: hovered,
@@ -2035,7 +2029,6 @@ function FlowCanvas({
     zpType: 'Trigger',
     data: {
       app: "Select an app",
-      icon: "",
       action: 'Trigger',
       config: {}
     },
@@ -2183,7 +2176,7 @@ function FlowCanvas({
       data: {
         app: "Condition",
         action: "Condition",
-        order: nodes.length + 1,
+        // order: nodes.length + 1,
         logic: {
           groups: conditions.map(group => ({
             id: group.id,
@@ -2263,7 +2256,7 @@ function FlowCanvas({
       },
       data: {
         action: "Action",
-        order: nodes.length + 1,
+        // order: nodes.length + 1,
         ...actionData
       }
     };
