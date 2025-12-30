@@ -77,19 +77,25 @@ export default function FlowCanvas({ id }) {
         if (!singleData?.nodes || isFlowLoaded.current) return;
         if (singleData?.nodes?.length) {
             const mappedNodes = singleData.nodes.map((node) => ({
-                ...node,  
-                type: "custom",     
+                ...node,
+                type: "custom",
                 data: {
                     ...node.data,
-                    action: node.type, 
+                    action: node.type,
                 },
             }));
 
 
             setNodes(mappedNodes);
         }
+        if (singleData?.edges?.length) {
+            const mappedEdges = singleData.edges.map((edge) => ({
+                ...edge,
+                type: "custom", 
+            }));
 
-        setEdges(singleData.edges || []);
+            setEdges(mappedEdges);
+        }
         isFlowLoaded.current = true;
     }, [singleData]);
 
@@ -118,7 +124,6 @@ export default function FlowCanvas({ id }) {
                 ...node
             }) => {
                 const backendType = data?.action?.toLowerCase();
-
                 const cleanedData = { ...data };
                 delete cleanedData.action;
 
@@ -129,11 +134,12 @@ export default function FlowCanvas({ id }) {
                 };
             });
         };
-
-
+        const mapEdgesForBackend = (edges) => {
+            return edges.map(({ type, ...edge }) => edge);
+        };
         const payload = {
             nodes: mapNodesForBackend(nodes)
-            , edges,
+            , edges: mapEdgesForBackend(edges),
         }
 
         if (id) {

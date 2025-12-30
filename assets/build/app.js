@@ -2062,7 +2062,13 @@ function FlowCanvas({
       }));
       setNodes(mappedNodes);
     }
-    setEdges(singleData.edges || []);
+    if (singleData?.edges?.length) {
+      const mappedEdges = singleData.edges.map(edge => ({
+        ...edge,
+        type: "custom"
+      }));
+      setEdges(mappedEdges);
+    }
     isFlowLoaded.current = true;
   }, [singleData]);
   const [drawerContext, setDrawerContext] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)({
@@ -2095,9 +2101,15 @@ function FlowCanvas({
         };
       });
     };
+    const mapEdgesForBackend = edges => {
+      return edges.map(({
+        type,
+        ...edge
+      }) => edge);
+    };
     const payload = {
       nodes: mapNodesForBackend(nodes),
-      edges
+      edges: mapEdgesForBackend(edges)
     };
     if (id) {
       const {
