@@ -129,7 +129,7 @@ export default function ActionDrawer({
         if (!selectedItem?.id) return [];
         const integration = integrations?.integrations?.[selectedItem.id];
         if (!integration) return [];
-        const isTriggerNode = context?.node?.action === "trigger" && source === "node";
+        const isTriggerNode = node?.data?.action === "trigger" && source === "node";
 
         if (isTriggerNode) {
             return Object.values(integration.triggers || {}).map((t) => ({
@@ -148,7 +148,7 @@ export default function ActionDrawer({
         const integration = integrations?.integrations?.[selectedItem.id];
         if (!integration) return [];
 
-        const isTriggerNode = context?.node?.action === "trigger" && source === "node";
+        const isTriggerNode = node?.data?.action === "trigger" && source === "node";
       
 
         if (isTriggerNode) {
@@ -368,7 +368,7 @@ export default function ActionDrawer({
                                         ) : (
                                             <Flex direction="column" gap={4}>
                                                 <Box>
-                                                    <Text mb={0}>{context.node?.data?.action === "trigger" && source === "node" ? "Trigger Type" : "Action Type"}</Text>
+                                                    <Text mb={0}>{node?.data?.action === "trigger" && source === "node" ? "Trigger Type" : "Action Type"}</Text>
                                                     <Select
                                                         options={actionOptions}
                                                         onChange={(opt) => setFieldValue("actionType", opt?.value)}
