@@ -51,9 +51,10 @@ export default function FlowCanvas({ id }) {
         {
             id: getNewNodeId(),
             type: 'custom',
-            zpType: 'Trigger',
+            zpType: 'trigger',
             data: {
-                app: "Select an app", action: 'Trigger',
+                app: "Select an app", 
+                // action: 'Trigger',
                 config: {}
             },
             position: { x: 125, y: 300 },
@@ -204,7 +205,7 @@ export default function FlowCanvas({ id }) {
             position: { x: newX, y: newY },
             data: {
                 app: "Condition",
-                action: "Condition",
+                // action: "Condition",
                 // order: nodes.length + 1,
                 logic: {
                     groups: conditions.map((group) => ({
@@ -292,7 +293,7 @@ export default function FlowCanvas({ id }) {
             zpType: "action",
             position: { x: newX, y: newY },
             data: {
-                action: "Action",
+                // action: "Action",
                 // order: nodes.length + 1,
                 ...actionData,
             },

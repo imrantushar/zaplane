@@ -129,7 +129,7 @@ export default function ActionDrawer({
         if (!selectedItem?.id) return [];
         const integration = integrations?.integrations?.[selectedItem.id];
         if (!integration) return [];
-        const isTriggerNode = context?.node?.data?.action === "Trigger" && source === "node";
+        const isTriggerNode = context?.node?.zpType !== "trigger" && source === "node";
 
         if (isTriggerNode) {
             return Object.values(integration.triggers || {}).map((t) => ({
@@ -142,14 +142,14 @@ export default function ActionDrawer({
             value: a.key,
         }));
     }, [selectedItem, context?.node]);
-
     const selectedActionFields = useMemo(() => {
         if (!selectedItem?.id || !values?.actionType) return [];
 
         const integration = integrations?.integrations?.[selectedItem.id];
         if (!integration) return [];
 
-        const isTriggerNode = context?.node?.data?.action === "Trigger" && source === "node";
+        const isTriggerNode = context?.node?.zpType !== "trigger" && source === "node";
+      
 
         if (isTriggerNode) {
             return integration.triggers?.[values.actionType]?.schema || [];
@@ -280,7 +280,7 @@ export default function ActionDrawer({
             };
         
             if (context?.source === "node") {
-                if (node?.data?.action === "Trigger") {
+                if (node?.data?.zpType !== "Trigger") {
                     updateNodeData(triggerPayload);
                 } else {
                     updateNodeData(payload);
