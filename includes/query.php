@@ -99,10 +99,29 @@ class Query {
     }
 
     public static function handle_trigger_node(array $node, array $payload): void {
-        error_log(print_r('handle_trigger_node', true));
+        global $wpdb;
+
+        // 1️⃣ Create a run
         $run_id = self::create_run($node, $payload);
         if (!$run_id) return;
-        self::schedule_node($run_id, $node['id']);
+
+        // 2️⃣ Load frozen graph for this run
+        $graph_json = $wpdb->get_var(
+            $wpdb->prepare(
+                "SELECT graph_json 
+                FROM {$wpdb->prefix}zaplane_workflow_versions
+                WHERE graph_hash = %s
+                LIMIT 1",
+                $node['workflow_version_hash']
+            )
+        );
+        if (!$graph_json) return;
+
+        $graph = json_decode($graph_json, true);
+        if (!$graph) return;
+
+        // 3️⃣ Schedule ONLY nodes connected to the trigger
+        self::schedule_next_nodes_from_graph($run_id, (string)$node['id'], $graph);
     }
 
     /* =====================================================
@@ -125,94 +144,80 @@ class Query {
     public static function execute_node(int $run_id, string $node_id): void {
         global $wpdb;
 
-        // 1️⃣ Load the run
+        // 1️⃣ Load run
         $run = $wpdb->get_row(
-            $wpdb->prepare("SELECT * FROM {$wpdb->prefix}zaplane_runs WHERE id = %d", $run_id),
+            $wpdb->prepare(
+                "SELECT * FROM {$wpdb->prefix}zaplane_runs WHERE id = %d",
+                $run_id
+            ),
             ARRAY_A
         );
-        if (!$run) return;
+        if (!$run || $run['status'] !== 'running') return;
 
-        // 2️⃣ Load the frozen graph JSON using workflow_version_hash
+        // 2️⃣ Load frozen workflow graph
         $graph_json = $wpdb->get_var(
-            $wpdb->prepare("
-                SELECT graph_json
+            $wpdb->prepare(
+                "SELECT graph_json 
                 FROM {$wpdb->prefix}zaplane_workflow_versions
                 WHERE graph_hash = %s
-                LIMIT 1
-            ", $run['workflow_version_hash'])
+                LIMIT 1",
+                $run['workflow_version_hash']
+            )
         );
         if (!$graph_json) return;
 
         $graph = json_decode($graph_json, true);
         if (!$graph) return;
 
-        // 3️⃣ Find the current node in the graph
+        // 3️⃣ Find this node in graph
         $node = null;
-        foreach (($graph['nodes'] ?? []) as $n) {
-            if ((string)($n['id'] ?? '') === (string)$node_id) {
+        foreach ($graph['nodes'] ?? [] as $n) {
+            if ((string)$n['id'] === (string)$node_id) {
                 $node = $n;
                 break;
             }
         }
         if (!$node) return;
 
+        // 4️⃣ SAFETY: never execute trigger again
+        if (($node['type'] ?? '') === 'trigger') {
+            return;
+        }
 
-        // 4️⃣ Load the integration
-        $integration_name = strtolower($node['data']['app'] ?? '');
-        $integration = IntegrationLoader::get($integration_name);
+        // 5️⃣ Load integration
+        $integration = IntegrationLoader::get(strtolower($node['data']['app'] ?? ''));
         if (!$integration) return;
 
-        // 5️⃣ Prepare input for the node
+        // 6️⃣ Prepare input
         $input = json_decode($run['trigger_data'], true) ?: [];
         $input['_run_id'] = $run_id;
-        $max_attempts = 3; // Maximum retry attempts
-        try {
-            // 6️⃣ Execute the node
-            $result = $integration::execute_node($node, $input);
-            error_log(print_r('Print Result', true));
-            error_log(print_r($result, true));
-            error_log(print_r('End Print Result', true));
-            // 7️⃣ Log node execution (optional)
-            // do_action('zaplane_node_executed', $run_id, $node_id, 'success', $result);
 
-            // 8️⃣ Schedule next nodes based on edges
-            if (!empty($result['port'])) {
-                self::schedule_next_nodes_from_graph($run_id, $node_id, $graph, $result['data'] ?? []);
-            }
+        try {
+            // 7️⃣ Execute node
+            $result = $integration::execute_node($node, $input);
+
+            // 8️⃣ Schedule next connected nodes
+            self::schedule_next_nodes_from_graph(
+                $run_id,
+                (string)$node_id,
+                $graph,
+                $result['data'] ?? []
+            );
 
         } catch (\Throwable $e) {
-            global $wpdb;
-            // Increment attempts
-            $wpdb->query(
-                $wpdb->prepare(
-                    "UPDATE {$wpdb->prefix}zaplane_runs 
-                    SET attempts = attempts + 1, last_error = %s
-                    WHERE id = %d",
-                    $e->getMessage(),
-                    $run_id
-                )
+            // Mark run failed
+            $wpdb->update(
+                $wpdb->prefix . 'zaplane_runs',
+                [
+                    'status'     => 'failed',
+                    'last_error' => $e->getMessage(),
+                    'finished_at' => current_time('mysql')
+                ],
+                [ 'id' => $run_id ]
             );
-
-            // Get current attempts
-            $attempts = (int) $wpdb->get_var(
-                $wpdb->prepare("SELECT attempts FROM {$wpdb->prefix}zaplane_runs WHERE id = %d", $run_id)
-            );
-
-            // Retry only if attempts < max
-            if ($attempts < $max_attempts) {
-                self::schedule_node($run_id, $node_id, 60); // retry after 60s
-            } else {
-                // Mark run as failed
-                $wpdb->update(
-                    $wpdb->prefix . 'zaplane_runs',
-                    ['status' => 'failed'],
-                    ['id' => $run_id]
-                );
-            }
-
-            // do_action('zaplane_node_executed', $run_id, $node_id, 'failed', ['error' => $e->getMessage()]);
         }
     }
+
 
     protected static function schedule_next_nodes_from_graph(
         int $run_id,
@@ -220,12 +225,9 @@ class Query {
         array $graph,
         array $data = []
     ): void {
-        $edges = $graph['edges'] ?? [];
-
-        foreach ($edges as $edge) {
-            if ((string)($edge['source'] ?? '') === (string)$node_id) {
-                $target_node_id = $edge['target'];
-                self::schedule_node($run_id, $target_node_id);
+        foreach ($graph['edges'] ?? [] as $edge) {
+            if ((string)$edge['source'] === (string)$node_id) {
+                self::schedule_node($run_id, $edge['target']);
             }
         }
     }

@@ -185,11 +185,12 @@ class Wordpress extends IntegrationBase {
         error_log(print_r('Run Node Start', true));
         error_log(print_r($node, true));
         error_log(print_r($input, true));
-          error_log(print_r('Run Node Start', true));
 
-        $config = $node['config'] ?? [];
+        error_log(print_r('End Run Node', true));
 
-        switch ( $config['action'] ?? '' ) {
+        $config = $node['data']['config'] ?? [];
+
+        switch ( $node['data']['event'] ?? '' ) {
 
             case 'create_post':
                 $id = wp_insert_post([

@@ -69,12 +69,9 @@ class Automation {
 
         $trigger_nodes = Query::get_active_workflows_for_event($event);
         if (empty($trigger_nodes)) return;
-        error_log(print_r($trigger_nodes, true));
         foreach ($trigger_nodes as $node) {
             $integration = IntegrationLoader::get(strtolower($node['app']) ?? '');
-            error_log(print_r( 'Integration' . $integration, true));
             if (!$integration) continue;
-             error_log(print_r( $node, true));
             $payload = $integration::resolve_trigger((array)$node['graph_node']['data'], $args);
             if (!$payload) continue;
 
