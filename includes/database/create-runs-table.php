@@ -13,6 +13,7 @@ class CreateRunsTable {
             workflow_version_hash CHAR(64) NOT NULL,
             status VARCHAR(20) DEFAULT 'running',
             trigger_data LONGTEXT,
+            attempts TINYINT UNSIGNED DEFAULT 0,
             started_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             finished_at DATETIME NULL,
             last_error TEXT,

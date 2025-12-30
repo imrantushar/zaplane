@@ -125,65 +125,111 @@ class Query {
     public static function execute_node(int $run_id, string $node_id): void {
         global $wpdb;
 
+        // 1️⃣ Load the run
         $run = $wpdb->get_row(
             $wpdb->prepare("SELECT * FROM {$wpdb->prefix}zaplane_runs WHERE id = %d", $run_id),
             ARRAY_A
         );
         if (!$run) return;
 
-        $graph_json = $wpdb->get_var("
-            SELECT wv.graph_json
-            FROM {$wpdb->prefix}zaplane_workflow_versions wv
-            JOIN {$wpdb->prefix}zaplane_runs r ON wv.graph_hash = r.workflow_version_hash
-            WHERE r.id = {$run_id} AND wv.is_active = 1
-        ");
-        error_log(print_r('Execute Node', true));
-        error_log(print_r($graph_json, true));
-        error_log(print_r('End Execute Node', true));
+        // 2️⃣ Load the frozen graph JSON using workflow_version_hash
+        $graph_json = $wpdb->get_var(
+            $wpdb->prepare("
+                SELECT graph_json
+                FROM {$wpdb->prefix}zaplane_workflow_versions
+                WHERE graph_hash = %s
+                LIMIT 1
+            ", $run['workflow_version_hash'])
+        );
         if (!$graph_json) return;
 
         $graph = json_decode($graph_json, true);
+        if (!$graph) return;
+
+        // 3️⃣ Find the current node in the graph
         $node = null;
         foreach (($graph['nodes'] ?? []) as $n) {
-            if (($n['id'] ?? '') === $node_id) {
+            if ((string)($n['id'] ?? '') === (string)$node_id) {
                 $node = $n;
                 break;
             }
         }
         if (!$node) return;
 
-        $integration = IntegrationLoader::get(strtolower($node['data']['app']) ?? '');
+
+        // 4️⃣ Load the integration
+        $integration_name = strtolower($node['data']['app'] ?? '');
+        $integration = IntegrationLoader::get($integration_name);
         if (!$integration) return;
 
+        // 5️⃣ Prepare input for the node
         $input = json_decode($run['trigger_data'], true) ?: [];
         $input['_run_id'] = $run_id;
-
+        $max_attempts = 3; // Maximum retry attempts
         try {
+            // 6️⃣ Execute the node
             $result = $integration::execute_node($node, $input);
-
+            error_log(print_r('Print Result', true));
+            error_log(print_r($result, true));
+            error_log(print_r('End Print Result', true));
+            // 7️⃣ Log node execution (optional)
             // do_action('zaplane_node_executed', $run_id, $node_id, 'success', $result);
 
+            // 8️⃣ Schedule next nodes based on edges
             if (!empty($result['port'])) {
-                self::schedule_next_nodes_from_graph($run_id, $node_id, $result['port'], $graph, $result['data'] ?? []);
+                self::schedule_next_nodes_from_graph($run_id, $node_id, $graph, $result['data'] ?? []);
             }
+
         } catch (\Throwable $e) {
-            $wpdb->update(
-                $wpdb->prefix . 'zaplane_runs',
-                ['attempts' => ((int)$run['attempts'] + 1), 'last_error' => $e->getMessage(), 'status' => 'failed'],
-                ['id' => $run_id]
+            global $wpdb;
+            // Increment attempts
+            $wpdb->query(
+                $wpdb->prepare(
+                    "UPDATE {$wpdb->prefix}zaplane_runs 
+                    SET attempts = attempts + 1, last_error = %s
+                    WHERE id = %d",
+                    $e->getMessage(),
+                    $run_id
+                )
             );
-            self::schedule_node($run_id, $node_id, 60);
+
+            // Get current attempts
+            $attempts = (int) $wpdb->get_var(
+                $wpdb->prepare("SELECT attempts FROM {$wpdb->prefix}zaplane_runs WHERE id = %d", $run_id)
+            );
+
+            // Retry only if attempts < max
+            if ($attempts < $max_attempts) {
+                self::schedule_node($run_id, $node_id, 60); // retry after 60s
+            } else {
+                // Mark run as failed
+                $wpdb->update(
+                    $wpdb->prefix . 'zaplane_runs',
+                    ['status' => 'failed'],
+                    ['id' => $run_id]
+                );
+            }
+
             // do_action('zaplane_node_executed', $run_id, $node_id, 'failed', ['error' => $e->getMessage()]);
         }
     }
 
-    protected static function schedule_next_nodes_from_graph(int $run_id, string $node_id, string $port, array $graph, array $data): void {
-        foreach (($graph['edges'] ?? []) as $edge) {
-            if (($edge['source'] ?? '') === $node_id && ($edge['sourceHandle'] ?? 'main') === $port) {
-                self::schedule_node($run_id, $edge['target'], (int)($edge['delay'] ?? 0));
+    protected static function schedule_next_nodes_from_graph(
+        int $run_id,
+        string $node_id,
+        array $graph,
+        array $data = []
+    ): void {
+        $edges = $graph['edges'] ?? [];
+
+        foreach ($edges as $edge) {
+            if ((string)($edge['source'] ?? '') === (string)$node_id) {
+                $target_node_id = $edge['target'];
+                self::schedule_node($run_id, $target_node_id);
             }
         }
     }
+
 
     /* =====================================================
      * CACHE HELPERS
