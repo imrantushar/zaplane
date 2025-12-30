@@ -2032,6 +2032,7 @@ function FlowCanvas({
   const [nodes, setNodes, onNodesChange] = (0,_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.useNodesState)([{
     id: getNewNodeId(),
     type: 'custom',
+    zpType: 'Trigger',
     data: {
       app: "Select an app",
       icon: "",
@@ -2065,7 +2066,12 @@ function FlowCanvas({
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
     if (!singleData?.nodes || isFlowLoaded.current) return;
     if (singleData?.nodes?.length) {
-      setNodes(singleData.nodes);
+      const mappedNodes = singleData.nodes.map(node => ({
+        ...node,
+        zpType: node.type,
+        type: "custom"
+      }));
+      setNodes(mappedNodes);
     }
     setEdges(singleData.edges || []);
     isFlowLoaded.current = true;
@@ -2080,8 +2086,20 @@ function FlowCanvas({
     dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_16__.getSingleWorkFlow)(id)).finally(() => setLoading(false));
   }, [id]);
   const onSubmitHandler = async () => {
+    const mapNodesForBackend = nodes => {
+      return nodes.map(({
+        zpType,
+        dragging,
+        selected,
+        measured,
+        ...node
+      }) => ({
+        ...node,
+        type: zpType?.toLowerCase()
+      }));
+    };
     const payload = {
-      nodes,
+      nodes: mapNodesForBackend(nodes),
       edges
     };
     if (id) {
@@ -2157,6 +2175,7 @@ function FlowCanvas({
     const newNode = {
       id: newNodeId,
       type: "custom",
+      zpType: 'logic',
       position: {
         x: newX,
         y: newY
@@ -2237,6 +2256,7 @@ function FlowCanvas({
     const newNode = {
       id: newNodeId,
       type: "custom",
+      zpType: "action",
       position: {
         x: newX,
         y: newY

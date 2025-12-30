@@ -51,9 +51,11 @@ export default function FlowCanvas({ id }) {
         {
             id: getNewNodeId(),
             type: 'custom',
-            data: { app: "Select an app", icon: "", action: 'Trigger',
-                config:{}
-             },
+            zpType: 'Trigger',
+            data: {
+                app: "Select an app", icon: "", action: 'Trigger',
+                config: {}
+            },
             position: { x: 125, y: 300 },
         }
     ]);
@@ -73,14 +75,21 @@ export default function FlowCanvas({ id }) {
     const GAP = 220;
     useEffect(() => {
         if (!singleData?.nodes || isFlowLoaded.current) return;
-          if(singleData?.nodes?.length){
-          setNodes(singleData.nodes);
-         }
+
+        if (singleData?.nodes?.length) {
+            const mappedNodes = singleData.nodes.map((node) => ({
+                ...node,
+                zpType: node.type,
+                type: "custom",
+            }));
+
+            setNodes(mappedNodes);
+        }
+
         setEdges(singleData.edges || []);
-
-
         isFlowLoaded.current = true;
     }, [singleData]);
+
 
 
 
@@ -94,9 +103,25 @@ export default function FlowCanvas({ id }) {
         dispatch(getSingleWorkFlow(id)).finally(() => setLoading(false));
 
     }, [id]);
+
     const onSubmitHandler = async () => {
+        const mapNodesForBackend = (nodes) => {
+            return nodes.map(({
+                zpType,
+                dragging,
+                selected,
+                measured,
+                ...node
+            }) => ({
+                ...node,
+                type: zpType?.toLowerCase(),
+            }));
+        };
+
+
         const payload = {
-            nodes, edges,
+            nodes: mapNodesForBackend(nodes)
+            , edges,
         }
 
         if (id) {
@@ -175,6 +200,7 @@ export default function FlowCanvas({ id }) {
         const newNode = {
             id: newNodeId,
             type: "custom",
+            zpType: 'logic',
             position: { x: newX, y: newY },
             data: {
                 app: "Condition",
@@ -263,6 +289,7 @@ export default function FlowCanvas({ id }) {
         const newNode = {
             id: newNodeId,
             type: "custom",
+            zpType: "action",
             position: { x: newX, y: newY },
             data: {
                 action: "Action",
@@ -346,7 +373,7 @@ export default function FlowCanvas({ id }) {
                     ...props.data,
                     onOpenDrawer: () => openDrawerForNode(props),
                     openDrawerFromAdd: () => openDrawerFromAdd(props),
-                   
+
                 }}
             />
         ),
@@ -360,6 +387,8 @@ export default function FlowCanvas({ id }) {
             />
         ),
     };
+
+
     return (
         <div style={{ flex: 1, height: "100vh" }}>
             <TopBar
