@@ -62,7 +62,9 @@ class Wordpress extends IntegrationBase {
      * ===================================================== */
 
     public static function resolve_trigger( array $node, array $args ) {
-
+        error_log(print_r('node', true));
+        error_log(print_r($node, true));
+        error_log(print_r('resolve_trigger - ' . $node['event'], true));
         switch ( $node['event'] ) {
 
             case 'publish_post':
@@ -180,7 +182,10 @@ class Wordpress extends IntegrationBase {
 
     public static function execute_node( array $node, array $input ): array {
 
-        error_log(print_r('Run Node', true));
+        error_log(print_r('Run Node Start', true));
+        error_log(print_r($node, true));
+        error_log(print_r($input, true));
+          error_log(print_r('Run Node Start', true));
 
         $config = $node['config'] ?? [];
 
