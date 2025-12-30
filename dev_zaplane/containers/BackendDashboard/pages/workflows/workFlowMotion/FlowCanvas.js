@@ -51,10 +51,9 @@ export default function FlowCanvas({ id }) {
         {
             id: getNewNodeId(),
             type: 'custom',
-            zpType: 'trigger',
             data: {
-                app: "Select an app", 
-                // action: 'Trigger',
+                app: "Select an app",
+                action: 'trigger',
                 config: {}
             },
             position: { x: 125, y: 300 },
@@ -76,13 +75,16 @@ export default function FlowCanvas({ id }) {
     const GAP = 220;
     useEffect(() => {
         if (!singleData?.nodes || isFlowLoaded.current) return;
-
         if (singleData?.nodes?.length) {
             const mappedNodes = singleData.nodes.map((node) => ({
-                ...node,
-                zpType: node.type,
-                type: "custom",
+                ...node,  
+                type: "custom",     
+                data: {
+                    ...node.data,
+                    action: node.type, 
+                },
             }));
+
 
             setNodes(mappedNodes);
         }
@@ -106,17 +108,26 @@ export default function FlowCanvas({ id }) {
     }, [id]);
 
     const onSubmitHandler = async () => {
+
         const mapNodesForBackend = (nodes) => {
             return nodes.map(({
-                zpType,
                 dragging,
                 selected,
                 measured,
+                data,
                 ...node
-            }) => ({
-                ...node,
-                type: zpType?.toLowerCase(),
-            }));
+            }) => {
+                const backendType = data?.action?.toLowerCase();
+
+                const cleanedData = { ...data };
+                delete cleanedData.action;
+
+                return {
+                    ...node,
+                    type: backendType,
+                    data: cleanedData,
+                };
+            });
         };
 
 
@@ -201,11 +212,10 @@ export default function FlowCanvas({ id }) {
         const newNode = {
             id: newNodeId,
             type: "custom",
-            zpType: 'logic',
             position: { x: newX, y: newY },
             data: {
-                app: "Condition",
-                // action: "Condition",
+                app: "Logic",
+                action: "logic",
                 // order: nodes.length + 1,
                 logic: {
                     groups: conditions.map((group) => ({
@@ -290,10 +300,9 @@ export default function FlowCanvas({ id }) {
         const newNode = {
             id: newNodeId,
             type: "custom",
-            zpType: "action",
             position: { x: newX, y: newY },
             data: {
-                // action: "Action",
+                action: "action",
                 // order: nodes.length + 1,
                 ...actionData,
             },

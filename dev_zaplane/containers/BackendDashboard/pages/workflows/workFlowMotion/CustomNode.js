@@ -30,7 +30,7 @@ export default function CustomNode({ id, data, xPos, yPos }) {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      {/* <NodeToolbar
+      <NodeToolbar
         isVisible={true}
         position={Position.Top}
         align="start"
@@ -46,12 +46,12 @@ export default function CustomNode({ id, data, xPos, yPos }) {
           >
             {data.action || "Action"}
           </Text>
-          <Text borderRadius="full" fontSize="sm" fontWeight="medium" margin={0}>
+          {/* <Text borderRadius="full" fontSize="sm" fontWeight="medium" margin={0}>
             {data.order || 1}
-          </Text>
+          </Text> */}
         </HStack>
-      </NodeToolbar> */}
-      {/* <NodeToolbar
+      </NodeToolbar>
+      <NodeToolbar
         isVisible={hovered}
         position={Position.Bottom}
         align="end"
@@ -70,7 +70,7 @@ export default function CustomNode({ id, data, xPos, yPos }) {
           <Icon as={RiDeleteBin7Line} boxSize={4} />
           {!data?.action && <Icon as={FaRegCopy} boxSize={4} />}
         </HStack>
-      </NodeToolbar> */}
+      </NodeToolbar>
       <Box
         bg="white"
         border="1px solid"
@@ -83,7 +83,7 @@ export default function CustomNode({ id, data, xPos, yPos }) {
         boxShadow="sm"
         onClick={data.onOpenDrawer}
       >
-        {data?.action !== "Trigger" && (
+        {data?.action !== "trigger" && (
           <Handle
             type="target"
             position={Position.Left}

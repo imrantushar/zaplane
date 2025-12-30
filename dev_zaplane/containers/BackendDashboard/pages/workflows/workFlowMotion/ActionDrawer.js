@@ -129,7 +129,7 @@ export default function ActionDrawer({
         if (!selectedItem?.id) return [];
         const integration = integrations?.integrations?.[selectedItem.id];
         if (!integration) return [];
-        const isTriggerNode = context?.node?.zpType !== "trigger" && source === "node";
+        const isTriggerNode = context?.node?.action === "trigger" && source === "node";
 
         if (isTriggerNode) {
             return Object.values(integration.triggers || {}).map((t) => ({
@@ -148,7 +148,7 @@ export default function ActionDrawer({
         const integration = integrations?.integrations?.[selectedItem.id];
         if (!integration) return [];
 
-        const isTriggerNode = context?.node?.zpType !== "trigger" && source === "node";
+        const isTriggerNode = context?.node?.action === "trigger" && source === "node";
       
 
         if (isTriggerNode) {
@@ -280,7 +280,7 @@ export default function ActionDrawer({
             };
         
             if (context?.source === "node") {
-                if (node?.data?.zpType !== "Trigger") {
+                if (node?.data?.action === "trigger") {
                     updateNodeData(triggerPayload);
                 } else {
                     updateNodeData(payload);
@@ -368,7 +368,7 @@ export default function ActionDrawer({
                                         ) : (
                                             <Flex direction="column" gap={4}>
                                                 <Box>
-                                                    <Text mb={0}>{context.node?.data?.action === "Trigger" && source === "node" ? "Trigger Type" : "Action Type"}</Text>
+                                                    <Text mb={0}>{context.node?.data?.action === "trigger" && source === "node" ? "Trigger Type" : "Action Type"}</Text>
                                                     <Select
                                                         options={actionOptions}
                                                         onChange={(opt) => setFieldValue("actionType", opt?.value)}
@@ -427,13 +427,7 @@ export default function ActionDrawer({
                                             </VStack>
                                         ) : (
                                             <>
-                                                <Text margin={0} fontSize="sm">Connection*</Text>
-                                                <Input
-                                                    size="sm"
-                                                    value={values.connection}
-                                                    onChange={(e) => setFieldValue("connection", e.target.value)}
-                                                    placeholder="Update API connection"
-                                                />
+                                            <Text margin='0'>There have only config data</Text>
                                             </>
                                         )}
                                     </Tabs.Content>
