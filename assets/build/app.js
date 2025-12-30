@@ -1422,6 +1422,7 @@ function ActionDrawer({
       const payload = {
         app: selectedItem.name,
         name: selectedItem.name,
+        event: values?.actionType,
         config: selectedActionFields.reduce((acc, field) => {
           acc[field.key] = values[field.key];
           return acc;
