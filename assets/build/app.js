@@ -989,13 +989,13 @@ const CreateWorkflows = () => {
   const onSubmitHandler = async (item, status) => {
     if (!item?.id || !status) return;
     const payload = {
-      status: status
+      status: status,
+      id: item.id
     };
     try {
-      await dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_17__.updateWorkFlow)({
-        id: item.id,
+      await dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_17__.updateWorkFlowStatus)({
         payload
-      })).unwrap();
+      }));
     } catch (error) {
       console.log(error);
     }
@@ -2669,7 +2669,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   fetchDynamic: () => (/* binding */ fetchDynamic),
 /* harmony export */   getSingleWorkFlow: () => (/* binding */ getSingleWorkFlow),
 /* harmony export */   getWorkFlow: () => (/* binding */ getWorkFlow),
-/* harmony export */   updateWorkFlow: () => (/* binding */ updateWorkFlow)
+/* harmony export */   updateWorkFlow: () => (/* binding */ updateWorkFlow),
+/* harmony export */   updateWorkFlowStatus: () => (/* binding */ updateWorkFlowStatus)
 /* harmony export */ });
 /* harmony import */ var _reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @reduxjs/toolkit */ "./node_modules/@reduxjs/toolkit/dist/redux-toolkit.modern.mjs");
 /* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
@@ -2736,6 +2737,29 @@ const deleteWorkFlow = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAs
     return (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.handleSliceError)(thunkAPI, e);
   }
 });
+const updateWorkFlowStatus = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyncThunk)('zaplane/updateWorkFlowStatus', async ({
+  payload
+}, thunkAPI) => {
+  try {
+    await (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.makeRequest)('update_workflow_status', {
+      id: payload.id,
+      ...payload
+    });
+    thunkAPI.dispatch((0,_notificationSlice_notificationSlice__WEBPACK_IMPORTED_MODULE_3__.showNotification)({
+      message: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Updated Status Successfully', 'storeengine'),
+      isShow: true,
+      type: 'success'
+    }));
+    console.log('res', payload);
+    return payload;
+  } catch (e) {
+    thunkAPI.dispatch((0,_notificationSlice_notificationSlice__WEBPACK_IMPORTED_MODULE_3__.showNotification)({
+      message: e,
+      isShow: true,
+      type: 'error'
+    }));
+  }
+});
 const workflowsSlice = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createSlice)({
   name: 'workflows',
   initialState: {
@@ -2762,6 +2786,11 @@ const workflowsSlice = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createSl
       });
     }).addCase(deleteWorkFlow.fulfilled, (state, action) => {
       state.data = state.data.filter(item => parseInt(item.id) !== parseInt(action.payload));
+    }).addCase(updateWorkFlowStatus.fulfilled, (state, action) => {
+      state.data = state.data.map(item => parseInt(item.id) === parseInt(action.payload.id) ? {
+        ...item,
+        status: action.payload.status
+      } : item);
     });
   }
 });

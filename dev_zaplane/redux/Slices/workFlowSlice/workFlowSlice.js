@@ -9,6 +9,7 @@ import {
 	handleSliceSuccess,
 	handleSliceError,
 	namespace,
+	makeRequest,
 } from '@ZAPUtils/helper';
 import { showNotification } from '../notificationSlice/notificationSlice';
 export const createWorkflows = createAsyncThunk(
@@ -92,7 +93,34 @@ export const deleteWorkFlow = createAsyncThunk(
 		}
 	}
 );
-
+export const updateWorkFlowStatus = createAsyncThunk(
+	'zaplane/updateWorkFlowStatus',
+	async ({payload }, thunkAPI) => {
+		try {
+			await makeRequest('update_workflow_status', {
+				id: payload.id,
+				...payload,
+			});
+			thunkAPI.dispatch(
+				showNotification({
+					message: __('Updated Status Successfully', 'storeengine'),
+					isShow: true,
+					type: 'success',
+				})
+			);
+			console.log('res',payload)
+			return payload;
+		} catch (e) {
+			thunkAPI.dispatch(
+				showNotification({
+					message: e,
+					isShow: true,
+					type: 'error',
+				})
+			);
+		}
+	}
+);
 const workflowsSlice = createSlice({
 	name: 'workflows',
 	initialState: {
@@ -128,6 +156,14 @@ const workflowsSlice = createSlice({
 					(item) => parseInt(item.id) !== parseInt(action.payload)
 				);
 			})
+			.addCase(updateWorkFlowStatus.fulfilled, (state, action) => {
+				state.data = state.data.map((item) =>
+					parseInt(item.id) === parseInt(action.payload.id)
+						? { ...item, status: action.payload.status }
+						: item
+				);
+			})
+
 
 
 	},

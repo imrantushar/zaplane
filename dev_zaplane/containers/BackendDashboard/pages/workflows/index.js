@@ -24,6 +24,7 @@ import {
   deleteWorkFlow,
   getWorkFlow,
   updateWorkFlow,
+  updateWorkFlowStatus,
 } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
 import { FiMoreVertical } from "react-icons/fi";
 import { showNotification } from "@ZAPRedux/Slices/notificationSlice/notificationSlice";
@@ -82,10 +83,11 @@ const CreateWorkflows = () => {
 
     const payload = {
       status: status,
+      id: item.id,
     };
 
     try {
-      await dispatch(updateWorkFlow({ id: item.id, payload })).unwrap();
+      await dispatch(updateWorkFlowStatus({payload}));
     } catch (error) {
     console.log(error);
     }
