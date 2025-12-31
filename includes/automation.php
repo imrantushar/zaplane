@@ -1,11 +1,12 @@
 <?php
 namespace Zaplane;
 
+use Zaplane\Classes\AutomationBase;
 use Zaplane\Classes\IntegrationLoader;
 
 if (!defined('ABSPATH')) exit;
 
-class Automation {
+class Automation extends AutomationBase {
 
     protected static ?self $instance = null;
     protected array $registered_hooks = [];
@@ -29,21 +30,22 @@ class Automation {
         add_action('zaplane_workflow_updated', [$self, 'reload_triggers']);
 
         // Action Scheduler hook
-        add_action('zaplane_execute_node', function ($run_id, $node_id) {
-            error_log(print_r('zaplane_execute_node', true));
-            if (empty($run_id) || empty($node_id)) return;
-            Query::execute_node((int)$run_id, $node_id);
-        }, 10, 2);
+        add_action('zaplane_execute_node', [$self, 'dispatch_execute_node'], 10, 2);
+    }
+
+    public function dispatch_execute_node($run_id, $node_id){
+        if (empty($run_id) || empty($node_id)) return;
+        $this->execute_node((int)$run_id, $node_id);
     }
 
     public function reload_triggers(): void {
-        Query::flush_trigger_cache();
+        $this->flush_trigger_cache();
         $this->deregister_hooks();
         $this->dispatch_active_triggers();
     }
 
     public function dispatch_active_triggers(): void {
-        $events = Query::get_active_trigger_events();
+        $events = $this->get_active_trigger_events();
         if (empty($events)) return;
 
         error_log(print_r($events, true));
@@ -67,7 +69,7 @@ class Automation {
         $event = current_filter();
         $args  = func_get_args();
 
-        $trigger_nodes = Query::get_active_workflows_for_event($event);
+        $trigger_nodes = $this->get_active_workflows_for_event($event);
         if (empty($trigger_nodes)) return;
         foreach ($trigger_nodes as $node) {
             $integration = IntegrationLoader::get(strtolower($node['app']) ?? '');
@@ -75,36 +77,9 @@ class Automation {
             $payload = $integration::resolve_trigger((array)$node['graph_node']['data'], $args);
             if (!$payload) continue;
 
-            Query::handle_trigger_node($node, $payload);
+            $this->handle_trigger_node($node, $payload);
         }
     }
 
-    public function resume_paused_runs(): void {
-        global $wpdb;
-        $runs = $wpdb->get_results("
-            SELECT id, current_node_id
-            FROM {$wpdb->prefix}zaplane_runs
-            WHERE status = 'paused'
-              AND resume_at <= NOW()
-        ");
-        foreach ($runs as $run) {
-            if (!empty($run->current_node_id)) {
-                Query::schedule_node($run->id, $run->current_node_id);
-            }
-        }
-    }
-
-    public function log_node_execution($run_id, $node_id, $status, $result): void {
-        global $wpdb;
-        $wpdb->insert(
-            $wpdb->prefix . 'zaplane_run_logs',
-            [
-                'run_id'  => $run_id,
-                'node_id' => $node_id,
-                'status'  => $status,
-                'payload' => wp_json_encode($result),
-                'created_at' => current_time('mysql')
-            ]
-        );
-    }
+    
 }
