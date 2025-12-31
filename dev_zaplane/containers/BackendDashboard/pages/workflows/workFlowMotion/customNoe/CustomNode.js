@@ -8,7 +8,8 @@ import {
 import { Box, Text, HStack, Icon, Badge, Button } from "@chakra-ui/react";
 import { RiDeleteBin7Line } from "react-icons/ri";
 import { FaRegCopy } from "react-icons/fa";
-import FloatingEdge from "./FloatingEdge";
+import FloatingEdge from "../floatingEdge/FloatingEdge";
+
 
 export default function CustomNode({ id, data, xPos, yPos }) {
   const [hovered, setHovered] = useState(false);

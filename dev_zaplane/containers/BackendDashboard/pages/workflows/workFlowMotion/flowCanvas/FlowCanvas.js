@@ -11,9 +11,9 @@ import {
 import "@xyflow/react/dist/base.css";
 import { __ } from '@wordpress/i18n';
 
-import CustomNode from "./CustomNode";
-import CustomEdge from "./CustomEdge";
-import ActionDrawer from "./ActionDrawer";
+
+import CustomEdge from "../customEdge/CustomEdge";
+import ActionDrawer from "../actionDrawer/ActionDrawer";
 import { useFormikContext } from "formik";
 import TopBar from "@ZAPComponents/TopBar";
 import { FaChevronRight } from "react-icons/fa";
@@ -38,7 +38,7 @@ import { createWorkflows, getSingleWorkFlow, getWorkFlow, updateWorkFlow } from 
 import { useDispatch, useSelector } from "react-redux";
 import { use } from "react";
 import { showNotification } from "@ZAPRedux/Slices/notificationSlice/notificationSlice";
-import { parseFlowJson } from "./helper";
+import CustomNode from "../customNoe/CustomNode";
 ;
 export default function FlowCanvas({ id }) {
 

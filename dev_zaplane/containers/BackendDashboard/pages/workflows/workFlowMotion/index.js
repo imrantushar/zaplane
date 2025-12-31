@@ -1,14 +1,12 @@
 import React from "react";
 import { ReactFlowProvider } from "@xyflow/react";
-import Sidebar from "./Sidebar";
-import FlowCanvas from "./FlowCanvas";
+import FlowCanvas from "./flowCanvas/FlowCanvas";
 import { Form, Formik } from "formik";
 
 export default function Workflows({id}) {
   return (
     <ReactFlowProvider>
       <div style={{ display: "flex", height: "100vh" }}>
-        {/* <Sidebar /> */}
         <Formik
           initialValues={
           {
