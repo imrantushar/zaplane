@@ -98,6 +98,7 @@ final class Zaplane {
 		Zaplane\Admin::init();
 		Zaplane\API::init();
 		Zaplane\Automation::init();
+		Zaplane\Ajax::init();
 	}
 
 	public function load_dependency() {
