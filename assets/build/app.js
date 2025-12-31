@@ -1376,30 +1376,34 @@ function ActionDrawer({
         });
       case "select":
         if (field.options) {
+          const options = field.options.map(opt => ({
+            value: opt.value,
+            label: opt.label
+          }));
           return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
             children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
               fontSize: "sm",
               margin: "0 0 4px 0",
               children: field.label
             }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(react_select__WEBPACK_IMPORTED_MODULE_15__["default"], {
-              options: field.options.map(opt => ({
-                value: opt.value,
-                label: opt.label
-              })),
+              options: options,
+              value: options.find(opt => opt.value === values[field.key]) || null,
               onChange: opt => setFieldValue(field.key, opt.value)
             })]
           });
         }
         if (field.dynamic) {
           const key = getKey(field);
+          const opts = dynamicOptions[key] || [];
           return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
             children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
               fontSize: "sm",
               margin: "0 0 4px 0",
               children: [field.label, field.required && " *"]
             }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(react_select__WEBPACK_IMPORTED_MODULE_15__["default"], {
-              options: dynamicOptions[key] || [],
+              options: opts,
               isLoading: loadingFields[key],
+              value: opts.find(opt => opt.value === values[field.key]) || null,
               onMenuOpen: () => fetchDynamicOptions(field),
               onChange: opt => setFieldValue(field.key, opt?.value)
             })]
@@ -1454,6 +1458,25 @@ function ActionDrawer({
     if (step === "configure") return !values.connection;
     return false;
   };
+  (0,react__WEBPACK_IMPORTED_MODULE_14__.useEffect)(() => {
+    if (!open) return;
+    if (context?.source === "node" && node?.data?.app) {
+      const matchedApp = APPS.find(app => app.name === node.data.app || app.id === node.data.app?.toLowerCase());
+      if (matchedApp) {
+        setMode("app");
+        setSelectedItem(matchedApp);
+        setStep("select");
+        if (node?.data?.config) {
+          Object.entries(node.data.config).forEach(([key, value]) => {
+            setFieldValue(key, value);
+          });
+        }
+        if (node?.data?.event) {
+          setFieldValue("actionType", node.data.event);
+        }
+      }
+    }
+  }, [open, node]);
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.DrawerRoot, {
     open: open,
     size: "md",
@@ -1530,6 +1553,7 @@ function ActionDrawer({
                       children: node?.data?.action === "trigger" && source === "node" ? "Trigger Type" : "Action Type"
                     }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(react_select__WEBPACK_IMPORTED_MODULE_15__["default"], {
                       options: actionOptions,
+                      value: actionOptions.find(opt => opt.value === values.actionType) || null,
                       onChange: opt => setFieldValue("actionType", opt?.value)
                     })]
                   }), selectedActionFields.map(field => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {

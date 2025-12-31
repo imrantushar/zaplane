@@ -149,7 +149,7 @@ export default function ActionDrawer({
         if (!integration) return [];
 
         const isTriggerNode = node?.data?.action === "trigger" && source === "node";
-      
+
 
         if (isTriggerNode) {
             return integration.triggers?.[values.actionType]?.schema || [];
@@ -180,55 +180,69 @@ export default function ActionDrawer({
 
         setLoadingFields(p => ({ ...p, [key]: false }));
     };
-
-
-
-
-    const renderField = (field, values, setFieldValue) => {
+        const renderField = (field, values, setFieldValue) => {
         switch (field.type) {
             case "text":
             case "expression":
                 return (
                     <Box>
-                        <Text fontSize="sm" margin='0 0 4px 0'>{field.label}</Text>
+                        <Text fontSize="sm" margin="0 0 4px 0">{field.label}</Text>
                         <Input
                             size="sm"
                             value={values[field.key] || ""}
-                            onChange={(e) => setFieldValue(field.key, e.target.value)}
+                            onChange={(e) =>
+                                setFieldValue(field.key, e.target.value)
+                            }
                             placeholder={field.label}
                         />
                     </Box>
                 );
+
             case "textarea":
                 return (
                     <Box>
-                        <Text fontSize="sm" margin='0 0 4px 0'>{field.label}</Text>
+                        <Text fontSize="sm" margin="0 0 4px 0">{field.label}</Text>
                         <Input
                             as="textarea"
                             size="sm"
                             value={values[field.key] || ""}
-                            onChange={(e) => setFieldValue(field.key, e.target.value)}
+                            onChange={(e) =>
+                                setFieldValue(field.key, e.target.value)
+                            }
                             placeholder={field.label}
                         />
                     </Box>
                 );
+
             case "select":
                 if (field.options) {
+                    const options = field.options.map((opt) => ({
+                        value: opt.value,
+                        label: opt.label,
+                    }));
+
                     return (
                         <Box>
-                            <Text fontSize="sm" margin='0 0 4px 0'>{field.label}</Text>
+                            <Text fontSize="sm" margin="0 0 4px 0">{field.label}</Text>
                             <Select
-                                options={field.options.map((opt) => ({
-                                    value: opt.value,
-                                    label: opt.label,
-                                }))}
-                                onChange={(opt) => setFieldValue(field.key, opt.value)}
+                                options={options}
+                                value={
+                                    options.find(
+                                        (opt) =>
+                                            opt.value === values[field.key]
+                                    ) || null
+                                }
+                                onChange={(opt) =>
+                                    setFieldValue(field.key, opt.value)
+                                }
                             />
                         </Box>
                     );
                 }
                 if (field.dynamic) {
                     const key = getKey(field);
+                    const opts = dynamicOptions[key] || [];
+
                     return (
                         <Box>
                             <Text fontSize="sm" margin="0 0 4px 0">
@@ -237,15 +251,27 @@ export default function ActionDrawer({
                             </Text>
 
                             <Select
-                                options={dynamicOptions[key] || []}
+                                options={opts}
                                 isLoading={loadingFields[key]}
-                                onMenuOpen={() => fetchDynamicOptions(field)}
-                                onChange={(opt) => setFieldValue(field.key, opt?.value)}
+                                value={
+                                    opts.find(
+                                        (opt) =>
+                                            opt.value === values[field.key]
+                                    ) || null
+                                }
+                                onMenuOpen={() =>
+                                    fetchDynamicOptions(field)
+                                }
+                                onChange={(opt) =>
+                                    setFieldValue(field.key, opt?.value)
+                                }
                             />
                         </Box>
                     );
                 }
+
                 return null;
+
             default:
                 return null;
         }
@@ -279,7 +305,7 @@ export default function ActionDrawer({
                     return acc;
                 }, {}),
             };
-        
+
             if (context?.source === "node") {
                 if (node?.data?.action === "trigger") {
                     updateNodeData(triggerPayload);
@@ -298,6 +324,32 @@ export default function ActionDrawer({
         if (step === "configure") return !values.connection;
         return false;
     };
+    useEffect(() => {
+        if (!open) return;
+        if (context?.source === "node" && node?.data?.app) {
+            const matchedApp = APPS.find(
+                (app) =>
+                    app.name === node.data.app ||
+                    app.id === node.data.app?.toLowerCase()
+            );
+
+            if (matchedApp) {
+                setMode("app");
+                setSelectedItem(matchedApp);
+                setStep("select");
+                if (node?.data?.config) {
+                    Object.entries(node.data.config).forEach(([key, value]) => {
+                        setFieldValue(key, value);
+                    });
+                }
+
+                if (node?.data?.event) {
+                    setFieldValue("actionType", node.data.event);
+                }
+            }
+        }
+    }, [open, node]);
+
     return (
         <Drawer.Root open={open} size="md" onOpenChange={(e) => !e.open && resetAll()}>
             <Portal>
@@ -372,6 +424,11 @@ export default function ActionDrawer({
                                                     <Text mb={0}>{node?.data?.action === "trigger" && source === "node" ? "Trigger Type" : "Action Type"}</Text>
                                                     <Select
                                                         options={actionOptions}
+                                                        value={
+                                                            actionOptions.find(
+                                                                (opt) => opt.value === values.actionType
+                                                            ) || null
+                                                        }
                                                         onChange={(opt) => setFieldValue("actionType", opt?.value)}
                                                     />
                                                 </Box>
@@ -428,7 +485,7 @@ export default function ActionDrawer({
                                             </VStack>
                                         ) : (
                                             <>
-                                            <Text margin='0'>There have only config data</Text>
+                                                <Text margin='0'>There have only config data</Text>
                                             </>
                                         )}
                                     </Tabs.Content>
