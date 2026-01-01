@@ -33,7 +33,7 @@ import {
     FiHelpCircle,
 } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
-import { createWorkflows, getRunsList, getSingleWorkFlow, getWorkFlow, updateWorkFlow } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
+import { createWorkflows, getQueueList, getRunsList, getSingleWorkFlow, getWorkFlow, updateWorkFlow } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { use } from "react";
 import { showNotification } from "@ZAPRedux/Slices/notificationSlice/notificationSlice";
@@ -448,16 +448,16 @@ export default function FlowCanvas({ id }) {
                             <Checkbox.Control />
                             <Checkbox.Label>show runs</Checkbox.Label>
                         </Checkbox.Root> */}
-                        <Button size="sm" variant="outline">
+                        {/* <Button size="sm" variant="outline">
                             {__("inactive", "zaplane")}
-                        </Button>
+                        </Button> */}
                         <Button size="sm" variant="outline"
-                        onClick={()=>dispatch(getRunsList({ limit: 20, offset: 0 }))}>
+                        onClick={()=>dispatch(getQueueList())}>
                             {__("Runs", "zaplane")}
                         </Button>
-                        <Button size="sm" variant="outline">
+                        {/* <Button size="sm" variant="outline">
                             {__("Save Draft", "zaplane")}
-                        </Button>
+                        </Button> */}
                         <ZAPDrawer
                             title="Action Settings"
                             size='xl'
@@ -472,6 +472,7 @@ export default function FlowCanvas({ id }) {
                                 </Button>
                             }
                         >
+                            <Button variant="outline" onClick={()=>dispatch(getRunsList({ limit: 20, offset: 0 }))}>refres</Button>
                             <Table.Root size="sm" variant="outline">
                                 {!expandedRowId && (
                                     <Table.Header>
