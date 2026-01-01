@@ -49,6 +49,7 @@ final class Zaplane {
 		 */
 		define( 'ZAPLANE_VERSION', '1.1.0' );
 		define( 'ZAPLANE_DB_VERSION', '1.0.0' );
+		define( 'ZAPLANE_ALLOW_LOGS', true );
 		define( 'ZAPLANE_SETTINGS_NAME', 'zaplane_settings' );
 		define( 'ZAPLANE_PLUGIN_FILE', __FILE__ );
 		define( 'ZAPLANE_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );

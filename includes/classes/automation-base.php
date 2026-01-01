@@ -80,6 +80,12 @@ class AutomationBase {
         ]);
         $run_id = $wpdb->insert_id;
 
+        // Start Developer Only
+        Logger::log("Run Created: handle_trigger_node", [
+            'run_id' => $run_id
+        ]);
+        // End Developer Only
+
         // 2️⃣ Load graph
         $graph = $this->load_graph_by_hash($trigger['workflow_version_hash']);
 
@@ -128,6 +134,14 @@ class AutomationBase {
                 'created_at' => current_time('mysql')
             ]);
         }
+
+        // Start Developer Only
+        Logger::log("Spawning spawn_node_run", [
+            'run_id' => $run_id,
+            'node_run_id' => $node_run_id,
+            'parent_node_run_id' => $parent_node_run_id
+        ]);
+        // End Developer Only
     }
 
     /* =====================================================
@@ -155,6 +169,8 @@ class AutomationBase {
     public function worker_tick() {
         global $wpdb;
 
+        Logger::log("Queue tick");
+
         $job = $wpdb->get_row("
             SELECT * FROM {$wpdb->prefix}zaplane_queue
             WHERE locked_at IS NULL
@@ -163,7 +179,10 @@ class AutomationBase {
             LIMIT 1
         ", ARRAY_A);
 
-        if (!$job) return;
+        if (!$job) {
+            Logger::log("Queue empty");
+            return;
+        }
 
         // Lock
         $lock = wp_generate_uuid4();
@@ -175,6 +194,11 @@ class AutomationBase {
             ],
             ['id' => $job['id']]
         );
+
+        Logger::log("Job locked", [
+            'job' => $job['id'],
+            'node_run' => $job['node_run_id']
+        ]);
 
         // Execute
         $node_run = $wpdb->get_row(
@@ -223,14 +247,26 @@ class AutomationBase {
             }
         }
 
+        Logger::log("Executing node", [
+            'node_run' => $nr['id'],
+            'node' => $nr['node_key']
+        ]);
+
+
         if (!$node) return;
+
+        Logger::log("Calling integration", [
+            'app' => $node['data']['app']
+        ]);
 
         $integration = IntegrationLoader::get(strtolower($node['data']['app'] ?? ''));
         $input = json_decode($nr['input_json'], true);
 
         try {
             $result = $integration::execute_node($node, $input);
-
+            Logger::log("Node success", [
+                'node_run' => $nr['id']
+            ]);
             // Update node_run
             $wpdb->update($wpdb->prefix . 'zaplane_node_runs', [
                 'status' => 'completed',
@@ -257,6 +293,9 @@ class AutomationBase {
                     );
                 }
             }
+            Logger::log("Routing success edges", [
+                'from' => $nr['node_key']
+            ]);
 
         } catch (\Throwable $e) {
             global $wpdb;
@@ -332,6 +371,11 @@ class AutomationBase {
 
     private function route_error_path(array $nr, \Throwable $e) {
         global $wpdb;
+
+        Logger::log("Routing error edges", [
+            'run_id' => $nr['run_id'],
+            'error' => $e->getMessage()
+        ], 'warn');
 
         $graph = $this->load_graph_by_hash(
             $wpdb->get_var(

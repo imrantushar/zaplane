@@ -49,7 +49,6 @@ class IntegrationLoader {
      * Get integration by slug
      */
     public static function get( string $slug ): ?string {
-        error_log(print_r(self::$integrations, true));
         return self::$integrations[ $slug ] ?? null;
     }
 
