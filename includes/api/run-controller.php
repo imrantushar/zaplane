@@ -186,18 +186,18 @@ class RunController extends WP_REST_Controller {
             )
         );
         $graph = json_decode($graph_json, true);
-
+        $automation = new \Zaplane\Automation();
         // Find trigger
         foreach ($graph['nodes'] as $n) {
             if ($n['type'] === 'trigger') {
                 foreach ($graph['edges'] as $e) {
                     if ($e['source'] === $n['id']) {
-                        // Container::get('automation')->spawn_node_run(
-                        //     $new_run,
-                        //     $e['target'],
-                        //     json_decode($old['trigger_data'], true),
-                        //     null
-                        // );
+                        $automation->spawn_node_run(
+                            $new_run,
+                            $e['target'],
+                            json_decode($old['trigger_data'], true),
+                            null
+                        );
                     }
                 }
                 break;

@@ -95,7 +95,7 @@ class AutomationBase {
      * NODE SPAWNING
      * ===================================================== */
 
-    private function spawn_node_run(int $run_id, string $node_key, array $data, ?int $parent_node_run_id) {
+    public function spawn_node_run(int $run_id, string $node_key, array $data, ?int $parent_node_run_id) {
         global $wpdb;
 
         // 1️⃣ Create node_run
