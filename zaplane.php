@@ -85,7 +85,6 @@ final class Zaplane {
 		// Init action.
 		do_action( 'zaplane_before_init' );
 		$this->dispatch_hooks();
-		$this->dispatch_automation();
 		// Init action.
 		do_action( 'zaplane_init' );
 	}
@@ -97,12 +96,8 @@ final class Zaplane {
 		Zaplane\Assets::init();
 		Zaplane\Admin::init();
 		Zaplane\API::init();
+		Zaplane\Automation::init();
 		Zaplane\Ajax::init();
-	}
-
-	public function dispatch_automation(){
-		$automation = Zaplane\Automation::instance();
-		Zaplane\Core\Container::set('automation', $automation);
 	}
 
 	public function load_dependency() {
