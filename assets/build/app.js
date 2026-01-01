@@ -137,6 +137,71 @@ const theme = (0,_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.createSystem)(_ch
 
 /***/ },
 
+/***/ "./dev_zaplane/components/Drawer/index.js"
+/*!************************************************!*\
+  !*** ./dev_zaplane/components/Drawer/index.js ***!
+  \************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@ark-ui/react/dist/components/portal/portal.js");
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/button/close-button.js");
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/drawer/drawer.js");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__);
+
+
+const ZAPDrawer = ({
+  trigger,
+  children,
+  title,
+  placement = "end",
+  size = "md",
+  closeOnOverlayClick = true,
+  zIndex = 9999
+}) => {
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.DrawerRoot, {
+    placement: placement,
+    size: size,
+    closeOnOverlayClick: closeOnOverlayClick,
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.DrawerTrigger, {
+      asChild: true,
+      children: trigger
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Portal, {
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.DrawerBackdrop, {
+        z: true
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.DrawerPositioner, {
+        marginTop: "30px",
+        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.DrawerContent, {
+          children: [title && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.DrawerHeader, {
+            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.DrawerTitle, {
+              margin: "0",
+              children: title
+            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.DrawerCloseTrigger, {
+              asChild: true,
+              children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.CloseButton, {
+                size: "sm"
+              })
+            })]
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.DrawerContext, {
+            children: store => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.DrawerBody, {
+              spaceY: "3",
+              children: typeof children === "function" ? children(store) : children
+            })
+          })]
+        })
+      })]
+    })]
+  });
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (ZAPDrawer);
+
+/***/ },
+
 /***/ "./dev_zaplane/components/LabeledInput/index.js"
 /*!******************************************************!*\
   !*** ./dev_zaplane/components/LabeledInput/index.js ***!
@@ -1161,6 +1226,114 @@ const CreateWorkflows = () => {
 
 /***/ },
 
+/***/ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/Components/LogDetails/LogDetails.js"
+/*!********************************************************************************************************************!*\
+  !*** ./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/Components/LogDetails/LogDetails.js ***!
+  \********************************************************************************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/box/index.js");
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/span/index.js");
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/text/index.js");
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/accordion/accordion.js");
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/badge/badge.js");
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/stack/h-stack.js");
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/stack/v-stack.js");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__);
+
+
+const LogDetails = () => {
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.AccordionRoot, {
+    collapsible: true,
+    defaultValue: ["schedule"],
+    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.AccordionItem, {
+      value: "schedule",
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.AccordionItemTrigger, {
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.HStack, {
+          flex: "1",
+          justify: "space-between",
+          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.HStack, {
+            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
+              fontWeight: "medium",
+              children: "Schedule"
+            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Badge, {
+              colorScheme: "blue",
+              children: "1"
+            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
+              fontSize: "sm",
+              color: "gray.500",
+              children: "Tools"
+            })]
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.HStack, {
+            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
+              w: "6px",
+              h: "6px",
+              borderRadius: "full",
+              bg: "green.500"
+            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
+              fontSize: "sm",
+              children: "Success"
+            })]
+          })]
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.AccordionItemIndicator, {})]
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.AccordionItemContent, {
+        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.AccordionItemBody, {
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_6__.VStack, {
+            align: "stretch",
+            spacing: "3",
+            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
+              bg: "white",
+              p: "3",
+              borderRadius: "md",
+              border: "1px solid",
+              borderColor: "gray.200",
+              children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
+                fontFamily: "mono",
+                fontSize: "sm",
+                children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Badge, {
+                  mr: "2",
+                  colorScheme: "purple",
+                  children: "+"
+                }), "\"Input\": []", " ", /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Span, {
+                  color: "gray.500",
+                  children: "0 items"
+                })]
+              })
+            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
+              bg: "white",
+              p: "3",
+              borderRadius: "md",
+              border: "1px solid",
+              borderColor: "gray.200",
+              children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
+                fontFamily: "mono",
+                fontSize: "sm",
+                children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Badge, {
+                  mr: "2",
+                  colorScheme: "purple",
+                  children: "+"
+                }), "\"Output\": []", " ", /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Span, {
+                  color: "gray.500",
+                  children: "0 items"
+                })]
+              })
+            })]
+          })
+        })
+      })]
+    })
+  });
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (LogDetails);
+
+/***/ },
+
 /***/ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionDrawer.js"
 /*!*************************************************************************************************************!*\
   !*** ./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionDrawer.js ***!
@@ -2067,14 +2240,20 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/text/index.js");
 /* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/button/button.js");
 /* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/checkbox/checkbox.js");
-/* harmony import */ var react_icons_fi__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! react-icons/fi */ "./node_modules/react-icons/fi/index.mjs");
-/* harmony import */ var react_router_dom__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! react-router-dom */ "./node_modules/react-router/dist/index.js");
-/* harmony import */ var _ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! @ZAPRedux/Slices/workFlowSlice/workFlowSlice */ "./dev_zaplane/redux/Slices/workFlowSlice/workFlowSlice.js");
-/* harmony import */ var react_redux__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/dist/react-redux.mjs");
-/* harmony import */ var _ZAPRedux_Slices_notificationSlice_notificationSlice__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! @ZAPRedux/Slices/notificationSlice/notificationSlice */ "./dev_zaplane/redux/Slices/notificationSlice/notificationSlice.js");
-/* harmony import */ var _customNoe_CustomNode__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ../customNoe/CustomNode */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/customNoe/CustomNode.js");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__);
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/stack/h-stack.js");
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/table/table.js");
+/* harmony import */ var react_icons_fi__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! react-icons/fi */ "./node_modules/react-icons/fi/index.mjs");
+/* harmony import */ var react_router_dom__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! react-router-dom */ "./node_modules/react-router/dist/index.js");
+/* harmony import */ var _ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! @ZAPRedux/Slices/workFlowSlice/workFlowSlice */ "./dev_zaplane/redux/Slices/workFlowSlice/workFlowSlice.js");
+/* harmony import */ var react_redux__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/dist/react-redux.mjs");
+/* harmony import */ var _ZAPRedux_Slices_notificationSlice_notificationSlice__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! @ZAPRedux/Slices/notificationSlice/notificationSlice */ "./dev_zaplane/redux/Slices/notificationSlice/notificationSlice.js");
+/* harmony import */ var _customNoe_CustomNode__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! ../customNoe/CustomNode */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/customNoe/CustomNode.js");
+/* harmony import */ var _ZAPComponents_Drawer__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! @ZAPComponents/Drawer */ "./dev_zaplane/components/Drawer/index.js");
+/* harmony import */ var _Components_LogDetails_LogDetails__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(/*! ../Components/LogDetails/LogDetails */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/Components/LogDetails/LogDetails.js");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__);
+
+
 
 
 
@@ -2115,8 +2294,8 @@ function FlowCanvas({
       y: 300
     }
   }]);
-  const dispatch = (0,react_redux__WEBPACK_IMPORTED_MODULE_16__.useDispatch)();
-  const navigate = (0,react_router_dom__WEBPACK_IMPORTED_MODULE_14__.useNavigate)();
+  const dispatch = (0,react_redux__WEBPACK_IMPORTED_MODULE_18__.useDispatch)();
+  const navigate = (0,react_router_dom__WEBPACK_IMPORTED_MODULE_16__.useNavigate)();
   const [edges, setEdges, onEdgesChange] = (0,_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.useEdgesState)([]);
   const [drawerOpen, setDrawerOpen] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
   const [selectedNode, setSelectedNode] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(null);
@@ -2130,7 +2309,7 @@ function FlowCanvas({
   const [loading, setLoading] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
   const {
     data
-  } = (0,react_redux__WEBPACK_IMPORTED_MODULE_16__.useSelector)(state => state.workflows);
+  } = (0,react_redux__WEBPACK_IMPORTED_MODULE_18__.useSelector)(state => state.workflows);
   const singleData = data[0];
   const isFlowLoaded = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(false);
   const GAP = 220;
@@ -2163,7 +2342,7 @@ function FlowCanvas({
   });
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
     setLoading(true);
-    dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_15__.getSingleWorkFlow)(id)).finally(() => setLoading(false));
+    dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_17__.getSingleWorkFlow)(id)).finally(() => setLoading(false));
   }, [id]);
   const onSubmitHandler = async () => {
     const mapNodesForBackend = nodes => {
@@ -2199,7 +2378,7 @@ function FlowCanvas({
     if (id) {
       const {
         payload: data
-      } = await dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_15__.updateWorkFlow)({
+      } = await dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_17__.updateWorkFlow)({
         id,
         payload
       }));
@@ -2412,7 +2591,7 @@ function FlowCanvas({
   console.log(nodes, 'all nodes');
   console.log(edges, 'all edges');
   const nodeTypes = {
-    custom: props => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_customNoe_CustomNode__WEBPACK_IMPORTED_MODULE_18__["default"], {
+    custom: props => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_customNoe_CustomNode__WEBPACK_IMPORTED_MODULE_20__["default"], {
       ...props,
       data: {
         ...props.data,
@@ -2422,46 +2601,145 @@ function FlowCanvas({
     })
   };
   const edgeTypes = {
-    custom: props => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_customEdge_CustomEdge__WEBPACK_IMPORTED_MODULE_5__["default"], {
+    custom: props => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_customEdge_CustomEdge__WEBPACK_IMPORTED_MODULE_5__["default"], {
       ...props,
       onEdgeDelete: onEdgeDelete,
       onAddNode: onAddNode
     })
   };
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsxs)("div", {
+  const [expandedRowId, setExpandedRowId] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(null);
+  const rows = [{
+    id: 1,
+    createdAt: "2026-01-01 06:09:01",
+    status: "SUCCESS",
+    duration: "0.00 sec",
+    size: "0.00 KB",
+    nodes: 1
+  }, {
+    id: 2,
+    createdAt: "2026-01-01 06:08:58",
+    status: "SUCCESS",
+    duration: "0.00 sec",
+    size: "0.00 KB",
+    nodes: 1
+  }];
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsxs)("div", {
     style: {
       flex: 1,
       height: "100vh"
     },
-    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_ZAPComponents_TopBar__WEBPACK_IMPORTED_MODULE_8__["default"], {
-      leftContent: () => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.Fragment, {
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_ZAPComponents_TopBar__WEBPACK_IMPORTED_MODULE_8__["default"], {
+      leftContent: () => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.Fragment, {
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {
           variant: "outline",
           onClick: () => navigate(-1),
-          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(react_icons_fi__WEBPACK_IMPORTED_MODULE_13__.FiArrowLeft, {})
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_10__.Text, {
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(react_icons_fi__WEBPACK_IMPORTED_MODULE_15__.FiArrowLeft, {})
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_10__.Text, {
           fontSize: "md",
           fontWeight: "medium",
           children: singleData?.title || (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("Untitled Workflow", "zaplane")
         })]
       }),
-      rightContent: () => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.Fragment, {
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_12__.CheckboxRoot, {
+      rightContent: () => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.Fragment, {
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_12__.CheckboxRoot, {
           padding: "7px 9px",
           borderRadius: "4px",
           border: "1px solid var(--zaplane-border-color)",
-          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_12__.CheckboxHiddenInput, {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_12__.CheckboxControl, {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_12__.CheckboxLabel, {
+          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_12__.CheckboxHiddenInput, {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_12__.CheckboxControl, {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_12__.CheckboxLabel, {
             children: "show runs"
           })]
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {
           size: "sm",
           variant: "outline",
           children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("inactive", "zaplane")
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {
           size: "sm",
           variant: "outline",
           children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("Save Draft", "zaplane")
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_ZAPComponents_Drawer__WEBPACK_IMPORTED_MODULE_21__["default"], {
+          title: "Action Settings",
+          size: "xl",
+          trigger: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {
+            size: "sm",
+            bg: "black",
+            color: "white",
+            _hover: {
+              bg: "gray.800"
+            },
+            children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("Logs", "zaplane")
+          }),
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_14__.TableRoot, {
+            size: "sm",
+            variant: "outline",
+            children: [!expandedRowId && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_14__.TableHeader, {
+              children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_14__.TableRow, {
+                children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_14__.TableColumnHeader, {
+                  children: "CREATED AT"
+                }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_14__.TableColumnHeader, {
+                  children: "STATUS"
+                }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_14__.TableColumnHeader, {
+                  children: "DURATION / SIZE"
+                }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_14__.TableColumnHeader, {
+                  children: "NODES"
+                }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_14__.TableColumnHeader, {
+                  children: "ACTIONS"
+                })]
+              })
+            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_14__.TableBody, {
+              children: expandedRowId ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_14__.TableRow, {
+                children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_14__.TableCell, {
+                  colSpan: 5,
+                  bg: "gray.50",
+                  children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_Components_LogDetails_LogDetails__WEBPACK_IMPORTED_MODULE_22__["default"], {})
+                })
+              }) : rows.map(row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_14__.TableRow, {
+                children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_14__.TableCell, {
+                  children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_10__.Text, {
+                    fontSize: "sm",
+                    children: row.createdAt
+                  })
+                }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_14__.TableCell, {
+                  children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_13__.HStack, {
+                    gap: "2",
+                    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_9__.Box, {
+                      w: "8px",
+                      h: "8px",
+                      borderRadius: "full",
+                      bg: "green.500"
+                    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_10__.Text, {
+                      fontSize: "sm",
+                      children: row.status
+                    })]
+                  })
+                }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_14__.TableCell, {
+                  children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_10__.Text, {
+                    fontSize: "sm",
+                    children: row.duration
+                  }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_10__.Text, {
+                    fontSize: "xs",
+                    color: "gray.500",
+                    children: row.size
+                  })]
+                }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_14__.TableCell, {
+                  children: row.nodes
+                }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_14__.TableCell, {
+                  children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_13__.HStack, {
+                    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {
+                      size: "xs",
+                      variant: "outline",
+                      onClick: () => setExpandedRowId(row.id),
+                      children: "Details"
+                    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {
+                      size: "xs",
+                      variant: "outline",
+                      children: "Re-execute"
+                    })]
+                  })
+                })]
+              }, row.id))
+            })]
+          })
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {
           size: "sm",
           bg: "black",
           color: "white",
@@ -2472,7 +2750,7 @@ function FlowCanvas({
           children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("Publish", "zaplane")
         })]
       })
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_9__.Box, {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsxs)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.ReactFlow, {
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_9__.Box, {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsxs)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.ReactFlow, {
       nodes: nodes,
       edges: edges,
       nodeTypes: nodeTypes,
@@ -2491,8 +2769,8 @@ function FlowCanvas({
       nodesConnectable: true,
       elementsSelectable: true,
       minZoom: 0.5,
-      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.Background, {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.Controls, {})]
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_actionDrawer_ActionDrawer__WEBPACK_IMPORTED_MODULE_6__["default"], {
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.Background, {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.Controls, {})]
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_actionDrawer_ActionDrawer__WEBPACK_IMPORTED_MODULE_6__["default"], {
       open: drawerOpen,
       onClose: () => {
         setDrawerOpen(false);
@@ -3042,6 +3320,458 @@ const makeRequest = async (action, payload = {}, isRaw = false, suffix = '') => 
 
 /***/ },
 
+/***/ "./node_modules/@ark-ui/react/dist/components/accordion/accordion-context.js"
+/*!***********************************************************************************!*\
+  !*** ./node_modules/@ark-ui/react/dist/components/accordion/accordion-context.js ***!
+  \***********************************************************************************/
+(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   AccordionContext: () => (/* binding */ AccordionContext)
+/* harmony export */ });
+/* harmony import */ var _use_accordion_context_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./use-accordion-context.js */ "./node_modules/@ark-ui/react/dist/components/accordion/use-accordion-context.js");
+'use client';
+
+
+const AccordionContext = (props) => props.children((0,_use_accordion_context_js__WEBPACK_IMPORTED_MODULE_0__.useAccordionContext)());
+
+
+
+
+/***/ },
+
+/***/ "./node_modules/@ark-ui/react/dist/components/accordion/accordion-item-content.js"
+/*!****************************************************************************************!*\
+  !*** ./node_modules/@ark-ui/react/dist/components/accordion/accordion-item-content.js ***!
+  \****************************************************************************************/
+(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   AccordionItemContent: () => (/* binding */ AccordionItemContent)
+/* harmony export */ });
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var _zag_js_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @zag-js/react */ "./node_modules/@zag-js/core/dist/index.mjs");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var _utils_create_split_props_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../utils/create-split-props.js */ "./node_modules/@ark-ui/react/dist/utils/create-split-props.js");
+/* harmony import */ var _collapsible_collapsible_content_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../collapsible/collapsible-content.js */ "./node_modules/@ark-ui/react/dist/components/collapsible/collapsible-content.js");
+/* harmony import */ var _use_accordion_context_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./use-accordion-context.js */ "./node_modules/@ark-ui/react/dist/components/accordion/use-accordion-context.js");
+/* harmony import */ var _use_accordion_item_props_context_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./use-accordion-item-props-context.js */ "./node_modules/@ark-ui/react/dist/components/accordion/use-accordion-item-props-context.js");
+'use client';
+
+
+
+
+
+
+
+
+const splitVisibilityProps = (0,_utils_create_split_props_js__WEBPACK_IMPORTED_MODULE_3__.createSplitProps)();
+const AccordionItemContent = (0,react__WEBPACK_IMPORTED_MODULE_2__.forwardRef)((props, ref) => {
+  const accordion = (0,_use_accordion_context_js__WEBPACK_IMPORTED_MODULE_5__.useAccordionContext)();
+  const itemProps = (0,_use_accordion_item_props_context_js__WEBPACK_IMPORTED_MODULE_6__.useAccordionItemPropsContext)();
+  const contentProps = accordion.getItemContentProps(itemProps);
+  const [, itemContentProps] = splitVisibilityProps(contentProps, ["hidden", "data-state"]);
+  const mergedProps = (0,_zag_js_react__WEBPACK_IMPORTED_MODULE_1__.mergeProps)(itemContentProps, props);
+  return /* @__PURE__ */ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_collapsible_collapsible_content_js__WEBPACK_IMPORTED_MODULE_4__.CollapsibleContent, { ref, ...mergedProps });
+});
+AccordionItemContent.displayName = "AccordionItemContent";
+
+
+
+
+/***/ },
+
+/***/ "./node_modules/@ark-ui/react/dist/components/accordion/accordion-item-context.js"
+/*!****************************************************************************************!*\
+  !*** ./node_modules/@ark-ui/react/dist/components/accordion/accordion-item-context.js ***!
+  \****************************************************************************************/
+(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   AccordionItemContext: () => (/* binding */ AccordionItemContext)
+/* harmony export */ });
+/* harmony import */ var _use_accordion_item_context_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./use-accordion-item-context.js */ "./node_modules/@ark-ui/react/dist/components/accordion/use-accordion-item-context.js");
+'use client';
+
+
+const AccordionItemContext = (props) => props.children((0,_use_accordion_item_context_js__WEBPACK_IMPORTED_MODULE_0__.useAccordionItemContext)());
+
+
+
+
+/***/ },
+
+/***/ "./node_modules/@ark-ui/react/dist/components/accordion/accordion-item-indicator.js"
+/*!******************************************************************************************!*\
+  !*** ./node_modules/@ark-ui/react/dist/components/accordion/accordion-item-indicator.js ***!
+  \******************************************************************************************/
+(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   AccordionItemIndicator: () => (/* binding */ AccordionItemIndicator)
+/* harmony export */ });
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var _zag_js_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @zag-js/react */ "./node_modules/@zag-js/core/dist/index.mjs");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var _factory_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../factory.js */ "./node_modules/@ark-ui/react/dist/components/factory.js");
+/* harmony import */ var _use_accordion_context_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./use-accordion-context.js */ "./node_modules/@ark-ui/react/dist/components/accordion/use-accordion-context.js");
+/* harmony import */ var _use_accordion_item_props_context_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./use-accordion-item-props-context.js */ "./node_modules/@ark-ui/react/dist/components/accordion/use-accordion-item-props-context.js");
+'use client';
+
+
+
+
+
+
+
+const AccordionItemIndicator = (0,react__WEBPACK_IMPORTED_MODULE_2__.forwardRef)((props, ref) => {
+  const accordion = (0,_use_accordion_context_js__WEBPACK_IMPORTED_MODULE_4__.useAccordionContext)();
+  const itemProps = (0,_use_accordion_item_props_context_js__WEBPACK_IMPORTED_MODULE_5__.useAccordionItemPropsContext)();
+  const mergedProps = (0,_zag_js_react__WEBPACK_IMPORTED_MODULE_1__.mergeProps)(accordion.getItemIndicatorProps(itemProps), props);
+  return /* @__PURE__ */ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_factory_js__WEBPACK_IMPORTED_MODULE_3__.ark.div, { ...mergedProps, ref });
+});
+AccordionItemIndicator.displayName = "AccordionItemIndicator";
+
+
+
+
+/***/ },
+
+/***/ "./node_modules/@ark-ui/react/dist/components/accordion/accordion-item-trigger.js"
+/*!****************************************************************************************!*\
+  !*** ./node_modules/@ark-ui/react/dist/components/accordion/accordion-item-trigger.js ***!
+  \****************************************************************************************/
+(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   AccordionItemTrigger: () => (/* binding */ AccordionItemTrigger)
+/* harmony export */ });
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var _zag_js_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @zag-js/react */ "./node_modules/@zag-js/core/dist/index.mjs");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var _collapsible_use_collapsible_context_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../collapsible/use-collapsible-context.js */ "./node_modules/@ark-ui/react/dist/components/collapsible/use-collapsible-context.js");
+/* harmony import */ var _factory_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../factory.js */ "./node_modules/@ark-ui/react/dist/components/factory.js");
+/* harmony import */ var _use_accordion_context_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./use-accordion-context.js */ "./node_modules/@ark-ui/react/dist/components/accordion/use-accordion-context.js");
+/* harmony import */ var _use_accordion_item_props_context_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./use-accordion-item-props-context.js */ "./node_modules/@ark-ui/react/dist/components/accordion/use-accordion-item-props-context.js");
+'use client';
+
+
+
+
+
+
+
+
+const AccordionItemTrigger = (0,react__WEBPACK_IMPORTED_MODULE_2__.forwardRef)((props, ref) => {
+  const accordion = (0,_use_accordion_context_js__WEBPACK_IMPORTED_MODULE_5__.useAccordionContext)();
+  const itemProps = (0,_use_accordion_item_props_context_js__WEBPACK_IMPORTED_MODULE_6__.useAccordionItemPropsContext)();
+  const collapsible = (0,_collapsible_use_collapsible_context_js__WEBPACK_IMPORTED_MODULE_3__.useCollapsibleContext)();
+  const triggerProps = accordion.getItemTriggerProps(itemProps);
+  const mergedProps = (0,_zag_js_react__WEBPACK_IMPORTED_MODULE_1__.mergeProps)(
+    {
+      ...triggerProps,
+      "aria-controls": collapsible.isUnmounted ? void 0 : triggerProps["aria-controls"]
+    },
+    props
+  );
+  return /* @__PURE__ */ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_factory_js__WEBPACK_IMPORTED_MODULE_4__.ark.button, { ...mergedProps, ref });
+});
+AccordionItemTrigger.displayName = "AccordionItemTrigger";
+
+
+
+
+/***/ },
+
+/***/ "./node_modules/@ark-ui/react/dist/components/accordion/accordion-item.js"
+/*!********************************************************************************!*\
+  !*** ./node_modules/@ark-ui/react/dist/components/accordion/accordion-item.js ***!
+  \********************************************************************************/
+(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   AccordionItem: () => (/* binding */ AccordionItem)
+/* harmony export */ });
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var _zag_js_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @zag-js/react */ "./node_modules/@zag-js/core/dist/index.mjs");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var _use_accordion_context_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./use-accordion-context.js */ "./node_modules/@ark-ui/react/dist/components/accordion/use-accordion-context.js");
+/* harmony import */ var _use_accordion_item_context_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./use-accordion-item-context.js */ "./node_modules/@ark-ui/react/dist/components/accordion/use-accordion-item-context.js");
+/* harmony import */ var _collapsible_collapsible_root_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../collapsible/collapsible-root.js */ "./node_modules/@ark-ui/react/dist/components/collapsible/collapsible-root.js");
+/* harmony import */ var _utils_create_split_props_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../utils/create-split-props.js */ "./node_modules/@ark-ui/react/dist/utils/create-split-props.js");
+/* harmony import */ var _utils_render_strategy_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../utils/render-strategy.js */ "./node_modules/@ark-ui/react/dist/utils/render-strategy.js");
+/* harmony import */ var _use_accordion_item_props_context_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./use-accordion-item-props-context.js */ "./node_modules/@ark-ui/react/dist/components/accordion/use-accordion-item-props-context.js");
+'use client';
+
+
+
+
+
+
+
+
+
+
+
+
+
+const splitItemProps = (0,_utils_create_split_props_js__WEBPACK_IMPORTED_MODULE_6__.createSplitProps)();
+const AccordionItem = (0,react__WEBPACK_IMPORTED_MODULE_2__.forwardRef)((props, ref) => {
+  const [itemProps, localProps] = splitItemProps(props, ["value", "disabled"]);
+  const accordion = (0,_use_accordion_context_js__WEBPACK_IMPORTED_MODULE_3__.useAccordionContext)();
+  const renderStrategy = (0,_utils_render_strategy_js__WEBPACK_IMPORTED_MODULE_7__.useRenderStrategyPropsContext)();
+  const mergedProps = (0,_zag_js_react__WEBPACK_IMPORTED_MODULE_1__.mergeProps)(accordion.getItemProps(itemProps), localProps);
+  const item = accordion.getItemState(itemProps);
+  const itemContentProps = accordion.getItemContentProps(itemProps);
+  return /* @__PURE__ */ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_use_accordion_item_props_context_js__WEBPACK_IMPORTED_MODULE_8__.AccordionItemPropsProvider, { value: itemProps, children: /* @__PURE__ */ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_use_accordion_item_context_js__WEBPACK_IMPORTED_MODULE_4__.AccordionItemProvider, { value: item, children: /* @__PURE__ */ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(
+    _collapsible_collapsible_root_js__WEBPACK_IMPORTED_MODULE_5__.CollapsibleRoot,
+    {
+      ref,
+      open: item.expanded,
+      ids: { content: itemContentProps.id },
+      ...renderStrategy,
+      ...mergedProps
+    }
+  ) }) });
+});
+AccordionItem.displayName = "AccordionItem";
+
+
+
+
+/***/ },
+
+/***/ "./node_modules/@ark-ui/react/dist/components/accordion/accordion-root-provider.js"
+/*!*****************************************************************************************!*\
+  !*** ./node_modules/@ark-ui/react/dist/components/accordion/accordion-root-provider.js ***!
+  \*****************************************************************************************/
+(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   AccordionRootProvider: () => (/* binding */ AccordionRootProvider)
+/* harmony export */ });
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var _zag_js_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @zag-js/react */ "./node_modules/@zag-js/core/dist/index.mjs");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var _utils_create_split_props_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../utils/create-split-props.js */ "./node_modules/@ark-ui/react/dist/utils/create-split-props.js");
+/* harmony import */ var _utils_render_strategy_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../utils/render-strategy.js */ "./node_modules/@ark-ui/react/dist/utils/render-strategy.js");
+/* harmony import */ var _factory_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../factory.js */ "./node_modules/@ark-ui/react/dist/components/factory.js");
+/* harmony import */ var _use_accordion_context_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./use-accordion-context.js */ "./node_modules/@ark-ui/react/dist/components/accordion/use-accordion-context.js");
+'use client';
+
+
+
+
+
+
+
+
+const splitRootProviderProps = (0,_utils_create_split_props_js__WEBPACK_IMPORTED_MODULE_3__.createSplitProps)();
+const AccordionRootProvider = (0,react__WEBPACK_IMPORTED_MODULE_2__.forwardRef)((props, ref) => {
+  const [renderStrategyProps, accordionProps] = (0,_utils_render_strategy_js__WEBPACK_IMPORTED_MODULE_4__.splitRenderStrategyProps)(props);
+  const [{ value: accordion }, localProps] = splitRootProviderProps(accordionProps, ["value"]);
+  const mergedProps = (0,_zag_js_react__WEBPACK_IMPORTED_MODULE_1__.mergeProps)(accordion.getRootProps(), localProps);
+  return /* @__PURE__ */ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_use_accordion_context_js__WEBPACK_IMPORTED_MODULE_6__.AccordionProvider, { value: accordion, children: /* @__PURE__ */ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_utils_render_strategy_js__WEBPACK_IMPORTED_MODULE_4__.RenderStrategyPropsProvider, { value: renderStrategyProps, children: /* @__PURE__ */ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_factory_js__WEBPACK_IMPORTED_MODULE_5__.ark.div, { ...mergedProps, ref }) }) });
+});
+AccordionRootProvider.displayName = "AccordionRootProvider";
+
+
+
+
+/***/ },
+
+/***/ "./node_modules/@ark-ui/react/dist/components/accordion/accordion-root.js"
+/*!********************************************************************************!*\
+  !*** ./node_modules/@ark-ui/react/dist/components/accordion/accordion-root.js ***!
+  \********************************************************************************/
+(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   AccordionRoot: () => (/* binding */ AccordionRoot)
+/* harmony export */ });
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var _zag_js_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @zag-js/react */ "./node_modules/@zag-js/core/dist/index.mjs");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var _utils_create_split_props_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../utils/create-split-props.js */ "./node_modules/@ark-ui/react/dist/utils/create-split-props.js");
+/* harmony import */ var _utils_render_strategy_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../utils/render-strategy.js */ "./node_modules/@ark-ui/react/dist/utils/render-strategy.js");
+/* harmony import */ var _factory_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../factory.js */ "./node_modules/@ark-ui/react/dist/components/factory.js");
+/* harmony import */ var _use_accordion_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./use-accordion.js */ "./node_modules/@ark-ui/react/dist/components/accordion/use-accordion.js");
+/* harmony import */ var _use_accordion_context_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./use-accordion-context.js */ "./node_modules/@ark-ui/react/dist/components/accordion/use-accordion-context.js");
+'use client';
+
+
+
+
+
+
+
+
+
+const splitRootProps = (0,_utils_create_split_props_js__WEBPACK_IMPORTED_MODULE_3__.createSplitProps)();
+const AccordionRoot = (0,react__WEBPACK_IMPORTED_MODULE_2__.forwardRef)((props, ref) => {
+  const [renderStrategyProps, accordionProps] = (0,_utils_render_strategy_js__WEBPACK_IMPORTED_MODULE_4__.splitRenderStrategyProps)(props);
+  const [useAccordionProps, localProps] = splitRootProps(accordionProps, [
+    "collapsible",
+    "defaultValue",
+    "disabled",
+    "id",
+    "ids",
+    "multiple",
+    "onFocusChange",
+    "onValueChange",
+    "orientation",
+    "value"
+  ]);
+  const accordion = (0,_use_accordion_js__WEBPACK_IMPORTED_MODULE_6__.useAccordion)(useAccordionProps);
+  const mergedProps = (0,_zag_js_react__WEBPACK_IMPORTED_MODULE_1__.mergeProps)(accordion.getRootProps(), localProps);
+  return /* @__PURE__ */ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_use_accordion_context_js__WEBPACK_IMPORTED_MODULE_7__.AccordionProvider, { value: accordion, children: /* @__PURE__ */ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_utils_render_strategy_js__WEBPACK_IMPORTED_MODULE_4__.RenderStrategyPropsProvider, { value: renderStrategyProps, children: /* @__PURE__ */ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_factory_js__WEBPACK_IMPORTED_MODULE_5__.ark.div, { ...mergedProps, ref }) }) });
+});
+AccordionRoot.displayName = "AccordionRoot";
+
+
+
+
+/***/ },
+
+/***/ "./node_modules/@ark-ui/react/dist/components/accordion/use-accordion-context.js"
+/*!***************************************************************************************!*\
+  !*** ./node_modules/@ark-ui/react/dist/components/accordion/use-accordion-context.js ***!
+  \***************************************************************************************/
+(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   AccordionProvider: () => (/* binding */ AccordionProvider),
+/* harmony export */   useAccordionContext: () => (/* binding */ useAccordionContext)
+/* harmony export */ });
+/* harmony import */ var _utils_create_context_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../utils/create-context.js */ "./node_modules/@ark-ui/react/dist/utils/create-context.js");
+'use client';
+
+
+const [AccordionProvider, useAccordionContext] = (0,_utils_create_context_js__WEBPACK_IMPORTED_MODULE_0__.createContext)({
+  name: "AccordionContext",
+  hookName: "useAccordionContext",
+  providerName: "<AccordionProvider />"
+});
+
+
+
+
+/***/ },
+
+/***/ "./node_modules/@ark-ui/react/dist/components/accordion/use-accordion-item-context.js"
+/*!********************************************************************************************!*\
+  !*** ./node_modules/@ark-ui/react/dist/components/accordion/use-accordion-item-context.js ***!
+  \********************************************************************************************/
+(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   AccordionItemProvider: () => (/* binding */ AccordionItemProvider),
+/* harmony export */   useAccordionItemContext: () => (/* binding */ useAccordionItemContext)
+/* harmony export */ });
+/* harmony import */ var _utils_create_context_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../utils/create-context.js */ "./node_modules/@ark-ui/react/dist/utils/create-context.js");
+'use client';
+
+
+const [AccordionItemProvider, useAccordionItemContext] = (0,_utils_create_context_js__WEBPACK_IMPORTED_MODULE_0__.createContext)({
+  name: "AccordionItemContext",
+  hookName: "useAccordionItemContext",
+  providerName: "<AccordionItemProvider />"
+});
+
+
+
+
+/***/ },
+
+/***/ "./node_modules/@ark-ui/react/dist/components/accordion/use-accordion-item-props-context.js"
+/*!**************************************************************************************************!*\
+  !*** ./node_modules/@ark-ui/react/dist/components/accordion/use-accordion-item-props-context.js ***!
+  \**************************************************************************************************/
+(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   AccordionItemPropsProvider: () => (/* binding */ AccordionItemPropsProvider),
+/* harmony export */   useAccordionItemPropsContext: () => (/* binding */ useAccordionItemPropsContext)
+/* harmony export */ });
+/* harmony import */ var _utils_create_context_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../utils/create-context.js */ "./node_modules/@ark-ui/react/dist/utils/create-context.js");
+'use client';
+
+
+const [AccordionItemPropsProvider, useAccordionItemPropsContext] = (0,_utils_create_context_js__WEBPACK_IMPORTED_MODULE_0__.createContext)({
+  name: "AccordionItemPropsContext",
+  hookName: "useAccordionItemPropsContext",
+  providerName: "<AccordionItemPropsProvider />"
+});
+
+
+
+
+/***/ },
+
+/***/ "./node_modules/@ark-ui/react/dist/components/accordion/use-accordion.js"
+/*!*******************************************************************************!*\
+  !*** ./node_modules/@ark-ui/react/dist/components/accordion/use-accordion.js ***!
+  \*******************************************************************************/
+(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   useAccordion: () => (/* binding */ useAccordion)
+/* harmony export */ });
+/* harmony import */ var _zag_js_accordion__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @zag-js/accordion */ "./node_modules/@zag-js/accordion/dist/index.mjs");
+/* harmony import */ var _zag_js_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @zag-js/react */ "./node_modules/@zag-js/react/dist/index.mjs");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var _providers_environment_use_environment_context_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../providers/environment/use-environment-context.js */ "./node_modules/@ark-ui/react/dist/providers/environment/use-environment-context.js");
+/* harmony import */ var _providers_locale_use_locale_context_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../providers/locale/use-locale-context.js */ "./node_modules/@ark-ui/react/dist/providers/locale/use-locale-context.js");
+'use client';
+
+
+
+
+
+
+const useAccordion = (props) => {
+  const id = (0,react__WEBPACK_IMPORTED_MODULE_2__.useId)();
+  const { getRootNode } = (0,_providers_environment_use_environment_context_js__WEBPACK_IMPORTED_MODULE_3__.useEnvironmentContext)();
+  const { dir } = (0,_providers_locale_use_locale_context_js__WEBPACK_IMPORTED_MODULE_4__.useLocaleContext)();
+  const machineProps = {
+    id,
+    dir,
+    getRootNode,
+    ...props
+  };
+  const service = (0,_zag_js_react__WEBPACK_IMPORTED_MODULE_1__.useMachine)(_zag_js_accordion__WEBPACK_IMPORTED_MODULE_0__.machine, machineProps);
+  return _zag_js_accordion__WEBPACK_IMPORTED_MODULE_0__.connect(service, _zag_js_react__WEBPACK_IMPORTED_MODULE_1__.normalizeProps);
+};
+
+
+
+
+/***/ },
+
 /***/ "./node_modules/@ark-ui/react/dist/components/carousel/carousel.anatomy.js"
 /*!*********************************************************************************!*\
   !*** ./node_modules/@ark-ui/react/dist/components/carousel/carousel.anatomy.js ***!
@@ -3549,6 +4279,194 @@ const useCheckbox = (ownProps = {}) => {
   };
   const service = (0,_zag_js_react__WEBPACK_IMPORTED_MODULE_1__.useMachine)(_zag_js_checkbox__WEBPACK_IMPORTED_MODULE_0__.machine, machineProps);
   return _zag_js_checkbox__WEBPACK_IMPORTED_MODULE_0__.connect(service, _zag_js_react__WEBPACK_IMPORTED_MODULE_1__.normalizeProps);
+};
+
+
+
+
+/***/ },
+
+/***/ "./node_modules/@ark-ui/react/dist/components/collapsible/collapsible-content.js"
+/*!***************************************************************************************!*\
+  !*** ./node_modules/@ark-ui/react/dist/components/collapsible/collapsible-content.js ***!
+  \***************************************************************************************/
+(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   CollapsibleContent: () => (/* binding */ CollapsibleContent)
+/* harmony export */ });
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var _zag_js_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @zag-js/react */ "./node_modules/@zag-js/core/dist/index.mjs");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var _factory_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../factory.js */ "./node_modules/@ark-ui/react/dist/components/factory.js");
+/* harmony import */ var _use_collapsible_context_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./use-collapsible-context.js */ "./node_modules/@ark-ui/react/dist/components/collapsible/use-collapsible-context.js");
+'use client';
+
+
+
+
+
+
+const CollapsibleContent = (0,react__WEBPACK_IMPORTED_MODULE_2__.forwardRef)((props, ref) => {
+  const collapsible = (0,_use_collapsible_context_js__WEBPACK_IMPORTED_MODULE_4__.useCollapsibleContext)();
+  if (collapsible.isUnmounted) {
+    return null;
+  }
+  const mergedProps = (0,_zag_js_react__WEBPACK_IMPORTED_MODULE_1__.mergeProps)(collapsible.getContentProps(), props);
+  return /* @__PURE__ */ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_factory_js__WEBPACK_IMPORTED_MODULE_3__.ark.div, { ...mergedProps, ref });
+});
+CollapsibleContent.displayName = "CollapsibleContent";
+
+
+
+
+/***/ },
+
+/***/ "./node_modules/@ark-ui/react/dist/components/collapsible/collapsible-root.js"
+/*!************************************************************************************!*\
+  !*** ./node_modules/@ark-ui/react/dist/components/collapsible/collapsible-root.js ***!
+  \************************************************************************************/
+(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   CollapsibleRoot: () => (/* binding */ CollapsibleRoot)
+/* harmony export */ });
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var _zag_js_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @zag-js/react */ "./node_modules/@zag-js/core/dist/index.mjs");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var _factory_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../factory.js */ "./node_modules/@ark-ui/react/dist/components/factory.js");
+/* harmony import */ var _split_collapsible_props_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./split-collapsible-props.js */ "./node_modules/@ark-ui/react/dist/components/collapsible/split-collapsible-props.js");
+/* harmony import */ var _use_collapsible_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./use-collapsible.js */ "./node_modules/@ark-ui/react/dist/components/collapsible/use-collapsible.js");
+/* harmony import */ var _use_collapsible_context_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./use-collapsible-context.js */ "./node_modules/@ark-ui/react/dist/components/collapsible/use-collapsible-context.js");
+'use client';
+
+
+
+
+
+
+
+
+const CollapsibleRoot = (0,react__WEBPACK_IMPORTED_MODULE_2__.forwardRef)((props, ref) => {
+  const [useCollapsibleProps, localProps] = (0,_split_collapsible_props_js__WEBPACK_IMPORTED_MODULE_4__.splitCollapsibleProps)(props);
+  const collapsible = (0,_use_collapsible_js__WEBPACK_IMPORTED_MODULE_5__.useCollapsible)(useCollapsibleProps);
+  const mergedProps = (0,_zag_js_react__WEBPACK_IMPORTED_MODULE_1__.mergeProps)(collapsible.getRootProps(), localProps);
+  return /* @__PURE__ */ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_use_collapsible_context_js__WEBPACK_IMPORTED_MODULE_6__.CollapsibleProvider, { value: collapsible, children: /* @__PURE__ */ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_factory_js__WEBPACK_IMPORTED_MODULE_3__.ark.div, { ...mergedProps, ref }) });
+});
+CollapsibleRoot.displayName = "CollapsibleRoot";
+
+
+
+
+/***/ },
+
+/***/ "./node_modules/@ark-ui/react/dist/components/collapsible/split-collapsible-props.js"
+/*!*******************************************************************************************!*\
+  !*** ./node_modules/@ark-ui/react/dist/components/collapsible/split-collapsible-props.js ***!
+  \*******************************************************************************************/
+(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   splitCollapsibleProps: () => (/* binding */ splitCollapsibleProps)
+/* harmony export */ });
+/* harmony import */ var _utils_create_split_props_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../utils/create-split-props.js */ "./node_modules/@ark-ui/react/dist/utils/create-split-props.js");
+'use client';
+
+
+const splitCollapsibleProps = (props) => (0,_utils_create_split_props_js__WEBPACK_IMPORTED_MODULE_0__.createSplitProps)()(props, [
+  "collapsedHeight",
+  "collapsedWidth",
+  "defaultOpen",
+  "disabled",
+  "id",
+  "ids",
+  "lazyMount",
+  "onExitComplete",
+  "onOpenChange",
+  "open",
+  "unmountOnExit"
+]);
+
+
+
+
+/***/ },
+
+/***/ "./node_modules/@ark-ui/react/dist/components/collapsible/use-collapsible-context.js"
+/*!*******************************************************************************************!*\
+  !*** ./node_modules/@ark-ui/react/dist/components/collapsible/use-collapsible-context.js ***!
+  \*******************************************************************************************/
+(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   CollapsibleProvider: () => (/* binding */ CollapsibleProvider),
+/* harmony export */   useCollapsibleContext: () => (/* binding */ useCollapsibleContext)
+/* harmony export */ });
+/* harmony import */ var _utils_create_context_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../utils/create-context.js */ "./node_modules/@ark-ui/react/dist/utils/create-context.js");
+'use client';
+
+
+const [CollapsibleProvider, useCollapsibleContext] = (0,_utils_create_context_js__WEBPACK_IMPORTED_MODULE_0__.createContext)({
+  name: "CollapsibleContext",
+  hookName: "useCollapsibleContext",
+  providerName: "<CollapsibleProvider />"
+});
+
+
+
+
+/***/ },
+
+/***/ "./node_modules/@ark-ui/react/dist/components/collapsible/use-collapsible.js"
+/*!***********************************************************************************!*\
+  !*** ./node_modules/@ark-ui/react/dist/components/collapsible/use-collapsible.js ***!
+  \***********************************************************************************/
+(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   useCollapsible: () => (/* binding */ useCollapsible)
+/* harmony export */ });
+/* harmony import */ var _zag_js_collapsible__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @zag-js/collapsible */ "./node_modules/@zag-js/collapsible/dist/index.mjs");
+/* harmony import */ var _zag_js_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @zag-js/react */ "./node_modules/@zag-js/react/dist/index.mjs");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var _providers_environment_use_environment_context_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../providers/environment/use-environment-context.js */ "./node_modules/@ark-ui/react/dist/providers/environment/use-environment-context.js");
+/* harmony import */ var _providers_locale_use_locale_context_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../providers/locale/use-locale-context.js */ "./node_modules/@ark-ui/react/dist/providers/locale/use-locale-context.js");
+'use client';
+
+
+
+
+
+
+const useCollapsible = (props = {}) => {
+  const { lazyMount, unmountOnExit, ...collapsibleProps } = props;
+  const id = (0,react__WEBPACK_IMPORTED_MODULE_2__.useId)();
+  const wasVisible = (0,react__WEBPACK_IMPORTED_MODULE_2__.useRef)(false);
+  const { dir } = (0,_providers_locale_use_locale_context_js__WEBPACK_IMPORTED_MODULE_4__.useLocaleContext)();
+  const { getRootNode } = (0,_providers_environment_use_environment_context_js__WEBPACK_IMPORTED_MODULE_3__.useEnvironmentContext)();
+  const machineProps = {
+    id,
+    dir,
+    getRootNode,
+    ...collapsibleProps
+  };
+  const service = (0,_zag_js_react__WEBPACK_IMPORTED_MODULE_1__.useMachine)(_zag_js_collapsible__WEBPACK_IMPORTED_MODULE_0__.machine, machineProps);
+  const api = _zag_js_collapsible__WEBPACK_IMPORTED_MODULE_0__.connect(service, _zag_js_react__WEBPACK_IMPORTED_MODULE_1__.normalizeProps);
+  if (api.visible) {
+    wasVisible.current = true;
+  }
+  const isUnmounted = !api.visible && !wasVisible.current && lazyMount || unmountOnExit && !api.visible && wasVisible.current;
+  return { ...api, isUnmounted };
 };
 
 
@@ -7345,6 +8263,111 @@ const AbsoluteCenter = (0,_styled_system_factory_js__WEBPACK_IMPORTED_MODULE_0__
   }
 });
 AbsoluteCenter.displayName = "AbsoluteCenter";
+
+
+
+
+/***/ },
+
+/***/ "./node_modules/@chakra-ui/react/dist/esm/components/accordion/accordion.js"
+/*!**********************************************************************************!*\
+  !*** ./node_modules/@chakra-ui/react/dist/esm/components/accordion/accordion.js ***!
+  \**********************************************************************************/
+(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   AccordionContext: () => (/* binding */ AccordionContext),
+/* harmony export */   AccordionItem: () => (/* binding */ AccordionItem),
+/* harmony export */   AccordionItemBody: () => (/* binding */ AccordionItemBody),
+/* harmony export */   AccordionItemContent: () => (/* binding */ AccordionItemContent),
+/* harmony export */   AccordionItemContext: () => (/* binding */ AccordionItemContext),
+/* harmony export */   AccordionItemIndicator: () => (/* binding */ AccordionItemIndicator),
+/* harmony export */   AccordionItemTrigger: () => (/* binding */ AccordionItemTrigger),
+/* harmony export */   AccordionPropsProvider: () => (/* binding */ AccordionPropsProvider),
+/* harmony export */   AccordionRoot: () => (/* binding */ AccordionRoot),
+/* harmony export */   AccordionRootProvider: () => (/* binding */ AccordionRootProvider),
+/* harmony export */   useAccordionStyles: () => (/* binding */ useAccordionStyles)
+/* harmony export */ });
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var _ark_ui_react_accordion__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @ark-ui/react/accordion */ "./node_modules/@ark-ui/react/dist/components/accordion/accordion-root-provider.js");
+/* harmony import */ var _ark_ui_react_accordion__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @ark-ui/react/accordion */ "./node_modules/@ark-ui/react/dist/components/accordion/accordion-root.js");
+/* harmony import */ var _ark_ui_react_accordion__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @ark-ui/react/accordion */ "./node_modules/@ark-ui/react/dist/components/accordion/accordion-item.js");
+/* harmony import */ var _ark_ui_react_accordion__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @ark-ui/react/accordion */ "./node_modules/@ark-ui/react/dist/components/accordion/accordion-item-content.js");
+/* harmony import */ var _ark_ui_react_accordion__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @ark-ui/react/accordion */ "./node_modules/@ark-ui/react/dist/components/accordion/accordion-item-trigger.js");
+/* harmony import */ var _ark_ui_react_accordion__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @ark-ui/react/accordion */ "./node_modules/@ark-ui/react/dist/components/accordion/accordion-item-indicator.js");
+/* harmony import */ var _ark_ui_react_accordion__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @ark-ui/react/accordion */ "./node_modules/@ark-ui/react/dist/components/accordion/accordion-context.js");
+/* harmony import */ var _ark_ui_react_accordion__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @ark-ui/react/accordion */ "./node_modules/@ark-ui/react/dist/components/accordion/accordion-item-context.js");
+/* harmony import */ var _styled_system_create_slot_recipe_context_js__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../../styled-system/create-slot-recipe-context.js */ "./node_modules/@chakra-ui/react/dist/esm/styled-system/create-slot-recipe-context.js");
+/* harmony import */ var _icons_js__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../icons.js */ "./node_modules/@chakra-ui/react/dist/esm/components/icons.js");
+
+"use client";
+
+
+
+
+
+const {
+  withProvider,
+  withContext,
+  useStyles: useAccordionStyles,
+  PropsProvider
+} = (0,_styled_system_create_slot_recipe_context_js__WEBPACK_IMPORTED_MODULE_9__.createSlotRecipeContext)({ key: "accordion" });
+const AccordionRootProvider = withProvider(_ark_ui_react_accordion__WEBPACK_IMPORTED_MODULE_1__.AccordionRootProvider, "root", { forwardAsChild: true });
+const AccordionRoot = withProvider(
+  _ark_ui_react_accordion__WEBPACK_IMPORTED_MODULE_2__.AccordionRoot,
+  "root",
+  { forwardAsChild: true }
+);
+const AccordionPropsProvider = PropsProvider;
+const AccordionItem = withContext(
+  _ark_ui_react_accordion__WEBPACK_IMPORTED_MODULE_3__.AccordionItem,
+  "item",
+  { forwardAsChild: true }
+);
+const AccordionItemContent = withContext(_ark_ui_react_accordion__WEBPACK_IMPORTED_MODULE_4__.AccordionItemContent, "itemContent", { forwardAsChild: true });
+const AccordionItemBody = withContext("div", "itemBody");
+const AccordionItemTrigger = withContext(_ark_ui_react_accordion__WEBPACK_IMPORTED_MODULE_5__.AccordionItemTrigger, "itemTrigger", { forwardAsChild: true });
+const AccordionItemIndicator = withContext(_ark_ui_react_accordion__WEBPACK_IMPORTED_MODULE_6__.AccordionItemIndicator, "itemIndicator", {
+  forwardAsChild: true,
+  defaultProps: {
+    children: /* @__PURE__ */ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_icons_js__WEBPACK_IMPORTED_MODULE_10__.ChevronDownIcon, {})
+  }
+});
+const AccordionContext = _ark_ui_react_accordion__WEBPACK_IMPORTED_MODULE_7__.AccordionContext;
+const AccordionItemContext = _ark_ui_react_accordion__WEBPACK_IMPORTED_MODULE_8__.AccordionItemContext;
+
+
+
+
+/***/ },
+
+/***/ "./node_modules/@chakra-ui/react/dist/esm/components/badge/badge.js"
+/*!**************************************************************************!*\
+  !*** ./node_modules/@chakra-ui/react/dist/esm/components/badge/badge.js ***!
+  \**************************************************************************/
+(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   Badge: () => (/* binding */ Badge),
+/* harmony export */   BadgePropsProvider: () => (/* binding */ BadgePropsProvider),
+/* harmony export */   PropsProvider: () => (/* binding */ PropsProvider),
+/* harmony export */   withContext: () => (/* binding */ withContext)
+/* harmony export */ });
+/* harmony import */ var _styled_system_create_recipe_context_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../styled-system/create-recipe-context.js */ "./node_modules/@chakra-ui/react/dist/esm/styled-system/create-recipe-context.js");
+
+"use client";
+
+
+const { PropsProvider, withContext } = (0,_styled_system_create_recipe_context_js__WEBPACK_IMPORTED_MODULE_0__.createRecipeContext)({
+  key: "badge"
+});
+const Badge = withContext("span");
+Badge.displayName = "Badge";
+const BadgePropsProvider = PropsProvider;
 
 
 

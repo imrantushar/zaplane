@@ -20,13 +20,12 @@ import { FaChevronRight } from "react-icons/fa";
 import {
     Box,
     Flex,
-    Text,
     Button,
-    IconButton,
-    HStack,
-    Badge,
     Checkbox,
-    useSelect,
+    Table,
+    Badge,
+    HStack,
+    Text,
 } from "@chakra-ui/react";
 import {
     FiArrowLeft,
@@ -39,6 +38,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { use } from "react";
 import { showNotification } from "@ZAPRedux/Slices/notificationSlice/notificationSlice";
 import CustomNode from "../customNoe/CustomNode";
+import ZAPDrawer from "@ZAPComponents/Drawer";
+import LogDetails from "../Components/LogDetails/LogDetails";
 ;
 export default function FlowCanvas({ id }) {
 
@@ -91,7 +92,7 @@ export default function FlowCanvas({ id }) {
         if (singleData?.edges?.length) {
             const mappedEdges = singleData.edges.map((edge) => ({
                 ...edge,
-                type: "custom", 
+                type: "custom",
             }));
 
             setEdges(mappedEdges);
@@ -403,7 +404,25 @@ export default function FlowCanvas({ id }) {
             />
         ),
     };
-
+    const [expandedRowId, setExpandedRowId] = useState(null);
+    const rows = [
+        {
+            id: 1,
+            createdAt: "2026-01-01 06:09:01",
+            status: "SUCCESS",
+            duration: "0.00 sec",
+            size: "0.00 KB",
+            nodes: 1,
+        },
+        {
+            id: 2,
+            createdAt: "2026-01-01 06:08:58",
+            status: "SUCCESS",
+            duration: "0.00 sec",
+            size: "0.00 KB",
+            nodes: 1,
+        },
+    ];
 
     return (
         <div style={{ flex: 1, height: "100vh" }}>
@@ -435,6 +454,87 @@ export default function FlowCanvas({ id }) {
                         <Button size="sm" variant="outline">
                             {__("Save Draft", "zaplane")}
                         </Button>
+                        <ZAPDrawer
+                            title="Action Settings"
+                            size='xl'
+                            trigger={
+                                <Button
+                                    size="sm"
+                                    bg="black"
+                                    color="white"
+                                    _hover={{ bg: "gray.800" }}
+                                >
+                                    {__("Logs", "zaplane")}
+                                </Button>
+                            }
+                        >
+                            <Table.Root size="sm" variant="outline">
+                                {!expandedRowId && (
+                                    <Table.Header>
+                                        <Table.Row>
+                                            <Table.ColumnHeader>CREATED AT</Table.ColumnHeader>
+                                            <Table.ColumnHeader>STATUS</Table.ColumnHeader>
+                                            <Table.ColumnHeader>DURATION / SIZE</Table.ColumnHeader>
+                                            <Table.ColumnHeader>NODES</Table.ColumnHeader>
+                                            <Table.ColumnHeader>ACTIONS</Table.ColumnHeader>
+                                        </Table.Row>
+                                    </Table.Header>
+                                )}
+
+
+                                <Table.Body>
+                                    {expandedRowId ? (
+                                        <Table.Row>
+                                            <Table.Cell colSpan={5} bg="gray.50">
+                                                <LogDetails />
+                                            </Table.Cell>
+                                        </Table.Row>
+                                    ) : (
+                                        rows.map((row) => (
+                                            <Table.Row key={row.id}>
+                                                <Table.Cell>
+                                                    <Text fontSize="sm">{row.createdAt}</Text>
+                                                </Table.Cell>
+
+                                                <Table.Cell>
+                                                    <HStack gap="2">
+                                                        <Box w="8px" h="8px" borderRadius="full" bg="green.500" />
+                                                        <Text fontSize="sm">{row.status}</Text>
+                                                    </HStack>
+                                                </Table.Cell>
+
+                                                <Table.Cell>
+                                                    <Text fontSize="sm">{row.duration}</Text>
+                                                    <Text fontSize="xs" color="gray.500">
+                                                        {row.size}
+                                                    </Text>
+                                                </Table.Cell>
+
+                                                <Table.Cell>{row.nodes}</Table.Cell>
+
+                                                <Table.Cell>
+                                                    <HStack>
+                                                        <Button
+                                                            size="xs"
+                                                            variant="outline"
+                                                            onClick={() => setExpandedRowId(row.id)}
+                                                        >
+                                                            Details
+                                                        </Button>
+                                                        <Button size="xs" variant="outline">
+                                                            Re-execute
+                                                        </Button>
+                                                    </HStack>
+                                                </Table.Cell>
+                                            </Table.Row>
+                                        ))
+                                    )}
+                                </Table.Body>
+
+                            </Table.Root>
+                        </ZAPDrawer>
+
+
                         <Button
                             size="sm"
                             bg="black"
@@ -444,6 +544,7 @@ export default function FlowCanvas({ id }) {
                         >
                             {__("Publish", "zaplane")}
                         </Button>
+
                     </>
                 )}
             />
