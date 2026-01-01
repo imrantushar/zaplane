@@ -55,6 +55,8 @@ class Automation extends AutomationBase {
 
         // Call base class method to execute it
         $this->execute_node_run($node_run);
+        // After processing this node, check if run is complete
+        $this->finalize_run((int)$node_run['run_id']);
     }
 
 

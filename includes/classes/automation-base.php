@@ -259,24 +259,72 @@ class AutomationBase {
             }
 
         } catch (\Throwable $e) {
-            // Update node_run as failed
-            $wpdb->update($wpdb->prefix . 'zaplane_node_runs', [
-                'status' => 'failed',
-                'output_json' => json_encode(['error'=>$e->getMessage()])
-            ], ['id' => $nr['id']]);
-
-            // Log node error
-            $wpdb->insert($wpdb->prefix . 'zaplane_node_logs', [
-                'node_run_id' => $nr['id'],
-                'level' => 'error',
-                'message' => $e->getMessage(),
-                'created_at' => current_time('mysql')
-            ]);
-
-            // Handle error edges
+            global $wpdb;
+            // 1️⃣ Update node_run as failed
+            $wpdb->update(
+                $wpdb->prefix . 'zaplane_node_runs',
+                [
+                    'status' => 'failed',
+                    'output_json' => json_encode(['error'=>$e->getMessage()]),
+                    'finished_at' => current_time('mysql')
+                ],
+                ['id' => $nr['id']]
+            );
+            // 2️⃣ Log node error
+            $wpdb->insert(
+                $wpdb->prefix . 'zaplane_node_logs',
+                [
+                    'node_run_id' => $nr['id'],
+                    'level' => 'error',
+                    'message' => $e->getMessage(),
+                    'created_at' => current_time('mysql')
+                ]
+            );
+            // 3️⃣ Handle error edges
             $this->route_error_path($nr, $e);
+            // 4️⃣ Finalize workflow run
+            $this->finalize_run((int)$nr['run_id']);
         }
     }
+
+    public function finalize_run(int $run_id): void {
+        global $wpdb;
+
+        // Check if any node is still pending/running
+        $pending_nodes = $wpdb->get_var(
+            $wpdb->prepare(
+                "SELECT COUNT(*) FROM {$wpdb->prefix}zaplane_node_runs 
+                WHERE run_id=%d AND status IN ('pending','running')",
+                $run_id
+            )
+        );
+
+        if ((int)$pending_nodes === 0) {
+            // Determine if any node failed
+            $failed_node = $wpdb->get_var(
+                $wpdb->prepare(
+                    "SELECT output_json FROM {$wpdb->prefix}zaplane_node_runs 
+                    WHERE run_id=%d AND status='failed' ORDER BY id DESC LIMIT 1",
+                    $run_id
+                )
+            );
+
+            $status = $failed_node ? 'failed' : 'completed';
+            $last_error = $failed_node ? json_decode($failed_node, true)['error'] ?? '' : null;
+
+            // Update run
+            $wpdb->update(
+                $wpdb->prefix.'zaplane_runs',
+                [
+                    'status' => $status,
+                    'finished_at' => current_time('mysql'),
+                    'last_error' => $last_error
+                ],
+                ['id'=>$run_id]
+            );
+        }
+    }
+
 
     /* =====================================================
      * ERROR PATHS
