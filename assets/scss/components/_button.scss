@@ -1,0 +1,93 @@
+.zaplane-btn {
+	position: relative;
+	display: block;
+	width: 100%;
+	font-family: $montserrat;
+	font-weight: 700;
+	font-size: 14px;
+	line-height: 20px;
+	text-decoration: none;
+	background: #fff;
+	color: #444;
+	cursor: pointer;
+	text-align: center;
+	height: auto;
+	border-radius: 8px;
+	box-sizing: border-box;
+	padding: 15px;
+	margin: 0;
+	border: 0;
+	z-index: 30;
+	overflow: hidden !important;
+	transition: all 0.3 ease;
+	&::after {
+		content: '';
+		display: block;
+		position: absolute;
+		width: 100%;
+		height: 100%;
+		left: -100%;
+		top: 0;
+		background: rgba( 0, 0, 0, 0.1 );
+		z-index: -1;
+		transition: all 0.25s cubic-bezier( 0.66, 0.36, 0.17, 0.91 );
+	}
+	&:hover::after {
+		left: 0;
+	}
+	&:focus {
+		box-shadow: none !important;
+		outline: none !important;
+	}
+	&--inline-block {
+		display: inline-block;
+		width: auto;
+		padding-left: 30px;
+		padding-right: 30px;
+	}
+	&--inline-flex {
+		display: inline-flex;
+		width: auto;
+		padding-left: 30px;
+		padding-right: 30px;
+		column-gap: 10px;
+	}
+	&--bg-red {
+		background: #f94d4d;
+		color: #fff;
+		&:hover {
+			color: #fff;
+		}
+	}
+	&--bg-light-red {
+		background: rgba( 249, 77, 77, 0.2 );
+		color: #f94d4d;
+		&:hover {
+			color: #f94d4d;
+		}
+	}
+	&--bg-purple {
+		background: #7b68ee;
+		color: #fff;
+		&:hover {
+			color: #fff;
+		}
+	}
+	&--bg-light-purple {
+		background: rgba( 123, 104, 238, 0.2 );
+		color: #7b68ee;
+		&:hover {
+			color: #7b68ee;
+		}
+	}
+	&--bg-white-border {
+		border: 2px solid rgba( 0, 0, 0, 0.1 );
+	}
+	&--bg-gray {
+		background: rgba( 0, 0, 0, 0.08 );
+	}
+}
+.zaplane-btn-group {
+	display: flex;
+	column-gap: 15px;
+}

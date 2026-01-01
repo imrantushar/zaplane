@@ -15,26 +15,31 @@ class IntegrationsController extends WP_REST_Controller {
         register_rest_route( $namespace, '/integrations', [
             'methods'  => 'GET',
             'callback' => [ $this, 'get_integrations' ],
+            'permission_callback' => '__return_true',
         ]);
 
         register_rest_route( $namespace, '/integrations/(?P<slug>[a-z0-9_-]+)/triggers', [
             'methods'  => 'GET',
             'callback' => [ $this, 'get_triggers' ],
+            'permission_callback' => '__return_true',
         ]);
 
         register_rest_route( $namespace, '/integrations/(?P<slug>[a-z0-9_-]+)/triggers/(?P<trigger>[a-z0-9_-]+)/schema', [
             'methods'  => 'GET',
             'callback' => [ $this, 'get_trigger_schema' ],
+            'permission_callback' => '__return_true',
         ]);
 
         register_rest_route( $namespace, '/integrations/(?P<slug>[a-z0-9_-]+)/actions', [
             'methods'  => 'GET',
             'callback' => [ $this, 'get_actions' ],
+            'permission_callback' => '__return_true',
         ]);
 
         register_rest_route( $namespace, '/integrations/(?P<slug>[a-z0-9_-]+)/actions/(?P<action>[a-z0-9_-]+)/schema', [
             'methods'  => 'GET',
             'callback' => [ $this, 'get_action_schema' ],
+            'permission_callback' => '__return_true',
         ]);
     }
 

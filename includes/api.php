@@ -9,9 +9,11 @@ class API {
     public static function init(){
         add_action( 'rest_api_init', function () {
             ( new \Zaplane\API\IntegrationsController() )->register_routes();
+            ( new \Zaplane\API\WorkflowsController() )->register_routes();
 
             register_rest_route( 'zaplane/v1', '/runs/(?P<id>\d+)', [
                 'methods'  => 'GET',
+                'permission_callback' => '__return_true',
                 'callback' => function ( $req ) {
                     global $wpdb;
                     return $wpdb->get_results(
@@ -22,6 +24,31 @@ class API {
                     );
                 }
             ]);
+
+            register_rest_route('zaplane/v1', '/dynamic', [
+                'methods' => 'POST',
+                'permission_callback' => '__return_true',
+                'callback' => function( $req ) {
+
+                    $integration = \Zaplane\Classes\IntegrationLoader::get(
+                        $req['integration']
+                    );
+
+                    if (! $integration) return [];
+
+                    $queries = $integration::get_dynamic_queries();
+
+                    $query = $req['query'];
+
+                    if (! isset($queries[$query])) return [];
+
+                    return call_user_func(
+                        $queries[$query],
+                        $req->get_json_params()
+                    );
+                }
+            ]);
+
         });
 
         
