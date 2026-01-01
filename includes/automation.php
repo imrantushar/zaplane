@@ -33,13 +33,35 @@ class Automation extends AutomationBase {
         add_action('zaplane_execute_node', [$self, 'dispatch_execute_node'], 10, 2);
     }
 
-    public function dispatch_execute_node($run_id, $node_id){
+
+    public function dispatch_execute_node($run_id, $node_id) {
         if (empty($run_id) || empty($node_id)) return;
-        $this->execute_node((int)$run_id, $node_id);
+
+        global $wpdb;
+
+        // Fetch the correct node_run from queue
+        $node_run = $wpdb->get_row(
+            $wpdb->prepare(
+                "SELECT * FROM {$wpdb->prefix}zaplane_node_runs 
+                WHERE run_id=%d AND node_key=%s AND status='pending' 
+                ORDER BY id ASC LIMIT 1",
+                $run_id,
+                $node_id
+            ),
+            ARRAY_A
+        );
+
+        if (!$node_run) return;
+
+        // Call base class method to execute it
+        $this->execute_node_run($node_run);
     }
 
+
+
+
     public function reload_triggers(): void {
-        $this->flush_trigger_cache();
+        // $this->flush_trigger_cache();
         $this->deregister_hooks();
         $this->dispatch_active_triggers();
     }
@@ -78,6 +100,7 @@ class Automation extends AutomationBase {
             if (!$payload) continue;
 
             $this->handle_trigger_node($node, $payload);
+
         }
     }
 

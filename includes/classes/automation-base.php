@@ -1,272 +1,238 @@
 <?php
 namespace Zaplane\Classes;
 
-if ( ! defined( 'ABSPATH' ) ) {
-    exit;
-}
+use Zaplane\Classes\IntegrationLoader;
 
-class AutomationBase { 
+if (!defined('ABSPATH')) exit;
+
+class AutomationBase {
 
     /* =====================================================
-     * TRIGGERS
+     * TRIGGER SYSTEM
      * ===================================================== */
 
     public function get_active_trigger_events(): array {
         global $wpdb;
 
-        $cache_key = 'zaplane_active_trigger_events';
-        $events = wp_cache_get($cache_key, 'zaplane');
-        if ($events !== false) return $events;
-
         $rows = $wpdb->get_results("
             SELECT wv.graph_json
             FROM {$wpdb->prefix}zaplane_workflows w
-            JOIN {$wpdb->prefix}zaplane_workflow_versions wv
-            ON w.id = wv.workflow_id
-            WHERE w.status = 'active' AND wv.is_active = 1
+            JOIN {$wpdb->prefix}zaplane_workflow_versions wv ON w.id = wv.workflow_id
+            WHERE w.status='active' AND wv.is_active=1
         ", ARRAY_A);
 
-        $events = [];
-        foreach ($rows as $row) {
-            $graph = json_decode($row['graph_json'], true);
-            foreach (($graph['nodes'] ?? []) as $node) {
-                if (($node['type'] ?? '') === 'trigger' && !empty($node['data']['event'])) {
-                    $events[] = $node['data']['event'];
+        $events=[];
+        foreach($rows as $r){
+            $g=json_decode($r['graph_json'],true);
+            foreach($g['nodes'] as $n){
+                if($n['type']==='trigger' && !empty($n['data']['event'])){
+                    $events[]=$n['data']['event'];
                 }
             }
         }
-
-        $events = array_unique($events);
-        wp_cache_set($cache_key, $events, 'zaplane', 60);
-
-        return $events;
+        return array_unique($events);
     }
 
     public function get_active_workflows_for_event(string $event): array {
         global $wpdb;
-        $cache_key = 'zaplane_triggers_' . md5($event);
-        $nodes = wp_cache_get($cache_key, 'zaplane');
-        if ($nodes !== false) return $nodes;
 
-        $rows = $wpdb->get_results("
-            SELECT w.id AS workflow_id, w.user_id, wv.graph_json, wv.graph_hash
+        $rows=$wpdb->get_results("
+            SELECT w.id,w.user_id,wv.graph_json,wv.graph_hash
             FROM {$wpdb->prefix}zaplane_workflows w
-            JOIN {$wpdb->prefix}zaplane_workflow_versions wv
-            ON w.id = wv.workflow_id
-            WHERE w.status = 'active' AND wv.is_active = 1
-        ", ARRAY_A);
+            JOIN {$wpdb->prefix}zaplane_workflow_versions wv ON w.id=wv.workflow_id
+            WHERE w.status='active' AND wv.is_active=1
+        ",ARRAY_A);
 
-        error_log(print_r('Rows', true));
-        error_log(print_r($rows, true));
-        $nodes = [];
-        foreach ($rows as $row) {
-            $graph = json_decode($row['graph_json'], true);
-            foreach (($graph['nodes'] ?? []) as $node) {
-                if (($node['type'] ?? '') === 'trigger' && ($node['data']['event'] ?? '') === $event) {
-                    $nodes[] = [
-                        'workflow_id' => $row['workflow_id'],
-                        'workflow_version_hash' => $row['graph_hash'],
-                        'user_id' => $row['user_id'],
-                        'id' => $node['id'],
-                        'app' => $node['data']['app'] ?? '',
-                        'data' => $node['data'] ?? [],
-                        'graph_node' => $node,
+        $out=[];
+        foreach($rows as $r){
+            $g=json_decode($r['graph_json'],true);
+            foreach($g['nodes'] as $n){
+                if($n['type']==='trigger' && $n['data']['event']===$event){
+                    $out[]=[
+                        'workflow_version_hash'=>$r['graph_hash'],
+                        'id'=>$n['id'],
+                        'app'=>$n['data']['app'],
+                        'graph_node'=>$n
                     ];
                 }
             }
         }
-
-        wp_cache_set($cache_key, $nodes, 'zaplane', 60);
-        return $nodes;
+        return $out;
     }
 
     /* =====================================================
-     * RUNS
+     * RUN CREATION
      * ===================================================== */
 
-    public function create_run(array $node, array $payload): int {
+    public function handle_trigger_node(array $trigger,array $payload){
         global $wpdb;
-        $wpdb->insert(
-            $wpdb->prefix . 'zaplane_runs',
-            [
-                'workflow_version_hash'     => $node['workflow_version_hash'],
-                'trigger_data'    => wp_json_encode($payload),
-                'status'          => 'running',
-                'started_at'      => current_time('mysql')
-            ]
-        );
-        return (int) $wpdb->insert_id;
+
+        $wpdb->insert($wpdb->prefix.'zaplane_runs',[
+            'workflow_version_hash'=>$trigger['workflow_version_hash'],
+            'trigger_data'=>wp_json_encode($payload),
+            'status'=>'running'
+        ]);
+        $run_id=$wpdb->insert_id;
+
+        $graph=$this->load_graph_by_hash($trigger['workflow_version_hash']);
+
+        // schedule children of trigger
+        foreach($graph['edges'] as $e){
+            if((string)$e['source']===(string)$trigger['id']){
+                $this->spawn_node_run($run_id,$e['target'],$payload,null);
+            }
+        }
     }
 
-    public function handle_trigger_node(array $node, array $payload): void {
+    /* =====================================================
+     * QUEUE WORKER
+     * ===================================================== */
+
+    public function worker_tick(){
         global $wpdb;
 
-        // 1️⃣ Create a run
-        $run_id = self::create_run($node, $payload);
-        if (!$run_id) return;
+        $job=$wpdb->get_row("
+            SELECT * FROM {$wpdb->prefix}zaplane_queue
+            WHERE locked_at IS NULL AND available_at<=NOW()
+            ORDER BY id LIMIT 1
+        ",ARRAY_A);
 
-        // 2️⃣ Load frozen graph for this run
-        $graph_json = $wpdb->get_var(
+        if(!$job) return;
+
+        $lock=wp_generate_uuid4();
+        $ok=$wpdb->query(
             $wpdb->prepare(
-                "SELECT graph_json 
-                FROM {$wpdb->prefix}zaplane_workflow_versions
-                WHERE graph_hash = %s
-                LIMIT 1",
-                $node['workflow_version_hash']
+                "UPDATE {$wpdb->prefix}zaplane_queue 
+                 SET locked_at=NOW(),lock_token=%s 
+                 WHERE id=%d AND locked_at IS NULL",
+                $lock,$job['id']
             )
         );
-        if (!$graph_json) return;
+        if(!$ok) return;
 
-        $graph = json_decode($graph_json, true);
-        if (!$graph) return;
+        $node_run=$wpdb->get_row(
+            $wpdb->prepare("SELECT * FROM {$wpdb->prefix}zaplane_node_runs WHERE id=%d",$job['node_run_id']),
+            ARRAY_A
+        );
 
-        // 3️⃣ Schedule ONLY nodes connected to the trigger
-        self::schedule_next_nodes_from_graph($run_id, (string)$node['id'], $graph);
+        $this->execute_node_run($node_run);
+
+        $wpdb->delete($wpdb->prefix.'zaplane_queue',['id'=>$job['id']]);
     }
 
     /* =====================================================
-     * EXECUTION
+     * NODE EXECUTION
      * ===================================================== */
+
+    public function execute_node_run(array $nr){
+        global $wpdb;
+
+        if($nr['status']!=='pending') return;
+
+        $wpdb->update($wpdb->prefix.'zaplane_node_runs',[
+            'status'=>'running',
+            'started_at'=>current_time('mysql')
+        ],['id'=>$nr['id']]);
+
+        $run=$wpdb->get_row(
+            $wpdb->prepare("SELECT * FROM {$wpdb->prefix}zaplane_runs WHERE id=%d",$nr['run_id']),
+            ARRAY_A
+        );
+
+        $graph=$this->load_graph_by_hash($run['workflow_version_hash']);
+
+        foreach($graph['nodes'] as $n){
+            if((string)$n['id']===(string)$nr['node_key']){ $node=$n; break;}
+        }
+
+        $integration=IntegrationLoader::get(strtolower($node['data']['app']));
+        $input=json_decode($nr['input_json'],true);
+
+        try{
+            $result=$integration::execute_node($node,$input);
+
+            $wpdb->update($wpdb->prefix.'zaplane_node_runs',[
+                'status'=>'completed',
+                'output_json'=>wp_json_encode($result),
+                'finished_at'=>current_time('mysql')
+            ],['id'=>$nr['id']]);
+
+            foreach($graph['edges'] as $e){
+                if((string)$e['source']===(string)$nr['node_key']){
+                    $this->spawn_node_run(
+                        $nr['run_id'],
+                        $e['target'],
+                        $result['data']??[],
+                        $nr['id']
+                    );
+                }
+            }
+
+        }catch(\Throwable $e){
+            $attempts = (int)$nr['attempts'] ?? 0;
+            $max_attempts = 3;
+            if($attempts < $max_attempts){
+                $wpdb->update($wpdb->prefix.'zaplane_node_runs', ['attempts'=>$attempts+1], ['id'=>$nr['id']]);
+                $this->spawn_node_run($nr['run_id'], $nr['node_key'], $input, $nr['parent_node_run_id']);
+                return;
+            }
+        }
+    }
+
+    /* =====================================================
+     * SPAWNER
+     * ===================================================== */
+
+    private function spawn_node_run($run_id, $node_key, $data, $parent_node_run_id){
+        global $wpdb;
+
+        $wpdb->insert($wpdb->prefix.'zaplane_node_runs',[
+            'run_id'=>$run_id,
+            'node_key'=>$node_key,
+            'parent_node_run_id'=>$parent_node_run_id,
+            'status'=>'pending',
+            'input_json'=>wp_json_encode($data)
+        ]);
+
+        $node_run_id = $wpdb->insert_id;
+
+        $wpdb->insert($wpdb->prefix.'zaplane_queue',[
+            'run_id'=>$run_id,
+            'node_run_id'=>$node_run_id,
+            'available_at'=>current_time('mysql')
+        ]);
+
+        // Schedule via Action Scheduler
+        $this->schedule_node($run_id, $node_key);
+    }
 
     public function schedule_node(int $run_id, string $node_id, int $delay = 0): void {
         if (!function_exists('as_enqueue_async_action')) return;
-        error_log(print_r('schedule node', true));
-        error_log(print_r('Node ID', true));
-        error_log(print_r($node_id, true));
+
+        error_log("Scheduling node: $node_id for run: $run_id");
+
         as_enqueue_async_action(
             'zaplane_execute_node',
-            ['run_id' => $run_id, 'node_id' => $node_id],
+            [
+                'run_id' => $run_id,
+                'node_id' => $node_id
+            ],
             'zaplane-workflows',
             time() + $delay
         );
     }
 
-    public function execute_node(int $run_id, string $node_id): void {
-        global $wpdb;
-
-        // 1️⃣ Load run
-        $run = $wpdb->get_row(
-            $wpdb->prepare(
-                "SELECT * FROM {$wpdb->prefix}zaplane_runs WHERE id = %d",
-                $run_id
-            ),
-            ARRAY_A
-        );
-        if (!$run || $run['status'] !== 'running') return;
-
-        // 2️⃣ Load frozen workflow graph
-        $graph_json = $wpdb->get_var(
-            $wpdb->prepare(
-                "SELECT graph_json 
-                FROM {$wpdb->prefix}zaplane_workflow_versions
-                WHERE graph_hash = %s
-                LIMIT 1",
-                $run['workflow_version_hash']
-            )
-        );
-        if (!$graph_json) return;
-
-        $graph = json_decode($graph_json, true);
-        if (!$graph) return;
-
-        // 3️⃣ Find this node in graph
-        $node = null;
-        foreach ($graph['nodes'] ?? [] as $n) {
-            if ((string)$n['id'] === (string)$node_id) {
-                $node = $n;
-                break;
-            }
-        }
-        if (!$node) return;
-
-        // 4️⃣ SAFETY: never execute trigger again
-        if (($node['type'] ?? '') === 'trigger') {
-            return;
-        }
-
-        // 5️⃣ Load integration
-        $integration = IntegrationLoader::get(strtolower($node['data']['app'] ?? ''));
-        if (!$integration) return;
-
-        // 6️⃣ Prepare input
-        $input = json_decode($run['trigger_data'], true) ?: [];
-        $input['_run_id'] = $run_id;
-
-        try {
-            // 7️⃣ Execute node
-            $result = $integration::execute_node($node, $input);
-
-            // 8️⃣ Schedule next connected nodes
-            self::schedule_next_nodes_from_graph(
-                $run_id,
-                (string)$node_id,
-                $graph,
-                $result['data'] ?? []
-            );
-
-        } catch (\Throwable $e) {
-            // Mark run failed
-            $wpdb->update(
-                $wpdb->prefix . 'zaplane_runs',
-                [
-                    'status'     => 'failed',
-                    'last_error' => $e->getMessage(),
-                    'finished_at' => current_time('mysql')
-                ],
-                [ 'id' => $run_id ]
-            );
-        }
-    }
-
-
-    private function schedule_next_nodes_from_graph(
-        int $run_id,
-        string $node_id,
-        array $graph,
-        array $data = []
-    ): void {
-        foreach ($graph['edges'] ?? [] as $edge) {
-            if ((string)$edge['source'] === (string)$node_id) {
-                $this->schedule_node($run_id, $edge['target']);
-            }
-        }
-    }
 
 
     /* =====================================================
-     * CACHE HELPERS
+     * GRAPH
      * ===================================================== */
 
-    public function flush_trigger_cache(): void {
-        wp_cache_delete('zaplane_active_trigger_events', 'zaplane');
-    }
-
-    public function resume_paused_runs(): void {
+    private function load_graph_by_hash(string $hash){
         global $wpdb;
-        $runs = $wpdb->get_results("
-            SELECT id, current_node_id
-            FROM {$wpdb->prefix}zaplane_runs
-            WHERE status = 'paused'
-              AND resume_at <= NOW()
-        ");
-        foreach ($runs as $run) {
-            if (!empty($run->current_node_id)) {
-                $this->schedule_node($run->id, $run->current_node_id);
-            }
-        }
-    }
-
-    public function log_node_execution($run_id, $node_id, $status, $result): void {
-        global $wpdb;
-        $wpdb->insert(
-            $wpdb->prefix . 'zaplane_run_logs',
-            [
-                'run_id'  => $run_id,
-                'node_id' => $node_id,
-                'status'  => $status,
-                'payload' => wp_json_encode($result),
-                'created_at' => current_time('mysql')
-            ]
+        $json=$wpdb->get_var(
+            $wpdb->prepare("SELECT graph_json FROM {$wpdb->prefix}zaplane_workflow_versions WHERE graph_hash=%s",$hash)
         );
+        return json_decode($json,true);
     }
 }
