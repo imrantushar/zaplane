@@ -23,7 +23,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 final class Zaplane {
-
 	private function __construct() {
 		$this->define_constants();
 		$this->set_global_settings();

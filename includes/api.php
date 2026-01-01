@@ -10,6 +10,7 @@ class API {
         add_action( 'rest_api_init', function () {
             ( new \Zaplane\API\IntegrationsController() )->register_routes();
             ( new \Zaplane\API\WorkflowsController() )->register_routes();
+            ( new \Zaplane\API\RunController() )->register_routes();
 
             register_rest_route( 'zaplane/v1', '/runs/(?P<id>\d+)', [
                 'methods'  => 'GET',
