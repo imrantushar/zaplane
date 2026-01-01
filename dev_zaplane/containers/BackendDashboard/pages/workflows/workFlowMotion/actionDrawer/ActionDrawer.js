@@ -10,6 +10,7 @@ import {
     Input,
     Tabs,
     Flex,
+    Code
 } from "@chakra-ui/react";
 import { fetchDynamic } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
 import { integrations } from "@ZAPUtils/helper";
@@ -180,7 +181,7 @@ export default function ActionDrawer({
 
         setLoadingFields(p => ({ ...p, [key]: false }));
     };
-        const renderField = (field, values, setFieldValue) => {
+    const renderField = (field, values, setFieldValue) => {
         switch (field.type) {
             case "text":
             case "expression":
@@ -491,9 +492,80 @@ export default function ActionDrawer({
                                     </Tabs.Content>
 
                                     <Tabs.Content value="test">
-                                        <Text fontWeight="bold">Test Step</Text>
-                                        <Text fontSize="sm" color="gray.500">Everything looks good. Click submit to save.</Text>
+                                        <Box>
+                                           <Button>
+                                            Run test
+                                           </Button>
+                                           <Text>Response</Text>
+                                            <Box
+                                                border="1px solid"
+                                                borderColor="gray.200"
+                                                borderRadius="md"
+                                                bg="gray.50"
+                                                p={4}
+                                            >
+                                                <Tabs.Root defaultValue="output">
+                                                    <Tabs.List
+                                                        display="flex"
+                                                        gap={6}
+                                                        borderBottom="1px solid"
+                                                        borderColor="gray.200"
+                                                        mb={4}
+                                                        position="relative"
+                                                    >
+                                                        <Tabs.Trigger
+                                                            value="input"
+                                                            fontWeight="medium"
+                                                            color="gray.600"
+                                                            // _selected={{ color: "blue.600" }}
+                                                        >
+                                                            Input
+                                                        </Tabs.Trigger>
+
+                                                        <Tabs.Trigger
+                                                            value="output"
+                                                            fontWeight="medium"
+                                                            color="gray.600"
+                                                            // _selected={{ color: "blue.600" }}
+                                                        >
+                                                            Output
+                                                        </Tabs.Trigger>
+
+                                                        <Tabs.Indicator
+                                                            height="2px"
+                                                            bg="blue.500"
+                                                            borderRadius="full"
+                                                        />
+                                                    </Tabs.List>
+                                                    <Tabs.Content value="input">
+                                                        <Box
+                                                            bg="white"
+                                                            border="1px solid"
+                                                            borderColor="gray.200"
+                                                            borderRadius="md"
+                                                            p={3}
+                                                            fontSize="sm"
+                                                        >
+                                                          <Code>input</Code>
+                                                        </Box>
+                                                    </Tabs.Content>
+                                                    <Tabs.Content value="output">
+                                                        <Box
+                                                            bg="white"
+                                                            border="1px solid"
+                                                            borderColor="gray.200"
+                                                            borderRadius="md"
+                                                            p={3}
+                                                            fontSize="sm"
+                                                        >
+                                                          <Code>output</Code>
+                                                        </Box>
+                                                    </Tabs.Content>
+                                                </Tabs.Root>
+                                            </Box>
+                                        </Box>
                                     </Tabs.Content>
+
                                 </Tabs.Root>
                             )}
                         </Drawer.Body>
