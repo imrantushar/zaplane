@@ -12,10 +12,11 @@ import {
     Flex,
     Code
 } from "@chakra-ui/react";
-import { fetchDynamic } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
+import { fetchDynamic, getSingleRunDetails } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
 import { integrations } from "@ZAPUtils/helper";
 import { useFormikContext } from "formik";
 import { useEffect, useMemo, useState } from "react";
+import { useDispatch } from "react-redux";
 import Select from "react-select";
 
 const APPS = Object.entries(integrations?.integrations || {}).map(
@@ -45,6 +46,7 @@ export default function ActionDrawer({
     const [dynamicOptions, setDynamicOptions] = useState({});
     const [loadingFields, setLoadingFields] = useState({});
     const { values, setFieldValue, resetForm } = useFormikContext();
+    const dispatch=useDispatch()
 
     const [conditions, setConditions] = useState([
         {
@@ -350,6 +352,7 @@ export default function ActionDrawer({
             }
         }
     }, [open, node]);
+    console.log(node);
 
     return (
         <Drawer.Root open={open} size="md" onOpenChange={(e) => !e.open && resetAll()}>
@@ -493,7 +496,7 @@ export default function ActionDrawer({
 
                                     <Tabs.Content value="test">
                                         <Box>
-                                           <Button>
+                                           <Button  onClick={()=>dispatch(getSingleRunDetails(node?.id))}>
                                             Run test
                                            </Button>
                                            <Text>Response</Text>

@@ -33,7 +33,7 @@ import {
     FiHelpCircle,
 } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
-import { createWorkflows, getSingleWorkFlow, getWorkFlow, updateWorkFlow } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
+import { createWorkflows, getRunsList, getSingleWorkFlow, getWorkFlow, updateWorkFlow } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { use } from "react";
 import { showNotification } from "@ZAPRedux/Slices/notificationSlice/notificationSlice";
@@ -439,7 +439,7 @@ export default function FlowCanvas({ id }) {
                 )}
                 rightContent={() => (
                     <>
-                        <Checkbox.Root
+                        {/* <Checkbox.Root
                             padding="7px 9px"
                             borderRadius="4px"
                             border="1px solid var(--zaplane-border-color)"
@@ -447,9 +447,13 @@ export default function FlowCanvas({ id }) {
                             <Checkbox.HiddenInput />
                             <Checkbox.Control />
                             <Checkbox.Label>show runs</Checkbox.Label>
-                        </Checkbox.Root>
+                        </Checkbox.Root> */}
                         <Button size="sm" variant="outline">
                             {__("inactive", "zaplane")}
+                        </Button>
+                        <Button size="sm" variant="outline"
+                        onClick={()=>dispatch(getRunsList({ limit: 20, offset: 0 }))}>
+                            {__("Runs", "zaplane")}
                         </Button>
                         <Button size="sm" variant="outline">
                             {__("Save Draft", "zaplane")}

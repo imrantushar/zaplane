@@ -95,7 +95,7 @@ export const deleteWorkFlow = createAsyncThunk(
 );
 export const updateWorkFlowStatus = createAsyncThunk(
 	'zaplane/updateWorkFlowStatus',
-	async ({payload }, thunkAPI) => {
+	async ({ payload }, thunkAPI) => {
 		try {
 			await makeRequest('update_workflow_status', {
 				id: payload.id,
@@ -108,7 +108,7 @@ export const updateWorkFlowStatus = createAsyncThunk(
 					type: 'success',
 				})
 			);
-			console.log('res',payload)
+			console.log('res', payload)
 			return payload;
 		} catch (e) {
 			thunkAPI.dispatch(
@@ -121,6 +121,48 @@ export const updateWorkFlowStatus = createAsyncThunk(
 		}
 	}
 );
+export const getSingleRunDetails = createAsyncThunk(
+	'zaplane/getSingleRunDetails',
+	async (runId, thunkAPI) => {
+		try {
+			const res = await API.get(
+				namespace + `runs/${parseInt(runId)}`
+			);
+
+			handleSliceSuccess(thunkAPI, __('Run details fetched successfully', 'workflow'));
+
+			return res.data;
+			// {
+			//   run: {},
+			//   nodes: [],
+			//   edges: [],
+			//   logs: []
+			// }
+		} catch (e) {
+			return handleSliceError(thunkAPI, e);
+		}
+	}
+);
+export const getRunsList = createAsyncThunk(
+	'zaplane/getRunsList',
+	async ({ limit = 50, offset = 0 } = {}, thunkAPI) => {
+		try {
+			const res = await API.get(
+				namespace + `runs?limit=${limit}&offset=${offset}`
+			);
+
+			handleSliceSuccess(
+				thunkAPI,
+				__('Runs fetched successfully', 'workflow')
+			);
+
+			return res.data; 
+		} catch (e) {
+			return handleSliceError(thunkAPI, e);
+		}
+	}
+);
+
 const workflowsSlice = createSlice({
 	name: 'workflows',
 	initialState: {
