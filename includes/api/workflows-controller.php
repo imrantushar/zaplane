@@ -54,6 +54,32 @@ class WorkflowsController extends WP_REST_Controller {
                 'permission_callback' => [$this, 'permissions_check'],
             ],
         ]);
+
+        // Versions
+        register_rest_route($namespace, '/' . $rest_base . '/(?P<id>\d+)/versions', [
+            [
+                'methods' => WP_REST_Server::READABLE,
+                'callback' => [$this, 'list_versions'],
+                'permission_callback' => [$this, 'permissions_check'],
+            ],
+        ]);
+
+        register_rest_route($namespace, '/' . $rest_base . '/(?P<id>\d+)/versions/(?P<version_id>\d+)', [
+            [
+                'methods' => WP_REST_Server::READABLE,
+                'callback' => [$this, 'get_version'],
+                'permission_callback' => [$this, 'permissions_check'],
+            ],
+        ]);
+
+        register_rest_route($namespace, '/' . $rest_base . '/(?P<id>\d+)/versions/(?P<version_id>\d+)/activate', [
+            [
+                'methods' => WP_REST_Server::CREATABLE,
+                'callback' => [$this, 'activate_version'],
+                'permission_callback' => [$this, 'permissions_check'],
+            ],
+        ]);
+
     }
 
     public function permissions_check() {
@@ -180,4 +206,93 @@ class WorkflowsController extends WP_REST_Controller {
 
         return rest_ensure_response(json_decode($row->graph_json, true));
     }
+
+    public function list_versions($request) {
+        global $wpdb;
+
+        $rows = $wpdb->get_results(
+            $wpdb->prepare(
+                "SELECT id, graph_hash, is_active, created_at
+                FROM {$wpdb->prefix}zaplane_workflow_versions
+                WHERE workflow_id=%d
+                ORDER BY id DESC",
+                $request['id']
+            )
+        );
+
+        return rest_ensure_response($rows);
+    }
+
+    public function get_version($request) {
+        global $wpdb;
+
+        $row = $wpdb->get_row(
+            $wpdb->prepare(
+                "SELECT id, graph_json, graph_hash, is_active
+                FROM {$wpdb->prefix}zaplane_workflow_versions
+                WHERE id=%d AND workflow_id=%d",
+                $request['version_id'],
+                $request['id']
+            )
+        );
+
+        if (!$row) {
+            return new WP_Error('not_found', 'Version not found', ['status'=>404]);
+        }
+
+        return rest_ensure_response([
+            'id' => $row->id,
+            'is_active' => (bool)$row->is_active,
+            'graph' => json_decode($row->graph_json, true)
+        ]);
+    }
+
+    public function activate_version($request) {
+        global $wpdb;
+
+        $workflow_id = intval($request['id']);
+        $version_id  = intval($request['version_id']);
+
+        // Make sure version belongs to workflow
+        $exists = $wpdb->get_var(
+            $wpdb->prepare(
+                "SELECT id FROM {$wpdb->prefix}zaplane_workflow_versions
+                WHERE id=%d AND workflow_id=%d",
+                $version_id,
+                $workflow_id
+            )
+        );
+
+        if (!$exists) {
+            return new WP_Error('invalid_version', 'Version not found', ['status'=>404]);
+        }
+
+        // Deactivate all versions
+        $wpdb->update(
+            $wpdb->prefix.'zaplane_workflow_versions',
+            ['is_active' => 0],
+            ['workflow_id' => $workflow_id]
+        );
+
+        // Activate selected
+        $wpdb->update(
+            $wpdb->prefix.'zaplane_workflow_versions',
+            ['is_active' => 1],
+            ['id' => $version_id]
+        );
+
+        /**
+         * Notify automation engine
+         * So triggers are re-registered
+         */
+        do_action('zaplane_workflow_updated', $workflow_id);
+
+        return rest_ensure_response([
+            'workflow_id' => $workflow_id,
+            'active_version' => $version_id
+        ]);
+    }
+
+
+
 }

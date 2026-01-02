@@ -30,6 +30,7 @@ class Automation extends AutomationBase {
         add_action('zaplane_node_executed', [$self, 'log_node_execution'], 10, 4);
         add_action('zaplane_workflow_updated', [$self, 'reload_triggers']);
 
+
         // Action Scheduler hook
         add_action('zaplane_execute_node', [$self, 'dispatch_execute_node'], 10, 2);
     }
