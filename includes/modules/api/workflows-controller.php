@@ -1,5 +1,5 @@
 <?php
-namespace Zaplane\API;
+namespace Zaplane\Modules\API;
 
 use WP_REST_Controller;
 use WP_REST_Server;

@@ -1,12 +1,18 @@
 <?php
-namespace Zaplane\API;
+namespace Zaplane\Modules\API;
 
 use WP_REST_Controller;
-use WP_REST_Server;
+use Zaplane\Classes\Container;
 
 if (!defined('ABSPATH')) exit;
 
 class RunController extends WP_REST_Controller {
+
+    protected Container $container;
+
+    public function __construct(Container $container) {
+        $this->container = $container;
+    }
 
     public function register_routes() {
         $ns = 'zaplane/v1';
@@ -272,7 +278,9 @@ class RunController extends WP_REST_Controller {
             )
         );
         $graph = json_decode($graph_json, true);
-        $automation = new \Zaplane\Automation();
+    
+
+        $automation = $this->container->get('automation');
         // Find trigger
         foreach ($graph['nodes'] as $n) {
             if ($n['type'] === 'trigger') {

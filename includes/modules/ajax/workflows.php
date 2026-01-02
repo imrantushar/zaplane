@@ -1,14 +1,14 @@
 <?php
-namespace Zaplane\Ajax;
+namespace Zaplane\Modules\Ajax;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
 class Workflows { 
-    public static function init(){ 
-        $self = new self();
-        add_action('wp_ajax_zaplane/update_workflow_status', [$self, 'update_workflow_status']);
+
+    public function register(){
+        add_action('wp_ajax_zaplane/update_workflow_status', [$this, 'update_workflow_status']);
     }
 
     public function update_workflow_status(){

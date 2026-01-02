@@ -1,12 +1,19 @@
 <?php
-namespace Zaplane\API;
+namespace Zaplane\Modules\API;
 
 use WP_REST_Controller;
+use Zaplane\Classes\Container;
 use Zaplane\Classes\IntegrationLoader;
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 class IntegrationsController extends WP_REST_Controller {
+
+    protected Container $container;
+
+    public function __construct(Container $container) {
+        $this->container = $container;
+    }
 
     public function register_routes() {
 
@@ -46,19 +53,12 @@ class IntegrationsController extends WP_REST_Controller {
     public function get_integrations() {
         $out = [];
 
-        foreach ( IntegrationLoader::all() as $slug => $class ) {
-            $out[] = [
-                'slug' => $slug,
-                'name' => $class::get_name(),
-                'icon' => $class::get_icon(),
-            ];
-        }
-
         return rest_ensure_response( $out );
     }
 
     public function get_triggers( $request ) {
-        $integration = IntegrationLoader::get( $request['slug'] );
+        $integrationLoader = $this->container->get('integration'); // loader instance
+        $integration = $integrationLoader->get($request['slug']);  // integration class
         if ( ! $integration ) {
             return new \WP_Error( 'not_found', 'Integration not found', [ 'status' => 404 ] );
         }
@@ -67,7 +67,8 @@ class IntegrationsController extends WP_REST_Controller {
     }
 
     public function get_trigger_schema( $request ) {
-        $integration = IntegrationLoader::get( $request['slug'] );
+         $integrationLoader = $this->container->get('integration'); // loader instance
+        $integration = $integrationLoader->get($request['slug']);  // integration class
         if ( ! $integration || ! method_exists( $integration, 'get_trigger_config_schema' ) ) {
             return [];
         }
@@ -78,7 +79,8 @@ class IntegrationsController extends WP_REST_Controller {
     }
 
     public function get_actions( $request ) {
-        $integration = IntegrationLoader::get( $request['slug'] );
+        $integrationLoader = $this->container->get('integration'); // loader instance
+        $integration = $integrationLoader->get($request['slug']);  // integration class
         if ( ! $integration ) {
             return new \WP_Error( 'not_found', 'Integration not found', [ 'status' => 404 ] );
         }
@@ -87,7 +89,8 @@ class IntegrationsController extends WP_REST_Controller {
     }
 
     public function get_action_schema( $request ) {
-        $integration = IntegrationLoader::get( $request['slug'] );
+        $integrationLoader = $this->container->get('integration'); // loader instance
+        $integration = $integrationLoader->get($request['slug']);  // integration class
         if ( ! $integration || ! method_exists( $integration, 'get_action_config_schema' ) ) {
             return [];
         }

@@ -1,61 +1,39 @@
 <?php
 namespace Zaplane\Classes;
 
-if ( ! defined( 'ABSPATH' ) ) {
-    exit;
-}
+if (!defined('ABSPATH')) exit;
 
 class IntegrationLoader {
 
-    protected static array $integrations = [];
+    protected static array $registry = [];
+    protected static array $instances = [];
 
-    /**
-     * Load all integrations
-     */
-    public static function load(): void {
+    public static function init(): self {
+        if (!empty(self::$registry)) return new self();
+        self::$registry = require ZAPLANE_INCLUDES_DIR_PATH . 'core/integration-registry.php';
+        do_action('zaplane_register_integrations_registry', self::$registry);
 
-        if ( ! empty( self::$integrations ) ) {
-            return;
+        return new self();
+    }
+
+    public static function get(string $slug): ?object {
+        if (!empty(self::$instances[$slug])) return self::$instances[$slug];
+        if (empty(self::$registry[$slug])) return null;
+
+        error_log(print_r($slug, true));
+        error_log(print_r($slug, true));
+        $file = ZAPLANE_INTEGRATION_DIR_PATH . '/' . basename(self::$registry[$slug]['file']);
+        error_log(print_r($file, true));
+        $class = self::$registry[$slug]['class'];
+
+        if (!class_exists($class) && file_exists($file)) {
+            require_once $file;
         }
+        if (!class_exists($class)) return null;
 
-        self::register(\Zaplane\Integration\Wordpress::class);
-        self::register(\Zaplane\Integration\Woo::class);
-        self::register(\Zaplane\Integration\Slack::class);
-        self::register(\Zaplane\Integration\Gmail::class);
-        self::register(\Zaplane\Integration\Trello::class);
-        self::register(\Zaplane\Integration\Stripe::class);
-        self::register(\Zaplane\Integration\Mailerlite::class);
+        $instance = new $class();
+        self::$instances[$slug] = $instance;
 
-        /**
-         * Allow integrations to self-register
-         */
-        do_action( 'zaplane_register_integrations' );
-    }
-
-    /**
-     * Register an integration class
-     */
-    public static function register( string $class ): void {
-
-        if ( ! class_exists( $class ) ) {
-            return;
-        }
-
-        $slug = $class::get_slug();
-        self::$integrations[ $slug ] = $class;
-    }
-
-    /**
-     * Get integration by slug
-     */
-    public static function get( string $slug ): ?string {
-        return self::$integrations[ $slug ] ?? null;
-    }
-
-    /**
-     * Get all integrations (UI usage)
-     */
-    public static function all(): array {
-        return self::$integrations;
+        return $instance;
     }
 }

@@ -1,5 +1,5 @@
 <?php
-namespace Zaplane;
+namespace Zaplane\Classes;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

@@ -1,14 +1,14 @@
 <?php
-namespace Zaplane;
+namespace Zaplane\Modules\Admin;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+use Zaplane\Classes\Helper;
 
-class Assets { 
-    public static function init(){
-        $self = new self();
-        add_action( 'admin_enqueue_scripts', [ $self, 'enqueue_app_assets' ] );
+if (!defined('ABSPATH')) exit;
+
+class Assets {
+
+    public function register(): void {
+        add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_app_assets' ] );
     }
 
     public function enqueue_app_assets($hook){

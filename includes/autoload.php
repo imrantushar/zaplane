@@ -2,86 +2,77 @@
 namespace Zaplane;
 
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly.
+    exit; // Exit if accessed directly.
 }
 
 class Autoload {
 
-	/**
-	 * Instance
-	 *
-	 * @access private
-	 * @var object Class Instance.
-	 * @since 1.1.0
-	 */
-	private static $instance;
+    /**
+     * Instance
+     */
+    private static ?self $instance = null;
 
-	/**
-	 * Autoload directories for different namespaces.
-	 *
-	 * @var array
-	 */
-	private $autoload_directories = array(
-		'Zaplane' => ZAPLANE_ROOT_DIR_PATH . 'includes/',
-	);
+    /**
+     * Namespace => directory map
+     */
+    private array $autoload_directories = [];
 
-	/**
-	 * Initiator
-	 *
-	 * @since 1.1.0
-	 * @return object initialized object of class.
-	 */
-	public static function get_instance() {
-		if ( ! isset( self::$instance ) ) {
-			self::$instance = new self();
-		}
-		return self::$instance;
-	}
+    /**
+     * Get singleton instance
+     */
+    public static function get_instance(): self {
+        if (self::$instance === null) {
+            self::$instance = new self();
+        }
+        return self::$instance;
+    }
 
-	/**
-	 * Register autoload directories for namespaces.
-	 *
-	 * @param string $namespace Namespace to autoload.
-	 * @param string $directory Directory path for the namespace.
-	 */
-	public function add_namespace_directory( $namespace, $directory ) {
-		$this->autoload_directories[ $namespace ] = $directory;
-	}
+    /**
+     * Add namespace directory mapping
+     */
+    public function add_namespace_directory(string $namespace, string $directory): void {
+        $this->autoload_directories[rtrim($namespace, '\\')] = rtrim($directory, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+    }
 
-	/**
-	 * Autoload classes.
-	 *
-	 * @param string $class Class name.
-	 */
-	public function autoload( $class ) {
-		foreach ( $this->autoload_directories as $namespace => $directory ) {
-			if ( 0 === strpos( $class, $namespace ) ) {
-				$class_to_load = $class;
-				$filename = strtolower(
-					preg_replace(
-						[ '/^' . $namespace . '\\\/', '/([a-z])([A-Z])/', '/_/', '/\\\/' ],
-						[ '', '$1-$2', '-', DIRECTORY_SEPARATOR ],
-						$class_to_load
-					)
-				);
-				$file = $directory . $filename . '.php';
-				// If the file is readable, include it.
-				if ( is_readable( $file ) ) {
-					require_once $file;
-				}
-			}
-		}
-	}
+    /**
+     * Autoload callback
+     */
+    public function autoload(string $class): void {
+        foreach ($this->autoload_directories as $namespace => $directory) {
+            if (0 !== strpos($class, $namespace)) {
+                continue;
+            }
 
-	/**
-	 * Constructor
-	 *
-	 * @since 1.1.0
-	 */
-	public function __construct() {
-		spl_autoload_register( [ $this, 'autoload' ] );
-	}
+            // Remove namespace prefix
+            $relative_class = substr($class, strlen($namespace) + 1);
+
+            // Convert namespace to folder structure + kebab-case file
+            $file = $directory . strtolower(
+                preg_replace(
+                    ['/([a-z])([A-Z])/', '/_/', '/\\\/'],
+                    ['$1-$2', '-', DIRECTORY_SEPARATOR],
+                    $relative_class
+                )
+            ) . '.php';
+
+            if (is_readable($file)) {
+                require_once $file;
+            }
+        }
+    }
+
+    /**
+     * Constructor: register autoloader
+     */
+    private function __construct() {
+        // Register autoload callback
+        spl_autoload_register([$this, 'autoload']);
+
+        // Default namespace mappings
+        $this->add_namespace_directory('Zaplane', ZAPLANE_ROOT_DIR_PATH . 'includes/');
+        $this->add_namespace_directory('Zaplane\\Integration', ZAPLANE_ROOT_DIR_PATH . 'integrations/'); // <-- your root integrations
+    }
 }
 
-
+// Initialize autoloader
 Autoload::get_instance();

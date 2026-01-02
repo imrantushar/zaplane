@@ -1,5 +1,5 @@
 <?php
-namespace Zaplane\API\Schema;
+namespace Zaplane\Modules\API\Schema;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
