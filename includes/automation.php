@@ -3,6 +3,7 @@ namespace Zaplane;
 
 use Zaplane\Classes\AutomationBase;
 use Zaplane\Classes\IntegrationLoader;
+use Zaplane\Classes\Logger;
 
 if (!defined('ABSPATH')) exit;
 
@@ -59,9 +60,6 @@ class Automation extends AutomationBase {
         $this->finalize_run((int)$node_run['run_id']);
     }
 
-
-
-
     public function reload_triggers(): void {
         // $this->flush_trigger_cache();
         $this->deregister_hooks();
@@ -71,11 +69,8 @@ class Automation extends AutomationBase {
     public function dispatch_active_triggers(): void {
         $events = $this->get_active_trigger_events();
         if (empty($events)) return;
-
-        error_log(print_r($events, true));
         foreach ($events as $event) {
             if (isset($this->registered_hooks[$event])) continue;
-
             $callback = [$this, 'automation_trigger_router'];
             add_action($event, $callback, 10, 99);
             $this->registered_hooks[$event] = $callback;
@@ -92,6 +87,14 @@ class Automation extends AutomationBase {
     public function automation_trigger_router(): void {
         $event = current_filter();
         $args  = func_get_args();
+        
+        // Developer only
+        Logger::reset();
+        Logger::log("Trigger fired: automation_trigger_router", [
+            'event' => current_filter(),
+            'args' => $args
+        ]);
+        // End Developer only
 
         $trigger_nodes = $this->get_active_workflows_for_event($event);
         if (empty($trigger_nodes)) return;
