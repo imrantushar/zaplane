@@ -1,109 +1,154 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import apiFetch from '@wordpress/api-fetch';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { __ } from '@wordpress/i18n';
 
-// --- 1. Fetch Logs ---
-export const fetchLogs = createAsyncThunk(
-    'logs/fetchLogs',
-    async ({ page, per_page, search = '' }, { rejectWithValue }) => {
-        try {
-            const path = `/gamify/v1/logs?page=${page}&per_page=${per_page}&search=${search}`;
-            const response = await apiFetch({ path, parse: false });
-            const total = response.headers.get('X-WP-Total');
-            const data = await response.json();
-            return { data, total: parseInt(total || 0, 10) };
-        } catch (error) {
-            return rejectWithValue(error.message);
-        }
+import {
+	API,
+	current_user_can,
+	current_user_id,
+	is_admin,
+	handleSliceSuccess,
+	handleSliceError,
+	namespace,
+	makeRequest,
+} from '@ZAPUtils/helper';
+import { showNotification } from '../notificationSlice/notificationSlice';
+
+export const getSingleRunDetails = createAsyncThunk(
+	'zaplane/getSingleRun',
+	async (runId, thunkAPI) => {
+		try {
+			const res = await API.get(
+				namespace + `runs/${parseInt(runId)}`
+			);
+
+			handleSliceSuccess(thunkAPI, __('Run details fetched successfully', 'workflow'));
+
+			return res.data;
+			// {
+			//   run: {},
+			//   nodes: [],
+			//   edges: [],
+			//   logs: []
+			// }
+		} catch (e) {
+			return handleSliceError(thunkAPI, e);
+		}
+	}
+);
+export const getRunsList = createAsyncThunk(
+	'zaplane/getRunsList',
+	async ({ limit = 50, offset = 0 } = {}, thunkAPI) => {
+		try {
+			const res = await API.get(
+				namespace + `runs?limit=${limit}&offset=${offset}`
+			);
+
+			handleSliceSuccess(
+				thunkAPI,
+				__('Runs fetched successfully', 'workflow')
+			);
+
+			return res.data; 
+		} catch (e) {
+			return handleSliceError(thunkAPI, e);
+		}
+	}
+);
+export const retryNodeRun = createAsyncThunk(
+  'zaplane/retryNodeRun',
+  async (nodeRunId, thunkAPI) => {
+    try {
+      const res = await API.post(
+        namespace + `node-runs/${parseInt(nodeRunId)}/retry`,
+        {}
+      );
+
+      thunkAPI.dispatch(
+        showNotification({
+          message: __('Node retried and queued successfully', 'workflow'),
+          isShow: true,
+          type: 'success',
+        })
+      );
+
+      return {
+        nodeRunId,
+        status: res?.data?.status || 'queued',
+      };
+    } catch (e) {
+      return handleSliceError(thunkAPI, e);
     }
+  }
+);
+export const replayWorkflowRun = createAsyncThunk(
+  'zaplane/replayWorkflowRun',
+  async (runId, thunkAPI) => {
+    try {
+      const res = await API.post(
+        namespace + `runs/${parseInt(runId)}/replay`,
+        {}
+      );
+
+      thunkAPI.dispatch(
+        showNotification({
+          message: __('Workflow replay started successfully', 'workflow'),
+          isShow: true,
+          type: 'success',
+        })
+      );
+
+      return {
+        oldRunId: runId,
+        newRunId: res?.data?.new_run_id,
+      };
+    } catch (e) {
+      return handleSliceError(thunkAPI, e);
+    }
+  }
 );
 
-// --- 2. Manual Action Trigger (Create) ---
-export const manualLogAction = createAsyncThunk(
-    'logs/manualAction',
-    async (formData, { rejectWithValue, dispatch }) => {
-        try {
-            const response = await apiFetch({
-                path: '/gamify/v1/actions/manual',
-                method: 'POST',
-                data: formData
-            });
-            dispatch(fetchLogs({ page: 1, per_page: 10 }));
-            return response;
-        } catch (error) {
-            return rejectWithValue(error.message);
-        }
-    }
-);
+const LogSlice = createSlice({
+	name: 'logs',
+	initialState: {
+		data: [],
 
-// --- 3. Update Log Action (NEW) ---
-export const updateLogAction = createAsyncThunk(
-    'logs/updateLog',
-    async ({ id, data }, { rejectWithValue, dispatch }) => {
-        try {
-            const response = await apiFetch({
-                path: `/gamify/v1/logs/${id}`,
-                method: 'PUT', // or PATCH
-                data: data
-            });
+	},
+	reducers: {
 
-            // Refresh logs to reflect changes
-            dispatch(fetchLogs({ page: 1, per_page: 10 }));
+	},
+	extraReducers: (builder) => {
+		builder
+			.addCase(getRunsList.fulfilled, (state, action) => {
+				state.data = action.payload;
+			})
+			
 
-            return response;
-        } catch (error) {
-            return rejectWithValue(error.message);
-        }
-    }
-);
 
-const logsSlice = createSlice({
-    name: 'logs',
-    initialState: {
-        items: [],
-        totalItems: 0,
-        currentPage: 1,
-        rowsPerPage: 10,
-        searchQuery: '',
-        status: 'idle',
-        actionStatus: 'idle',
-        error: null,
-    },
-    reducers: {
-        setPage: (state, action) => { state.currentPage = action.payload; },
-        setRowsPerPage: (state, action) => { state.rowsPerPage = action.payload; },
-        setSearchQuery: (state, action) => { state.searchQuery = action.payload; },
-        resetActionStatus: (state) => { state.actionStatus = 'idle'; }
-    },
-    extraReducers: (builder) => {
-        builder
-            // Fetch Logs
-            .addCase(fetchLogs.pending, (state) => { state.status = 'loading'; })
-            .addCase(fetchLogs.fulfilled, (state, action) => {
-                state.status = 'succeeded';
-                state.items = action.payload.data;
-                state.totalItems = action.payload.total;
-            })
-            .addCase(fetchLogs.rejected, (state, action) => {
-                state.status = 'failed';
-                state.error = action.payload;
-            })
 
-            // Manual & Update Actions (Share same loading logic)
-            .addCase(manualLogAction.pending, (state) => { state.actionStatus = 'loading'; })
-            .addCase(manualLogAction.fulfilled, (state) => { state.actionStatus = 'succeeded'; })
-            .addCase(manualLogAction.rejected, (state, action) => {
-                state.actionStatus = 'failed';
-                state.error = action.payload;
-            })
-
-            .addCase(updateLogAction.pending, (state) => { state.actionStatus = 'loading'; })
-            .addCase(updateLogAction.fulfilled, (state) => { state.actionStatus = 'succeeded'; })
-            .addCase(updateLogAction.rejected, (state, action) => {
-                state.actionStatus = 'failed';
-                state.error = action.payload;
-            });
-    },
+	},
 });
 
-export const { setPage, setRowsPerPage, setSearchQuery, resetActionStatus } = logsSlice.actions;
-export default logsSlice.reducer;
+
+export async function fetchDynamic({
+	integration,
+	query,
+	select,
+	where = {},
+	search = "",
+	limit = 20,
+}) {
+	const { data } = await API.post(namespace + "dynamic", {
+		integration,
+		query,
+		select,
+		where,
+		search,
+		limit,
+	});
+
+	return data;
+}
+
+
+export const { createWorkflowTitle } = LogSlice.actions;
+export default LogSlice.reducer;

@@ -4,6 +4,8 @@ import React, { useEffect } from 'react';
 import CreateWorkflows from './pages/workflows';
 import Workflows from './pages/workflows/workFlowMotion';
 import Notification from '@ZAPComponents/Notification';
+import Logs from './pages/logs';
+import Queue from './pages/queue';
 
 
 
@@ -17,8 +19,10 @@ const renderSwitch = (page, id, action, path) => {
 				return <Workflows id={ id } />;
 			}
 			return <CreateWorkflows />;
-		// case 'zaplane-logs':
-		// 	return <Logs />;
+		case 'zaplane-logs':
+			return <Logs />;
+		case 'zaplane-queue':
+			return <Queue />;
 
 		// case 'zaplane-settings':
 		// 	return <Settings />;

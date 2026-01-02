@@ -4,6 +4,8 @@ import { configureStore } from '@reduxjs/toolkit';
 import appReducer from './Slices/appSlice/appSlice';
 import menuReducer from './Slices/menuSlice/menuSlice';
 import workflowsReducer from './Slices/workFlowSlice/workFlowSlice';
+import logsReducer from './Slices/logsSlice/LogsSlice';
+import queueReducer from './Slices/queueSlice/queueSlice';
 
 import logger from 'redux-logger'
 /**
@@ -19,6 +21,8 @@ export const store = configureStore({
         adminmenu: menuReducer,
         app: appReducer,
         workflows: workflowsReducer,
+        logs:logsReducer,
+        queue:queueReducer
         // Future reducers will be added here (e.g., points, settings)
     },
     middleware: (getDefaultMiddleware) =>

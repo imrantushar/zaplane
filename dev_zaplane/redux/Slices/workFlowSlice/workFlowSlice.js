@@ -121,8 +121,28 @@ export const updateWorkFlowStatus = createAsyncThunk(
 		}
 	}
 );
+
+export const getRunWorkFlow = createAsyncThunk(
+  'zaplane/getRunWorkFlow',
+  async (_, thunkAPI) => {
+    try {
+      const res = await API.get(
+        namespace + 'runs'
+      );
+
+      handleSliceSuccess(
+        thunkAPI,
+        __('Queue fetched successfully', 'workflow')
+      );
+
+      return res.data; 
+    } catch (e) {
+      return handleSliceError(thunkAPI, e);
+    }
+  }
+);
 export const getSingleRunDetails = createAsyncThunk(
-	'zaplane/getSingleRunDetails',
+	'zaplane/getSingleRun',
 	async (runId, thunkAPI) => {
 		try {
 			const res = await API.get(
@@ -142,96 +162,6 @@ export const getSingleRunDetails = createAsyncThunk(
 			return handleSliceError(thunkAPI, e);
 		}
 	}
-);
-export const getRunsList = createAsyncThunk(
-	'zaplane/getRunsList',
-	async ({ limit = 50, offset = 0 } = {}, thunkAPI) => {
-		try {
-			const res = await API.get(
-				namespace + `runs?limit=${limit}&offset=${offset}`
-			);
-
-			handleSliceSuccess(
-				thunkAPI,
-				__('Runs fetched successfully', 'workflow')
-			);
-
-			return res.data; 
-		} catch (e) {
-			return handleSliceError(thunkAPI, e);
-		}
-	}
-);
-export const getQueueList = createAsyncThunk(
-  'zaplane/getQueueList',
-  async (_, thunkAPI) => {
-    try {
-      const res = await API.get(
-        namespace + 'queue'
-      );
-
-      handleSliceSuccess(
-        thunkAPI,
-        __('Queue fetched successfully', 'workflow')
-      );
-
-      return res.data; 
-    } catch (e) {
-      return handleSliceError(thunkAPI, e);
-    }
-  }
-);
-export const retryNodeRun = createAsyncThunk(
-  'zaplane/retryNodeRun',
-  async (nodeRunId, thunkAPI) => {
-    try {
-      const res = await API.post(
-        namespace + `node-runs/${parseInt(nodeRunId)}/retry`,
-        {}
-      );
-
-      thunkAPI.dispatch(
-        showNotification({
-          message: __('Node retried and queued successfully', 'workflow'),
-          isShow: true,
-          type: 'success',
-        })
-      );
-
-      return {
-        nodeRunId,
-        status: res?.data?.status || 'queued',
-      };
-    } catch (e) {
-      return handleSliceError(thunkAPI, e);
-    }
-  }
-);
-export const replayWorkflowRun = createAsyncThunk(
-  'zaplane/replayWorkflowRun',
-  async (runId, thunkAPI) => {
-    try {
-      const res = await API.post(
-        namespace + `runs/${parseInt(runId)}/replay`,
-        {}
-      );
-
-      thunkAPI.dispatch(
-        showNotification({
-          message: __('Workflow replay started successfully', 'workflow'),
-          isShow: true,
-          type: 'success',
-        })
-      );
-
-      return {
-        oldRunId: runId,
-        newRunId: res?.data?.new_run_id,
-      };
-    } catch (e) {
-      return handleSliceError(thunkAPI, e);
-    }
-  }
 );
 
 const workflowsSlice = createSlice({

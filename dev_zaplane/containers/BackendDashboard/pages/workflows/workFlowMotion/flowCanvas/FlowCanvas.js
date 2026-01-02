@@ -33,7 +33,7 @@ import {
     FiHelpCircle,
 } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
-import { createWorkflows, getQueueList, getRunsList, getSingleWorkFlow, getWorkFlow, updateWorkFlow } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
+import { createWorkflows, getQueueList, getRunsList, getRunWorkFlow, getSingleWorkFlow, getWorkFlow, updateWorkFlow } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { use } from "react";
 import { showNotification } from "@ZAPRedux/Slices/notificationSlice/notificationSlice";
@@ -452,94 +452,9 @@ export default function FlowCanvas({ id }) {
                             {__("inactive", "zaplane")}
                         </Button> */}
                         <Button size="sm" variant="outline"
-                        onClick={()=>dispatch(getQueueList())}>
+                        onClick={()=>dispatch(getRunWorkFlow())}>
                             {__("Runs", "zaplane")}
                         </Button>
-                        {/* <Button size="sm" variant="outline">
-                            {__("Save Draft", "zaplane")}
-                        </Button> */}
-                        <ZAPDrawer
-                            title="Action Settings"
-                            size='xl'
-                            trigger={
-                                <Button
-                                    size="sm"
-                                    bg="black"
-                                    color="white"
-                                    _hover={{ bg: "gray.800" }}
-                                >
-                                    {__("Logs", "zaplane")}
-                                </Button>
-                            }
-                        >
-                            <Button variant="outline" onClick={()=>dispatch(getRunsList({ limit: 20, offset: 0 }))}>refres</Button>
-                            <Table.Root size="sm" variant="outline">
-                                {!expandedRowId && (
-                                    <Table.Header>
-                                        <Table.Row>
-                                            <Table.ColumnHeader>CREATED AT</Table.ColumnHeader>
-                                            <Table.ColumnHeader>STATUS</Table.ColumnHeader>
-                                            <Table.ColumnHeader>DURATION / SIZE</Table.ColumnHeader>
-                                            <Table.ColumnHeader>NODES</Table.ColumnHeader>
-                                            <Table.ColumnHeader>ACTIONS</Table.ColumnHeader>
-                                        </Table.Row>
-                                    </Table.Header>
-                                )}
-
-
-                                <Table.Body>
-                                    {expandedRowId ? (
-                                        <Table.Row>
-                                            <Table.Cell colSpan={5} bg="gray.50">
-                                                <LogDetails />
-                                            </Table.Cell>
-                                        </Table.Row>
-                                    ) : (
-                                        rows.map((row) => (
-                                            <Table.Row key={row.id}>
-                                                <Table.Cell>
-                                                    <Text fontSize="sm">{row.createdAt}</Text>
-                                                </Table.Cell>
-
-                                                <Table.Cell>
-                                                    <HStack gap="2">
-                                                        <Box w="8px" h="8px" borderRadius="full" bg="green.500" />
-                                                        <Text fontSize="sm">{row.status}</Text>
-                                                    </HStack>
-                                                </Table.Cell>
-
-                                                <Table.Cell>
-                                                    <Text fontSize="sm">{row.duration}</Text>
-                                                    <Text fontSize="xs" color="gray.500">
-                                                        {row.size}
-                                                    </Text>
-                                                </Table.Cell>
-
-                                                <Table.Cell>{row.nodes}</Table.Cell>
-
-                                                <Table.Cell>
-                                                    <HStack>
-                                                        <Button
-                                                            size="xs"
-                                                            variant="outline"
-                                                            onClick={() => setExpandedRowId(row.id)}
-                                                        >
-                                                            Details
-                                                        </Button>
-                                                        <Button size="xs" variant="outline">
-                                                            Re-execute
-                                                        </Button>
-                                                    </HStack>
-                                                </Table.Cell>
-                                            </Table.Row>
-                                        ))
-                                    )}
-                                </Table.Body>
-
-                            </Table.Root>
-                        </ZAPDrawer>
-
-
                         <Button
                             size="sm"
                             bg="black"
