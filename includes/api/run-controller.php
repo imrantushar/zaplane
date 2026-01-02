@@ -23,9 +23,21 @@ class RunController extends WP_REST_Controller {
             'permission_callback' => [$this, 'permissions']
         ]);
 
+        register_rest_route($ns, '/runs/(?P<id>\d+)/live', [
+            'methods'  => 'GET',
+            'callback' => [$this, 'get_live_run'],
+            'permission_callback' => [$this, 'permissions']
+        ]);
+
         register_rest_route($ns, '/queue', [
             'methods'  => 'GET',
             'callback' => [$this, 'get_queue'],
+            'permission_callback' => [$this, 'permissions']
+        ]);
+
+        register_rest_route($ns, '/node-runs/(?P<id>\d+)', [
+            'methods'  => 'GET',
+            'callback' => [$this, 'get_node_run'],
             'permission_callback' => [$this, 'permissions']
         ]);
 
@@ -35,11 +47,25 @@ class RunController extends WP_REST_Controller {
             'permission_callback' => [$this, 'permissions']
         ]);
 
+        register_rest_route($ns, '/runs/(?P<id>\d+)/timeline', [
+            'methods'=>'GET',
+            'callback'=>[$this,'get_timeline'],
+            'permission_callback'=>[$this,'permissions']
+        ]);
+
+
         register_rest_route($ns, '/runs/(?P<id>\d+)/replay', [
             'methods'  => 'POST',
             'callback' => [$this, 'replay_run'],
             'permission_callback' => [$this, 'permissions']
         ]);
+
+        register_rest_route($ns, '/runs/(?P<id>\d+)/stop', [
+            'methods'=>'POST',
+            'callback'=>[$this,'stop_run'],
+            'permission_callback'=>[$this,'permissions']
+        ]);
+
     }
 
     public function permissions() {
@@ -50,16 +76,76 @@ class RunController extends WP_REST_Controller {
      * RUNS LIST
      * ====================================================== */
 
-    public function list_runs() {
+    public function list_runs($req) {
         global $wpdb;
 
-        return $wpdb->get_results("
-            SELECT id, workflow_version_hash, status, started_at, finished_at, last_error
-            FROM {$wpdb->prefix}zaplane_runs
-            ORDER BY id DESC
-            LIMIT 200
-        ", ARRAY_A);
+        $page     = max(1, (int) ($req['page'] ?? 1));
+        $per_page = min(200, max(10, (int) ($req['per_page'] ?? 50)));
+        $offset   = ($page - 1) * $per_page;
+
+        $where = [];
+        $args  = [];
+
+        // Filter by status
+        if (!empty($req['status'])) {
+            $where[] = "r.status = %s";
+            $args[]  = sanitize_text_field($req['status']);
+        }
+
+        // Filter by workflow
+        if (!empty($req['workflow_id'])) {
+            $where[] = "v.workflow_id = %d";
+            $args[]  = (int)$req['workflow_id'];
+        }
+
+        // Search in error message
+        if (!empty($req['search'])) {
+            $where[] = "r.last_error LIKE %s";
+            $args[]  = '%' . $wpdb->esc_like($req['search']) . '%';
+        }
+
+        $where_sql = $where ? 'WHERE ' . implode(' AND ', $where) : '';
+
+        // Total count (for pagination UI)
+        $total = $wpdb->get_var(
+            $wpdb->prepare("
+                SELECT COUNT(*)
+                FROM {$wpdb->prefix}zaplane_runs r
+                LEFT JOIN {$wpdb->prefix}zaplane_workflow_versions v
+                ON v.graph_hash = r.workflow_version_hash
+                $where_sql
+            ", $args)
+        );
+
+        // Data
+        $rows = $wpdb->get_results(
+            $wpdb->prepare("
+                SELECT 
+                    r.id,
+                    r.workflow_version_hash,
+                    v.workflow_id,
+                    r.status,
+                    r.started_at,
+                    r.finished_at,
+                    r.last_error
+                FROM {$wpdb->prefix}zaplane_runs r
+                LEFT JOIN {$wpdb->prefix}zaplane_workflow_versions v
+                ON v.graph_hash = r.workflow_version_hash
+                $where_sql
+                ORDER BY r.id DESC
+                LIMIT %d OFFSET %d
+            ", array_merge($args, [$per_page, $offset])),
+            ARRAY_A
+        );
+
+        return [
+            'page'      => $page,
+            'per_page' => $per_page,
+            'total'    => (int)$total,
+            'runs'     => $rows
+        ];
     }
+
 
     /* ======================================================
      * SINGLE RUN INSPECTOR
@@ -206,4 +292,129 @@ class RunController extends WP_REST_Controller {
 
         return ['new_run_id' => $new_run];
     }
+
+    public function get_live_run($req) {
+        global $wpdb;
+        $run_id = (int) $req['id'];
+
+        // Run header
+        $run = $wpdb->get_row(
+            $wpdb->prepare("SELECT * FROM {$wpdb->prefix}zaplane_runs WHERE id=%d", $run_id),
+            ARRAY_A
+        );
+        if (!$run) {
+            return new \WP_Error('not_found', 'Run not found', ['status'=>404]);
+        }
+
+        // Node states
+        $nodes = $wpdb->get_results(
+            $wpdb->prepare(
+                "SELECT id, node_key, status, started_at, finished_at
+                FROM {$wpdb->prefix}zaplane_node_runs
+                WHERE run_id=%d",
+                $run_id
+            ),
+            ARRAY_A
+        );
+
+        // Executed edges
+        $edges = $wpdb->get_results(
+            $wpdb->prepare(
+                "SELECT source_node, target_node, status
+                FROM {$wpdb->prefix}zaplane_execution_edges
+                WHERE run_id=%d",
+                $run_id
+            ),
+            ARRAY_A
+        );
+
+        // Logs (last 200)
+        $logs = $wpdb->get_results(
+            $wpdb->prepare(
+                "SELECT l.id, l.level, l.message, l.created_at, nr.node_key
+                FROM {$wpdb->prefix}zaplane_node_logs l
+                JOIN {$wpdb->prefix}zaplane_node_runs nr ON nr.id=l.node_run_id
+                WHERE nr.run_id=%d
+                ORDER BY l.id DESC
+                LIMIT 200",
+                $run_id
+            ),
+            ARRAY_A
+        );
+
+        return [
+            'run' => [
+                'id' => $run['id'],
+                'status' => $run['status'],
+                'started_at' => $run['started_at'],
+                'finished_at' => $run['finished_at'],
+                'last_error' => $run['last_error']
+            ],
+            'nodes' => $nodes,
+            'edges' => $edges,
+            'logs' => array_reverse($logs)
+        ];
+    }
+
+    public function get_node_run($req) {
+        global $wpdb;
+        $id = (int)$req['id'];
+
+        $node = $wpdb->get_row(
+            $wpdb->prepare("SELECT * FROM {$wpdb->prefix}zaplane_node_runs WHERE id=%d", $id),
+            ARRAY_A
+        );
+
+        $logs = $wpdb->get_results(
+            $wpdb->prepare(
+                "SELECT * FROM {$wpdb->prefix}zaplane_node_logs WHERE node_run_id=%d ORDER BY id",
+                $id
+            ),
+            ARRAY_A
+        );
+
+        return [
+            'node' => $node,
+            'logs' => $logs
+        ];
+    }
+
+    public function get_timeline($req){
+        global $wpdb;
+        $id=(int)$req['id'];
+
+        return $wpdb->get_results(
+            $wpdb->prepare(
+                "SELECT * FROM {$wpdb->prefix}zaplane_execution_edges WHERE run_id=%d ORDER BY id",
+                $id
+            ),
+            ARRAY_A
+        );
+    }
+
+    public function stop_run($req){
+        global $wpdb;
+        $id=(int)$req['id'];
+
+        // Cancel queued jobs
+        $wpdb->delete($wpdb->prefix.'zaplane_queue',['run_id'=>$id]);
+
+        // Mark running nodes as cancelled
+        $wpdb->update($wpdb->prefix.'zaplane_node_runs',
+            ['status'=>'cancelled'],
+            ['run_id'=>$id,'status'=>'running']
+        );
+
+        // Mark run cancelled
+        $wpdb->update($wpdb->prefix.'zaplane_runs',
+            ['status'=>'cancelled','finished_at'=>current_time('mysql')],
+            ['id'=>$id]
+        );
+
+        return ['stopped'=>true];
+    }
+
+
+
+
 }
