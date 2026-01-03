@@ -80,32 +80,7 @@ export const retryNodeRun = createAsyncThunk(
     }
   }
 );
-export const replayWorkflowRun = createAsyncThunk(
-  'zaplane/replayWorkflowRun',
-  async (runId, thunkAPI) => {
-    try {
-      const res = await API.post(
-        namespace + `runs/${parseInt(runId)}/replay`,
-        {}
-      );
 
-      thunkAPI.dispatch(
-        showNotification({
-          message: __('Workflow replay started successfully', 'workflow'),
-          isShow: true,
-          type: 'success',
-        })
-      );
-
-      return {
-        oldRunId: runId,
-        newRunId: res?.data?.new_run_id,
-      };
-    } catch (e) {
-      return handleSliceError(thunkAPI, e);
-    }
-  }
-);
 
 const LogSlice = createSlice({
 	name: 'logs',
@@ -129,26 +104,5 @@ const LogSlice = createSlice({
 });
 
 
-export async function fetchDynamic({
-	integration,
-	query,
-	select,
-	where = {},
-	search = "",
-	limit = 20,
-}) {
-	const { data } = await API.post(namespace + "dynamic", {
-		integration,
-		query,
-		select,
-		where,
-		search,
-		limit,
-	});
 
-	return data;
-}
-
-
-export const { createWorkflowTitle } = LogSlice.actions;
 export default LogSlice.reducer;

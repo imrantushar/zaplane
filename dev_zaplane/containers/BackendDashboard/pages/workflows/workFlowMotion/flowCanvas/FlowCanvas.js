@@ -33,13 +33,14 @@ import {
     FiHelpCircle,
 } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
-import { createWorkflows, getQueueList, getRunsList, getRunWorkFlow, getSingleWorkFlow, getWorkFlow, updateWorkFlow } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
+import { getRunWorkFlow, getSingleWorkFlow, updateWorkFlow } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { use } from "react";
 import { showNotification } from "@ZAPRedux/Slices/notificationSlice/notificationSlice";
 import CustomNode from "../customNoe/CustomNode";
 import ZAPDrawer from "@ZAPComponents/Drawer";
 import LogDetails from "../Components/LogDetails/LogDetails";
+import { getRunLive, getRunTimeline, replayWorkflowRun, stopRun } from "@ZAPRedux/Slices/executionSlice/executionSlice";
 ;
 export default function FlowCanvas({ id }) {
 
@@ -452,9 +453,35 @@ export default function FlowCanvas({ id }) {
                             {__("inactive", "zaplane")}
                         </Button> */}
                         <Button size="sm" variant="outline"
-                        onClick={()=>dispatch(getRunWorkFlow())}>
+                            onClick={() => dispatch(getRunWorkFlow())}>
                             {__("Runs", "zaplane")}
                         </Button>
+                        <ZAPDrawer
+                            title="Execution "
+                            trigger={
+                                <Button size="sm" variant="outline"
+                                    onClick={() => dispatch(getRunLive(id))}>
+
+                                    {__("Execution ", "zaplane")}
+                                </Button>
+                            }>
+                            <Flex gap={"10px"}>
+                                <Button size="sm" variant="outline"
+                                    onClick={() => dispatch(replayWorkflowRun(id))}>
+                                    {__("Re play workflow ", "zaplane")}
+                                </Button>
+                                <Button size="sm" variant="outline"
+                                    onClick={() => dispatch(getRunTimeline(id))}>
+                                    {__("History ", "zaplane")}
+                                </Button>
+                                <Button size="sm" variant="outline"
+                                    onClick={() => dispatch(stopRun(id))}>
+
+                                    {__("Stop ", "zaplane")}
+                                </Button>
+                            </Flex>
+
+                        </ZAPDrawer>
                         <Button
                             size="sm"
                             bg="black"
