@@ -159,41 +159,50 @@ class RunController extends WP_REST_Controller {
 
     public function get_run($req) {
         global $wpdb;
-        $run_id = (int) $req['id'];
+        $run_id = (int)$req['id'];
 
         $run = $wpdb->get_row(
-            $wpdb->prepare("SELECT * FROM {$wpdb->prefix}zaplane_runs WHERE id=%d", $run_id),
+            $wpdb->prepare(
+                "SELECT r.*, w.title, w.id AS workflow_id
+                FROM {$wpdb->prefix}zaplane_runs r
+                JOIN {$wpdb->prefix}zaplane_workflow_versions v ON v.graph_hash=r.workflow_version_hash
+                JOIN {$wpdb->prefix}zaplane_workflows w ON w.id=v.workflow_id
+                WHERE r.id=%d",
+                $run_id
+            ),
             ARRAY_A
         );
 
         $nodes = $wpdb->get_results(
-            $wpdb->prepare("SELECT * FROM {$wpdb->prefix}zaplane_node_runs WHERE run_id=%d", $run_id),
+            $wpdb->prepare("SELECT * FROM {$wpdb->prefix}zaplane_node_runs WHERE run_id=%d",$run_id),
             ARRAY_A
         );
 
         $edges = $wpdb->get_results(
-            $wpdb->prepare("SELECT * FROM {$wpdb->prefix}zaplane_execution_edges WHERE run_id=%d", $run_id),
+            $wpdb->prepare(
+                "SELECT e.*, nr.node_key AS from_node
+                FROM {$wpdb->prefix}zaplane_execution_edges e
+                JOIN {$wpdb->prefix}zaplane_node_runs nr ON nr.id=e.from_node_run_id
+                WHERE e.run_id=%d ORDER BY e.id",
+                $run_id
+            ),
             ARRAY_A
         );
 
         $logs = $wpdb->get_results(
-            $wpdb->prepare("
-                SELECT l.*, nr.node_key
+            $wpdb->prepare(
+                "SELECT l.*, nr.node_key
                 FROM {$wpdb->prefix}zaplane_node_logs l
-                JOIN {$wpdb->prefix}zaplane_node_runs nr ON nr.id = l.node_run_id
-                WHERE nr.run_id = %d
-                ORDER BY l.id
-            ", $run_id),
+                JOIN {$wpdb->prefix}zaplane_node_runs nr ON nr.id=l.node_run_id
+                WHERE nr.run_id=%d ORDER BY l.id",
+                $run_id
+            ),
             ARRAY_A
         );
 
-        return [
-            'run'   => $run,
-            'nodes' => $nodes,
-            'edges' => $edges,
-            'logs'  => $logs
-        ];
+        return compact('run','nodes','edges','logs');
     }
+
 
     /* ======================================================
      * QUEUE
@@ -203,13 +212,23 @@ class RunController extends WP_REST_Controller {
         global $wpdb;
 
         return $wpdb->get_results("
-            SELECT q.id, q.run_id, q.node_run_id, q.available_at, q.locked_at,
-                   nr.node_key, nr.status
+            SELECT 
+                q.id,
+                q.run_id,
+                q.node_run_id,
+                q.available_at,
+                q.locked_at,
+                q.locked_by,
+                q.attempts,
+                q.last_error,
+                nr.node_key,
+                nr.status
             FROM {$wpdb->prefix}zaplane_queue q
             JOIN {$wpdb->prefix}zaplane_node_runs nr ON nr.id = q.node_run_id
             ORDER BY q.available_at ASC
         ", ARRAY_A);
     }
+
 
     /* ======================================================
      * RETRY NODE
@@ -217,35 +236,43 @@ class RunController extends WP_REST_Controller {
 
     public function retry_node($req) {
         global $wpdb;
-        $id = (int) $req['id'];
+        $id = (int)$req['id'];
 
         $nr = $wpdb->get_row(
             $wpdb->prepare("SELECT * FROM {$wpdb->prefix}zaplane_node_runs WHERE id=%d", $id),
             ARRAY_A
         );
-        if (!$nr) return ['error' => 'Node run not found'];
+        if (!$nr) return new \WP_Error('not_found', 'Node run not found', ['status'=>404]);
 
+        // remove old queue entries
+        $wpdb->delete($wpdb->prefix.'zaplane_queue', ['node_run_id'=>$id]);
+
+        // reset node state
         $wpdb->update(
             $wpdb->prefix.'zaplane_node_runs',
             [
                 'status' => 'pending',
+                'attempts' => 0,
                 'started_at' => null,
-                'finished_at' => null
+                'finished_at' => null,
+                'output_json' => null
             ],
             ['id' => $id]
         );
 
+        // requeue
         $wpdb->insert(
             $wpdb->prefix.'zaplane_queue',
             [
-                'run_id'      => $nr['run_id'],
+                'run_id' => $nr['run_id'],
                 'node_run_id' => $id,
                 'available_at' => current_time('mysql')
             ]
         );
 
-        return ['status' => 'requeued'];
+        return ['status'=>'requeued'];
     }
+
 
     /* ======================================================
      * REPLAY RUN
@@ -303,21 +330,17 @@ class RunController extends WP_REST_Controller {
 
     public function get_live_run($req) {
         global $wpdb;
-        $run_id = (int) $req['id'];
+        $run_id = (int)$req['id'];
 
-        // Run header
         $run = $wpdb->get_row(
             $wpdb->prepare("SELECT * FROM {$wpdb->prefix}zaplane_runs WHERE id=%d", $run_id),
             ARRAY_A
         );
-        if (!$run) {
-            return new \WP_Error('not_found', 'Run not found', ['status'=>404]);
-        }
+        if (!$run) return new \WP_Error('not_found','Run not found',['status'=>404]);
 
-        // Node states
         $nodes = $wpdb->get_results(
             $wpdb->prepare(
-                "SELECT id, node_key, status, started_at, finished_at
+                "SELECT id, node_key, status, attempts, started_at, finished_at
                 FROM {$wpdb->prefix}zaplane_node_runs
                 WHERE run_id=%d",
                 $run_id
@@ -325,21 +348,26 @@ class RunController extends WP_REST_Controller {
             ARRAY_A
         );
 
-        // Executed edges
         $edges = $wpdb->get_results(
             $wpdb->prepare(
-                "SELECT source_node, target_node, status
-                FROM {$wpdb->prefix}zaplane_execution_edges
-                WHERE run_id=%d",
+                "SELECT 
+                    e.from_node_run_id,
+                    nr.node_key AS from_node,
+                    e.to_node_key,
+                    e.payload_json,
+                    e.created_at
+                FROM {$wpdb->prefix}zaplane_execution_edges e
+                JOIN {$wpdb->prefix}zaplane_node_runs nr ON nr.id=e.from_node_run_id
+                WHERE e.run_id=%d
+                ORDER BY e.id",
                 $run_id
             ),
             ARRAY_A
         );
 
-        // Logs (last 200)
         $logs = $wpdb->get_results(
             $wpdb->prepare(
-                "SELECT l.id, l.level, l.message, l.created_at, nr.node_key
+                "SELECT l.id,l.level,l.message,l.created_at,nr.node_key
                 FROM {$wpdb->prefix}zaplane_node_logs l
                 JOIN {$wpdb->prefix}zaplane_node_runs nr ON nr.id=l.node_run_id
                 WHERE nr.run_id=%d
@@ -351,18 +379,19 @@ class RunController extends WP_REST_Controller {
         );
 
         return [
-            'run' => [
-                'id' => $run['id'],
-                'status' => $run['status'],
-                'started_at' => $run['started_at'],
-                'finished_at' => $run['finished_at'],
-                'last_error' => $run['last_error']
+            'run'=>[
+                'id'=>$run['id'],
+                'status'=>$run['status'],
+                'started_at'=>$run['started_at'],
+                'finished_at'=>$run['finished_at'],
+                'last_error'=>$run['last_error']
             ],
-            'nodes' => $nodes,
-            'edges' => $edges,
-            'logs' => array_reverse($logs)
+            'nodes'=>$nodes,
+            'edges'=>$edges,
+            'logs'=>array_reverse($logs)
         ];
     }
+
 
     public function get_node_run($req) {
         global $wpdb;
@@ -404,23 +433,33 @@ class RunController extends WP_REST_Controller {
         global $wpdb;
         $id=(int)$req['id'];
 
-        // Cancel queued jobs
+        // remove queued jobs
         $wpdb->delete($wpdb->prefix.'zaplane_queue',['run_id'=>$id]);
 
-        // Mark running nodes as cancelled
-        $wpdb->update($wpdb->prefix.'zaplane_node_runs',
-            ['status'=>'cancelled'],
-            ['run_id'=>$id,'status'=>'running']
+        // unlock running jobs
+        $wpdb->update(
+            $wpdb->prefix.'zaplane_queue',
+            ['locked_at'=>null,'lock_token'=>null],
+            ['run_id'=>$id]
         );
 
-        // Mark run cancelled
-        $wpdb->update($wpdb->prefix.'zaplane_runs',
+        // cancel all nodes
+        $wpdb->update(
+            $wpdb->prefix.'zaplane_node_runs',
+            ['status'=>'cancelled','finished_at'=>current_time('mysql')],
+            ['run_id'=>$id]
+        );
+
+        // cancel run
+        $wpdb->update(
+            $wpdb->prefix.'zaplane_runs',
             ['status'=>'cancelled','finished_at'=>current_time('mysql')],
             ['id'=>$id]
         );
 
         return ['stopped'=>true];
     }
+
 
 
 
