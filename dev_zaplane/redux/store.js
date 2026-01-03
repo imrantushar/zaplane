@@ -4,7 +4,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import appReducer from './Slices/appSlice/appSlice';
 import menuReducer from './Slices/menuSlice/menuSlice';
 import workflowsReducer from './Slices/workFlowSlice/workFlowSlice';
-import logsReducer from './Slices/logsSlice/LogsSlice';
+import logsReducer from './Slices/logsSlice/logsSlice';
 import queueReducer from './Slices/queueSlice/queueSlice';
 import executionReducer from './Slices/executionSlice/executionSlice';
 

@@ -1110,7 +1110,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/table/table.js");
 /* harmony import */ var react_redux__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/dist/react-redux.mjs");
 /* harmony import */ var _LogDetails_LogDetails__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./LogDetails/LogDetails */ "./dev_zaplane/containers/BackendDashboard/pages/logs/LogDetails/LogDetails.js");
-/* harmony import */ var _ZAPRedux_Slices_logsSlice_LogsSlice__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @ZAPRedux/Slices/logsSlice/LogsSlice */ "./dev_zaplane/redux/Slices/logsSlice/LogsSlice.js");
+/* harmony import */ var _ZAPRedux_Slices_logsSlice_logsSlice__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @ZAPRedux/Slices/logsSlice/logsSlice */ "./dev_zaplane/redux/Slices/logsSlice/logsSlice.js");
 /* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
 /* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__);
 
@@ -1125,7 +1125,7 @@ const Logs = () => {
   const runs = (0,react_redux__WEBPACK_IMPORTED_MODULE_6__.useSelector)(state => state.logs?.data || []);
   console.log(runs);
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
-    dispatch((0,_ZAPRedux_Slices_logsSlice_LogsSlice__WEBPACK_IMPORTED_MODULE_8__.getRunsList)({
+    dispatch((0,_ZAPRedux_Slices_logsSlice_logsSlice__WEBPACK_IMPORTED_MODULE_8__.getRunsList)({
       limit: 20,
       offset: 0
     }));
@@ -1164,7 +1164,7 @@ const Logs = () => {
             runId: expandedRowId
           })
         })
-      }) : runs.map(row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.TableRow, {
+      }) : runs?.runs?.map(row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.TableRow, {
         children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.TableCell, {
           children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
             fontSize: "sm",
@@ -1210,7 +1210,7 @@ const Logs = () => {
             }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Button, {
               size: "xs",
               variant: "outline",
-              onClick: () => dispatch((0,_ZAPRedux_Slices_logsSlice_LogsSlice__WEBPACK_IMPORTED_MODULE_8__.retryNodeRun)(row?.id)),
+              onClick: () => dispatch((0,_ZAPRedux_Slices_logsSlice_logsSlice__WEBPACK_IMPORTED_MODULE_8__.retryNodeRun)(row?.id)),
               children: "Re-execute"
             })]
           })
@@ -3300,21 +3300,18 @@ const executionSlice = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createSl
 
 /***/ },
 
-/***/ "./dev_zaplane/redux/Slices/logsSlice/LogsSlice.js"
+/***/ "./dev_zaplane/redux/Slices/logsSlice/logsSlice.js"
 /*!*********************************************************!*\
-  !*** ./dev_zaplane/redux/Slices/logsSlice/LogsSlice.js ***!
+  !*** ./dev_zaplane/redux/Slices/logsSlice/logsSlice.js ***!
   \*********************************************************/
 (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   createWorkflowTitle: () => (/* binding */ createWorkflowTitle),
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__),
-/* harmony export */   fetchDynamic: () => (/* binding */ fetchDynamic),
 /* harmony export */   getRunsList: () => (/* binding */ getRunsList),
 /* harmony export */   getSingleRunDetails: () => (/* binding */ getSingleRunDetails),
-/* harmony export */   replayWorkflowRun: () => (/* binding */ replayWorkflowRun),
 /* harmony export */   retryNodeRun: () => (/* binding */ retryNodeRun)
 /* harmony export */ });
 /* harmony import */ var _reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @reduxjs/toolkit */ "./node_modules/@reduxjs/toolkit/dist/redux-toolkit.modern.mjs");
@@ -3369,23 +3366,7 @@ const retryNodeRun = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyn
     return (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.handleSliceError)(thunkAPI, e);
   }
 });
-const replayWorkflowRun = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyncThunk)('zaplane/replayWorkflowRun', async (runId, thunkAPI) => {
-  try {
-    const res = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.post(_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.namespace + `runs/${parseInt(runId)}/replay`, {});
-    thunkAPI.dispatch((0,_notificationSlice_notificationSlice__WEBPACK_IMPORTED_MODULE_3__.showNotification)({
-      message: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Workflow replay started successfully', 'workflow'),
-      isShow: true,
-      type: 'success'
-    }));
-    return {
-      oldRunId: runId,
-      newRunId: res?.data?.new_run_id
-    };
-  } catch (e) {
-    return (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.handleSliceError)(thunkAPI, e);
-  }
-});
-const LogSlice = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createSlice)({
+const logSlice = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createSlice)({
   name: 'logs',
   initialState: {
     data: []
@@ -3397,30 +3378,7 @@ const LogSlice = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createSlice)({
     });
   }
 });
-async function fetchDynamic({
-  integration,
-  query,
-  select,
-  where = {},
-  search = "",
-  limit = 20
-}) {
-  const {
-    data
-  } = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.post(_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.namespace + "dynamic", {
-    integration,
-    query,
-    select,
-    where,
-    search,
-    limit
-  });
-  return data;
-}
-const {
-  createWorkflowTitle
-} = LogSlice.actions;
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (LogSlice.reducer);
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (logSlice.reducer);
 
 /***/ },
 
@@ -3763,7 +3721,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Slices_appSlice_appSlice__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Slices/appSlice/appSlice */ "./dev_zaplane/redux/Slices/appSlice/appSlice.js");
 /* harmony import */ var _Slices_menuSlice_menuSlice__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Slices/menuSlice/menuSlice */ "./dev_zaplane/redux/Slices/menuSlice/menuSlice.js");
 /* harmony import */ var _Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./Slices/workFlowSlice/workFlowSlice */ "./dev_zaplane/redux/Slices/workFlowSlice/workFlowSlice.js");
-/* harmony import */ var _Slices_logsSlice_LogsSlice__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./Slices/logsSlice/LogsSlice */ "./dev_zaplane/redux/Slices/logsSlice/LogsSlice.js");
+/* harmony import */ var _Slices_logsSlice_logsSlice__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./Slices/logsSlice/logsSlice */ "./dev_zaplane/redux/Slices/logsSlice/logsSlice.js");
 /* harmony import */ var _Slices_queueSlice_queueSlice__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./Slices/queueSlice/queueSlice */ "./dev_zaplane/redux/Slices/queueSlice/queueSlice.js");
 /* harmony import */ var _Slices_executionSlice_executionSlice__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./Slices/executionSlice/executionSlice */ "./dev_zaplane/redux/Slices/executionSlice/executionSlice.js");
 /* harmony import */ var redux_logger__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! redux-logger */ "./node_modules/redux-logger/dist/redux-logger.js");
@@ -3791,7 +3749,7 @@ const store = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.configureStore)({
     adminmenu: _Slices_menuSlice_menuSlice__WEBPACK_IMPORTED_MODULE_2__["default"],
     app: _Slices_appSlice_appSlice__WEBPACK_IMPORTED_MODULE_1__["default"],
     workflows: _Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_3__["default"],
-    logs: _Slices_logsSlice_LogsSlice__WEBPACK_IMPORTED_MODULE_4__["default"],
+    logs: _Slices_logsSlice_logsSlice__WEBPACK_IMPORTED_MODULE_4__["default"],
     queue: _Slices_queueSlice_queueSlice__WEBPACK_IMPORTED_MODULE_5__["default"],
     execution: _Slices_executionSlice_executionSlice__WEBPACK_IMPORTED_MODULE_6__["default"]
     // Future reducers will be added here (e.g., points, settings)
