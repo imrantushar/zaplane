@@ -33,7 +33,7 @@ import {
     FiHelpCircle,
 } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
-import {  getRunWorkFlow, getSingleWorkFlow,  updateWorkFlow } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
+import { getRunWorkFlow, getSingleWorkFlow, updateWorkFlow } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { use } from "react";
 import { showNotification } from "@ZAPRedux/Slices/notificationSlice/notificationSlice";
@@ -467,13 +467,11 @@ export default function FlowCanvas({ id }) {
                             }>
                             <Flex gap={"10px"}>
                                 <Button size="sm" variant="outline"
-                                    onClick={() => dispatch(getRunTimeline(id))}>
-
+                                    onClick={() => dispatch(replayWorkflowRun(id))}>
                                     {__("Re play workflow ", "zaplane")}
                                 </Button>
                                 <Button size="sm" variant="outline"
-                                    onClick={() => dispatch(replayWorkflowRun(id))}>
-
+                                    onClick={() => dispatch(getRunTimeline(id))}>
                                     {__("History ", "zaplane")}
                                 </Button>
                                 <Button size="sm" variant="outline"
