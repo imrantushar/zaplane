@@ -82,7 +82,7 @@ export const retryNodeRun = createAsyncThunk(
 );
 
 
-const LogSlice = createSlice({
+const logSlice = createSlice({
 	name: 'logs',
 	initialState: {
 		data: [],
@@ -105,4 +105,4 @@ const LogSlice = createSlice({
 
 
 
-export default LogSlice.reducer;
+export default logSlice.reducer;

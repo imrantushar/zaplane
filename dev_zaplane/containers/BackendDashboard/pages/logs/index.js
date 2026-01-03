@@ -9,7 +9,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 
 import LogDetails from "./LogDetails/LogDetails";
-import { getRunsList, retryNodeRun, } from "@ZAPRedux/Slices/logsSlice/LogsSlice";
+import { getRunsList, retryNodeRun, } from "@ZAPRedux/Slices/logsSlice/logsSlice";
 
 
 
@@ -62,7 +62,7 @@ const Logs = () => {
                         </Table.Cell>
                     </Table.Row>
                 ) : (
-                    runs.map((row) => (
+                    runs?.runs?.map((row) => (
                         <Table.Row key={row.id}>
                             <Table.Cell>
                                 <Text fontSize="sm">
