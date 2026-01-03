@@ -199,21 +199,56 @@ class WorkflowsController extends WP_REST_Controller {
     public function get_graph($request) {
         global $wpdb;
 
+        $workflow_id = (int) $request['id'];
+
         $row = $wpdb->get_row(
-            $wpdb->prepare(
-                "SELECT graph_json
-                 FROM {$wpdb->prefix}zaplane_workflow_versions
-                 WHERE workflow_id = %d AND is_active = 1",
-                $request['id']
-            )
+            $wpdb->prepare("
+                SELECT 
+                    w.id AS workflow_id,
+                    w.title,
+                    w.name,
+                    w.status,
+                    w.user_id,
+
+                    v.id AS version_id,
+                    v.graph_hash,
+                    v.graph_json,
+                    v.created_at AS version_created_at
+
+                FROM {$wpdb->prefix}zaplane_workflows w
+                LEFT JOIN {$wpdb->prefix}zaplane_workflow_versions v 
+                    ON v.workflow_id = w.id AND v.is_active = 1
+
+                WHERE w.id = %d
+            ", $workflow_id),
+            ARRAY_A
         );
 
         if (!$row) {
-            return rest_ensure_response(['nodes'=>[], 'edges'=>[]]);
+            return new \WP_Error('not_found', 'Workflow not found', ['status' => 404]);
         }
 
-        return rest_ensure_response(json_decode($row->graph_json, true));
+        $graph = $row['graph_json']
+            ? json_decode($row['graph_json'], true)
+            : ['nodes'=>[], 'edges'=>[]];
+
+        return rest_ensure_response([
+            'workflow' => [
+                'id'     => (int) $row['workflow_id'],
+                'title'   => $row['title'],
+                'name'   => $row['name'],
+                'status' => $row['status'],
+                'user_id'=> (int) $row['user_id'],
+            ],
+            'version' => [
+                'id'        => $row['version_id'] ? (int)$row['version_id'] : null,
+                'hash'      => $row['graph_hash'],
+                'created_at' => $row['version_created_at']
+            ],
+            'graph' => $graph
+        ]);
     }
+
 
     public function list_versions($request) {
         global $wpdb;
