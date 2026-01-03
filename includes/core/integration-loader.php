@@ -1,5 +1,5 @@
 <?php
-namespace Zaplane\Classes;
+namespace Zaplane\Core;
 
 if (!defined('ABSPATH')) exit;
 
@@ -19,13 +19,8 @@ class IntegrationLoader {
     public static function get(string $slug): ?object {
         if (!empty(self::$instances[$slug])) return self::$instances[$slug];
         if (empty(self::$registry[$slug])) return null;
-
-        error_log(print_r($slug, true));
-        error_log(print_r($slug, true));
         $file = ZAPLANE_INTEGRATION_DIR_PATH . '/' . basename(self::$registry[$slug]['file']);
-        error_log(print_r($file, true));
         $class = self::$registry[$slug]['class'];
-
         if (!class_exists($class) && file_exists($file)) {
             require_once $file;
         }
@@ -35,5 +30,19 @@ class IntegrationLoader {
         self::$instances[$slug] = $instance;
 
         return $instance;
+    }
+
+    // Only Used for WP Cli JSON Generator
+    public static function all(): array {
+        self::init();
+
+        $all = [];
+        foreach (self::$registry as $slug => $meta) {
+            $instance = self::get($slug);
+            if ($instance) {
+                $all[$slug] = $instance;
+            }
+        }
+        return $all;
     }
 }

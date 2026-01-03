@@ -1,13 +1,13 @@
 <?php
 if ( ! defined( 'WP_CLI' ) ) return;
 
-use Zaplane\Classes\IntegrationLoader;
+use Zaplane\Core\IntegrationLoader;
 
 class ZaplaneIntegrationJsonGenerator {
 
     public function __invoke() {
 
-        IntegrationLoader::load();
+        IntegrationLoader::init();
 
         $manifest = [
             'version'      => ZAPLANE_VERSION ?? '1.0.0',
@@ -62,7 +62,7 @@ class ZaplaneIntegrationJsonGenerator {
         $file = ZAPLANE_ROOT_DIR_PATH . 'assets/json/integrations.json';
 
         if ( ! is_writable( dirname( $file ) ) ) {
-            WP_CLI::error( 'assets/ folder is not writable.' );
+            \WP_CLI::error( 'assets/ folder is not writable.' );
         }
 
         file_put_contents(
@@ -70,8 +70,8 @@ class ZaplaneIntegrationJsonGenerator {
             wp_json_encode( $manifest, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES )
         );
 
-        WP_CLI::success( 'Zaplane integrations.json built successfully.' );
-        WP_CLI::log( $file );
+        \WP_CLI::success( 'Zaplane integrations.json built successfully.' );
+        \WP_CLI::log( $file );
     }
 }
 

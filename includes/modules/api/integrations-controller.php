@@ -3,7 +3,6 @@ namespace Zaplane\Modules\API;
 
 use WP_REST_Controller;
 use Zaplane\Classes\Container;
-use Zaplane\Classes\IntegrationLoader;
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 

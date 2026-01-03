@@ -31,6 +31,11 @@ define( 'ZAPLANE_ASSETS_URI', ZAPLANE_PLUGIN_ROOT_URI . 'assets/' );
 // Include the main bootstrap class
 require_once __DIR__ . '/includes/core/zaplane.php';
 
+// Development Purpose CLI Command
+if(file_exists(__DIR__ . '/dev-cli.php')){
+    require_once __DIR__ . '/dev-cli.php';
+}
+
 // Activation hook
 register_activation_hook(ZAPLANE_PLUGIN_FILE, function () {
     \Zaplane\Installer::init()->run();

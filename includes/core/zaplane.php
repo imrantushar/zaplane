@@ -4,8 +4,7 @@ namespace Zaplane\Core;
 if (!defined('ABSPATH')) exit;
 
 use Zaplane\Classes\Container;
-use Zaplane\Classes\IntegrationLoader;
-use Zaplane\Modules\Automation;
+use Zaplane\Core\IntegrationLoader;
 
 final class Zaplane {
 
