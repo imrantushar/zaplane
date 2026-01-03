@@ -29,6 +29,12 @@ class RunController extends WP_REST_Controller {
             'permission_callback' => [$this, 'permissions']
         ]);
 
+        register_rest_route($ns, '/runs/(?P<id>\d+)/nodes', [
+            'methods'  => 'GET',
+            'callback' => [$this, 'get_run_nodes'],
+            'permission_callback' => [$this, 'permissions']
+        ]);
+
         register_rest_route($ns, '/runs/(?P<id>\d+)/live', [
             'methods'  => 'GET',
             'callback' => [$this, 'get_live_run'],
@@ -201,6 +207,20 @@ class RunController extends WP_REST_Controller {
         );
 
         return compact('run','nodes','edges','logs');
+    }
+
+    public function get_run_nodes($req){
+        global $wpdb;
+        $run_id = (int)$req['id'];
+
+        $node_runs = $wpdb->get_results($wpdb->prepare("
+            SELECT id, node_key, status, started_at, finished_at, input_json, output_json
+            FROM {$wpdb->prefix}zaplane_node_runs
+            WHERE run_id=%d
+            ORDER BY id ASC
+        ", $run_id), ARRAY_A);
+
+        return rest_ensure_response($node_runs);
     }
 
 

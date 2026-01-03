@@ -80,6 +80,14 @@ class WorkflowsController extends WP_REST_Controller {
             ],
         ]);
 
+        register_rest_route($namespace, '/' . $rest_base . '/(?P<id>\d+)/runs', [
+            [
+                'methods' => WP_REST_Server::READABLE,
+                'callback' => [$this, 'get_runs'],
+                'permission_callback' => [$this, 'permissions_check'],
+            ],
+        ]);
+
     }
 
     public function permissions_check() {
@@ -291,6 +299,27 @@ class WorkflowsController extends WP_REST_Controller {
             'workflow_id' => $workflow_id,
             'active_version' => $version_id
         ]);
+    }
+
+    public function get_runs($request){
+        global $wpdb;
+        $wid = (int)$request['id'];
+
+        $hash = $wpdb->get_var($wpdb->prepare("
+            SELECT graph_hash
+            FROM {$wpdb->prefix}zaplane_workflow_versions
+            WHERE workflow_id=%d AND is_active=1
+        ", $wid));
+
+        $runs =  $wpdb->get_results($wpdb->prepare("
+            SELECT id, status, started_at, finished_at, last_error
+            FROM {$wpdb->prefix}zaplane_runs
+            WHERE workflow_version_hash=%s
+            ORDER BY id DESC
+            LIMIT 100
+        ", $hash), ARRAY_A);
+
+        return rest_ensure_response($runs);
     }
 
 
