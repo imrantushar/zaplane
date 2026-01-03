@@ -5,6 +5,7 @@ if (!defined('ABSPATH')) exit;
 
 use Zaplane\Classes\Container;
 use Zaplane\Core\IntegrationLoader;
+use Zaplane\Core\Automation;
 
 final class Zaplane {
 
@@ -42,6 +43,7 @@ final class Zaplane {
         $container->set('integrations', fn($c) => IntegrationLoader::init($c));
         // Optional core modules
         $container->set('modules', fn($c) => ModuleManager::init($c));
+        $container->set('automation', fn($c) => Automation::init($c));
         return $container;
     }
 
@@ -52,7 +54,11 @@ final class Zaplane {
     public function init_plugin(): void {
         // Initialize modules first
         $modules = $this->container->get('modules');
-        $modules->boot(); // Calls register_hooks() on all modules
+        $modules->boot();
+    
+        $automation = $this->container->get('automation');
+        $automation->boot();
+
         do_action('zaplane_init');
     }
 }

@@ -1,5 +1,5 @@
 <?php
-namespace Zaplane\Modules;
+namespace Zaplane\Core;
 
 use Zaplane\Classes\Container;
 use Zaplane\Core\ModuleInterface;
@@ -7,7 +7,7 @@ use Zaplane\Classes\Logger;
 
 if (!defined('ABSPATH')) exit;
 
-class Automation implements ModuleInterface {
+class Automation {
 
     protected static ?self $instance = null;
     protected array $registered_hooks = [];
@@ -21,7 +21,7 @@ class Automation implements ModuleInterface {
     public static function init(Container $container): self {
         if (!self::$instance) {
             self::$instance = new self($container);
-            self::$instance->register_hooks();
+            self::$instance->boot();
         }
         return self::$instance;
     }
@@ -33,7 +33,7 @@ class Automation implements ModuleInterface {
     /**
      * Register WordPress hooks
      */
-    public function register_hooks(): void {
+    public function boot(): void {
 
         add_action('init', [$this, 'dispatch_active_triggers']);
         add_action('zaplane_resume_runs', [$this, 'resume_paused_runs']);

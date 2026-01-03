@@ -26,7 +26,6 @@ class ModuleManager {
     protected function load_modules(): void {
         // List all module classes here
         $module_classes = [
-            \Zaplane\Modules\Automation::class,
             \Zaplane\Modules\Admin::class,
             \Zaplane\Modules\Ajax::class,
             \Zaplane\Modules\API::class,

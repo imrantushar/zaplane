@@ -308,6 +308,7 @@ class RunController extends WP_REST_Controller {
     
 
         $automation = $this->container->get('automation');
+        error_log(print_r( $automation, true));
         // Find trigger
         foreach ($graph['nodes'] as $n) {
             if ($n['type'] === 'trigger') {
