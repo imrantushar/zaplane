@@ -2180,7 +2180,7 @@ function ActionDrawer({
                 value: "test",
                 children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
                   children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Button, {
-                    onClick: () => dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_12__.getSingleRunDetails)(node?.id)),
+                    onClick: () => dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_12__.getSingleRun)(node?.id)),
                     children: "Run test"
                   }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
                     children: "Response"
@@ -3458,7 +3458,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   deleteWorkFlow: () => (/* binding */ deleteWorkFlow),
 /* harmony export */   fetchDynamic: () => (/* binding */ fetchDynamic),
 /* harmony export */   getRunWorkFlow: () => (/* binding */ getRunWorkFlow),
-/* harmony export */   getSingleRunDetails: () => (/* binding */ getSingleRunDetails),
+/* harmony export */   getSingleRun: () => (/* binding */ getSingleRun),
 /* harmony export */   getSingleWorkFlow: () => (/* binding */ getSingleWorkFlow),
 /* harmony export */   getWorkFlow: () => (/* binding */ getWorkFlow),
 /* harmony export */   updateWorkFlow: () => (/* binding */ updateWorkFlow),
@@ -3561,17 +3561,11 @@ const getRunWorkFlow = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAs
     return (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.handleSliceError)(thunkAPI, e);
   }
 });
-const getSingleRunDetails = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyncThunk)('zaplane/getSingleRun', async (runId, thunkAPI) => {
+const getSingleRun = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyncThunk)('zaplane/getSingleRun', async (runId, thunkAPI) => {
   try {
     const res = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.get(_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.namespace + `runs/${parseInt(runId)}`);
-    (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.handleSliceSuccess)(thunkAPI, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Run details fetched successfully', 'workflow'));
+    (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.handleSliceSuccess)(thunkAPI, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Run fetched successfully', 'workflow'));
     return res.data;
-    // {
-    //   run: {},
-    //   nodes: [],
-    //   edges: [],
-    //   logs: []
-    // }
   } catch (e) {
     return (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.handleSliceError)(thunkAPI, e);
   }

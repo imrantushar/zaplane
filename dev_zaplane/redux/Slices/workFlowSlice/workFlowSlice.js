@@ -141,7 +141,7 @@ export const getRunWorkFlow = createAsyncThunk(
     }
   }
 );
-export const getSingleRunDetails = createAsyncThunk(
+export const getSingleRun = createAsyncThunk(
 	'zaplane/getSingleRun',
 	async (runId, thunkAPI) => {
 		try {
@@ -149,15 +149,10 @@ export const getSingleRunDetails = createAsyncThunk(
 				namespace + `runs/${parseInt(runId)}`
 			);
 
-			handleSliceSuccess(thunkAPI, __('Run details fetched successfully', 'workflow'));
+			handleSliceSuccess(thunkAPI, __('Run fetched successfully', 'workflow'));
 
 			return res.data;
-			// {
-			//   run: {},
-			//   nodes: [],
-			//   edges: [],
-			//   logs: []
-			// }
+			
 		} catch (e) {
 			return handleSliceError(thunkAPI, e);
 		}
