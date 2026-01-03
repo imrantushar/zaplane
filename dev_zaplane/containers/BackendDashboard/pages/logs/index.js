@@ -9,7 +9,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 
 import LogDetails from "./LogDetails/LogDetails";
-import { getRunsList, retryNodeRun } from "@ZAPRedux/Slices/logsSlice/logsSlice";
+import { getRunsList, getSingleRunDetails, retryNodeRun } from "@ZAPRedux/Slices/logsSlice/logsSlice";
 
 
 

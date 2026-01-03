@@ -1203,7 +1203,7 @@ const Logs = () => {
               size: "xs",
               variant: "outline",
               onClick: () => {
-                dispatch(getSingleRunDetails(row?.id));
+                dispatch((0,_ZAPRedux_Slices_logsSlice_logsSlice__WEBPACK_IMPORTED_MODULE_8__.getSingleRunDetails)(row?.id));
                 setExpandedRowId(row.id);
               },
               children: "Details"
