@@ -25,7 +25,7 @@ class RunController extends WP_REST_Controller {
 
         register_rest_route($ns, '/runs/(?P<id>\d+)', [
             'methods'  => 'GET',
-            'callback' => [$this, 'get_run'],
+            'callback' => [$this, 'get_run_view'],
             'permission_callback' => [$this, 'permissions']
         ]);
 
@@ -37,7 +37,7 @@ class RunController extends WP_REST_Controller {
 
         register_rest_route($ns, '/runs/(?P<id>\d+)/live', [
             'methods'  => 'GET',
-            'callback' => [$this, 'get_live_run'],
+            'callback' => [$this, 'get_live_view'],
             'permission_callback' => [$this, 'permissions']
         ]);
 
@@ -163,19 +163,12 @@ class RunController extends WP_REST_Controller {
      * SINGLE RUN INSPECTOR
      * ====================================================== */
 
-    public function get_run($req) {
+    public function get_run_view($req){
         global $wpdb;
         $run_id = (int)$req['id'];
 
         $run = $wpdb->get_row(
-            $wpdb->prepare(
-                "SELECT r.*, w.title, w.id AS workflow_id
-                FROM {$wpdb->prefix}zaplane_runs r
-                JOIN {$wpdb->prefix}zaplane_workflow_versions v ON v.graph_hash=r.workflow_version_hash
-                JOIN {$wpdb->prefix}zaplane_workflows w ON w.id=v.workflow_id
-                WHERE r.id=%d",
-                $run_id
-            ),
+            $wpdb->prepare("SELECT * FROM {$wpdb->prefix}zaplane_runs WHERE id=%d",$run_id),
             ARRAY_A
         );
 
@@ -185,19 +178,13 @@ class RunController extends WP_REST_Controller {
         );
 
         $edges = $wpdb->get_results(
-            $wpdb->prepare(
-                "SELECT e.*, nr.node_key AS from_node
-                FROM {$wpdb->prefix}zaplane_execution_edges e
-                JOIN {$wpdb->prefix}zaplane_node_runs nr ON nr.id=e.from_node_run_id
-                WHERE e.run_id=%d ORDER BY e.id",
-                $run_id
-            ),
+            $wpdb->prepare("SELECT * FROM {$wpdb->prefix}zaplane_execution_edges WHERE run_id=%d",$run_id),
             ARRAY_A
         );
 
         $logs = $wpdb->get_results(
             $wpdb->prepare(
-                "SELECT l.*, nr.node_key
+                "SELECT l.*,nr.node_key
                 FROM {$wpdb->prefix}zaplane_node_logs l
                 JOIN {$wpdb->prefix}zaplane_node_runs nr ON nr.id=l.node_run_id
                 WHERE nr.run_id=%d ORDER BY l.id",
@@ -206,8 +193,44 @@ class RunController extends WP_REST_Controller {
             ARRAY_A
         );
 
-        return compact('run','nodes','edges','logs');
+        return [
+            'run'=>$run,
+            'execution'=>$this->build_tree($nodes,$edges,$logs)
+        ];
     }
+
+    private function build_tree($nodes,$edges,$logs){
+        $byId=[];
+        foreach($nodes as $n){
+            $n['logs']=[];
+            $n['children']=[];
+            $byId[$n['id']]=$n;
+        }
+
+        foreach($logs as $l){
+            foreach($byId as &$n){
+                if($n['id']==$l['node_run_id']){
+                    $n['logs'][]=$l;
+                }
+            }
+        }
+
+        foreach($edges as $e){
+            foreach($byId as &$n){
+                if($n['id']==$e['from_node_run_id']){
+                    foreach($byId as &$child){
+                        if($child['node_key']==$e['to_node_key'] && $child['parent_node_run_id']==$n['id']){
+                            $n['children'][]=&$child;
+                        }
+                    }
+                }
+            }
+        }
+
+        return array_values(array_filter($byId,fn($n)=>!$n['parent_node_run_id']));
+    }
+
+
 
     public function get_run_nodes($req){
         global $wpdb;
@@ -349,69 +372,36 @@ class RunController extends WP_REST_Controller {
         return ['new_run_id' => $new_run];
     }
 
-    public function get_live_run($req) {
+    public function get_live_view($req){
         global $wpdb;
-        $run_id = (int)$req['id'];
+        $id=(int)$req['id'];
 
         $run = $wpdb->get_row(
-            $wpdb->prepare("SELECT * FROM {$wpdb->prefix}zaplane_runs WHERE id=%d", $run_id),
+            $wpdb->prepare("SELECT * FROM {$wpdb->prefix}zaplane_runs WHERE id=%d",$id),
             ARRAY_A
         );
-        if (!$run) return new \WP_Error('not_found','Run not found',['status'=>404]);
 
         $nodes = $wpdb->get_results(
-            $wpdb->prepare(
-                "SELECT id, node_key, status, attempts, started_at, finished_at
-                FROM {$wpdb->prefix}zaplane_node_runs
-                WHERE run_id=%d",
-                $run_id
-            ),
-            ARRAY_A
-        );
-
-        $edges = $wpdb->get_results(
-            $wpdb->prepare(
-                "SELECT 
-                    e.from_node_run_id,
-                    nr.node_key AS from_node,
-                    e.to_node_key,
-                    e.payload_json,
-                    e.created_at
-                FROM {$wpdb->prefix}zaplane_execution_edges e
-                JOIN {$wpdb->prefix}zaplane_node_runs nr ON nr.id=e.from_node_run_id
-                WHERE e.run_id=%d
-                ORDER BY e.id",
-                $run_id
-            ),
+            $wpdb->prepare("SELECT * FROM {$wpdb->prefix}zaplane_node_runs WHERE run_id=%d",$id),
             ARRAY_A
         );
 
         $logs = $wpdb->get_results(
             $wpdb->prepare(
-                "SELECT l.id,l.level,l.message,l.created_at,nr.node_key
+                "SELECT l.*,nr.node_key
                 FROM {$wpdb->prefix}zaplane_node_logs l
                 JOIN {$wpdb->prefix}zaplane_node_runs nr ON nr.id=l.node_run_id
-                WHERE nr.run_id=%d
-                ORDER BY l.id DESC
-                LIMIT 200",
-                $run_id
-            ),
+                WHERE nr.run_id=%d ORDER BY l.id DESC LIMIT 200",$id),
             ARRAY_A
         );
 
         return [
-            'run'=>[
-                'id'=>$run['id'],
-                'status'=>$run['status'],
-                'started_at'=>$run['started_at'],
-                'finished_at'=>$run['finished_at'],
-                'last_error'=>$run['last_error']
-            ],
+            'run'=>$run,
             'nodes'=>$nodes,
-            'edges'=>$edges,
             'logs'=>array_reverse($logs)
         ];
     }
+
 
 
     public function get_node_run($req) {
