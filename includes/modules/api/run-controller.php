@@ -199,7 +199,7 @@ class RunController extends WP_REST_Controller {
             ),
             ARRAY_A
         );
-
+        error_log(print_r($nodes, true));  
         return [
             'run'=>$run,
             'execution'=>$this->build_tree($nodes,$edges,$logs)
