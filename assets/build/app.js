@@ -575,9 +575,6 @@ const Notification = () => {
   const targetElement = document.querySelector('#zaplane-app');
   const notification = (0,react_redux__WEBPACK_IMPORTED_MODULE_1__.useSelector)(state => state.notification);
   const dispatch = (0,react_redux__WEBPACK_IMPORTED_MODULE_1__.useDispatch)();
-  console.log({
-    notification
-  });
   const isShowNotification = notification?.showNotification || notification?.isShow;
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
     if (isShowNotification && targetElement) {
@@ -3757,76 +3754,14 @@ const notificationSlice = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.creat
   initialState: {
     message: '',
     isShow: false,
-    type: '',
-    isHtml: false,
-    linkTo: false
+    type: ''
   },
   reducers: {
-    showNotification: (state, {
-      payload: {
-        message = null,
-        isShow = false,
-        type = 'success',
-        isHtml = false,
-        linkTo = false
-      }
-    }) => {
-      let messageRef = message;
-      if (messageRef instanceof Error) {
-        message = messageRef.message;
-        type = 'error';
-
-        // noinspection JSUnresolvedReference
-        // If Axios error and server sends error details.
-        if (messageRef.isAxiosError) {
-          if (messageRef?.response?.data?.message) {
-            if (messageRef.response.data?.additional_errors && messageRef.response.data?.additional_errors.length) {
-              message = [{
-                code: messageRef.response.data.code,
-                message: messageRef.response.data.message,
-                data: messageRef.response.data.data
-              }, ...messageRef.response.data?.additional_errors];
-            } else {
-              message = messageRef.response.data.message;
-            }
-          } else if (messageRef?.response?.data?.data) {
-            message = messageRef.response.data.data;
-          }
-        }
-        messageRef = message;
-      }
-      if ('object' === typeof messageRef && !Array.isArray(messageRef)) {
-        if (messageRef?.message) {
-          message = messageRef.message;
-        } else if (messageRef?.response?.data?.data) {
-          message = messageRef.response.data.data;
-        } else if (messageRef?.data?.message) {
-          message = messageRef.data.message;
-        }
-      }
-      if (Array.isArray(message) && message[0].code && message[0].message) {
-        if (message.length === 1) {
-          message = message[0].message;
-        } else {
-          const errors = [...message];
-          message = '<ul class="community-m-0" style="padding-left:1rem; margin: 0;">';
-          for (const err of errors) {
-            message += `<li id="error-${err.code}">${err.message}</li>`;
-          }
-          isHtml = true;
-          message += '</ul>';
-        }
-      } else if (message?.error?.message) {
-        message = message?.error.message;
-      }
-      if ('string' === typeof message && message.includes('<') && (message.includes('</') || message.includes('/>'))) {
-        isHtml = true;
-      }
-      state.message = message;
-      state.isShow = isShow;
-      state.type = type;
-      state.isHtml = isHtml;
-      state.linkTo = linkTo;
+    showNotification: (state, actions) => {
+      const payload = actions.payload;
+      state.message = payload.message;
+      state.isShow = payload.isShow;
+      state.type = payload.type;
     }
   }
 });
@@ -4034,9 +3969,9 @@ const getAllVersion = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsy
     return (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.handleSliceError)(thunkAPI, e);
   }
 });
-const getPreviewOldVersion = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyncThunk)('zaplane/getPreviewOldVersion', async (id, versionID, thunkAPI) => {
+const getPreviewOldVersion = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyncThunk)('zaplane/getPreviewOldVersion', async (runId, thunkAPI) => {
   try {
-    const res = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.get(_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.namespace + `workflows/${id}/versions/${versionID}`);
+    const res = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.get(_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.namespace + `workflows//versions/8`);
     (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.handleSliceSuccess)(thunkAPI, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Run fetched successfully', 'workflow'));
     return res.data;
   } catch (e) {
@@ -4128,13 +4063,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Slices_logsSlice_logsSlice__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./Slices/logsSlice/logsSlice */ "./dev_zaplane/redux/Slices/logsSlice/logsSlice.js");
 /* harmony import */ var _Slices_queueSlice_queueSlice__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./Slices/queueSlice/queueSlice */ "./dev_zaplane/redux/Slices/queueSlice/queueSlice.js");
 /* harmony import */ var _Slices_executionSlice_executionSlice__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./Slices/executionSlice/executionSlice */ "./dev_zaplane/redux/Slices/executionSlice/executionSlice.js");
-/* harmony import */ var _Slices_notificationSlice_notificationSlice__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./Slices/notificationSlice/notificationSlice */ "./dev_zaplane/redux/Slices/notificationSlice/notificationSlice.js");
-/* harmony import */ var redux_logger__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! redux-logger */ "./node_modules/redux-logger/dist/redux-logger.js");
-/* harmony import */ var redux_logger__WEBPACK_IMPORTED_MODULE_8___default = /*#__PURE__*/__webpack_require__.n(redux_logger__WEBPACK_IMPORTED_MODULE_8__);
+/* harmony import */ var redux_logger__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! redux-logger */ "./node_modules/redux-logger/dist/redux-logger.js");
+/* harmony import */ var redux_logger__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(redux_logger__WEBPACK_IMPORTED_MODULE_7__);
 
 
 // Import all the reducers you have created
-
 
 
 
@@ -4152,7 +4085,6 @@ __webpack_require__.r(__webpack_exports__);
 const store = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.configureStore)({
   reducer: {
     // Register the reducer from each slice here
-    notification: _Slices_notificationSlice_notificationSlice__WEBPACK_IMPORTED_MODULE_7__["default"],
     adminmenu: _Slices_menuSlice_menuSlice__WEBPACK_IMPORTED_MODULE_2__["default"],
     app: _Slices_appSlice_appSlice__WEBPACK_IMPORTED_MODULE_1__["default"],
     workflows: _Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_3__["default"],
@@ -4161,7 +4093,7 @@ const store = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.configureStore)({
     execution: _Slices_executionSlice_executionSlice__WEBPACK_IMPORTED_MODULE_6__["default"]
     // Future reducers will be added here (e.g., points, settings)
   },
-  middleware: getDefaultMiddleware => getDefaultMiddleware().concat((redux_logger__WEBPACK_IMPORTED_MODULE_8___default()))
+  middleware: getDefaultMiddleware => getDefaultMiddleware().concat((redux_logger__WEBPACK_IMPORTED_MODULE_7___default()))
 });
 
 /***/ },

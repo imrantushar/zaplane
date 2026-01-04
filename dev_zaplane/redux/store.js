@@ -7,7 +7,6 @@ import workflowsReducer from './Slices/workFlowSlice/workFlowSlice';
 import logsReducer from './Slices/logsSlice/logsSlice';
 import queueReducer from './Slices/queueSlice/queueSlice';
 import executionReducer from './Slices/executionSlice/executionSlice';
-import notificationReducer from './Slices/notificationSlice/notificationSlice';
 
 import logger from 'redux-logger'
 /**
@@ -20,7 +19,6 @@ import logger from 'redux-logger'
 export const store = configureStore({
     reducer: {
         // Register the reducer from each slice here
-        notification: notificationReducer,
         adminmenu: menuReducer,
         app: appReducer,
         workflows: workflowsReducer,
