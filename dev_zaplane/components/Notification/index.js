@@ -23,6 +23,7 @@ const Notification = () => {
 	const targetElement = document.querySelector('#zaplane-app') 
 	const notification = useSelector( ( state ) => state.notification );
 	const dispatch = useDispatch();
+	console.log({notification});
 
 	const isShowNotification =
 		notification?.showNotification || notification?.isShow;
