@@ -240,7 +240,7 @@ export const versionActive = createAsyncThunk(
 	'zaplane/versionActive',
 	async ({id,versionID}, thunkAPI) => {
 		try {
-			const res = await API.get(
+			const res = await API.post(
 				namespace + `workflows/${id}/versions/${parseInt(versionID)}/activate`
 			);
 			handleSliceSuccess(thunkAPI, __('version active successfully', 'workflow'));

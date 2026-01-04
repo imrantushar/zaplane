@@ -4077,7 +4077,7 @@ const versionActive = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsy
   versionID
 }, thunkAPI) => {
   try {
-    const res = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.get(_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.namespace + `workflows/${id}/versions/${parseInt(versionID)}/activate`);
+    const res = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.post(_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.namespace + `workflows/${id}/versions/${parseInt(versionID)}/activate`);
     (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.handleSliceSuccess)(thunkAPI, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('version active successfully', 'workflow'));
     return res.data;
   } catch (e) {
