@@ -30,7 +30,6 @@ const Queue = () => {
                     <Table.ColumnHeader>STATUS</Table.ColumnHeader>
                     <Table.ColumnHeader>DURATION / SIZE</Table.ColumnHeader>
                     <Table.ColumnHeader>NODES</Table.ColumnHeader>
-                    <Table.ColumnHeader>ACTIONS</Table.ColumnHeader>
                 </Table.Row>
             </Table.Header>
 
@@ -72,18 +71,6 @@ const Queue = () => {
                             <Text fontSize="sm">
                                 {row.node_key}
                             </Text>
-                        </Table.Cell>
-
-                        <Table.Cell>
-                            <HStack>
-                                <Button size="xs" variant="outline">
-                                    Details
-                                </Button>
-
-                                <Button size="xs" variant="outline">
-                                    Refresh
-                                </Button>
-                            </HStack>
                         </Table.Cell>
                     </Table.Row>
                 ))}
