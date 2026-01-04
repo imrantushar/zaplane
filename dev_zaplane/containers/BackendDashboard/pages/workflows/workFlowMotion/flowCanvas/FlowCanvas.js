@@ -473,6 +473,7 @@ export default function FlowCanvas({ id }) {
 
                             <VersionHistoryTable
                                 versions={versions}
+                                id={id}
                                 
                             />
 
@@ -495,21 +496,11 @@ export default function FlowCanvas({ id }) {
                                     {__("Logs ", "zaplane")}
                                 </Button>
                             }>
-                            {/* <Flex gap={"10px"}>
                                 <Button size="sm" variant="outline"
                                     onClick={() => dispatch(replayWorkflowRun(id))}>
-                                    {__("Re play workflow ", "zaplane")}
+                                    {__("🔄 Replay ", "zaplane")}
                                 </Button>
-                                <Button size="sm" variant="outline"
-                                    onClick={() => dispatch(getRunTimeline(id))}>
-                                    {__("History ", "zaplane")}
-                                </Button>
-                                <Button size="sm" variant="outline"
-                                    onClick={() => dispatch(stopRun(id))}>
-
-                                    {__("Stop ", "zaplane")}
-                                </Button>
-                            </Flex> */}
+                                
                             <RunsTable
                                 runs={runs?.runs}
                             />

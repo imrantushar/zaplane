@@ -5,7 +5,7 @@ import {
   Button,
   Text,
 } from "@chakra-ui/react";
-import { getNodeDetails, getNodeLogDetails, getSingleRun } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
+import { deepLogsRun, getNodeDetails, getNodeLogDetails, getSingleRun, nodeLogsRun } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
 import { RotateCcw, Trash2 } from "lucide-react";
 import { useDispatch } from "react-redux";
 
@@ -98,7 +98,6 @@ const RunsTable = ({ runs = [] }) => {
                 {run.finished_at ?? "—"}
               </Text>
             </Table.Cell>
-            {console.log(run)}
             <Table.Cell textAlign="right">
               <HStack justify="flex-end" spacing="1">
                 <Button
@@ -107,6 +106,20 @@ const RunsTable = ({ runs = [] }) => {
                   onClick={() => dispatch(getNodeLogDetails(run?.id))}
                 >
                   Details
+                </Button>
+                <Button
+                  size="xs"
+                  variant="outline"
+                  onClick={() => dispatch(nodeLogsRun(run?.id))}
+                >
+                  node 
+                </Button>
+                <Button
+                  size="xs"
+                  variant="outline"
+                  onClick={() => dispatch(deepLogsRun(run?.id))}
+                >
+                  deep log
                 </Button>
                 <Button
                   size="xs"

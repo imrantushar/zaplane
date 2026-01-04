@@ -5,11 +5,13 @@ import {
   HStack,
   Text,
 } from "@chakra-ui/react";
+import { getPreviewOldVersion, versionActive } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
 import { CheckCircle, Eye } from "lucide-react";
 import { useDispatch } from "react-redux";
 
 const VersionHistoryTable = ({
   versions = [],
+  id,
 }) => {
     const dispatch=useDispatch()
   const statusStyle = (isActive) => {
@@ -74,7 +76,7 @@ const VersionHistoryTable = ({
                   <Button
                     size="xs"
                     variant="outline"
-
+                    onClick={()=>dispatch(versionActive({id:id,versionID:version?.id}))}
                    
                   >
                     <CheckCircle size={14} />
@@ -84,7 +86,7 @@ const VersionHistoryTable = ({
                 <Button
                   size="xs"
                   variant="ghost"
-                  onClick={()=>dispatch(getPreviewOldVersion())}
+                  onClick={()=>dispatch(getPreviewOldVersion({id:id,versionID:version?.id}))}
                  
                 >
                   <Eye size={14} />

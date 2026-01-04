@@ -159,6 +159,36 @@ export const getSingleRun = createAsyncThunk(
 		}
 	}
 );
+export const nodeLogsRun = createAsyncThunk(
+	'zaplane/nodeLogsRun',
+	async (runId, thunkAPI) => {
+		try {
+			const res = await API.get(
+				namespace + `runs/${parseInt(runId)}/nodes`
+			);
+
+			return res.data;
+			
+		} catch (e) {
+			return handleSliceError(thunkAPI, e);
+		}
+	}
+);
+export const deepLogsRun = createAsyncThunk(
+	'zaplane/deepLogsRun',
+	async (runId, thunkAPI) => {
+		try {
+			const res = await API.get(
+				namespace + `node-runs/${runId}`
+			);
+
+			return res.data;
+			
+		} catch (e) {
+			return handleSliceError(thunkAPI, e);
+		}
+	}
+);
 export const getNodeLogDetails = createAsyncThunk(
 	'zaplane/getNodeLogDetails',
 	async (runId, thunkAPI) => {
@@ -166,8 +196,6 @@ export const getNodeLogDetails = createAsyncThunk(
 			const res = await API.get(
 				namespace + `runs/?P${parseInt(runId)}\d+/nodes`
 			);
-
-			handleSliceSuccess(thunkAPI, __('Run fetched successfully', 'workflow'));
 
 			return res.data;
 			
@@ -183,9 +211,6 @@ export const getAllVersion = createAsyncThunk(
 			const res = await API.get(
 				namespace + `workflows/${parseInt(runId)}/versions`
 			);
-
-			handleSliceSuccess(thunkAPI, __('Run fetched successfully', 'workflow'));
-
 			return res.data;
 			
 		} catch (e) {
@@ -195,13 +220,31 @@ export const getAllVersion = createAsyncThunk(
 );
 export const getPreviewOldVersion = createAsyncThunk(
 	'zaplane/getPreviewOldVersion',
-	async (id,versionID, thunkAPI) => {
+	async ({id,versionID}, thunkAPI) => {
+		console.log(id,versionID,'boom');
 		try {
 			const res = await API.get(
-				namespace + `workflows/${id}/versions/${versionID}`
+				namespace + `workflows/${id}/versions/${parseInt(versionID)}`
 			);
 
-			handleSliceSuccess(thunkAPI, __('Run fetched successfully', 'workflow'));
+			handleSliceSuccess(thunkAPI, __(' fetched prevews version successfully', 'workflow'));
+
+			return res.data;
+			
+		} catch (e) {
+			return handleSliceError(thunkAPI, e);
+		}
+	}
+);
+export const versionActive = createAsyncThunk(
+	'zaplane/versionActive',
+	async ({id,versionID}, thunkAPI) => {
+		try {
+			const res = await API.get(
+				namespace + `workflows/${id}/versions/${parseInt(versionID)}`
+			);
+
+			handleSliceSuccess(thunkAPI, __('version active successfully', 'workflow'));
 
 			return res.data;
 			
