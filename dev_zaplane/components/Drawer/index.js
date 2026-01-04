@@ -22,15 +22,16 @@ const ZAPDrawer = ({
             placement={placement}
             size={size}
             closeOnOverlayClick={closeOnOverlayClick}
+           
         >
             <Drawer.Trigger asChild>
                 {trigger}
             </Drawer.Trigger>
 
             <Portal>
-                <Drawer.Backdrop z />
-                <Drawer.Positioner marginTop='30px'>
-                    <Drawer.Content>
+                <Drawer.Backdrop />
+                <Drawer.Positioner  marginTop='30px'>
+                    <Drawer.Content  marginLeft='161px'>
                         {title && (
                             <Drawer.Header>
                                 <Drawer.Title margin='0' >{title}</Drawer.Title>
