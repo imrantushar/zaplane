@@ -241,9 +241,8 @@ export const versionActive = createAsyncThunk(
 	async ({id,versionID}, thunkAPI) => {
 		try {
 			const res = await API.get(
-				namespace + `workflows/${id}/versions/${parseInt(versionID)}`
+				namespace + `workflows/${id}/versions/${parseInt(versionID)}/activate`
 			);
-
 			handleSliceSuccess(thunkAPI, __('version active successfully', 'workflow'));
 
 			return res.data;
