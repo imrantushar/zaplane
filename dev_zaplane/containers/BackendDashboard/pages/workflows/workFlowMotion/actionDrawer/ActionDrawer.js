@@ -12,7 +12,7 @@ import {
     Flex,
     Code
 } from "@chakra-ui/react";
-import { fetchDynamic, getSingleRun, getSingleRunDetails, getSingleRunNode } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
+import { fetchDynamic, getSingleRun, getSingleRunDetails } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
 import { integrations } from "@ZAPUtils/helper";
 import { useFormikContext } from "formik";
 import { useEffect, useMemo, useState } from "react";
@@ -496,9 +496,7 @@ export default function ActionDrawer({
 
                                     <Tabs.Content value="test">
                                         <Box>
-                                           <Button  
-                                        //    onClick={()=>dispatch(getSingleRunNode(node?.id))}
-                                           >
+                                           <Button  onClick={()=>dispatch(getSingleRun(node?.id))}>
                                             Run test
                                            </Button>
                                            <Text>Response</Text>

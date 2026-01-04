@@ -12,7 +12,6 @@ import {
 	makeRequest,
 } from '@ZAPUtils/helper';
 import { showNotification } from '../notificationSlice/notificationSlice';
-import { version } from 'react';
 export const createWorkflows = createAsyncThunk(
 	'zaplane/createWorkflows',
 	async (payload, thunkAPI) => {
@@ -147,58 +146,7 @@ export const getSingleRun = createAsyncThunk(
 	async (runId, thunkAPI) => {
 		try {
 			const res = await API.get(
-				namespace + `node-runs/${parseInt(runId)}/retry`
-			);
-
-			handleSliceSuccess(thunkAPI, __('Run fetched successfully', 'workflow'));
-
-			return res.data;
-			
-		} catch (e) {
-			return handleSliceError(thunkAPI, e);
-		}
-	}
-);
-export const getNodeLogDetails = createAsyncThunk(
-	'zaplane/getNodeLogDetails',
-	async (runId, thunkAPI) => {
-		try {
-			const res = await API.get(
-				namespace + `runs/?P${parseInt(runId)}\d+/nodes`
-			);
-
-			handleSliceSuccess(thunkAPI, __('Run fetched successfully', 'workflow'));
-
-			return res.data;
-			
-		} catch (e) {
-			return handleSliceError(thunkAPI, e);
-		}
-	}
-);
-export const getAllVersion = createAsyncThunk(
-	'zaplane/getAllVersion',
-	async (runId, thunkAPI) => {
-		try {
-			const res = await API.get(
-				namespace + `workflows/${parseInt(runId)}/versions`
-			);
-
-			handleSliceSuccess(thunkAPI, __('Run fetched successfully', 'workflow'));
-
-			return res.data;
-			
-		} catch (e) {
-			return handleSliceError(thunkAPI, e);
-		}
-	}
-);
-export const getPreviewOldVersion = createAsyncThunk(
-	'zaplane/getPreviewOldVersion',
-	async (id,versionID, thunkAPI) => {
-		try {
-			const res = await API.get(
-				namespace + `workflows/${id}/versions/${versionID}`
+				namespace + `runs/${parseInt(runId)}`
 			);
 
 			handleSliceSuccess(thunkAPI, __('Run fetched successfully', 'workflow'));
@@ -216,8 +164,6 @@ const workflowsSlice = createSlice({
 	name: 'workflows',
 	initialState: {
 		data: [],
-		runs: [],
-		versions:[]
 
 	},
 	reducers: {
@@ -255,12 +201,6 @@ const workflowsSlice = createSlice({
 						? { ...item, status: action.payload.status }
 						: item
 				);
-			})
-			.addCase(getRunWorkFlow.fulfilled, (state, action) => {
-				state.runs = action.payload;
-			})
-			.addCase(getAllVersion.fulfilled, (state, action) => {
-				state.versions = action.payload;
 			})
 
 

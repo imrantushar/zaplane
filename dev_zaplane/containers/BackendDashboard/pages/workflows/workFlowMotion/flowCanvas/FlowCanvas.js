@@ -26,7 +26,6 @@ import {
     Badge,
     HStack,
     Text,
-    Tabs
 } from "@chakra-ui/react";
 import {
     FiArrowLeft,
@@ -34,7 +33,7 @@ import {
     FiHelpCircle,
 } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
-import { getAllVersion, getRunWorkFlow, getSingleWorkFlow, updateWorkFlow, updateWorkFlowStatus } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
+import { getRunWorkFlow, getSingleWorkFlow, updateWorkFlow } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { use } from "react";
 import { showNotification } from "@ZAPRedux/Slices/notificationSlice/notificationSlice";
@@ -42,9 +41,6 @@ import CustomNode from "../customNoe/CustomNode";
 import ZAPDrawer from "@ZAPComponents/Drawer";
 import LogDetails from "../Components/LogDetails/LogDetails";
 import { getRunLive, getRunTimeline, replayWorkflowRun, stopRun } from "@ZAPRedux/Slices/executionSlice/executionSlice";
-import { LucideHistory } from "lucide-react";
-import RunsTable from "./RunsTable/RunsTable";
-import VersionHistoryTable from "./VersionHistoryTable/VersionHistoryTable";
 ;
 export default function FlowCanvas({ id }) {
 
@@ -76,17 +72,13 @@ export default function FlowCanvas({ id }) {
     const { values, setFieldValue } = useFormikContext()
     const [loading, setLoading] = useState(false);
     const { data } = useSelector((state) => state.workflows);
-    const { runs } = useSelector((state) => state.workflows);
-    const { versions } = useSelector((state) => state.workflows);
-    console.log(versions, 'v');
     const singleData = data[0]
     const isFlowLoaded = useRef(false);
     const GAP = 220;
-    console.log(singleData);
     useEffect(() => {
-        if (!singleData?.graph || isFlowLoaded.current) return;
-        if (singleData.graph.nodes?.length) {
-            const mappedNodes = singleData.graph.nodes.map((node) => ({
+        if (!singleData?.nodes || isFlowLoaded.current) return;
+        if (singleData?.nodes?.length) {
+            const mappedNodes = singleData.nodes.map((node) => ({
                 ...node,
                 type: "custom",
                 data: {
@@ -95,21 +87,19 @@ export default function FlowCanvas({ id }) {
                 },
             }));
 
+
             setNodes(mappedNodes);
         }
-
-        if (singleData.graph.edges?.length) {
-            const mappedEdges = singleData.graph.edges.map((edge) => ({
+        if (singleData?.edges?.length) {
+            const mappedEdges = singleData.edges.map((edge) => ({
                 ...edge,
                 type: "custom",
             }));
 
             setEdges(mappedEdges);
         }
-
         isFlowLoaded.current = true;
     }, [singleData]);
-
 
 
 
@@ -415,12 +405,26 @@ export default function FlowCanvas({ id }) {
             />
         ),
     };
-
-    const statusOptions = [
-        { value: "active", label: "Active" },
-        { value: "paused", label: "Paused" },
-        { value: "draft", label: "draft" },
+    const [expandedRowId, setExpandedRowId] = useState(null);
+    const rows = [
+        {
+            id: 1,
+            createdAt: "2026-01-01 06:09:01",
+            status: "SUCCESS",
+            duration: "0.00 sec",
+            size: "0.00 KB",
+            nodes: 1,
+        },
+        {
+            id: 2,
+            createdAt: "2026-01-01 06:08:58",
+            status: "SUCCESS",
+            duration: "0.00 sec",
+            size: "0.00 KB",
+            nodes: 1,
+        },
     ];
+
     return (
         <div style={{ flex: 1, height: "100vh" }}>
             <TopBar
@@ -430,72 +434,38 @@ export default function FlowCanvas({ id }) {
                             <FiArrowLeft />
                         </Button>
                         <Text fontSize="md" fontWeight="medium">
-                            {singleData?.workflow?.title || __("Untitled Workflow", "zaplane")}
+                            {singleData?.title || __("Untitled Workflow", "zaplane")}
                         </Text>
                     </>
                 )}
-                middleContent={() => (
-                    <Tabs.Root defaultValue="Editor" variant="plain">
-                        <Tabs.List bg="bg.muted" rounded="l3" p="1">
-                            <Tabs.Trigger value="Editor">
-                                Editor
-                            </Tabs.Trigger>
-                            <Tabs.Trigger value="Executions">
-                                <ZAPDrawer
-                                    title="Execution"
-                                    placement='start'
-                                    trigger={
-                                        <Text margin="0" size="sm"
-                                            onClick={() => dispatch(getRunLive(id))}>
-
-                                            {__("Execution ", "zaplane")}
-                                        </Text>
-                                    }>
-
-
-                                </ZAPDrawer>
-                            </Tabs.Trigger>
-                            <Tabs.Indicator rounded="l2" />
-                        </Tabs.List>
-                        {/* <Tabs.Content value="members">Manage your team members</Tabs.Content>
-                        <Tabs.Content value="projects">Manage your projects</Tabs.Content> */}
-
-                    </Tabs.Root>
-                )}
                 rightContent={() => (
                     <>
-                        <ZAPDrawer
-                            title="Version History "
-                            trigger={
-                                <Text margin='0' cursor="pointer" onClick={() => dispatch(getAllVersion(id))}> <LucideHistory /></Text>
-
-                            }>
-
-                            <VersionHistoryTable
-                                versions={versions}
-                                
-                            />
-
-                        </ZAPDrawer>
-
-
-                        <Button size="sm" variant="outline"
+                        {/* <Checkbox.Root
+                            padding="7px 9px"
+                            borderRadius="4px"
+                            border="1px solid var(--zaplane-border-color)"
                         >
-                            {__(singleData?.workflow?.status, "zaplane")}
-                        </Button>
+                            <Checkbox.HiddenInput />
+                            <Checkbox.Control />
+                            <Checkbox.Label>show runs</Checkbox.Label>
+                        </Checkbox.Root> */}
+                        {/* <Button size="sm" variant="outline">
+                            {__("inactive", "zaplane")}
+                        </Button> */}
                         <Button size="sm" variant="outline"
                             onClick={() => dispatch(getRunWorkFlow())}>
                             {__("Runs", "zaplane")}
                         </Button>
                         <ZAPDrawer
-                            title="Log History"
-                            size="xl"
+                            title="Execution "
                             trigger={
-                                <Button size="sm" variant="outline" onClick={() => dispatch(getRunWorkFlow())}>
-                                    {__("Logs ", "zaplane")}
+                                <Button size="sm" variant="outline"
+                                    onClick={() => dispatch(getRunLive(id))}>
+
+                                    {__("Execution ", "zaplane")}
                                 </Button>
                             }>
-                            {/* <Flex gap={"10px"}>
+                            <Flex gap={"10px"}>
                                 <Button size="sm" variant="outline"
                                     onClick={() => dispatch(replayWorkflowRun(id))}>
                                     {__("Re play workflow ", "zaplane")}
@@ -509,11 +479,7 @@ export default function FlowCanvas({ id }) {
 
                                     {__("Stop ", "zaplane")}
                                 </Button>
-                            </Flex> */}
-                            <RunsTable
-                                runs={runs?.runs}
-                            />
-
+                            </Flex>
 
                         </ZAPDrawer>
                         <Button
