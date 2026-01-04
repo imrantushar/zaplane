@@ -4020,7 +4020,7 @@ const getRunWorkFlow = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAs
 });
 const getSingleRun = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyncThunk)('zaplane/getSingleRun', async (runId, thunkAPI) => {
   try {
-    const res = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.get(_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.namespace + `node-runs/${parseInt(runId)}/retry`);
+    const res = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.post(_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.namespace + `node-runs/${parseInt(runId)}/retry`);
     (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.handleSliceSuccess)(thunkAPI, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Run fetched successfully', 'workflow'));
     return res.data;
   } catch (e) {

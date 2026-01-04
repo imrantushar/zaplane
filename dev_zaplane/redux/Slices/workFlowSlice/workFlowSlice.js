@@ -146,7 +146,7 @@ export const getSingleRun = createAsyncThunk(
 	'zaplane/getSingleRun',
 	async (runId, thunkAPI) => {
 		try {
-			const res = await API.get(
+			const res = await API.post(
 				namespace + `node-runs/${parseInt(runId)}/retry`
 			);
 
