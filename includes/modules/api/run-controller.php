@@ -41,24 +41,6 @@ class RunController extends WP_REST_Controller {
             'permission_callback' => [$this, 'permissions']
         ]);
 
-        register_rest_route($ns, '/queue', [
-            'methods'  => 'GET',
-            'callback' => [$this, 'get_queue'],
-            'permission_callback' => [$this, 'permissions']
-        ]);
-
-        register_rest_route($ns, '/node-runs/(?P<id>\d+)', [
-            'methods'  => 'GET',
-            'callback' => [$this, 'get_node_run'],
-            'permission_callback' => [$this, 'permissions']
-        ]);
-
-        register_rest_route($ns, '/node-runs/(?P<id>\d+)/retry', [
-            'methods'  => 'POST',
-            'callback' => [$this, 'retry_node'],
-            'permission_callback' => [$this, 'permissions']
-        ]);
-
         register_rest_route($ns, '/runs/(?P<id>\d+)/timeline', [
             'methods'=>'GET',
             'callback'=>[$this,'get_timeline'],
@@ -77,6 +59,31 @@ class RunController extends WP_REST_Controller {
             'callback'=>[$this,'stop_run'],
             'permission_callback'=>[$this,'permissions']
         ]);
+
+        register_rest_route($ns, '/queue', [
+            'methods'  => 'GET',
+            'callback' => [$this, 'get_queue'],
+            'permission_callback' => [$this, 'permissions']
+        ]);
+
+        register_rest_route($ns, '/node-runs/(?P<id>\d+)', [
+            'methods'  => 'GET',
+            'callback' => [$this, 'get_node_run'],
+            'permission_callback' => [$this, 'permissions']
+        ]);
+        register_rest_route($ns, '/node-runs/(?P<id>\d+)/inspect', [
+            'methods' => 'GET',
+            'callback' => [$this,'inspect_node'],
+            'permission_callback' => [$this,'permissions']
+        ]);
+
+        register_rest_route($ns, '/node-runs/(?P<id>\d+)/retry', [
+            'methods'  => 'POST',
+            'callback' => [$this, 'retry_node'],
+            'permission_callback' => [$this, 'permissions']
+        ]);
+
+        
 
     }
 
@@ -471,8 +478,61 @@ class RunController extends WP_REST_Controller {
         return ['stopped'=>true];
     }
 
+    public function inspect_node($req){
+        global $wpdb;
+        $id = (int)$req['id'];
 
+        // Node run
+        $nr = $wpdb->get_row(
+            $wpdb->prepare("SELECT * FROM {$wpdb->prefix}zaplane_node_runs WHERE id=%d",$id),
+            ARRAY_A
+        );
+        if(!$nr) return new \WP_Error('not_found','Node not found',['status'=>404]);
 
+        // Run
+        $run = $wpdb->get_row(
+            $wpdb->prepare("SELECT * FROM {$wpdb->prefix}zaplane_runs WHERE id=%d",$nr['run_id']),
+            ARRAY_A
+        );
 
+        // Parent (from execution edges)
+        $parent = $wpdb->get_row(
+            $wpdb->prepare(
+                "SELECT nr.id,nr.node_key 
+                FROM {$wpdb->prefix}zaplane_execution_edges e
+                JOIN {$wpdb->prefix}zaplane_node_runs nr ON nr.id=e.from_node_run_id
+                WHERE e.run_id=%d AND e.to_node_key=%s
+                ORDER BY e.id DESC LIMIT 1",
+                $nr['run_id'],$nr['node_key']
+            ),
+            ARRAY_A
+        );
 
+        // Logs
+        $logs = $wpdb->get_results(
+            $wpdb->prepare(
+                "SELECT level,message,created_at 
+                FROM {$wpdb->prefix}zaplane_node_logs 
+                WHERE node_run_id=%d ORDER BY id",$id),
+            ARRAY_A
+        );
+
+        return [
+            'node_run'=>[
+                'id'=>$nr['id'],
+                'node_key'=>$nr['node_key'],
+                'status'=>$nr['status'],
+                'started_at'=>$nr['started_at'],
+                'finished_at'=>$nr['finished_at'],
+                'input'=>json_decode($nr['input_json'],true),
+                'output'=>json_decode($nr['output_json'],true),
+            ],
+            'trigger'=>[
+                'type'=>'trigger',
+                'data'=>json_decode($run['trigger_data'],true)
+            ],
+            'parent'=>$parent,
+            'logs'=>$logs
+        ];
+    }
 }
