@@ -42,34 +42,26 @@ class Automation {
 
 
         // Action Scheduler hook
-        add_action('zaplane_execute_node', [$this, 'dispatch_execute_node'], 10, 2);
+        add_action('zaplane_execute_node_run', [$this, 'dispatch_execute_node_run'], 10, 1);
     }
 
-
-    public function dispatch_execute_node($run_id, $node_id) {
-        if (empty($run_id) || empty($node_id)) return;
-
+    public function dispatch_execute_node_run($node_run_id) {
         global $wpdb;
 
-        // Fetch the correct node_run from queue
         $node_run = $wpdb->get_row(
             $wpdb->prepare(
-                "SELECT * FROM {$wpdb->prefix}zaplane_node_runs 
-                WHERE run_id=%d AND node_key=%s AND status='pending' 
-                ORDER BY id ASC LIMIT 1",
-                $run_id,
-                $node_id
+                "SELECT * FROM {$wpdb->prefix}zaplane_node_runs WHERE id=%d",
+                $node_run_id
             ),
             ARRAY_A
         );
 
         if (!$node_run) return;
 
-        // Call base class method to execute it
         $this->execute_node_run($node_run);
-        // After processing this node, check if run is complete
         $this->finalize_run((int)$node_run['run_id']);
     }
+
 
     public function reload_triggers(): void {
         $this->deregister_hooks();
@@ -239,7 +231,7 @@ class Automation {
         ]);
 
         // 3️⃣ Schedule via Action Scheduler
-        $this->schedule_node($run_id, $node_key);
+        $this->schedule_node_run($node_run_id);
 
         // 4️⃣ Insert execution edge if parent exists
         if ($parent_node_run_id) {
@@ -265,19 +257,15 @@ class Automation {
      * ACTION SCHEDULER
      * ===================================================== */
 
-    public function schedule_node(int $run_id, string $node_id, int $delay = 0): void {
-        if (!function_exists('as_enqueue_async_action')) return;
-
+    public function schedule_node_run(int $node_run_id, int $delay = 0) {
         as_enqueue_async_action(
-            'zaplane_execute_node',
-            [
-                'run_id' => $run_id,
-                'node_id' => $node_id
-            ],
+            'zaplane_execute_node_run',
+            ['node_run_id' => $node_run_id],
             'zaplane-workflows',
             time() + $delay
         );
     }
+
 
     /* =====================================================
      * WORKER TICK
