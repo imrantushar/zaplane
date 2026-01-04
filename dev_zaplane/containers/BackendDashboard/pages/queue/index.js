@@ -56,9 +56,7 @@ const Queue = () => {
                                     }
                                 />
                                 <Text fontSize="sm">
-                                    {isSuccess(row.status)
-                                        ? "Success"
-                                        : "Failed"}
+                                    {row.status}
                                 </Text>
                             </HStack>
                         </Table.Cell>

@@ -1290,7 +1290,7 @@ const Queue = () => {
               bg: isSuccess(row.status) ? "green.500" : "red.500"
             }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
               fontSize: "sm",
-              children: isSuccess(row.status) ? "Success" : "Failed"
+              children: row.status
             })]
           })
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.TableCell, {
@@ -4060,7 +4060,7 @@ const deepLogsRun = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsync
 });
 const getNodeLogDetails = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyncThunk)('zaplane/getNodeLogDetails', async (runId, thunkAPI) => {
   try {
-    const res = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.get(_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.namespace + `runs/?P${parseInt(runId)}\d+/nodes`);
+    const res = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.get(_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.namespace + `runs/${parseInt(runId)}/nodes`);
     return res.data;
   } catch (e) {
     return (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.handleSliceError)(thunkAPI, e);

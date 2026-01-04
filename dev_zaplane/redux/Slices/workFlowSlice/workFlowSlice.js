@@ -194,7 +194,7 @@ export const getNodeLogDetails = createAsyncThunk(
 	async (runId, thunkAPI) => {
 		try {
 			const res = await API.get(
-				namespace + `runs/?P${parseInt(runId)}\d+/nodes`
+				namespace + `runs/${parseInt(runId)}/nodes`
 			);
 
 			return res.data;
