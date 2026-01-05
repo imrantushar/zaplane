@@ -4134,6 +4134,12 @@ const workflowsSlice = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createSl
       state.runs = action.payload;
     }).addCase(getAllVersion.fulfilled, (state, action) => {
       state.versions = action.payload;
+    }).addCase(versionActive.fulfilled, (state, action) => {
+      const activeVersionId = action.meta.arg.versionID;
+      state.versions = state.versions.map(version => ({
+        ...version,
+        is_active: parseInt(version.id) === parseInt(activeVersionId) ? "1" : "0"
+      }));
     });
   }
 });
