@@ -254,8 +254,8 @@ const workflowsSlice = createSlice({
 		data: [],
 		runs: [],
 		versions: [],
-		nodeDetails:[]
-		
+		nodeDetails: []
+
 
 	},
 	reducers: {
@@ -296,6 +296,15 @@ const workflowsSlice = createSlice({
 			})
 			.addCase(getRunWorkFlow.fulfilled, (state, action) => {
 				state.runs = action.payload;
+			})
+			.addCase(getPreviewOldVersion.fulfilled, (state, action) => {
+				if (!state.data.length) return;
+				state.data[0] = {
+					...state.data[0],
+					graph: action.payload.graph,
+					is_preview: true,
+					preview_version_id: action.payload.version?.id,
+				};
 			})
 			.addCase(getAllVersion.fulfilled, (state, action) => {
 				state.versions = action.payload;

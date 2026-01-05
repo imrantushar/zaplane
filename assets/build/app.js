@@ -2593,27 +2593,22 @@ function FlowCanvas({
   const GAP = 220;
   console.log(singleData);
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
-    if (!singleData?.graph || isFlowLoaded.current) return;
-    if (singleData.graph.nodes?.length) {
-      const mappedNodes = singleData.graph.nodes.map(node => ({
-        ...node,
-        type: "custom",
-        data: {
-          ...node.data,
-          action: node.type
-        }
-      }));
-      setNodes(mappedNodes);
-    }
-    if (singleData.graph.edges?.length) {
-      const mappedEdges = singleData.graph.edges.map(edge => ({
-        ...edge,
-        type: "custom"
-      }));
-      setEdges(mappedEdges);
-    }
-    isFlowLoaded.current = true;
-  }, [singleData]);
+    if (!singleData?.graph) return;
+    const mappedNodes = (singleData.graph.nodes || []).map(node => ({
+      ...node,
+      type: "custom",
+      data: {
+        ...node.data,
+        action: node.type
+      }
+    }));
+    const mappedEdges = (singleData.graph.edges || []).map(edge => ({
+      ...edge,
+      type: "custom"
+    }));
+    setNodes(mappedNodes);
+    setEdges(mappedEdges);
+  }, [singleData?.graph]);
   const [drawerContext, setDrawerContext] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)({
     source: null,
     node: null,
@@ -4151,6 +4146,14 @@ const workflowsSlice = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createSl
       } : item);
     }).addCase(getRunWorkFlow.fulfilled, (state, action) => {
       state.runs = action.payload;
+    }).addCase(getPreviewOldVersion.fulfilled, (state, action) => {
+      if (!state.data.length) return;
+      state.data[0] = {
+        ...state.data[0],
+        graph: action.payload.graph,
+        is_preview: true,
+        preview_version_id: action.payload.version?.id
+      };
     }).addCase(getAllVersion.fulfilled, (state, action) => {
       state.versions = action.payload;
     }).addCase(versionActive.fulfilled, (state, action) => {

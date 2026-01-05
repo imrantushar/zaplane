@@ -76,7 +76,7 @@ export default function FlowCanvas({ id }) {
     const [loading, setLoading] = useState(false);
     const { data } = useSelector((state) => state.workflows);
     const { runs } = useSelector((state) => state.workflows);
-    console.log(runs,'runss');
+    console.log(runs, 'runss');
     const { versions } = useSelector((state) => state.workflows);
     console.log(versions, 'v');
     const singleData = data[0]
@@ -84,36 +84,23 @@ export default function FlowCanvas({ id }) {
     const GAP = 220;
     console.log(singleData);
     useEffect(() => {
-        if (!singleData?.graph || isFlowLoaded.current) return;
-        if (singleData.graph.nodes?.length) {
-            const mappedNodes = singleData.graph.nodes.map((node) => ({
-                ...node,
-                type: "custom",
-                data: {
-                    ...node.data,
-                    action: node.type,
-                },
-            }));
+        if (!singleData?.graph) return;
+        const mappedNodes = (singleData.graph.nodes || []).map((node) => ({
+            ...node,
+            type: "custom",
+            data: {
+                ...node.data,
+                action: node.type,
+            },
+        }));
 
-            setNodes(mappedNodes);
-        }
-
-        if (singleData.graph.edges?.length) {
-            const mappedEdges = singleData.graph.edges.map((edge) => ({
-                ...edge,
-                type: "custom",
-            }));
-
-            setEdges(mappedEdges);
-        }
-
-        isFlowLoaded.current = true;
-    }, [singleData]);
-
-
-
-
-
+        const mappedEdges = (singleData.graph.edges || []).map((edge) => ({
+            ...edge,
+            type: "custom",
+        }));
+        setNodes(mappedNodes);
+        setEdges(mappedEdges);
+    }, [singleData?.graph]);
     const [drawerContext, setDrawerContext] = useState({
         source: null,
         node: null,
@@ -389,15 +376,15 @@ export default function FlowCanvas({ id }) {
         );
     };
     const deleteNode = useCallback((nodeId) => {
-        console.log(nodeId,'nodeid');
-    setNodes((nds) => nds.filter((n) => n.id !== nodeId));
+        console.log(nodeId, 'nodeid');
+        setNodes((nds) => nds.filter((n) => n.id !== nodeId));
 
-    setEdges((eds) =>
-        eds.filter(
-            (e) => e.source !== nodeId && e.target !== nodeId
-        )
-    );
-}, []);
+        setEdges((eds) =>
+            eds.filter(
+                (e) => e.source !== nodeId && e.target !== nodeId
+            )
+        );
+    }, []);
 
     console.log(nodes, 'all nodes');
     console.log(edges, 'all edges');
@@ -484,7 +471,7 @@ export default function FlowCanvas({ id }) {
                             <VersionHistoryTable
                                 versions={versions}
                                 id={id}
-                                
+
                             />
 
                         </ZAPDrawer>
@@ -506,10 +493,10 @@ export default function FlowCanvas({ id }) {
                                     {__("Logs ", "zaplane")}
                                 </Button>
                             }>
-                                <Button size="sm" variant="outline"
-                                    onClick={() => dispatch(replayWorkflowRun(id))}>
-                                    {__("🔄 Replay ", "zaplane")}
-                                </Button>
+                            <Button size="sm" variant="outline"
+                                onClick={() => dispatch(replayWorkflowRun(id))}>
+                                {__("🔄 Replay ", "zaplane")}
+                            </Button>
                             <RunsTable
                                 runs={runs?.runs}
                             />
