@@ -2356,7 +2356,8 @@ function CustomNode({
         pointerEvents: "auto",
         children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.Icon, {
           as: react_icons_ri__WEBPACK_IMPORTED_MODULE_7__.RiDeleteBin7Line,
-          boxSize: 4
+          boxSize: 4,
+          onClick: () => data?.deleteNode(id)
         }), !data?.action && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.Icon, {
           as: react_icons_fa__WEBPACK_IMPORTED_MODULE_8__.FaRegCopy,
           boxSize: 4
@@ -2866,6 +2867,11 @@ function FlowCanvas({
       return n;
     }));
   };
+  const deleteNode = (0,react__WEBPACK_IMPORTED_MODULE_0__.useCallback)(nodeId => {
+    console.log(nodeId, 'nodeid');
+    setNodes(nds => nds.filter(n => n.id !== nodeId));
+    setEdges(eds => eds.filter(e => e.source !== nodeId && e.target !== nodeId));
+  }, []);
   console.log(nodes, 'all nodes');
   console.log(edges, 'all edges');
   const nodeTypes = {
@@ -2874,7 +2880,8 @@ function FlowCanvas({
       data: {
         ...props.data,
         onOpenDrawer: () => openDrawerForNode(props),
-        openDrawerFromAdd: () => openDrawerFromAdd(props)
+        openDrawerFromAdd: () => openDrawerFromAdd(props),
+        deleteNode: () => deleteNode(props.id)
       }
     })
   };
