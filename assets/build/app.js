@@ -906,8 +906,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _ZAPComponents_Notification__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @ZAPComponents/Notification */ "./dev_zaplane/components/Notification/index.js");
 /* harmony import */ var _pages_logs__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./pages/logs */ "./dev_zaplane/containers/BackendDashboard/pages/logs/index.js");
 /* harmony import */ var _pages_queue__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./pages/queue */ "./dev_zaplane/containers/BackendDashboard/pages/queue/index.js");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__);
+/* harmony import */ var _pages_setting__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./pages/setting */ "./dev_zaplane/containers/BackendDashboard/pages/setting/index.js");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__);
+
 
 
 
@@ -919,20 +921,22 @@ __webpack_require__.r(__webpack_exports__);
 const renderSwitch = (page, id, action, path) => {
   switch (page) {
     case 'zaplane':
-      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.Fragment, {
+      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.Fragment, {
         children: "Zaplane Dashboard"
       });
     case 'zaplane-workflows':
       if (action || id) {
-        return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_pages_workflows_workFlowMotion__WEBPACK_IMPORTED_MODULE_3__["default"], {
+        return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_pages_workflows_workFlowMotion__WEBPACK_IMPORTED_MODULE_3__["default"], {
           id: id
         });
       }
-      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_pages_workflows__WEBPACK_IMPORTED_MODULE_2__["default"], {});
+      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_pages_workflows__WEBPACK_IMPORTED_MODULE_2__["default"], {});
     case 'zaplane-logs':
-      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_pages_logs__WEBPACK_IMPORTED_MODULE_5__["default"], {});
+      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_pages_logs__WEBPACK_IMPORTED_MODULE_5__["default"], {});
     case 'zaplane-queue':
-      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_pages_queue__WEBPACK_IMPORTED_MODULE_6__["default"], {});
+      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_pages_queue__WEBPACK_IMPORTED_MODULE_6__["default"], {});
+    case 'zaplane-settings':
+      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_pages_setting__WEBPACK_IMPORTED_MODULE_7__["default"], {});
 
     // case 'zaplane-settings':
     // 	return <Settings />;
@@ -958,16 +962,16 @@ const renderSwitch = (page, id, action, path) => {
     // 	return <Leaderboards />;
 
     default:
-      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.Fragment, {
+      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.Fragment, {
         children: "No page found"
       });
   }
 };
 function BackendDashboard() {
   const query = (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_0__.useQuery)();
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)("div", {
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)("div", {
     className: "zaplane-admin-content",
-    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_ZAPComponents_Notification__WEBPACK_IMPORTED_MODULE_4__["default"], {}), renderSwitch(query.get('page'), parseInt(query.get('id')), query.get('action'), query.get('path'))]
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_ZAPComponents_Notification__WEBPACK_IMPORTED_MODULE_4__["default"], {}), renderSwitch(query.get('page'), parseInt(query.get('id')), query.get('action'), query.get('path'))]
   });
 }
 
@@ -1320,6 +1324,156 @@ const Queue = () => {
   });
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Queue);
+
+/***/ },
+
+/***/ "./dev_zaplane/containers/BackendDashboard/pages/setting/index.js"
+/*!************************************************************************!*\
+  !*** ./dev_zaplane/containers/BackendDashboard/pages/setting/index.js ***!
+  \************************************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var react_redux__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/dist/react-redux.mjs");
+/* harmony import */ var _ZAPRedux_Slices_settingSlice_settingSlice__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @ZAPRedux/Slices/settingSlice/settingSlice */ "./dev_zaplane/redux/Slices/settingSlice/settingSlice.js");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__);
+
+
+
+
+const Setting = () => {
+  const dispatch = (0,react_redux__WEBPACK_IMPORTED_MODULE_1__.useDispatch)();
+  const {
+    data,
+    loading
+  } = (0,react_redux__WEBPACK_IMPORTED_MODULE_1__.useSelector)(state => state.setting);
+  console.log(data);
+  const [method, setMethod] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)('GET');
+  const [path, setPath] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)('');
+  const [body, setBody] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)('');
+  const handleSubmit = () => {
+    try {
+      dispatch((0,_ZAPRedux_Slices_settingSlice_settingSlice__WEBPACK_IMPORTED_MODULE_2__.testAPI)({
+        method,
+        path,
+        body: body ? JSON.parse(body) : null
+      }));
+    } catch (e) {
+      alert('Invalid JSON body');
+    }
+  };
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("div", {
+    style: {
+      maxWidth: '900px',
+      margin: 'auto',
+      padding: '20px',
+      fontFamily: 'sans-serif'
+    },
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("h2", {
+      style: {
+        fontSize: '24px',
+        fontWeight: 'bold',
+        marginBottom: '20px'
+      },
+      children: "API Tester"
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("div", {
+      style: {
+        marginBottom: '15px'
+      },
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("select", {
+        value: method,
+        onChange: e => setMethod(e.target.value),
+        style: {
+          marginRight: '10px'
+        },
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("option", {
+          value: "GET",
+          children: "GET"
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("option", {
+          value: "POST",
+          children: "POST"
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("option", {
+          value: "PUT",
+          children: "PUT"
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("option", {
+          value: "DELETE",
+          children: "DELETE"
+        })]
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("input", {
+        type: "text",
+        placeholder: "",
+        value: path,
+        onChange: e => setPath(e.target.value),
+        style: {
+          padding: '8px',
+          width: '60%',
+          marginRight: '10px'
+        }
+      })]
+    }), (method === 'POST' || method === 'PUT') && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("textarea", {
+      placeholder: "JSON Body e.g. { \"name\": \"example\" }",
+      value: body,
+      onChange: e => setBody(e.target.value),
+      rows: 5,
+      style: {
+        width: '100%',
+        padding: '10px',
+        marginBottom: '10px',
+        fontFamily: 'monospace'
+      }
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("button", {
+      onClick: handleSubmit,
+      disabled: loading,
+      style: {
+        padding: '10px 20px',
+        backgroundColor: '#3182ce',
+        color: '#fff',
+        border: 'none',
+        borderRadius: '4px',
+        cursor: 'pointer'
+      },
+      children: loading ? 'Loading...' : 'Send Request'
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("hr", {
+      style: {
+        margin: '30px 0'
+      }
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("h3", {
+      style: {
+        fontWeight: 'bold',
+        marginBottom: '10px'
+      },
+      children: "data"
+    }), !data || data.length === 0 ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("p", {
+      style: {
+        color: '#666'
+      },
+      children: "No response yet"
+    }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
+      style: {
+        background: '#f7fafc',
+        padding: '10px',
+        border: '1px solid #e2e8f0',
+        borderRadius: '5px',
+        marginBottom: '10px'
+      },
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("pre", {
+        style: {
+          whiteSpace: 'pre-wrap',
+          wordBreak: 'break-word'
+        },
+        children: JSON.stringify(data, null, 2)
+      })
+    })]
+  });
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Setting);
 
 /***/ },
 
@@ -3918,6 +4072,73 @@ const queueSlice = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createSlice)
 
 /***/ },
 
+/***/ "./dev_zaplane/redux/Slices/settingSlice/settingSlice.js"
+/*!***************************************************************!*\
+  !*** ./dev_zaplane/redux/Slices/settingSlice/settingSlice.js ***!
+  \***************************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__),
+/* harmony export */   testAPI: () => (/* binding */ testAPI)
+/* harmony export */ });
+/* harmony import */ var _reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @reduxjs/toolkit */ "./node_modules/@reduxjs/toolkit/dist/redux-toolkit.modern.mjs");
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @ZAPUtils/helper */ "./dev_zaplane/utils/helper.js");
+/* harmony import */ var _notificationSlice_notificationSlice__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../notificationSlice/notificationSlice */ "./dev_zaplane/redux/Slices/notificationSlice/notificationSlice.js");
+
+
+
+
+const testAPI = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyncThunk)('zaplane/runDynamicApi', async ({
+  method,
+  path,
+  body
+}, thunkAPI) => {
+  try {
+    const url = _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.namespace + path;
+    let res;
+    switch (method) {
+      case 'GET':
+        res = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.get(url);
+        break;
+      case 'POST':
+        res = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.post(url, body);
+        break;
+      case 'PUT':
+        res = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.put(url, body);
+        break;
+      case 'DELETE':
+        res = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.delete(url);
+        break;
+      default:
+        throw new Error('Invalid HTTP Method');
+    }
+    (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.handleSliceSuccess)(thunkAPI, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('API request successful', 'workflow'));
+    return res.data;
+  } catch (e) {
+    return (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.handleSliceError)(thunkAPI, e);
+  }
+});
+const settingSlice = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createSlice)({
+  name: 'setting',
+  initialState: {
+    data: []
+  },
+  reducers: {},
+  extraReducers: builder => {
+    builder.addCase(testAPI.fulfilled, (state, action) => {
+      state.data = action.payload;
+    });
+  }
+});
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (settingSlice.reducer);
+
+/***/ },
+
 /***/ "./dev_zaplane/redux/Slices/workFlowSlice/workFlowSlice.js"
 /*!*****************************************************************!*\
   !*** ./dev_zaplane/redux/Slices/workFlowSlice/workFlowSlice.js ***!
@@ -4212,12 +4433,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Slices_logsSlice_logsSlice__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./Slices/logsSlice/logsSlice */ "./dev_zaplane/redux/Slices/logsSlice/logsSlice.js");
 /* harmony import */ var _Slices_queueSlice_queueSlice__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./Slices/queueSlice/queueSlice */ "./dev_zaplane/redux/Slices/queueSlice/queueSlice.js");
 /* harmony import */ var _Slices_executionSlice_executionSlice__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./Slices/executionSlice/executionSlice */ "./dev_zaplane/redux/Slices/executionSlice/executionSlice.js");
-/* harmony import */ var _Slices_notificationSlice_notificationSlice__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./Slices/notificationSlice/notificationSlice */ "./dev_zaplane/redux/Slices/notificationSlice/notificationSlice.js");
-/* harmony import */ var redux_logger__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! redux-logger */ "./node_modules/redux-logger/dist/redux-logger.js");
-/* harmony import */ var redux_logger__WEBPACK_IMPORTED_MODULE_8___default = /*#__PURE__*/__webpack_require__.n(redux_logger__WEBPACK_IMPORTED_MODULE_8__);
+/* harmony import */ var _Slices_settingSlice_settingSlice__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./Slices/settingSlice/settingSlice */ "./dev_zaplane/redux/Slices/settingSlice/settingSlice.js");
+/* harmony import */ var _Slices_notificationSlice_notificationSlice__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./Slices/notificationSlice/notificationSlice */ "./dev_zaplane/redux/Slices/notificationSlice/notificationSlice.js");
+/* harmony import */ var redux_logger__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! redux-logger */ "./node_modules/redux-logger/dist/redux-logger.js");
+/* harmony import */ var redux_logger__WEBPACK_IMPORTED_MODULE_9___default = /*#__PURE__*/__webpack_require__.n(redux_logger__WEBPACK_IMPORTED_MODULE_9__);
 
 
 // Import all the reducers you have created
+
 
 
 
@@ -4236,16 +4459,17 @@ __webpack_require__.r(__webpack_exports__);
 const store = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.configureStore)({
   reducer: {
     // Register the reducer from each slice here
-    notification: _Slices_notificationSlice_notificationSlice__WEBPACK_IMPORTED_MODULE_7__["default"],
+    notification: _Slices_notificationSlice_notificationSlice__WEBPACK_IMPORTED_MODULE_8__["default"],
     adminmenu: _Slices_menuSlice_menuSlice__WEBPACK_IMPORTED_MODULE_2__["default"],
     app: _Slices_appSlice_appSlice__WEBPACK_IMPORTED_MODULE_1__["default"],
     workflows: _Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_3__["default"],
     logs: _Slices_logsSlice_logsSlice__WEBPACK_IMPORTED_MODULE_4__["default"],
     queue: _Slices_queueSlice_queueSlice__WEBPACK_IMPORTED_MODULE_5__["default"],
-    execution: _Slices_executionSlice_executionSlice__WEBPACK_IMPORTED_MODULE_6__["default"]
+    execution: _Slices_executionSlice_executionSlice__WEBPACK_IMPORTED_MODULE_6__["default"],
+    setting: _Slices_settingSlice_settingSlice__WEBPACK_IMPORTED_MODULE_7__["default"]
     // Future reducers will be added here (e.g., points, settings)
   },
-  middleware: getDefaultMiddleware => getDefaultMiddleware().concat((redux_logger__WEBPACK_IMPORTED_MODULE_8___default()))
+  middleware: getDefaultMiddleware => getDefaultMiddleware().concat((redux_logger__WEBPACK_IMPORTED_MODULE_9___default()))
 });
 
 /***/ },
