@@ -49,69 +49,69 @@ export default function ActionDrawer({
     const dispatch=useDispatch()
 
     const [conditions, setConditions] = useState([
-        {
-            id: crypto.randomUUID(),
-            type: "AND",
-            rules: [
-                {
-                    id: crypto.randomUUID(),
-                    field: "",
-                    operator: "",
-                    value: "",
-                },
-            ],
-        },
+        // {
+        //     id: crypto.randomUUID(),
+        //     type: "AND",
+        //     rules: [
+        //         {
+        //             id: crypto.randomUUID(),
+        //             field: "",
+        //             operator: "",
+        //             value: "",
+        //         },
+        //     ],
+        // },
     ]);
 
-    const addAndCondition = (groupId) => {
-        setConditions((prev) =>
-            prev.map((g) =>
-                g.id === groupId
-                    ? {
-                        ...g,
-                        rules: [
-                            ...g.rules,
-                            { id: crypto.randomUUID(), field: "", operator: "", value: "" },
-                        ],
-                    }
-                    : g
-            )
-        );
-    };
+    // const addAndCondition = (groupId) => {
+    //     setConditions((prev) =>
+    //         prev.map((g) =>
+    //             g.id === groupId
+    //                 ? {
+    //                     ...g,
+    //                     rules: [
+    //                         ...g.rules,
+    //                         { id: crypto.randomUUID(), field: "", operator: "", value: "" },
+    //                     ],
+    //                 }
+    //                 : g
+    //         )
+    //     );
+    // };
 
-    const addOrGroup = () => {
-        setConditions((prev) => [
-            ...prev,
-            {
-                id: crypto.randomUUID(),
-                type: "OR",
-                rules: [{ id: crypto.randomUUID(), field: "", operator: "", value: "" }],
-            },
-        ]);
-    };
+    // const addOrGroup = () => {
+    //     setConditions((prev) => [
+    //         ...prev,
+    //         {
+    //             id: crypto.randomUUID(),
+    //             type: "OR",
+    //             rules: [{ id: crypto.randomUUID(), field: "", operator: "", value: "" }],
+    //         },
+    //     ]);
+    // };
 
-    const updateRule = (groupId, ruleId, key, value) => {
-        setConditions((prev) =>
-            prev.map((g) =>
-                g.id === groupId
-                    ? {
-                        ...g,
-                        rules: g.rules.map((r) => (r.id === ruleId ? { ...r, [key]: value } : r)),
-                    }
-                    : g
-            )
-        );
-    };
+    // const updateRule = (groupId, ruleId, key, value) => {
+    //     setConditions((prev) =>
+    //         prev.map((g) =>
+    //             g.id === groupId
+    //                 ? {
+    //                     ...g,
+    //                     rules: g.rules.map((r) => (r.id === ruleId ? { ...r, [key]: value } : r)),
+    //                 }
+    //                 : g
+    //         )
+    //     );
+    // };
 
-    const removeRule = (groupId, ruleId) => {
-        setConditions((prev) =>
-            prev.map((g) =>
-                g.id === groupId
-                    ? { ...g, rules: g.rules.filter((r) => r.id !== ruleId) }
-                    : g
-            )
-        );
-    };
+    // const removeRule = (groupId, ruleId) => {
+    //     setConditions((prev) =>
+    //         prev.map((g) =>
+    //             g.id === groupId
+    //                 ? { ...g, rules: g.rules.filter((r) => r.id !== ruleId) }
+    //                 : g
+    //         )
+    //     );
+    // };
 
     const resetAll = () => {
         setMode(null);
