@@ -27,7 +27,7 @@ const APPS = Object.entries(integrations?.integrations || {}).map(
 );
 
 const TOOLS = [
-    { id: "condition", name: "Condition" },
+    // { id: "condition", name: "Condition" },
     { id: "router", name: "Router" },
 ];
 

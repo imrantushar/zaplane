@@ -1733,10 +1733,9 @@ const APPS = Object.entries(_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_13__.integ
   id: value.slug || key,
   name: value.name
 }));
-const TOOLS = [{
-  id: "condition",
-  name: "Condition"
-}, {
+const TOOLS = [
+// { id: "condition", name: "Condition" },
+{
   id: "router",
   name: "Router"
 }];
