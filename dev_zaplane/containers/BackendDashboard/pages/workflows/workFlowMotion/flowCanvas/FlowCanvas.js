@@ -34,7 +34,7 @@ import {
     FiHelpCircle,
 } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
-import { getAllVersion, getRunWorkFlow, getSingleWorkFlow, updateWorkFlow, updateWorkFlowStatus } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
+import { getAllVersion, getRunWorkFlow, getSingleWorkFlow, liveMonitor, updateWorkFlow, updateWorkFlowStatus } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { use } from "react";
 import { showNotification } from "@ZAPRedux/Slices/notificationSlice/notificationSlice";
@@ -500,7 +500,6 @@ export default function FlowCanvas({ id }) {
                                     onClick={() => dispatch(replayWorkflowRun(id))}>
                                     {__("🔄 Replay ", "zaplane")}
                                 </Button>
-                                
                             <RunsTable
                                 runs={runs?.runs}
                             />

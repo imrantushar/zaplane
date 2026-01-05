@@ -29,7 +29,7 @@ const Queue = () => {
                     <Table.ColumnHeader>CREATED AT</Table.ColumnHeader>
                     <Table.ColumnHeader>STATUS</Table.ColumnHeader>
                     <Table.ColumnHeader>DURATION / SIZE</Table.ColumnHeader>
-                    <Table.ColumnHeader>NODES</Table.ColumnHeader>
+                    <Table.ColumnHeader>NODES key</Table.ColumnHeader>
                 </Table.Row>
             </Table.Header>
 

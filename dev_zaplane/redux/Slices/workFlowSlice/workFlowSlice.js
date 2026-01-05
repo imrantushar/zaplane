@@ -168,21 +168,21 @@ export const nodeLogsRunDetails = createAsyncThunk(
 		}
 	}
 );
-// export const deepLogsRun = createAsyncThunk(
-// 	'zaplane/deepLogsRun',
-// 	async (runId, thunkAPI) => {
-// 		try {
-// 			const res = await API.get(
-// 				namespace + `node-runs/${runId}`
-// 			);
+export const singleNodeRun = createAsyncThunk(
+	'zaplane/singleNodeRun',
+	async (runId, thunkAPI) => {
+		try {
+			const res = await API.get(
+				namespace + `node-runs/${runId}`
+			);
 
-// 			return res.data;
+			return res.data;
 
-// 		} catch (e) {
-// 			return handleSliceError(thunkAPI, e);
-// 		}
-// 	}
-// );
+		} catch (e) {
+			return handleSliceError(thunkAPI, e);
+		}
+	}
+);
 export const getNodeLogDetails = createAsyncThunk(
 	'zaplane/getNodeLogDetails',
 	async (runId, thunkAPI) => {
