@@ -1832,15 +1832,12 @@ function ActionDrawer({
     setStep("select");
     setSelectedItem(null);
     onClose();
-    setConditions([{
-      id: crypto.randomUUID(),
-      rules: [{
-        id: crypto.randomUUID(),
-        field: "",
-        operator: "",
-        value: ""
-      }]
-    }]);
+    // setConditions([
+    //     {
+    //         id: crypto.randomUUID(),
+    //         rules: [{ id: crypto.randomUUID(), field: "", operator: "", value: "" }],
+    //     },
+    // ]);
     resetForm();
   };
   const LIST = mode === "app" && APPS;
