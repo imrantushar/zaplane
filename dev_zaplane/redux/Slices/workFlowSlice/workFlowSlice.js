@@ -130,12 +130,6 @@ export const getRunWorkFlow = createAsyncThunk(
 			const res = await API.get(
 				namespace + 'runs'
 			);
-
-			handleSliceSuccess(
-				thunkAPI,
-				__('Queue fetched successfully', 'workflow')
-			);
-
 			return res.data;
 		} catch (e) {
 			return handleSliceError(thunkAPI, e);
@@ -159,8 +153,8 @@ export const getSingleRun = createAsyncThunk(
 		}
 	}
 );
-export const nodeLogsRun = createAsyncThunk(
-	'zaplane/nodeLogsRun',
+export const nodeLogsRunDetails = createAsyncThunk(
+	'zaplane/nodeLogsRunDetails',
 	async (runId, thunkAPI) => {
 		try {
 			const res = await API.get(
@@ -174,21 +168,21 @@ export const nodeLogsRun = createAsyncThunk(
 		}
 	}
 );
-export const deepLogsRun = createAsyncThunk(
-	'zaplane/deepLogsRun',
-	async (runId, thunkAPI) => {
-		try {
-			const res = await API.get(
-				namespace + `node-runs/${runId}`
-			);
+// export const deepLogsRun = createAsyncThunk(
+// 	'zaplane/deepLogsRun',
+// 	async (runId, thunkAPI) => {
+// 		try {
+// 			const res = await API.get(
+// 				namespace + `node-runs/${runId}`
+// 			);
 
-			return res.data;
+// 			return res.data;
 
-		} catch (e) {
-			return handleSliceError(thunkAPI, e);
-		}
-	}
-);
+// 		} catch (e) {
+// 			return handleSliceError(thunkAPI, e);
+// 		}
+// 	}
+// );
 export const getNodeLogDetails = createAsyncThunk(
 	'zaplane/getNodeLogDetails',
 	async (runId, thunkAPI) => {
@@ -259,7 +253,9 @@ const workflowsSlice = createSlice({
 	initialState: {
 		data: [],
 		runs: [],
-		versions: []
+		versions: [],
+		nodeDetails:[]
+		
 
 	},
 	reducers: {
@@ -313,6 +309,9 @@ const workflowsSlice = createSlice({
 							? "1"
 							: "0",
 				}));
+			})
+			.addCase(nodeLogsRunDetails.fulfilled, (state, action) => {
+				state.nodeDetails = action.payload;
 			})
 
 

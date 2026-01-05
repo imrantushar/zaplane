@@ -40,7 +40,6 @@ import { use } from "react";
 import { showNotification } from "@ZAPRedux/Slices/notificationSlice/notificationSlice";
 import CustomNode from "../customNoe/CustomNode";
 import ZAPDrawer from "@ZAPComponents/Drawer";
-import LogDetails from "../Components/LogDetails/LogDetails";
 import { getRunLive, getRunTimeline, replayWorkflowRun, stopRun } from "@ZAPRedux/Slices/executionSlice/executionSlice";
 import { LucideHistory } from "lucide-react";
 import RunsTable from "./RunsTable/RunsTable";
@@ -77,6 +76,7 @@ export default function FlowCanvas({ id }) {
     const [loading, setLoading] = useState(false);
     const { data } = useSelector((state) => state.workflows);
     const { runs } = useSelector((state) => state.workflows);
+    console.log(runs,'runss');
     const { versions } = useSelector((state) => state.workflows);
     console.log(versions, 'v');
     const singleData = data[0]

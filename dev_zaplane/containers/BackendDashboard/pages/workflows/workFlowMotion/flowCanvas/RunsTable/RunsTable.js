@@ -5,37 +5,53 @@ import {
   Button,
   Text,
 } from "@chakra-ui/react";
-import { deepLogsRun, getNodeDetails, getNodeLogDetails, getSingleRun, nodeLogsRun } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
-import { RotateCcw, Trash2 } from "lucide-react";
 import { useDispatch } from "react-redux";
+import { useState } from "react";
+import {
+  getNodeLogDetails,
+  getSingleRun,
+  nodeLogsRunDetails,
+} from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
+import LogDetails from "../LogDetails/LogDetails";
+
 
 const RunsTable = ({ runs = [] }) => {
-  const dispatch=useDispatch()
+  const dispatch = useDispatch();
+
+  const [showDetails, setShowDetails] = useState(false);
+  const [activeRunId, setActiveRunId] = useState(null);
+
   const statusStyle = (status) => {
     switch (status) {
       case "completed":
-        return {
-          color: "green.600",
-          bg: "green.50",
-        };
+        return { color: "green.600", bg: "green.50" };
       case "running":
-        return {
-          color: "blue.600",
-          bg: "blue.50",
-        };
+        return { color: "blue.600", bg: "blue.50" };
       case "failed":
-        return {
-          color: "red.600",
-          bg: "red.50",
-        };
+        return { color: "red.600", bg: "red.50" };
       default:
-        return {
-          color: "gray.600",
-          bg: "gray.50",
-        };
+        return { color: "gray.600", bg: "gray.50" };
     }
   };
 
+  /* ===============================
+     DETAILS VIEW (TABLE HIDDEN)
+     =============================== */
+  if (showDetails) {
+    return (
+      <LogDetails
+        runId={activeRunId}
+        onBack={() => {
+          setShowDetails(false);
+          setActiveRunId(null);
+        }}
+      />
+    );
+  }
+
+  /* ===============================
+     TABLE VIEW
+     =============================== */
   if (!runs.length) {
     return (
       <Text fontSize="sm" color="gray.500">
@@ -46,9 +62,7 @@ const RunsTable = ({ runs = [] }) => {
 
   return (
     <Table.Root size="sm" variant="line">
-      <Table.Caption>
-        Workflow Execution History
-      </Table.Caption>
+      <Table.Caption>Workflow Execution History</Table.Caption>
 
       <Table.Header>
         <Table.Row>
@@ -64,8 +78,8 @@ const RunsTable = ({ runs = [] }) => {
       </Table.Header>
 
       <Table.Body>
-        {runs.map((run, index) => (
-          <Table.Row key={`${run.id}-${index}`}>
+        {runs.map((run) => (
+          <Table.Row key={run.id}>
             <Table.Cell>
               <Text fontWeight="medium">#{run.id}</Text>
             </Table.Cell>
@@ -88,47 +102,34 @@ const RunsTable = ({ runs = [] }) => {
             </Table.Cell>
 
             <Table.Cell>
-              <Text fontSize="sm">
-                {run.started_at || "—"}
-              </Text>
+              <Text fontSize="sm">{run.started_at || "—"}</Text>
             </Table.Cell>
 
             <Table.Cell>
-              <Text fontSize="sm">
-                {run.finished_at ?? "—"}
-              </Text>
+              <Text fontSize="sm">{run.finished_at || "—"}</Text>
             </Table.Cell>
+
             <Table.Cell textAlign="right">
               <HStack justify="flex-end" spacing="1">
                 <Button
                   size="xs"
                   variant="outline"
-                  onClick={() => dispatch(getNodeLogDetails(run?.id))}
+                  onClick={() => {
+                    setActiveRunId(run.id);
+                    setShowDetails(true);
+                    dispatch(nodeLogsRunDetails(run.id));
+                  }}
                 >
                   Details
                 </Button>
+
                 <Button
                   size="xs"
                   variant="outline"
-                  onClick={() => dispatch(nodeLogsRun(run?.id))}
-                >
-                  node 
-                </Button>
-                <Button
-                  size="xs"
-                  variant="outline"
-                  onClick={() => dispatch(deepLogsRun(run?.id))}
-                >
-                  deep log
-                </Button>
-                <Button
-                  size="xs"
-                  variant="outline"
-                  onClick={() => dispatch(getSingleRun(run?.id))}
+                  onClick={() => dispatch(getSingleRun(run.id))}
                 >
                   Re-execute
                 </Button>
-
               </HStack>
             </Table.Cell>
           </Table.Row>
