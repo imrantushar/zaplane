@@ -159,8 +159,8 @@ export const getSingleRun = createAsyncThunk(
 		}
 	}
 );
-export const nodeLogsRun = createAsyncThunk(
-	'zaplane/nodeLogsRun',
+export const nodeLogsRunDetails = createAsyncThunk(
+	'zaplane/nodeLogsRunDetails',
 	async (runId, thunkAPI) => {
 		try {
 			const res = await API.get(
@@ -259,7 +259,9 @@ const workflowsSlice = createSlice({
 	initialState: {
 		data: [],
 		runs: [],
-		versions: []
+		versions: [],
+		nodeDetails:[]
+		
 
 	},
 	reducers: {
@@ -313,6 +315,9 @@ const workflowsSlice = createSlice({
 							? "1"
 							: "0",
 				}));
+			})
+			.addCase(nodeLogsRunDetails.fulfilled, (state, action) => {
+				state.nodeDetails = action.payload;
 			})
 
 
