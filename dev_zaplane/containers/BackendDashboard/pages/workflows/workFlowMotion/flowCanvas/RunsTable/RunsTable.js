@@ -10,6 +10,7 @@ import { useState } from "react";
 import {
   getNodeLogDetails,
   getSingleRun,
+  nodeLogsRunDetails,
 } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
 import LogDetails from "../LogDetails/LogDetails";
 
@@ -116,7 +117,7 @@ const RunsTable = ({ runs = [] }) => {
                   onClick={() => {
                     setActiveRunId(run.id);
                     setShowDetails(true);
-                    dispatch(getNodeLogDetails(run.id));
+                    dispatch(nodeLogsRunDetails(run.id));
                   }}
                 >
                   Details

@@ -2583,6 +2583,7 @@ function FlowCanvas({
   const {
     runs
   } = (0,react_redux__WEBPACK_IMPORTED_MODULE_16__.useSelector)(state => state.workflows);
+  console.log(runs, 'runss');
   const {
     versions
   } = (0,react_redux__WEBPACK_IMPORTED_MODULE_16__.useSelector)(state => state.workflows);
@@ -3287,7 +3288,7 @@ const RunsTable = ({
               onClick: () => {
                 setActiveRunId(run.id);
                 setShowDetails(true);
-                dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_7__.getNodeLogDetails)(run.id));
+                dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_7__.nodeLogsRunDetails)(run.id));
               },
               children: "Details"
             }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Button, {
@@ -3927,7 +3928,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   createWorkflowTitle: () => (/* binding */ createWorkflowTitle),
 /* harmony export */   createWorkflows: () => (/* binding */ createWorkflows),
-/* harmony export */   deepLogsRun: () => (/* binding */ deepLogsRun),
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__),
 /* harmony export */   deleteWorkFlow: () => (/* binding */ deleteWorkFlow),
 /* harmony export */   fetchDynamic: () => (/* binding */ fetchDynamic),
@@ -4037,7 +4037,6 @@ const updateWorkFlowStatus = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.cr
 const getRunWorkFlow = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyncThunk)('zaplane/getRunWorkFlow', async (_, thunkAPI) => {
   try {
     const res = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.get(_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.namespace + 'runs');
-    (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.handleSliceSuccess)(thunkAPI, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Queue fetched successfully', 'workflow'));
     return res.data;
   } catch (e) {
     return (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.handleSliceError)(thunkAPI, e);
@@ -4060,14 +4059,21 @@ const nodeLogsRunDetails = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.crea
     return (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.handleSliceError)(thunkAPI, e);
   }
 });
-const deepLogsRun = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyncThunk)('zaplane/deepLogsRun', async (runId, thunkAPI) => {
-  try {
-    const res = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.get(_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.namespace + `node-runs/${runId}`);
-    return res.data;
-  } catch (e) {
-    return (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.handleSliceError)(thunkAPI, e);
-  }
-});
+// export const deepLogsRun = createAsyncThunk(
+// 	'zaplane/deepLogsRun',
+// 	async (runId, thunkAPI) => {
+// 		try {
+// 			const res = await API.get(
+// 				namespace + `node-runs/${runId}`
+// 			);
+
+// 			return res.data;
+
+// 		} catch (e) {
+// 			return handleSliceError(thunkAPI, e);
+// 		}
+// 	}
+// );
 const getNodeLogDetails = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyncThunk)('zaplane/getNodeLogDetails', async (runId, thunkAPI) => {
   try {
     const res = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.get(_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.namespace + `runs/${parseInt(runId)}`);

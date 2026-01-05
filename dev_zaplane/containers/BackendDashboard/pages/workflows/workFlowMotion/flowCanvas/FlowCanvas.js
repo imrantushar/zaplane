@@ -76,6 +76,7 @@ export default function FlowCanvas({ id }) {
     const [loading, setLoading] = useState(false);
     const { data } = useSelector((state) => state.workflows);
     const { runs } = useSelector((state) => state.workflows);
+    console.log(runs,'runss');
     const { versions } = useSelector((state) => state.workflows);
     console.log(versions, 'v');
     const singleData = data[0]
