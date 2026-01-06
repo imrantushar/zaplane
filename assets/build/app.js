@@ -3061,12 +3061,14 @@ function FlowCanvas({
       onAddNode: onAddNode
     })
   };
-  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
-    const interval = setInterval(() => {
-      dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_15__.getRunWorkFlow)(id));
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []);
+
+  // useEffect(() => {
+  //     const interval = setInterval(() => {
+  //         dispatch(getRunWorkFlow());
+  //     }, 5000);
+
+  //     return () => clearInterval(interval);
+  // }, []);
   const drawerWidths = {
     history: "497px",
     logs: "882px"
@@ -3149,7 +3151,10 @@ function FlowCanvas({
           trigger: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_26__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {
             size: "sm",
             variant: "outline",
-            onClick: () => setActiveDrawer("logs"),
+            onClick: () => {
+              dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_15__.getRunWorkFlow)());
+              setActiveDrawer("logs");
+            },
             children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("Logs ", "zaplane")
           }),
           children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_26__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {

@@ -416,13 +416,13 @@ export default function FlowCanvas({ id }) {
         ),
     };
 
-    useEffect(() => {
-        const interval = setInterval(() => {
-            dispatch(getRunWorkFlow(id));
-        }, 5000);
+    // useEffect(() => {
+    //     const interval = setInterval(() => {
+    //         dispatch(getRunWorkFlow());
+    //     }, 5000);
 
-        return () => clearInterval(interval);
-    }, []);
+    //     return () => clearInterval(interval);
+    // }, []);
     const drawerWidths = {
         history: "497px",
         logs: "882px",
@@ -519,7 +519,11 @@ export default function FlowCanvas({ id }) {
                             onClose={() => setActiveDrawer(null)}
                             trigger={
                                 <Button size="sm" variant="outline"
-                                    onClick={() => setActiveDrawer("logs")}
+                                    onClick={() => {
+                                         dispatch(getRunWorkFlow())
+                                        setActiveDrawer("logs")
+                                    }}
+
                                 >
                                     {__("Logs ", "zaplane")}
                                 </Button>
