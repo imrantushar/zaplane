@@ -4,6 +4,8 @@ import {
   Button,
   HStack,
   Text,
+  Flex,
+  Spinner,
 } from "@chakra-ui/react";
 import { getPreviewOldVersion, versionActive } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
 import { CheckCircle, Eye } from "lucide-react";
@@ -26,6 +28,15 @@ const VersionHistoryTable = ({
       bg: "gray.100",
     };
   };
+ 
+   if (!versions.length) {
+     return (
+       <Flex align="center" justify="center" h="100%">
+         <Spinner size="sm" />
+       </Flex>
+ 
+     );
+   }
 
   return (
     <Table.Root size="sm" variant="line">

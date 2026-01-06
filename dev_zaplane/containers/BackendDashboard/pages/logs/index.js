@@ -10,6 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import LogDetails from "./LogDetails/LogDetails";
 import { getRunsList, getSingleRunDetails, retryNodeRun, } from "@ZAPRedux/Slices/logsSlice/logsSlice";
+import { nodeLogsRunDetails } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
 
 
 
@@ -112,7 +113,7 @@ const Logs = () => {
                                         size="xs"
                                         variant="outline"
                                         onClick={() => {
-                                            dispatch(getSingleRunDetails(row?.id))
+                                            dispatch(nodeLogsRunDetails(row?.id))
                                             setExpandedRowId(row.id)
                                         }
 

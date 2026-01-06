@@ -16,12 +16,22 @@ const ZAPDrawer = ({
     size = "md",
     closeOnOverlayClick = true,
     zIndex = 9999,
+    onClose,
+    open
 }) => {
     return (
         <Drawer.Root
             placement={placement}
             size={size}
+             open={open}  
+              modal={false}
+             closeOnInteractOutside={false}
             closeOnOverlayClick={closeOnOverlayClick}
+            onOpenChange={(details) => {
+                if (!details.open) {
+                    onClose?.();
+                }
+            }}
            
         >
             <Drawer.Trigger asChild>
@@ -29,9 +39,9 @@ const ZAPDrawer = ({
             </Drawer.Trigger>
 
             <Portal>
-                <Drawer.Backdrop />
-                <Drawer.Positioner  marginTop='30px' zIndex={"99999999"}>
-                    <Drawer.Content  marginLeft='161px'>
+                <Drawer.Positioner  marginTop='32px' zIndex={"99999999"}
+                 pointerEvents="none">
+                    <Drawer.Content  pointerEvents="auto">
                         {title && (
                             <Drawer.Header>
                                 <Drawer.Title margin='0' >{title}</Drawer.Title>

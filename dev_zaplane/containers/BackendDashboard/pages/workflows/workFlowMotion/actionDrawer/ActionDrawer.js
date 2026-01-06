@@ -358,7 +358,7 @@ export default function ActionDrawer({
         <Drawer.Root open={open} size="md" onOpenChange={(e) => !e.open && resetAll()}>
             <Portal>
                 <Drawer.Backdrop />
-                <Drawer.Positioner>
+                <Drawer.Positioner marginTop='30px'>
                     <Drawer.Content>
                         <Drawer.Header>
                             <Drawer.Title margin="0">

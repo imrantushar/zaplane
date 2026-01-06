@@ -4,6 +4,8 @@ import {
   HStack,
   Button,
   Text,
+  Spinner,
+  Flex,
 } from "@chakra-ui/react";
 import { useDispatch } from "react-redux";
 import { useState } from "react";
@@ -33,10 +35,6 @@ const RunsTable = ({ runs = [] }) => {
         return { color: "gray.600", bg: "gray.50" };
     }
   };
-
-  /* ===============================
-     DETAILS VIEW (TABLE HIDDEN)
-     =============================== */
   if (showDetails) {
     return (
       <LogDetails
@@ -49,14 +47,12 @@ const RunsTable = ({ runs = [] }) => {
     );
   }
 
-  /* ===============================
-     TABLE VIEW
-     =============================== */
   if (!runs.length) {
     return (
-      <Text fontSize="sm" color="gray.500">
-        No execution history found.
-      </Text>
+      <Flex align="center" justify="center" h="100%">
+        <Spinner size="xl" />
+      </Flex>
+
     );
   }
 

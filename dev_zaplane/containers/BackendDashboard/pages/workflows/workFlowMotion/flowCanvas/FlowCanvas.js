@@ -78,14 +78,14 @@ export default function FlowCanvas({ id }) {
     const [loading, setLoading] = useState(false);
     const { data } = useSelector((state) => state.workflows);
     const { runs } = useSelector((state) => state.workflows);
-    console.log(runs, 'runss');
     const { versions } = useSelector((state) => state.workflows);
-    console.log(versions, 'v');
     const singleData = data[0]
     const isFlowLoaded = useRef(false);
     const GAP = 220;
     const containerRef = useRef(null);
     const [isFullscreen, setIsFullscreen] = useState(false);
+    const [activeDrawer, setActiveDrawer] = useState(null);
+
 
     useEffect(() => {
         if (!singleData?.graph) return;
@@ -424,12 +424,20 @@ export default function FlowCanvas({ id }) {
 
         return () => clearInterval(interval);
     }, []);
-
+    const drawerWidths = {
+        history: "497px",
+        logs: "882px",
+    };
     return (
         <div
             ref={containerRef}
             className="zaplane_flowcanvas"
-            style={{ flex: 1, height: "100vh" }}
+            style={{
+                flex: 1, height: "100vh",
+                marginRight: drawerWidths[activeDrawer] || "0px",
+                transition: "margin-right 0.4s ease",
+
+            }}
         >
 
             <TopBar
@@ -481,8 +489,14 @@ export default function FlowCanvas({ id }) {
 
                         <ZAPDrawer
                             title="Version History "
+                            open={activeDrawer === "history"}
+                            onClose={() => setActiveDrawer(null)}
                             trigger={
-                                <Text margin='0' cursor="pointer" onClick={() => dispatch(getAllVersion(id))}> <LucideHistory /></Text>
+                                <Text margin='0' cursor="pointer" onClick={() => {
+                                    setActiveDrawer("history");
+                                    dispatch(getAllVersion(id))
+                                }
+                                }> <LucideHistory /></Text>
 
                             }>
 
@@ -495,16 +509,18 @@ export default function FlowCanvas({ id }) {
                         </ZAPDrawer>
 
 
-                        <Button size="sm" variant="outline"
+                        {/* <Button size="sm" variant="outline"
                         >
                             {__(singleData?.workflow?.status, "zaplane")}
-                        </Button>
+                        </Button> */}
                         <ZAPDrawer
                             title="Log History"
                             size="xl"
+                            open={activeDrawer === "logs"}
+                            onClose={() => setActiveDrawer(null)}
                             trigger={
                                 <Button size="sm" variant="outline"
-                                // onClick={() => dispatch(getRunWorkFlow())}
+                                    onClick={() => setActiveDrawer("logs")}
                                 >
                                     {__("Logs ", "zaplane")}
                                 </Button>
