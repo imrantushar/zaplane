@@ -125,10 +125,10 @@ export const updateWorkFlowStatus = createAsyncThunk(
 
 export const getRunWorkFlow = createAsyncThunk(
 	'zaplane/getRunWorkFlow',
-	async (_, thunkAPI) => {
+	async (id, thunkAPI) => {
 		try {
 			const res = await API.get(
-				namespace + 'runs'
+				namespace + `workflows/${id}/runs`
 			);
 			return res.data;
 		} catch (e) {

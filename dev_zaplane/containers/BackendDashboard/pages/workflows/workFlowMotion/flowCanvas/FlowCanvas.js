@@ -85,7 +85,7 @@ export default function FlowCanvas({ id }) {
     const containerRef = useRef(null);
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [activeDrawer, setActiveDrawer] = useState(null);
-   console.log(singleData,'singledata');
+   console.log(runs,'singledata');
     useEffect(() => {
         if (!singleData?.graph?.nodes?.length) return;
         const mappedNodes = (singleData.graph.nodes || []).map((node) => ({
@@ -520,7 +520,7 @@ export default function FlowCanvas({ id }) {
                             trigger={
                                 <Button size="sm" variant="outline"
                                     onClick={() => {
-                                         dispatch(getRunWorkFlow())
+                                         dispatch(getRunWorkFlow(id))
                                         setActiveDrawer("logs")
                                     }}
 
@@ -533,7 +533,7 @@ export default function FlowCanvas({ id }) {
                                 {__("🔄 Replay ", "zaplane")}
                             </Button>
                             <RunsTable
-                                runs={runs?.runs}
+                                runs={runs}
                             />
 
 

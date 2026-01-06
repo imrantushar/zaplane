@@ -63,7 +63,6 @@ const RunsTable = ({ runs = [] }) => {
       <Table.Header>
         <Table.Row>
           <Table.ColumnHeader>Run ID</Table.ColumnHeader>
-          <Table.ColumnHeader>Workflow ID</Table.ColumnHeader>
           <Table.ColumnHeader>Status</Table.ColumnHeader>
           <Table.ColumnHeader>Started</Table.ColumnHeader>
           <Table.ColumnHeader>Finished</Table.ColumnHeader>
@@ -79,11 +78,6 @@ const RunsTable = ({ runs = [] }) => {
             <Table.Cell>
               <Text fontWeight="medium">#{run.id}</Text>
             </Table.Cell>
-
-            <Table.Cell>
-              <Text fontSize="sm">{run.workflow_id}</Text>
-            </Table.Cell>
-
             <Table.Cell>
               <Badge
                 px="2"
