@@ -3041,16 +3041,12 @@ function FlowCanvas({
       onAddNode: onAddNode
     })
   };
-  const statusOptions = [{
-    value: "active",
-    label: "Active"
-  }, {
-    value: "paused",
-    label: "Paused"
-  }, {
-    value: "draft",
-    label: "draft"
-  }];
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    const interval = setInterval(() => {
+      dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_15__.getRunWorkFlow)(id));
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_24__.jsxs)("div", {
     style: {
       flex: 1,
@@ -3112,18 +3108,14 @@ function FlowCanvas({
           size: "sm",
           variant: "outline",
           children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)(singleData?.workflow?.status, "zaplane")
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_24__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {
-          size: "sm",
-          variant: "outline",
-          onClick: () => dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_15__.getRunWorkFlow)()),
-          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("Runs", "zaplane")
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_24__.jsxs)(_ZAPComponents_Drawer__WEBPACK_IMPORTED_MODULE_19__["default"], {
           title: "Log History",
           size: "xl",
           trigger: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_24__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {
             size: "sm",
-            variant: "outline",
-            onClick: () => dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_15__.getRunWorkFlow)()),
+            variant: "outline"
+            // onClick={() => dispatch(getRunWorkFlow())}
+            ,
             children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("Logs ", "zaplane")
           }),
           children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_24__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {

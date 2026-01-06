@@ -413,11 +413,14 @@ export default function FlowCanvas({ id }) {
         ),
     };
 
-    const statusOptions = [
-        { value: "active", label: "Active" },
-        { value: "paused", label: "Paused" },
-        { value: "draft", label: "draft" },
-    ];
+    useEffect(() => {
+        const interval = setInterval(() => {
+            dispatch(getRunWorkFlow(id));
+        }, 5000); 
+
+        return () => clearInterval(interval);
+    }, [ ]);
+
     return (
         <div style={{ flex: 1, height: "100vh" }}>
             <TopBar
@@ -481,15 +484,13 @@ export default function FlowCanvas({ id }) {
                         >
                             {__(singleData?.workflow?.status, "zaplane")}
                         </Button>
-                        <Button size="sm" variant="outline"
-                            onClick={() => dispatch(getRunWorkFlow())}>
-                            {__("Runs", "zaplane")}
-                        </Button>
                         <ZAPDrawer
                             title="Log History"
                             size="xl"
                             trigger={
-                                <Button size="sm" variant="outline" onClick={() => dispatch(getRunWorkFlow())}>
+                                <Button size="sm" variant="outline"
+                                // onClick={() => dispatch(getRunWorkFlow())}
+                                >
                                     {__("Logs ", "zaplane")}
                                 </Button>
                             }>
