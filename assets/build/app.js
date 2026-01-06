@@ -463,6 +463,114 @@ const ZAPLabel = ({
 
 /***/ },
 
+/***/ "./dev_zaplane/components/LogDetails/LogDetails.js"
+/*!*********************************************************!*\
+  !*** ./dev_zaplane/components/LogDetails/LogDetails.js ***!
+  \*********************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/box/index.js");
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/text/index.js");
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/accordion/accordion.js");
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/badge/badge.js");
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/stack/h-stack.js");
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/stack/v-stack.js");
+/* harmony import */ var react_redux__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/dist/react-redux.mjs");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__);
+
+
+
+const LogDetails = ({
+  runId,
+  onBack
+}) => {
+  const {
+    nodeDetails = []
+  } = (0,react_redux__WEBPACK_IMPORTED_MODULE_6__.useSelector)(state => state.workflows);
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
+      mb: "4",
+      cursor: "pointer",
+      color: "blue.500",
+      onClick: onBack,
+      children: "\u2190 Back to Runs"
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
+      mb: "4",
+      fontWeight: "bold",
+      children: ["Run ID: #", runId]
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.AccordionRoot, {
+      collapsible: true,
+      children: nodeDetails.map(log => {
+        const input = JSON.parse(log.input_json || "{}");
+        const output = JSON.parse(log.output_json || "{}");
+        return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.AccordionItem, {
+          value: log.id,
+          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.AccordionItemTrigger, {
+            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.HStack, {
+              flex: "1",
+              justify: "space-between",
+              children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.HStack, {
+                children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
+                  fontWeight: "medium",
+                  children: ["Node #", log.node_key]
+                }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Badge, {
+                  children: ["Log ", log.id]
+                })]
+              }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Badge, {
+                colorScheme: log.status === "completed" ? "green" : log.status === "failed" ? "red" : "blue",
+                children: log.status
+              })]
+            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.AccordionItemIndicator, {})]
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.AccordionItemContent, {
+            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.AccordionItemBody, {
+              children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.VStack, {
+                spacing: "4",
+                align: "stretch",
+                children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
+                  p: "3",
+                  border: "1px solid",
+                  borderColor: "gray.200",
+                  borderRadius: "md",
+                  bg: "gray.50",
+                  children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
+                    fontWeight: "bold",
+                    mb: "2",
+                    children: "Input"
+                  }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)("pre", {
+                    children: JSON.stringify(input, null, 2)
+                  })]
+                }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
+                  p: "3",
+                  border: "1px solid",
+                  borderColor: "gray.200",
+                  borderRadius: "md",
+                  bg: "gray.50",
+                  children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
+                    fontWeight: "bold",
+                    mb: "2",
+                    children: "Output"
+                  }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)("pre", {
+                    children: JSON.stringify(output, null, 2)
+                  })]
+                })]
+              })
+            })
+          })]
+        }, log.id);
+      })
+    })]
+  });
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (LogDetails);
+
+/***/ },
+
 /***/ "./dev_zaplane/components/Modal/WPModal.js"
 /*!*************************************************!*\
   !*** ./dev_zaplane/components/Modal/WPModal.js ***!
@@ -989,122 +1097,6 @@ function BackendDashboard() {
 
 /***/ },
 
-/***/ "./dev_zaplane/containers/BackendDashboard/pages/logs/LogDetails/LogDetails.js"
-/*!*************************************************************************************!*\
-  !*** ./dev_zaplane/containers/BackendDashboard/pages/logs/LogDetails/LogDetails.js ***!
-  \*************************************************************************************/
-(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/box/index.js");
-/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/span/index.js");
-/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/text/index.js");
-/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/accordion/accordion.js");
-/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/badge/badge.js");
-/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/stack/h-stack.js");
-/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/stack/v-stack.js");
-/* harmony import */ var react_router_dom__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! react-router-dom */ "./node_modules/react-router/dist/index.js");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__);
-
-
-
-const LogDetails = () => {
-  const navigate = (0,react_router_dom__WEBPACK_IMPORTED_MODULE_7__.useNavigate)();
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
-    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
-      onClick: () => navigate(-1),
-      children: "Back Space"
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.AccordionRoot, {
-      collapsible: true,
-      defaultValue: ["schedule"],
-      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.AccordionItem, {
-        value: "schedule",
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.AccordionItemTrigger, {
-          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.HStack, {
-            flex: "1",
-            justify: "space-between",
-            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.HStack, {
-              children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
-                fontWeight: "medium",
-                children: "Schedule"
-              }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Badge, {
-                colorScheme: "blue",
-                children: "1"
-              }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
-                fontSize: "sm",
-                color: "gray.500",
-                children: "Tools"
-              })]
-            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.HStack, {
-              children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
-                w: "6px",
-                h: "6px",
-                borderRadius: "full",
-                bg: "green.500"
-              }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
-                fontSize: "sm",
-                children: "Success"
-              })]
-            })]
-          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.AccordionItemIndicator, {})]
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.AccordionItemContent, {
-          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.AccordionItemBody, {
-            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_6__.VStack, {
-              align: "stretch",
-              spacing: "3",
-              children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
-                bg: "white",
-                p: "3",
-                borderRadius: "md",
-                border: "1px solid",
-                borderColor: "gray.200",
-                children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
-                  fontFamily: "mono",
-                  fontSize: "sm",
-                  children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Badge, {
-                    mr: "2",
-                    colorScheme: "purple",
-                    children: "+"
-                  }), "\"Input\": []", " ", /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Span, {
-                    color: "gray.500",
-                    children: "0 items"
-                  })]
-                })
-              }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
-                bg: "white",
-                p: "3",
-                borderRadius: "md",
-                border: "1px solid",
-                borderColor: "gray.200",
-                children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
-                  fontFamily: "mono",
-                  fontSize: "sm",
-                  children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Badge, {
-                    mr: "2",
-                    colorScheme: "purple",
-                    children: "+"
-                  }), "\"Output\": []", " ", /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Span, {
-                    color: "gray.500",
-                    children: "0 items"
-                  })]
-                })
-              })]
-            })
-          })
-        })]
-      })
-    })]
-  });
-};
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (LogDetails);
-
-/***/ },
-
 /***/ "./dev_zaplane/containers/BackendDashboard/pages/logs/index.js"
 /*!*********************************************************************!*\
   !*** ./dev_zaplane/containers/BackendDashboard/pages/logs/index.js ***!
@@ -1120,15 +1112,18 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/box/index.js");
 /* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/text/index.js");
-/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/button/button.js");
-/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/stack/h-stack.js");
-/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/table/table.js");
-/* harmony import */ var react_redux__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/dist/react-redux.mjs");
-/* harmony import */ var _LogDetails_LogDetails__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./LogDetails/LogDetails */ "./dev_zaplane/containers/BackendDashboard/pages/logs/LogDetails/LogDetails.js");
-/* harmony import */ var _ZAPRedux_Slices_logsSlice_logsSlice__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @ZAPRedux/Slices/logsSlice/logsSlice */ "./dev_zaplane/redux/Slices/logsSlice/logsSlice.js");
-/* harmony import */ var _ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @ZAPRedux/Slices/workFlowSlice/workFlowSlice */ "./dev_zaplane/redux/Slices/workFlowSlice/workFlowSlice.js");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__);
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/badge/badge.js");
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/button/button.js");
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/flex/flex.js");
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/spinner/spinner.js");
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/stack/h-stack.js");
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/table/table.js");
+/* harmony import */ var react_redux__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/dist/react-redux.mjs");
+/* harmony import */ var _ZAPRedux_Slices_logsSlice_logsSlice__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @ZAPRedux/Slices/logsSlice/logsSlice */ "./dev_zaplane/redux/Slices/logsSlice/logsSlice.js");
+/* harmony import */ var _ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @ZAPRedux/Slices/workFlowSlice/workFlowSlice */ "./dev_zaplane/redux/Slices/workFlowSlice/workFlowSlice.js");
+/* harmony import */ var _ZAPComponents_LogDetails_LogDetails__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @ZAPComponents/LogDetails/LogDetails */ "./dev_zaplane/components/LogDetails/LogDetails.js");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__);
 
 
 
@@ -1137,102 +1132,159 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const Logs = () => {
-  const dispatch = (0,react_redux__WEBPACK_IMPORTED_MODULE_6__.useDispatch)();
-  const [expandedRowId, setExpandedRowId] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(null);
-  const runs = (0,react_redux__WEBPACK_IMPORTED_MODULE_6__.useSelector)(state => state.logs?.data || []);
-  console.log(runs);
+  const dispatch = (0,react_redux__WEBPACK_IMPORTED_MODULE_9__.useDispatch)();
+  const [showDetails, setShowDetails] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
+  const [activeRunId, setActiveRunId] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(null);
+  const runs = (0,react_redux__WEBPACK_IMPORTED_MODULE_9__.useSelector)(state => state.logs?.data?.runs || []);
+  const loading = (0,react_redux__WEBPACK_IMPORTED_MODULE_9__.useSelector)(state => state.logs?.loading);
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
-    dispatch((0,_ZAPRedux_Slices_logsSlice_logsSlice__WEBPACK_IMPORTED_MODULE_8__.getRunsList)({
+    dispatch((0,_ZAPRedux_Slices_logsSlice_logsSlice__WEBPACK_IMPORTED_MODULE_10__.getRunsList)({
       limit: 20,
       offset: 0
     }));
   }, [dispatch]);
   const getDuration = (start, end) => {
     if (!start || !end) return "--";
-    const startTime = new Date(start);
-    const endTime = new Date(end);
-    const seconds = Math.round((endTime - startTime) / 1000);
+    const seconds = Math.round((new Date(end) - new Date(start)) / 1000);
     return `${seconds}s`;
   };
-  const isSuccess = status => status === "completed";
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.TableRoot, {
+  const statusStyle = status => {
+    switch (status) {
+      case "completed":
+        return {
+          color: "green.600",
+          bg: "green.50",
+          text: "Success"
+        };
+      case "failed":
+        return {
+          color: "red.600",
+          bg: "red.50",
+          text: "Failed"
+        };
+      case "running":
+        return {
+          color: "blue.600",
+          bg: "blue.50",
+          text: "Running"
+        };
+      default:
+        return {
+          color: "gray.600",
+          bg: "gray.50",
+          text: status || "—"
+        };
+    }
+  };
+  if (loading) {
+    return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.Flex, {
+      align: "center",
+      justify: "center",
+      h: "100%",
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_6__.Spinner, {
+        size: "xl"
+      })
+    });
+  }
+  if (showDetails) {
+    return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_ZAPComponents_LogDetails_LogDetails__WEBPACK_IMPORTED_MODULE_12__["default"], {
+      runId: activeRunId,
+      onBack: () => {
+        setShowDetails(false);
+        setActiveRunId(null);
+      }
+    });
+  }
+  if (!runs.length) {
+    return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.Flex, {
+      align: "center",
+      justify: "center",
+      h: "100%",
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
+        children: "No runs available"
+      })
+    });
+  }
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_8__.TableRoot, {
     size: "sm",
     variant: "outline",
-    children: [!expandedRowId && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.TableHeader, {
-      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.TableRow, {
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.TableColumnHeader, {
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_8__.TableHeader, {
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_8__.TableRow, {
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_8__.TableColumnHeader, {
           children: "CREATED AT"
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.TableColumnHeader, {
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_8__.TableColumnHeader, {
           children: "STATUS"
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.TableColumnHeader, {
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_8__.TableColumnHeader, {
           children: "DURATION / SIZE"
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.TableColumnHeader, {
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_8__.TableColumnHeader, {
           children: "NODES"
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.TableColumnHeader, {
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_8__.TableColumnHeader, {
           children: "ACTIONS"
         })]
       })
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.TableBody, {
-      children: expandedRowId ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.TableRow, {
-        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.TableCell, {
-          colSpan: 5,
-          bg: "gray.50",
-          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_LogDetails_LogDetails__WEBPACK_IMPORTED_MODULE_7__["default"], {
-            runId: expandedRowId
-          })
-        })
-      }) : runs?.runs?.map(row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.TableRow, {
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.TableCell, {
-          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
-            fontSize: "sm",
-            children: row.started_at
-          })
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.TableCell, {
-          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.HStack, {
-            gap: "2",
-            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Box, {
-              w: "8px",
-              h: "8px",
-              borderRadius: "full",
-              bg: isSuccess(row.status) ? "green.500" : "red.500"
-            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_8__.TableBody, {
+      children: runs.map(run => {
+        const status = statusStyle(run.status);
+        return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_8__.TableRow, {
+          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_8__.TableCell, {
+            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
               fontSize: "sm",
-              children: isSuccess(row.status) ? "Success" : "Failed"
+              children: run.started_at || "—"
+            })
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_8__.TableCell, {
+            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_7__.HStack, {
+              gap: "2",
+              children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Box, {
+                w: "8px",
+                h: "8px",
+                borderRadius: "full",
+                bg: status.color
+              }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Badge, {
+                px: "2",
+                py: "0.5",
+                rounded: "md",
+                fontSize: "xs",
+                bg: status.bg,
+                color: status.color,
+                children: status.text
+              })]
+            })
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_8__.TableCell, {
+            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
+              fontSize: "sm",
+              children: getDuration(run.started_at, run.finished_at)
+            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
+              fontSize: "xs",
+              color: "gray.500",
+              children: "--"
             })]
-          })
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.TableCell, {
-          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
-            fontSize: "sm",
-            children: getDuration(row.started_at, row.finished_at)
-          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
-            fontSize: "xs",
-            color: "gray.500",
-            children: "--"
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_8__.TableCell, {
+            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
+              fontSize: "sm",
+              children: "--"
+            })
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_8__.TableCell, {
+            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_7__.HStack, {
+              spacing: "2",
+              children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Button, {
+                size: "xs",
+                variant: "outline",
+                onClick: () => {
+                  setActiveRunId(run.id);
+                  setShowDetails(true);
+                  dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_11__.nodeLogsRunDetails)(run.id));
+                },
+                children: "Details"
+              }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Button, {
+                size: "xs",
+                variant: "outline",
+                onClick: () => dispatch((0,_ZAPRedux_Slices_logsSlice_logsSlice__WEBPACK_IMPORTED_MODULE_10__.retryNodeRun)(run.id)),
+                children: "Re-execute"
+              })]
+            })
           })]
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.TableCell, {
-          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
-            fontSize: "sm",
-            children: "--"
-          })
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.TableCell, {
-          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.HStack, {
-            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Button, {
-              size: "xs",
-              variant: "outline",
-              onClick: () => {
-                dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_9__.nodeLogsRunDetails)(row?.id));
-                setExpandedRowId(row.id);
-              },
-              children: "Details"
-            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Button, {
-              size: "xs",
-              variant: "outline",
-              onClick: () => dispatch((0,_ZAPRedux_Slices_logsSlice_logsSlice__WEBPACK_IMPORTED_MODULE_8__.retryNodeRun)(row?.id)),
-              children: "Re-execute"
-            })]
-          })
-        })]
-      }, row.id))
+        }, run.id);
+      })
     })]
   });
 };
