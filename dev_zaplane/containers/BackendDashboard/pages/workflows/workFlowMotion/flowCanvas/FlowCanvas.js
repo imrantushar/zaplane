@@ -416,13 +416,13 @@ export default function FlowCanvas({ id }) {
         ),
     };
 
-    // useEffect(() => {
-    //     const interval = setInterval(() => {
-    //         dispatch(getRunWorkFlow(id));
-    //     }, 5000);
+    useEffect(() => {
+        const interval = setInterval(() => {
+            dispatch(getRunWorkFlow(id));
+        }, 5000);
 
-    //     return () => clearInterval(interval);
-    // }, []);
+        return () => clearInterval(interval);
+    }, []);
     const drawerWidths = {
         history: "497px",
         logs: "882px",
