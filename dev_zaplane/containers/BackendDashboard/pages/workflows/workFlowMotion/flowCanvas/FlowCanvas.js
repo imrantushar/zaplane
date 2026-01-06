@@ -44,6 +44,8 @@ import { getRunLive, getRunTimeline, replayWorkflowRun, stopRun } from "@ZAPRedu
 import { LucideHistory } from "lucide-react";
 import RunsTable from "./RunsTable/RunsTable";
 import VersionHistoryTable from "./VersionHistoryTable/VersionHistoryTable";
+import { LuFullscreen, LuMinimize } from "react-icons/lu";
+import { toggleFullscreenMode } from "./helper";
 ;
 export default function FlowCanvas({ id }) {
 
@@ -82,7 +84,9 @@ export default function FlowCanvas({ id }) {
     const singleData = data[0]
     const isFlowLoaded = useRef(false);
     const GAP = 220;
-    console.log(singleData);
+    const containerRef = useRef(null);
+    const [isFullscreen, setIsFullscreen] = useState(false);
+
     useEffect(() => {
         if (!singleData?.graph) return;
         const mappedNodes = (singleData.graph.nodes || []).map((node) => ({
@@ -416,13 +420,18 @@ export default function FlowCanvas({ id }) {
     useEffect(() => {
         const interval = setInterval(() => {
             dispatch(getRunWorkFlow(id));
-        }, 5000); 
+        }, 5000);
 
         return () => clearInterval(interval);
-    }, [ ]);
+    }, []);
 
     return (
-        <div style={{ flex: 1, height: "100vh" }}>
+        <div
+            ref={containerRef}
+            className="zaplane_flowcanvas"
+            style={{ flex: 1, height: "100vh" }}
+        >
+
             <TopBar
                 leftContent={() => (
                     <>
@@ -446,7 +455,7 @@ export default function FlowCanvas({ id }) {
                                     placement='start'
                                     trigger={
                                         <Text margin="0" size="sm"
-                                            onClick={() => dispatch(getRunLive(id))}>
+                                        >
 
                                             {__("Execution ", "zaplane")}
                                         </Text>
@@ -457,13 +466,19 @@ export default function FlowCanvas({ id }) {
                             </Tabs.Trigger>
                             <Tabs.Indicator rounded="l2" />
                         </Tabs.List>
-                        {/* <Tabs.Content value="members">Manage your team members</Tabs.Content>
-                        <Tabs.Content value="projects">Manage your projects</Tabs.Content> */}
 
                     </Tabs.Root>
                 )}
                 rightContent={() => (
                     <>
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => toggleFullscreenMode(containerRef, isFullscreen, setIsFullscreen)}
+                        >
+                            {isFullscreen ? <LuMinimize /> : <LuFullscreen />}
+                        </Button>
+
                         <ZAPDrawer
                             title="Version History "
                             trigger={

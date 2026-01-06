@@ -30,7 +30,7 @@ const ZAPDrawer = ({
 
             <Portal>
                 <Drawer.Backdrop />
-                <Drawer.Positioner  marginTop='30px'>
+                <Drawer.Positioner  marginTop='30px' zIndex={"99999999"}>
                     <Drawer.Content  marginLeft='161px'>
                         {title && (
                             <Drawer.Header>
