@@ -2,7 +2,6 @@
 namespace Zaplane\Core;
 
 use Zaplane\Classes\Container;
-use Zaplane\Classes\Logger;
 use Zaplane\Classes\Query;
 
 if (!defined('ABSPATH')) exit;
@@ -27,13 +26,11 @@ class Automation {
 
     public function boot(): void {
         add_action('init', [$this, 'dispatch_active_triggers']);
-        add_action('zaplane_execute_node_run', [$this, 'dispatch_node_run'], 10, 1);
+        add_action('zaplane_execute_node_run', [$this, 'dispatch_node_run']);
         add_action('zaplane_workflow_updated', [$this, 'reload_triggers']);
     }
 
-    /* =====================================================
-     * TRIGGER REGISTRATION
-     * ===================================================== */
+    /* ================= TRIGGERS ================= */
 
     public function reload_triggers() {
         foreach ($this->registered_hooks as $event => $cb) {
@@ -53,10 +50,6 @@ class Automation {
         }
     }
 
-    /* =====================================================
-     * TRIGGER → RUN
-     * ===================================================== */
-
     public function trigger_router() {
         $event = current_filter();
         $args  = func_get_args();
@@ -72,10 +65,11 @@ class Automation {
         }
     }
 
+    /* ================= RUN ================= */
+
     private function start_run_from_trigger(array $trigger, array $payload) {
         global $wpdb;
 
-        // Create run
         $wpdb->insert('wp_zaplane_runs', [
             'workflow_version_hash' => $trigger['workflow_version_hash'],
             'status' => 'running',
@@ -85,18 +79,10 @@ class Automation {
 
         $run_id = $wpdb->insert_id;
 
-        // Create TRIGGER node_run (root)
-        $this->spawn_node_run(
-            $run_id,
-            $trigger['id'],
-            $payload,
-            null
-        );
+        $this->spawn_node_run($run_id, $trigger['id'], $payload, null);
     }
 
-    /* =====================================================
-     * NODE SPAWNING
-     * ===================================================== */
+    /* ================= NODE SPAWN ================= */
 
     public function spawn_node_run(int $run_id, string $node_key, array $input, ?int $parent): int {
         global $wpdb;
@@ -110,29 +96,29 @@ class Automation {
             'started_at' => current_time('mysql')
         ]);
 
-        $id = $wpdb->insert_id;
+        $node_run_id = $wpdb->insert_id;
 
         as_enqueue_async_action(
             'zaplane_execute_node_run',
-            ['node_run_id' => $id],
+            ['node_run_id' => $node_run_id],
             'zaplane'
         );
 
-        return $id;
+        return $node_run_id;
     }
 
-    /* =====================================================
-     * ACTION SCHEDULER → NODE RUNNER
-     * ===================================================== */
+    /* ================= WORKER ================= */
 
-    public function dispatch_node_run(int $node_run_id) {
+    public function dispatch_node_run($args) {
         global $wpdb;
+
+        $node_run_id = (int)$args['node_run_id'];
 
         // Atomic lock
         $updated = $wpdb->query(
             $wpdb->prepare(
                 "UPDATE wp_zaplane_node_runs 
-                 SET status='running', started_at=NOW() 
+                 SET status='running'
                  WHERE id=%d AND status='pending'",
                 $node_run_id
             )
@@ -148,9 +134,7 @@ class Automation {
         $this->execute_node($nr);
     }
 
-    /* =====================================================
-     * NODE EXECUTION
-     * ===================================================== */
+    /* ================= NODE EXECUTION ================= */
 
     private function execute_node(array $nr) {
         global $wpdb;
@@ -172,7 +156,6 @@ class Automation {
         $input = json_decode($nr['input_json'], true);
 
         try {
-            // TRIGGER node
             if ($node['type'] === 'trigger') {
                 $output = $input;
             } else {
@@ -187,7 +170,7 @@ class Automation {
                 'finished_at' => current_time('mysql')
             ], ['id' => $nr['id']]);
 
-            $this->spawn_children($nr, $node, $output, $graph);
+            $this->spawn_children($nr, $output, $graph);
 
         } catch (\Throwable $e) {
 
@@ -196,18 +179,12 @@ class Automation {
                 'output_json' => json_encode(['error' => $e->getMessage()]),
                 'finished_at' => current_time('mysql')
             ], ['id' => $nr['id']]);
-
-            $this->spawn_error_children($nr, $graph, $e->getMessage());
         }
 
         $this->finalize_run($nr['run_id']);
     }
 
-    /* =====================================================
-     * GRAPH ROUTING
-     * ===================================================== */
-
-    private function spawn_children($nr, $node, $output, $graph) {
+    private function spawn_children($nr, $output, $graph) {
         foreach ($graph['edges'] as $e) {
             if ($e['source'] === $nr['node_key']) {
                 $this->spawn_node_run(
@@ -219,23 +196,6 @@ class Automation {
             }
         }
     }
-
-    private function spawn_error_children($nr, $graph, $error) {
-        foreach ($graph['edges'] as $e) {
-            if ($e['source'] === $nr['node_key'] && ($e['type'] ?? '') === 'error') {
-                $this->spawn_node_run(
-                    $nr['run_id'],
-                    $e['target'],
-                    ['error' => $error],
-                    $nr['id']
-                );
-            }
-        }
-    }
-
-    /* =====================================================
-     * RUN FINALIZATION
-     * ===================================================== */
 
     private function finalize_run(int $run_id) {
         global $wpdb;
@@ -263,10 +223,6 @@ class Automation {
             ], ['id' => $run_id]);
         }
     }
-
-    /* =====================================================
-     * GRAPH + TRIGGER DISCOVERY
-     * ===================================================== */
 
     private function load_graph_by_hash(string $hash): array {
         global $wpdb;
