@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-01-03 04:20:07",
+    "generated_at": "2026-01-06 11:26:46",
     "integrations": {
         "wordpress": {
             "slug": "wordpress",
@@ -102,6 +102,15 @@
                     "outputs": [
                         "main"
                     ]
+                },
+                "deleted_post": {
+                    "key": "deleted_post",
+                    "label": "Post Deleted",
+                    "hook": "before_delete_post",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
                 }
             },
             "actions": {
@@ -168,6 +177,29 @@
                             "key": "value",
                             "label": "Value",
                             "type": "expression"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_post_title": {
+                    "key": "update_post_title",
+                    "label": "Update Post Title",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_post": {
+                    "key": "delete_post",
+                    "label": "Delete Post",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "Post ID to Delete",
+                            "type": "expression",
+                            "required": true
                         }
                     ],
                     "outputs": [

@@ -21,6 +21,7 @@ class Wordpress extends IntegrationBase {
             'post_updated'  => ['label' => 'Post Updated',   'hook' => 'post_updated'],
             'user_register' => ['label' => 'User Registered','hook' => 'user_register'],
             'comment_post'  => ['label' => 'Comment Added',  'hook' => 'comment_post'],
+            'deleted_post'  => ['label' => 'Post Deleted',   'hook' => 'before_delete_post'],
         ];
     }
 
@@ -106,6 +107,17 @@ class Wordpress extends IntegrationBase {
                     'post_id'    => $comment->comment_post_ID,
                     'content'    => $comment->comment_content,
                 ];
+
+            case 'deleted_post':
+                $post = get_post($args[0] ?? 0);
+                if (!$post) return false;
+
+                return [
+                    'post_id'    => $post->ID,
+                    'post_title' => $post->post_title,
+                    'post_type'  => $post->post_type,
+                    'status'     => $post->post_status,
+                ];
         }
 
         return false;
@@ -119,6 +131,8 @@ class Wordpress extends IntegrationBase {
         return [
             'create_post'   => ['label'=>'Create Post'],
             'update_option' => ['label'=>'Update Option'],
+            'update_post_title' => ['label'=>'Update Post Title'],
+            'delete_post'   => ['label'=>'Delete Post'],
         ];
     }
 
@@ -165,10 +179,30 @@ class Wordpress extends IntegrationBase {
 
         if ( $action === 'update_option' ) {
             return [
-                ['key'=>'option_name','label'=>'Option','type'=>'text','required'=>true],
-                ['key'=>'value','label'=>'Value','type'=>'expression'],
+                [
+                    'key'=>'option_name',
+                    'label'=>'Option',
+                    'type'=>'text',
+                    'required'=>true
+                ],
+                [
+                    'key'=>'value',
+                    'label'=>'Value',
+                    'type'=>'expression'
+                ],
             ];
         }
+
+        if ( $action === 'delete_post' ) {
+    return [
+        [
+            'key' => 'post_id',
+            'label' => 'Post ID to Delete',
+            'type' => 'expression', 
+            'required' => true,
+        ],
+    ];
+}
 
         return [];
     }
@@ -195,6 +229,12 @@ class Wordpress extends IntegrationBase {
             case 'update_option':
                 update_option( $config['option_name'], $config['value'] );
                 return ['port'=>'main','data'=>[]];
+
+            case 'delete_post':
+                wp_delete_post( $config['post_id'], true );
+                return ['port'=>'main','data'=>['post_id'=>$config['post_id']]];
+
+
         }
 
         return ['port'=>'main','data'=>$input];
