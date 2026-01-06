@@ -3659,7 +3659,7 @@ const toggleFullscreenMode = (containerRef, isFullscreen, setIsFullscreen) => {
     position: isEnter ? "fixed" : "",
     top: isEnter ? "0" : "",
     left: isEnter ? "0" : "",
-    width: isEnter ? "100vw" : "",
+    width: isEnter ? "-webkit-fill-available" : "",
     height: isEnter ? "100vh" : "",
     zIndex: isEnter ? "9999" : ""
   });
