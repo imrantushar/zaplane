@@ -2781,7 +2781,7 @@ function FlowCanvas({
     }));
     setNodes(mappedNodes);
     setEdges(mappedEdges);
-  }, [singleData?.graph]);
+  }, []);
   const [drawerContext, setDrawerContext] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)({
     source: null,
     node: null,
