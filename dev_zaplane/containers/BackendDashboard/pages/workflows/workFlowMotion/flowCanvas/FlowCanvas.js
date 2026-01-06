@@ -103,7 +103,7 @@ export default function FlowCanvas({ id }) {
         }));
         setNodes(mappedNodes);
         setEdges(mappedEdges);
-    }, [singleData]);
+    }, [singleData?.graph]);
     const [drawerContext, setDrawerContext] = useState({
         source: null,
         node: null,
