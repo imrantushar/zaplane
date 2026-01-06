@@ -2767,7 +2767,7 @@ function FlowCanvas({
   const [activeDrawer, setActiveDrawer] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(null);
   console.log(singleData, 'singledata');
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
-    if (!singleData?.graph.nodes.length) return;
+    if (!singleData?.graph?.nodes?.length) return;
     const mappedNodes = (singleData.graph.nodes || []).map(node => ({
       ...node,
       type: "custom",

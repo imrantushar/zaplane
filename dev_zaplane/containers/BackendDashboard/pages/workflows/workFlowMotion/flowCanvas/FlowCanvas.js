@@ -87,7 +87,7 @@ export default function FlowCanvas({ id }) {
     const [activeDrawer, setActiveDrawer] = useState(null);
    console.log(singleData,'singledata');
     useEffect(() => {
-        if (!singleData?.graph.nodes.length) return;
+        if (!singleData?.graph?.nodes?.length) return;
         const mappedNodes = (singleData.graph.nodes || []).map((node) => ({
             ...node,
             type: "custom",
