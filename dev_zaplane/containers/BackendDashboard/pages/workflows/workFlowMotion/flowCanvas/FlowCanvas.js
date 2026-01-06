@@ -45,7 +45,7 @@ import { LucideHistory } from "lucide-react";
 import RunsTable from "./RunsTable/RunsTable";
 import VersionHistoryTable from "./VersionHistoryTable/VersionHistoryTable";
 import { LuFullscreen, LuMinimize } from "react-icons/lu";
-import { toggleFullscreenMode } from "./helper";
+import { toggleFullscreenMode } from "../helper";
 ;
 export default function FlowCanvas({ id }) {
 
@@ -423,17 +423,14 @@ export default function FlowCanvas({ id }) {
 
     //     return () => clearInterval(interval);
     // }, []);
-    const drawerWidths = {
-        history: "497px",
-        logs: "882px",
-    };
+  
     return (
         <div
             ref={containerRef}
             className="zaplane_flowcanvas"
             style={{
                 flex: 1, height: "100vh",
-                marginRight: drawerWidths[activeDrawer] || "0px",
+                marginRight: activeDrawer?"497px":"0px",
                 transition: "margin-right 0.4s ease",
 
             }}
@@ -514,7 +511,7 @@ export default function FlowCanvas({ id }) {
                         </Button> */}
                         <ZAPDrawer
                             title="Log History"
-                            size="xl"
+                            size="md"
                             open={activeDrawer === "logs"}
                             onClose={() => setActiveDrawer(null)}
                             trigger={
