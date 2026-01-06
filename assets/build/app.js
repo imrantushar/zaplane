@@ -2765,8 +2765,9 @@ function FlowCanvas({
   const containerRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
   const [isFullscreen, setIsFullscreen] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
   const [activeDrawer, setActiveDrawer] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(null);
+  console.log(singleData, 'singledata');
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
-    if (!singleData?.graph) return;
+    if (!singleData?.graph.nodes.length) return;
     const mappedNodes = (singleData.graph.nodes || []).map(node => ({
       ...node,
       type: "custom",
@@ -2781,7 +2782,7 @@ function FlowCanvas({
     }));
     setNodes(mappedNodes);
     setEdges(mappedEdges);
-  }, []);
+  }, [singleData]);
   const [drawerContext, setDrawerContext] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)({
     source: null,
     node: null,
@@ -3060,12 +3061,14 @@ function FlowCanvas({
       onAddNode: onAddNode
     })
   };
-  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
-    const interval = setInterval(() => {
-      dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_15__.getRunWorkFlow)(id));
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []);
+
+  // useEffect(() => {
+  //     const interval = setInterval(() => {
+  //         dispatch(getRunWorkFlow(id));
+  //     }, 5000);
+
+  //     return () => clearInterval(interval);
+  // }, []);
   const drawerWidths = {
     history: "497px",
     logs: "882px"

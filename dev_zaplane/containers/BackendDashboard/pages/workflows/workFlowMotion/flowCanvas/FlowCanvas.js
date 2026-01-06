@@ -85,10 +85,9 @@ export default function FlowCanvas({ id }) {
     const containerRef = useRef(null);
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [activeDrawer, setActiveDrawer] = useState(null);
-
-
+   console.log(singleData,'singledata');
     useEffect(() => {
-        if (!singleData?.graph) return;
+        if (!singleData?.graph.nodes.length) return;
         const mappedNodes = (singleData.graph.nodes || []).map((node) => ({
             ...node,
             type: "custom",
@@ -104,7 +103,7 @@ export default function FlowCanvas({ id }) {
         }));
         setNodes(mappedNodes);
         setEdges(mappedEdges);
-    }, []);
+    }, [singleData]);
     const [drawerContext, setDrawerContext] = useState({
         source: null,
         node: null,
@@ -417,13 +416,13 @@ export default function FlowCanvas({ id }) {
         ),
     };
 
-    useEffect(() => {
-        const interval = setInterval(() => {
-            dispatch(getRunWorkFlow(id));
-        }, 5000);
+    // useEffect(() => {
+    //     const interval = setInterval(() => {
+    //         dispatch(getRunWorkFlow(id));
+    //     }, 5000);
 
-        return () => clearInterval(interval);
-    }, []);
+    //     return () => clearInterval(interval);
+    // }, []);
     const drawerWidths = {
         history: "497px",
         logs: "882px",
