@@ -3061,14 +3061,12 @@ function FlowCanvas({
       onAddNode: onAddNode
     })
   };
-
-  // useEffect(() => {
-  //     const interval = setInterval(() => {
-  //         dispatch(getRunWorkFlow(id));
-  //     }, 5000);
-
-  //     return () => clearInterval(interval);
-  // }, []);
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    const interval = setInterval(() => {
+      dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_15__.getRunWorkFlow)(id));
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
   const drawerWidths = {
     history: "497px",
     logs: "882px"
