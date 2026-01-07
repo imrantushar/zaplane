@@ -145,12 +145,33 @@ export const getSingleRun = createAsyncThunk(
 		}
 	}
 );
+export const workFLowExction = createAsyncThunk(
+  'zaplane/workFLowExction',
+  async (payload, thunkAPI) => {
+    console.log(payload, 'pay');
+
+    try {
+      const res = await API.post(
+        namespace + 'execute',
+        payload
+      );
+
+      handleSliceSuccess(thunkAPI, __('Run fetched successfully', 'workflow'));
+      return res.data;
+
+    } catch (e) {
+      return handleSliceError(thunkAPI, e);
+    }
+  }
+);
+
+
 export const nodeLogsRunDetails = createAsyncThunk(
 	'zaplane/nodeLogsRunDetails',
 	async (runId, thunkAPI) => {
 		try {
 			const res = await API.get(
-				namespace + `runs/${parseInt(runId)}/nodes`
+				namespace + `runs/${parseInt(runId)}`
 			);
 
 			return res.data;

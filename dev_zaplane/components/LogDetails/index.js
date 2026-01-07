@@ -29,7 +29,7 @@ const LogDetails = ({ runId, onBack }) => {
       </Text>
 
       <Accordion.Root collapsible>
-        {nodeDetails.map((log) => {
+        {nodeDetails?.nodes?.map((log) => {
           const input = JSON.parse(log.input_json || "{}");
           const output = JSON.parse(log.output_json || "{}");
 

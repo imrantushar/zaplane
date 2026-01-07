@@ -40,7 +40,7 @@ export const getRunsList = createAsyncThunk(
 	async ({ limit = 50, offset = 0 } = {}, thunkAPI) => {
 		try {
 			const res = await API.get(
-				namespace + `runs?limit=${limit}&offset=${offset}`
+				namespace + `runs`
 			);
 
 			handleSliceSuccess(

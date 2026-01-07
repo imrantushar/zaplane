@@ -511,7 +511,7 @@ const LogDetails = ({
       children: ["Run ID: #", runId]
     }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.AccordionRoot, {
       collapsible: true,
-      children: nodeDetails.map(log => {
+      children: nodeDetails?.nodes?.map(log => {
         const input = JSON.parse(log.input_json || "{}");
         const output = JSON.parse(log.output_json || "{}");
         return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.AccordionItem, {
@@ -1142,13 +1142,9 @@ const Logs = () => {
   const [showDetails, setShowDetails] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
   const [activeRunId, setActiveRunId] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(null);
   const runs = (0,react_redux__WEBPACK_IMPORTED_MODULE_8__.useSelector)(state => state.logs?.data || {});
-  // console.log(runs);
-
+  console.log(runs, 'data');
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
-    dispatch((0,_ZAPRedux_Slices_logsSlice_logsSlice__WEBPACK_IMPORTED_MODULE_9__.getRunsList)({
-      limit: 20,
-      offset: 0
-    }));
+    dispatch((0,_ZAPRedux_Slices_logsSlice_logsSlice__WEBPACK_IMPORTED_MODULE_9__.getRunsList)());
   }, [dispatch]);
   const isSuccess = status => status === "completed";
   if (showDetails) {
@@ -1160,7 +1156,7 @@ const Logs = () => {
       }
     });
   }
-  if (!runs?.runs?.length) {
+  if (!runs?.length) {
     return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Flex, {
       align: "center",
       justify: "center",
@@ -1188,7 +1184,7 @@ const Logs = () => {
         })]
       })
     }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_7__.TableBody, {
-      children: runs?.runs?.map(row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_7__.TableRow, {
+      children: runs?.map(row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_7__.TableRow, {
         children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_7__.TableCell, {
           children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
             fontSize: "sm",
@@ -3135,7 +3131,13 @@ function FlowCanvas({
             }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_28__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {
               size: "sm",
               variant: "outline",
-              onClick: () => dispatch((0,_ZAPRedux_Slices_executionSlice_executionSlice__WEBPACK_IMPORTED_MODULE_21__.replayWorkflowRun)(id)),
+              onClick: () => {
+                const paylod = {
+                  workflow_hash: singleData?.version?.hash
+                };
+                console.log(paylod, "pp");
+                dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_16__.workFLowExction)(paylod));
+              },
               children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("🔄 Replay ", "zaplane")
             })]
           }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_28__.jsx)(_RunsTable_RunsTable__WEBPACK_IMPORTED_MODULE_23__["default"], {
@@ -3741,7 +3743,7 @@ const getRunTimeline = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAs
 });
 const replayWorkflowRun = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyncThunk)('zaplane/replayWorkflowRun', async (runId, thunkAPI) => {
   try {
-    const res = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.post(_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.namespace + `runs/${parseInt(runId)}/replay`, {});
+    const res = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.post(_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.namespace + `runs/${parseInt(runId)}/execute`, {});
     thunkAPI.dispatch((0,_notificationSlice_notificationSlice__WEBPACK_IMPORTED_MODULE_3__.showNotification)({
       message: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Workflow replay started successfully', 'workflow'),
       isShow: true,
@@ -3826,7 +3828,7 @@ const getRunsList = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsync
   offset = 0
 } = {}, thunkAPI) => {
   try {
-    const res = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.get(_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.namespace + `runs?limit=${limit}&offset=${offset}`);
+    const res = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.get(_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.namespace + `runs`);
     (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.handleSliceSuccess)(thunkAPI, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Runs fetched successfully', 'workflow'));
     return res.data;
   } catch (e) {
@@ -4155,7 +4157,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   singleNodeRun: () => (/* binding */ singleNodeRun),
 /* harmony export */   updateWorkFlow: () => (/* binding */ updateWorkFlow),
 /* harmony export */   updateWorkFlowStatus: () => (/* binding */ updateWorkFlowStatus),
-/* harmony export */   versionActive: () => (/* binding */ versionActive)
+/* harmony export */   versionActive: () => (/* binding */ versionActive),
+/* harmony export */   workFLowExction: () => (/* binding */ workFLowExction)
 /* harmony export */ });
 /* harmony import */ var _reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @reduxjs/toolkit */ "./node_modules/@reduxjs/toolkit/dist/redux-toolkit.modern.mjs");
 /* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
@@ -4257,9 +4260,19 @@ const getSingleRun = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyn
     return (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.handleSliceError)(thunkAPI, e);
   }
 });
+const workFLowExction = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyncThunk)('zaplane/workFLowExction', async (payload, thunkAPI) => {
+  console.log(payload, 'pay');
+  try {
+    const res = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.post(_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.namespace + 'execute', payload);
+    (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.handleSliceSuccess)(thunkAPI, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Run fetched successfully', 'workflow'));
+    return res.data;
+  } catch (e) {
+    return (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.handleSliceError)(thunkAPI, e);
+  }
+});
 const nodeLogsRunDetails = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyncThunk)('zaplane/nodeLogsRunDetails', async (runId, thunkAPI) => {
   try {
-    const res = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.get(_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.namespace + `runs/${parseInt(runId)}/nodes`);
+    const res = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.get(_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.namespace + `runs/${parseInt(runId)}`);
     return res.data;
   } catch (e) {
     return (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.handleSliceError)(thunkAPI, e);

@@ -26,14 +26,11 @@ const Logs = () => {
     const [activeRunId, setActiveRunId] = useState(null);
 
     const runs = useSelector((state) => state.logs?.data || {});
-    // console.log(runs);
+    console.log(runs,'data');
 
     useEffect(() => {
         dispatch(
-            getRunsList({
-                limit: 20,
-                offset: 0,
-            })
+            getRunsList()
         );
     }, [dispatch]);
 
@@ -51,7 +48,7 @@ const Logs = () => {
             />
         );
     }
-    if (!runs?.runs?.length) {
+    if (!runs?.length) {
         return (
             <Flex align="center" justify="center" h="100%">
                 <Spinner size="xl" />
@@ -72,7 +69,7 @@ const Logs = () => {
             </Table.Header>
 
             <Table.Body>
-                {runs?.runs?.map((row) => (
+                {runs?.map((row) => (
                     <Table.Row key={row.id}>
                         <Table.Cell>
                             <Text fontSize="sm">
