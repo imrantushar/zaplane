@@ -2765,8 +2765,9 @@ function FlowCanvas({
   const containerRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
   const [isFullscreen, setIsFullscreen] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
   const [activeDrawer, setActiveDrawer] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(null);
+  console.log(runs, 'singledata');
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
-    if (!singleData?.graph) return;
+    if (!singleData?.graph?.nodes?.length) return;
     const mappedNodes = (singleData.graph.nodes || []).map(node => ({
       ...node,
       type: "custom",
@@ -2781,7 +2782,7 @@ function FlowCanvas({
     }));
     setNodes(mappedNodes);
     setEdges(mappedEdges);
-  }, []);
+  }, [singleData?.graph]);
   const [drawerContext, setDrawerContext] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)({
     source: null,
     node: null,
@@ -3060,12 +3061,14 @@ function FlowCanvas({
       onAddNode: onAddNode
     })
   };
-  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
-    const interval = setInterval(() => {
-      dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_15__.getRunWorkFlow)(id));
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []);
+
+  // useEffect(() => {
+  //     const interval = setInterval(() => {
+  //         dispatch(getRunWorkFlow());
+  //     }, 5000);
+
+  //     return () => clearInterval(interval);
+  // }, []);
   const drawerWidths = {
     history: "497px",
     logs: "882px"
@@ -3148,7 +3151,10 @@ function FlowCanvas({
           trigger: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_26__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {
             size: "sm",
             variant: "outline",
-            onClick: () => setActiveDrawer("logs"),
+            onClick: () => {
+              dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_15__.getRunWorkFlow)(id));
+              setActiveDrawer("logs");
+            },
             children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("Logs ", "zaplane")
           }),
           children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_26__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {
@@ -3157,7 +3163,7 @@ function FlowCanvas({
             onClick: () => dispatch((0,_ZAPRedux_Slices_executionSlice_executionSlice__WEBPACK_IMPORTED_MODULE_20__.replayWorkflowRun)(id)),
             children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("🔄 Replay ", "zaplane")
           }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_26__.jsx)(_RunsTable_RunsTable__WEBPACK_IMPORTED_MODULE_22__["default"], {
-            runs: runs?.runs
+            runs: runs
           })]
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_26__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {
           size: "sm",
@@ -3410,8 +3416,6 @@ const RunsTable = ({
         children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_6__.TableColumnHeader, {
           children: "Run ID"
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_6__.TableColumnHeader, {
-          children: "Workflow ID"
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_6__.TableColumnHeader, {
           children: "Status"
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_6__.TableColumnHeader, {
           children: "Started"
@@ -3428,11 +3432,6 @@ const RunsTable = ({
           children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Text, {
             fontWeight: "medium",
             children: ["#", run.id]
-          })
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_6__.TableCell, {
-          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Text, {
-            fontSize: "sm",
-            children: run.workflow_id
           })
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_6__.TableCell, {
           children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Badge, {
@@ -4345,9 +4344,9 @@ const updateWorkFlowStatus = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.cr
     }));
   }
 });
-const getRunWorkFlow = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyncThunk)('zaplane/getRunWorkFlow', async (_, thunkAPI) => {
+const getRunWorkFlow = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyncThunk)('zaplane/getRunWorkFlow', async (id, thunkAPI) => {
   try {
-    const res = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.get(_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.namespace + 'runs');
+    const res = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.get(_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.namespace + `workflows/${id}/runs`);
     return res.data;
   } catch (e) {
     return (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.handleSliceError)(thunkAPI, e);

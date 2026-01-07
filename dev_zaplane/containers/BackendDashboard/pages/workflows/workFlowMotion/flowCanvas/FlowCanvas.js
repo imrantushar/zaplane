@@ -85,10 +85,9 @@ export default function FlowCanvas({ id }) {
     const containerRef = useRef(null);
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [activeDrawer, setActiveDrawer] = useState(null);
-
-
+   console.log(runs,'singledata');
     useEffect(() => {
-        if (!singleData?.graph) return;
+        if (!singleData?.graph?.nodes?.length) return;
         const mappedNodes = (singleData.graph.nodes || []).map((node) => ({
             ...node,
             type: "custom",
@@ -104,7 +103,7 @@ export default function FlowCanvas({ id }) {
         }));
         setNodes(mappedNodes);
         setEdges(mappedEdges);
-    }, []);
+    }, [singleData?.graph]);
     const [drawerContext, setDrawerContext] = useState({
         source: null,
         node: null,
@@ -417,13 +416,13 @@ export default function FlowCanvas({ id }) {
         ),
     };
 
-    useEffect(() => {
-        const interval = setInterval(() => {
-            dispatch(getRunWorkFlow(id));
-        }, 5000);
+    // useEffect(() => {
+    //     const interval = setInterval(() => {
+    //         dispatch(getRunWorkFlow());
+    //     }, 5000);
 
-        return () => clearInterval(interval);
-    }, []);
+    //     return () => clearInterval(interval);
+    // }, []);
     const drawerWidths = {
         history: "497px",
         logs: "882px",
@@ -520,7 +519,11 @@ export default function FlowCanvas({ id }) {
                             onClose={() => setActiveDrawer(null)}
                             trigger={
                                 <Button size="sm" variant="outline"
-                                    onClick={() => setActiveDrawer("logs")}
+                                    onClick={() => {
+                                         dispatch(getRunWorkFlow(id))
+                                        setActiveDrawer("logs")
+                                    }}
+
                                 >
                                     {__("Logs ", "zaplane")}
                                 </Button>
@@ -530,7 +533,7 @@ export default function FlowCanvas({ id }) {
                                 {__("🔄 Replay ", "zaplane")}
                             </Button>
                             <RunsTable
-                                runs={runs?.runs}
+                                runs={runs}
                             />
 
 
