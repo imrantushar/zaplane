@@ -22,6 +22,7 @@ class Wordpress extends IntegrationBase {
             'user_register' => ['label' => 'User Registered','hook' => 'user_register'],
             'comment_post'  => ['label' => 'Comment Added',  'hook' => 'comment_post'],
             'deleted_post'  => ['label' => 'Post Deleted',   'hook' => 'before_delete_post'],
+            'trashed_post'  => ['label' => 'Post Trashed',   'hook' => 'trashed_post'],
         ];
     }
 
@@ -108,9 +109,20 @@ class Wordpress extends IntegrationBase {
                     'content'    => $comment->comment_content,
                 ];
 
+            case 'trashed_post' :
+                $post = get_post( $args[0] ?? 0 );
+                if ( ! $post) return false;
+
+                return [
+                    'post_id'    => $post->ID,
+                    'post_title' => $post->post_title,
+                    'post_type'  => $post->post_type,
+                    'status'     => $post->post_status,
+                ];
+
             case 'deleted_post':
-                $post = get_post($args[0] ?? 0);
-                if (!$post) return false;
+                $post = get_post( $args[0] ?? 0 );
+                if ( ! $post) return false;
 
                 return [
                     'post_id'    => $post->ID,
@@ -133,6 +145,7 @@ class Wordpress extends IntegrationBase {
             'update_option' => ['label'=>'Update Option'],
             'update_post_title' => ['label'=>'Update Post Title'],
             'delete_post'   => ['label'=>'Delete Post'],
+            'deactivate_plugin'   => ['label'=>'Deactivate Plugin'],
         ];
     }
 
@@ -218,6 +231,22 @@ class Wordpress extends IntegrationBase {
                     'type'=>'expression', 
                     'required'=>true,
                 ],
+            ]; 
+        }
+
+        if ( $action === 'deactivate_plugin' ) {
+            return [
+                [
+                    'key'=>'plugin',
+                    'label'=>'Active Plugin',
+                    'type'=>'select',
+                    'dynamic'=>[
+                        'integration'=>'wordpress',
+                        'query'=>'active_plugins',
+                        'select'=>['file', 'name' ],
+                    ],
+                    'required'=>true,
+                ],
             ];
         }
 
@@ -248,18 +277,21 @@ class Wordpress extends IntegrationBase {
                 return ['port'=>'main','data'=>[]];
 
             case 'update_post_title':
-                $update = wp_update_post([
+                wp_update_post([
                     'ID'  => $config['post_id'] ,
                     'post_title' => $config['post_title'],
                 ]);
-                error_log( print_r($update, true));
                 return ['port'=>'main','data'=>[]];
 
             case 'delete_post':
                 wp_delete_post( $config['post_id'], true );
                 return ['port'=>'main','data'=>['post_id'=>$config['post_id']]];
 
-
+            case 'deactivate_plugin':
+                if ( is_plugin_active( $config[ 'plugin' ] ) ) {
+                    deactivate_plugins( $config[ 'plugin' ] ); 
+                }
+                return ['port'=>'main', 'data'=>[]];
         }
 
         return ['port'=>'main','data'=>$input];
@@ -274,6 +306,7 @@ class Wordpress extends IntegrationBase {
             'post_types' => [ self::class, 'query_post_types' ],
             'posts'      => [ self::class, 'query_posts' ],
             'users'      => [ self::class, 'query_users' ],
+            'active_plugins' => [ self::class, 'query_active_plugins' ],
         ];
     }
 
@@ -310,4 +343,33 @@ class Wordpress extends IntegrationBase {
             'email'=>$u->user_email
         ], $users);
     }
+
+    public static function query_active_plugins( $q ) {
+        if ( ! function_exists( 'is_plugin_active' ) ) {
+            require_once ABSPATH . 'wp-admin/includes/plugin.php';
+        }
+
+        $all_plugins = get_plugins();
+        $active_plugin = get_option( 'active_plugins', [] );
+        $result = [];
+
+        foreach ( $active_plugin as $plugin ) {
+            if ( ! isset( $all_plugins[ $plugin ] ) ) {
+                continue;
+            }
+
+            if ( $plugin === 'zaplane/zaplane.php' ) {
+                continue;
+            }
+
+            $result[] = [
+                'file' => $plugin,
+                'name' => $all_plugins[ $plugin ][ 'Name' ],
+            ];
+        }
+
+        return $result;
+    }
 }
+
+
