@@ -18,40 +18,21 @@ class RunController extends WP_REST_Controller {
         $ns = 'zaplane/v1';
 
         register_rest_route($ns, '/runs', [
-            'methods'  => 'GET',
-            'callback' => [$this, 'list_runs'],
-            'permission_callback' => [$this, 'permissions']
-        ]);
-
-        register_rest_route($ns, '/runs/(?P<id>\d+)', [
-            'methods'  => 'GET',
-            'callback' => [$this, 'get_run_view'],
-            'permission_callback' => [$this, 'permissions']
-        ]);
-
-        register_rest_route($ns, '/runs/(?P<id>\d+)/nodes', [
-            'methods'  => 'GET',
-            'callback' => [$this, 'get_run_nodes'],
-            'permission_callback' => [$this, 'permissions']
-        ]);
-
-        register_rest_route($ns, '/runs/(?P<id>\d+)/live', [
-            'methods'  => 'GET',
-            'callback' => [$this, 'get_live_view'],
-            'permission_callback' => [$this, 'permissions']
-        ]);
-
-        register_rest_route($ns, '/runs/(?P<id>\d+)/timeline', [
-            'methods'=>'GET',
-            'callback'=>[$this,'get_timeline'],
+            'methods' => 'GET',
+            'callback' => [$this,'list_runs'],
             'permission_callback'=>[$this,'permissions']
         ]);
 
+        register_rest_route($ns, '/runs/(?P<id>\d+)', [
+            'methods'=>'GET',
+            'callback'=>[$this,'get_run'],
+            'permission_callback'=>[$this,'permissions']
+        ]);
 
         register_rest_route($ns, '/runs/(?P<id>\d+)/replay', [
-            'methods'  => 'POST',
-            'callback' => [$this, 'replay_run'],
-            'permission_callback' => [$this, 'permissions']
+            'methods'=>'POST',
+            'callback'=>[$this,'replay_run'],
+            'permission_callback'=>[$this,'permissions']
         ]);
 
         register_rest_route($ns, '/runs/(?P<id>\d+)/stop', [
@@ -60,479 +41,213 @@ class RunController extends WP_REST_Controller {
             'permission_callback'=>[$this,'permissions']
         ]);
 
-        register_rest_route($ns, '/queue', [
-            'methods'  => 'GET',
-            'callback' => [$this, 'get_queue'],
-            'permission_callback' => [$this, 'permissions']
-        ]);
-
         register_rest_route($ns, '/node-runs/(?P<id>\d+)', [
-            'methods'  => 'GET',
-            'callback' => [$this, 'get_node_run'],
-            'permission_callback' => [$this, 'permissions']
-        ]);
-        register_rest_route($ns, '/node-runs/(?P<id>\d+)/inspect', [
-            'methods' => 'GET',
-            'callback' => [$this,'inspect_node'],
-            'permission_callback' => [$this,'permissions']
+            'methods'=>'GET',
+            'callback'=>[$this,'get_node_run'],
+            'permission_callback'=>[$this,'permissions']
         ]);
 
         register_rest_route($ns, '/node-runs/(?P<id>\d+)/retry', [
-            'methods'  => 'POST',
-            'callback' => [$this, 'retry_node'],
-            'permission_callback' => [$this, 'permissions']
+            'methods'=>'POST',
+            'callback'=>[$this,'retry_node'],
+            'permission_callback'=>[$this,'permissions']
         ]);
 
-        
+        register_rest_route($ns, '/execute', [
+            'methods'=>'POST',
+            'callback'=>[$this,'execute_workflow'],
+            'permission_callback'=>[$this,'permissions']
+        ]);
 
+        register_rest_route($ns, '/execute-node', [
+            'methods'=>'POST',
+            'callback'=>[$this,'execute_single_node'],
+            'permission_callback'=>[$this,'permissions']
+        ]);
     }
 
     public function permissions() {
         return current_user_can('manage_options');
     }
 
-    /* ======================================================
-     * RUNS LIST
-     * ====================================================== */
+    /* ================= RUN LIST ================= */
 
-    public function list_runs($req) {
+    public function list_runs() {
         global $wpdb;
-
-        $page     = max(1, (int) ($req['page'] ?? 1));
-        $per_page = min(200, max(10, (int) ($req['per_page'] ?? 50)));
-        $offset   = ($page - 1) * $per_page;
-
-        $where = [];
-        $args  = [];
-
-        // Filter by status
-        if (!empty($req['status'])) {
-            $where[] = "r.status = %s";
-            $args[]  = sanitize_text_field($req['status']);
-        }
-
-        // Filter by workflow
-        if (!empty($req['workflow_id'])) {
-            $where[] = "v.workflow_id = %d";
-            $args[]  = (int)$req['workflow_id'];
-        }
-
-        // Search in error message
-        if (!empty($req['search'])) {
-            $where[] = "r.last_error LIKE %s";
-            $args[]  = '%' . $wpdb->esc_like($req['search']) . '%';
-        }
-
-        $where_sql = $where ? 'WHERE ' . implode(' AND ', $where) : '';
-
-        // Total count (for pagination UI)
-        $total = $wpdb->get_var(
-            $wpdb->prepare("
-                SELECT COUNT(*)
-                FROM {$wpdb->prefix}zaplane_runs r
-                LEFT JOIN {$wpdb->prefix}zaplane_workflow_versions v
-                ON v.graph_hash = r.workflow_version_hash
-                $where_sql
-            ", $args)
-        );
-
-        // Data
-        $rows = $wpdb->get_results(
-            $wpdb->prepare("
-                SELECT 
-                    r.id,
-                    r.workflow_version_hash,
-                    v.workflow_id,
-                    r.status,
-                    r.started_at,
-                    r.finished_at,
-                    r.last_error
-                FROM {$wpdb->prefix}zaplane_runs r
-                LEFT JOIN {$wpdb->prefix}zaplane_workflow_versions v
-                ON v.graph_hash = r.workflow_version_hash
-                $where_sql
-                ORDER BY r.id DESC
-                LIMIT %d OFFSET %d
-            ", array_merge($args, [$per_page, $offset])),
-            ARRAY_A
-        );
-
-        return [
-            'page'      => $page,
-            'per_page' => $per_page,
-            'total'    => (int)$total,
-            'runs'     => $rows
-        ];
-    }
-
-
-    /* ======================================================
-     * SINGLE RUN INSPECTOR
-     * ====================================================== */
-
-    public function get_run_view($req){
-        global $wpdb;
-        $run_id = (int)$req['id'];
-
-        $run = $wpdb->get_row(
-            $wpdb->prepare("SELECT * FROM {$wpdb->prefix}zaplane_runs WHERE id=%d",$run_id),
-            ARRAY_A
-        );
-
-        $nodes = $wpdb->get_results(
-            $wpdb->prepare("SELECT * FROM {$wpdb->prefix}zaplane_node_runs WHERE run_id=%d",$run_id),
-            ARRAY_A
-        );
-
-        $edges = $wpdb->get_results(
-            $wpdb->prepare("SELECT * FROM {$wpdb->prefix}zaplane_execution_edges WHERE run_id=%d",$run_id),
-            ARRAY_A
-        );
-
-        $logs = $wpdb->get_results(
-            $wpdb->prepare(
-                "SELECT l.*,nr.node_key
-                FROM {$wpdb->prefix}zaplane_node_logs l
-                JOIN {$wpdb->prefix}zaplane_node_runs nr ON nr.id=l.node_run_id
-                WHERE nr.run_id=%d ORDER BY l.id",
-                $run_id
-            ),
-            ARRAY_A
-        );
-        error_log(print_r($nodes, true));  
-        return [
-            'run'=>$run,
-            'execution'=>$this->build_tree($nodes,$edges,$logs)
-        ];
-    }
-
-    private function build_tree($nodes,$edges,$logs){
-        $byId=[];
-        foreach($nodes as $n){
-            $n['logs']=[];
-            $n['children']=[];
-            $byId[$n['id']]=$n;
-        }
-
-        foreach($logs as $l){
-            foreach($byId as &$n){
-                if($n['id']==$l['node_run_id']){
-                    $n['logs'][]=$l;
-                }
-            }
-        }
-
-        foreach($edges as $e){
-            foreach($byId as &$n){
-                if($n['id']==$e['from_node_run_id']){
-                    foreach($byId as &$child){
-                        if($child['node_key']==$e['to_node_key'] && $child['parent_node_run_id']==$n['id']){
-                            $n['children'][]=&$child;
-                        }
-                    }
-                }
-            }
-        }
-
-        return array_values(array_filter($byId,fn($n)=>!$n['parent_node_run_id']));
-    }
-
-
-
-    public function get_run_nodes($req){
-        global $wpdb;
-        $run_id = (int)$req['id'];
-
-        $node_runs = $wpdb->get_results($wpdb->prepare("
-            SELECT id, node_key, status, started_at, finished_at, input_json, output_json
-            FROM {$wpdb->prefix}zaplane_node_runs
-            WHERE run_id=%d
-            ORDER BY id ASC
-        ", $run_id), ARRAY_A);
-
-        return rest_ensure_response($node_runs);
-    }
-
-
-    /* ======================================================
-     * QUEUE
-     * ====================================================== */
-
-    public function get_queue() {
-        global $wpdb;
-
         return $wpdb->get_results("
-            SELECT 
-                q.id,
-                q.run_id,
-                q.node_run_id,
-                q.available_at,
-                q.locked_at,
-                q.locked_by,
-                q.attempts,
-                q.last_error,
-                nr.node_key,
-                nr.status
-            FROM {$wpdb->prefix}zaplane_queue q
-            JOIN {$wpdb->prefix}zaplane_node_runs nr ON nr.id = q.node_run_id
-            ORDER BY q.available_at ASC
+            SELECT id,status,started_at,finished_at
+            FROM {$wpdb->prefix}zaplane_runs
+            ORDER BY id DESC
+            LIMIT 100
         ", ARRAY_A);
     }
 
+    /* ================= RUN VIEW ================= */
 
-    /* ======================================================
-     * RETRY NODE
-     * ====================================================== */
-
-    public function retry_node($req) {
+    public function get_run($req) {
         global $wpdb;
-        $id = (int)$req['id'];
+        $id = (int) $req['id'];
 
-        $nr = $wpdb->get_row(
-            $wpdb->prepare("SELECT * FROM {$wpdb->prefix}zaplane_node_runs WHERE id=%d", $id),
-            ARRAY_A
-        );
-        if (!$nr) return new \WP_Error('not_found', 'Node run not found', ['status'=>404]);
-
-        // remove old queue entries
-        $wpdb->delete($wpdb->prefix.'zaplane_queue', ['node_run_id'=>$id]);
-
-        // reset node state
-        $wpdb->update(
-            $wpdb->prefix.'zaplane_node_runs',
-            [
-                'status' => 'pending',
-                'attempts' => 0,
-                'started_at' => null,
-                'finished_at' => null,
-                'output_json' => null
-            ],
-            ['id' => $id]
-        );
-
-        // requeue
-        $wpdb->insert(
-            $wpdb->prefix.'zaplane_queue',
-            [
-                'run_id' => $nr['run_id'],
-                'node_run_id' => $id,
-                'available_at' => current_time('mysql')
-            ]
-        );
-
-        return ['status'=>'requeued'];
+        return [
+            'run' => $wpdb->get_row($wpdb->prepare(
+                "SELECT * FROM {$wpdb->prefix}zaplane_runs WHERE id=%d",$id
+            ),ARRAY_A),
+            'nodes' => $wpdb->get_results($wpdb->prepare(
+                "SELECT * FROM {$wpdb->prefix}zaplane_node_runs WHERE run_id=%d",$id
+            ),ARRAY_A)
+        ];
     }
 
-
-    /* ======================================================
-     * REPLAY RUN
-     * ====================================================== */
+    /* ================= REPLAY ================= */
 
     public function replay_run($req) {
         global $wpdb;
-        $old_id = (int) $req['id'];
+        $old = (int)$req['id'];
 
-        $old = $wpdb->get_row(
-            $wpdb->prepare("SELECT * FROM {$wpdb->prefix}zaplane_runs WHERE id=%d", $old_id),
-            ARRAY_A
-        );
-        if (!$old) return ['error' => 'Run not found'];
+        $run = $wpdb->get_row($wpdb->prepare(
+            "SELECT * FROM {$wpdb->prefix}zaplane_runs WHERE id=%d",$old
+        ),ARRAY_A);
 
-        // Create new run
-        $wpdb->insert($wpdb->prefix.'zaplane_runs', [
-            'workflow_version_hash' => $old['workflow_version_hash'],
-            'trigger_data' => $old['trigger_data'],
-            'status' => 'running',
-            'started_at' => current_time('mysql')
+        if(!$run) return new \WP_Error('not_found','Run not found');
+
+        $wpdb->insert("{$wpdb->prefix}zaplane_runs",[
+            'workflow_version_hash'=>$run['workflow_version_hash'],
+            'trigger_data'=>$run['trigger_data'],
+            'status'=>'running',
+            'start_node_key'=>$run['start_node_key'],
+            'target_node_key'=>$run['target_node_key'],
+            'started_at'=>current_time('mysql')
         ]);
-        $new_run = $wpdb->insert_id;
 
-        // Load graph
-        $graph_json = $wpdb->get_var(
-            $wpdb->prepare(
-                "SELECT graph_json FROM {$wpdb->prefix}zaplane_workflow_versions WHERE graph_hash=%s",
-                $old['workflow_version_hash']
-            )
+        $new = $wpdb->insert_id;
+
+        $this->container->get('automation')->spawn_node_run(
+            $new,
+            $run['start_node_key'],
+            json_decode($run['trigger_data'],true),
+            null
         );
-        $graph = json_decode($graph_json, true);
-    
 
-        $automation = $this->container->get('automation');
-        error_log(print_r( $automation, true));
-        // Find trigger
-        foreach ($graph['nodes'] as $n) {
-            if ($n['type'] === 'trigger') {
-                foreach ($graph['edges'] as $e) {
-                    if ($e['source'] === $n['id']) {
-                        $automation->spawn_node_run(
-                            $new_run,
-                            $e['target'],
-                            json_decode($old['trigger_data'], true),
-                            null
-                        );
-                    }
-                }
-                break;
-            }
-        }
-
-        return ['new_run_id' => $new_run];
+        return ['run_id'=>$new];
     }
 
-    public function get_live_view($req){
-        global $wpdb;
-        $id=(int)$req['id'];
-
-        $run = $wpdb->get_row(
-            $wpdb->prepare("SELECT * FROM {$wpdb->prefix}zaplane_runs WHERE id=%d",$id),
-            ARRAY_A
-        );
-
-        $nodes = $wpdb->get_results(
-            $wpdb->prepare("SELECT * FROM {$wpdb->prefix}zaplane_node_runs WHERE run_id=%d",$id),
-            ARRAY_A
-        );
-
-        $logs = $wpdb->get_results(
-            $wpdb->prepare(
-                "SELECT l.*,nr.node_key
-                FROM {$wpdb->prefix}zaplane_node_logs l
-                JOIN {$wpdb->prefix}zaplane_node_runs nr ON nr.id=l.node_run_id
-                WHERE nr.run_id=%d ORDER BY l.id DESC LIMIT 200",$id),
-            ARRAY_A
-        );
-
-        return [
-            'run'=>$run,
-            'nodes'=>$nodes,
-            'logs'=>array_reverse($logs)
-        ];
-    }
-
-
-
-    public function get_node_run($req) {
-        global $wpdb;
-        $id = (int)$req['id'];
-
-        $node = $wpdb->get_row(
-            $wpdb->prepare("SELECT * FROM {$wpdb->prefix}zaplane_node_runs WHERE id=%d", $id),
-            ARRAY_A
-        );
-
-        $logs = $wpdb->get_results(
-            $wpdb->prepare(
-                "SELECT * FROM {$wpdb->prefix}zaplane_node_logs WHERE node_run_id=%d ORDER BY id",
-                $id
-            ),
-            ARRAY_A
-        );
-
-        return [
-            'node' => $node,
-            'logs' => $logs
-        ];
-    }
-
-    public function get_timeline($req){
-        global $wpdb;
-        $id=(int)$req['id'];
-
-        return $wpdb->get_results(
-            $wpdb->prepare(
-                "SELECT * FROM {$wpdb->prefix}zaplane_execution_edges WHERE run_id=%d ORDER BY id",
-                $id
-            ),
-            ARRAY_A
-        );
-    }
+    /* ================= STOP ================= */
 
     public function stop_run($req){
         global $wpdb;
         $id=(int)$req['id'];
 
-        // remove queued jobs
-        $wpdb->delete($wpdb->prefix.'zaplane_queue',['run_id'=>$id]);
+        $wpdb->update("{$wpdb->prefix}zaplane_runs",[
+            'status'=>'cancelled',
+            'finished_at'=>current_time('mysql')
+        ],['id'=>$id]);
 
-        // unlock running jobs
-        $wpdb->update(
-            $wpdb->prefix.'zaplane_queue',
-            ['locked_at'=>null,'lock_token'=>null],
-            ['run_id'=>$id]
-        );
-
-        // cancel all nodes
-        $wpdb->update(
-            $wpdb->prefix.'zaplane_node_runs',
-            ['status'=>'cancelled','finished_at'=>current_time('mysql')],
-            ['run_id'=>$id]
-        );
-
-        // cancel run
-        $wpdb->update(
-            $wpdb->prefix.'zaplane_runs',
-            ['status'=>'cancelled','finished_at'=>current_time('mysql')],
-            ['id'=>$id]
-        );
+        $wpdb->update("{$wpdb->prefix}zaplane_node_runs",[
+            'status'=>'cancelled',
+            'finished_at'=>current_time('mysql')
+        ],['run_id'=>$id]);
 
         return ['stopped'=>true];
     }
 
-    public function inspect_node($req){
+    /* ================= NODE ================= */
+
+    public function get_node_run($req){
         global $wpdb;
-        $id = (int)$req['id'];
+        return $wpdb->get_row($wpdb->prepare(
+            "SELECT * FROM {$wpdb->prefix}zaplane_node_runs WHERE id=%d",(int)$req['id']
+        ),ARRAY_A);
+    }
 
-        // Node run
-        $nr = $wpdb->get_row(
-            $wpdb->prepare("SELECT * FROM {$wpdb->prefix}zaplane_node_runs WHERE id=%d",$id),
-            ARRAY_A
-        );
-        if(!$nr) return new \WP_Error('not_found','Node not found',['status'=>404]);
+    public function retry_node($req){
+        global $wpdb;
+        $id=(int)$req['id'];
 
-        // Run
-        $run = $wpdb->get_row(
-            $wpdb->prepare("SELECT * FROM {$wpdb->prefix}zaplane_runs WHERE id=%d",$nr['run_id']),
-            ARRAY_A
-        );
+        $wpdb->update("{$wpdb->prefix}zaplane_node_runs",[
+            'status'=>'pending',
+            'started_at'=>null,
+            'finished_at'=>null,
+            'output_json'=>null
+        ],['id'=>$id]);
 
-        // Parent (from execution edges)
-        $parent = $wpdb->get_row(
-            $wpdb->prepare(
-                "SELECT nr.id,nr.node_key 
-                FROM {$wpdb->prefix}zaplane_execution_edges e
-                JOIN {$wpdb->prefix}zaplane_node_runs nr ON nr.id=e.from_node_run_id
-                WHERE e.run_id=%d AND e.to_node_key=%s
-                ORDER BY e.id DESC LIMIT 1",
-                $nr['run_id'],$nr['node_key']
-            ),
-            ARRAY_A
-        );
+        as_enqueue_async_action('zaplane_execute_node_run',['node_run_id'=>$id],'zaplane');
+        return ['requeued'=>true];
+    }
 
-        // Logs
-        $logs = $wpdb->get_results(
-            $wpdb->prepare(
-                "SELECT level,message,created_at 
-                FROM {$wpdb->prefix}zaplane_node_logs 
-                WHERE node_run_id=%d ORDER BY id",$id),
-            ARRAY_A
+    /* ================= EXECUTE FULL ================= */
+
+    public function execute_workflow($req){
+        global $wpdb;
+
+        $workflow = $req['workflow_hash'];
+        $data = $req['data'] ?? [];
+
+        $graph=json_decode($wpdb->get_var(
+            $wpdb->prepare("SELECT graph_json FROM {$wpdb->prefix}zaplane_workflow_versions WHERE graph_hash=%s",$workflow)
+        ),true);
+
+        foreach($graph['nodes'] as $n){
+            if($n['type']==='trigger'){ $trigger=$n; break; }
+        }
+
+        if(empty($trigger)) return new \WP_Error('no_trigger','No trigger node');
+
+        $wpdb->insert("{$wpdb->prefix}zaplane_runs",[
+            'workflow_version_hash'=>$workflow,
+            'status'=>'running',
+            'trigger_data'=>json_encode($data),
+            'start_node_key'=>$trigger['id'],
+            'target_node_key'=>null,
+            'started_at'=>current_time('mysql')
+        ]);
+
+        $run=$wpdb->insert_id;
+
+        $this->container->get('automation')->spawn_node_run($run,$trigger['id'],$data,null);
+
+        return ['run_id'=>$run];
+    }
+
+    /* ================= EXECUTE SINGLE NODE ================= */
+
+    public function execute_single_node($req){
+        global $wpdb;
+
+        $workflow = $req['workflow_hash'];
+        $target   = (string)$req['node_key'];
+        $input    = $req['input'] ?? [];
+
+        $graph=json_decode($wpdb->get_var(
+            $wpdb->prepare("SELECT graph_json FROM {$wpdb->prefix}zaplane_workflow_versions WHERE graph_hash=%s",$workflow)
+        ),true);
+
+        foreach($graph['nodes'] as $n){
+            if($n['type']==='trigger'){ $trigger=$n; break; }
+        }
+
+        if(empty($trigger)) return new \WP_Error('no_trigger','No trigger node');
+
+        $wpdb->insert("{$wpdb->prefix}zaplane_runs",[
+            'workflow_version_hash'=>$workflow,
+            'status'=>'running',
+            'trigger_data'=>json_encode($input),
+            'start_node_key'=>$trigger['id'],
+            'target_node_key'=>$target,
+            'started_at'=>current_time('mysql')
+        ]);
+
+        $run=$wpdb->insert_id;
+
+        $this->container->get('automation')->spawn_node_run(
+            $run,
+            $trigger['id'],
+            $input,
+            null
         );
 
         return [
-            'node_run'=>[
-                'id'=>$nr['id'],
-                'node_key'=>$nr['node_key'],
-                'status'=>$nr['status'],
-                'started_at'=>$nr['started_at'],
-                'finished_at'=>$nr['finished_at'],
-                'input'=>json_decode($nr['input_json'],true),
-                'output'=>json_decode($nr['output_json'],true),
-            ],
-            'trigger'=>[
-                'type'=>'trigger',
-                'data'=>json_decode($run['trigger_data'],true)
-            ],
-            'parent'=>$parent,
-            'logs'=>$logs
+            'run_id'=>$run,
+            'target_node'=>$target
         ];
     }
 }
