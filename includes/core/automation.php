@@ -26,7 +26,7 @@ class Automation {
 
     public function boot(): void {
         add_action('init', [$this, 'dispatch_active_triggers']);
-        add_action('zaplane_execute_node_run', [$this, 'dispatch_node_run'], 10, 1);
+        add_action('zaplane_execute_node_run', [$this, 'dispatch_node_run']);
         add_action('zaplane_workflow_updated', [$this, 'reload_triggers']);
     }
 
@@ -79,6 +79,9 @@ class Automation {
 
         $run_id = $wpdb->insert_id;
 
+        error_log(print_r('Run ID:' . $run_id, true));
+        error_log(print_r($payload, true));
+
         $this->spawn_node_run($run_id, $trigger['id'], $payload, null);
     }
 
@@ -109,10 +112,8 @@ class Automation {
 
     /* ================= WORKER ================= */
 
-    public function dispatch_node_run( array $args) {
+    public function dispatch_node_run( int $node_run_id) {
         global $wpdb;
-
-        $node_run_id = (int)$args['node_run_id'];
 
         // Atomic lock
         $updated = $wpdb->query(
