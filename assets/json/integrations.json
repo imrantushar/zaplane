@@ -102,6 +102,43 @@
                     "outputs": [
                         "main"
                     ]
+                },
+                "post_status_update": {
+                    "key": "post_status_update",
+                    "label": "Post Status Update",
+                    "hook": "post_status_updates",
+                    "schema": [
+                        {
+                            "key": "post_type",
+                            "label": "Post Type",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "post_types",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "posts",
+                            "label": "Post",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "posts",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
                 }
             },
             "actions": {

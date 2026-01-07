@@ -21,6 +21,7 @@ class Wordpress extends IntegrationBase {
             'post_updated'  => ['label' => 'Post Updated',   'hook' => 'post_updated'],
             'user_register' => ['label' => 'User Registered','hook' => 'user_register'],
             'comment_post'  => ['label' => 'Comment Added',  'hook' => 'comment_post'],
+            'post_status_update'  => ['label' => 'Post Status Update',  'hook' => 'post_status_updates'],
         ];
     }
 
@@ -50,7 +51,32 @@ class Wordpress extends IntegrationBase {
                         ['label'=>'Publish','value'=>'publish'],
                         ['label'=>'Draft','value'=>'draft'],
                     ]
-                ]
+                    ],
+            ];
+        }
+        if ( $trigger === 'post_status_update' ) {
+            return [
+                [
+                    'key'   => 'post_type',
+                    'label' => 'Post Type',
+                    'type'  => 'select',
+                    'dynamic' => [
+                        'integration' => 'wordpress',
+                        'query'       => 'post_types',
+                        'select'      => ['name','label'],
+                    ],
+                    'required' => true,
+                ],
+                [
+                    'key'   => 'posts',
+                    'label' => 'Post',
+                    'type'  => 'select',
+                    'dynamic' => [
+                        'integration' => 'wordpress',
+                        'query'       => 'posts',
+                        'select'      => ['name','label'],
+                    ],
+                ],
             ];
         }
 
@@ -67,7 +93,10 @@ class Wordpress extends IntegrationBase {
             case 'publish_post':
             case 'post_updated':
 
+                $post = $args[1] ?? null;
+                if ( ! $post instanceof \WP_Post ) {
                 $post = get_post( $args[0] ?? 0 );
+                }
                 if ( ! $post ) return false;
 
                 // Apply trigger filters
@@ -106,6 +135,31 @@ class Wordpress extends IntegrationBase {
                     'post_id'    => $comment->comment_post_ID,
                     'content'    => $comment->comment_content,
                 ];
+
+            case 'post_status_update':
+
+    $new_status = $args[0] ?? null;
+    $post       = $args[2] ?? null;
+
+    if ( ! $post instanceof \WP_Post ) return false;
+
+    if ( ! empty($node['config']['post_type']) &&
+         $post->post_type !== $node['config']['post_type'] ) {
+        return false;
+    }
+
+    if ( ! empty($node['config']['posts']) &&
+         (int) $post->ID !== (int) $node['config']['posts'] ) {
+        return false;
+    }
+
+    return [
+        'post_id'    => $post->ID,
+        'post_title' => $post->post_title,
+        'post_type'  => $post->post_type,
+        'status'     => $new_status,
+    ];
+
         }
 
         return false;
@@ -222,18 +276,35 @@ class Wordpress extends IntegrationBase {
 
     public static function query_posts( $q ) {
 
+        $post_type = $q['where']['post_type'] ?? ( $q['post_type'] ?? 'post' );
+        if ( $post_type === 'any' ) {
+            $post_types = get_post_types(['public'=>true], 'names');
+            unset( $post_types['attachment'] );
+            $post_type = array_values( $post_types );
+        }
+
+        if ( $post_type === '' || $post_type === null ) {
+            $post_type = 'post';
+        }
+
+        $post_status = $q['where']['post_status'] ?? ( $q['post_status'] ?? 'any' );
+        if ( $post_status === '' || $post_status === null ) {
+            $post_status = 'any';
+        }
+
         $args = [
-            'post_type'   => $q['where']['post_type'] ?? 'post',
-            'post_status' => $q['where']['post_status'] ?? 'publish',
+            'post_type'   => $post_type,
+            'post_status' => $post_status,
             's'           => $q['search'] ?? '',
             'numberposts' => $q['limit'] ?? 20,
         ];
 
         $posts = get_posts( $args );
-
         return array_map(fn($p)=>[
             'ID'         => $p->ID,
-            'post_title'=> $p->post_title,
+            'post_title' => $p->post_title,
+            'name'       => $p->ID,
+            'label'      => $p->post_title,
         ], $posts);
     }
 
