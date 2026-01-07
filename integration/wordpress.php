@@ -193,16 +193,33 @@ class Wordpress extends IntegrationBase {
             ];
         }
 
+        if ( $action === 'update_post_title' ) {
+            return [
+                [
+                    'key'=>'post_id',
+                    'label'=>'Post ID',
+                    'type'=>'expression',
+                    'required'=>true,
+                ],
+                [
+                    'key'=>'post_title',
+                    'label'=>'New Post Title',
+                    'type'=>'expression',
+                    'required'=>true,
+                ],
+            ];
+        }
+        
         if ( $action === 'delete_post' ) {
-    return [
-        [
-            'key' => 'post_id',
-            'label' => 'Post ID to Delete',
-            'type' => 'expression', 
-            'required' => true,
-        ],
-    ];
-}
+            return [
+                [
+                    'key'=>'post_id',
+                    'label'=>'Post ID to Delete',
+                    'type'=>'expression', 
+                    'required'=>true,
+                ],
+            ];
+        }
 
         return [];
     }
@@ -228,6 +245,14 @@ class Wordpress extends IntegrationBase {
 
             case 'update_option':
                 update_option( $config['option_name'], $config['value'] );
+                return ['port'=>'main','data'=>[]];
+
+            case 'update_post_title':
+                $update = wp_update_post([
+                    'ID'  => $config['post_id'] ,
+                    'post_title' => $config['post_title'],
+                ]);
+                error_log( print_r($update, true));
                 return ['port'=>'main','data'=>[]];
 
             case 'delete_post':

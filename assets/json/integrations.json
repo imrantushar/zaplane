@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-01-06 11:26:46",
+    "generated_at": "2026-01-07 06:37:25",
     "integrations": {
         "wordpress": {
             "slug": "wordpress",
@@ -186,7 +186,20 @@
                 "update_post_title": {
                     "key": "update_post_title",
                     "label": "Update Post Title",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "Post ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "post_title",
+                            "label": "New Post Title",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
