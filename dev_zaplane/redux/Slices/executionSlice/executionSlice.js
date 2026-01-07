@@ -56,7 +56,7 @@ export const replayWorkflowRun = createAsyncThunk(
 	async (runId, thunkAPI) => {
 		try {
 			const res = await API.post(
-				namespace + `runs/${parseInt(runId)}/replay`,
+				namespace + `runs/${parseInt(runId)}/execute`,
 				{}
 			);
 

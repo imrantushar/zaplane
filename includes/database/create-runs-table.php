@@ -11,6 +11,8 @@ class CreateRunsTable {
 		$sql        = "CREATE TABLE IF NOT EXISTS $table_name (
             id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
             workflow_version_hash CHAR(64) NOT NULL,
+            target_node_key VARCHAR(64) NULL,
+            start_node_key VARCHAR(64) NULL,
             status VARCHAR(20) DEFAULT 'running',
             trigger_data LONGTEXT,
             attempts TINYINT UNSIGNED DEFAULT 0,
