@@ -26,6 +26,7 @@ import {
     Badge,
     HStack,
     Text,
+    Tabs
 } from "@chakra-ui/react";
 import {
     FiArrowLeft,
@@ -33,14 +34,19 @@ import {
     FiHelpCircle,
 } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
-import { getRunWorkFlow, getSingleWorkFlow, updateWorkFlow } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
+import { getAllVersion, getRunWorkFlow, getSingleWorkFlow, liveMonitor, updateWorkFlow, updateWorkFlowStatus, workFLowExction } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { use } from "react";
 import { showNotification } from "@ZAPRedux/Slices/notificationSlice/notificationSlice";
 import CustomNode from "../customNoe/CustomNode";
 import ZAPDrawer from "@ZAPComponents/Drawer";
-import LogDetails from "../Components/LogDetails/LogDetails";
 import { getRunLive, getRunTimeline, replayWorkflowRun, stopRun } from "@ZAPRedux/Slices/executionSlice/executionSlice";
+import { LucideHistory } from "lucide-react";
+import RunsTable from "./RunsTable/RunsTable";
+import VersionHistoryTable from "./VersionHistoryTable/VersionHistoryTable";
+import { LuFullscreen, LuMinimize } from "react-icons/lu";
+import { toggleFullscreenMode } from "../helper";
+import Select from "react-select";
 ;
 export default function FlowCanvas({ id }) {
 
@@ -71,39 +77,32 @@ export default function FlowCanvas({ id }) {
     const [selectedEvent, setSelectedEvent] = useState(null);
     const { values, setFieldValue } = useFormikContext()
     const [loading, setLoading] = useState(false);
-    const { data } = useSelector((state) => state.workflows);
+    const { data, runs, versions } = useSelector((state) => state.workflows);
     const singleData = data[0]
     const isFlowLoaded = useRef(false);
     const GAP = 220;
+    const containerRef = useRef(null);
+    const [isFullscreen, setIsFullscreen] = useState(false);
+    const [activeDrawer, setActiveDrawer] = useState(null);
+    console.log(singleData, 'singledata');
     useEffect(() => {
-        if (!singleData?.nodes || isFlowLoaded.current) return;
-        if (singleData?.nodes?.length) {
-            const mappedNodes = singleData.nodes.map((node) => ({
-                ...node,
-                type: "custom",
-                data: {
-                    ...node.data,
-                    action: node.type,
-                },
-            }));
+        if (!singleData?.graph?.nodes?.length) return;
+        const mappedNodes = (singleData.graph.nodes || []).map((node) => ({
+            ...node,
+            type: "custom",
+            data: {
+                ...node.data,
+                action: node.type,
+            },
+        }));
 
-
-            setNodes(mappedNodes);
-        }
-        if (singleData?.edges?.length) {
-            const mappedEdges = singleData.edges.map((edge) => ({
-                ...edge,
-                type: "custom",
-            }));
-
-            setEdges(mappedEdges);
-        }
-        isFlowLoaded.current = true;
-    }, [singleData]);
-
-
-
-
+        const mappedEdges = (singleData.graph.edges || []).map((edge) => ({
+            ...edge,
+            type: "custom",
+        }));
+        setNodes(mappedNodes);
+        setEdges(mappedEdges);
+    }, [singleData?.graph]);
     const [drawerContext, setDrawerContext] = useState({
         source: null,
         node: null,
@@ -143,14 +142,19 @@ export default function FlowCanvas({ id }) {
             nodes: mapNodesForBackend(nodes)
             , edges: mapEdgesForBackend(edges),
         }
-
-        if (id) {
-            const { payload: data } = await dispatch(
-                updateWorkFlow({ id, payload })
-            );
-
-
+        const statusPaylod = {
+            status: values?.status,
+            id: id,
         }
+        if (values.status && values.status !== singleData?.workflow.status) {
+            await dispatch(updateWorkFlowStatus(statusPaylod));
+        }
+        await dispatch(
+            updateWorkFlow({ id, payload })
+        );
+
+
+
     };
     const { screenToFlowPosition } = useReactFlow();
     const openDrawerForNode = (node) => {
@@ -378,7 +382,16 @@ export default function FlowCanvas({ id }) {
             })
         );
     };
+    const deleteNode = useCallback((nodeId) => {
+        console.log(nodeId, 'nodeid');
+        setNodes((nds) => nds.filter((n) => n.id !== nodeId));
 
+        setEdges((eds) =>
+            eds.filter(
+                (e) => e.source !== nodeId && e.target !== nodeId
+            )
+        );
+    }, []);
 
     console.log(nodes, 'all nodes');
     console.log(edges, 'all edges');
@@ -391,6 +404,7 @@ export default function FlowCanvas({ id }) {
                     ...props.data,
                     onOpenDrawer: () => openDrawerForNode(props),
                     openDrawerFromAdd: () => openDrawerFromAdd(props),
+                    deleteNode: () => deleteNode(props.id),
 
                 }}
             />
@@ -405,28 +419,32 @@ export default function FlowCanvas({ id }) {
             />
         ),
     };
-    const [expandedRowId, setExpandedRowId] = useState(null);
-    const rows = [
-        {
-            id: 1,
-            createdAt: "2026-01-01 06:09:01",
-            status: "SUCCESS",
-            duration: "0.00 sec",
-            size: "0.00 KB",
-            nodes: 1,
-        },
-        {
-            id: 2,
-            createdAt: "2026-01-01 06:08:58",
-            status: "SUCCESS",
-            duration: "0.00 sec",
-            size: "0.00 KB",
-            nodes: 1,
-        },
-    ];
 
+    // useEffect(() => {
+    //     const interval = setInterval(() => {
+    //         dispatch(getRunWorkFlow());
+    //     }, 5000);
+
+    //     return () => clearInterval(interval);
+    // }, []);
+    const statusOptions = [
+        { value: "active", label: "Active" },
+        { value: "paused", label: "Paused" },
+        { value: "draft", label: "draft" },
+    ];
+    console.log(values, 'valuess');
     return (
-        <div style={{ flex: 1, height: "100vh" }}>
+        <div
+            ref={containerRef}
+            className="zaplane_flowcanvas"
+            style={{
+                flex: 1, height: "100vh",
+                marginRight: activeDrawer ? "497px" : "0px",
+                transition: "margin-right 0.4s ease",
+
+            }}
+        >
+
             <TopBar
                 leftContent={() => (
                     <>
@@ -434,54 +452,118 @@ export default function FlowCanvas({ id }) {
                             <FiArrowLeft />
                         </Button>
                         <Text fontSize="md" fontWeight="medium">
-                            {singleData?.title || __("Untitled Workflow", "zaplane")}
+                            {singleData?.workflow?.title || __("Untitled Workflow", "zaplane")}
                         </Text>
                     </>
                 )}
+                middleContent={() => (
+                    <Tabs.Root defaultValue="Editor" variant="plain">
+                        <Tabs.List bg="bg.muted" rounded="l3" p="1">
+                            <Tabs.Trigger value="Editor">
+                                Editor
+                            </Tabs.Trigger>
+                            <Tabs.Trigger value="Executions">
+                                <ZAPDrawer
+                                    title="Execution"
+                                    placement='start'
+                                    trigger={
+                                        <Text margin="0" size="sm"
+                                        >
+
+                                            {__("Execution ", "zaplane")}
+                                        </Text>
+                                    }>
+
+
+                                </ZAPDrawer>
+                            </Tabs.Trigger>
+                            <Tabs.Indicator rounded="l2" />
+                        </Tabs.List>
+
+                    </Tabs.Root>
+                )}
                 rightContent={() => (
                     <>
-                        {/* <Checkbox.Root
-                            padding="7px 9px"
-                            borderRadius="4px"
-                            border="1px solid var(--zaplane-border-color)"
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => toggleFullscreenMode(containerRef, isFullscreen, setIsFullscreen)}
                         >
-                            <Checkbox.HiddenInput />
-                            <Checkbox.Control />
-                            <Checkbox.Label>show runs</Checkbox.Label>
-                        </Checkbox.Root> */}
-                        {/* <Button size="sm" variant="outline">
-                            {__("inactive", "zaplane")}
-                        </Button> */}
-                        <Button size="sm" variant="outline"
-                            onClick={() => dispatch(getRunWorkFlow())}>
-                            {__("Runs", "zaplane")}
+                            {isFullscreen ? <LuMinimize /> : <LuFullscreen />}
                         </Button>
                         <ZAPDrawer
-                            title="Execution "
+                            title="Log History"
+                            size="md"
+                            open={activeDrawer === "logs"}
+                            onClose={() => setActiveDrawer(null)}
                             trigger={
                                 <Button size="sm" variant="outline"
-                                    onClick={() => dispatch(getRunLive(id))}>
+                                    onClick={() => {
+                                        dispatch(getRunWorkFlow(id))
+                                        setActiveDrawer("logs")
+                                    }}
 
-                                    {__("Execution ", "zaplane")}
+                                >
+                                    {__("Logs ", "zaplane")}
                                 </Button>
                             }>
-                            <Flex gap={"10px"}>
+                            <Flex gap="5px">
                                 <Button size="sm" variant="outline"
-                                    onClick={() => dispatch(replayWorkflowRun(id))}>
-                                    {__("Re play workflow ", "zaplane")}
+                                    onClick={() => dispatch(getRunWorkFlow(id))}>
+                                    {__("🔄 Refresh ", "zaplane")}
                                 </Button>
                                 <Button size="sm" variant="outline"
-                                    onClick={() => dispatch(getRunTimeline(id))}>
-                                    {__("History ", "zaplane")}
-                                </Button>
-                                <Button size="sm" variant="outline"
-                                    onClick={() => dispatch(stopRun(id))}>
-
-                                    {__("Stop ", "zaplane")}
+                                    onClick={() =>
+                                         {
+                                            const paylod={
+                                                workflow_hash: singleData?.version?.hash, 
+                                            }
+                                            console.log(paylod,"pp");
+                                            dispatch(workFLowExction(paylod))
+                                            }}>
+                                    {__("🔄 Replay ", "zaplane")}
                                 </Button>
                             </Flex>
+                            <RunsTable
+                                runs={runs}
+                            />
+
 
                         </ZAPDrawer>
+                        <ZAPDrawer
+                            title="Version History "
+                            open={activeDrawer === "history"}
+                            onClose={() => setActiveDrawer(null)}
+                            trigger={
+                                <Text margin='0' cursor="pointer" onClick={() => {
+                                    setActiveDrawer("history");
+                                    dispatch(getAllVersion(id))
+                                }
+                                }> <LucideHistory /></Text>
+
+                            }>
+
+                            <VersionHistoryTable
+                                versions={versions}
+                                id={id}
+
+                            />
+
+                        </ZAPDrawer>
+                        <Select
+                            options={statusOptions}
+                            value={
+                                values?.status
+                                    ? statusOptions.find(opt => opt.value === values.status)
+                                    : statusOptions.find(opt => opt.value === singleData?.workflow?.status)
+                            }
+
+                            onChange={(selected) =>
+                                setFieldValue('status', selected.value)}
+                            isClearable={false}
+                            isSearchable={false}
+                            placeholder="Select status"
+                        />
                         <Button
                             size="sm"
                             bg="black"
@@ -489,9 +571,8 @@ export default function FlowCanvas({ id }) {
                             _hover={{ bg: "gray.800" }}
                             onClick={() => onSubmitHandler()}
                         >
-                            {__("Publish", "zaplane")}
+                            {__("Update", "zaplane")}
                         </Button>
-
                     </>
                 )}
             />

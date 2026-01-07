@@ -68,7 +68,7 @@ export default function CustomNode({ id, data, xPos, yPos }) {
           cursor="pointer"
           pointerEvents="auto"
         >
-          <Icon as={RiDeleteBin7Line} boxSize={4} />
+          <Icon as={RiDeleteBin7Line} boxSize={4} onClick={() => data?.deleteNode(id)} />
           {!data?.action && <Icon as={FaRegCopy} boxSize={4} />}
         </HStack>
       </NodeToolbar>

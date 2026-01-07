@@ -29,8 +29,7 @@ const Queue = () => {
                     <Table.ColumnHeader>CREATED AT</Table.ColumnHeader>
                     <Table.ColumnHeader>STATUS</Table.ColumnHeader>
                     <Table.ColumnHeader>DURATION / SIZE</Table.ColumnHeader>
-                    <Table.ColumnHeader>NODES</Table.ColumnHeader>
-                    <Table.ColumnHeader>ACTIONS</Table.ColumnHeader>
+                    <Table.ColumnHeader>NODES key</Table.ColumnHeader>
                 </Table.Row>
             </Table.Header>
 
@@ -56,9 +55,7 @@ const Queue = () => {
                                     }
                                 />
                                 <Text fontSize="sm">
-                                    {isSuccess(row.status)
-                                        ? "Success"
-                                        : "Failed"}
+                                    {row.status}
                                 </Text>
                             </HStack>
                         </Table.Cell>
@@ -74,18 +71,6 @@ const Queue = () => {
                             <Text fontSize="sm">
                                 {row.node_key}
                             </Text>
-                        </Table.Cell>
-
-                        <Table.Cell>
-                            <HStack>
-                                <Button size="xs" variant="outline">
-                                    Details
-                                </Button>
-
-                                <Button size="xs" variant="outline">
-                                    Refresh
-                                </Button>
-                            </HStack>
                         </Table.Cell>
                     </Table.Row>
                 ))}
