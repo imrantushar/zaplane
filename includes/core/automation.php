@@ -26,7 +26,7 @@ class Automation {
 
     public function boot(): void {
         add_action('init', [$this, 'dispatch_active_triggers']);
-        add_action('zaplane_execute_node_run', [$this, 'dispatch_node_run']);
+        add_action('zaplane_execute_node_run', [$this, 'dispatch_node_run'], 10, 1);
         add_action('zaplane_workflow_updated', [$this, 'reload_triggers']);
     }
 
@@ -109,7 +109,7 @@ class Automation {
 
     /* ================= WORKER ================= */
 
-    public function dispatch_node_run($args) {
+    public function dispatch_node_run( array $args) {
         global $wpdb;
 
         $node_run_id = (int)$args['node_run_id'];
