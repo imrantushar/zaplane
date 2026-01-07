@@ -148,7 +148,6 @@ export const getSingleRun = createAsyncThunk(
 export const workFLowExction = createAsyncThunk(
   'zaplane/workFLowExction',
   async (payload, thunkAPI) => {
-    console.log(payload, 'pay');
 
     try {
       const res = await API.post(
@@ -157,6 +156,22 @@ export const workFLowExction = createAsyncThunk(
       );
 
       handleSliceSuccess(thunkAPI, __('Run fetched successfully', 'workflow'));
+      return res.data;
+
+    } catch (e) {
+      return handleSliceError(thunkAPI, e);
+    }
+  }
+);
+export const workFLowSingeNodeExction = createAsyncThunk(
+  'zaplane/workFLowSingeNodeExction',
+  async (payload, thunkAPI) => {
+
+    try {
+      const res = await API.post(
+        namespace + 'execute-node',
+        payload
+      );
       return res.data;
 
     } catch (e) {

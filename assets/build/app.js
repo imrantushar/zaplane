@@ -1802,7 +1802,8 @@ function ActionDrawer({
   onClose,
   updateNodeData,
   createActionNode,
-  createConditionNode
+  createConditionNode,
+  singleData
 }) {
   const {
     source,
@@ -2080,6 +2081,7 @@ function ActionDrawer({
     }
   }, [open, node]);
   console.log(node);
+  console.log(values, 'action values');
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsxs)(_ZAPComponents_Drawer__WEBPACK_IMPORTED_MODULE_9__["default"], {
     open: open,
     onClose: resetAll,
@@ -2237,7 +2239,14 @@ function ActionDrawer({
         value: "test",
         children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
           children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Button, {
-            onClick: () => dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_10__.singleNodeRun)(node?.id)),
+            onClick: () => {
+              const paylod = {
+                workflow_hash: singleData?.version?.hash,
+                node_key: node?.id,
+                input: values
+              };
+              dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_10__.workFLowSingeNodeExction)(paylod));
+            },
             children: "Run test"
           }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
             children: "Response"
@@ -3223,7 +3232,8 @@ function FlowCanvas({
       createConditionNode: createConditionNode,
       context: drawerContext,
       createActionNode: createActionNode,
-      updateNodeData: updateNodeData
+      updateNodeData: updateNodeData,
+      singleData: singleData
     })]
   });
 }
@@ -4107,6 +4117,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   updateWorkFlowStatus: () => (/* binding */ updateWorkFlowStatus),
 /* harmony export */   versionActive: () => (/* binding */ versionActive),
 /* harmony export */   workFLowExction: () => (/* binding */ workFLowExction),
+/* harmony export */   workFLowSingeNodeExction: () => (/* binding */ workFLowSingeNodeExction),
 /* harmony export */   workflowNodeListiner: () => (/* binding */ workflowNodeListiner),
 /* harmony export */   workflowNodeListinerStop: () => (/* binding */ workflowNodeListinerStop)
 /* harmony export */ });
@@ -4211,10 +4222,17 @@ const getSingleRun = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyn
   }
 });
 const workFLowExction = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyncThunk)('zaplane/workFLowExction', async (payload, thunkAPI) => {
-  console.log(payload, 'pay');
   try {
     const res = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.post(_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.namespace + 'execute', payload);
     (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.handleSliceSuccess)(thunkAPI, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Run fetched successfully', 'workflow'));
+    return res.data;
+  } catch (e) {
+    return (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.handleSliceError)(thunkAPI, e);
+  }
+});
+const workFLowSingeNodeExction = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyncThunk)('zaplane/workFLowSingeNodeExction', async (payload, thunkAPI) => {
+  try {
+    const res = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.post(_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.namespace + 'execute-node', payload);
     return res.data;
   } catch (e) {
     return (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.handleSliceError)(thunkAPI, e);

@@ -13,7 +13,7 @@ import {
     Code
 } from "@chakra-ui/react";
 import ZAPDrawer from "@ZAPComponents/Drawer";
-import { fetchDynamic, getSingleRun, getSingleRunDetails, getSingleRunNode, liveMonitor, singleNodeRun } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
+import { fetchDynamic, getSingleRun, getSingleRunDetails, getSingleRunNode, liveMonitor, singleNodeRun, workFLowSingeNodeExction } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
 import { integrations } from "@ZAPUtils/helper";
 import { useFormikContext } from "formik";
 import { useEffect, useMemo, useState } from "react";
@@ -39,6 +39,7 @@ export default function ActionDrawer({
     updateNodeData,
     createActionNode,
     createConditionNode,
+    singleData
 }) {
     const { source, node } = context;
     const [mode, setMode] = useState(null);
@@ -354,7 +355,7 @@ export default function ActionDrawer({
         }
     }, [open, node]);
     console.log(node);
-
+  console.log(values,'action values');
     return (
         <ZAPDrawer
             open={open}
@@ -543,7 +544,16 @@ export default function ActionDrawer({
 
                     <Tabs.Content value="test">
                         <Box>
-                            <Button onClick={() => dispatch(singleNodeRun(node?.id))}>
+                            <Button onClick={() => {
+                                const paylod={
+                                    workflow_hash:singleData?.version?.hash,
+                                    node_key:node?.id,
+                                    input:values
+                                }
+                                dispatch(workFLowSingeNodeExction(paylod))
+                            }
+
+                            }>
                                 Run test
                             </Button>
 

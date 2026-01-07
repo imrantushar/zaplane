@@ -620,6 +620,7 @@ export default function FlowCanvas({ id }) {
                 context={drawerContext}
                 createActionNode={createActionNode}
                 updateNodeData={updateNodeData}
+                singleData={singleData}
 
             />
         </div>
