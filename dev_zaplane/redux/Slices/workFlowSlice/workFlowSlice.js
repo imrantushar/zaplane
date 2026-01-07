@@ -96,20 +96,12 @@ export const deleteWorkFlow = createAsyncThunk(
 );
 export const updateWorkFlowStatus = createAsyncThunk(
 	'zaplane/updateWorkFlowStatus',
-	async ({ payload }, thunkAPI) => {
+	async (payload , thunkAPI) => {
 		try {
 			await makeRequest('update_workflow_status', {
 				id: payload.id,
 				...payload,
 			});
-			thunkAPI.dispatch(
-				showNotification({
-					message: __('Updated Status Successfully', 'storeengine'),
-					isShow: true,
-					type: 'success',
-				})
-			);
-			console.log('res', payload)
 			return payload;
 		} catch (e) {
 			thunkAPI.dispatch(
@@ -289,7 +281,7 @@ const workflowsSlice = createSlice({
 			})
 			.addCase(updateWorkFlowStatus.fulfilled, (state, action) => {
 				state.data = state.data.map((item) =>
-					parseInt(item.id) === parseInt(action.payload.id)
+					parseInt(item.id) === parseInt(action.payload?.id)
 						? { ...item, status: action.payload.status }
 						: item
 				);

@@ -87,7 +87,7 @@ const CreateWorkflows = () => {
     };
 
     try {
-      await dispatch(updateWorkFlowStatus({payload}));
+      await dispatch(updateWorkFlowStatus(payload));
     } catch (error) {
     console.log(error);
     }
