@@ -164,7 +164,32 @@ export const workFLowExction = createAsyncThunk(
     }
   }
 );
-
+export const workflowNodeListiner = createAsyncThunk(
+	'zaplane/workflowNodeListiner',
+	async (id, thunkAPI) => {
+		try {
+			const res = await API.get(
+				namespace + `node-listiner/${id}`
+			);
+			return res.data;
+		} catch (e) {
+			return handleSliceError(thunkAPI, e);
+		}
+	}
+);
+export const workflowNodeListinerStop = createAsyncThunk(
+	'zaplane/workflowNodeListinerStop',
+	async (id, thunkAPI) => {
+		try {
+			const res = await API.get(
+				namespace + `node-listiner/${id}/stop`
+			);
+			return res.data;
+		} catch (e) {
+			return handleSliceError(thunkAPI, e);
+		}
+	}
+);
 
 export const nodeLogsRunDetails = createAsyncThunk(
 	'zaplane/nodeLogsRunDetails',

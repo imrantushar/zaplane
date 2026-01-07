@@ -34,7 +34,7 @@ import {
     FiHelpCircle,
 } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
-import { getAllVersion, getRunWorkFlow, getSingleWorkFlow, liveMonitor, updateWorkFlow, updateWorkFlowStatus, workFLowExction } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
+import { getAllVersion, getRunWorkFlow, getSingleWorkFlow, liveMonitor, updateWorkFlow, updateWorkFlowStatus, workFLowExction, workflowNodeListiner } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { use } from "react";
 import { showNotification } from "@ZAPRedux/Slices/notificationSlice/notificationSlice";
@@ -454,6 +454,14 @@ export default function FlowCanvas({ id }) {
                         <Text fontSize="md" fontWeight="medium">
                             {singleData?.workflow?.title || __("Untitled Workflow", "zaplane")}
                         </Text>
+                        <Button size="sm" variant="outline"
+                            onClick={() => dispatch(workflowNodeListiner(id))}>
+                            {__("Runs ", "zaplane")}
+                        </Button>
+                        <Button size="sm" variant="outline"
+                            onClick={() => dispatch(workflowNodeListiner(id))}>
+                            {__("Stop", "zaplane")}
+                        </Button>
                     </>
                 )}
                 middleContent={() => (
@@ -513,14 +521,13 @@ export default function FlowCanvas({ id }) {
                                     {__("🔄 Refresh ", "zaplane")}
                                 </Button>
                                 <Button size="sm" variant="outline"
-                                    onClick={() =>
-                                         {
-                                            const paylod={
-                                                workflow_hash: singleData?.version?.hash, 
-                                            }
-                                            console.log(paylod,"pp");
-                                            dispatch(workFLowExction(paylod))
-                                            }}>
+                                    onClick={() => {
+                                        const paylod = {
+                                            workflow_hash: singleData?.version?.hash,
+                                        }
+                                        console.log(paylod, "pp");
+                                        dispatch(workFLowExction(paylod))
+                                    }}>
                                     {__("🔄 Replay ", "zaplane")}
                                 </Button>
                             </Flex>
