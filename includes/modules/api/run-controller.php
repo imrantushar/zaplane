@@ -126,30 +126,61 @@ class RunController extends WP_REST_Controller {
 
     public function replay_run($req){
         global $wpdb;
-        $old=(int)$req['id'];
 
-        $run=$wpdb->get_row($wpdb->prepare("SELECT * FROM {$wpdb->prefix}zaplane_runs WHERE id=%d",$old),ARRAY_A);
-        if(!$run) return new \WP_Error('not_found','Run not found');
+        $old = (int) $req['id'];
 
-        $wpdb->insert("{$wpdb->prefix}zaplane_runs",[
-            'workflow_version_hash'=>$run['workflow_version_hash'],
-            'trigger_data'=>$run['trigger_data'],
-            'status'=>'running',
-            'started_at'=>current_time('mysql')
+        $run = $wpdb->get_row(
+            $wpdb->prepare("SELECT * FROM {$wpdb->prefix}zaplane_runs WHERE id=%d", $old),
+            ARRAY_A
+        );
+        if (!$run) {
+            return new \WP_Error('not_found', 'Run not found');
+        }
+
+        // Create new run
+        $wpdb->insert("{$wpdb->prefix}zaplane_runs", [
+            'workflow_version_hash' => $run['workflow_version_hash'],
+            'trigger_data' => $run['trigger_data'],
+            'status' => 'running',
+            'started_at' => current_time('mysql')
         ]);
+        $new_run_id = $wpdb->insert_id;
 
-        $new=$wpdb->insert_id;
+        // Load graph
+        $graph_json = $wpdb->get_var(
+            $wpdb->prepare(
+                "SELECT graph_json FROM {$wpdb->prefix}zaplane_workflow_versions WHERE graph_hash=%s",
+                $run['workflow_version_hash']
+            )
+        );
+        $graph = json_decode($graph_json, true);
 
-        $automation=$this->container->get('automation');
+        // Find trigger node
+        $triggerNode = null;
+        foreach ($graph['nodes'] as $n) {
+            if ($n['type'] === 'trigger') {
+                $triggerNode = $n;
+                break;
+            }
+        }
+
+        if (!$triggerNode) {
+            return new \WP_Error('no_trigger', 'Workflow has no trigger node');
+        }
+
+        $automation = $this->container->get('automation');
+
+        // Spawn trigger node run
         $automation->spawn_node_run(
-            $new,
-            json_decode($run['trigger_data'],true)['node'] ?? 'trigger',
-            json_decode($run['trigger_data'],true),
+            $new_run_id,
+            (string)$triggerNode['id'],
+            json_decode($run['trigger_data'], true),
             null
         );
 
-        return ['run_id'=>$new];
+        return ['run_id' => $new_run_id];
     }
+
 
     /* ================= STOP ================= */
 
