@@ -19,7 +19,7 @@ export const toggleFullscreenMode = (containerRef, isFullscreen, setIsFullscreen
     position: isEnter ? "fixed" : "",
     top: isEnter ? "0" : "",
     left: isEnter ? "0" : "",
-    width: isEnter ? "100vw" : "",
+    width: isEnter ? "-webkit-fill-available" : "",
     height: isEnter ? "100vh" : "",
     zIndex: isEnter ? "9999" : "",
   });
@@ -37,4 +37,23 @@ export const toggleFullscreenMode = (containerRef, isFullscreen, setIsFullscreen
   applyStyles(wpAdminBar, { top: isEnter ? "0" : "" });
 
   setIsFullscreen(isEnter);
+};
+export const getDuration = (start, end) => {
+    if (!start || !end) return "--";
+
+    const startTime = new Date(start.replace(" ", "T"));
+    const endTime = new Date(end.replace(" ", "T"));
+
+    if (isNaN(startTime) || isNaN(endTime)) return "--";
+
+    const diffMs = endTime - startTime;
+    const seconds = Math.floor(diffMs / 1000);
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+
+    if (mins > 0) {
+        return `${mins}m ${secs}s`;
+    }
+    console.log(secs,'k');
+    return `${secs}s`;
 };

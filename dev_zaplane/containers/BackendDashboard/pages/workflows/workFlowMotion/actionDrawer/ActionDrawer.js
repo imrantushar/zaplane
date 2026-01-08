@@ -12,6 +12,7 @@ import {
     Flex,
     Code
 } from "@chakra-ui/react";
+import ZAPDrawer from "@ZAPComponents/Drawer";
 import { fetchDynamic, getSingleRun, getSingleRunDetails, getSingleRunNode, liveMonitor, singleNodeRun } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
 import { integrations } from "@ZAPUtils/helper";
 import { useFormikContext } from "formik";
@@ -163,7 +164,6 @@ export default function ActionDrawer({
     const getKey = (field) =>
         `${context?.node?.data?.action}:${selectedItem?.id}:${field.key}`;
 
-    // ✅ FIX: fetchDynamic ajax
     const fetchDynamicOptions = async (field) => {
         if (!field.dynamic) return;
 
@@ -172,28 +172,18 @@ export default function ActionDrawer({
 
         setLoadingFields(p => ({ ...p, [key]: true }));
 
-        try {
-            const res = await fetchDynamic(field.dynamic); 
-            setDynamicOptions(p => ({
-                ...p,
-                [key]: Object.values(res).map(i => ({
-                    value: i[field.dynamic.select[0]],
-                    label: i[field.dynamic.select[1]],
-                })),
-            }));
-        } catch (err) {
-            console.error("Dynamic fetch failed:", err);
-        }
+        const res = await fetchDynamic(field.dynamic);
+
+        setDynamicOptions(p => ({
+            ...p,
+            [key]: Object.values(res).map(i => ({
+                value: i[field.dynamic.select[0]],
+                label: i[field.dynamic.select[1]],
+            })),
+        }));
 
         setLoadingFields(p => ({ ...p, [key]: false }));
     };
-
-    //  Action/Trigger chane dynamic cache reset
-    useEffect(() => {
-        if (!values?.actionType) return;
-        setDynamicOptions({});
-        setLoadingFields({});
-    }, [values?.actionType]);
     const renderField = (field, values, setFieldValue) => {
         switch (field.type) {
             case "text":
@@ -366,237 +356,252 @@ export default function ActionDrawer({
     console.log(node);
 
     return (
-        <Drawer.Root open={open} size="md" onOpenChange={(e) => !e.open && resetAll()}>
-            <Portal>
-                <Drawer.Backdrop />
-                <Drawer.Positioner marginTop='30px'>
-                    <Drawer.Content>
-                        <Drawer.Header>
-                            <Drawer.Title margin="0">
-                                {!mode && "Choose Type"}
-                                {mode && !selectedItem && `Select ${mode}`}
-                                {selectedItem && selectedItem.name}
-                            </Drawer.Title>
-                            <Drawer.CloseTrigger asChild>
-                                <CloseButton />
-                            </Drawer.CloseTrigger>
-                        </Drawer.Header>
+        <ZAPDrawer
+            open={open}
+            onClose={resetAll}
+            title={
+                !mode
+                    ? "Choose Type"
+                    : !selectedItem
+                        ? `Select ${mode}`
+                        : selectedItem.name
+            }
+            placement="end"
+            size="md"
+            closeOnOverlayClick={true}
+            footer={
+                <HStack justify="space-between" w="full">
+                    <Button variant="ghost" onClick={resetAll}>
+                        Cancel
+                    </Button>
+                    <Button
+                        colorScheme="blue"
+                        onClick={handleContinue}
+                        isDisabled={isContinueDisabled()}
+                    >
+                        {step === "test" ? "Submit" : "Continue"}
+                    </Button>
+                </HStack>
+            }
+        >
+            {!mode && (
+                <VStack spacing={4}>
+                    <Button w="100%" justifyContent="left" onClick={() => setMode("app")}>
+                        Apps
+                    </Button>
+                    {TOOLS.map((item) => (
+                        <Button
+                            key={item.id}
+                            width="100%"
+                            justifyContent="space-between"
+                            onClick={() => {
+                                setSelectedItem(item);
+                                setStep("select");
+                                setMode("tools");
+                            }}
+                        >
+                            {item.name}
+                        </Button>
+                    ))}
+                </VStack>
+            )}
 
-                        <Drawer.Body>
-                            {!mode && (
-                                <VStack spacing={4}>
-                                    <Button w="100%" justifyContent="left" onClick={() => setMode("app")}>Apps</Button>
-                                    {TOOLS.map((item) => (
-                                        <Button
-                                            key={item.id}
-                                            width="100%"
-                                            justifyContent="space-between"
-                                            onClick={() => {
-                                                setSelectedItem(item);
-                                                setStep("select");
-                                                setMode("tools");
-                                            }}
-                                        >
-                                            {item.name}
-                                        </Button>
-                                    ))}
-                                </VStack>
-                            )}
+            {mode && !selectedItem && (
+                <VStack align="stretch">
+                    {LIST.map((item) => (
+                        <Button
+                            key={item.id}
+                            justifyContent="space-between"
+                            onClick={() => {
+                                setSelectedItem(item);
+                                setStep("select");
+                            }}
+                        >
+                            {item.name} →
+                        </Button>
+                    ))}
+                    <Button size="sm" variant="ghost" onClick={() => setMode(null)}>
+                        ← Back
+                    </Button>
+                </VStack>
+            )}
 
-                            {mode && !selectedItem && (
-                                <VStack align="stretch">
-                                    {LIST.map((item) => (
-                                        <Button
-                                            key={item.id}
-                                            justifyContent="space-between"
-                                            onClick={() => {
-                                                setSelectedItem(item);
-                                                setStep("select");
-                                            }}
-                                        >
-                                            {item.name} →
-                                        </Button>
-                                    ))}
-                                    <Button size="sm" variant="ghost" onClick={() => setMode(null)}>← Back</Button>
-                                </VStack>
-                            )}
+            {selectedItem && (
+                <Tabs.Root value={step} isManual>
+                    <Tabs.List mb={4}>
+                        <Tabs.Trigger value="select">Select</Tabs.Trigger>
+                        <Tabs.Trigger value="configure">Configure</Tabs.Trigger>
+                        <Tabs.Trigger value="test">Test</Tabs.Trigger>
+                        <Tabs.Indicator />
+                    </Tabs.List>
 
-                            {selectedItem && (
-                                <Tabs.Root value={step} isManual>
-                                    <Tabs.List mb={4}>
-                                        <Tabs.Trigger value="select">Select</Tabs.Trigger>
-                                        <Tabs.Trigger value="configure">Configure</Tabs.Trigger>
-                                        <Tabs.Trigger value="test">Test</Tabs.Trigger>
-                                        <Tabs.Indicator />
-                                    </Tabs.List>
+                    <Tabs.Content value="select">
+                        {selectedItem.id === "condition" ? (
+                            <>Condition</>
+                        ) : (
+                            <Flex direction="column" gap={4}>
+                                <Box>
+                                    <Text mb={0}>
+                                        {node?.data?.action === "trigger" && source === "node"
+                                            ? "Trigger Type"
+                                            : "Action Type"}
+                                    </Text>
+                                    <Select
+                                        options={actionOptions}
+                                        value={
+                                            actionOptions.find(
+                                                (opt) => opt.value === values.actionType
+                                            ) || null
+                                        }
+                                        onChange={(opt) => setFieldValue("actionType", opt?.value)}
+                                    />
+                                </Box>
 
-                                    <Tabs.Content value="select">
-                                        {selectedItem.id === "condition" ? (
-                                            <>Condition</>
-                                        ) : (
-                                            <Flex direction="column" gap={4}>
-                                                <Box>
-                                                    <Text mb={0}>{node?.data?.action === "trigger" && source === "node" ? "Trigger Type" : "Action Type"}</Text>
-                                                    <Select
-                                                        options={actionOptions}
-                                                        value={
-                                                            actionOptions.find(
-                                                                (opt) => opt.value === values.actionType
-                                                            ) || null
+                                {selectedActionFields.map((field) => (
+                                    <Box key={field.key}>
+                                        {renderField(field, values, setFieldValue)}
+                                    </Box>
+                                ))}
+                            </Flex>
+                        )}
+                    </Tabs.Content>
+
+                    <Tabs.Content value="configure">
+                        {selectedItem.id === "condition" ? (
+                            <VStack align="stretch" gap={4}>
+                                {conditions.map((group, gi) => (
+                                    <Box
+                                        key={group.id}
+                                        border="1px solid #E2E8F0"
+                                        p={3}
+                                        rounded="md"
+                                    >
+                                        {group.rules.map((rule) => (
+                                            <HStack key={rule.id} mb={2}>
+                                                <Box width="35%">
+                                                    <Input
+                                                        placeholder="Condition"
+                                                        value={rule.field}
+                                                        onChange={(e) =>
+                                                            updateRule(group.id, rule.id, "field", e.target.value)
                                                         }
-                                                        onChange={(opt) => setFieldValue("actionType", opt?.value)}
                                                     />
                                                 </Box>
-                                                {selectedActionFields.map((field) => (
-                                                    <Box key={field.key}>
-                                                        {renderField(field, values, setFieldValue)}
-                                                    </Box>
-                                                ))}
-                                            </Flex>
-                                        )}
-                                    </Tabs.Content>
-
-                                    <Tabs.Content value="configure">
-                                        {selectedItem.id === "condition" ? (
-                                            <VStack align="stretch" gap={4}>
-                                                {conditions.map((group, gi) => (
-                                                    <Box key={group.id} border="1px solid #E2E8F0" p={3} rounded="md">
-                                                        {group.rules.map((rule) => (
-                                                            <HStack key={rule.id} mb={2}>
-                                                                <Box width="35%">
-                                                                    <Input
-                                                                        placeholder="Condition"
-                                                                        value={rule.field}
-                                                                        onChange={(e) => updateRule(group.id, rule.id, "field", e.target.value)}
-                                                                    />
-                                                                </Box>
-                                                                <Box width="35%">
-                                                                    <Select
-                                                                        placeholder="Operator"
-                                                                        options={[
-                                                                            { value: "equals", label: "Equals" },
-                                                                            { value: "contains", label: "Contains" },
-                                                                        ]}
-                                                                        onChange={(opt) => updateRule(group.id, rule.id, "operator", opt.value)}
-                                                                    />
-                                                                </Box>
-                                                                <Box width="35%">
-                                                                    <Input
-                                                                        placeholder="Value"
-                                                                        value={rule.value}
-                                                                        onChange={(e) => updateRule(group.id, rule.id, "value", e.target.value)}
-                                                                    />
-                                                                </Box>
-                                                                <Button size="sm" colorScheme="red" onClick={() => removeRule(group.id, rule.id)}>✕</Button>
-                                                            </HStack>
-                                                        ))}
-                                                        <Button size="sm" variant="outline" onClick={() => addAndCondition(group.id)}>+ And</Button>
-                                                        {gi !== conditions.length - 1 && (
-                                                            <Text textAlign="center" my={2} fontSize="sm" color="gray.500">OR</Text>
-                                                        )}
-                                                    </Box>
-                                                ))}
-                                                <Button variant="outline" onClick={addOrGroup}>+ Or Group</Button>
-                                            </VStack>
-                                        ) : (
-                                            <>
-                                                <Text margin='0'>There have only config data</Text>
-                                            </>
-                                        )}
-                                    </Tabs.Content>
-
-                                    <Tabs.Content value="test">
-                                        <Box>
-                                            <Button
-                                                onClick={() => dispatch(singleNodeRun(node?.id))}
+                                                <Box width="35%">
+                                                    <Select
+                                                        placeholder="Operator"
+                                                        options={[
+                                                            { value: "equals", label: "Equals" },
+                                                            { value: "contains", label: "Contains" },
+                                                        ]}
+                                                        onChange={(opt) =>
+                                                            updateRule(group.id, rule.id, "operator", opt.value)
+                                                        }
+                                                    />
+                                                </Box>
+                                                <Box width="35%">
+                                                    <Input
+                                                        placeholder="Value"
+                                                        value={rule.value}
+                                                        onChange={(e) =>
+                                                            updateRule(group.id, rule.id, "value", e.target.value)
+                                                        }
+                                                    />
+                                                </Box>
+                                                <Button
+                                                    size="sm"
+                                                    colorScheme="red"
+                                                    onClick={() => removeRule(group.id, rule.id)}
+                                                >
+                                                    ✕
+                                                </Button>
+                                            </HStack>
+                                        ))}
+                                        <Button size="sm" variant="outline" onClick={() => addAndCondition(group.id)}>
+                                            + And
+                                        </Button>
+                                        {gi !== conditions.length - 1 && (
+                                            <Text
+                                                textAlign="center"
+                                                my={2}
+                                                fontSize="sm"
+                                                color="gray.500"
                                             >
-                                                Run test
-                                            </Button>
-                                            <Text>Response</Text>
-                                            <Box
-                                                border="1px solid"
-                                                borderColor="gray.200"
-                                                borderRadius="md"
-                                                bg="gray.50"
-                                                p={4}
-                                            >
-                                                <Tabs.Root defaultValue="output">
-                                                    <Tabs.List
-                                                        display="flex"
-                                                        gap={6}
-                                                        borderBottom="1px solid"
-                                                        borderColor="gray.200"
-                                                        mb={4}
-                                                        position="relative"
-                                                    >
-                                                        <Tabs.Trigger
-                                                            value="input"
-                                                            fontWeight="medium"
-                                                            color="gray.600"
-                                                        // _selected={{ color: "blue.600" }}
-                                                        >
-                                                            Input
-                                                        </Tabs.Trigger>
+                                                OR
+                                            </Text>
+                                        )}
+                                    </Box>
+                                ))}
+                                <Button variant="outline" onClick={addOrGroup}>
+                                    + Or Group
+                                </Button>
+                            </VStack>
+                        ) : (
+                            <Text margin="0">There have only config data</Text>
+                        )}
+                    </Tabs.Content>
 
-                                                        <Tabs.Trigger
-                                                            value="output"
-                                                            fontWeight="medium"
-                                                            color="gray.600"
-                                                        // _selected={{ color: "blue.600" }}
-                                                        >
-                                                            Output
-                                                        </Tabs.Trigger>
+                    <Tabs.Content value="test">
+                        <Box>
+                            <Button onClick={() => dispatch(singleNodeRun(node?.id))}>
+                                Run test
+                            </Button>
 
-                                                        <Tabs.Indicator
-                                                            height="2px"
-                                                            bg="blue.500"
-                                                            borderRadius="full"
-                                                        />
-                                                    </Tabs.List>
-                                                    <Tabs.Content value="input">
-                                                        <Box
-                                                            bg="white"
-                                                            border="1px solid"
-                                                            borderColor="gray.200"
-                                                            borderRadius="md"
-                                                            p={3}
-                                                            fontSize="sm"
-                                                        >
-                                                            <Code>input</Code>
-                                                        </Box>
-                                                    </Tabs.Content>
-                                                    <Tabs.Content value="output">
-                                                        <Box
-                                                            bg="white"
-                                                            border="1px solid"
-                                                            borderColor="gray.200"
-                                                            borderRadius="md"
-                                                            p={3}
-                                                            fontSize="sm"
-                                                        >
-                                                            <Code>output</Code>
-                                                        </Box>
-                                                    </Tabs.Content>
-                                                </Tabs.Root>
-                                            </Box>
+                            <Text>Response</Text>
+
+                            <Box
+                                border="1px solid"
+                                borderColor="gray.200"
+                                borderRadius="md"
+                                bg="gray.50"
+                                p={4}
+                            >
+                                <Tabs.Root defaultValue="output">
+                                    <Tabs.List
+                                        display="flex"
+                                        gap={6}
+                                        borderBottom="1px solid"
+                                        borderColor="gray.200"
+                                        mb={4}
+                                        position="relative"
+                                    >
+                                        <Tabs.Trigger value="input">Input</Tabs.Trigger>
+                                        <Tabs.Trigger value="output">Output</Tabs.Trigger>
+                                        <Tabs.Indicator height="2px" bg="blue.500" borderRadius="full" />
+                                    </Tabs.List>
+
+                                    <Tabs.Content value="input">
+                                        <Box
+                                            bg="white"
+                                            border="1px solid"
+                                            borderColor="gray.200"
+                                            borderRadius="md"
+                                            p={3}
+                                            fontSize="sm"
+                                        >
+                                            <Code>input</Code>
                                         </Box>
                                     </Tabs.Content>
 
+                                    <Tabs.Content value="output">
+                                        <Box
+                                            bg="white"
+                                            border="1px solid"
+                                            borderColor="gray.200"
+                                            borderRadius="md"
+                                            p={3}
+                                            fontSize="sm"
+                                        >
+                                            <Code>output</Code>
+                                        </Box>
+                                    </Tabs.Content>
                                 </Tabs.Root>
-                            )}
-                        </Drawer.Body>
+                            </Box>
+                        </Box>
+                    </Tabs.Content>
+                </Tabs.Root>
+            )}
 
-                        <Drawer.Footer>
-                            <HStack justify="space-between" w="full">
-                                <Button variant="ghost" onClick={resetAll}>Cancel</Button>
-                                <Button colorScheme="blue" onClick={handleContinue} isDisabled={isContinueDisabled()}>
-                                    {step === "test" ? "Submit" : "Continue"}
-                                </Button>
-                            </HStack>
-                        </Drawer.Footer>
-                    </Drawer.Content>
-                </Drawer.Positioner>
-            </Portal>
-        </Drawer.Root>
+        </ZAPDrawer>
     );
 }
