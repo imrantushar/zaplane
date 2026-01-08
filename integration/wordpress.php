@@ -21,6 +21,14 @@ class Wordpress extends IntegrationBase {
             'post_updated'  => ['label' => 'Post Updated',   'hook' => 'post_updated'],
             'user_register' => ['label' => 'User Registered','hook' => 'user_register'],
             'comment_post'  => ['label' => 'Comment Added',  'hook' => 'comment_post'],
+            'set_user_role'  => ['label' => 'User Role Updated',  'hook' => 'set_user_role'],
+            'show_user_profile' => ['label' => 'User Profile Show', 'hook' => 'show_user_profile'],
+            'edit_user_profile' => ['label' => 'User Profile Edit', 'hook' => 'edit_user_profile'],
+            'personal_options_update' => ['label' => 'Personal Options Update', 'hook' => 'personal_options_update'],
+            'edit_user_profile_update' => ['label' => 'Edit User', 'hook' => 'edit_user_profile_update'],
+            'profile_update' => ['label' => 'Profile Update', 'hook' => 'profile_update'],
+            'remove_user_from_blog' => ['label' => 'Remove Blog User', 'hook' => 'remove_user_from_blog'],
+            'delete_user' => ['label' => 'Delete User', 'hook' => 'delete_user'],
         ];
     }
 
@@ -61,7 +69,25 @@ class Wordpress extends IntegrationBase {
      * TRIGGER PAYLOAD
      * ===================================================== */
 
+    private static function build_user_payload( $user_arg, array $extra = [] ) {
+        $user_id = $user_arg instanceof \WP_User ? $user_arg->ID : $user_arg;
+        $user_id = (int) $user_id;
+        if ( $user_id <= 0 ) return false;
+
+        $user = get_userdata( $user_id );
+        if ( ! $user ) return false;
+
+        $payload = [
+            'user_id' => $user->ID,
+            'email'   => $user->user_email,
+            'role'    => $user->roles[0] ?? '',
+        ];
+
+        return $extra ? array_merge( $payload, $extra ) : $payload;
+    }
+
     public static function resolve_trigger( array $node, array $args ) {
+  
         switch ( $node['event'] ) {
 
             case 'publish_post':
@@ -87,14 +113,7 @@ class Wordpress extends IntegrationBase {
 
             case 'user_register':
 
-                $user = get_userdata( $args[0] ?? 0 );
-                if ( ! $user ) return false;
-
-                return [
-                    'user_id' => $user->ID,
-                    'email'   => $user->user_email,
-                    'role'    => $user->roles[0] ?? '',
-                ];
+                return self::build_user_payload( $args[0] ?? 0 ) ?: false;
 
             case 'comment_post':
 
@@ -106,6 +125,54 @@ class Wordpress extends IntegrationBase {
                     'post_id'    => $comment->comment_post_ID,
                     'content'    => $comment->comment_content,
                 ];
+
+            case 'set_user_role':
+
+                $payload = self::build_user_payload( $args[0] ?? 0 );
+                if ( ! $payload ) return false;
+
+                $role = $args[1] ?? '';
+                $payload['role'] = $role ?: ( $payload['role'] ?? '' );
+                $payload['old_roles'] = $args[2] ?? [];
+
+                return $payload;
+
+            case 'show_user_profile':
+            case 'edit_user_profile':
+                return self::build_user_payload( $args[0] ?? 0 ) ?: false;
+
+            case 'personal_options_update':
+            case 'edit_user_profile_update':
+                return self::build_user_payload( $args[0] ?? 0 ) ?: false;
+
+            case 'profile_update':
+                $payload = self::build_user_payload( $args[0] ?? 0 );
+                if ( ! $payload ) return false;
+
+                $old_user = $args[1] ?? null;
+                if ( $old_user instanceof \WP_User ) {
+                    $payload['old_email'] = $old_user->user_email;
+                    $payload['old_role'] = $old_user->roles[0] ?? '';
+                }
+
+                return $payload;
+
+            case 'remove_user_from_blog':
+                return self::build_user_payload(
+                    $args[0] ?? 0,
+                    [
+                        'blog_id' => $args[1] ?? 0,
+                        'reassign' => $args[2] ?? 0,
+                    ]
+                ) ?: false;
+
+            case 'delete_user':
+                return self::build_user_payload(
+                    $args[2] ?? ( $args[0] ?? 0 ),
+                    [
+                        'reassign' => $args[1] ?? 0,
+                    ]
+                ) ?: false;
         }
 
         return false;

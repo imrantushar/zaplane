@@ -102,6 +102,78 @@
                     "outputs": [
                         "main"
                     ]
+                },
+                "set_user_role": {
+                    "key": "set_user_role",
+                    "label": "User Role Updated",
+                    "hook": "set_user_role",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "show_user_profile": {
+                    "key": "show_user_profile",
+                    "label": "User Profile Show",
+                    "hook": "show_user_profile",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "edit_user_profile": {
+                    "key": "edit_user_profile",
+                    "label": "User Profile Edit",
+                    "hook": "edit_user_profile",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "personal_options_update": {
+                    "key": "personal_options_update",
+                    "label": "Personal Options Update",
+                    "hook": "personal_options_update",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "edit_user_profile_update": {
+                    "key": "edit_user_profile_update",
+                    "label": "Edit User",
+                    "hook": "edit_user_profile_update",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "profile_update": {
+                    "key": "profile_update",
+                    "label": "Profile Update",
+                    "hook": "profile_update",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "remove_user_from_blog": {
+                    "key": "remove_user_from_blog",
+                    "label": "Remove Blog User",
+                    "hook": "remove_user_from_blog",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_user": {
+                    "key": "delete_user",
+                    "label": "Delete User",
+                    "hook": "delete_user",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
                 }
             },
             "actions": {
