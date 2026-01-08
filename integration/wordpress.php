@@ -21,7 +21,7 @@ class Wordpress extends IntegrationBase {
             'post_updated'  => ['label' => 'Post Updated',   'hook' => 'post_updated'],
             'user_register' => ['label' => 'User Registered','hook' => 'user_register'],
             'comment_post'  => ['label' => 'Comment Added',  'hook' => 'comment_post'],
-            'post_status_update'  => ['label' => 'Post Status Update',  'hook' => 'post_status_updates'],
+            'post_status_update'  => ['label' => 'Post Status Update',  'hook' => 'transition_post_status'],
         ];
     }
 
@@ -138,28 +138,20 @@ class Wordpress extends IntegrationBase {
 
             case 'post_status_update':
 
-    $new_status = $args[0] ?? null;
-    $post       = $args[2] ?? null;
+                $new_status = $args[0] ?? null;
+                $old_status = $args[1] ?? null;
+                $post       = $args[2] ?? null;
 
-    if ( ! $post instanceof \WP_Post ) return false;
+                if ( ! $post instanceof \WP_Post ) return false;
 
-    if ( ! empty($node['config']['post_type']) &&
-         $post->post_type !== $node['config']['post_type'] ) {
-        return false;
-    }
-
-    if ( ! empty($node['config']['posts']) &&
-         (int) $post->ID !== (int) $node['config']['posts'] ) {
-        return false;
-    }
-
-    return [
-        'post_id'    => $post->ID,
-        'post_title' => $post->post_title,
-        'post_type'  => $post->post_type,
-        'status'     => $new_status,
-    ];
-
+                return [
+                    'post_id'    => $post->ID,
+                    'post_title' => $post->post_title,
+                    'post_type'  => $post->post_type,
+                    'new_status' => $new_status,
+                    'old_status' => $old_status,
+                ];
+                
         }
 
         return false;

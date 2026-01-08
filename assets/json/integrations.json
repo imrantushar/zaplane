@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-01-03 04:20:07",
+    "generated_at": "2026-01-08 05:30:18",
     "integrations": {
         "wordpress": {
             "slug": "wordpress",
@@ -106,7 +106,7 @@
                 "post_status_update": {
                     "key": "post_status_update",
                     "label": "Post Status Update",
-                    "hook": "post_status_updates",
+                    "hook": "transition_post_status",
                     "schema": [
                         {
                             "key": "post_type",
