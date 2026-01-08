@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-01-08 12:25:12",
+    "generated_at": "2026-01-08 12:54:07",
     "integrations": {
         "wordpress": {
             "slug": "wordpress",
@@ -177,6 +177,30 @@
                     "outputs": [
                         "main"
                     ]
+                },
+                "switch_theme": {
+                    "key": "switch_theme",
+                    "label": "Theme Switch",
+                    "hook": "switch_theme",
+                    "schema": [
+                        {
+                            "key": "theme",
+                            "label": "Theme Switch",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "deactivate_theme",
+                                "select": [
+                                    "file",
+                                    "name"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
                 }
             },
             "actions": {
@@ -319,6 +343,29 @@
                             "dynamic": {
                                 "integration": "wordpress",
                                 "query": "active_plugins",
+                                "select": [
+                                    "file",
+                                    "name"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "switch_theme": {
+                    "key": "switch_theme",
+                    "label": "Theme Switch",
+                    "schema": [
+                        {
+                            "key": "theme",
+                            "label": "Theme Switch",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "deactivate_theme",
                                 "select": [
                                     "file",
                                     "name"

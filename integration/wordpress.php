@@ -17,15 +17,16 @@ class Wordpress extends IntegrationBase {
 
     public static function get_triggers(): array {
         return [
-            'publish_post'  => ['label' => 'Post Published', 'hook' => 'publish_post'],
-            'post_updated'  => ['label' => 'Post Updated',   'hook' => 'post_updated'],
-            'user_register' => ['label' => 'User Registered','hook' => 'user_register'],
-            'comment_post'  => ['label' => 'Comment Added',  'hook' => 'comment_post'],
-            'deleted_post'  => ['label' => 'Post Deleted',   'hook' => 'before_delete_post'],
-            'trashed_post'  => ['label' => 'Post Trashed',   'hook' => 'trashed_post'],
-            'save_post'     => ['label' => 'Save Post',   'hook' => 'save_post'],
-            'activated_plugin'     => ['label' => 'Activate Plugin',   'hook' => 'activated_plugin'],
-            'deactivate_plugin'     => ['label' => 'Deactivate Plugin',   'hook' => 'deactivate_plugin'],
+            'publish_post'      => ['label' => 'Post Published',    'hook' => 'publish_post'],
+            'post_updated'      => ['label' => 'Post Updated',      'hook' => 'post_updated'],
+            'user_register'     => ['label' => 'User Registered',   'hook' => 'user_register'],
+            'comment_post'      => ['label' => 'Comment Added',     'hook' => 'comment_post'],
+            'deleted_post'      => ['label' => 'Post Deleted',      'hook' => 'before_delete_post'],
+            'trashed_post'      => ['label' => 'Post Trashed',      'hook' => 'trashed_post'],
+            'save_post'         => ['label' => 'Save Post',         'hook' => 'save_post'],
+            'activated_plugin'  => ['label' => 'Activate Plugin',   'hook' => 'activated_plugin'],
+            'deactivate_plugin' => ['label' => 'Deactivate Plugin', 'hook' => 'deactivate_plugin'],
+            'switch_theme'      => ['label' => 'Theme Switch',      'hook' => 'switch_theme'],
         ];
     }
 
@@ -67,7 +68,7 @@ class Wordpress extends IntegrationBase {
                     'type'=>'select',
                     'dynamic'=>[
                         'integration'=>'wordpress',
-                        'query'=>'deactivate_plugins',
+                        'query'=>'inactive_plugins',
                         'select'=>['file','name'],
                     ],
                     'required'=>true,
@@ -84,6 +85,22 @@ class Wordpress extends IntegrationBase {
                     'dynamic'=>[
                         'integration'=>'wordpress',
                         'query'=>'active_plugins',
+                        'select'=>['file', 'name' ],
+                    ],
+                    'required'=>true,
+                ],
+            ];
+        }
+
+        if ( $trigger === 'switch_theme' ) {
+            return [
+                [
+                    'key'=>'theme',
+                    'label'=>'Theme Switch',
+                    'type'=>'select',
+                    'dynamic'=>[
+                        'integration'=>'wordpress',
+                        'query'=>'deactivate_theme',
                         'select'=>['file', 'name' ],
                     ],
                     'required'=>true,
@@ -192,6 +209,14 @@ class Wordpress extends IntegrationBase {
                 return [
                     'plugin' => $plugin,
                 ];
+
+            case 'switch_theme' :
+                $theme = $args[0] ?? 0;
+                if ( ! $theme ) return false;
+                
+                return [
+                    'theme' => $theme,
+                ];
         }
 
         return false;
@@ -209,6 +234,7 @@ class Wordpress extends IntegrationBase {
             'delete_post' => ['label'=>'Delete Post'],
             'activated_plugin' => ['label'=>'Activate Plugin'],
             'deactivate_plugin' => ['label'=>'Deactivate Plugin'],
+            'switch_theme' => ['label'=>'Theme Switch'],
         ];
     }
 
@@ -305,7 +331,7 @@ class Wordpress extends IntegrationBase {
                     'type'=>'select',
                     'dynamic'=>[
                         'integration'=>'wordpress',
-                        'query'=>'deactivate_plugins',
+                        'query'=>'inactive_plugins',
                         'select'=>['file','name'],
                     ],
                     'required'=>true,
@@ -322,6 +348,22 @@ class Wordpress extends IntegrationBase {
                     'dynamic'=>[
                         'integration'=>'wordpress',
                         'query'=>'active_plugins',
+                        'select'=>['file', 'name' ],
+                    ],
+                    'required'=>true,
+                ],
+            ];
+        }
+
+        if ( $action === 'switch_theme' ) {
+            return [
+                [
+                    'key'=>'theme',
+                    'label'=>'Theme Switch',
+                    'type'=>'select',
+                    'dynamic'=>[
+                        'integration'=>'wordpress',
+                        'query'=>'deactivate_theme',
                         'select'=>['file', 'name' ],
                     ],
                     'required'=>true,
@@ -377,6 +419,12 @@ class Wordpress extends IntegrationBase {
                     deactivate_plugins( $config[ 'plugin' ] ); 
                 }
                 return ['port'=>'main', 'data'=>[]];
+
+            case 'switch_theme' : 
+                if ( $theme = $config['theme'] ?? '' ) {
+                    switch_theme( $theme );
+                }
+                return ['port'=>'main', 'data'=>['theme'=>$theme]];
         }
 
         return ['port'=>'main','data'=>$input];
@@ -392,7 +440,8 @@ class Wordpress extends IntegrationBase {
             'posts'      => [ self::class, 'query_posts' ],
             'users'      => [ self::class, 'query_users' ],
             'active_plugins' => [ self::class, 'query_active_plugins' ],
-            'deactivate_plugins' => [ self::class, 'query_deactivate_plugins' ],
+            'inactive_plugins' => [ self::class, 'query_deactivate_plugins' ],
+            'deactivate_theme' => [ self::class, 'query_deactivate_theme' ],
         ];
     }
 
@@ -478,6 +527,26 @@ class Wordpress extends IntegrationBase {
             $result[] = [
                 'file' => $inactive_plugin,
                 'name' => $plugin[ 'Name' ],
+            ];
+        }
+
+        return $result;
+    }
+
+    public static function query_deactivate_theme( $q ) {
+        $all_themes = wp_get_themes();
+        $active_theme = wp_get_theme()->get_stylesheet();
+        $result = [];
+
+        foreach ( $all_themes as $stylesheet => $theme ) {
+        
+            if ( $stylesheet === $active_theme ) {
+                continue;
+            }
+
+            $result[] = [
+                'file' => $stylesheet,
+                'name' => $theme->get( 'Name' ),
             ];
         }
 
