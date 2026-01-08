@@ -24,6 +24,8 @@ class Wordpress extends IntegrationBase {
             'deleted_post'  => ['label' => 'Post Deleted',   'hook' => 'before_delete_post'],
             'trashed_post'  => ['label' => 'Post Trashed',   'hook' => 'trashed_post'],
             'save_post'     => ['label' => 'Save Post',   'hook' => 'save_post'],
+            'activated_plugin'     => ['label' => 'Activate Plugin',   'hook' => 'activated_plugin'],
+            'deactivate_plugin'     => ['label' => 'Deactivate Plugin',   'hook' => 'deactivate_plugin'],
         ];
     }
 
@@ -54,6 +56,38 @@ class Wordpress extends IntegrationBase {
                         ['label'=>'Draft','value'=>'draft'],
                     ]
                 ]
+            ];
+        }
+
+        if ( $trigger === 'activated_plugin' ) {
+            return [
+                [
+                    'key'=>'plugin',
+                    'label'=>'Deactivate Plugin',
+                    'type'=>'select',
+                    'dynamic'=>[
+                        'integration'=>'wordpress',
+                        'query'=>'deactivate_plugins',
+                        'select'=>['file','name'],
+                    ],
+                    'required'=>true,
+                ],
+            ];
+        }
+
+        if ( $trigger === 'deactivate_plugin' ) {
+            return [
+                [
+                    'key'=>'plugin',
+                    'label'=>'Active Plugin',
+                    'type'=>'select',
+                    'dynamic'=>[
+                        'integration'=>'wordpress',
+                        'query'=>'active_plugins',
+                        'select'=>['file', 'name' ],
+                    ],
+                    'required'=>true,
+                ],
             ];
         }
 
@@ -143,6 +177,21 @@ class Wordpress extends IntegrationBase {
                     'status'     => $post->post_status,
                 ];
 
+            case 'activated_plugin' :
+                $plugin = $args[0] ?? 0;
+                if ( ! $plugin ) return false;
+
+                return [
+                    'plugin' => $plugin,
+                ];
+
+            case 'deactivate_plugin' :
+                $plugin = $args[0] ?? 0;
+                if ( ! $plugin ) return false;
+                
+                return [
+                    'plugin' => $plugin,
+                ];
         }
 
         return false;
@@ -158,6 +207,7 @@ class Wordpress extends IntegrationBase {
             'update_option' => ['label'=>'Update Option'],
             'update_post_title' => ['label'=>'Update Post Title'],
             'delete_post' => ['label'=>'Delete Post'],
+            'activated_plugin' => ['label'=>'Activate Plugin'],
             'deactivate_plugin' => ['label'=>'Deactivate Plugin'],
         ];
     }
@@ -247,6 +297,22 @@ class Wordpress extends IntegrationBase {
             ]; 
         }
 
+        if ( $action === 'activated_plugin' ) {
+            return [
+                [
+                    'key'=>'plugin',
+                    'label'=>'Deactivate Plugin',
+                    'type'=>'select',
+                    'dynamic'=>[
+                        'integration'=>'wordpress',
+                        'query'=>'deactivate_plugins',
+                        'select'=>['file','name'],
+                    ],
+                    'required'=>true,
+                ],
+            ];
+        }
+
         if ( $action === 'deactivate_plugin' ) {
             return [
                 [
@@ -300,6 +366,12 @@ class Wordpress extends IntegrationBase {
                 wp_delete_post( $config['post_id'], true );
                 return ['port'=>'main','data'=>['post_id'=>$config['post_id']]];
 
+            case 'activated_plugin' : 
+                if ( $plugin = $config['plugin'] ?? '' ) {
+                    activate_plugin( $plugin );
+                }
+                return ['port'=>'main', 'data'=>['plugin'=>$plugin]];
+
             case 'deactivate_plugin':
                 if ( is_plugin_active( $config[ 'plugin' ] ) ) {
                     deactivate_plugins( $config[ 'plugin' ] ); 
@@ -320,6 +392,7 @@ class Wordpress extends IntegrationBase {
             'posts'      => [ self::class, 'query_posts' ],
             'users'      => [ self::class, 'query_users' ],
             'active_plugins' => [ self::class, 'query_active_plugins' ],
+            'deactivate_plugins' => [ self::class, 'query_deactivate_plugins' ],
         ];
     }
 
@@ -378,6 +451,33 @@ class Wordpress extends IntegrationBase {
             $result[] = [
                 'file' => $plugin,
                 'name' => $all_plugins[ $plugin ][ 'Name' ],
+            ];
+        }
+
+        return $result;
+    }
+
+    public static function query_deactivate_plugins( $q ) {
+        if ( ! function_exists( 'get_plugins' ) ) {
+            require_once ABSPATH . 'wp-admin/includes/plugin.php';
+        }
+
+        $all_plugins = get_plugins();
+        $active_plugin = get_option( 'active_plugins', [] );
+        $result = [];
+
+        foreach ( $all_plugins as $inactive_plugin => $plugin ) {
+            if ( in_array( $inactive_plugin, $active_plugin, true  ) ) {
+                continue;
+            }
+
+            if ( $inactive_plugin === 'zaplane/zaplane.php' ) {
+                continue;
+            }
+
+            $result[] = [
+                'file' => $inactive_plugin,
+                'name' => $plugin[ 'Name' ],
             ];
         }
 
