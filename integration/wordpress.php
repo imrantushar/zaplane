@@ -15,6 +15,7 @@ class Wordpress extends IntegrationBase {
      * TRIGGERS
      * ===================================================== */
 
+    
     public static function get_triggers(): array {
         return [
             'publish_post'  => ['label' => 'Post Published', 'hook' => 'publish_post'],
