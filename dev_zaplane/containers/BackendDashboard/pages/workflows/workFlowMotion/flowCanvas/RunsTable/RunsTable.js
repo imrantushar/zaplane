@@ -14,7 +14,9 @@ import {
   getSingleRun,
   nodeLogsRunDetails,
 } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
-import LogDetails from "../LogDetails/LogDetails";
+import LogDetails from "@ZAPComponents/LogDetails";
+import { getDuration } from "../../helper";
+
 
 
 const RunsTable = ({ runs = [] }) => {
@@ -64,8 +66,7 @@ const RunsTable = ({ runs = [] }) => {
         <Table.Row>
           <Table.ColumnHeader>Run ID</Table.ColumnHeader>
           <Table.ColumnHeader>Status</Table.ColumnHeader>
-          <Table.ColumnHeader>Started</Table.ColumnHeader>
-          <Table.ColumnHeader>Finished</Table.ColumnHeader>
+          <Table.ColumnHeader>DURATION</Table.ColumnHeader>
           <Table.ColumnHeader textAlign="right">
             Actions
           </Table.ColumnHeader>
@@ -92,11 +93,13 @@ const RunsTable = ({ runs = [] }) => {
             </Table.Cell>
 
             <Table.Cell>
-              <Text fontSize="sm">{run.started_at || "—"}</Text>
-            </Table.Cell>
+              <Text textAlign="center" fontSize="sm">
+                {getDuration(
+                  run.started_at,
+                  run.finished_at,
 
-            <Table.Cell>
-              <Text fontSize="sm">{run.finished_at || "—"}</Text>
+                )}
+              </Text>
             </Table.Cell>
 
             <Table.Cell textAlign="right">
