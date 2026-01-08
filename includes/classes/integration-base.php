@@ -21,6 +21,10 @@ abstract class IntegrationBase {
         return '';
     }
 
+    public static function get_category(): string {
+        return 'app'; // app | tool
+    }
+
     /* ---------------------------------------------------------
      * Trigger & Action Definitions
      * --------------------------------------------------------- */
