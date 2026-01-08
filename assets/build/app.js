@@ -1928,6 +1928,8 @@ function ActionDrawer({
     return integration.actions?.[values.actionType]?.schema || [];
   }, [selectedItem, values?.actionType, context?.node]);
   const getKey = field => `${context?.node?.data?.action}:${selectedItem?.id}:${field.key}`;
+
+  // ✅ FIX: fetchDynamic ajax
   const fetchDynamicOptions = async field => {
     if (!field.dynamic) return;
     const key = getKey(field);
@@ -1936,19 +1938,30 @@ function ActionDrawer({
       ...p,
       [key]: true
     }));
-    const res = await (0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_12__.fetchDynamic)(field.dynamic);
-    setDynamicOptions(p => ({
-      ...p,
-      [key]: Object.values(res).map(i => ({
-        value: i[field.dynamic.select[0]],
-        label: i[field.dynamic.select[1]]
-      }))
-    }));
+    try {
+      const res = await (0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_12__.fetchDynamic)(field.dynamic);
+      setDynamicOptions(p => ({
+        ...p,
+        [key]: Object.values(res).map(i => ({
+          value: i[field.dynamic.select[0]],
+          label: i[field.dynamic.select[1]]
+        }))
+      }));
+    } catch (err) {
+      console.error("Dynamic fetch failed:", err);
+    }
     setLoadingFields(p => ({
       ...p,
       [key]: false
     }));
   };
+
+  //  Action/Trigger chane dynamic cache reset
+  (0,react__WEBPACK_IMPORTED_MODULE_15__.useEffect)(() => {
+    if (!values?.actionType) return;
+    setDynamicOptions({});
+    setLoadingFields({});
+  }, [values?.actionType]);
   const renderField = (field, values, setFieldValue) => {
     switch (field.type) {
       case "text":

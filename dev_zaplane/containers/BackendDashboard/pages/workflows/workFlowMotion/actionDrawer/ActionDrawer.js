@@ -46,7 +46,7 @@ export default function ActionDrawer({
     const [dynamicOptions, setDynamicOptions] = useState({});
     const [loadingFields, setLoadingFields] = useState({});
     const { values, setFieldValue, resetForm } = useFormikContext();
-    const dispatch=useDispatch()
+    const dispatch = useDispatch()
 
     const [conditions, setConditions] = useState([
         // {
@@ -163,6 +163,7 @@ export default function ActionDrawer({
     const getKey = (field) =>
         `${context?.node?.data?.action}:${selectedItem?.id}:${field.key}`;
 
+    // ✅ FIX: fetchDynamic ajax
     const fetchDynamicOptions = async (field) => {
         if (!field.dynamic) return;
 
@@ -171,18 +172,28 @@ export default function ActionDrawer({
 
         setLoadingFields(p => ({ ...p, [key]: true }));
 
-        const res = await fetchDynamic(field.dynamic);
-
-        setDynamicOptions(p => ({
-            ...p,
-            [key]: Object.values(res).map(i => ({
-                value: i[field.dynamic.select[0]],
-                label: i[field.dynamic.select[1]],
-            })),
-        }));
+        try {
+            const res = await fetchDynamic(field.dynamic); 
+            setDynamicOptions(p => ({
+                ...p,
+                [key]: Object.values(res).map(i => ({
+                    value: i[field.dynamic.select[0]],
+                    label: i[field.dynamic.select[1]],
+                })),
+            }));
+        } catch (err) {
+            console.error("Dynamic fetch failed:", err);
+        }
 
         setLoadingFields(p => ({ ...p, [key]: false }));
     };
+
+    //  Action/Trigger chane dynamic cache reset
+    useEffect(() => {
+        if (!values?.actionType) return;
+        setDynamicOptions({});
+        setLoadingFields({});
+    }, [values?.actionType]);
     const renderField = (field, values, setFieldValue) => {
         switch (field.type) {
             case "text":
@@ -496,12 +507,12 @@ export default function ActionDrawer({
 
                                     <Tabs.Content value="test">
                                         <Box>
-                                           <Button  
-                                           onClick={()=>dispatch(singleNodeRun(node?.id))}
-                                           >
-                                            Run test
-                                           </Button>
-                                           <Text>Response</Text>
+                                            <Button
+                                                onClick={() => dispatch(singleNodeRun(node?.id))}
+                                            >
+                                                Run test
+                                            </Button>
+                                            <Text>Response</Text>
                                             <Box
                                                 border="1px solid"
                                                 borderColor="gray.200"
@@ -522,7 +533,7 @@ export default function ActionDrawer({
                                                             value="input"
                                                             fontWeight="medium"
                                                             color="gray.600"
-                                                            // _selected={{ color: "blue.600" }}
+                                                        // _selected={{ color: "blue.600" }}
                                                         >
                                                             Input
                                                         </Tabs.Trigger>
@@ -531,7 +542,7 @@ export default function ActionDrawer({
                                                             value="output"
                                                             fontWeight="medium"
                                                             color="gray.600"
-                                                            // _selected={{ color: "blue.600" }}
+                                                        // _selected={{ color: "blue.600" }}
                                                         >
                                                             Output
                                                         </Tabs.Trigger>
@@ -551,7 +562,7 @@ export default function ActionDrawer({
                                                             p={3}
                                                             fontSize="sm"
                                                         >
-                                                          <Code>input</Code>
+                                                            <Code>input</Code>
                                                         </Box>
                                                     </Tabs.Content>
                                                     <Tabs.Content value="output">
@@ -563,7 +574,7 @@ export default function ActionDrawer({
                                                             p={3}
                                                             fontSize="sm"
                                                         >
-                                                          <Code>output</Code>
+                                                            <Code>output</Code>
                                                         </Box>
                                                     </Tabs.Content>
                                                 </Tabs.Root>
