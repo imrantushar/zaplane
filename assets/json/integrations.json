@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-01-07 10:42:44",
+    "generated_at": "2026-01-08 10:32:05",
     "integrations": {
         "wordpress": {
             "slug": "wordpress",
@@ -116,6 +116,15 @@
                     "key": "trashed_post",
                     "label": "Post Trashed",
                     "hook": "trashed_post",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "save_post": {
+                    "key": "save_post",
+                    "label": "Save Post",
+                    "hook": "save_post",
                     "schema": [],
                     "outputs": [
                         "main"

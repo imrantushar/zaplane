@@ -23,6 +23,7 @@ class Wordpress extends IntegrationBase {
             'comment_post'  => ['label' => 'Comment Added',  'hook' => 'comment_post'],
             'deleted_post'  => ['label' => 'Post Deleted',   'hook' => 'before_delete_post'],
             'trashed_post'  => ['label' => 'Post Trashed',   'hook' => 'trashed_post'],
+            'save_post'     => ['label' => 'Save Post',   'hook' => 'save_post'],
         ];
     }
 
@@ -130,6 +131,18 @@ class Wordpress extends IntegrationBase {
                     'post_type'  => $post->post_type,
                     'status'     => $post->post_status,
                 ];
+
+            case 'save_post' :
+                $post = get_post( $args[0] ?? 0 );
+                if ( ! $post ) return false;
+
+                return [
+                    'post_id'    => $post->ID,
+                    'post_title' => $post->post_title,
+                    'post_type'  => $post->post_type,
+                    'status'     => $post->post_status,
+                ];
+
         }
 
         return false;
@@ -144,8 +157,8 @@ class Wordpress extends IntegrationBase {
             'create_post'   => ['label'=>'Create Post'],
             'update_option' => ['label'=>'Update Option'],
             'update_post_title' => ['label'=>'Update Post Title'],
-            'delete_post'   => ['label'=>'Delete Post'],
-            'deactivate_plugin'   => ['label'=>'Deactivate Plugin'],
+            'delete_post' => ['label'=>'Delete Post'],
+            'deactivate_plugin' => ['label'=>'Deactivate Plugin'],
         ];
     }
 
