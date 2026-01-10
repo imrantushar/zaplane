@@ -4,6 +4,8 @@ namespace Zaplane\Core;
 if (!defined('ABSPATH')) exit;
 
 use Zaplane\Classes\Container;
+use Zaplane\Classes\ConnectionManager;
+use Zaplane\Classes\OAuthHandler;
 use Zaplane\Core\IntegrationLoader;
 use Zaplane\Core\Automation;
 
@@ -44,6 +46,9 @@ final class Zaplane {
         // Optional core modules
         $container->set('modules', fn($c) => ModuleManager::init($c));
         $container->set('automation', fn($c) => Automation::init($c));
+        // Connection services
+        $container->set('connections', fn($c) => new ConnectionManager());
+        $container->set('oauth', fn($c) => new OAuthHandler($c->get('connections')));
         return $container;
     }
 
