@@ -28,6 +28,7 @@ class API implements ModuleInterface {
         (new API\IntegrationsController($this->container))->register_routes();
         (new API\WorkflowsController($this->container))->register_routes();
         (new API\RunController($this->container))->register_routes();
+        (new API\ConnectionsController($this->container))->register_routes();
 
         register_rest_route( 'zaplane/v1', '/runs/(?P<id>\d+)', [
             'methods'  => 'GET',
