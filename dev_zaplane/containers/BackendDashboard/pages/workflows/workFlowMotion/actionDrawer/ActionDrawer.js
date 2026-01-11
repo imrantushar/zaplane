@@ -20,17 +20,21 @@ import { useEffect, useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
 import Select from "react-select";
 
-const APPS = Object.entries(integrations?.integrations || {}).map(
+const APPS = Object.entries(integrations.apps || {}).map(
     ([key, value]) => ({
         id: value.slug || key,
         name: value.name,
     })
 );
 
-const TOOLS = [
-    // { id: "condition", name: "Condition" },
-    { id: "router", name: "Router" },
-];
+const TOOLS = Object.entries(integrations.tools).map(
+   ([key,value]) =>(
+    {
+        id:value.slug || key,
+        name:value.name
+    }
+   )
+)
 
 export default function ActionDrawer({
     open,
@@ -50,89 +54,19 @@ export default function ActionDrawer({
     const { values, setFieldValue, resetForm } = useFormikContext();
     const dispatch = useDispatch()
 
-    const [conditions, setConditions] = useState([
-        // {
-        //     id: crypto.randomUUID(),
-        //     type: "AND",
-        //     rules: [
-        //         {
-        //             id: crypto.randomUUID(),
-        //             field: "",
-        //             operator: "",
-        //             value: "",
-        //         },
-        //     ],
-        // },
-    ]);
-
-    // const addAndCondition = (groupId) => {
-    //     setConditions((prev) =>
-    //         prev.map((g) =>
-    //             g.id === groupId
-    //                 ? {
-    //                     ...g,
-    //                     rules: [
-    //                         ...g.rules,
-    //                         { id: crypto.randomUUID(), field: "", operator: "", value: "" },
-    //                     ],
-    //                 }
-    //                 : g
-    //         )
-    //     );
-    // };
-
-    // const addOrGroup = () => {
-    //     setConditions((prev) => [
-    //         ...prev,
-    //         {
-    //             id: crypto.randomUUID(),
-    //             type: "OR",
-    //             rules: [{ id: crypto.randomUUID(), field: "", operator: "", value: "" }],
-    //         },
-    //     ]);
-    // };
-
-    // const updateRule = (groupId, ruleId, key, value) => {
-    //     setConditions((prev) =>
-    //         prev.map((g) =>
-    //             g.id === groupId
-    //                 ? {
-    //                     ...g,
-    //                     rules: g.rules.map((r) => (r.id === ruleId ? { ...r, [key]: value } : r)),
-    //                 }
-    //                 : g
-    //         )
-    //     );
-    // };
-
-    // const removeRule = (groupId, ruleId) => {
-    //     setConditions((prev) =>
-    //         prev.map((g) =>
-    //             g.id === groupId
-    //                 ? { ...g, rules: g.rules.filter((r) => r.id !== ruleId) }
-    //                 : g
-    //         )
-    //     );
-    // };
 
     const resetAll = () => {
         setMode(null);
         setStep("select");
         setSelectedItem(null);
         onClose();
-        // setConditions([
-        //     {
-        //         id: crypto.randomUUID(),
-        //         rules: [{ id: crypto.randomUUID(), field: "", operator: "", value: "" }],
-        //     },
-        // ]);
         resetForm();
     };
 
     const LIST = mode === "app" && APPS;
     const actionOptions = useMemo(() => {
         if (!selectedItem?.id) return [];
-        const integration = integrations?.integrations?.[selectedItem.id];
+        const integration = integrations?.apps?.[selectedItem.id];
         if (!integration) return [];
         const isTriggerNode = node?.data?.action === "trigger" && source === "node";
 
@@ -150,7 +84,7 @@ export default function ActionDrawer({
     const selectedActionFields = useMemo(() => {
         if (!selectedItem?.id || !values?.actionType) return [];
 
-        const integration = integrations?.integrations?.[selectedItem.id];
+        const integration = integrations?.apps[selectedItem.id];
         if (!integration) return [];
 
         const isTriggerNode = node?.data?.action === "trigger" && source === "node";
@@ -468,78 +402,7 @@ export default function ActionDrawer({
                     </Tabs.Content>
 
                     <Tabs.Content value="configure">
-                        {selectedItem.id === "condition" ? (
-                            <VStack align="stretch" gap={4}>
-                                {conditions.map((group, gi) => (
-                                    <Box
-                                        key={group.id}
-                                        border="1px solid #E2E8F0"
-                                        p={3}
-                                        rounded="md"
-                                    >
-                                        {group.rules.map((rule) => (
-                                            <HStack key={rule.id} mb={2}>
-                                                <Box width="35%">
-                                                    <Input
-                                                        placeholder="Condition"
-                                                        value={rule.field}
-                                                        onChange={(e) =>
-                                                            updateRule(group.id, rule.id, "field", e.target.value)
-                                                        }
-                                                    />
-                                                </Box>
-                                                <Box width="35%">
-                                                    <Select
-                                                        placeholder="Operator"
-                                                        options={[
-                                                            { value: "equals", label: "Equals" },
-                                                            { value: "contains", label: "Contains" },
-                                                        ]}
-                                                        onChange={(opt) =>
-                                                            updateRule(group.id, rule.id, "operator", opt.value)
-                                                        }
-                                                    />
-                                                </Box>
-                                                <Box width="35%">
-                                                    <Input
-                                                        placeholder="Value"
-                                                        value={rule.value}
-                                                        onChange={(e) =>
-                                                            updateRule(group.id, rule.id, "value", e.target.value)
-                                                        }
-                                                    />
-                                                </Box>
-                                                <Button
-                                                    size="sm"
-                                                    colorScheme="red"
-                                                    onClick={() => removeRule(group.id, rule.id)}
-                                                >
-                                                    ✕
-                                                </Button>
-                                            </HStack>
-                                        ))}
-                                        <Button size="sm" variant="outline" onClick={() => addAndCondition(group.id)}>
-                                            + And
-                                        </Button>
-                                        {gi !== conditions.length - 1 && (
-                                            <Text
-                                                textAlign="center"
-                                                my={2}
-                                                fontSize="sm"
-                                                color="gray.500"
-                                            >
-                                                OR
-                                            </Text>
-                                        )}
-                                    </Box>
-                                ))}
-                                <Button variant="outline" onClick={addOrGroup}>
-                                    + Or Group
-                                </Button>
-                            </VStack>
-                        ) : (
-                            <Text margin="0">There have only config data</Text>
-                        )}
+                        <Text margin="0">There have only config data</Text>
                     </Tabs.Content>
 
                     <Tabs.Content value="test">
