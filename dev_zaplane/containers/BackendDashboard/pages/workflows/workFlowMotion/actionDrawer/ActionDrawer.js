@@ -1,8 +1,5 @@
 import {
-    Drawer,
-    Portal,
     Button,
-    CloseButton,
     VStack,
     Text,
     Box,
@@ -13,28 +10,25 @@ import {
     Code
 } from "@chakra-ui/react";
 import ZAPDrawer from "@ZAPComponents/Drawer";
-import { fetchDynamic, getSingleRun, getSingleRunDetails, getSingleRunNode, liveMonitor, singleNodeRun, workFLowSingeNodeExction } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
+import {
+    fetchDynamic,
+    workFLowSingeNodeExction
+} from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
 import { integrations } from "@ZAPUtils/helper";
 import { useFormikContext } from "formik";
 import { useEffect, useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
 import Select from "react-select";
 
-const APPS = Object.entries(integrations.apps || {}).map(
-    ([key, value]) => ({
-        id: value.slug || key,
-        name: value.name,
-    })
-);
+const APPS = Object.entries(integrations.apps || {}).map(([key, value]) => ({
+    id: value.slug || key,
+    name: value.name,
+}));
 
-const TOOLS = Object.entries(integrations.tools).map(
-   ([key,value]) =>(
-    {
-        id:value.slug || key,
-        name:value.name
-    }
-   )
-)
+const TOOLS = Object.entries(integrations.tools || {}).map(([key, value]) => ({
+    id: value.slug || key,
+    name: value.name,
+}));
 
 export default function ActionDrawer({
     open,
@@ -46,58 +40,98 @@ export default function ActionDrawer({
     singleData
 }) {
     const { source, node } = context;
-    const [mode, setMode] = useState(null);
+    const dispatch = useDispatch();
+    const { values, setFieldValue, resetForm } = useFormikContext();
+
+    const [mode, setMode] = useState(null); 
     const [step, setStep] = useState("select");
     const [selectedItem, setSelectedItem] = useState(null);
     const [dynamicOptions, setDynamicOptions] = useState({});
     const [loadingFields, setLoadingFields] = useState({});
-    const { values, setFieldValue, resetForm } = useFormikContext();
-    const dispatch = useDispatch()
-
-
     const resetAll = () => {
         setMode(null);
         setStep("select");
         setSelectedItem(null);
-        onClose();
         resetForm();
+        onClose();
     };
 
-    const LIST = mode === "app" && APPS;
+    const LIST =
+        mode === "app"
+            ? APPS
+            : mode === "tools"
+            ? TOOLS
+            : [];
+
+    const getIntegration = () => {
+        if (!selectedItem?.id) return null;
+        return mode === "tools"
+            ? integrations.tools?.[selectedItem.id]
+            : integrations.apps?.[selectedItem.id];
+    };
+
+    // toll action auto seleted
+    useEffect(() => {
+        if (mode !== "tools" || !selectedItem) return;
+
+        const tool = integrations.tools?.[selectedItem.id];
+        const actions = Object.values(tool?.actions || {});
+
+        if (actions.length === 1) {
+            setFieldValue("actionType", actions[0].key);
+        }
+    }, [mode, selectedItem]);
+
+//    action option
     const actionOptions = useMemo(() => {
-        if (!selectedItem?.id) return [];
-        const integration = integrations?.apps?.[selectedItem.id];
+        const integration = getIntegration();
         if (!integration) return [];
-        const isTriggerNode = node?.data?.action === "trigger" && source === "node";
+
+        if (mode === "tools") {
+            return Object.values(integration.actions || {}).map(a => ({
+                label: a.label,
+                value: a.key,
+            }));
+        }
+
+        const isTriggerNode =
+            node?.data?.action === "trigger" && source === "node";
 
         if (isTriggerNode) {
-            return Object.values(integration.triggers || {}).map((t) => ({
+            return Object.values(integration.triggers || {}).map(t => ({
                 label: t.label,
                 value: t.key,
             }));
         }
-        return Object.values(integration.actions || {}).map((a) => ({
+
+        return Object.values(integration.actions || {}).map(a => ({
             label: a.label,
             value: a.key,
         }));
-    }, [selectedItem, context?.node]);
+    }, [selectedItem, mode, node]);
+
+    // shema shows
     const selectedActionFields = useMemo(() => {
-        if (!selectedItem?.id || !values?.actionType) return [];
+        const integration = getIntegration();
+        if (!integration || !values?.actionType) return [];
 
-        const integration = integrations?.apps[selectedItem.id];
-        if (!integration) return [];
+        if (mode === "tools") {
+            return integration.actions?.[values.actionType]?.schema || [];
+        }
 
-        const isTriggerNode = node?.data?.action === "trigger" && source === "node";
-
+        const isTriggerNode =
+            node?.data?.action === "trigger" && source === "node";
 
         if (isTriggerNode) {
             return integration.triggers?.[values.actionType]?.schema || [];
         }
 
         return integration.actions?.[values.actionType]?.schema || [];
-    }, [selectedItem, values?.actionType, context?.node]);
+    }, [selectedItem, values?.actionType, mode, node]);
+
+    // dainamic filed
     const getKey = (field) =>
-        `${context?.node?.data?.action}:${selectedItem?.id}:${field.key}`;
+        `${mode}:${selectedItem?.id}:${field.key}`;
 
     const fetchDynamicOptions = async (field) => {
         if (!field.dynamic) return;
@@ -119,20 +153,36 @@ export default function ActionDrawer({
 
         setLoadingFields(p => ({ ...p, [key]: false }));
     };
-    const renderField = (field, values, setFieldValue) => {
+
+  
+    const renderField = (field) => {
         switch (field.type) {
             case "text":
             case "expression":
                 return (
                     <Box>
-                        <Text fontSize="sm" margin="0 0 4px 0">{field.label}</Text>
+                        <Text fontSize="sm">{field.label}</Text>
                         <Input
                             size="sm"
                             value={values[field.key] || ""}
                             onChange={(e) =>
                                 setFieldValue(field.key, e.target.value)
                             }
-                            placeholder={field.label}
+                        />
+                    </Box>
+                );
+
+            case "number":
+                return (
+                    <Box>
+                        <Text fontSize="sm">{field.label}</Text>
+                        <Input
+                            size="sm"
+                            type="number"
+                            value={values[field.key] || ""}
+                            onChange={(e) =>
+                                setFieldValue(field.key, e.target.value)
+                            }
                         />
                     </Box>
                 );
@@ -140,7 +190,7 @@ export default function ActionDrawer({
             case "textarea":
                 return (
                     <Box>
-                        <Text fontSize="sm" margin="0 0 4px 0">{field.label}</Text>
+                        <Text fontSize="sm">{field.label}</Text>
                         <Input
                             as="textarea"
                             size="sm"
@@ -148,54 +198,48 @@ export default function ActionDrawer({
                             onChange={(e) =>
                                 setFieldValue(field.key, e.target.value)
                             }
-                            placeholder={field.label}
                         />
                     </Box>
                 );
 
             case "select":
                 if (field.options) {
-                    const options = field.options.map((opt) => ({
-                        value: opt.value,
+                    const options = field.options.map(opt => ({
                         label: opt.label,
+                        value: opt.value,
                     }));
 
                     return (
                         <Box>
-                            <Text fontSize="sm" margin="0 0 4px 0">{field.label}</Text>
+                            <Text fontSize="sm">{field.label}</Text>
                             <Select
                                 options={options}
                                 value={
                                     options.find(
-                                        (opt) =>
-                                            opt.value === values[field.key]
+                                        o => o.value === values[field.key]
                                     ) || null
                                 }
                                 onChange={(opt) =>
-                                    setFieldValue(field.key, opt.value)
+                                    setFieldValue(field.key, opt?.value)
                                 }
                             />
                         </Box>
                     );
                 }
+
                 if (field.dynamic) {
                     const key = getKey(field);
                     const opts = dynamicOptions[key] || [];
 
                     return (
                         <Box>
-                            <Text fontSize="sm" margin="0 0 4px 0">
-                                {field.label}
-                                {field.required && " *"}
-                            </Text>
-
+                            <Text fontSize="sm">{field.label}</Text>
                             <Select
                                 options={opts}
                                 isLoading={loadingFields[key]}
                                 value={
                                     opts.find(
-                                        (opt) =>
-                                            opt.value === values[field.key]
+                                        o => o.value === values[field.key]
                                     ) || null
                                 }
                                 onMenuOpen={() =>
@@ -208,7 +252,6 @@ export default function ActionDrawer({
                         </Box>
                     );
                 }
-
                 return null;
 
             default:
@@ -217,103 +260,41 @@ export default function ActionDrawer({
     };
 
     const handleContinue = () => {
-        if (step === "select") setStep("configure");
-        else if (step === "configure") setStep("test");
-        else if (step === "test") {
-            if (selectedItem.id === "condition") {
-                createConditionNode({ conditions });
-                resetAll();
-                return;
-            }
+        if (step === "select") return setStep("configure");
+        if (step === "configure") return setStep("test");
 
-            const payload = {
-                app: selectedItem.name,
-                name: selectedItem.name,
-                event: values?.actionType,
-                config: selectedActionFields.reduce((acc, field) => {
-                    acc[field.key] = values[field.key];
-                    return acc;
-                }, {}),
-            };
-            const triggerPayload = {
-                app: selectedItem.name,
-                name: selectedItem.name,
-                event: values?.actionType,
-                config: selectedActionFields.reduce((acc, field) => {
-                    acc[field.key] = values[field.key];
-                    return acc;
-                }, {}),
-            };
+        const payload = {
+            app: selectedItem.name,
+            name: selectedItem.name,
+            event: values.actionType,
+            config: selectedActionFields.reduce((acc, f) => {
+                acc[f.key] = values[f.key];
+                return acc;
+            }, {}),
+        };
 
-            if (context?.source === "node") {
-                if (node?.data?.action === "trigger") {
-                    updateNodeData(triggerPayload);
-                } else {
-                    updateNodeData(payload);
-                }
-            } else {
-                createActionNode(payload);
-            }
-
-            resetAll();
+        if (context?.source === "node") {
+            updateNodeData(payload);
+        } else {
+            createActionNode(payload);
         }
-    };
-    const isContinueDisabled = () => {
-        if (step === "select") return !values.actionType;
-        if (step === "configure") return !values.connection;
-        return false;
-    };
-    useEffect(() => {
-        if (!open) return;
-        if (context?.source === "node" && node?.data?.app) {
-            const matchedApp = APPS.find(
-                (app) =>
-                    app.name === node.data.app ||
-                    app.id === node.data.app?.toLowerCase()
-            );
 
-            if (matchedApp) {
-                setMode("app");
-                setSelectedItem(matchedApp);
-                setStep("select");
-                if (node?.data?.config) {
-                    Object.entries(node.data.config).forEach(([key, value]) => {
-                        setFieldValue(key, value);
-                    });
-                }
+        resetAll();
+    };
 
-                if (node?.data?.event) {
-                    setFieldValue("actionType", node.data.event);
-                }
-            }
-        }
-    }, [open, node]);
-    console.log(node);
-  console.log(values,'action values');
     return (
         <ZAPDrawer
             open={open}
             onClose={resetAll}
-            title={
-                !mode
-                    ? "Choose Type"
-                    : !selectedItem
-                        ? `Select ${mode}`
-                        : selectedItem.name
-            }
+            title={!mode ? "Choose Type" : selectedItem?.name}
             placement="end"
             size="md"
-            closeOnOverlayClick={true}
             footer={
-                <HStack justify="space-between" w="full">
+                <HStack justify="space-between">
                     <Button variant="ghost" onClick={resetAll}>
                         Cancel
                     </Button>
-                    <Button
-                        colorScheme="blue"
-                        onClick={handleContinue}
-                        isDisabled={isContinueDisabled()}
-                    >
+                    <Button onClick={handleContinue}>
                         {step === "test" ? "Submit" : "Continue"}
                     </Button>
                 </HStack>
@@ -324,35 +305,33 @@ export default function ActionDrawer({
                     <Button w="100%" justifyContent="left" onClick={() => setMode("app")}>
                         Apps
                     </Button>
-                    {TOOLS.map((item) => (
+
+                    {TOOLS.map(tool => (
                         <Button
-                            key={item.id}
-                            width="100%"
+                            key={tool.id}
+                            w="100%"
                             justifyContent="space-between"
                             onClick={() => {
-                                setSelectedItem(item);
-                                setStep("select");
                                 setMode("tools");
+                                setSelectedItem(tool);
                             }}
                         >
-                            {item.name}
+                            {tool.name}
                         </Button>
                     ))}
                 </VStack>
             )}
 
             {mode && !selectedItem && (
-                <VStack align="stretch">
-                    {LIST.map((item) => (
+                <VStack>
+                    {LIST.map(item => (
                         <Button
+                            justifyContent="left"
                             key={item.id}
-                            justifyContent="space-between"
-                            onClick={() => {
-                                setSelectedItem(item);
-                                setStep("select");
-                            }}
+                            w="100%"
+                            onClick={() => setSelectedItem(item)}
                         >
-                            {item.name} →
+                            {item.name}
                         </Button>
                     ))}
                     <Button size="sm" variant="ghost" onClick={() => setMode(null)}>
@@ -367,114 +346,53 @@ export default function ActionDrawer({
                         <Tabs.Trigger value="select">Select</Tabs.Trigger>
                         <Tabs.Trigger value="configure">Configure</Tabs.Trigger>
                         <Tabs.Trigger value="test">Test</Tabs.Trigger>
-                        <Tabs.Indicator />
                     </Tabs.List>
 
                     <Tabs.Content value="select">
-                        {selectedItem.id === "condition" ? (
-                            <>Condition</>
-                        ) : (
-                            <Flex direction="column" gap={4}>
-                                <Box>
-                                    <Text mb={0}>
-                                        {node?.data?.action === "trigger" && source === "node"
-                                            ? "Trigger Type"
-                                            : "Action Type"}
-                                    </Text>
-                                    <Select
-                                        options={actionOptions}
-                                        value={
-                                            actionOptions.find(
-                                                (opt) => opt.value === values.actionType
-                                            ) || null
-                                        }
-                                        onChange={(opt) => setFieldValue("actionType", opt?.value)}
-                                    />
+                        <Box mb={4}>
+                            <Text fontSize="sm">Action Type</Text>
+                            <Select
+                                options={actionOptions}
+                                value={
+                                    actionOptions.find(
+                                        o => o.value === values.actionType
+                                    ) || null
+                                }
+                                onChange={(opt) =>
+                                    setFieldValue("actionType", opt?.value)
+                                }
+                            />
+                        </Box>
+
+                        <Flex direction="column" gap={4}>
+                            {selectedActionFields.map(field => (
+                                <Box key={field.key}>
+                                    {renderField(field)}
                                 </Box>
-
-                                {selectedActionFields.map((field) => (
-                                    <Box key={field.key}>
-                                        {renderField(field, values, setFieldValue)}
-                                    </Box>
-                                ))}
-                            </Flex>
-                        )}
-                    </Tabs.Content>
-
-                    <Tabs.Content value="configure">
-                        <Text margin="0">There have only config data</Text>
+                            ))}
+                        </Flex>
                     </Tabs.Content>
 
                     <Tabs.Content value="test">
-                        <Box>
-                            <Button onClick={() => {
-                                const paylod={
-                                    workflow_hash:singleData?.version?.hash,
-                                    node_key:node?.id,
-                                    input:values
-                                }
-                                dispatch(workFLowSingeNodeExction(paylod))
+                        <Button
+                            mb={4}
+                            onClick={() =>
+                                dispatch(
+                                    workFLowSingeNodeExction({
+                                        workflow_hash: singleData?.version?.hash,
+                                        node_key: node?.id,
+                                        input: values,
+                                    })
+                                )
                             }
+                        >
+                            Run test
+                        </Button>
 
-                            }>
-                                Run test
-                            </Button>
-
-                            <Text>Response</Text>
-
-                            <Box
-                                border="1px solid"
-                                borderColor="gray.200"
-                                borderRadius="md"
-                                bg="gray.50"
-                                p={4}
-                            >
-                                <Tabs.Root defaultValue="output">
-                                    <Tabs.List
-                                        display="flex"
-                                        gap={6}
-                                        borderBottom="1px solid"
-                                        borderColor="gray.200"
-                                        mb={4}
-                                        position="relative"
-                                    >
-                                        <Tabs.Trigger value="input">Input</Tabs.Trigger>
-                                        <Tabs.Trigger value="output">Output</Tabs.Trigger>
-                                        <Tabs.Indicator height="2px" bg="blue.500" borderRadius="full" />
-                                    </Tabs.List>
-
-                                    <Tabs.Content value="input">
-                                        <Box
-                                            bg="white"
-                                            border="1px solid"
-                                            borderColor="gray.200"
-                                            borderRadius="md"
-                                            p={3}
-                                            fontSize="sm"
-                                        >
-                                            <Code>input</Code>
-                                        </Box>
-                                    </Tabs.Content>
-
-                                    <Tabs.Content value="output">
-                                        <Box
-                                            bg="white"
-                                            border="1px solid"
-                                            borderColor="gray.200"
-                                            borderRadius="md"
-                                            p={3}
-                                            fontSize="sm"
-                                        >
-                                            <Code>output</Code>
-                                        </Box>
-                                    </Tabs.Content>
-                                </Tabs.Root>
-                            </Box>
-                        </Box>
+                        <Code w="100%">Output</Code>
                     </Tabs.Content>
                 </Tabs.Root>
             )}
-
         </ZAPDrawer>
     );
 }

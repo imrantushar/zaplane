@@ -1790,7 +1790,7 @@ const APPS = Object.entries(_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_11__.integ
   id: value.slug || key,
   name: value.name
 }));
-const TOOLS = Object.entries(_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_11__.integrations.tools).map(([key, value]) => ({
+const TOOLS = Object.entries(_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_11__.integrations.tools || {}).map(([key, value]) => ({
   id: value.slug || key,
   name: value.name
 }));
@@ -1807,29 +1807,50 @@ function ActionDrawer({
     source,
     node
   } = context;
-  const [mode, setMode] = (0,react__WEBPACK_IMPORTED_MODULE_13__.useState)(null);
-  const [step, setStep] = (0,react__WEBPACK_IMPORTED_MODULE_13__.useState)("select");
-  const [selectedItem, setSelectedItem] = (0,react__WEBPACK_IMPORTED_MODULE_13__.useState)(null);
-  const [dynamicOptions, setDynamicOptions] = (0,react__WEBPACK_IMPORTED_MODULE_13__.useState)({});
-  const [loadingFields, setLoadingFields] = (0,react__WEBPACK_IMPORTED_MODULE_13__.useState)({});
+  const dispatch = (0,react_redux__WEBPACK_IMPORTED_MODULE_14__.useDispatch)();
   const {
     values,
     setFieldValue,
     resetForm
   } = (0,formik__WEBPACK_IMPORTED_MODULE_12__.useFormikContext)();
-  const dispatch = (0,react_redux__WEBPACK_IMPORTED_MODULE_14__.useDispatch)();
+  const [mode, setMode] = (0,react__WEBPACK_IMPORTED_MODULE_13__.useState)(null);
+  const [step, setStep] = (0,react__WEBPACK_IMPORTED_MODULE_13__.useState)("select");
+  const [selectedItem, setSelectedItem] = (0,react__WEBPACK_IMPORTED_MODULE_13__.useState)(null);
+  const [dynamicOptions, setDynamicOptions] = (0,react__WEBPACK_IMPORTED_MODULE_13__.useState)({});
+  const [loadingFields, setLoadingFields] = (0,react__WEBPACK_IMPORTED_MODULE_13__.useState)({});
   const resetAll = () => {
     setMode(null);
     setStep("select");
     setSelectedItem(null);
-    onClose();
     resetForm();
+    onClose();
   };
-  const LIST = mode === "app" && APPS;
+  const LIST = mode === "app" ? APPS : mode === "tools" ? TOOLS : [];
+  const getIntegration = () => {
+    if (!selectedItem?.id) return null;
+    return mode === "tools" ? _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_11__.integrations.tools?.[selectedItem.id] : _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_11__.integrations.apps?.[selectedItem.id];
+  };
+
+  // toll action auto seleted
+  (0,react__WEBPACK_IMPORTED_MODULE_13__.useEffect)(() => {
+    if (mode !== "tools" || !selectedItem) return;
+    const tool = _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_11__.integrations.tools?.[selectedItem.id];
+    const actions = Object.values(tool?.actions || {});
+    if (actions.length === 1) {
+      setFieldValue("actionType", actions[0].key);
+    }
+  }, [mode, selectedItem]);
+
+  //    action option
   const actionOptions = (0,react__WEBPACK_IMPORTED_MODULE_13__.useMemo)(() => {
-    if (!selectedItem?.id) return [];
-    const integration = _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_11__.integrations?.apps?.[selectedItem.id];
+    const integration = getIntegration();
     if (!integration) return [];
+    if (mode === "tools") {
+      return Object.values(integration.actions || {}).map(a => ({
+        label: a.label,
+        value: a.key
+      }));
+    }
     const isTriggerNode = node?.data?.action === "trigger" && source === "node";
     if (isTriggerNode) {
       return Object.values(integration.triggers || {}).map(t => ({
@@ -1841,18 +1862,24 @@ function ActionDrawer({
       label: a.label,
       value: a.key
     }));
-  }, [selectedItem, context?.node]);
+  }, [selectedItem, mode, node]);
+
+  // shema shows
   const selectedActionFields = (0,react__WEBPACK_IMPORTED_MODULE_13__.useMemo)(() => {
-    if (!selectedItem?.id || !values?.actionType) return [];
-    const integration = _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_11__.integrations?.apps[selectedItem.id];
-    if (!integration) return [];
+    const integration = getIntegration();
+    if (!integration || !values?.actionType) return [];
+    if (mode === "tools") {
+      return integration.actions?.[values.actionType]?.schema || [];
+    }
     const isTriggerNode = node?.data?.action === "trigger" && source === "node";
     if (isTriggerNode) {
       return integration.triggers?.[values.actionType]?.schema || [];
     }
     return integration.actions?.[values.actionType]?.schema || [];
-  }, [selectedItem, values?.actionType, context?.node]);
-  const getKey = field => `${context?.node?.data?.action}:${selectedItem?.id}:${field.key}`;
+  }, [selectedItem, values?.actionType, mode, node]);
+
+  // dainamic filed
+  const getKey = field => `${mode}:${selectedItem?.id}:${field.key}`;
   const fetchDynamicOptions = async field => {
     if (!field.dynamic) return;
     const key = getKey(field);
@@ -1874,51 +1901,58 @@ function ActionDrawer({
       [key]: false
     }));
   };
-  const renderField = (field, values, setFieldValue) => {
+  const renderField = field => {
     switch (field.type) {
       case "text":
       case "expression":
         return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
           children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
             fontSize: "sm",
-            margin: "0 0 4px 0",
             children: field.label
           }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.Input, {
             size: "sm",
             value: values[field.key] || "",
-            onChange: e => setFieldValue(field.key, e.target.value),
-            placeholder: field.label
+            onChange: e => setFieldValue(field.key, e.target.value)
+          })]
+        });
+      case "number":
+        return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
+          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
+            fontSize: "sm",
+            children: field.label
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.Input, {
+            size: "sm",
+            type: "number",
+            value: values[field.key] || "",
+            onChange: e => setFieldValue(field.key, e.target.value)
           })]
         });
       case "textarea":
         return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
           children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
             fontSize: "sm",
-            margin: "0 0 4px 0",
             children: field.label
           }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.Input, {
             as: "textarea",
             size: "sm",
             value: values[field.key] || "",
-            onChange: e => setFieldValue(field.key, e.target.value),
-            placeholder: field.label
+            onChange: e => setFieldValue(field.key, e.target.value)
           })]
         });
       case "select":
         if (field.options) {
           const options = field.options.map(opt => ({
-            value: opt.value,
-            label: opt.label
+            label: opt.label,
+            value: opt.value
           }));
           return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
             children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
               fontSize: "sm",
-              margin: "0 0 4px 0",
               children: field.label
             }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(react_select__WEBPACK_IMPORTED_MODULE_15__["default"], {
               options: options,
-              value: options.find(opt => opt.value === values[field.key]) || null,
-              onChange: opt => setFieldValue(field.key, opt.value)
+              value: options.find(o => o.value === values[field.key]) || null,
+              onChange: opt => setFieldValue(field.key, opt?.value)
             })]
           });
         }
@@ -1926,14 +1960,13 @@ function ActionDrawer({
           const key = getKey(field);
           const opts = dynamicOptions[key] || [];
           return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
-            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
+            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
               fontSize: "sm",
-              margin: "0 0 4px 0",
-              children: [field.label, field.required && " *"]
+              children: field.label
             }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(react_select__WEBPACK_IMPORTED_MODULE_15__["default"], {
               options: opts,
               isLoading: loadingFields[key],
-              value: opts.find(opt => opt.value === values[field.key]) || null,
+              value: opts.find(o => o.value === values[field.key]) || null,
               onMenuOpen: () => fetchDynamicOptions(field),
               onChange: opt => setFieldValue(field.key, opt?.value)
             })]
@@ -1945,88 +1978,38 @@ function ActionDrawer({
     }
   };
   const handleContinue = () => {
-    if (step === "select") setStep("configure");else if (step === "configure") setStep("test");else if (step === "test") {
-      if (selectedItem.id === "condition") {
-        createConditionNode({
-          conditions
-        });
-        resetAll();
-        return;
-      }
-      const payload = {
-        app: selectedItem.name,
-        name: selectedItem.name,
-        event: values?.actionType,
-        config: selectedActionFields.reduce((acc, field) => {
-          acc[field.key] = values[field.key];
-          return acc;
-        }, {})
-      };
-      const triggerPayload = {
-        app: selectedItem.name,
-        name: selectedItem.name,
-        event: values?.actionType,
-        config: selectedActionFields.reduce((acc, field) => {
-          acc[field.key] = values[field.key];
-          return acc;
-        }, {})
-      };
-      if (context?.source === "node") {
-        if (node?.data?.action === "trigger") {
-          updateNodeData(triggerPayload);
-        } else {
-          updateNodeData(payload);
-        }
-      } else {
-        createActionNode(payload);
-      }
-      resetAll();
+    if (step === "select") return setStep("configure");
+    if (step === "configure") return setStep("test");
+    const payload = {
+      app: selectedItem.name,
+      name: selectedItem.name,
+      event: values.actionType,
+      config: selectedActionFields.reduce((acc, f) => {
+        acc[f.key] = values[f.key];
+        return acc;
+      }, {})
+    };
+    if (context?.source === "node") {
+      updateNodeData(payload);
+    } else {
+      createActionNode(payload);
     }
+    resetAll();
   };
-  const isContinueDisabled = () => {
-    if (step === "select") return !values.actionType;
-    if (step === "configure") return !values.connection;
-    return false;
-  };
-  (0,react__WEBPACK_IMPORTED_MODULE_13__.useEffect)(() => {
-    if (!open) return;
-    if (context?.source === "node" && node?.data?.app) {
-      const matchedApp = APPS.find(app => app.name === node.data.app || app.id === node.data.app?.toLowerCase());
-      if (matchedApp) {
-        setMode("app");
-        setSelectedItem(matchedApp);
-        setStep("select");
-        if (node?.data?.config) {
-          Object.entries(node.data.config).forEach(([key, value]) => {
-            setFieldValue(key, value);
-          });
-        }
-        if (node?.data?.event) {
-          setFieldValue("actionType", node.data.event);
-        }
-      }
-    }
-  }, [open, node]);
-  console.log(node);
-  console.log(values, 'action values');
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsxs)(_ZAPComponents_Drawer__WEBPACK_IMPORTED_MODULE_9__["default"], {
     open: open,
     onClose: resetAll,
-    title: !mode ? "Choose Type" : !selectedItem ? `Select ${mode}` : selectedItem.name,
+    title: !mode ? "Choose Type" : selectedItem?.name,
     placement: "end",
     size: "md",
-    closeOnOverlayClick: true,
     footer: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_6__.HStack, {
       justify: "space-between",
-      w: "full",
       children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Button, {
         variant: "ghost",
         onClick: resetAll,
         children: "Cancel"
       }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Button, {
-        colorScheme: "blue",
         onClick: handleContinue,
-        isDisabled: isContinueDisabled(),
         children: step === "test" ? "Submit" : "Continue"
       })]
     }),
@@ -2037,25 +2020,21 @@ function ActionDrawer({
         justifyContent: "left",
         onClick: () => setMode("app"),
         children: "Apps"
-      }), TOOLS.map(item => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Button, {
-        width: "100%",
+      }), TOOLS.map(tool => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Button, {
+        w: "100%",
         justifyContent: "space-between",
         onClick: () => {
-          setSelectedItem(item);
-          setStep("select");
           setMode("tools");
+          setSelectedItem(tool);
         },
-        children: item.name
-      }, item.id))]
+        children: tool.name
+      }, tool.id))]
     }), mode && !selectedItem && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_7__.VStack, {
-      align: "stretch",
-      children: [LIST.map(item => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Button, {
-        justifyContent: "space-between",
-        onClick: () => {
-          setSelectedItem(item);
-          setStep("select");
-        },
-        children: [item.name, " \u2192"]
+      children: [LIST.map(item => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Button, {
+        justifyContent: "left",
+        w: "100%",
+        onClick: () => setSelectedItem(item),
+        children: item.name
       }, item.id)), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Button, {
         size: "sm",
         variant: "ghost",
@@ -2076,104 +2055,40 @@ function ActionDrawer({
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_8__.TabsTrigger, {
           value: "test",
           children: "Test"
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_8__.TabsIndicator, {})]
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_8__.TabsContent, {
+        })]
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_8__.TabsContent, {
         value: "select",
-        children: selectedItem.id === "condition" ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.Fragment, {
-          children: "Condition"
-        }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Flex, {
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
+          mb: 4,
+          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
+            fontSize: "sm",
+            children: "Action Type"
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(react_select__WEBPACK_IMPORTED_MODULE_15__["default"], {
+            options: actionOptions,
+            value: actionOptions.find(o => o.value === values.actionType) || null,
+            onChange: opt => setFieldValue("actionType", opt?.value)
+          })]
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Flex, {
           direction: "column",
           gap: 4,
-          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
-            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
-              mb: 0,
-              children: node?.data?.action === "trigger" && source === "node" ? "Trigger Type" : "Action Type"
-            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(react_select__WEBPACK_IMPORTED_MODULE_15__["default"], {
-              options: actionOptions,
-              value: actionOptions.find(opt => opt.value === values.actionType) || null,
-              onChange: opt => setFieldValue("actionType", opt?.value)
-            })]
-          }), selectedActionFields.map(field => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
-            children: renderField(field, values, setFieldValue)
-          }, field.key))]
-        })
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_8__.TabsContent, {
-        value: "configure",
-        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
-          margin: "0",
-          children: "There have only config data"
-        })
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_8__.TabsContent, {
+          children: selectedActionFields.map(field => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
+            children: renderField(field)
+          }, field.key))
+        })]
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_8__.TabsContent, {
         value: "test",
-        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
-          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Button, {
-            onClick: () => {
-              const paylod = {
-                workflow_hash: singleData?.version?.hash,
-                node_key: node?.id,
-                input: values
-              };
-              dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_10__.workFLowSingeNodeExction)(paylod));
-            },
-            children: "Run test"
-          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
-            children: "Response"
-          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
-            border: "1px solid",
-            borderColor: "gray.200",
-            borderRadius: "md",
-            bg: "gray.50",
-            p: 4,
-            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_8__.TabsRoot, {
-              defaultValue: "output",
-              children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_8__.TabsList, {
-                display: "flex",
-                gap: 6,
-                borderBottom: "1px solid",
-                borderColor: "gray.200",
-                mb: 4,
-                position: "relative",
-                children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_8__.TabsTrigger, {
-                  value: "input",
-                  children: "Input"
-                }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_8__.TabsTrigger, {
-                  value: "output",
-                  children: "Output"
-                }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_8__.TabsIndicator, {
-                  height: "2px",
-                  bg: "blue.500",
-                  borderRadius: "full"
-                })]
-              }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_8__.TabsContent, {
-                value: "input",
-                children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
-                  bg: "white",
-                  border: "1px solid",
-                  borderColor: "gray.200",
-                  borderRadius: "md",
-                  p: 3,
-                  fontSize: "sm",
-                  children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Code, {
-                    children: "input"
-                  })
-                })
-              }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_8__.TabsContent, {
-                value: "output",
-                children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
-                  bg: "white",
-                  border: "1px solid",
-                  borderColor: "gray.200",
-                  borderRadius: "md",
-                  p: 3,
-                  fontSize: "sm",
-                  children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Code, {
-                    children: "output"
-                  })
-                })
-              })]
-            })
-          })]
-        })
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Button, {
+          mb: 4,
+          onClick: () => dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_10__.workFLowSingeNodeExction)({
+            workflow_hash: singleData?.version?.hash,
+            node_key: node?.id,
+            input: values
+          })),
+          children: "Run test"
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Code, {
+          w: "100%",
+          children: "Output"
+        })]
       })]
     })]
   });
