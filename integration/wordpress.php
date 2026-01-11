@@ -17,17 +17,23 @@ class Wordpress extends IntegrationBase {
 
     public static function get_triggers(): array {
         return [
-            'publish_post'  => ['label' => 'Post Published', 'hook' => 'publish_post'],
-            'post_updated'  => ['label' => 'Post Updated',   'hook' => 'post_updated'],
-            'user_register' => ['label' => 'User Registered','hook' => 'user_register'],
-            'comment_post'  => ['label' => 'Comment Added',  'hook' => 'comment_post'],
+            'publish_post'              => ['label' => 'Post Published',           'hook' => 'publish_post'],
+            'post_updated'              => ['label' => 'Post Updated',             'hook' => 'post_updated'],
+            'transition_post_status'    => ['label' => 'Post Status Updated',      'hook' => 'transition_post_status'],
+            'wp_insert_post'            => ['label' => 'Revision Creation',        'hook' => 'wp_insert_post'],
+            'before_delete_post'        => ['label' => 'Post Deleted',             'hook' => 'before_delete_post'],
+            'delete_post'               => ['label' => 'Delete Post',              'hook' => 'delete_post'],
+            'user_register'             => ['label' => 'User Registered',          'hook' => 'user_register'],
+            'comment_post'              => ['label' => 'Comment Post',             'hook' => 'comment_post'],
+            'pre_comment_approved'      => ['label' => 'Pre-Approve Comment',      'hook' => 'pre_comment_approved'],
+            'edit_comment'              => ['label' => 'Edit Comment',             'hook' => 'edit_comment'],
+            'delete_comment'            => ['label' => 'Comment Deletion',         'hook' => 'delete_comment'],
             'trashed_comment'           => ['label' => 'Comment Trashed',          'hook' => 'trashed_comment'],
             'untrashed_comment'         => ['label' => 'Comment Untrashed',        'hook' => 'untrashed_comment'],
             'transition_comment_status' => ['label' => 'Comment Status Changed',   'hook' => 'transition_comment_status'],
             'untrashed_post'            => ['label' => 'Post Untrashed',           'hook' => 'untrashed_post'],
             'wp_update_comment_count'   => ['label' => 'Comment Count Updated',    'hook' => 'wp_update_comment_count'],
             'wp_set_comment_status'     => ['label' => 'Comment Status Set',       'hook' => 'wp_set_comment_status'],
-
         ];
     }
 
@@ -134,6 +140,95 @@ class Wordpress extends IntegrationBase {
                     'post_title' => $post->post_title,
                     'post_type'  => $post->post_type,
                     'status'     => $post->post_status,
+                ];
+
+            case 'transition_post_status':
+
+                $new_status = $args[0] ?? '';
+                    error_log( 'PPP new_status ID: ' . $new_status );
+
+                $old_status = $args[1] ?? '';
+                    error_log( 'PPP old_status ID: ' . $old_status );
+                $post = get_post( $args[2] ?? 0 );
+                if ( ! $post ) return false;
+
+                // Only run trigger if old status is not 'new'
+                if ( $old_status == 'new' ) {
+                    return false;
+                }
+
+                return [
+                    'post_id'    => $post->ID,
+                    'post_title' => $post->post_title,
+                    'post_type'  => $post->post_type,
+                    'old_status' => $old_status,
+                    'new_status' => $new_status,
+                ];
+
+            case 'wp_insert_post':
+
+                $post_id = $args[0] ?? 0;
+                $post = get_post( $post_id );
+                if ( ! $post || $post->post_type !== 'revision' ) return false;
+
+                $parent_post = get_post( $post->post_parent );
+                return [
+                    'revision_id'    => $post->ID,
+                    'parent_post_id' => $post->post_parent,
+                    'parent_title'   => $parent_post->post_title ?? '',
+                    'post_type'      => $parent_post->post_type ?? '',
+                ];
+
+            case 'before_delete_post':
+            case 'delete_post':
+
+                $post = get_post( $args[0] ?? 0 );
+                if ( ! $post ) return false;
+
+                return [
+                    'post_id'    => $post->ID,
+                    'post_title' => $post->post_title,
+                    'post_type'  => $post->post_type,
+                    'status'     => $post->post_status,
+                ];
+
+            case 'pre_comment_approved':
+
+                $approved = $args[0] ?? null;
+                $comment_data = $args[1] ?? [];
+
+                return [
+                    'approved'       => $approved,
+                    'comment_author' => $comment_data['comment_author'] ?? '',
+                    'comment_email'  => $comment_data['comment_author_email'] ?? '',
+                    'comment_content'=> $comment_data['comment_content'] ?? '',
+                    'post_id'        => $comment_data['comment_post_ID'] ?? 0,
+                ];
+
+            case 'edit_comment':
+
+                $comment_id = $args[0] ?? 0;
+                $comment = get_comment( $comment_id );
+                if ( ! $comment ) return false;
+
+                return [
+                    'comment_id' => $comment->comment_ID,
+                    'post_id'    => $comment->comment_post_ID,
+                    'content'    => $comment->comment_content,
+                    'status'     => $comment->comment_approved,
+                ];
+
+            case 'delete_comment':
+
+                $comment_id = $args[0] ?? 0;
+                $comment = get_comment( $comment_id );
+                if ( ! $comment ) return false;
+
+                return [
+                    'comment_id' => $comment->comment_ID,
+                    'post_id'    => $comment->comment_post_ID,
+                    'content'    => $comment->comment_content,
+                    'author'     => $comment->comment_author,
                 ];
 
             case 'user_register':
@@ -243,21 +338,22 @@ class Wordpress extends IntegrationBase {
                 ];
 
 
-            case 'wp_set_comment_status':
+          case 'wp_set_comment_status':
+    $comment_id = $args[0] ?? 0;
+    $status     = $args[1] ?? '';
+    $comment = get_comment( $comment_id );
 
+    if ( ! $comment ) {
+        return false;
+    }
 
-                $comment_id = $args[0] ?? 0;
-                $status = $args[1] ?? '';
-                $comment = get_comment( $comment_id );
-                if ( ! $comment ) return false;
+    return [
+        'comment_id' => $comment->comment_ID,
+        'post_id'    => $comment->comment_post_ID,
+        'status'     => $status,
+        'content'    => $comment->comment_content,
+    ];
 
-
-                return [
-                    'comment_id' => $comment->comment_ID,
-                    'post_id'    => $comment->comment_post_ID,
-                    'status'     => $status,
-                    'content'    => $comment->comment_content,
-                ];
 
 
         }

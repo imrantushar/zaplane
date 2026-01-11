@@ -1,24 +1,878 @@
-:root{--zaplane-font:"Roboto",sans-serif;--zaplane-primary:#006bff;--zaplane-second-primary:#8f7ee7;--zaplane-border-color:#cbd1d7;--zaplane-body-background:#f6f7f8;--zaplane-background:#fff;--zaplane-font-color:#0a2540;--zaplane-secondary:#738496;--zaplane-warn-muted:#738496;--zaplane-placing:#f15b50;--zaplane-warning:#fdb022;--zaplane-placeholder:#a2adb9;--zaplane-shadow:0px 0px 1px 0px rgba(20,26,36,.2),0px 1px 2px 0px rgba(20,26,36,.1);--zaplane-shadow-2:0px 0px 1px 0px rgba(16,24,40,.15),0px 8px 16px 0px rgba(20,26,36,.1);--zaplane-gray:#f6f7f8}#wpbody-content,#wpcontent{padding:0}.zaplane-select--width-full{width:100%}.zaplane-select--120{width:120px}.zaplane-select--136{width:136px}.zaplane-select--140{width:140px}.zaplane-select--150{width:150px}.zaplane-select--164{width:164px}.zaplane-select--214{width:214px}.zaplane-select--200{width:200px}.zaplane-select--250{width:250px}.zaplane-select--300{width:300px}.zaplane-select{font-size:14px}.zaplane-select .zaplane-select__control{background:#fff;border:1px solid #cbd1d7;border-radius:4px;box-shadow:none}.zaplane-select .zaplane-select__control .zaplane-select__input-container .zaplane-select__input{box-shadow:none;height:100%;min-height:unset}.zaplane-select .zaplane-select__control:hover{border:1px solid #cbd1d7}.zaplane-select--transparent .zaplane-select__control{border:none}.zaplane-select--transparent .zaplane-select__placeholder{color:var(--zaplane-font-color);font-size:14px;font-weight:500}.zaplane-select--transparent .zaplane-select__indicator-separator{display:none}.zaplane-select--transparent .zaplane-select__dropdown-indicator{color:var(--zaplane-font-color);font-weight:500;padding:8px 8px 8px 0}.zaplane-radio-option{align-items:center;cursor:pointer;display:flex;gap:8px}.zaplane-radio-input{-webkit-appearance:none;-moz-appearance:none;appearance:none;border:2px solid var(--zaplane-border-color);border-radius:50%;cursor:pointer;flex-shrink:0;height:20px;margin:0;position:relative;transition:all .2s ease;width:20px}.zaplane-radio-input:checked{background-color:var(--zaplane-primary-color);border-color:var(--zaplane-primary-color)}.zaplane-radio-input:checked:before{background-color:#fff;border-radius:50%;content:"";height:8px;left:50%;position:absolute;top:50%;transform:translate(-50%,-50%);width:8px}.zaplane-radio-input:focus{box-shadow:0 0 0 3px rgba(49,130,206,.1);outline:none}.zaplane-radio-input:hover{border-color:var(--zaplane-primary-color)}.zaplane-radio-label{cursor:pointer;font-size:14px;font-weight:500;-webkit-user-select:none;-moz-user-select:none;user-select:none}.zaplane-radio-option{color:var(--zaplane-gray-color)}.zaplane-radio-option.active,.zaplane-radio-option.active .zaplane-radio-label{color:var(--zaplane-primary-color)}@media(max-width:768px){.zaplane-ticket-table td>p{width:-moz-fit-content;width:fit-content}.zaplane-ticket-table table td,.zaplane-ticket-table table tr{display:revert}}.zaplaness-notification{align-items:center;background:#fff;border-radius:4px;box-shadow:0 12px 72px -8px rgba(16,24,40,.25);display:flex;gap:20px;justify-content:space-between;min-width:400px;padding:10px 16px;z-index:99999}.zaplaness-notification--success{background:#00ad6b;color:#fff}.zaplaness-notification--dashboard{bottom:35px;left:40%;position:fixed;transform:translateX(-50%)}.zaplaness-notification--dashboard .zaplaness-btn{background:transparent}.zaplaness-notification--lesson{bottom:35px;left:40%;padding:20px 32px;position:fixed;transform:translateX(-50%)}.zaplaness-notification--lesson .zaplaness-btn--bg-red{padding:4px!important}.zaplaness-notification--info{background:#7b68ee;color:#fff}.zaplaness-notification--warning{background:#fdb022;color:#fff}.zaplaness-notification--error{background:#ff4d4d;color:#fff}.zaplaness-notification .zaplaness-icon{border-radius:50%;height:20px;width:20px}.zaplaness-notification .zaplaness-icon,.zaplaness-notification .zaplaness-icon--check{align-items:center;display:flex;justify-content:center}.zaplaness-notification .zaplaness-icon--check:before{color:#f8f8f8;font-size:20px}.zaplaness-notification .zaplaness-icon--success{background:#00ad6b}.zaplaness-notification .zaplaness-icon--info{background:#7b68ee}.zaplaness-notification .zaplaness-icon--warning{background:#fdb022}.zaplaness-notification .zaplaness-icon--error{background:#ffeded}.zaplaness-notification .zaplaness-icon--notification{font-size:25px}.zaplaness-notification .zaplaness-icon--information{font-size:22px}.zaplaness-notification .zaplaness-icon--information:before{color:#fff}.zaplaness-notification .zaplaness-icon--information-error{font-size:22px}.zaplaness-notification .zaplaness-btn{padding:12px 0}.zaplaness-notification .zaplaness-btn .zaplaness-icon--close{background:transparent}.zaplaness-notification .zaplaness-btn .zaplaness-icon--close:before{color:#fff}.zaplaness-notification__message{align-items:center;display:flex;font-size:14px;font-weight:400;gap:20px;line-height:21px;margin:0}@media screen and (max-width:485px){.zaplaness-notification{min-width:90%}}.zaplaness-status{align-items:center;border-radius:45px;display:flex;font-size:14px;font-weight:400;gap:10px;justify-content:center;line-height:16px;min-width:50px;padding:8px 20px;text-align:center;text-transform:capitalize}.zaplaness-status--passed{background:rgba(22,163,74,.1);color:#16a34a}.zaplaness-status--failed{background:rgba(220,38,38,.1);color:#dc2626}.zaplaness-status--pending{background:rgba(234,179,8,.1);color:#eab308}
-.zaplane-wp-modal{width:600px}
-.react-flow{direction:ltr;--xy-edge-stroke-default:#b1b1b7;--xy-edge-stroke-width-default:1;--xy-edge-stroke-selected-default:#555;--xy-connectionline-stroke-default:#b1b1b7;--xy-connectionline-stroke-width-default:1;--xy-attribution-background-color-default:hsla(0,0%,100%,.5);--xy-minimap-background-color-default:#fff;--xy-minimap-mask-background-color-default:hsla(0,0%,94%,.6);--xy-minimap-mask-stroke-color-default:transparent;--xy-minimap-mask-stroke-width-default:1;--xy-minimap-node-background-color-default:#e2e2e2;--xy-minimap-node-stroke-color-default:transparent;--xy-minimap-node-stroke-width-default:2;--xy-background-color-default:transparent;--xy-background-pattern-dots-color-default:#91919a;--xy-background-pattern-lines-color-default:#eee;--xy-background-pattern-cross-color-default:#e2e2e2;background-color:var(--xy-background-color,var(--xy-background-color-default));--xy-node-border-default:1px solid #bbb;--xy-node-border-selected-default:1px solid #555;--xy-handle-background-color-default:#333;--xy-selection-background-color-default:rgba(150,150,180,.1);--xy-selection-border-default:1px dotted hsla(0,0%,61%,.8);--xy-resize-background-color-default:#3367d9}.react-flow.dark{--xy-edge-stroke-default:#3e3e3e;--xy-edge-stroke-width-default:1;--xy-edge-stroke-selected-default:#727272;--xy-connectionline-stroke-default:#b1b1b7;--xy-connectionline-stroke-width-default:1;--xy-attribution-background-color-default:hsla(0,0%,59%,.25);--xy-minimap-background-color-default:#141414;--xy-minimap-mask-background-color-default:rgba(60,60,60,.6);--xy-minimap-mask-stroke-color-default:transparent;--xy-minimap-mask-stroke-width-default:1;--xy-minimap-node-background-color-default:#2b2b2b;--xy-minimap-node-stroke-color-default:transparent;--xy-minimap-node-stroke-width-default:2;--xy-background-color-default:#141414;--xy-background-pattern-dots-color-default:#777;--xy-background-pattern-lines-color-default:#777;--xy-background-pattern-cross-color-default:#777;--xy-node-color-default:#f8f8f8}.react-flow__background{background-color:var(--xy-background-color-props,var(--xy-background-color,var(--xy-background-color-default)));pointer-events:none;z-index:-1}.react-flow__container{height:100%;left:0;position:absolute;top:0;width:100%}.react-flow__pane{z-index:1}.react-flow__pane.draggable{cursor:grab}.react-flow__pane.dragging{cursor:grabbing}.react-flow__pane.selection{cursor:pointer}.react-flow__viewport{pointer-events:none;transform-origin:0 0;z-index:2}.react-flow__renderer{z-index:4}.react-flow__selection{z-index:6}.react-flow__nodesselection-rect:focus,.react-flow__nodesselection-rect:focus-visible{outline:none}.react-flow__edge-path{fill:none;stroke:var(--xy-edge-stroke,var(--xy-edge-stroke-default));stroke-width:var(--xy-edge-stroke-width,var(--xy-edge-stroke-width-default))}.react-flow__connection-path{fill:none;stroke:var(--xy-connectionline-stroke,var(--xy-connectionline-stroke-default));stroke-width:var(--xy-connectionline-stroke-width,var(--xy-connectionline-stroke-width-default))}.react-flow .react-flow__edges{position:absolute}.react-flow .react-flow__edges svg{overflow:visible;pointer-events:none;position:absolute}.react-flow__edge{pointer-events:visibleStroke}.react-flow__edge.selectable{cursor:pointer}.react-flow__edge.animated path{animation:dashdraw .5s linear infinite;stroke-dasharray:5}.react-flow__edge.animated path.react-flow__edge-interaction{animation:none;stroke-dasharray:none}.react-flow__edge.inactive{pointer-events:none}.react-flow__edge.selected,.react-flow__edge:focus,.react-flow__edge:focus-visible{outline:none}.react-flow__edge.selectable:focus .react-flow__edge-path,.react-flow__edge.selectable:focus-visible .react-flow__edge-path,.react-flow__edge.selected .react-flow__edge-path{stroke:var(--xy-edge-stroke-selected,var(--xy-edge-stroke-selected-default))}.react-flow__edge-textwrapper{pointer-events:all}.react-flow__edge .react-flow__edge-text{pointer-events:none;-webkit-user-select:none;-moz-user-select:none;user-select:none}.react-flow__arrowhead polyline{stroke:var(--xy-edge-stroke,var(--xy-edge-stroke-default))}.react-flow__arrowhead polyline.arrowclosed{fill:var(--xy-edge-stroke,var(--xy-edge-stroke-default))}.react-flow__connection{pointer-events:none}.react-flow__connection .animated{animation:dashdraw .5s linear infinite;stroke-dasharray:5}svg.react-flow__connectionline{overflow:visible;position:absolute;z-index:1001}.react-flow__nodes{pointer-events:none;transform-origin:0 0}.react-flow__node{box-sizing:border-box;cursor:default;pointer-events:all;position:absolute;transform-origin:0 0;-webkit-user-select:none;-moz-user-select:none;user-select:none}.react-flow__node.selectable{cursor:pointer}.react-flow__node.draggable{cursor:grab;pointer-events:all}.react-flow__node.draggable.dragging{cursor:grabbing}.react-flow__nodesselection{pointer-events:none;transform-origin:left top;z-index:3}.react-flow__nodesselection-rect{cursor:grab;pointer-events:all;position:absolute}.react-flow__handle{background-color:var(--xy-handle-background-color,var(--xy-handle-background-color-default));min-height:5px;min-width:5px;pointer-events:none;position:absolute}.react-flow__handle.connectingfrom{pointer-events:all}.react-flow__handle.connectionindicator{cursor:crosshair;pointer-events:all}.react-flow__handle-bottom{bottom:0;left:50%;top:auto;transform:translate(-50%,50%)}.react-flow__handle-top{left:50%;top:0;transform:translate(-50%,-50%)}.react-flow__handle-left{left:0;top:50%;transform:translate(-50%,-50%)}.react-flow__handle-right{right:0;top:50%;transform:translate(50%,-50%)}.react-flow__edgeupdater{cursor:move;pointer-events:all}.react-flow__pane.selection .react-flow__panel{pointer-events:none}.react-flow__panel{margin:15px;position:absolute;z-index:5}.react-flow__panel.top{top:0}.react-flow__panel.bottom{bottom:0}.react-flow__panel.bottom.center,.react-flow__panel.top.center{left:50%;transform:translateX(-15px) translateX(-50%)}.react-flow__panel.left{left:0}.react-flow__panel.right{right:0}.react-flow__panel.left.center,.react-flow__panel.right.center{top:50%;transform:translateY(-15px) translateY(-50%)}.react-flow__attribution{background:var(--xy-attribution-background-color,var(--xy-attribution-background-color-default));font-size:10px;margin:0;padding:2px 3px}.react-flow__attribution a{color:#999;text-decoration:none}@keyframes dashdraw{0%{stroke-dashoffset:10}}.react-flow__edgelabel-renderer{pointer-events:none}.react-flow__edgelabel-renderer,.react-flow__viewport-portal{height:100%;left:0;position:absolute;top:0;-webkit-user-select:none;-moz-user-select:none;user-select:none;width:100%}.react-flow__minimap{background:var(
-    --xy-minimap-background-color-props,var(--xy-minimap-background-color,var(--xy-minimap-background-color-default))
-  )}.react-flow__minimap-svg{display:block}.react-flow__minimap-mask{fill:var(
-      --xy-minimap-mask-background-color-props,var(--xy-minimap-mask-background-color,var(--xy-minimap-mask-background-color-default))
-    );stroke:var(
-      --xy-minimap-mask-stroke-color-props,var(--xy-minimap-mask-stroke-color,var(--xy-minimap-mask-stroke-color-default))
-    );stroke-width:var(
-      --xy-minimap-mask-stroke-width-props,var(--xy-minimap-mask-stroke-width,var(--xy-minimap-mask-stroke-width-default))
-    )}.react-flow__minimap-node{fill:var(
-      --xy-minimap-node-background-color-props,var(--xy-minimap-node-background-color,var(--xy-minimap-node-background-color-default))
-    );stroke:var(
-      --xy-minimap-node-stroke-color-props,var(--xy-minimap-node-stroke-color,var(--xy-minimap-node-stroke-color-default))
-    );stroke-width:var(
-      --xy-minimap-node-stroke-width-props,var(--xy-minimap-node-stroke-width,var(--xy-minimap-node-stroke-width-default))
-    )}.react-flow__background-pattern.dots{fill:var(
-      --xy-background-pattern-color-props,var(--xy-background-pattern-color,var(--xy-background-pattern-dots-color-default))
-    )}.react-flow__background-pattern.lines{stroke:var(
-      --xy-background-pattern-color-props,var(--xy-background-pattern-color,var(--xy-background-pattern-lines-color-default))
-    )}.react-flow__background-pattern.cross{stroke:var(
-      --xy-background-pattern-color-props,var(--xy-background-pattern-color,var(--xy-background-pattern-cross-color-default))
-    )}.react-flow__controls{display:flex;flex-direction:column}.react-flow__controls.horizontal{flex-direction:row}.react-flow__controls-button{align-items:center;display:flex;height:26px;justify-content:center;padding:4px;width:26px}.react-flow__controls-button svg{fill:currentColor;max-height:12px;max-width:12px;width:100%}.react-flow__node-default,.react-flow__node-group,.react-flow__node-input,.react-flow__node-output{border:var(--xy-node-border,var(--xy-node-border-default));color:var(--xy-node-color,var(--xy-node-color-default))}.react-flow__node-default.selected,.react-flow__node-default:focus,.react-flow__node-default:focus-visible,.react-flow__node-group.selected,.react-flow__node-group:focus,.react-flow__node-group:focus-visible,.react-flow__node-input.selected,.react-flow__node-input:focus,.react-flow__node-input:focus-visible,.react-flow__node-output.selected,.react-flow__node-output:focus,.react-flow__node-output:focus-visible{border:var(--xy-node-border-selected,var(--xy-node-border-selected-default));outline:none}.react-flow__nodesselection-rect,.react-flow__selection{background:var(--xy-selection-background-color,var(--xy-selection-background-color-default));border:var(--xy-selection-border,var(--xy-selection-border-default))}.react-flow__resize-control{position:absolute}.react-flow__resize-control.left,.react-flow__resize-control.right{cursor:ew-resize}.react-flow__resize-control.bottom,.react-flow__resize-control.top{cursor:ns-resize}.react-flow__resize-control.bottom.right,.react-flow__resize-control.top.left{cursor:nwse-resize}.react-flow__resize-control.bottom.left,.react-flow__resize-control.top.right{cursor:nesw-resize}.react-flow__resize-control.handle{background-color:var(--xy-resize-background-color,var(--xy-resize-background-color-default));border:1px solid #fff;border-radius:1px;height:5px;translate:-50% -50%;width:5px}.react-flow__resize-control.handle.left{left:0;top:50%}.react-flow__resize-control.handle.right{left:100%;top:50%}.react-flow__resize-control.handle.top{left:50%;top:0}.react-flow__resize-control.handle.bottom{left:50%;top:100%}.react-flow__resize-control.handle.bottom.left,.react-flow__resize-control.handle.top.left{left:0}.react-flow__resize-control.handle.bottom.right,.react-flow__resize-control.handle.top.right{left:100%}.react-flow__resize-control.line{border-color:var(--xy-resize-background-color,var(--xy-resize-background-color-default));border-style:solid;border-width:0}.react-flow__resize-control.line.left,.react-flow__resize-control.line.right{height:100%;top:0;transform:translate(-50%);width:1px}.react-flow__resize-control.line.left{border-left-width:1px;left:0}.react-flow__resize-control.line.right{border-right-width:1px;left:100%}.react-flow__resize-control.line.bottom,.react-flow__resize-control.line.top{height:1px;left:0;transform:translateY(-50%);width:100%}.react-flow__resize-control.line.top{border-top-width:1px;top:0}.react-flow__resize-control.line.bottom{border-bottom-width:1px;top:100%}
-.zaplane-topbar-logo{background:#e2e0ff;border-radius:50%;padding:6px}
+/*!************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ../node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!../node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!../node_modules/@wordpress/scripts/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./assets/scss/backend.scss ***!
+  \************************************************************************************************************************************************************************************************************************************************************************************/
+:root {
+  --zaplane-font: "Roboto", sans-serif;
+  --zaplane-primary: #006BFF;
+  --zaplane-second-primary: #8F7EE7;
+  --zaplane-border-color: #CBD1D7;
+  --zaplane-body-background: #F6F7F8;
+  --zaplane-background: #FFFFFF;
+  --zaplane-font-color: #0A2540;
+  --zaplane-secondary: #738496;
+  --zaplane-warn-muted: #738496;
+  --zaplane-placing: #F15B50;
+  --zaplane-warning: #FDB022;
+  --zaplane-placeholder: #A2ADB9;
+  --zaplane-shadow: 0px 0px 1px 0px rgba(20, 26, 36, 0.2), 0px 1px 2px 0px rgba(20, 26, 36, 0.1);
+  --zaplane-shadow-2: 0px 0px 1px 0px rgba(16, 24, 40, 0.15), 0px 8px 16px 0px rgba(20, 26, 36, 0.1);
+  --zaplane-gray: #F6F7F8;
+}
+
+#wpbody-content {
+  padding: 0;
+}
+
+#wpcontent {
+  padding: 0;
+}
+
+.zaplane-select--width-full {
+  width: 100%;
+}
+
+.zaplane-select--120 {
+  width: 120px;
+}
+
+.zaplane-select--136 {
+  width: 136px;
+}
+
+.zaplane-select--140 {
+  width: 140px;
+}
+
+.zaplane-select--150 {
+  width: 150px;
+}
+
+.zaplane-select--164 {
+  width: 164px;
+}
+
+.zaplane-select--214 {
+  width: 214px;
+}
+
+.zaplane-select--200 {
+  width: 200px;
+}
+
+.zaplane-select--250 {
+  width: 250px;
+}
+
+.zaplane-select--300 {
+  width: 300px;
+}
+
+.zaplane-select {
+  font-size: 14px;
+}
+
+.zaplane-select .zaplane-select__control {
+  border: 1px solid #CBD1D7;
+  background: #FFF;
+  border-radius: 4px;
+  box-shadow: none;
+}
+
+.zaplane-select .zaplane-select__control .zaplane-select__input-container .zaplane-select__input {
+  box-shadow: none;
+  height: 100%;
+  min-height: unset;
+}
+
+.zaplane-select .zaplane-select__control:hover {
+  border: 1px solid #CBD1D7;
+}
+
+.zaplane-select--transparent .zaplane-select__control {
+  border: none;
+}
+
+.zaplane-select--transparent .zaplane-select__placeholder {
+  font-size: 14px;
+  color: var(--zaplane-font-color);
+  font-weight: 500;
+}
+
+.zaplane-select--transparent .zaplane-select__indicator-separator {
+  display: none;
+}
+
+.zaplane-select--transparent .zaplane-select__dropdown-indicator {
+  padding: 8px 8px 8px 0;
+  color: var(--zaplane-font-color);
+  font-weight: 500;
+}
+
+.zaplane-radio-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.zaplane-radio-input {
+  -webkit-appearance: none;
+     -moz-appearance: none;
+          appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--zaplane-border-color);
+  border-radius: 50%;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.zaplane-radio-input:checked {
+  border-color: var(--zaplane-primary-color);
+  background-color: var(--zaplane-primary-color);
+}
+
+.zaplane-radio-input:checked::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 8px;
+  height: 8px;
+  background-color: white;
+  border-radius: 50%;
+}
+
+.zaplane-radio-input:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+}
+
+.zaplane-radio-input:hover {
+  border-color: var(--zaplane-primary-color);
+}
+
+.zaplane-radio-label {
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+}
+
+.zaplane-radio-option {
+  color: var(--zaplane-gray-color);
+}
+
+.zaplane-radio-option.active {
+  color: var(--zaplane-primary-color);
+}
+
+.zaplane-radio-option.active .zaplane-radio-label {
+  color: var(--zaplane-primary-color);
+}
+
+@media (max-width: 768px) {
+  .zaplane-ticket-table td > p {
+    width: -moz-fit-content;
+    width: fit-content;
+  }
+  .zaplane-ticket-table table td, .zaplane-ticket-table table tr {
+    display: revert;
+  }
+}
+
+.zaplaness-notification {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 10px 16px;
+  box-shadow: 0px 12px 72px -8px rgba(16, 24, 40, 0.25);
+  border-radius: 4px;
+  min-width: 400px;
+  z-index: 99999;
+  background: #fff;
+}
+
+.zaplaness-notification--success {
+  background: #00AD6B;
+  color: #fff;
+}
+
+.zaplaness-notification--dashboard {
+  position: fixed;
+  left: 40%;
+  transform: translateX(-50%);
+  bottom: 35px;
+}
+
+.zaplaness-notification--dashboard .zaplaness-btn {
+  background: transparent;
+}
+
+.zaplaness-notification--lesson {
+  position: fixed;
+  left: 40%;
+  transform: translateX(-50%);
+  bottom: 35px;
+  padding: 20px 32px;
+}
+
+.zaplaness-notification--lesson .zaplaness-btn--bg-red {
+  padding: 4px !important;
+}
+
+.zaplaness-notification--info {
+  background: #7B68EE;
+  color: #fff;
+}
+
+.zaplaness-notification--warning {
+  background: #FDB022;
+  color: #fff;
+}
+
+.zaplaness-notification--error {
+  background: #FF4D4D;
+  color: #fff;
+}
+
+.zaplaness-notification .zaplaness-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.zaplaness-notification .zaplaness-icon--check {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.zaplaness-notification .zaplaness-icon--check::before {
+  font-size: 20px;
+  color: #f8f8f8;
+}
+
+.zaplaness-notification .zaplaness-icon--success {
+  background: #00AD6B;
+}
+
+.zaplaness-notification .zaplaness-icon--info {
+  background: #7B68EE;
+}
+
+.zaplaness-notification .zaplaness-icon--warning {
+  background: #FDB022;
+}
+
+.zaplaness-notification .zaplaness-icon--error {
+  background: #FFEDED;
+}
+
+.zaplaness-notification .zaplaness-icon--notification {
+  font-size: 25px;
+}
+
+.zaplaness-notification .zaplaness-icon--information {
+  font-size: 22px;
+}
+
+.zaplaness-notification .zaplaness-icon--information::before {
+  color: #fff;
+}
+
+.zaplaness-notification .zaplaness-icon--information-error {
+  font-size: 22px;
+}
+
+.zaplaness-notification .zaplaness-btn {
+  padding: 12px 0;
+}
+
+.zaplaness-notification .zaplaness-btn .zaplaness-icon--close {
+  background: transparent;
+}
+
+.zaplaness-notification .zaplaness-btn .zaplaness-icon--close::before {
+  color: #fff;
+}
+
+.zaplaness-notification__message {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 21px;
+  margin: 0;
+}
+
+@media screen and (max-width: 485px) {
+  .zaplaness-notification {
+    min-width: 90%;
+  }
+}
+
+.zaplaness-status {
+  align-items: center;
+  border-radius: 45px;
+  display: flex;
+  font-size: 14px;
+  font-weight: 400;
+  gap: 10px;
+  justify-content: center;
+  line-height: 16px;
+  min-width: 50px;
+  padding: 8px 20px;
+  text-align: center;
+  text-transform: capitalize;
+}
+
+.zaplaness-status--passed {
+  background: rgba(22, 163, 74, 0.1);
+  color: #16A34A;
+}
+
+.zaplaness-status--failed {
+  background: rgba(220, 38, 38, 0.1);
+  color: #DC2626;
+}
+
+.zaplaness-status--pending {
+  background: rgba(234, 179, 8, 0.1);
+  color: #EAB308;
+}
+/*!****************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ../node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!../node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!../node_modules/@wordpress/scripts/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./dev_zaplane/components/Modal/styles.scss ***!
+  \****************************************************************************************************************************************************************************************************************************************************************************************************/
+.zaplane-wp-modal {
+  width: 600px;
+}
+/*!*************************************************************************************************************************************************************************************************!*\
+  !*** css ../node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[2].use[1]!../node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[2].use[2]!../node_modules/@xyflow/react/dist/base.css ***!
+  \*************************************************************************************************************************************************************************************************/
+/* this will be exported as base.css and can be used for a basic styling */
+/* these are the necessary styles for React/Svelte Flow, they get used by base.css and style.css */
+.react-flow {
+  direction: ltr;
+
+  --xy-edge-stroke-default: #b1b1b7;
+  --xy-edge-stroke-width-default: 1;
+  --xy-edge-stroke-selected-default: #555;
+
+  --xy-connectionline-stroke-default: #b1b1b7;
+  --xy-connectionline-stroke-width-default: 1;
+
+  --xy-attribution-background-color-default: rgba(255, 255, 255, 0.5);
+
+  --xy-minimap-background-color-default: #fff;
+  --xy-minimap-mask-background-color-default: rgba(240, 240, 240, 0.6);
+  --xy-minimap-mask-stroke-color-default: transparent;
+  --xy-minimap-mask-stroke-width-default: 1;
+  --xy-minimap-node-background-color-default: #e2e2e2;
+  --xy-minimap-node-stroke-color-default: transparent;
+  --xy-minimap-node-stroke-width-default: 2;
+
+  --xy-background-color-default: transparent;
+  --xy-background-pattern-dots-color-default: #91919a;
+  --xy-background-pattern-lines-color-default: #eee;
+  --xy-background-pattern-cross-color-default: #e2e2e2;
+  background-color: var(--xy-background-color, var(--xy-background-color-default));
+  --xy-node-border-default: 1px solid #bbb;
+  --xy-node-border-selected-default: 1px solid #555;
+
+  --xy-handle-background-color-default: #333;
+
+  --xy-selection-background-color-default: rgba(150, 150, 180, 0.1);
+  --xy-selection-border-default: 1px dotted rgba(155, 155, 155, 0.8);
+  --xy-resize-background-color-default: #3367d9;
+}
+.react-flow.dark {
+  --xy-edge-stroke-default: #3e3e3e;
+  --xy-edge-stroke-width-default: 1;
+  --xy-edge-stroke-selected-default: #727272;
+
+  --xy-connectionline-stroke-default: #b1b1b7;
+  --xy-connectionline-stroke-width-default: 1;
+
+  --xy-attribution-background-color-default: rgba(150, 150, 150, 0.25);
+
+  --xy-minimap-background-color-default: #141414;
+  --xy-minimap-mask-background-color-default: rgba(60, 60, 60, 0.6);
+  --xy-minimap-mask-stroke-color-default: transparent;
+  --xy-minimap-mask-stroke-width-default: 1;
+  --xy-minimap-node-background-color-default: #2b2b2b;
+  --xy-minimap-node-stroke-color-default: transparent;
+  --xy-minimap-node-stroke-width-default: 2;
+
+  --xy-background-color-default: #141414;
+  --xy-background-pattern-dots-color-default: #777;
+  --xy-background-pattern-lines-color-default: #777;
+  --xy-background-pattern-cross-color-default: #777;
+  --xy-node-color-default: #f8f8f8;
+}
+.react-flow__background {
+  background-color: var(--xy-background-color-props, var(--xy-background-color, var(--xy-background-color-default)));
+  pointer-events: none;
+  z-index: -1;
+}
+.react-flow__container {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+}
+.react-flow__pane {
+  z-index: 1;
+}
+.react-flow__pane.draggable {
+    cursor: grab;
+  }
+.react-flow__pane.dragging {
+    cursor: grabbing;
+  }
+.react-flow__pane.selection {
+    cursor: pointer;
+  }
+.react-flow__viewport {
+  transform-origin: 0 0;
+  z-index: 2;
+  pointer-events: none;
+}
+.react-flow__renderer {
+  z-index: 4;
+}
+.react-flow__selection {
+  z-index: 6;
+}
+.react-flow__nodesselection-rect:focus,
+.react-flow__nodesselection-rect:focus-visible {
+  outline: none;
+}
+.react-flow__edge-path {
+  stroke: var(--xy-edge-stroke, var(--xy-edge-stroke-default));
+  stroke-width: var(--xy-edge-stroke-width, var(--xy-edge-stroke-width-default));
+  fill: none;
+}
+.react-flow__connection-path {
+  stroke: var(--xy-connectionline-stroke, var(--xy-connectionline-stroke-default));
+  stroke-width: var(--xy-connectionline-stroke-width, var(--xy-connectionline-stroke-width-default));
+  fill: none;
+}
+.react-flow .react-flow__edges {
+  position: absolute;
+}
+.react-flow .react-flow__edges svg {
+    overflow: visible;
+    position: absolute;
+    pointer-events: none;
+  }
+.react-flow__edge {
+  pointer-events: visibleStroke;
+}
+.react-flow__edge.selectable {
+    cursor: pointer;
+  }
+.react-flow__edge.animated path {
+    stroke-dasharray: 5;
+    animation: dashdraw 0.5s linear infinite;
+  }
+.react-flow__edge.animated path.react-flow__edge-interaction {
+    stroke-dasharray: none;
+    animation: none;
+  }
+.react-flow__edge.inactive {
+    pointer-events: none;
+  }
+.react-flow__edge.selected,
+  .react-flow__edge:focus,
+  .react-flow__edge:focus-visible {
+    outline: none;
+  }
+.react-flow__edge.selected .react-flow__edge-path,
+  .react-flow__edge.selectable:focus .react-flow__edge-path,
+  .react-flow__edge.selectable:focus-visible .react-flow__edge-path {
+    stroke: var(--xy-edge-stroke-selected, var(--xy-edge-stroke-selected-default));
+  }
+.react-flow__edge-textwrapper {
+    pointer-events: all;
+  }
+.react-flow__edge .react-flow__edge-text {
+    pointer-events: none;
+    -webkit-user-select: none;
+       -moz-user-select: none;
+            user-select: none;
+  }
+/* Arrowhead marker styles - use CSS custom properties as default */
+.react-flow__arrowhead polyline {
+  stroke: var(--xy-edge-stroke, var(--xy-edge-stroke-default));
+}
+.react-flow__arrowhead polyline.arrowclosed {
+  fill: var(--xy-edge-stroke, var(--xy-edge-stroke-default));
+}
+.react-flow__connection {
+  pointer-events: none;
+}
+.react-flow__connection .animated {
+    stroke-dasharray: 5;
+    animation: dashdraw 0.5s linear infinite;
+  }
+svg.react-flow__connectionline {
+  z-index: 1001;
+  overflow: visible;
+  position: absolute;
+}
+.react-flow__nodes {
+  pointer-events: none;
+  transform-origin: 0 0;
+}
+.react-flow__node {
+  position: absolute;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+  pointer-events: all;
+  transform-origin: 0 0;
+  box-sizing: border-box;
+  cursor: default;
+}
+.react-flow__node.selectable {
+    cursor: pointer;
+  }
+.react-flow__node.draggable {
+    cursor: grab;
+    pointer-events: all;
+  }
+.react-flow__node.draggable.dragging {
+      cursor: grabbing;
+    }
+.react-flow__nodesselection {
+  z-index: 3;
+  transform-origin: left top;
+  pointer-events: none;
+}
+.react-flow__nodesselection-rect {
+    position: absolute;
+    pointer-events: all;
+    cursor: grab;
+  }
+.react-flow__handle {
+  position: absolute;
+  pointer-events: none;
+  min-width: 5px;
+  min-height: 5px;
+  background-color: var(--xy-handle-background-color, var(--xy-handle-background-color-default));
+}
+.react-flow__handle.connectingfrom {
+    pointer-events: all;
+  }
+.react-flow__handle.connectionindicator {
+    pointer-events: all;
+    cursor: crosshair;
+  }
+.react-flow__handle-bottom {
+    top: auto;
+    left: 50%;
+    bottom: 0;
+    transform: translate(-50%, 50%);
+  }
+.react-flow__handle-top {
+    top: 0;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+.react-flow__handle-left {
+    top: 50%;
+    left: 0;
+    transform: translate(-50%, -50%);
+  }
+.react-flow__handle-right {
+    top: 50%;
+    right: 0;
+    transform: translate(50%, -50%);
+  }
+.react-flow__edgeupdater {
+  cursor: move;
+  pointer-events: all;
+}
+.react-flow__pane.selection .react-flow__panel {
+  pointer-events: none;
+}
+.react-flow__panel {
+  position: absolute;
+  z-index: 5;
+  margin: 15px;
+}
+.react-flow__panel.top {
+    top: 0;
+  }
+.react-flow__panel.bottom {
+    bottom: 0;
+  }
+.react-flow__panel.top.center, .react-flow__panel.bottom.center {
+      left: 50%;
+      transform: translateX(-15px) translateX(-50%);
+    }
+.react-flow__panel.left {
+    left: 0;
+  }
+.react-flow__panel.right {
+    right: 0;
+  }
+.react-flow__panel.left.center, .react-flow__panel.right.center {
+      top: 50%;
+      transform: translateY(-15px) translateY(-50%);
+    }
+.react-flow__attribution {
+  font-size: 10px;
+  background: var(--xy-attribution-background-color, var(--xy-attribution-background-color-default));
+  padding: 2px 3px;
+  margin: 0;
+}
+.react-flow__attribution a {
+    text-decoration: none;
+    color: #999;
+  }
+@keyframes dashdraw {
+  from {
+    stroke-dashoffset: 10;
+  }
+}
+.react-flow__edgelabel-renderer {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+  left: 0;
+  top: 0;
+}
+.react-flow__viewport-portal {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+}
+.react-flow__minimap {
+  background: var(
+    --xy-minimap-background-color-props,
+    var(--xy-minimap-background-color, var(--xy-minimap-background-color-default))
+  );
+}
+.react-flow__minimap-svg {
+    display: block;
+  }
+.react-flow__minimap-mask {
+    fill: var(
+      --xy-minimap-mask-background-color-props,
+      var(--xy-minimap-mask-background-color, var(--xy-minimap-mask-background-color-default))
+    );
+    stroke: var(
+      --xy-minimap-mask-stroke-color-props,
+      var(--xy-minimap-mask-stroke-color, var(--xy-minimap-mask-stroke-color-default))
+    );
+    stroke-width: var(
+      --xy-minimap-mask-stroke-width-props,
+      var(--xy-minimap-mask-stroke-width, var(--xy-minimap-mask-stroke-width-default))
+    );
+  }
+.react-flow__minimap-node {
+    fill: var(
+      --xy-minimap-node-background-color-props,
+      var(--xy-minimap-node-background-color, var(--xy-minimap-node-background-color-default))
+    );
+    stroke: var(
+      --xy-minimap-node-stroke-color-props,
+      var(--xy-minimap-node-stroke-color, var(--xy-minimap-node-stroke-color-default))
+    );
+    stroke-width: var(
+      --xy-minimap-node-stroke-width-props,
+      var(--xy-minimap-node-stroke-width, var(--xy-minimap-node-stroke-width-default))
+    );
+  }
+.react-flow__background-pattern.dots {
+    fill: var(
+      --xy-background-pattern-color-props,
+      var(--xy-background-pattern-color, var(--xy-background-pattern-dots-color-default))
+    );
+  }
+.react-flow__background-pattern.lines {
+    stroke: var(
+      --xy-background-pattern-color-props,
+      var(--xy-background-pattern-color, var(--xy-background-pattern-lines-color-default))
+    );
+  }
+.react-flow__background-pattern.cross {
+    stroke: var(
+      --xy-background-pattern-color-props,
+      var(--xy-background-pattern-color, var(--xy-background-pattern-cross-color-default))
+    );
+  }
+.react-flow__controls {
+  display: flex;
+  flex-direction: column;
+}
+.react-flow__controls.horizontal {
+    flex-direction: row;
+  }
+.react-flow__controls-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 26px;
+    width: 26px;
+    padding: 4px;
+  }
+.react-flow__controls-button svg {
+      width: 100%;
+      max-width: 12px;
+      max-height: 12px;
+      fill: currentColor;
+    }
+.react-flow__node-input,
+.react-flow__node-default,
+.react-flow__node-output,
+.react-flow__node-group {
+  border: var(--xy-node-border, var(--xy-node-border-default));
+  color: var(--xy-node-color, var(--xy-node-color-default));
+}
+.react-flow__node-input.selected,
+  .react-flow__node-input:focus,
+  .react-flow__node-input:focus-visible,
+  .react-flow__node-default.selected,
+  .react-flow__node-default:focus,
+  .react-flow__node-default:focus-visible,
+  .react-flow__node-output.selected,
+  .react-flow__node-output:focus,
+  .react-flow__node-output:focus-visible,
+  .react-flow__node-group.selected,
+  .react-flow__node-group:focus,
+  .react-flow__node-group:focus-visible {
+    outline: none;
+    border: var(--xy-node-border-selected, var(--xy-node-border-selected-default));
+  }
+.react-flow__nodesselection-rect,
+.react-flow__selection {
+  background: var(--xy-selection-background-color, var(--xy-selection-background-color-default));
+  border: var(--xy-selection-border, var(--xy-selection-border-default));
+}
+.react-flow__resize-control {
+  position: absolute;
+}
+.react-flow__resize-control.left,
+.react-flow__resize-control.right {
+  cursor: ew-resize;
+}
+.react-flow__resize-control.top,
+.react-flow__resize-control.bottom {
+  cursor: ns-resize;
+}
+.react-flow__resize-control.top.left,
+.react-flow__resize-control.bottom.right {
+  cursor: nwse-resize;
+}
+.react-flow__resize-control.bottom.left,
+.react-flow__resize-control.top.right {
+  cursor: nesw-resize;
+}
+/* handle styles */
+.react-flow__resize-control.handle {
+  width: 5px;
+  height: 5px;
+  border: 1px solid #fff;
+  border-radius: 1px;
+  background-color: var(--xy-resize-background-color, var(--xy-resize-background-color-default));
+  translate: -50% -50%;
+}
+.react-flow__resize-control.handle.left {
+  left: 0;
+  top: 50%;
+}
+.react-flow__resize-control.handle.right {
+  left: 100%;
+  top: 50%;
+}
+.react-flow__resize-control.handle.top {
+  left: 50%;
+  top: 0;
+}
+.react-flow__resize-control.handle.bottom {
+  left: 50%;
+  top: 100%;
+}
+.react-flow__resize-control.handle.top.left {
+  left: 0;
+}
+.react-flow__resize-control.handle.bottom.left {
+  left: 0;
+}
+.react-flow__resize-control.handle.top.right {
+  left: 100%;
+}
+.react-flow__resize-control.handle.bottom.right {
+  left: 100%;
+}
+/* line styles */
+.react-flow__resize-control.line {
+  border-color: var(--xy-resize-background-color, var(--xy-resize-background-color-default));
+  border-width: 0;
+  border-style: solid;
+}
+.react-flow__resize-control.line.left,
+.react-flow__resize-control.line.right {
+  width: 1px;
+  transform: translate(-50%, 0);
+  top: 0;
+  height: 100%;
+}
+.react-flow__resize-control.line.left {
+  left: 0;
+  border-left-width: 1px;
+}
+.react-flow__resize-control.line.right {
+  left: 100%;
+  border-right-width: 1px;
+}
+.react-flow__resize-control.line.top,
+.react-flow__resize-control.line.bottom {
+  height: 1px;
+  transform: translate(0, -50%);
+  left: 0;
+  width: 100%;
+}
+.react-flow__resize-control.line.top {
+  top: 0;
+  border-top-width: 1px;
+}
+.react-flow__resize-control.line.bottom {
+  border-bottom-width: 1px;
+  top: 100%;
+}
+
+/*!*****************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ../node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!../node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!../node_modules/@wordpress/scripts/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./dev_zaplane/components/TopBar/styles.scss ***!
+  \*****************************************************************************************************************************************************************************************************************************************************************************************************/
+.zaplane-topbar-logo {
+  background: #E2E0FF;
+  padding: 6px;
+  border-radius: 50%;
+}
+
+/*# sourceMappingURL=app.css.map*/

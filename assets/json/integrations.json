@@ -96,13 +96,76 @@
                 },
                 "comment_post": {
                     "key": "comment_post",
-                    "label": "Comment Added",
+                    "label": "Comment Post",
                     "hook": "comment_post",
                     "schema": [],
                     "outputs": [
                         "main"
                     ]
-                } ,
+                },
+                "transition_post_status": {
+                    "key": "transition_post_status",
+                    "label": "Post Status Updated",
+                    "hook": "transition_post_status",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "wp_insert_post": {
+                    "key": "wp_insert_post",
+                    "label": "Revision Creation",
+                    "hook": "wp_insert_post",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "before_delete_post": {
+                    "key": "before_delete_post",
+                    "label": "Post Deleted",
+                    "hook": "before_delete_post",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_post": {
+                    "key": "delete_post",
+                    "label": "Delete Post",
+                    "hook": "delete_post",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "pre_comment_approved": {
+                    "key": "pre_comment_approved",
+                    "label": "Pre-Approve Comment",
+                    "hook": "pre_comment_approved",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "edit_comment": {
+                    "key": "edit_comment",
+                    "label": "Edit Comment",
+                    "hook": "edit_comment",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_comment": {
+                    "key": "delete_comment",
+                    "label": "Comment Deletion",
+                    "hook": "delete_comment",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
 
                 "trashed_comment": {
                     "key": "trashed_comment",
