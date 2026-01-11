@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-01-11 09:28:45",
+    "generated_at": "2026-01-11 11:35:49",
     "integrations": {
         "wordpress": {
             "slug": "wordpress",
@@ -114,7 +114,7 @@
                 },
                 "trashed_post": {
                     "key": "trashed_post",
-                    "label": "Post Trashed",
+                    "label": "Post Moved to Trash",
                     "hook": "trashed_post",
                     "schema": [],
                     "outputs": [
@@ -200,6 +200,33 @@
                     "key": "customizer_registration",
                     "label": "Customizer Registration",
                     "hook": "customizer_registration",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add_attachment": {
+                    "key": "add_attachment",
+                    "label": "Add Attachment",
+                    "hook": "add_attachment",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "edit_attachment": {
+                    "key": "edit_attachment",
+                    "label": "Attachment Edit",
+                    "hook": "edit_attachment",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "save_attachment": {
+                    "key": "save_attachment",
+                    "label": "Attachment Save",
+                    "hook": "save_post",
                     "schema": [],
                     "outputs": [
                         "main"

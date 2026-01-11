@@ -17,18 +17,21 @@ class Wordpress extends IntegrationBase {
 
     public static function get_triggers(): array {
         return [
-            'publish_post'      => ['label' => 'Post Published',    'hook' => 'publish_post'],
-            'post_updated'      => ['label' => 'Post Updated',      'hook' => 'post_updated'],
-            'user_register'     => ['label' => 'User Registered',   'hook' => 'user_register'],
-            'comment_post'      => ['label' => 'Comment Added',     'hook' => 'comment_post'],
-            'deleted_post'      => ['label' => 'Post Deleted',      'hook' => 'before_delete_post'],
-            'trashed_post'      => ['label' => 'Post Trashed',      'hook' => 'trashed_post'],
-            'save_post'         => ['label' => 'Save Post',         'hook' => 'save_post'],
-            'activated_plugin'  => ['label' => 'Activate Plugin',   'hook' => 'activated_plugin'],
-            'deactivate_plugin' => ['label' => 'Deactivate Plugin', 'hook' => 'deactivate_plugin'],
-            'switch_theme'      => ['label' => 'Theme Switch',      'hook' => 'switch_theme'],
-            'switch_blog'       => ['label' => 'Blog Switch',       'hook' => 'switch_blog'],
-            'customizer_registration'       => ['label' => 'Customizer Registration',       'hook' => 'customizer_registration'],
+            'publish_post'            => ['label' => 'Post Published',          'hook' => 'publish_post'],
+            'post_updated'            => ['label' => 'Post Updated',            'hook' => 'post_updated'],
+            'user_register'           => ['label' => 'User Registered',         'hook' => 'user_register'],
+            'comment_post'            => ['label' => 'Comment Added',           'hook' => 'comment_post'],
+            'deleted_post'            => ['label' => 'Post Deleted',            'hook' => 'before_delete_post'],
+            'trashed_post'            => ['label' => 'Post Moved to Trash',     'hook' => 'trashed_post'],
+            'save_post'               => ['label' => 'Save Post',               'hook' => 'save_post'],
+            'activated_plugin'        => ['label' => 'Activate Plugin',         'hook' => 'activated_plugin'],
+            'deactivate_plugin'       => ['label' => 'Deactivate Plugin',       'hook' => 'deactivate_plugin'],
+            'switch_theme'            => ['label' => 'Theme Switch',            'hook' => 'switch_theme'],
+            'switch_blog'             => ['label' => 'Blog Switch',             'hook' => 'switch_blog'],
+            'customizer_registration' => ['label' => 'Customizer Registration', 'hook' => 'customizer_registration'],
+            'add_attachment'          => ['label' => 'Add Attachment',          'hook' => 'add_attachment'],
+            'edit_attachment'         => ['label' => 'Attachment Edit',         'hook' => 'edit_attachment'],
+            'save_attachment'         => ['label' => 'Attachment Save',         'hook' => 'save_post'],
         ];
     }
 
@@ -220,6 +223,54 @@ class Wordpress extends IntegrationBase {
 
                 return [
                     'message' => 'Customizer Registration',
+                ];
+
+            case 'add_attachment' : 
+                $attachment_id = $args[0] ?? 0;
+                if ( ! $attachment_id ) return false;
+
+                $attachment = get_post( $attachment_id );
+                if ( ! $attachment || $attachment->post_type !== 'attachment' ) return false;
+
+                return [
+                    'attachment_id' => $attachment_id,
+                    'post_title'    => $attachment->post_title,
+                    'mime_type'     => get_post_mime_type( $attachment_id ),
+                    'url'           => wp_get_attachment_url( $attachment_id ),
+                    'uploaded_by'   => $attachment->post_author,
+                    'uploaded_at'   => $attachment->post_date,
+                ];
+
+            case 'edit_attachment' : 
+                $attachment_id = $args[0] ?? 0;
+                if ( ! $attachment_id ) return false;
+
+                $attachment = get_post( $attachment_id );
+                if ( ! $attachment || $attachment->post_type !== 'attachment' ) return false;
+
+                return [
+                    'attachment_id' => $attachment_id,
+                    'post_title'    => $attachment->post_title,
+                    'mime_type'     => get_post_mime_type( $attachment_id ),
+                    'url'           => wp_get_attachment_url( $attachment_id ),
+                    'edited_by'     => get_current_user_id(),
+                    'edited_at'     => current_time( 'mysql' ),
+                ];
+
+            case 'save_attachment' : 
+                $attachment_id = $args[0] ?? 0;
+                if ( ! $attachment_id ) return false;
+
+                $attachment = get_post( $attachment_id );
+                if ( ! $attachment || $attachment->post_type !== 'attachment' ) return false;
+
+                return [
+                    'attachment_id' => $attachment_id,
+                    'post_title'    => $attachment->post_title,
+                    'mime_type'     => get_post_mime_type( $attachment_id ),
+                    'url'           => wp_get_attachment_url( $attachment_id ),
+                    'saved_by'      => get_current_user_id(),
+                    'saved_at'      => current_time( 'mysql' ),
                 ];
 
         }
