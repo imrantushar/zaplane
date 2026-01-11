@@ -1,11 +1,12 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-01-03 04:20:07",
-    "integrations": {
+    "generated_at": "2026-01-08 10:08:42",
+    "apps": {
         "wordpress": {
             "slug": "wordpress",
             "name": "Wordpress",
             "icon": "",
+            "category": "app",
             "triggers": {
                 "publish_post": {
                     "key": "publish_post",
@@ -180,6 +181,7 @@
             "slug": "woo",
             "name": "Woocommerce",
             "icon": "",
+            "category": "app",
             "triggers": {
                 "new_order": {
                     "key": "new_order",
@@ -223,6 +225,7 @@
             "slug": "slack",
             "name": "Slack",
             "icon": "",
+            "category": "app",
             "triggers": {
                 "message_received": {
                     "key": "message_received",
@@ -245,36 +248,11 @@
                 }
             }
         },
-        "gmail": {
-            "slug": "gmail",
-            "name": "Gmail",
-            "icon": "",
-            "triggers": {
-                "new_email": {
-                    "key": "new_email",
-                    "label": "New Email",
-                    "hook": "gmail_new_email",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                }
-            },
-            "actions": {
-                "send_email": {
-                    "key": "send_email",
-                    "label": "Send Email",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                }
-            }
-        },
         "trello": {
             "slug": "trello",
             "name": "Trello",
             "icon": "",
+            "category": "app",
             "triggers": {
                 "card_created": {
                     "key": "card_created",
@@ -301,6 +279,7 @@
             "slug": "stripe",
             "name": "Stripe",
             "icon": "",
+            "category": "app",
             "triggers": {
                 "payment_succeeded": {
                     "key": "payment_succeeded",
@@ -323,26 +302,172 @@
                 }
             }
         },
-        "mailerlite": {
-            "slug": "mailerlite",
-            "name": "Mailerlite",
+        "webhook": {
+            "slug": "webhook",
+            "name": "Webhook",
             "icon": "",
+            "category": "app",
             "triggers": {
-                "subscriber_added": {
-                    "key": "subscriber_added",
-                    "label": "Subscriber Added",
-                    "hook": "mailerlite_webhook",
-                    "schema": [],
+                "incoming": {
+                    "key": "incoming",
+                    "label": "Incoming Webhook",
+                    "hook": null,
+                    "schema": [
+                        {
+                            "key": "path",
+                            "label": "Webhook Path",
+                            "type": "text",
+                            "required": true,
+                            "help": "Example: order-created"
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
                 }
             },
+            "actions": []
+        }
+    },
+    "tools": {
+        "condition": {
+            "slug": "condition",
+            "name": "Condition",
+            "icon": "",
+            "category": "tool",
+            "triggers": [],
             "actions": {
-                "add_subscriber": {
-                    "key": "add_subscriber",
-                    "label": "Add Subscriber",
-                    "schema": [],
+                "if": {
+                    "key": "if",
+                    "label": "If Condition",
+                    "schema": [
+                        {
+                            "key": "expression",
+                            "label": "Condition",
+                            "type": "expression",
+                            "required": true,
+                            "help": "Example: {{post.status}} == \"publish\""
+                        }
+                    ],
+                    "outputs": [
+                        "true",
+                        "false"
+                    ]
+                }
+            }
+        },
+        "delay": {
+            "slug": "delay",
+            "name": "Delay",
+            "icon": "",
+            "category": "tool",
+            "triggers": [],
+            "actions": {
+                "wait": {
+                    "key": "wait",
+                    "label": "Wait / Delay",
+                    "schema": [
+                        {
+                            "key": "seconds",
+                            "label": "Wait Seconds",
+                            "type": "number",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
+        },
+        "iterator": {
+            "slug": "iterator",
+            "name": "Iterator",
+            "icon": "",
+            "category": "tool",
+            "triggers": [],
+            "actions": []
+        },
+        "Http": {
+            "slug": "Http",
+            "name": "HTTP Request",
+            "icon": "",
+            "category": "tool",
+            "triggers": [],
+            "actions": {
+                "request": {
+                    "key": "request",
+                    "label": "Send HTTP Request",
+                    "schema": [
+                        {
+                            "key": "url",
+                            "label": "URL",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "method",
+                            "label": "Method",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "GET",
+                                    "value": "GET"
+                                },
+                                {
+                                    "label": "POST",
+                                    "value": "POST"
+                                },
+                                {
+                                    "label": "PUT",
+                                    "value": "PUT"
+                                },
+                                {
+                                    "label": "DELETE",
+                                    "value": "DELETE"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "headers",
+                            "label": "Headers (JSON)",
+                            "type": "textarea"
+                        },
+                        {
+                            "key": "body",
+                            "label": "Body",
+                            "type": "expression"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
+        },
+        "variable": {
+            "slug": "variable",
+            "name": "Set Variable",
+            "icon": "",
+            "category": "tool",
+            "triggers": [],
+            "actions": {
+                "set": {
+                    "key": "set",
+                    "label": "Set Variable",
+                    "schema": [
+                        {
+                            "key": "name",
+                            "label": "Variable Name",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "value",
+                            "label": "Value",
+                            "type": "expression"
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
