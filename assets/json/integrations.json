@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-01-11 11:35:49",
+    "generated_at": "2026-01-11 12:53:58",
     "integrations": {
         "wordpress": {
             "slug": "wordpress",
@@ -226,6 +226,15 @@
                 "save_attachment": {
                     "key": "save_attachment",
                     "label": "Attachment Save",
+                    "hook": "save_post",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_attachment": {
+                    "key": "update_attachment",
+                    "label": "Attachment Update",
                     "hook": "save_post",
                     "schema": [],
                     "outputs": [

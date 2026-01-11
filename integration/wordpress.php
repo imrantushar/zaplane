@@ -32,6 +32,7 @@ class Wordpress extends IntegrationBase {
             'add_attachment'          => ['label' => 'Add Attachment',          'hook' => 'add_attachment'],
             'edit_attachment'         => ['label' => 'Attachment Edit',         'hook' => 'edit_attachment'],
             'save_attachment'         => ['label' => 'Attachment Save',         'hook' => 'save_post'],
+            'update_attachment'       => ['label' => 'Attachment Update',       'hook' => 'save_post'],
         ];
     }
 
@@ -214,7 +215,7 @@ class Wordpress extends IntegrationBase {
                 return [
                     'blog_id'   => $blog,
                     'blog_url'  => get_home_url( $blog ),
-                    'blog_name' => get_bloginfo( 'name' ),
+                    'blog_name' => get_blog_option( $blog, 'blogname' ),
                 ];
 
             case 'customizer_registration' :
@@ -269,7 +270,23 @@ class Wordpress extends IntegrationBase {
                     'post_title'    => $attachment->post_title,
                     'mime_type'     => get_post_mime_type( $attachment_id ),
                     'url'           => wp_get_attachment_url( $attachment_id ),
-                    'saved_by'      => get_current_user_id(),
+                    'saved_by'      => get_current_user_id() ? : 0,
+                    'saved_at'      => current_time( 'mysql' ),
+                ];
+
+            case 'update_attachment' : 
+                $attachment_id = $args[0] ?? 0;
+                if ( ! $attachment_id ) return false;
+
+                $attachment = get_post( $attachment_id );
+                if ( ! $attachment || $attachment->post_type !== 'attachment' ) return false;
+
+                return [
+                    'attachment_id' => $attachment_id,
+                    'post_title'    => $attachment->post_title,
+                    'mime_type'     => get_post_mime_type( $attachment_id ),
+                    'url'           => wp_get_attachment_url( $attachment_id ),
+                    'saved_by'      => get_current_user_id() ? : 0,
                     'saved_at'      => current_time( 'mysql' ),
                 ];
 
