@@ -306,7 +306,93 @@
                     "outputs": [
                         "main"
                     ]
+                } ,
+              "untrash_post": {
+                    "key": "untrash_post",
+                    "label": "Untrash Post",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "Post ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "untrash_comment": {
+                    "key": "untrash_comment",
+                    "label": "Untrash Comment",
+                    "schema": [
+                        {
+                            "key": "comment_id",
+                            "label": "Comment ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_comment_count": {
+                    "key": "update_comment_count",
+                    "label": "Update Comment Count",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "Post ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "set_comment_status": {
+                    "key": "set_comment_status",
+                    "label": "Set Comment Status",
+                    "schema": [
+                        {
+                            "key": "comment_id",
+                            "label": "Comment ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "status",
+                            "label": "Status",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Approved",
+                                    "value": "1"
+                                },
+                                {
+                                    "label": "Pending",
+                                    "value": "0"
+                                },
+                                {
+                                    "label": "Spam",
+                                    "value": "spam"
+                                },
+                                {
+                                    "label": "Trash",
+                                    "value": "trash"
+                                }
+                            ],
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
                 }
+            
+              
             }
         },
         "woo": {
