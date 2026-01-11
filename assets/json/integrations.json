@@ -102,7 +102,140 @@
                     "outputs": [
                         "main"
                     ]
+                } ,
+
+                "trashed_comment": {
+                    "key": "trashed_comment",
+                    "label": "Comment Trashed",
+                    "hook": "trashed_comment",
+                    "schema": [
+                        {
+                            "key": "post_type",
+                            "label": "Post Type",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "post_types",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "untrashed_comment": {
+                    "key": "untrashed_comment",
+                    "label": "Comment Untrashed",
+                    "hook": "untrashed_comment",
+                    "schema": [
+                        {
+                            "key": "post_type",
+                            "label": "Post Type",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "post_types",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "transition_comment_status": {
+                    "key": "transition_comment_status",
+                    "label": "Comment Status Changed",
+                    "hook": "transition_comment_status",
+                    "schema": [
+                        {
+                            "key": "from_status",
+                            "label": "From Status",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Approved",
+                                    "value": "1"
+                                },
+                                {
+                                    "label": "Pending",
+                                    "value": "0"
+                                },
+                                {
+                                    "label": "Spam",
+                                    "value": "spam"
+                                },
+                                {
+                                    "label": "Trash",
+                                    "value": "trash"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "to_status",
+                            "label": "To Status",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Approved",
+                                    "value": "1"
+                                },
+                                {
+                                    "label": "Pending",
+                                    "value": "0"
+                                },
+                                {
+                                    "label": "Spam",
+                                    "value": "spam"
+                                },
+                                {
+                                    "label": "Trash",
+                                    "value": "trash"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "untrashed_post": {
+                    "key": "untrashed_post",
+                    "label": "Post Untrashed",
+                    "hook": "untrashed_post",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "wp_update_comment_count": {
+                    "key": "wp_update_comment_count",
+                    "label": "Comment Count Updated",
+                    "hook": "wp_update_comment_count",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "wp_set_comment_status": {
+                    "key": "wp_set_comment_status",
+                    "label": "Comment Status Set",
+                    "hook": "wp_set_comment_status",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
                 }
+              
             },
             "actions": {
                 "create_post": {

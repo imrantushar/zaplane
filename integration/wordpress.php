@@ -21,6 +21,13 @@ class Wordpress extends IntegrationBase {
             'post_updated'  => ['label' => 'Post Updated',   'hook' => 'post_updated'],
             'user_register' => ['label' => 'User Registered','hook' => 'user_register'],
             'comment_post'  => ['label' => 'Comment Added',  'hook' => 'comment_post'],
+            'trashed_comment'           => ['label' => 'Comment Trashed',          'hook' => 'trashed_comment'],
+            'untrashed_comment'         => ['label' => 'Comment Untrashed',        'hook' => 'untrashed_comment'],
+            'transition_comment_status' => ['label' => 'Comment Status Changed',   'hook' => 'transition_comment_status'],
+            'untrashed_post'            => ['label' => 'Post Untrashed',           'hook' => 'untrashed_post'],
+            'wp_update_comment_count'   => ['label' => 'Comment Count Updated',    'hook' => 'wp_update_comment_count'],
+            'wp_set_comment_status'     => ['label' => 'Comment Status Set',       'hook' => 'wp_set_comment_status'],
+
         ];
     }
 
@@ -51,6 +58,50 @@ class Wordpress extends IntegrationBase {
                         ['label'=>'Draft','value'=>'draft'],
                     ]
                 ]
+                
+            ];
+        }
+         if ( in_array( $trigger, ['trashed_comment','untrashed_comment'], true ) ) {
+            return [
+                [
+                    'key'=>'post_type',
+                    'label'=>'Post Type',
+                    'type'=>'select',
+                    'dynamic'=>[
+                        'integration'=>'wordpress',
+                        'query'=>'post_types',
+                        'select'=>['name','label'],
+                    ],
+                    'required'=>false,
+                ],
+            ];
+        }
+
+
+        if ( $trigger === 'transition_comment_status' ) {
+            return [
+                [
+                    'key'=>'from_status',
+                    'label'=>'From Status',
+                    'type'=>'select',
+                    'options'=>[
+                        ['label'=>'Approved','value'=>'1'],
+                        ['label'=>'Pending','value'=>'0'],
+                        ['label'=>'Spam','value'=>'spam'],
+                        ['label'=>'Trash','value'=>'trash'],
+                    ]
+                ],
+                [
+                    'key'=>'to_status',
+                    'label'=>'To Status',
+                    'type'=>'select',
+                    'options'=>[
+                        ['label'=>'Approved','value'=>'1'],
+                        ['label'=>'Pending','value'=>'0'],
+                        ['label'=>'Spam','value'=>'spam'],
+                        ['label'=>'Trash','value'=>'trash'],
+                    ]
+                ],
             ];
         }
 
@@ -106,6 +157,109 @@ class Wordpress extends IntegrationBase {
                     'post_id'    => $comment->comment_post_ID,
                     'content'    => $comment->comment_content,
                 ];
+
+            case 'trashed_comment':
+            case 'untrashed_comment':
+
+
+                $comment = get_comment( $args[0] ?? 0 );
+                if ( ! $comment ) return false;
+
+
+                // Apply post type filter if specified
+                if ( ! empty($node['config']['post_type']) ) {
+                    $post = get_post( $comment->comment_post_ID );
+                    if ( ! $post || $post->post_type !== $node['config']['post_type'] ) {
+                        return false;
+                    }
+                }
+
+
+                return [
+                    'comment_id' => $comment->comment_ID,
+                    'post_id'    => $comment->comment_post_ID,
+                    'content'    => $comment->comment_content,
+                    'status'     => $comment->comment_approved,
+                ];
+
+
+            case 'transition_comment_status':
+
+
+                $comment_id = $args[1] ?? 0;
+                $comment = get_comment( $comment_id );
+                if ( ! $comment ) return false;
+
+
+                $new_status = $args[0] ?? '';
+                $old_status = $args[2] ?? '';
+
+
+                // Apply status filters
+                if ( ! empty($node['config']['from_status']) && $old_status !== $node['config']['from_status'] ) {
+                    return false;
+                }
+                if ( ! empty($node['config']['to_status']) && $new_status !== $node['config']['to_status'] ) {
+                    return false;
+                }
+
+
+                return [
+                    'comment_id' => $comment->comment_ID,
+                    'post_id'    => $comment->comment_post_ID,
+                    'old_status' => $old_status,
+                    'new_status' => $new_status,
+                    'content'    => $comment->comment_content,
+                ];
+
+
+            case 'untrashed_post':
+
+
+                $post = get_post( $args[0] ?? 0 );
+                if ( ! $post ) return false;
+
+
+                return [
+                    'post_id'    => $post->ID,
+                    'post_title' => $post->post_title,
+                    'post_type'  => $post->post_type,
+                    'status'     => $post->post_status,
+                ];
+
+
+            case 'wp_update_comment_count':
+
+
+                $post_id = $args[0] ?? 0;
+                $post = get_post( $post_id );
+                if ( ! $post ) return false;
+
+
+                return [
+                    'post_id'       => $post_id,
+                    'comment_count' => $post->comment_count,
+                    'post_title'    => $post->post_title,
+                ];
+
+
+            case 'wp_set_comment_status':
+
+
+                $comment_id = $args[0] ?? 0;
+                $status = $args[1] ?? '';
+                $comment = get_comment( $comment_id );
+                if ( ! $comment ) return false;
+
+
+                return [
+                    'comment_id' => $comment->comment_ID,
+                    'post_id'    => $comment->comment_post_ID,
+                    'status'     => $status,
+                    'content'    => $comment->comment_content,
+                ];
+
+
         }
 
         return false;
@@ -119,6 +273,11 @@ class Wordpress extends IntegrationBase {
         return [
             'create_post'   => ['label'=>'Create Post'],
             'update_option' => ['label'=>'Update Option'],
+            'untrash_post'          => ['label'=>'Untrash Post'],
+            'untrash_comment'       => ['label'=>'Untrash Comment'],
+            'update_comment_count'  => ['label'=>'Update Comment Count'],
+            'set_comment_status'    => ['label'=>'Set Comment Status'],
+
         ];
     }
 
@@ -169,6 +328,64 @@ class Wordpress extends IntegrationBase {
                 ['key'=>'value','label'=>'Value','type'=>'expression'],
             ];
         }
+   if ( $action === 'untrash_post' ) {
+            return [
+                [
+                    'key'=>'post_id',
+                    'label'=>'Post ID',
+                    'type'=>'expression',
+                    'required'=>true,
+                ],
+            ];
+        }
+
+
+        if ( $action === 'untrash_comment' ) {
+            return [
+                [
+                    'key'=>'comment_id',
+                    'label'=>'Comment ID',
+                    'type'=>'expression',
+                    'required'=>true,
+                ],
+            ];
+        }
+
+
+        if ( $action === 'update_comment_count' ) {
+            return [
+                [
+                    'key'=>'post_id',
+                    'label'=>'Post ID',
+                    'type'=>'expression',
+                    'required'=>true,
+                ],
+            ];
+        }
+
+
+        if ( $action === 'set_comment_status' ) {
+            return [
+                [
+                    'key'=>'comment_id',
+                    'label'=>'Comment ID',
+                    'type'=>'expression',
+                    'required'=>true,
+                ],
+                [
+                    'key'=>'status',
+                    'label'=>'Status',
+                    'type'=>'select',
+                    'options'=>[
+                        ['label'=>'Approved','value'=>'1'],
+                        ['label'=>'Pending','value'=>'0'],
+                        ['label'=>'Spam','value'=>'spam'],
+                        ['label'=>'Trash','value'=>'trash'],
+                    ],
+                    'required'=>true,
+                ],
+            ];
+        }
 
         return [];
     }
@@ -195,6 +412,25 @@ class Wordpress extends IntegrationBase {
             case 'update_option':
                 update_option( $config['option_name'], $config['value'] );
                 return ['port'=>'main','data'=>[]];
+           case 'untrash_post':
+                $result = wp_untrash_post( $config['post_id'] );
+                return ['port'=>'main','data'=>['success'=>(bool)$result,'post_id'=>$config['post_id']]];
+
+
+            case 'untrash_comment':
+                $result = wp_untrash_comment( $config['comment_id'] );
+                return ['port'=>'main','data'=>['success'=>(bool)$result,'comment_id'=>$config['comment_id']]];
+
+
+            case 'update_comment_count':
+                wp_update_comment_count( $config['post_id'] );
+                $post = get_post( $config['post_id'] );
+                return ['port'=>'main','data'=>['post_id'=>$config['post_id'],'comment_count'=>$post->comment_count ?? 0]];
+
+
+            case 'set_comment_status':
+                $result = wp_set_comment_status( $config['comment_id'], $config['status'] );
+                return ['port'=>'main','data'=>['success'=>(bool)$result,'comment_id'=>$config['comment_id'],'status'=>$config['status']]];                
         }
 
         return ['port'=>'main','data'=>$input];
