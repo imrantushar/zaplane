@@ -1032,8 +1032,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _pages_logs__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./pages/logs */ "./dev_zaplane/containers/BackendDashboard/pages/logs/index.js");
 /* harmony import */ var _pages_queue__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./pages/queue */ "./dev_zaplane/containers/BackendDashboard/pages/queue/index.js");
 /* harmony import */ var _pages_setting__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./pages/setting */ "./dev_zaplane/containers/BackendDashboard/pages/setting/index.js");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__);
+/* harmony import */ var _pages_connections__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./pages/connections */ "./dev_zaplane/containers/BackendDashboard/pages/connections/index.js");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__);
+
 
 
 
@@ -1046,22 +1048,22 @@ __webpack_require__.r(__webpack_exports__);
 const renderSwitch = (page, id, action, path) => {
   switch (page) {
     case 'zaplane':
-      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.Fragment, {
+      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.Fragment, {
         children: "Zaplane Dashboard"
       });
     case 'zaplane-workflows':
       if (action || id) {
-        return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_pages_workflows_workFlowMotion__WEBPACK_IMPORTED_MODULE_3__["default"], {
+        return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_pages_workflows_workFlowMotion__WEBPACK_IMPORTED_MODULE_3__["default"], {
           id: id
         });
       }
-      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_pages_workflows__WEBPACK_IMPORTED_MODULE_2__["default"], {});
+      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_pages_workflows__WEBPACK_IMPORTED_MODULE_2__["default"], {});
     case 'zaplane-logs':
-      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_pages_logs__WEBPACK_IMPORTED_MODULE_5__["default"], {});
-    case 'zaplane-queue':
-      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_pages_queue__WEBPACK_IMPORTED_MODULE_6__["default"], {});
+      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_pages_logs__WEBPACK_IMPORTED_MODULE_5__["default"], {});
+    case 'zaplane-connections':
+      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_pages_connections__WEBPACK_IMPORTED_MODULE_8__["default"], {});
     case 'zaplane-settings':
-      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_pages_setting__WEBPACK_IMPORTED_MODULE_7__["default"], {});
+      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_pages_setting__WEBPACK_IMPORTED_MODULE_7__["default"], {});
 
     // case 'zaplane-settings':
     // 	return <Settings />;
@@ -1087,18 +1089,197 @@ const renderSwitch = (page, id, action, path) => {
     // 	return <Leaderboards />;
 
     default:
-      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.Fragment, {
+      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.Fragment, {
         children: "No page found"
       });
   }
 };
 function BackendDashboard() {
   const query = (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_0__.useQuery)();
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)("div", {
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxs)("div", {
     className: "zaplane-admin-content",
-    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_ZAPComponents_Notification__WEBPACK_IMPORTED_MODULE_4__["default"], {}), renderSwitch(query.get('page'), parseInt(query.get('id')), query.get('action'), query.get('path'))]
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_ZAPComponents_Notification__WEBPACK_IMPORTED_MODULE_4__["default"], {}), renderSwitch(query.get('page'), parseInt(query.get('id')), query.get('action'), query.get('path'))]
   });
 }
+
+/***/ },
+
+/***/ "./dev_zaplane/containers/BackendDashboard/pages/connections/index.js"
+/*!****************************************************************************!*\
+  !*** ./dev_zaplane/containers/BackendDashboard/pages/connections/index.js ***!
+  \****************************************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var react_redux__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/dist/react-redux.mjs");
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/box/index.js");
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/text/index.js");
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/badge/badge.js");
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/button/button.js");
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/button/icon-button.js");
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/flex/flex.js");
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/stack/h-stack.js");
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/stack/v-stack.js");
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_10___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_10__);
+/* harmony import */ var react_icons_fa__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! react-icons/fa */ "./node_modules/react-icons/fa/index.mjs");
+/* harmony import */ var react_icons_fi__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! react-icons/fi */ "./node_modules/react-icons/fi/index.mjs");
+/* harmony import */ var react_select__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! react-select */ "./node_modules/react-select/dist/react-select.esm.js");
+/* harmony import */ var _ZAPRedux_Slices_connectionsSlice_connectionsSlice__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! @ZAPRedux/Slices/connectionsSlice/connectionsSlice */ "./dev_zaplane/redux/Slices/connectionsSlice/connectionsSlice.js");
+/* harmony import */ var _ZAPComponents_Modal_WPModal__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! @ZAPComponents/Modal/WPModal */ "./dev_zaplane/components/Modal/WPModal.js");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__);
+
+
+
+
+
+
+
+
+
+
+const Connections = () => {
+  const dispatch = (0,react_redux__WEBPACK_IMPORTED_MODULE_1__.useDispatch)();
+  const connections = (0,react_redux__WEBPACK_IMPORTED_MODULE_1__.useSelector)(state => state.connections?.list || []);
+  const [isModalOpen, setIsModalOpen] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
+  const [selectedApp, setSelectedApp] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(null);
+  const [loadingOAuth, setLoadingOAuth] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
+
+  // Load connections
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    dispatch((0,_ZAPRedux_Slices_connectionsSlice_connectionsSlice__WEBPACK_IMPORTED_MODULE_14__.fetchConnections)());
+  }, [dispatch]);
+
+  // Start OAuth
+  const connectionAuth = async () => {
+    if (!selectedApp) return;
+    try {
+      setLoadingOAuth(true);
+      const res = await dispatch((0,_ZAPRedux_Slices_connectionsSlice_connectionsSlice__WEBPACK_IMPORTED_MODULE_14__.initOAuth)({
+        app: selectedApp.value,
+        name: selectedApp.label // ✅ correct name
+      })).unwrap();
+      const popup = window.open(res.auth_url, "oauth_popup", "width=600,height=700");
+      const handler = event => {
+        if (event.data?.type === "zaplane_oauth_callback") {
+          window.removeEventListener("message", handler);
+          popup?.close();
+          if (event.data.data?.success) {
+            dispatch((0,_ZAPRedux_Slices_connectionsSlice_connectionsSlice__WEBPACK_IMPORTED_MODULE_14__.fetchConnections)());
+            setIsModalOpen(false);
+            setSelectedApp(null);
+          }
+        }
+      };
+      window.addEventListener("message", handler);
+    } catch (e) {
+      console.error("OAuth failed", e);
+    } finally {
+      setLoadingOAuth(false);
+    }
+  };
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Box, {
+    p: 6,
+    borderWidth: "1px",
+    borderRadius: "md",
+    boxShadow: "sm",
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_9__.VStack, {
+      align: "stretch",
+      spacing: 6,
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_8__.HStack, {
+        justify: "space-between",
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Text, {
+          fontSize: "xl",
+          fontWeight: "bold",
+          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_10__.__)("Connections", "zaplane")
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.Button, {
+          leftIcon: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(react_icons_fa__WEBPACK_IMPORTED_MODULE_11__.FaSlack, {}),
+          variant: "outline",
+          onClick: () => setIsModalOpen(true),
+          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_10__.__)("Create credential", "zaplane")
+        })]
+      }), connections.length === 0 ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Text, {
+        color: "gray.500",
+        children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_10__.__)("No connections found", "zaplane")
+      }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_9__.VStack, {
+        align: "stretch",
+        spacing: 3,
+        children: connections.map(conn => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_7__.Flex, {
+          p: 4,
+          borderWidth: "1px",
+          borderRadius: "md",
+          justify: "space-between",
+          align: "center",
+          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_8__.HStack, {
+            spacing: 3,
+            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(react_icons_fa__WEBPACK_IMPORTED_MODULE_11__.FaSlack, {
+              color: "#4A154B"
+            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Box, {
+              children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Text, {
+                fontWeight: "medium",
+                children: conn.name
+              }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Badge, {
+                colorScheme: conn.status === "active" ? "green" : "gray",
+                children: conn.status
+              })]
+            })]
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_8__.HStack, {
+            spacing: 2,
+            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_6__.IconButton, {
+              size: "sm",
+              icon: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(react_icons_fi__WEBPACK_IMPORTED_MODULE_12__.FiRefreshCw, {}),
+              "aria-label": "Test connection",
+              onClick: () => dispatch((0,_ZAPRedux_Slices_connectionsSlice_connectionsSlice__WEBPACK_IMPORTED_MODULE_14__.testConnection)(conn.id))
+            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_6__.IconButton, {
+              size: "sm",
+              colorScheme: "red",
+              icon: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(react_icons_fi__WEBPACK_IMPORTED_MODULE_12__.FiTrash2, {}),
+              "aria-label": "Delete connection",
+              onClick: () => dispatch((0,_ZAPRedux_Slices_connectionsSlice_connectionsSlice__WEBPACK_IMPORTED_MODULE_14__.deleteConnection)(conn.id))
+            })]
+          })]
+        }, conn.id))
+      })]
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_ZAPComponents_Modal_WPModal__WEBPACK_IMPORTED_MODULE_15__["default"], {
+      title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_10__.__)("Create credential", "zaplane"),
+      isOpen: isModalOpen,
+      onRequestClose: () => setIsModalOpen(false),
+      size: "medium",
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Box, {
+        px: 4,
+        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_9__.VStack, {
+          spacing: 4,
+          align: "stretch",
+          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Text, {
+            children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_10__.__)("Select an app or service to connect", "zaplane")
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(react_select__WEBPACK_IMPORTED_MODULE_13__["default"], {
+            value: selectedApp,
+            onChange: setSelectedApp,
+            options: [{
+              value: "slack",
+              label: "Slack OAuth2 API"
+            }]
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.Button, {
+            width: "220px",
+            colorScheme: "blue",
+            onClick: connectionAuth,
+            isLoading: loadingOAuth,
+            isDisabled: !selectedApp,
+            children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_10__.__)("Connect My Account", "zaplane")
+          })]
+        })
+      })
+    })]
+  });
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Connections);
 
 /***/ },
 
@@ -3502,6 +3683,115 @@ const {
 
 /***/ },
 
+/***/ "./dev_zaplane/redux/Slices/connectionsSlice/connectionsSlice.js"
+/*!***********************************************************************!*\
+  !*** ./dev_zaplane/redux/Slices/connectionsSlice/connectionsSlice.js ***!
+  \***********************************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__),
+/* harmony export */   deleteConnection: () => (/* binding */ deleteConnection),
+/* harmony export */   fetchAuthFields: () => (/* binding */ fetchAuthFields),
+/* harmony export */   fetchConnections: () => (/* binding */ fetchConnections),
+/* harmony export */   initOAuth: () => (/* binding */ initOAuth),
+/* harmony export */   resetAuthFields: () => (/* binding */ resetAuthFields),
+/* harmony export */   resetOAuth: () => (/* binding */ resetOAuth),
+/* harmony export */   testConnection: () => (/* binding */ testConnection)
+/* harmony export */ });
+/* harmony import */ var _reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @reduxjs/toolkit */ "./node_modules/@reduxjs/toolkit/dist/redux-toolkit.modern.mjs");
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @ZAPUtils/helper */ "./dev_zaplane/utils/helper.js");
+/* harmony import */ var _notificationSlice_notificationSlice__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../notificationSlice/notificationSlice */ "./dev_zaplane/redux/Slices/notificationSlice/notificationSlice.js");
+
+
+
+
+
+// get all connection
+const fetchConnections = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyncThunk)('zaplane/fetchConnections', async ({}, thunkAPI) => {
+  try {
+    const res = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.get(_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.namespace + 'connections');
+    return res.data;
+  } catch (e) {
+    return (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.handleSliceError)(thunkAPI, e);
+  }
+});
+
+// get auth filed with key
+const fetchAuthFields = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyncThunk)('zaplane/connections/authFields', async (app, thunkAPI) => {
+  try {
+    const res = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.get(_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.namespace + `connections/auth-fields/${app}`);
+    return res.data;
+  } catch (e) {
+    return (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.handleSliceError)(thunkAPI, e);
+  }
+});
+
+// start auth
+const initOAuth = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyncThunk)('zaplane/initOAuth', async ({
+  app,
+  name
+}, thunkAPI) => {
+  try {
+    const res = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.post(_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.namespace + 'connections/oauth/init', {
+      app,
+      name
+    });
+    return res.data;
+  } catch (e) {
+    return (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.handleSliceError)(thunkAPI, e);
+  }
+});
+
+// test connection
+const testConnection = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyncThunk)('zaplane/testConnection', async (connectionId, thunkAPI) => {
+  try {
+    const res = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.post(_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.namespace + `connections/${connectionId}/test`);
+    (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.handleSliceSuccess)(thunkAPI, res.data?.message || (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Connection successful', 'workflow'));
+    return {
+      id: connectionId,
+      result: res.data
+    };
+  } catch (e) {
+    return (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.handleSliceError)(thunkAPI, e);
+  }
+});
+
+//  deleted connection 
+const deleteConnection = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyncThunk)('zaplane/deleteConnection', async (connectionId, thunkAPI) => {
+  try {
+    await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.delete(_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.namespace + `connections/${connectionId}`);
+    thunkAPI.dispatch((0,_notificationSlice_notificationSlice__WEBPACK_IMPORTED_MODULE_3__.showNotification)({
+      type: 'success',
+      message: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Connection deleted', 'workflow')
+    }));
+    return connectionId;
+  } catch (e) {
+    return (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.handleSliceError)(thunkAPI, e);
+  }
+});
+const connectionsSlice = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createSlice)({
+  name: 'connections',
+  initialState: {
+    list: []
+  },
+  reducers: {},
+  extraReducers: builder => {
+    builder;
+  }
+});
+const {
+  resetAuthFields,
+  resetOAuth
+} = connectionsSlice.actions;
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (connectionsSlice.reducer);
+
+/***/ },
+
 /***/ "./dev_zaplane/redux/Slices/executionSlice/executionSlice.js"
 /*!*******************************************************************!*\
   !*** ./dev_zaplane/redux/Slices/executionSlice/executionSlice.js ***!
@@ -4196,13 +4486,15 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Slices_logsSlice_logsSlice__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./Slices/logsSlice/logsSlice */ "./dev_zaplane/redux/Slices/logsSlice/logsSlice.js");
 /* harmony import */ var _Slices_queueSlice_queueSlice__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./Slices/queueSlice/queueSlice */ "./dev_zaplane/redux/Slices/queueSlice/queueSlice.js");
 /* harmony import */ var _Slices_executionSlice_executionSlice__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./Slices/executionSlice/executionSlice */ "./dev_zaplane/redux/Slices/executionSlice/executionSlice.js");
-/* harmony import */ var _Slices_settingSlice_settingSlice__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./Slices/settingSlice/settingSlice */ "./dev_zaplane/redux/Slices/settingSlice/settingSlice.js");
-/* harmony import */ var _Slices_notificationSlice_notificationSlice__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./Slices/notificationSlice/notificationSlice */ "./dev_zaplane/redux/Slices/notificationSlice/notificationSlice.js");
-/* harmony import */ var redux_logger__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! redux-logger */ "./node_modules/redux-logger/dist/redux-logger.js");
-/* harmony import */ var redux_logger__WEBPACK_IMPORTED_MODULE_9___default = /*#__PURE__*/__webpack_require__.n(redux_logger__WEBPACK_IMPORTED_MODULE_9__);
+/* harmony import */ var _Slices_connectionsSlice_connectionsSlice__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./Slices/connectionsSlice/connectionsSlice */ "./dev_zaplane/redux/Slices/connectionsSlice/connectionsSlice.js");
+/* harmony import */ var _Slices_settingSlice_settingSlice__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./Slices/settingSlice/settingSlice */ "./dev_zaplane/redux/Slices/settingSlice/settingSlice.js");
+/* harmony import */ var _Slices_notificationSlice_notificationSlice__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./Slices/notificationSlice/notificationSlice */ "./dev_zaplane/redux/Slices/notificationSlice/notificationSlice.js");
+/* harmony import */ var redux_logger__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! redux-logger */ "./node_modules/redux-logger/dist/redux-logger.js");
+/* harmony import */ var redux_logger__WEBPACK_IMPORTED_MODULE_10___default = /*#__PURE__*/__webpack_require__.n(redux_logger__WEBPACK_IMPORTED_MODULE_10__);
 
 
 // Import all the reducers you have created
+
 
 
 
@@ -4222,17 +4514,18 @@ __webpack_require__.r(__webpack_exports__);
 const store = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.configureStore)({
   reducer: {
     // Register the reducer from each slice here
-    notification: _Slices_notificationSlice_notificationSlice__WEBPACK_IMPORTED_MODULE_8__["default"],
+    notification: _Slices_notificationSlice_notificationSlice__WEBPACK_IMPORTED_MODULE_9__["default"],
     adminmenu: _Slices_menuSlice_menuSlice__WEBPACK_IMPORTED_MODULE_2__["default"],
     app: _Slices_appSlice_appSlice__WEBPACK_IMPORTED_MODULE_1__["default"],
     workflows: _Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_3__["default"],
     logs: _Slices_logsSlice_logsSlice__WEBPACK_IMPORTED_MODULE_4__["default"],
     queue: _Slices_queueSlice_queueSlice__WEBPACK_IMPORTED_MODULE_5__["default"],
     execution: _Slices_executionSlice_executionSlice__WEBPACK_IMPORTED_MODULE_6__["default"],
-    setting: _Slices_settingSlice_settingSlice__WEBPACK_IMPORTED_MODULE_7__["default"]
+    connections: _Slices_connectionsSlice_connectionsSlice__WEBPACK_IMPORTED_MODULE_7__["default"],
+    setting: _Slices_settingSlice_settingSlice__WEBPACK_IMPORTED_MODULE_8__["default"]
     // Future reducers will be added here (e.g., points, settings)
   },
-  middleware: getDefaultMiddleware => getDefaultMiddleware().concat((redux_logger__WEBPACK_IMPORTED_MODULE_9___default()))
+  middleware: getDefaultMiddleware => getDefaultMiddleware().concat((redux_logger__WEBPACK_IMPORTED_MODULE_10___default()))
 });
 
 /***/ },
