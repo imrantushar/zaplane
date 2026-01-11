@@ -27,6 +27,8 @@ class Wordpress extends IntegrationBase {
             'activated_plugin'  => ['label' => 'Activate Plugin',   'hook' => 'activated_plugin'],
             'deactivate_plugin' => ['label' => 'Deactivate Plugin', 'hook' => 'deactivate_plugin'],
             'switch_theme'      => ['label' => 'Theme Switch',      'hook' => 'switch_theme'],
+            'switch_blog'       => ['label' => 'Blog Switch',       'hook' => 'switch_blog'],
+            'customizer_registration'       => ['label' => 'Customizer Registration',       'hook' => 'customizer_registration'],
         ];
     }
 
@@ -63,31 +65,15 @@ class Wordpress extends IntegrationBase {
         if ( $trigger === 'activated_plugin' ) {
             return [
                 [
-                    'key'=>'plugin',
-                    'label'=>'Deactivate Plugin',
-                    'type'=>'select',
-                    'dynamic'=>[
-                        'integration'=>'wordpress',
-                        'query'=>'inactive_plugins',
-                        'select'=>['file','name'],
+                    'key'     => 'plugin',
+                    'label'   => 'Inactive Plugin',
+                    'type'    => 'select',
+                    'dynamic' =>[
+                        'integration' => 'wordpress',
+                        'query'       => 'inactive_plugins',
+                        'select'      => [ 'file', 'name' ],
                     ],
-                    'required'=>true,
-                ],
-            ];
-        }
-
-        if ( $trigger === 'deactivate_plugin' ) {
-            return [
-                [
-                    'key'=>'plugin',
-                    'label'=>'Active Plugin',
-                    'type'=>'select',
-                    'dynamic'=>[
-                        'integration'=>'wordpress',
-                        'query'=>'active_plugins',
-                        'select'=>['file', 'name' ],
-                    ],
-                    'required'=>true,
+                    'required' => true,
                 ],
             ];
         }
@@ -95,15 +81,15 @@ class Wordpress extends IntegrationBase {
         if ( $trigger === 'switch_theme' ) {
             return [
                 [
-                    'key'=>'theme',
-                    'label'=>'Theme Switch',
-                    'type'=>'select',
-                    'dynamic'=>[
-                        'integration'=>'wordpress',
-                        'query'=>'deactivate_theme',
-                        'select'=>['file', 'name' ],
+                    'key'     => 'theme',
+                    'label'   => 'Theme Switch',
+                    'type'    => 'select',
+                    'dynamic' => [
+                        'integration' => 'wordpress',
+                        'query'       => 'deactivate_theme',
+                        'select'      => [ 'file', 'name' ],
                     ],
-                    'required'=>true,
+                    'required' => true,
                 ],
             ];
         }
@@ -217,6 +203,25 @@ class Wordpress extends IntegrationBase {
                 return [
                     'theme' => $theme,
                 ];
+
+            case 'switch_blog' :
+                $blog = $args[0] ?? 0;
+                if ( ! $blog ) return false;
+
+                return [
+                    'blog_id'   => $blog,
+                    'blog_url'  => get_home_url( $blog ),
+                    'blog_name' => get_bloginfo( 'name' ),
+                ];
+
+            case 'customizer_registration' :
+                $customizer = $args[0] ?? 0;
+                if ( ! $customizer ) return false;
+
+                return [
+                    'message' => 'Customizer Registration',
+                ];
+
         }
 
         return false;
@@ -228,13 +233,13 @@ class Wordpress extends IntegrationBase {
 
     public static function get_actions(): array {
         return [
-            'create_post'   => ['label'=>'Create Post'],
-            'update_option' => ['label'=>'Update Option'],
-            'update_post_title' => ['label'=>'Update Post Title'],
-            'delete_post' => ['label'=>'Delete Post'],
-            'activated_plugin' => ['label'=>'Activate Plugin'],
-            'deactivate_plugin' => ['label'=>'Deactivate Plugin'],
-            'switch_theme' => ['label'=>'Theme Switch'],
+            'create_post'       => ['label' => 'Create Post'],
+            'update_option'     => ['label' => 'Update Option'],
+            'update_post_title' => ['label' => 'Update Post Title'],
+            'delete_post'       => ['label' => 'Delete Post'],
+            'activate_plugin'   => ['label' => 'Activate Plugin'],
+            'deactivate_plugin' => ['label' => 'Deactivate Plugin'],
+            'switch_theme'      => ['label' => 'Theme Switch'],
         ];
     }
 
@@ -246,34 +251,34 @@ class Wordpress extends IntegrationBase {
         if ( $action === 'create_post' ) {
             return [
                 [
-                    'key'=>'post_title',
-                    'label'=>'Title',
-                    'type'=>'expression',
-                    'required'=>true,
+                    'key'      => 'post_title',
+                    'label'    => 'Title',
+                    'type'     => 'expression',
+                    'required' => true,
                 ],
                 [
-                    'key'=>'post_content',
-                    'label'=>'Content',
-                    'type'=>'textarea',
+                    'key'   => 'post_content',
+                    'label' => 'Content',
+                    'type'  => 'textarea',
                 ],
                 [
-                    'key'=>'post_type',
-                    'label'=>'Post Type',
-                    'type'=>'select',
-                    'dynamic'=>[
-                        'integration'=>'wordpress',
-                        'query'=>'post_types',
-                        'select'=>['name','label'],
+                    'key'     => 'post_type',
+                    'label'   => 'Post Type',
+                    'type'    => 'select',
+                    'dynamic' => [
+                        'integration' => 'wordpress',
+                        'query'       => 'post_types',
+                        'select'      => [ 'name', 'label' ],
                     ],
-                    'required'=>true,
+                    'required' => true,
                 ],
                 [
-                    'key'=>'post_status',
-                    'label'=>'Status',
-                    'type'=>'select',
-                    'options'=>[
-                        ['label'=>'Draft','value'=>'draft'],
-                        ['label'=>'Publish','value'=>'publish'],
+                    'key'     => 'post_status',
+                    'label'   => 'Status',
+                    'type'    => 'select',
+                    'options' => [
+                        ['label' => 'Draft', 'value'   => 'draft' ],
+                        ['label' => 'Publish', 'value' => 'publish' ],
                     ],
                 ],
             ];
@@ -282,15 +287,15 @@ class Wordpress extends IntegrationBase {
         if ( $action === 'update_option' ) {
             return [
                 [
-                    'key'=>'option_name',
-                    'label'=>'Option',
-                    'type'=>'text',
-                    'required'=>true
+                    'key'      => 'option_name',
+                    'label'    => 'Option',
+                    'type'     => 'text',
+                    'required' => true
                 ],
                 [
-                    'key'=>'value',
-                    'label'=>'Value',
-                    'type'=>'expression'
+                    'key'   => 'value',
+                    'label' => 'Value',
+                    'type'  => 'expression'
                 ],
             ];
         }
@@ -298,16 +303,16 @@ class Wordpress extends IntegrationBase {
         if ( $action === 'update_post_title' ) {
             return [
                 [
-                    'key'=>'post_id',
-                    'label'=>'Post ID',
-                    'type'=>'expression',
-                    'required'=>true,
+                    'key'      => 'post_id',
+                    'label'    => 'Post ID',
+                    'type'     => 'expression',
+                    'required' => true,
                 ],
                 [
-                    'key'=>'post_title',
-                    'label'=>'New Post Title',
-                    'type'=>'expression',
-                    'required'=>true,
+                    'key'      => 'post_title',
+                    'label'    => 'New Post Title',
+                    'type'     => 'expression',
+                    'required' => true,
                 ],
             ];
         }
@@ -315,26 +320,26 @@ class Wordpress extends IntegrationBase {
         if ( $action === 'delete_post' ) {
             return [
                 [
-                    'key'=>'post_id',
-                    'label'=>'Post ID to Delete',
-                    'type'=>'expression', 
-                    'required'=>true,
+                    'key'      => 'post_id',
+                    'label'    => 'Post ID to Delete',
+                    'type'     => 'expression', 
+                    'required' => true,
                 ],
             ]; 
         }
 
-        if ( $action === 'activated_plugin' ) {
+        if ( $action === 'activate_plugin' ) {
             return [
                 [
-                    'key'=>'plugin',
-                    'label'=>'Deactivate Plugin',
-                    'type'=>'select',
-                    'dynamic'=>[
-                        'integration'=>'wordpress',
-                        'query'=>'inactive_plugins',
-                        'select'=>['file','name'],
+                    'key'     => 'plugin',
+                    'label'   => 'Inactive Plugin',
+                    'type'    => 'select',
+                    'dynamic' => [
+                        'integration' => 'wordpress',
+                        'query'       => 'inactive_plugins',
+                        'select'      => [ 'file', 'name' ],
                     ],
-                    'required'=>true,
+                    'required' => true,
                 ],
             ];
         }
@@ -342,15 +347,15 @@ class Wordpress extends IntegrationBase {
         if ( $action === 'deactivate_plugin' ) {
             return [
                 [
-                    'key'=>'plugin',
-                    'label'=>'Active Plugin',
-                    'type'=>'select',
-                    'dynamic'=>[
-                        'integration'=>'wordpress',
-                        'query'=>'active_plugins',
-                        'select'=>['file', 'name' ],
+                    'key'     => 'plugin',
+                    'label'   => 'Active Plugin',
+                    'type'    => 'select',
+                    'dynamic' => [
+                        'integration' => 'wordpress',
+                        'query'       => 'active_plugins',
+                        'select'      => [ 'file', 'name' ],
                     ],
-                    'required'=>true,
+                    'required' => true,
                 ],
             ];
         }
@@ -358,15 +363,15 @@ class Wordpress extends IntegrationBase {
         if ( $action === 'switch_theme' ) {
             return [
                 [
-                    'key'=>'theme',
-                    'label'=>'Theme Switch',
-                    'type'=>'select',
-                    'dynamic'=>[
-                        'integration'=>'wordpress',
-                        'query'=>'deactivate_theme',
-                        'select'=>['file', 'name' ],
+                    'key'     => 'theme',
+                    'label'   => 'Theme Switch',
+                    'type'    => 'select',
+                    'dynamic' => [
+                        'integration' => 'wordpress',
+                        'query'       => 'deactivate_theme',
+                        'select'      => [ 'file', 'name' ],
                     ],
-                    'required'=>true,
+                    'required' => true,
                 ],
             ];
         }
@@ -399,7 +404,7 @@ class Wordpress extends IntegrationBase {
 
             case 'update_post_title':
                 wp_update_post([
-                    'ID'  => $config['post_id'] ,
+                    'ID'         => $config['post_id'] ,
                     'post_title' => $config['post_title'],
                 ]);
                 return ['port'=>'main','data'=>[]];
@@ -408,7 +413,7 @@ class Wordpress extends IntegrationBase {
                 wp_delete_post( $config['post_id'], true );
                 return ['port'=>'main','data'=>['post_id'=>$config['post_id']]];
 
-            case 'activated_plugin' : 
+            case 'activate_plugin' : 
                 if ( $plugin = $config['plugin'] ?? '' ) {
                     activate_plugin( $plugin );
                 }
@@ -436,12 +441,12 @@ class Wordpress extends IntegrationBase {
 
     public static function get_dynamic_queries(): array {
         return [
-            'post_types' => [ self::class, 'query_post_types' ],
-            'posts'      => [ self::class, 'query_posts' ],
-            'users'      => [ self::class, 'query_users' ],
-            'active_plugins' => [ self::class, 'query_active_plugins' ],
-            'inactive_plugins' => [ self::class, 'query_deactivate_plugins' ],
-            'deactivate_theme' => [ self::class, 'query_deactivate_theme' ],
+            'post_types'        => [ self::class, 'query_post_types' ],
+            'posts'             => [ self::class, 'query_posts' ],
+            'users'             => [ self::class, 'query_users' ],
+            'active_plugins'    => [ self::class, 'query_active_plugins' ],
+            'inactive_plugins'  => [ self::class, 'query_deactivate_plugins' ],
+            'deactivate_theme'  => [ self::class, 'query_deactivate_theme' ],
         ];
     }
 
@@ -466,16 +471,16 @@ class Wordpress extends IntegrationBase {
 
         return array_map(fn($p)=>[
             'ID'         => $p->ID,
-            'post_title'=> $p->post_title,
+            'post_title' => $p->post_title,
         ], $posts);
     }
 
     public static function query_users( $q ) {
         $users = get_users(['search'=>$q['search'] ?? '']);
         return array_map(fn($u)=>[
-            'ID'=>$u->ID,
-            'name'=>$u->display_name,
-            'email'=>$u->user_email
+            'ID'    => $u->ID,
+            'name'  => $u->display_name,
+            'email' => $u->user_email
         ], $users);
     }
 
@@ -484,9 +489,9 @@ class Wordpress extends IntegrationBase {
             require_once ABSPATH . 'wp-admin/includes/plugin.php';
         }
 
-        $all_plugins = get_plugins();
+        $all_plugins   = get_plugins();
         $active_plugin = get_option( 'active_plugins', [] );
-        $result = [];
+        $result        = [];
 
         foreach ( $active_plugin as $plugin ) {
             if ( ! isset( $all_plugins[ $plugin ] ) ) {
@@ -511,9 +516,9 @@ class Wordpress extends IntegrationBase {
             require_once ABSPATH . 'wp-admin/includes/plugin.php';
         }
 
-        $all_plugins = get_plugins();
+        $all_plugins   = get_plugins();
         $active_plugin = get_option( 'active_plugins', [] );
-        $result = [];
+        $result        = [];
 
         foreach ( $all_plugins as $inactive_plugin => $plugin ) {
             if ( in_array( $inactive_plugin, $active_plugin, true  ) ) {
@@ -534,9 +539,9 @@ class Wordpress extends IntegrationBase {
     }
 
     public static function query_deactivate_theme( $q ) {
-        $all_themes = wp_get_themes();
+        $all_themes   = wp_get_themes();
         $active_theme = wp_get_theme()->get_stylesheet();
-        $result = [];
+        $result       = [];
 
         foreach ( $all_themes as $stylesheet => $theme ) {
         

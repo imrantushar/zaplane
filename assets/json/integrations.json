@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-01-08 12:54:07",
+    "generated_at": "2026-01-11 09:28:45",
     "integrations": {
         "wordpress": {
             "slug": "wordpress",
@@ -137,11 +137,11 @@
                     "schema": [
                         {
                             "key": "plugin",
-                            "label": "Deactivate Plugin",
+                            "label": "Inactive Plugin",
                             "type": "select",
                             "dynamic": {
                                 "integration": "wordpress",
-                                "query": "deactivate_plugins",
+                                "query": "inactive_plugins",
                                 "select": [
                                     "file",
                                     "name"
@@ -158,22 +158,7 @@
                     "key": "deactivate_plugin",
                     "label": "Deactivate Plugin",
                     "hook": "deactivate_plugin",
-                    "schema": [
-                        {
-                            "key": "plugin",
-                            "label": "Active Plugin",
-                            "type": "select",
-                            "dynamic": {
-                                "integration": "wordpress",
-                                "query": "active_plugins",
-                                "select": [
-                                    "file",
-                                    "name"
-                                ]
-                            },
-                            "required": true
-                        }
-                    ],
+                    "schema": [],
                     "outputs": [
                         "main"
                     ]
@@ -198,6 +183,24 @@
                             "required": true
                         }
                     ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "switch_blog": {
+                    "key": "switch_blog",
+                    "label": "Blog Switch",
+                    "hook": "switch_blog",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "customizer_registration": {
+                    "key": "customizer_registration",
+                    "label": "Customizer Registration",
+                    "hook": "customizer_registration",
+                    "schema": [],
                     "outputs": [
                         "main"
                     ]
@@ -309,17 +312,17 @@
                         "main"
                     ]
                 },
-                "activated_plugin": {
-                    "key": "activated_plugin",
+                "activate_plugin": {
+                    "key": "activate_plugin",
                     "label": "Activate Plugin",
                     "schema": [
                         {
                             "key": "plugin",
-                            "label": "Deactivate Plugin",
+                            "label": "Inactive Plugin",
                             "type": "select",
                             "dynamic": {
                                 "integration": "wordpress",
-                                "query": "deactivate_plugins",
+                                "query": "inactive_plugins",
                                 "select": [
                                     "file",
                                     "name"
