@@ -30,6 +30,27 @@ class Wordpress extends IntegrationBase {
             'profile_update' => ['label' => 'Profile Update', 'hook' => 'profile_update'],
             'remove_user_from_blog' => ['label' => 'Remove Blog User', 'hook' => 'remove_user_from_blog'],
             'delete_user' => ['label' => 'Delete User', 'hook' => 'delete_user'],
+            'login_footer' => ['label' => 'Login Footer', 'hook' => 'login_footer'],
+            'login_form' => ['label' => 'Login Form', 'hook' => 'login_form'],
+            'login_head' => ['label' => 'Login Head', 'hook' => 'login_head'],
+            'login_init' => ['label' => 'Login Initialization', 'hook' => 'login_init'],
+            'lostpassword_form' => ['label' => 'Lost Password Form', 'hook' => 'lostpassword_form'],
+            'retrieve_password' => ['label' => 'Password Retrieval', 'hook' => 'retrieve_password'],
+            'password_reset' => ['label' => 'Password Reset', 'hook' => 'password_reset'],
+            'after_password_reset' => ['label' => 'After Password Reset', 'hook' => 'after_password_reset'],
+            'register_form' => ['label' => 'Registration Form', 'hook' => 'register_form'],
+            'signup_blogform' => ['label' => 'Signup Blog Form', 'hook' => 'signup_blogform'],
+            'signup_extra_fields' => ['label' => 'Signup Extra Fields', 'hook' => 'signup_extra_fields'],
+            'signup_finished' => ['label' => 'Signup Finished', 'hook' => 'signup_finished'],
+            'signup_header' => ['label' => 'Signup Header', 'hook' => 'signup_header'],
+            'add_action' => ['label' => 'Add Action', 'hook' => 'add_action'],
+            'do_action' => ['label' => 'Do Action', 'hook' => 'do_action'],
+            'add_meta_boxes' => ['label' => 'Meta Box Setup', 'hook' => 'add_meta_boxes'],
+            'add_option' => ['label' => 'Option Addition', 'hook' => 'add_option'],
+            'delete_option' => ['label' => 'Option Deletion', 'hook' => 'delete_option'],
+            'delete_post_meta' => ['label' => 'Post Option Delete', 'hook' => 'delete_post_meta'],
+            'admin_post' => ['label' => 'Admin Post Action', 'hook' => 'admin_post'],
+            'wp_delete_site' => ['label' => 'Site Deletion', 'hook' => 'wp_delete_site'],
         ];
     }
 
@@ -63,28 +84,29 @@ class Wordpress extends IntegrationBase {
             ];
         }
 
+        if ( $trigger === 'add_action' ) {
+            return [
+                [
+                    'key' => 'hook_name',
+                    'label' => 'Hook Name',
+                    'type' => 'text',
+                    'required' => true,
+                ],
+            ];
+        }
+
+        if ( $trigger === 'do_action' ) {
+            return [
+                [
+                    'key' => 'hook_name',
+                    'label' => "Hook Name (Use this code to trigger the action: do_action('hook_name', 1, ['key' => 'value']))",
+                    'type' => 'text',
+                    'required' => true,
+                ],
+            ];
+        }
+
         return [];
-    }
-
-    /* =====================================================
-     * TRIGGER PAYLOAD
-     * ===================================================== */
-
-    private static function build_user_payload( $user_arg, array $extra = [] ) {
-        $user_id = $user_arg instanceof \WP_User ? $user_arg->ID : $user_arg;
-        $user_id = (int) $user_id;
-        if ( $user_id <= 0 ) return false;
-
-        $user = get_userdata( $user_id );
-        if ( ! $user ) return false;
-
-        $payload = [
-            'user_id' => $user->ID,
-            'email'   => $user->user_email,
-            'role'    => $user->roles[0] ?? '',
-        ];
-
-        return $extra ? array_merge( $payload, $extra ) : $payload;
     }
 
     public static function resolve_trigger( array $node, array $args ) {
@@ -114,7 +136,7 @@ class Wordpress extends IntegrationBase {
 
             case 'user_register':
 
-                return self::build_user_payload( $args[0] ?? 0 ) ?: false;
+                return static::get_user_payload( $args[0] ?? 0 ) ?: false;
 
             case 'comment_post':
 
@@ -129,7 +151,7 @@ class Wordpress extends IntegrationBase {
 
             case 'set_user_role':
 
-                $payload = self::build_user_payload( $args[0] ?? 0 );
+                $payload = static::get_user_payload( $args[0] ?? 0 );
                 if ( ! $payload ) return false;
 
                 $role = $args[1] ?? '';
@@ -140,14 +162,14 @@ class Wordpress extends IntegrationBase {
 
             case 'show_user_profile':
             case 'edit_user_profile':
-                return self::build_user_payload( $args[0] ?? 0 ) ?: false;
+                return static::get_user_payload( $args[0] ?? 0 ) ?: false;
 
             case 'personal_options_update':
             case 'edit_user_profile_update':
-                return self::build_user_payload( $args[0] ?? 0 ) ?: false;
+                return static::get_user_payload( $args[0] ?? 0 ) ?: false;
 
             case 'profile_update':
-                $payload = self::build_user_payload( $args[0] ?? 0 );
+                $payload = static::get_user_payload( $args[0] ?? 0 );
                 if ( ! $payload ) return false;
 
                 $old_user = $args[1] ?? null;
@@ -159,7 +181,7 @@ class Wordpress extends IntegrationBase {
                 return $payload;
 
             case 'remove_user_from_blog':
-                return self::build_user_payload(
+                return static::get_user_payload(
                     $args[0] ?? 0,
                     [
                         'blog_id' => $args[1] ?? 0,
@@ -168,12 +190,128 @@ class Wordpress extends IntegrationBase {
                 ) ?: false;
 
             case 'delete_user':
-                return self::build_user_payload(
+                return static::get_user_payload(
                     $args[2] ?? ( $args[0] ?? 0 ),
                     [
                         'reassign' => $args[1] ?? 0,
                     ]
                 ) ?: false;
+
+            case 'login_footer':
+            case 'login_form':
+            case 'login_head':
+            case 'login_init':
+            case 'lostpassword_form':
+            case 'register_form':
+            case 'signup_extra_fields':
+            case 'signup_finished':
+            case 'signup_header':
+                return [
+                    'event' => $node['event'],
+                ];
+
+            case 'retrieve_password':
+                return static::get_user_payload( $args[0] ?? '' ) ?: [
+                    'event' => $node['event'],
+                    'user_login' => (string) ( $args[0] ?? '' ),
+                ];
+
+            case 'password_reset':
+                return static::get_user_payload( $args[0] ?? 0 ) ?: false;
+
+            case 'after_password_reset':
+                return static::get_user_payload(
+                    $args[0] ?? 0,
+                    [
+                        'after_reset' => true,
+                    ]
+                ) ?: false;
+
+            case 'add_action':
+                $hook_name = (string) ( $args[0] ?? '' );
+                if ( ! empty( $node['config']['hook_name'] ) && $hook_name !== $node['config']['hook_name'] ) {
+                    return false;
+                }
+
+                return [
+                    'hook_name' => $hook_name,
+                    'callback' => $args[1] ?? null,
+                    'priority' => (int) ( $args[2] ?? 10 ),
+                    'accepted_args' => (int) ( $args[3] ?? 1 ),
+                ];
+
+            case 'do_action':
+                $hook_name = (string) ( $args[0] ?? '' );
+                if ( ! empty( $node['config']['hook_name'] ) && $hook_name !== $node['config']['hook_name'] ) {
+                    return false;
+                }
+
+                return [
+                    'hook_name' => $hook_name,
+                    'args' => array_slice( $args, 1 ),
+                ];
+
+            case 'add_meta_boxes':
+                $post_type = (string) ( $args[0] ?? '' );
+                $post = $args[1] ?? null;
+
+                return [
+                    'post_type' => $post_type,
+                    'post_id' => $post instanceof \WP_Post ? $post->ID : 0,
+                    'post_title' => $post instanceof \WP_Post ? $post->post_title : '',
+                    'post_status' => $post instanceof \WP_Post ? $post->post_status : '',
+                ];
+
+            case 'add_option':
+                return [
+                    'option_name' => (string) ( $args[0] ?? '' ),
+                    'value' => $args[1] ?? null,
+                ];
+
+            case 'delete_option':
+                return [
+                    'option_name' => (string) ( $args[0] ?? '' ),
+                ];
+
+            case 'delete_post_meta':
+                return [
+                    'meta_ids' => $args[0] ?? [],
+                    'post_id' => (int) ( $args[1] ?? 0 ),
+                    'meta_key' => (string) ( $args[2] ?? '' ),
+                    'meta_value' => $args[3] ?? null,
+                ];
+
+            case 'admin_post':
+                return [
+                    'action' => (string) ( $_REQUEST['action'] ?? '' ),
+                ];
+
+            case 'wp_delete_site':
+                $site = $args[0] ?? null;
+                if ( $site instanceof \WP_Site ) {
+                    return [
+                        'blog_id' => (int) $site->blog_id,
+                        'site_id' => (int) $site->site_id,
+                        'domain' => (string) $site->domain,
+                        'path' => (string) $site->path,
+                        'registered' => (string) $site->registered,
+                        'deleted' => (string) $site->deleted,
+                    ];
+                }
+                return [
+                    'blog_id' => 0,
+                ];
+
+            case 'signup_blogform':
+                $errors = $args[0] ?? null;
+                $error_messages = [];
+                if ( $errors instanceof \WP_Error ) {
+                    $error_messages = $errors->get_error_messages();
+                }
+                return [
+                    'event' => $node['event'],
+                    'error_messages' => $error_messages,
+                ];
         }
 
         return false;
@@ -306,11 +444,49 @@ class Wordpress extends IntegrationBase {
     }
 
     public static function query_users( $q ) {
-        $users = get_users(['search'=>$q['search'] ?? '']);
-        return array_map(fn($u)=>[
-            'ID'=>$u->ID,
-            'name'=>$u->display_name,
-            'email'=>$u->user_email
-        ], $users);
+        $q = is_array( $q ) ? $q : [];
+        $users = $q['users'] ?? get_users( [ 'search' => $q['search'] ?? '' ] );
+        return array_map( function( $user ) {
+            $data = (array) $user->data;
+            unset( $data['user_pass'], $data['user_activation_key'] );
+
+            return [
+                'ID'          => $user->ID,
+                'name'        => $user->display_name,
+                'email'       => $user->user_email,
+                'login'       => $user->user_login,
+                'nicename'    => $user->user_nicename,
+                'url'         => $user->user_url,
+                'registered'  => $user->user_registered,
+                'roles'       => $user->roles ?? [],
+                'first_name'  => $user->first_name ?? '',
+                'last_name'   => $user->last_name ?? '',
+                'nickname'    => $user->nickname ?? '',
+                'description' => $user->description ?? '',
+                'locale'      => function_exists( 'get_user_locale' ) ? get_user_locale( $user->ID ) : '',
+                'avatar'      => get_avatar_url( $user->ID ),
+                'caps'        => array_keys( $user->caps ?? [] ),
+                'data'        => $data,
+                'meta'        => get_user_meta( $user->ID ),
+            ];
+        }, $users );
+    }
+
+    // Resolve user and reuse query_users payload
+    private static function get_user_payload( $user_id_or_login, array $extra = [] ): ?array {
+        if ( $user_id_or_login instanceof \WP_User ) {
+            $user = $user_id_or_login;
+        } elseif ( is_numeric( $user_id_or_login ) ) {
+            $user = get_userdata( (int) $user_id_or_login );
+        } else {
+            $user = get_user_by( 'login', (string) $user_id_or_login );
+        }
+
+        if ( ! $user ) {
+            return null;
+        }
+
+        $payload = static::query_users( [ 'users' => [ $user ] ] );
+        return $payload ? array_merge( $payload[0], $extra ) : null;
     }
 }

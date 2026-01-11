@@ -174,6 +174,209 @@
                     "outputs": [
                         "main"
                     ]
+                },
+                "login_footer": {
+                    "key": "login_footer",
+                    "label": "Login Footer",
+                    "hook": "login_footer",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "login_form": {
+                    "key": "login_form",
+                    "label": "Login Form",
+                    "hook": "login_form",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "login_head": {
+                    "key": "login_head",
+                    "label": "Login Head",
+                    "hook": "login_head",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "login_init": {
+                    "key": "login_init",
+                    "label": "Login Initialization",
+                    "hook": "login_init",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "lostpassword_form": {
+                    "key": "lostpassword_form",
+                    "label": "Lost Password Form",
+                    "hook": "lostpassword_form",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "retrieve_password": {
+                    "key": "retrieve_password",
+                    "label": "Password Retrieval",
+                    "hook": "retrieve_password",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "password_reset": {
+                    "key": "password_reset",
+                    "label": "Password Reset",
+                    "hook": "password_reset",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "after_password_reset": {
+                    "key": "after_password_reset",
+                    "label": "After Password Reset",
+                    "hook": "after_password_reset",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "register_form": {
+                    "key": "register_form",
+                    "label": "Registration Form",
+                    "hook": "register_form",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "signup_blogform": {
+                    "key": "signup_blogform",
+                    "label": "Signup Blog Form",
+                    "hook": "signup_blogform",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "signup_extra_fields": {
+                    "key": "signup_extra_fields",
+                    "label": "Signup Extra Fields",
+                    "hook": "signup_extra_fields",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "signup_finished": {
+                    "key": "signup_finished",
+                    "label": "Signup Finished",
+                    "hook": "signup_finished",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "signup_header": {
+                    "key": "signup_header",
+                    "label": "Signup Header",
+                    "hook": "signup_header",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add_action": {
+                    "key": "add_action",
+                    "label": "Add Action",
+                    "hook": "add_action",
+                    "schema": [
+                        {
+                            "key": "hook_name",
+                            "label": "Hook Name (Use this code to trigger the action: do_action('hook_name', 1, ['key' => 'value']))",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "do_action": {
+                    "key": "do_action",
+                    "label": "Do Action",
+                    "hook": "do_action",
+                    "schema": [
+                        {
+                            "key": "hook_name",
+                            "label": "Hook Name",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add_meta_boxes": {
+                    "key": "add_meta_boxes",
+                    "label": "Meta Box Setup",
+                    "hook": "add_meta_boxes",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add_option": {
+                    "key": "add_option",
+                    "label": "Option Addition",
+                    "hook": "add_option",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_option": {
+                    "key": "delete_option",
+                    "label": "Option Deletion",
+                    "hook": "delete_option",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_post_meta": {
+                    "key": "delete_post_meta",
+                    "label": "Post Option Delete",
+                    "hook": "delete_post_meta",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "admin_post": {
+                    "key": "admin_post",
+                    "label": "Admin Post Action",
+                    "hook": "admin_post",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "wp_delete_site": {
+                    "key": "wp_delete_site",
+                    "label": "Site Deletion",
+                    "hook": "wp_delete_site",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
                 }
             },
             "actions": {
