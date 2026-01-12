@@ -432,7 +432,6 @@ export default function FlowCanvas({ id }) {
         { value: "paused", label: "Paused" },
         { value: "draft", label: "draft" },
     ];
-    console.log(values, 'valuess');
     return (
         <div
             ref={containerRef}
@@ -463,32 +462,6 @@ export default function FlowCanvas({ id }) {
                             {__("Stop", "zaplane")}
                         </Button>
                     </>
-                )}
-                middleContent={() => (
-                    <Tabs.Root defaultValue="Editor" variant="plain">
-                        <Tabs.List bg="bg.muted" rounded="l3" p="1">
-                            <Tabs.Trigger value="Editor">
-                                Editor
-                            </Tabs.Trigger>
-                            <Tabs.Trigger value="Executions">
-                                <ZAPDrawer
-                                    title="Execution"
-                                    placement='start'
-                                    trigger={
-                                        <Text margin="0" size="sm"
-                                        >
-
-                                            {__("Execution ", "zaplane")}
-                                        </Text>
-                                    }>
-
-
-                                </ZAPDrawer>
-                            </Tabs.Trigger>
-                            <Tabs.Indicator rounded="l2" />
-                        </Tabs.List>
-
-                    </Tabs.Root>
                 )}
                 rightContent={() => (
                     <>
