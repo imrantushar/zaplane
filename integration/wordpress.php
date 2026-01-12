@@ -35,6 +35,10 @@ class Wordpress extends IntegrationBase {
             'untrashed_post'            => ['label' => 'Post Untrashed',           'hook' => 'untrashed_post'],
             'wp_update_comment_count'   => ['label' => 'Comment Count Updated',    'hook' => 'wp_update_comment_count'],
             'wp_set_comment_status'     => ['label' => 'Comment Status Set',       'hook' => 'wp_set_comment_status'],
+             'wp_login'                 => ['label' => 'User Logged in',           'hook' => 'wp_login'],
+             'wp_login_failed'                 => ['label' => 'User Logged Failed', 'hook' => 'wp_login_failed'],
+             'wp_logout'                => ['label' => 'User logout',               'hook' => 'wp_logout'],
+
         ];
     }
 
@@ -363,7 +367,43 @@ class Wordpress extends IntegrationBase {
         'content'    => $comment->comment_content,
     ];
 
+    case 'wp_login':
+                $user_login = $args[0] ?? '';
+                $user       = $args[1] ?? null;
+           if ( ! $user instanceof \WP_User ) {
+        return false;
+         } 
 
+    return [
+        'user_id'    => $user->ID,
+        'username'   => $user_login,
+        'email'      => $user->user_email,
+        'roles'      => $user->roles,
+        'login_time' => current_time( 'mysql' ),
+    ];
+
+    case 'wp_login_failed':
+      $user_login = $args[0] ?? '';
+    return [
+            'user_id'    => null, // No WP_User object exists
+            'username'   => $user_login,
+            'email'      => null,
+            'roles'      => [], // No roles on failed login
+            'login_time' => current_time( 'mysql' ),
+            'user_exists'=> username_exists( $user_login ) ? true : false, // optional
+        ];
+       case 'wp_logout':
+        $user = wp_get_current_user();
+        error_log('chck user:' . print_r($user,true));
+    
+        if (! $user instanceof \WP_User || $user->ID !== 0) return false;
+        return [
+            'user_id'     => $user->ID,
+            'username'    => $user->user_login,
+            'email'       => $user->user_email,
+            'roles'       => $user->roles,
+            'logout_time' => current_time('mysql'),
+        ];
 
         }
 

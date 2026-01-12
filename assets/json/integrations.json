@@ -304,8 +304,34 @@
                     "outputs": [
                         "main"
                     ]
+                } ,
+                 "wp_login": {
+                    "key": "wp_login",
+                    "label": "User Login",
+                    "hook": "wp_login",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                } ,
+                 "wp_login_failed": {
+                    "key": "wp_login_failed",
+                    "label": "User Login failed",
+                    "hook": "wp_login_failed",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                } ,
+                 "wp_logout": {
+                    "key": "wp_logout",
+                    "label": "User Log Out",
+                    "hook": "wp_logout",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
                 }
-              
             },
             "actions": {
                 "create_post": {
