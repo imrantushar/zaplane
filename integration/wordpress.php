@@ -17,29 +17,35 @@ class Wordpress extends IntegrationBase {
 
     public static function get_triggers(): array {
         return [
-            'publish_post'             => ['label' => 'Post Published',          'hook' => 'publish_post'],
-            'post_updated'             => ['label' => 'Post Updated',            'hook' => 'post_updated'],
-            'user_register'            => ['label' => 'User Registered',         'hook' => 'user_register'],
-            'comment_post'             => ['label' => 'Comment Added',           'hook' => 'comment_post'],
-            'deleted_post'             => ['label' => 'Before Deleted Post',     'hook' => 'before_delete_post'],
-            'trashed_post'             => ['label' => 'Post Moved to Trash',     'hook' => 'trashed_post'],
-            'save_post'                => ['label' => 'Save Post',               'hook' => 'save_post'],
-            'activated_plugin'         => ['label' => 'Activate Plugin',         'hook' => 'activated_plugin'],
-            'deactivate_plugin'        => ['label' => 'Deactivate Plugin',       'hook' => 'deactivate_plugin'],
-            'switch_theme'             => ['label' => 'Theme Switch',            'hook' => 'switch_theme'],
-            'switch_blog'              => ['label' => 'Blog Switch',             'hook' => 'switch_blog'],
-            'customize_register'       => ['label' => 'Customizer Registration', 'hook' => 'customize_register'],
-            'rest_api_init'            => ['label' => 'REST API Init',           'hook' => 'rest_api_init'],
-            'add_attachment'           => ['label' => 'Add Attachment',          'hook' => 'add_attachment'],
-            'edit_attachment'          => ['label' => 'Attachment Edit',         'hook' => 'edit_attachment'],
-            'save_attachment'          => ['label' => 'Attachment Save',         'hook' => 'attachment_fields_to_save'],
-            'attachment_updated'       => ['label' => 'Attachment Update',       'hook' => 'attachment_updated'],
-            'delete_attachment'        => ['label' => 'Media Deletion',          'hook' => 'delete_attachment'],
-            'media_edit'               => ['label' => 'Media Edit',              'hook' => 'edit_attachment'],
-            'media_upload_tabs'        => ['label' => 'Media Tabs',              'hook' => 'media_upload_tabs'],
-            'image_sizes'              => ['label' => 'Image Sizes',             'hook' => 'image_size_names_choose'],
-            'wp_insert_post'           => ['label' => 'WP Insert Post',          'hook' => 'wp_insert_post'],
-            'wp_insert_comment'        => ['label' => 'WP Insert Comment',       'hook' => 'wp_insert_comment'],
+            'publish_post'                => ['label' => 'Post Published',               'hook' => 'publish_post'],
+            'post_updated'                => ['label' => 'Post Updated',                 'hook' => 'post_updated'],
+            'user_register'               => ['label' => 'User Registered',              'hook' => 'user_register'],
+            'comment_post'                => ['label' => 'Comment Added',                'hook' => 'comment_post'],
+            'deleted_post'                => ['label' => 'Before Deleted Post',          'hook' => 'before_delete_post'],
+            'trashed_post'                => ['label' => 'Post Moved to Trash',          'hook' => 'trashed_post'],
+            'save_post'                   => ['label' => 'Save Post',                    'hook' => 'save_post'],
+            'activated_plugin'            => ['label' => 'Activate Plugin',              'hook' => 'activated_plugin'],
+            'deactivate_plugin'           => ['label' => 'Deactivate Plugin',            'hook' => 'deactivate_plugin'],
+            'switch_theme'                => ['label' => 'Theme Switch',                 'hook' => 'switch_theme'],
+            'switch_blog'                 => ['label' => 'Blog Switch',                  'hook' => 'switch_blog'],
+            'customize_register'          => ['label' => 'Customizer Registration',      'hook' => 'customize_register'],
+            'rest_api_init'               => ['label' => 'REST API Init',                'hook' => 'rest_api_init'],
+            'add_attachment'              => ['label' => 'Add Attachment',               'hook' => 'add_attachment'],
+            'edit_attachment'             => ['label' => 'Attachment Edit',              'hook' => 'edit_attachment'],
+            'save_attachment'             => ['label' => 'Attachment Save',              'hook' => 'attachment_fields_to_save'],
+            'attachment_updated'          => ['label' => 'Attachment Update',            'hook' => 'attachment_updated'],
+            'attachment_count'            => ['label' => 'Attachment Count',             'hook' => 'wp_count_attachments'],
+            'attachment_metadata'         => ['label' => 'Generate Attachment Metadata', 'hook' => 'wp_generate_attachment_metadata'],
+            'delete_attachment'           => ['label' => 'Media Deletion',               'hook' => 'delete_attachment'],
+            'media_edit'                  => ['label' => 'Media Edit',                   'hook' => 'edit_attachment'],
+            'media_upload_tabs'           => ['label' => 'Media Tabs',                   'hook' => 'media_upload_tabs'],
+            'image_sizes'                 => ['label' => 'Image Sizes',                  'hook' => 'image_size_names_choose'],
+            'wp_insert_post'              => ['label' => 'WP Insert Post',               'hook' => 'wp_insert_post'],
+            'wp_insert_comment'           => ['label' => 'WP Insert Comment',            'hook' => 'wp_insert_comment'],
+            'create_application_password' => ['label' => 'Create Application Password',  'hook' => 'wp_create_application_password'],
+            'update_application_password' => ['label' => 'Update Application Password',  'hook' => 'wp_update_application_password'],
+            'delete_application_password' => ['label' => 'Delete Application Password',  'hook' => 'wp_delete_application_password'],
+            'update_option'               => ['label' => 'Option Update',                'hook' => 'update_option'],
         ];
     }
 
@@ -276,6 +282,34 @@ class Wordpress extends IntegrationBase {
                     'time'          => current_time( 'mysql' ),
                     'fields'        => $attachment,
                 ];
+
+            case 'attachment_count' :
+                $post_type = $args[0] ?? 0;
+                $count = wp_count_attachments( $post_type );
+
+                return [
+                    'post_type' => $post_type,
+                    'counts'    => (array) $count,
+                    'time'     => current_time( 'mysql' ), 
+                ];
+
+            case 'attachment_metadata' :
+                $metadata = $args[0] ?? [];
+                $attachment_id = $args[1] ?? 0;
+                if ( ! $attachment_id || empty( $metadata ) ) return false;
+
+                $attachment = get_post( $attachment_id );
+                if ( ! $attachment || $attachment->post_type !== 'attachment' ) return false;
+
+                return [
+                    'attachment_id' => $attachment_id,
+                    'post_title'    => $attachment->post_title,
+                    'mime_type'     => get_post_mime_type( $attachment_id ),
+                    'url'           => wp_get_attachment_url( $attachment_id ),
+                    'matadata'      => $metadata,
+                    'user_id'       => get_current_user_id(),
+                    'time'          => current_time( 'mysql' ),
+                ];
             
             case 'delete_attachment' :
                 $attachment_id = $args[0] ?? 0;
@@ -299,7 +333,7 @@ class Wordpress extends IntegrationBase {
                 ];
             
             case 'image_sizes' : 
-                $sizes         = $args[0] ?? [];
+                $sizes = $args[0] ?? [];
                 if ( empty( $sizes ) || ! is_array( $sizes ) ) return false;
 
                 return [
@@ -325,8 +359,8 @@ class Wordpress extends IntegrationBase {
 
             case 'wp_insert_comment' :
                 $comment_id = $args[0] ?? 0;
-                if ( $comment_id ) return false;
-                $comment    = get_comment( $comment_id );
+                if ( ! $comment_id ) return false;
+                $comment = get_comment( $comment_id );
                 if ( ! $comment ) return false;
 
                 return [
@@ -338,6 +372,44 @@ class Wordpress extends IntegrationBase {
                     'status'       => $comment->comment_approved,
                     'date'         => $comment->comment_date,
                 ];
+                
+            case 'create_application_password' :
+                $user_id      = $args[0] ?? 0;
+                $new_password = $args[1] ?? '';
+                if ( ! $user_id || empty( $new_password ) ) return false;
+                $user = get_userdata( $user_id );
+                if ( ! $user ) return false;
+
+                return [
+                    'user_id'      => $user_id,
+                    'user_login'   => $user->user_login,
+                    'new_password' => $new_password,
+                    'time'         => current_time( 'mysql' ),
+                ];
+
+            case 'update_application_password' :
+                $user_id = $args[0] ?? 0;
+                $item    = $args[1] ?? null;
+                if ( ! $user_id || empty( $item ) ) return false;
+
+                return [
+                    'user_id'   => $user_id,
+                    'item_name' => $item['name'] ?? '',
+                    'item_id'   => $item['uuid'] ?? '',
+                    'time'      => current_time( 'mysql' ),
+                ];
+
+            case 'delete_application_password' :
+                $user_id = $args[0] ?? 0;
+                $uuid    = $args[1] ?? '';
+                if ( ! $user_id ) return false;
+                return [
+                    'user_id' => $user_id,
+                    'uuid'    => $uuid,
+                ];
+
+            case 'update_option' :
+                
         }
 
         return false;

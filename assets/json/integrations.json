@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-01-12 06:42:57",
+    "generated_at": "2026-01-12 09:51:40",
     "integrations": {
         "wordpress": {
             "slug": "wordpress",
@@ -250,6 +250,24 @@
                         "main"
                     ]
                 },
+                "attachment_count": {
+                    "key": "attachment_count",
+                    "label": "Attachment Count",
+                    "hook": "wp_count_attachments",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "attachment_metadata": {
+                    "key": "attachment_metadata",
+                    "label": "Generate Attachment Metadata",
+                    "hook": "wp_generate_attachment_metadata",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
                 "delete_attachment": {
                     "key": "delete_attachment",
                     "label": "Media Deletion",
@@ -299,6 +317,42 @@
                     "key": "wp_insert_comment",
                     "label": "WP Insert Comment",
                     "hook": "wp_insert_comment",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "wp_insert_site": {
+                    "key": "wp_insert_site",
+                    "label": "Site Creation",
+                    "hook": "wp_insert_site",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_application_password": {
+                    "key": "create_application_password",
+                    "label": "Create Application Password",
+                    "hook": "wp_create_application_password",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_application_password": {
+                    "key": "update_application_password",
+                    "label": "Update Application Password",
+                    "hook": "wp_update_application_password",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_application_password": {
+                    "key": "delete_application_password",
+                    "label": "Delete Application Password",
+                    "hook": "wp_delete_application_password",
                     "schema": [],
                     "outputs": [
                         "main"
