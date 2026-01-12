@@ -121,6 +121,13 @@
                         "main"
                     ]
                 },
+                "wp_trash_post":{
+                    "key": "wp_trash_post",
+                    "label": "Trashed Post" ,
+                    "hook": "wp_trash_post",
+                    "schema":[],
+                    "outputs": ["main"]
+                } ,
                 "before_delete_post": {
                     "key": "before_delete_post",
                     "label": "Post Deleted",

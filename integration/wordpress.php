@@ -20,6 +20,7 @@ class Wordpress extends IntegrationBase {
             'publish_post'              => ['label' => 'Post Published',           'hook' => 'publish_post'],
             'post_updated'              => ['label' => 'Post Updated',             'hook' => 'post_updated'],
             'transition_post_status'    => ['label' => 'Post Status Updated',      'hook' => 'transition_post_status'],
+            'wp_trash_post'    => ['label' => 'Post Status Updated',                'hook' => 'wp_trash_post'],           
             'wp_insert_post'            => ['label' => 'Revision Creation',        'hook' => 'wp_insert_post'],
             'before_delete_post'        => ['label' => 'Post Deleted',             'hook' => 'before_delete_post'],
             'delete_post'               => ['label' => 'Delete Post',              'hook' => 'delete_post'],
@@ -145,13 +146,9 @@ class Wordpress extends IntegrationBase {
             case 'transition_post_status':
 
                 $new_status = $args[0] ?? '';
-                    error_log( 'PPP new_status ID: ' . $new_status );
-
                 $old_status = $args[1] ?? '';
-                    error_log( 'PPP old_status ID: ' . $old_status );
                 $post = get_post( $args[2] ?? 0 );
                 if ( ! $post ) return false;
-
                 // Only run trigger if old status is not 'new'
                 if ( $old_status == 'new' ) {
                     return false;
@@ -178,7 +175,19 @@ class Wordpress extends IntegrationBase {
                     'parent_title'   => $parent_post->post_title ?? '',
                     'post_type'      => $parent_post->post_type ?? '',
                 ];
+            case 'wp_trash_post':
+                $post_id = $args[0] ?? 0;
+                $post = get_post( $post_id );
+                 if ( ! $post ) return false;
 
+                   return [
+
+                    'post_id'    => $post->ID,
+                    'post_title' => $post->post_title,
+                    'post_type'  => $post->post_type,
+                    'status'     => $post->post_status,
+
+                ];
             case 'before_delete_post':
             case 'delete_post':
 
