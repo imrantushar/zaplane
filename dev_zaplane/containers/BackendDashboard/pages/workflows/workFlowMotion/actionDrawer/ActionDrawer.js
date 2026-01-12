@@ -43,11 +43,50 @@ export default function ActionDrawer({
     const dispatch = useDispatch();
     const { values, setFieldValue, resetForm } = useFormikContext();
 
-    const [mode, setMode] = useState(null); 
+    const [mode, setMode] = useState(null);
     const [step, setStep] = useState("select");
     const [selectedItem, setSelectedItem] = useState(null);
     const [dynamicOptions, setDynamicOptions] = useState({});
     const [loadingFields, setLoadingFields] = useState({});
+
+   console.log(context,'contexttttt');
+    useEffect(() => {
+        if (!open || !node?.data || source === "add") return;
+        const nodeData = node.data;
+        let detectedMode = null;
+        let detectedItem = null;
+        detectedItem = TOOLS.find(
+            t => t.name === nodeData.app || t.id === nodeData.app
+        );
+
+        if (detectedItem) {
+            detectedMode = "tools";
+        } else {
+            detectedItem = APPS.find(
+                a => a.name === nodeData.app || a.id === nodeData.app
+            );
+            detectedMode = "app";
+        }
+
+        //set state
+        setMode(detectedMode);
+        setSelectedItem(detectedItem || null);
+        setStep("select");
+
+        //action type
+        if (nodeData.event) {
+            setFieldValue("actionType", nodeData.event);
+        }
+        //default config
+        if (nodeData.config) {
+            Object.entries(nodeData.config).forEach(([key, value]) => {
+                setFieldValue(key, value);
+            });
+        }
+
+    }, [open, node?.data]);
+
+
     const resetAll = () => {
         setMode(null);
         setStep("select");
@@ -60,8 +99,8 @@ export default function ActionDrawer({
         mode === "app"
             ? APPS
             : mode === "tools"
-            ? TOOLS
-            : [];
+                ? TOOLS
+                : [];
 
     const getIntegration = () => {
         if (!selectedItem?.id) return null;
@@ -82,7 +121,7 @@ export default function ActionDrawer({
         }
     }, [mode, selectedItem]);
 
-//    action option
+    //    action option
     const actionOptions = useMemo(() => {
         const integration = getIntegration();
         if (!integration) return [];
@@ -154,7 +193,7 @@ export default function ActionDrawer({
         setLoadingFields(p => ({ ...p, [key]: false }));
     };
 
-  
+
     const renderField = (field) => {
         switch (field.type) {
             case "text":

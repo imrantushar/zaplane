@@ -1999,6 +1999,36 @@ function ActionDrawer({
   const [selectedItem, setSelectedItem] = (0,react__WEBPACK_IMPORTED_MODULE_13__.useState)(null);
   const [dynamicOptions, setDynamicOptions] = (0,react__WEBPACK_IMPORTED_MODULE_13__.useState)({});
   const [loadingFields, setLoadingFields] = (0,react__WEBPACK_IMPORTED_MODULE_13__.useState)({});
+  console.log(context, 'contexttttt');
+  (0,react__WEBPACK_IMPORTED_MODULE_13__.useEffect)(() => {
+    if (!open || !node?.data || source === "add") return;
+    const nodeData = node.data;
+    let detectedMode = null;
+    let detectedItem = null;
+    detectedItem = TOOLS.find(t => t.name === nodeData.app || t.id === nodeData.app);
+    if (detectedItem) {
+      detectedMode = "tools";
+    } else {
+      detectedItem = APPS.find(a => a.name === nodeData.app || a.id === nodeData.app);
+      detectedMode = "app";
+    }
+
+    //set state
+    setMode(detectedMode);
+    setSelectedItem(detectedItem || null);
+    setStep("select");
+
+    //action type
+    if (nodeData.event) {
+      setFieldValue("actionType", nodeData.event);
+    }
+    //default config
+    if (nodeData.config) {
+      Object.entries(nodeData.config).forEach(([key, value]) => {
+        setFieldValue(key, value);
+      });
+    }
+  }, [open, node?.data]);
   const resetAll = () => {
     setMode(null);
     setStep("select");
