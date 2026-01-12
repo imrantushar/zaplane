@@ -1,6 +1,7 @@
 <?php
 namespace Zaplane\Integration;
 
+use WP_User;
 use Zaplane\Classes\IntegrationBase;
 
 if ( ! defined( 'ABSPATH' ) ) exit;
@@ -45,7 +46,13 @@ class Wordpress extends IntegrationBase {
             'create_application_password' => ['label' => 'Create Application Password',  'hook' => 'wp_create_application_password'],
             'update_application_password' => ['label' => 'Update Application Password',  'hook' => 'wp_update_application_password'],
             'delete_application_password' => ['label' => 'Delete Application Password',  'hook' => 'wp_delete_application_password'],
+            'added_option'                => ['label' => 'Option Addition',              'hook' => 'added_option'],
             'update_option'               => ['label' => 'Option Update',                'hook' => 'update_option'],
+            'delete_option'               => ['label' => 'Option Delete',                'hook' => 'delete_option'],
+            'wp_login'                    => ['label' => 'WP login',                     'hook' => 'wp_login'],
+            'wp_login_failed'             => ['label' => 'WP Login Failed',              'hook' => 'wp_login_failed'],
+            'wp_logout'                   => ['label' => 'WP Logout',                    'hook' => 'wp_logout'],
+            // 'validate_reset'               => ['label' => 'Validate Reset',                'hook' => 'validate_password_reset'],
         ];
     }
 
@@ -408,8 +415,59 @@ class Wordpress extends IntegrationBase {
                     'uuid'    => $uuid,
                 ];
 
+            case 'added_option' :
+                $option_name = $args[0] ?? '';
+                $option_value = $args[1] ?? null;
+                if ( empty( $option_name ) ) return false;
+
+                return [
+                    'option_name' => $option_name,
+                    'option_value' => $option_value,
+                ];
+
             case 'update_option' :
-                
+                $option_name = $args[0] ?? '';
+                $old_value = $args[1] ?? null;
+                $new_value = $args[2] ?? null;
+                if ( empty( $option_name ) ) return false;
+
+                return [
+                    'option_name' => $option_name,
+                    'old_value' => $old_value,
+                    'new_value' => $new_value,
+                ];
+            
+            case 'delete_option' :
+                $option_name = $args[0] ?? '';
+                if ( empty( $option_name ) ) return false;
+
+                return [
+                    'option_name' => $option_name,
+                ];
+            
+            case 'wp_login' :
+                $user = $args[0] ?? 0;
+                if ( ! $user || $user instanceof WP_User ) return false;
+
+                return [
+                    'user_id'      => $user->ID,
+                    'user_login'   => $user->user_login,
+                    'user_email'   => $user->user_email,
+                    'display_name' => $user->display_name,
+                ];
+
+            case 'wp_login_failed' :
+                $username = $args[0] ?? '';
+                if ( empty( $username ) ) return false;
+
+                return [
+                    'user_login_attempt' => $username,
+                    'time' => current_time( 'mysql' ),
+                    'ip_address' => $_SERVER['REMOTE_ADDR'] ?? '',
+                ];
+
+            
+
         }
 
         return false;

@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-01-12 09:51:40",
+    "generated_at": "2026-01-12 12:08:55",
     "integrations": {
         "wordpress": {
             "slug": "wordpress",
@@ -322,15 +322,6 @@
                         "main"
                     ]
                 },
-                "wp_insert_site": {
-                    "key": "wp_insert_site",
-                    "label": "Site Creation",
-                    "hook": "wp_insert_site",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
                 "create_application_password": {
                     "key": "create_application_password",
                     "label": "Create Application Password",
@@ -353,6 +344,33 @@
                     "key": "delete_application_password",
                     "label": "Delete Application Password",
                     "hook": "wp_delete_application_password",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "added_option": {
+                    "key": "added_option",
+                    "label": "Option Addition",
+                    "hook": "added_option",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_option": {
+                    "key": "update_option",
+                    "label": "Option Update",
+                    "hook": "update_option",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_option": {
+                    "key": "delete_option",
+                    "label": "Option Delete",
+                    "hook": "delete_option",
                     "schema": [],
                     "outputs": [
                         "main"
