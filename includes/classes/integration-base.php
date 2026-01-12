@@ -152,10 +152,20 @@ abstract class IntegrationBase {
 
     /**
      * Get authentication type for this integration
-     * @return string 'none' | 'api_key' | 'oauth2' | 'basic'
+     * @return string 'none' | 'api_key' | 'oauth2' | 'basic' | 'both'
      */
     public static function get_auth_type(): string {
         return 'none';
+    }
+
+    /**
+     * Get available authentication methods when auth_type is 'both'
+     * Override this for integrations supporting multiple auth methods
+     *
+     * @return array List of auth methods with labels and descriptions
+     */
+    public static function get_available_auth_types(): array {
+        return [];
     }
 
     /**
@@ -172,9 +182,10 @@ abstract class IntegrationBase {
      *   ]
      * ]
      *
+     * @param string|null $auth_type Optional auth type to get fields for
      * @return array Field definitions
      */
-    public static function get_auth_fields(): array {
+    public static function get_auth_fields( ?string $auth_type = null ): array {
         return [];
     }
 
@@ -203,9 +214,10 @@ abstract class IntegrationBase {
      *
      * @param string $redirect_uri Callback URL
      * @param string $state        CSRF state token
+     * @param array  $credentials  Optional credentials (client_id, client_secret for user-provided OAuth)
      * @return string|null Authorization URL or null if not OAuth2
      */
-    public static function get_oauth_auth_url( string $redirect_uri, string $state ): ?string {
+    public static function get_oauth_auth_url( string $redirect_uri, string $state, array $credentials = array() ): ?string {
         return null;
     }
 
@@ -215,10 +227,11 @@ abstract class IntegrationBase {
      *
      * @param string $code         Authorization code from provider
      * @param string $redirect_uri Callback URL used in auth request
+     * @param array  $credentials  Optional credentials (client_id, client_secret for user-provided OAuth)
      * @return array Token data ['access_token', 'refresh_token', 'expires_in', ...]
      * @throws \Exception on failure
      */
-    public static function exchange_oauth_code( string $code, string $redirect_uri ): array {
+    public static function exchange_oauth_code( string $code, string $redirect_uri, array $credentials = array() ): array {
         return [];
     }
 

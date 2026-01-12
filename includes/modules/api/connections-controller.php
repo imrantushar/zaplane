@@ -100,15 +100,19 @@ class ConnectionsController extends WP_REST_Controller {
 				'callback'            => array( $this, 'init_oauth' ),
 				'permission_callback' => array( $this, 'permissions_check' ),
 				'args'                => array(
-					'app'  => array(
+					'app'         => array(
 						'required'          => true,
 						'type'              => 'string',
 						'sanitize_callback' => 'sanitize_text_field',
 					),
-					'name' => array(
+					'name'        => array(
 						'required'          => true,
 						'type'              => 'string',
 						'sanitize_callback' => 'sanitize_text_field',
+					),
+					'credentials' => array(
+						'type'        => 'object',
+						'description' => 'OAuth credentials (client_id, client_secret) if user-provided',
 					),
 				),
 			)
@@ -148,6 +152,12 @@ class ConnectionsController extends WP_REST_Controller {
 				'methods'             => WP_REST_Server::READABLE,
 				'callback'            => array( $this, 'get_auth_fields' ),
 				'permission_callback' => array( $this, 'permissions_check' ),
+				'args'                => array(
+					'auth_type' => array(
+						'type'              => 'string',
+						'sanitize_callback' => 'sanitize_text_field',
+					),
+				),
 			)
 		);
 	}
@@ -344,11 +354,12 @@ class ConnectionsController extends WP_REST_Controller {
 		$user_id = get_current_user_id();
 		$app = $request->get_param( 'app' );
 		$name = $request->get_param( 'name' );
+		$credentials = $request->get_param( 'credentials' ) ?? array();
 
 		$oauth = $this->get_oauth_handler();
 
 		try {
-			$result = $oauth->init_flow( $app, $user_id, $name );
+			$result = $oauth->init_flow( $app, $user_id, $name, $credentials );
 			return rest_ensure_response( $result );
 		} catch ( \Exception $e ) {
 			return new WP_Error(
@@ -392,7 +403,9 @@ class ConnectionsController extends WP_REST_Controller {
 	 */
 	public function get_auth_fields( $request ) {
 		$app = $request->get_param( 'app' );
+		$auth_type = $request->get_param( 'auth_type' );
 
+		IntegrationLoader::init();
 		$integration = IntegrationLoader::get( $app );
 
 		if ( ! $integration ) {
@@ -403,14 +416,22 @@ class ConnectionsController extends WP_REST_Controller {
 			);
 		}
 
-		return rest_ensure_response(
-			array(
-				'app'         => $app,
-				'auth_type'   => $integration::get_auth_type(),
-				'auth_fields' => $integration::get_auth_fields(),
-				'requires_connection' => $integration::requires_connection(),
-			)
+		$main_auth_type = $integration::get_auth_type();
+		$response = array(
+			'app'                 => $app,
+			'auth_type'           => $main_auth_type,
+			'requires_connection' => $integration::requires_connection(),
 		);
+
+		// If integration supports multiple auth types
+		if ( $main_auth_type === 'both' ) {
+			$response['available_auth_types'] = $integration::get_available_auth_types();
+			$response['auth_fields'] = $integration::get_auth_fields( $auth_type );
+		} else {
+			$response['auth_fields'] = $integration::get_auth_fields();
+		}
+
+		return rest_ensure_response( $response );
 	}
 
 	/**

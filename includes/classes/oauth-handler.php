@@ -27,36 +27,41 @@ class OAuthHandler {
 	 * @param string $app             Integration slug
 	 * @param int    $user_id         WordPress user ID
 	 * @param string $connection_name User-defined connection name
+	 * @param array  $credentials     OAuth credentials (client_id, client_secret) if user-provided
 	 * @return array ['auth_url' => string, 'state' => string]
 	 * @throws \Exception on failure
 	 */
-	public function init_flow( string $app, int $user_id, string $connection_name ): array {
+	public function init_flow( string $app, int $user_id, string $connection_name, array $credentials = array() ): array {
+		// Ensure registry is loaded
+		IntegrationLoader::init();
 		$integration = IntegrationLoader::get( $app );
 
 		if ( ! $integration ) {
 			throw new \Exception( 'Integration not found: ' . $app );
 		}
 
-		if ( $integration::get_auth_type() !== 'oauth2' ) {
+		$auth_type = $integration::get_auth_type();
+		if ( $auth_type !== 'oauth2' && $auth_type !== 'both' ) {
 			throw new \Exception( 'Integration does not support OAuth2' );
 		}
 
 		$redirect_uri = self::get_callback_url();
 
-		// Generate and store state token
+		// Generate and store state token (include credentials for callback)
 		$state = $this->generate_state(
 			array(
-				'app'     => $app,
-				'user_id' => $user_id,
-				'name'    => $connection_name,
+				'app'         => $app,
+				'user_id'     => $user_id,
+				'name'        => $connection_name,
+				'credentials' => $credentials, // Store for token exchange
 			)
 		);
 
-		// Get authorization URL from integration
-		$auth_url = $integration::get_oauth_auth_url( $redirect_uri, $state );
+		// Get authorization URL from integration, passing credentials
+		$auth_url = $integration::get_oauth_auth_url( $redirect_uri, $state, $credentials );
 
 		if ( ! $auth_url ) {
-			throw new \Exception( 'Failed to generate OAuth authorization URL' );
+			throw new \Exception( 'Failed to generate OAuth authorization URL. Client ID may be missing.' );
 		}
 
 		return array(
@@ -85,7 +90,10 @@ class OAuthHandler {
 		$app = $state_data['app'];
 		$user_id = $state_data['user_id'];
 		$name = $state_data['name'];
+		$credentials = $state_data['credentials'] ?? array();
 
+		// Ensure registry is loaded
+		IntegrationLoader::init();
 		$integration = IntegrationLoader::get( $app );
 
 		if ( ! $integration ) {
@@ -94,9 +102,9 @@ class OAuthHandler {
 
 		$redirect_uri = self::get_callback_url();
 
-		// Exchange code for tokens
+		// Exchange code for tokens, passing stored credentials
 		try {
-			$tokens = $integration::exchange_oauth_code( $code, $redirect_uri );
+			$tokens = $integration::exchange_oauth_code( $code, $redirect_uri, $credentials );
 		} catch ( \Exception $e ) {
 			return new \WP_Error( 'token_exchange_failed', $e->getMessage() );
 		}
@@ -108,13 +116,16 @@ class OAuthHandler {
 			);
 		}
 
+		// Merge tokens with original credentials (keep client_id/secret for future refreshes)
+		$final_credentials = array_merge( $credentials, $tokens );
+
 		// Create the connection with tokens as credentials
 		$connection_id = $this->connections->create(
 			$user_id,
 			$app,
 			$name,
 			'oauth2',
-			$tokens
+			$final_credentials
 		);
 
 		if ( is_wp_error( $connection_id ) ) {
@@ -122,7 +133,7 @@ class OAuthHandler {
 		}
 
 		// Set OAuth expiry if provided
-		if ( isset( $tokens['expires_in'] ) ) {
+		if ( isset( $tokens['expires_in'] ) && $tokens['expires_in'] !== null ) {
 			$this->connections->set_oauth_expiry( $connection_id, (int) $tokens['expires_in'] );
 		}
 

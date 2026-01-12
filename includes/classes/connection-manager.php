@@ -32,7 +32,8 @@ class ConnectionManager {
 	public function create( int $user_id, string $app, string $name, string $auth_type, array $credentials ) {
 		global $wpdb;
 
-		// Validate integration exists
+		// Validate integration exists (ensure registry is loaded first)
+		IntegrationLoader::init();
 		$integration = IntegrationLoader::get( $app );
 		if ( ! $integration ) {
 			return new \WP_Error( 'invalid_app', 'Integration not found: ' . $app );
@@ -250,6 +251,7 @@ class ConnectionManager {
 			);
 		}
 
+		IntegrationLoader::init();
 		$integration = IntegrationLoader::get( $connection['app'] );
 
 		if ( ! $integration ) {
@@ -350,6 +352,7 @@ class ConnectionManager {
 			return $credentials; // No refresh token available
 		}
 
+		IntegrationLoader::init();
 		$integration = IntegrationLoader::get( $connection['app'] );
 
 		if ( ! $integration ) {

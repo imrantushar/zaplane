@@ -2,7 +2,6 @@
 namespace Zaplane\Integration;
 
 use Zaplane\Classes\IntegrationBase;
-use Zaplane\Classes\OAuthHandler;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -10,13 +9,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * Slack Integration
- * Reference implementation for OAuth2 integrations
+ * Supports both OAuth 2.0 and Bot Token authentication
  */
 class Slack extends IntegrationBase {
 
+	private const API_BASE_URL = 'https://slack.com/api';
 	private const OAUTH_AUTHORIZE_URL = 'https://slack.com/oauth/v2/authorize';
 	private const OAUTH_TOKEN_URL = 'https://slack.com/api/oauth.v2.access';
-	private const API_BASE_URL = 'https://slack.com/api';
 
 	/* ---------------------------------------------------------
 	 * Core Identity
@@ -108,18 +107,19 @@ class Slack extends IntegrationBase {
 			throw new \Exception( 'No connection credentials available for Slack' );
 		}
 
-		$access_token = $credentials['access_token'] ?? '';
+		// Get token - supports both OAuth (access_token) and direct bot token
+		$token = $credentials['access_token'] ?? $credentials['bot_token'] ?? '';
 
-		if ( empty( $access_token ) ) {
+		if ( empty( $token ) ) {
 			throw new \Exception( 'Slack access token is missing' );
 		}
 
 		if ( $action === 'send_message' ) {
-			return self::action_send_message( $node, $input, $access_token );
+			return self::action_send_message( $node, $input, $token );
 		}
 
 		if ( $action === 'send_dm' ) {
-			return self::action_send_dm( $node, $input, $access_token );
+			return self::action_send_dm( $node, $input, $token );
 		}
 
 		return array(
@@ -131,7 +131,7 @@ class Slack extends IntegrationBase {
 	/**
 	 * Send message to a channel
 	 */
-	private static function action_send_message( array $node, array $input, string $access_token ): array {
+	private static function action_send_message( array $node, array $input, string $token ): array {
 		$channel = $node['config']['data']['channel'] ?? '';
 		$text = $node['config']['data']['text'] ?? '';
 
@@ -142,7 +142,7 @@ class Slack extends IntegrationBase {
 			self::API_BASE_URL . '/chat.postMessage',
 			array(
 				'headers' => array(
-					'Authorization' => 'Bearer ' . $access_token,
+					'Authorization' => 'Bearer ' . $token,
 					'Content-Type'  => 'application/json; charset=utf-8',
 				),
 				'body'    => wp_json_encode(
@@ -179,7 +179,7 @@ class Slack extends IntegrationBase {
 	/**
 	 * Send direct message to a user
 	 */
-	private static function action_send_dm( array $node, array $input, string $access_token ): array {
+	private static function action_send_dm( array $node, array $input, string $token ): array {
 		$user_id = $node['config']['data']['user_id'] ?? '';
 		$text = $node['config']['data']['text'] ?? '';
 
@@ -190,7 +190,7 @@ class Slack extends IntegrationBase {
 			self::API_BASE_URL . '/conversations.open',
 			array(
 				'headers' => array(
-					'Authorization' => 'Bearer ' . $access_token,
+					'Authorization' => 'Bearer ' . $token,
 					'Content-Type'  => 'application/json; charset=utf-8',
 				),
 				'body'    => wp_json_encode( array( 'users' => $user_id ) ),
@@ -214,7 +214,7 @@ class Slack extends IntegrationBase {
 			self::API_BASE_URL . '/chat.postMessage',
 			array(
 				'headers' => array(
-					'Authorization' => 'Bearer ' . $access_token,
+					'Authorization' => 'Bearer ' . $token,
 					'Content-Type'  => 'application/json; charset=utf-8',
 				),
 				'body'    => wp_json_encode(
@@ -256,94 +256,106 @@ class Slack extends IntegrationBase {
 		return true;
 	}
 
+	/**
+	 * Slack supports both OAuth 2.0 and token-based authentication
+	 * Return 'both' to indicate multiple auth types are available
+	 */
 	public static function get_auth_type(): string {
-		return 'oauth2';
+		return 'both';
 	}
 
-	public static function get_oauth_scopes(): array {
+	/**
+	 * Get available authentication methods for this integration
+	 *
+	 * @return array List of auth methods with labels
+	 */
+	public static function get_available_auth_types(): array {
 		return array(
-			'chat:write',
-			'channels:read',
-			'users:read',
-			'im:write',
+			'oauth2'  => array(
+				'label'       => 'OAuth 2.0',
+				'description' => 'Connect securely using Slack OAuth. Recommended for most users.',
+			),
+			'api_key' => array(
+				'label'       => 'Bot Token',
+				'description' => 'Use a Bot User OAuth Token directly. Requires creating a Slack App.',
+			),
 		);
 	}
 
 	/**
-	 * Get OAuth authorization URL
+	 * Define the authentication fields for the connection form
+	 * Returns fields based on the selected auth type
+	 *
+	 * @param string|null $auth_type The selected auth type (oauth2 or api_key)
+	 * @return array Field definitions
 	 */
-	public static function get_oauth_auth_url( string $redirect_uri, string $state ): ?string {
-		$client_id = self::get_client_id();
-
-		if ( empty( $client_id ) ) {
-			return null;
-		}
-
-		return OAuthHandler::build_auth_url(
-			self::OAUTH_AUTHORIZE_URL,
-			$client_id,
-			$redirect_uri,
-			$state,
-			self::get_oauth_scopes()
-		);
-	}
-
-	/**
-	 * Exchange authorization code for tokens
-	 */
-	public static function exchange_oauth_code( string $code, string $redirect_uri ): array {
-		$response = wp_remote_post(
-			self::OAUTH_TOKEN_URL,
-			array(
-				'body' => array(
-					'client_id'     => self::get_client_id(),
-					'client_secret' => self::get_client_secret(),
-					'code'          => $code,
-					'redirect_uri'  => $redirect_uri,
-				),
-			)
+	public static function get_auth_fields( ?string $auth_type = null ): array {
+		// OAuth 2.0 fields - shown when user selects OAuth
+		$oauth_fields = array(
+			'client_id'     => array(
+				'type'        => 'text',
+				'label'       => 'Client ID',
+				'placeholder' => 'Your Slack App Client ID',
+				'required'    => true,
+				'help'        => 'Go to api.slack.com/apps → Your App → Basic Information → App Credentials',
+			),
+			'client_secret' => array(
+				'type'        => 'password',
+				'label'       => 'Client Secret',
+				'placeholder' => 'Your Slack App Client Secret',
+				'required'    => true,
+				'help'        => 'Found in the same location as Client ID',
+			),
 		);
 
-		if ( is_wp_error( $response ) ) {
-			throw new \Exception( 'OAuth token exchange failed: ' . $response->get_error_message() );
+		// Token-based fields - shown when user selects Bot Token
+		$token_fields = array(
+			'bot_token' => array(
+				'type'        => 'password',
+				'label'       => 'Bot Token',
+				'placeholder' => 'xoxb-xxxx-xxxx-xxxx',
+				'required'    => true,
+				'help'        => 'Go to api.slack.com/apps → Your App → OAuth & Permissions → Bot User OAuth Token',
+			),
+		);
+
+		// Return fields based on auth type
+		if ( $auth_type === 'oauth2' ) {
+			return $oauth_fields;
 		}
 
-		$body = json_decode( wp_remote_retrieve_body( $response ), true );
-
-		if ( empty( $body['ok'] ) ) {
-			throw new \Exception( 'OAuth error: ' . ( $body['error'] ?? 'Unknown error' ) );
+		if ( $auth_type === 'api_key' ) {
+			return $token_fields;
 		}
 
+		// Return all fields if no specific type requested
 		return array(
-			'access_token'  => $body['access_token'] ?? '',
-			'refresh_token' => $body['refresh_token'] ?? null,
-			'expires_in'    => $body['expires_in'] ?? null,
-			'token_type'    => $body['token_type'] ?? 'bearer',
-			'team_id'       => $body['team']['id'] ?? '',
-			'team_name'     => $body['team']['name'] ?? '',
-			'bot_user_id'   => $body['bot_user_id'] ?? '',
+			'oauth2'  => $oauth_fields,
+			'api_key' => $token_fields,
 		);
-	}
-
-	/**
-	 * Refresh OAuth token (Slack tokens don't typically expire, but implemented for completeness)
-	 */
-	public static function refresh_oauth_token( string $refresh_token ): array {
-		// Slack bot tokens don't expire by default
-		// If using user tokens with rotation, implement refresh here
-		return array();
 	}
 
 	/**
 	 * Test connection with provided credentials
+	 * Works with both OAuth tokens and Bot tokens
 	 */
 	public static function test_connection( array $credentials ): array {
-		$access_token = $credentials['access_token'] ?? '';
+		// Get the token - could be from OAuth (access_token) or direct bot token
+		$token = $credentials['access_token'] ?? $credentials['bot_token'] ?? '';
 
-		if ( empty( $access_token ) ) {
+		if ( empty( $token ) ) {
 			return array(
 				'success' => false,
-				'message' => 'Access token is missing',
+				'message' => 'No access token or bot token provided',
+				'details' => array(),
+			);
+		}
+
+		// Validate token format for bot tokens
+		if ( isset( $credentials['bot_token'] ) && strpos( $token, 'xoxb-' ) !== 0 ) {
+			return array(
+				'success' => false,
+				'message' => 'Invalid token format. Bot tokens should start with xoxb-',
 				'details' => array(),
 			);
 		}
@@ -352,7 +364,7 @@ class Slack extends IntegrationBase {
 			self::API_BASE_URL . '/auth.test',
 			array(
 				'headers' => array(
-					'Authorization' => 'Bearer ' . $access_token,
+					'Authorization' => 'Bearer ' . $token,
 				),
 			)
 		);
@@ -389,24 +401,101 @@ class Slack extends IntegrationBase {
 	}
 
 	/* ---------------------------------------------------------
-	 * Helper Methods
+	 * OAuth 2.0 Methods
 	 * --------------------------------------------------------- */
 
 	/**
-	 * Get Slack Client ID from settings
+	 * Get OAuth 2.0 scopes required for Slack
 	 */
-	private static function get_client_id(): string {
-		$settings = $GLOBALS['zaplane_settings'] ?? new \stdClass();
-		return $settings->slack_client_id ?? get_option( 'zaplane_slack_client_id', '' );
+	public static function get_oauth_scopes(): array {
+		return array(
+			'chat:write',
+			'channels:read',
+			'users:read',
+			'im:write',
+		);
 	}
 
 	/**
-	 * Get Slack Client Secret from settings
+	 * Get OAuth authorization URL
+	 *
+	 * @param string $redirect_uri Callback URL
+	 * @param string $state        CSRF state token
+	 * @param array  $credentials  Contains client_id and client_secret
+	 * @return string|null Authorization URL
 	 */
-	private static function get_client_secret(): string {
-		$settings = $GLOBALS['zaplane_settings'] ?? new \stdClass();
-		return $settings->slack_client_secret ?? get_option( 'zaplane_slack_client_secret', '' );
+	public static function get_oauth_auth_url( string $redirect_uri, string $state, array $credentials = array() ): ?string {
+		$client_id = $credentials['client_id'] ?? '';
+
+		if ( empty( $client_id ) ) {
+			return null;
+		}
+
+		$params = array(
+			'client_id'    => $client_id,
+			'redirect_uri' => $redirect_uri,
+			'state'        => $state,
+			'scope'        => implode( ',', self::get_oauth_scopes() ),
+		);
+
+		return self::OAUTH_AUTHORIZE_URL . '?' . http_build_query( $params );
 	}
+
+	/**
+	 * Exchange authorization code for tokens
+	 *
+	 * @param string $code         Authorization code
+	 * @param string $redirect_uri Callback URL
+	 * @param array  $credentials  Contains client_id and client_secret
+	 * @return array Token data
+	 * @throws \Exception on failure
+	 */
+	public static function exchange_oauth_code( string $code, string $redirect_uri, array $credentials = array() ): array {
+		$client_id = $credentials['client_id'] ?? '';
+		$client_secret = $credentials['client_secret'] ?? '';
+
+		if ( empty( $client_id ) || empty( $client_secret ) ) {
+			throw new \Exception( 'Client ID and Client Secret are required for OAuth token exchange' );
+		}
+
+		$response = wp_remote_post(
+			self::OAUTH_TOKEN_URL,
+			array(
+				'body' => array(
+					'client_id'     => $client_id,
+					'client_secret' => $client_secret,
+					'code'          => $code,
+					'redirect_uri'  => $redirect_uri,
+				),
+			)
+		);
+
+		if ( is_wp_error( $response ) ) {
+			throw new \Exception( 'OAuth token exchange failed: ' . $response->get_error_message() );
+		}
+
+		$body = json_decode( wp_remote_retrieve_body( $response ), true );
+
+		if ( empty( $body['ok'] ) ) {
+			throw new \Exception( 'Slack OAuth error: ' . ( $body['error'] ?? 'Unknown error' ) );
+		}
+
+		return array(
+			'access_token'  => $body['access_token'] ?? '',
+			'token_type'    => $body['token_type'] ?? 'bot',
+			'scope'         => $body['scope'] ?? '',
+			'team_id'       => $body['team']['id'] ?? '',
+			'team_name'     => $body['team']['name'] ?? '',
+			'bot_user_id'   => $body['bot_user_id'] ?? '',
+			// Slack bot tokens don't expire, but we track this for consistency
+			'expires_in'    => null,
+			'refresh_token' => null,
+		);
+	}
+
+	/* ---------------------------------------------------------
+	 * Helper Methods
+	 * --------------------------------------------------------- */
 
 	/**
 	 * Substitute variables in text from input data
