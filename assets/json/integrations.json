@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-01-11 12:53:58",
+    "generated_at": "2026-01-12 05:04:55",
     "integrations": {
         "wordpress": {
             "slug": "wordpress",
@@ -216,7 +216,7 @@
                 },
                 "edit_attachment": {
                     "key": "edit_attachment",
-                    "label": "Attachment Edit",
+                    "label": "Media Edit",
                     "hook": "edit_attachment",
                     "schema": [],
                     "outputs": [
@@ -236,6 +236,33 @@
                     "key": "update_attachment",
                     "label": "Attachment Update",
                     "hook": "save_post",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_attachment": {
+                    "key": "delete_attachment",
+                    "label": "Media Deletion",
+                    "hook": "delete_attachment",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "media_upload_tabs": {
+                    "key": "media_upload_tabs",
+                    "label": "Media Tabs",
+                    "hook": "media_upload_tabs",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "intermediate_image_sizes": {
+                    "key": "intermediate_image_sizes",
+                    "label": "Image Sizes",
+                    "hook": "intermediate_image_sizes",
                     "schema": [],
                     "outputs": [
                         "main"

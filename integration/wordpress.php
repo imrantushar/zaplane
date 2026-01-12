@@ -17,22 +17,26 @@ class Wordpress extends IntegrationBase {
 
     public static function get_triggers(): array {
         return [
-            'publish_post'            => ['label' => 'Post Published',          'hook' => 'publish_post'],
-            'post_updated'            => ['label' => 'Post Updated',            'hook' => 'post_updated'],
-            'user_register'           => ['label' => 'User Registered',         'hook' => 'user_register'],
-            'comment_post'            => ['label' => 'Comment Added',           'hook' => 'comment_post'],
-            'deleted_post'            => ['label' => 'Post Deleted',            'hook' => 'before_delete_post'],
-            'trashed_post'            => ['label' => 'Post Moved to Trash',     'hook' => 'trashed_post'],
-            'save_post'               => ['label' => 'Save Post',               'hook' => 'save_post'],
-            'activated_plugin'        => ['label' => 'Activate Plugin',         'hook' => 'activated_plugin'],
-            'deactivate_plugin'       => ['label' => 'Deactivate Plugin',       'hook' => 'deactivate_plugin'],
-            'switch_theme'            => ['label' => 'Theme Switch',            'hook' => 'switch_theme'],
-            'switch_blog'             => ['label' => 'Blog Switch',             'hook' => 'switch_blog'],
-            'customizer_registration' => ['label' => 'Customizer Registration', 'hook' => 'customizer_registration'],
-            'add_attachment'          => ['label' => 'Add Attachment',          'hook' => 'add_attachment'],
-            'edit_attachment'         => ['label' => 'Attachment Edit',         'hook' => 'edit_attachment'],
-            'save_attachment'         => ['label' => 'Attachment Save',         'hook' => 'save_post'],
-            'update_attachment'       => ['label' => 'Attachment Update',       'hook' => 'save_post'],
+            'publish_post'             => ['label' => 'Post Published',          'hook' => 'publish_post'],
+            'post_updated'             => ['label' => 'Post Updated',            'hook' => 'post_updated'],
+            'user_register'            => ['label' => 'User Registered',         'hook' => 'user_register'],
+            'comment_post'             => ['label' => 'Comment Added',           'hook' => 'comment_post'],
+            'deleted_post'             => ['label' => 'Post Deleted',            'hook' => 'before_delete_post'],
+            'trashed_post'             => ['label' => 'Post Moved to Trash',     'hook' => 'trashed_post'],
+            'save_post'                => ['label' => 'Save Post',               'hook' => 'save_post'],
+            'activated_plugin'         => ['label' => 'Activate Plugin',         'hook' => 'activated_plugin'],
+            'deactivate_plugin'        => ['label' => 'Deactivate Plugin',       'hook' => 'deactivate_plugin'],
+            'switch_theme'             => ['label' => 'Theme Switch',            'hook' => 'switch_theme'],
+            'switch_blog'              => ['label' => 'Blog Switch',             'hook' => 'switch_blog'],
+            'customizer_registration'  => ['label' => 'Customizer Registration', 'hook' => 'customizer_registration'],
+            'add_attachment'           => ['label' => 'Add Attachment',          'hook' => 'add_attachment'],
+            'edit_attachment'          => ['label' => 'Attachment Edit',         'hook' => 'edit_attachment'],
+            'save_attachment'          => ['label' => 'Attachment Save',         'hook' => 'save_post'],
+            'update_attachment'        => ['label' => 'Attachment Update',       'hook' => 'save_post'],
+            'delete_attachment'        => ['label' => 'Media Deletion',          'hook' => 'delete_attachment'],
+            'edit_attachment'          => ['label' => 'Media Edit',              'hook' => 'edit_attachment'],
+            'media_upload_tabs'        => ['label' => 'Media Tabs',              'hook' => 'media_upload_tabs'],
+            'intermediate_image_sizes' => ['label' => 'Image Sizes',             'hook' => 'intermediate_image_sizes'],
         ];
     }
 
@@ -227,38 +231,10 @@ class Wordpress extends IntegrationBase {
                 ];
 
             case 'add_attachment' : 
-                $attachment_id = $args[0] ?? 0;
-                if ( ! $attachment_id ) return false;
-
-                $attachment = get_post( $attachment_id );
-                if ( ! $attachment || $attachment->post_type !== 'attachment' ) return false;
-
-                return [
-                    'attachment_id' => $attachment_id,
-                    'post_title'    => $attachment->post_title,
-                    'mime_type'     => get_post_mime_type( $attachment_id ),
-                    'url'           => wp_get_attachment_url( $attachment_id ),
-                    'uploaded_by'   => $attachment->post_author,
-                    'uploaded_at'   => $attachment->post_date,
-                ];
-
             case 'edit_attachment' : 
-                $attachment_id = $args[0] ?? 0;
-                if ( ! $attachment_id ) return false;
-
-                $attachment = get_post( $attachment_id );
-                if ( ! $attachment || $attachment->post_type !== 'attachment' ) return false;
-
-                return [
-                    'attachment_id' => $attachment_id,
-                    'post_title'    => $attachment->post_title,
-                    'mime_type'     => get_post_mime_type( $attachment_id ),
-                    'url'           => wp_get_attachment_url( $attachment_id ),
-                    'edited_by'     => get_current_user_id(),
-                    'edited_at'     => current_time( 'mysql' ),
-                ];
-
             case 'save_attachment' : 
+            case 'update_attachment' :
+                
                 $attachment_id = $args[0] ?? 0;
                 if ( ! $attachment_id ) return false;
 
@@ -270,12 +246,35 @@ class Wordpress extends IntegrationBase {
                     'post_title'    => $attachment->post_title,
                     'mime_type'     => get_post_mime_type( $attachment_id ),
                     'url'           => wp_get_attachment_url( $attachment_id ),
-                    'saved_by'      => get_current_user_id() ? : 0,
-                    'saved_at'      => current_time( 'mysql' ),
+                    'user_id'       => get_current_user_id(),
+                    'time'          => current_time( 'mysql' ),
+                ];
+            
+            case 'delete_attachment' :
+                $attachment_id = $args[0] ?? 0;
+                if ( ! $attachment_id ) return false;
+
+                return [
+                    'attachment_id' => $attachment_id,
+                    'user_id'       => get_current_user_id(),
+                    'time'          => current_time( 'mysql' ),
                 ];
 
-            case 'update_attachment' : 
-                $attachment_id = $args[0] ?? 0;
+            case 'media_upload_tabs' : 
+                $tabs = $args[0] ?? [];
+                if ( empty( $tabs ) || ! is_array( $tabs) ) return false;
+
+                return [
+                    'tabs'         => $tabs,
+                    'tabs_keys'    => array_keys( $tabs ),
+                    'count'        => count( $tabs ),
+                    'triggered_at' => current_time( 'mysql' ),
+                ];
+            
+            case 'intermediate_image_sizes' : 
+                $sizes         = $args[0] ?? [];
+                $metadate     = $args[1] ?? [];
+                $attachment_id = $args[2] ?? 0;
                 if ( ! $attachment_id ) return false;
 
                 $attachment = get_post( $attachment_id );
@@ -286,10 +285,11 @@ class Wordpress extends IntegrationBase {
                     'post_title'    => $attachment->post_title,
                     'mime_type'     => get_post_mime_type( $attachment_id ),
                     'url'           => wp_get_attachment_url( $attachment_id ),
-                    'saved_by'      => get_current_user_id() ? : 0,
-                    'saved_at'      => current_time( 'mysql' ),
+                    'user_id'       => get_current_user_id(),
+                    'time'          => current_time( 'mysql' ),
+                    'sizes'         => $sizes,
+                    'metadate'     => $metadate,
                 ];
-
         }
 
         return false;
