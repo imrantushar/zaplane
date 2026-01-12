@@ -25,8 +25,9 @@ const Logs = () => {
     const [showDetails, setShowDetails] = useState(false);
     const [activeRunId, setActiveRunId] = useState(null);
 
-    const runs = useSelector((state) => state.logs?.data || {});
-    console.log(runs,'data');
+    const 
+    {data,isLoading} = useSelector((state) => state.logs || {});
+    console.log(data,isLoading,'data');
 
     useEffect(() => {
         dispatch(
@@ -48,10 +49,17 @@ const Logs = () => {
             />
         );
     }
-    if (!runs?.length) {
+    if (isLoading) {
         return (
             <Flex align="center" justify="center" h="100%">
                 <Spinner size="xl" />
+            </Flex>
+        );
+    }
+    if(!data?.length){
+           return (
+            <Flex align="center" justify="center" h="100%">
+               <Text>There Have No data</Text>
             </Flex>
         );
     }
@@ -69,7 +77,7 @@ const Logs = () => {
             </Table.Header>
 
             <Table.Body>
-                {runs?.map((row) => (
+                {data?.map((row) => (
                     <Table.Row key={row.id}>
                         <Table.Cell>
                             <Text fontSize="sm">

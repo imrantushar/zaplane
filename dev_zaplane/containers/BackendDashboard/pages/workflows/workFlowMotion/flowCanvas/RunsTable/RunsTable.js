@@ -7,7 +7,7 @@ import {
   Spinner,
   Flex,
 } from "@chakra-ui/react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useState } from "react";
 import {
   getNodeLogDetails,
@@ -24,6 +24,7 @@ const RunsTable = ({ runs = [] }) => {
 
   const [showDetails, setShowDetails] = useState(false);
   const [activeRunId, setActiveRunId] = useState(null);
+   const { isLoading } = useSelector((state) => state.workflows);
 
   const statusStyle = (status) => {
     switch (status) {
@@ -49,10 +50,18 @@ const RunsTable = ({ runs = [] }) => {
     );
   }
 
-  if (!runs.length) {
+  if (isLoading) {
     return (
       <Flex align="center" justify="center" h="100%">
         <Spinner size="xl" />
+      </Flex>
+
+    );
+  }
+  if (!runs.length) {
+    return (
+      <Flex align="center" justify="center" h="100%">
+        <Text>No History available</Text>
       </Flex>
 
     );

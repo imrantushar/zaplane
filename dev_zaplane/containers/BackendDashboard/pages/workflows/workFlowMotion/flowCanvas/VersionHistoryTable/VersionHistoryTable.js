@@ -9,13 +9,14 @@ import {
 } from "@chakra-ui/react";
 import { getPreviewOldVersion, versionActive } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
 import { CheckCircle, Eye } from "lucide-react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 const VersionHistoryTable = ({
   versions = [],
   id,
 }) => {
     const dispatch=useDispatch()
+    const { isLoading } = useSelector((state) => state.workflows);
   const statusStyle = (isActive) => {
     if (isActive === "1") {
       return {
@@ -29,10 +30,18 @@ const VersionHistoryTable = ({
     };
   };
  
-   if (!versions.length) {
+   if (isLoading) {
      return (
        <Flex align="center" justify="center" h="100%">
          <Spinner size="sm" />
+       </Flex>
+ 
+     );
+   }
+   if (!versions.length) {
+     return (
+       <Flex align="center" justify="center" h="100%">
+         <Text>Right now Have no Version</Text>
        </Flex>
  
      );

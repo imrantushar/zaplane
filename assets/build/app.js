@@ -1322,8 +1322,11 @@ const Logs = () => {
   const dispatch = (0,react_redux__WEBPACK_IMPORTED_MODULE_8__.useDispatch)();
   const [showDetails, setShowDetails] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
   const [activeRunId, setActiveRunId] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(null);
-  const runs = (0,react_redux__WEBPACK_IMPORTED_MODULE_8__.useSelector)(state => state.logs?.data || {});
-  console.log(runs, 'data');
+  const {
+    data,
+    isLoading
+  } = (0,react_redux__WEBPACK_IMPORTED_MODULE_8__.useSelector)(state => state.logs || {});
+  console.log(data, isLoading, 'data');
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
     dispatch((0,_ZAPRedux_Slices_logsSlice_logsSlice__WEBPACK_IMPORTED_MODULE_9__.getRunsList)());
   }, [dispatch]);
@@ -1337,13 +1340,23 @@ const Logs = () => {
       }
     });
   }
-  if (!runs?.length) {
+  if (isLoading) {
     return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Flex, {
       align: "center",
       justify: "center",
       h: "100%",
       children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.Spinner, {
         size: "xl"
+      })
+    });
+  }
+  if (!data?.length) {
+    return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Flex, {
+      align: "center",
+      justify: "center",
+      h: "100%",
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
+        children: "There Have No data"
       })
     });
   }
@@ -1365,7 +1378,7 @@ const Logs = () => {
         })]
       })
     }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_7__.TableBody, {
-      children: runs?.map(row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_7__.TableRow, {
+      children: data?.map(row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_7__.TableRow, {
         children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_7__.TableCell, {
           children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
             fontSize: "sm",
@@ -3273,6 +3286,9 @@ const RunsTable = ({
   const dispatch = (0,react_redux__WEBPACK_IMPORTED_MODULE_7__.useDispatch)();
   const [showDetails, setShowDetails] = (0,react__WEBPACK_IMPORTED_MODULE_8__.useState)(false);
   const [activeRunId, setActiveRunId] = (0,react__WEBPACK_IMPORTED_MODULE_8__.useState)(null);
+  const {
+    isLoading
+  } = (0,react_redux__WEBPACK_IMPORTED_MODULE_7__.useSelector)(state => state.workflows);
   const statusStyle = status => {
     switch (status) {
       case "completed":
@@ -3306,13 +3322,23 @@ const RunsTable = ({
       }
     });
   }
-  if (!runs.length) {
+  if (isLoading) {
     return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Flex, {
       align: "center",
       justify: "center",
       h: "100%",
       children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Spinner, {
         size: "xl"
+      })
+    });
+  }
+  if (!runs.length) {
+    return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Flex, {
+      align: "center",
+      justify: "center",
+      h: "100%",
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Text, {
+        children: "No History available"
       })
     });
   }
@@ -3432,6 +3458,9 @@ const VersionHistoryTable = ({
   id
 }) => {
   const dispatch = (0,react_redux__WEBPACK_IMPORTED_MODULE_10__.useDispatch)();
+  const {
+    isLoading
+  } = (0,react_redux__WEBPACK_IMPORTED_MODULE_10__.useSelector)(state => state.workflows);
   const statusStyle = isActive => {
     if (isActive === "1") {
       return {
@@ -3444,13 +3473,23 @@ const VersionHistoryTable = ({
       bg: "gray.100"
     };
   };
-  if (!versions.length) {
+  if (isLoading) {
     return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Flex, {
       align: "center",
       justify: "center",
       h: "100%",
       children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Spinner, {
         size: "sm"
+      })
+    });
+  }
+  if (!versions.length) {
+    return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Flex, {
+      align: "center",
+      justify: "center",
+      h: "100%",
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Text, {
+        children: "Right now Have no Version"
       })
     });
   }
@@ -3977,12 +4016,14 @@ const retryNodeRun = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyn
 const logSlice = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createSlice)({
   name: 'logs',
   initialState: {
-    data: []
+    data: [],
+    isLoading: true
   },
   reducers: {},
   extraReducers: builder => {
     builder.addCase(getRunsList.fulfilled, (state, action) => {
       state.data = action.payload;
+      state.isLoading = false;
     });
   }
 });
@@ -4420,7 +4461,8 @@ const workflowsSlice = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createSl
     data: [],
     runs: [],
     versions: [],
-    nodeDetails: []
+    nodeDetails: [],
+    isLoading: true
   },
   reducers: {},
   extraReducers: builder => {
@@ -4450,6 +4492,7 @@ const workflowsSlice = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createSl
       } : item);
     }).addCase(getRunWorkFlow.fulfilled, (state, action) => {
       state.runs = action.payload;
+      state.isLoading = false;
     }).addCase(getPreviewOldVersion.fulfilled, (state, action) => {
       if (!state.data.length) return;
       state.data[0] = {
@@ -4460,6 +4503,7 @@ const workflowsSlice = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createSl
       };
     }).addCase(getAllVersion.fulfilled, (state, action) => {
       state.versions = action.payload;
+      state.isLoading = false;
     }).addCase(versionActive.fulfilled, (state, action) => {
       const activeVersionId = action.meta.arg.versionID;
       state.versions = state.versions.map(version => ({

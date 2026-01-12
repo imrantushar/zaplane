@@ -307,7 +307,8 @@ const workflowsSlice = createSlice({
 		data: [],
 		runs: [],
 		versions: [],
-		nodeDetails: []
+		nodeDetails: [],
+		isLoading:true
 
 
 	},
@@ -349,6 +350,7 @@ const workflowsSlice = createSlice({
 			})
 			.addCase(getRunWorkFlow.fulfilled, (state, action) => {
 				state.runs = action.payload;
+				state.isLoading=false
 			})
 			.addCase(getPreviewOldVersion.fulfilled, (state, action) => {
 				if (!state.data.length) return;
@@ -361,6 +363,7 @@ const workflowsSlice = createSlice({
 			})
 			.addCase(getAllVersion.fulfilled, (state, action) => {
 				state.versions = action.payload;
+				state.isLoading=false
 			})
 			.addCase(versionActive.fulfilled, (state, action) => {
 				const activeVersionId = action.meta.arg.versionID;
