@@ -11,6 +11,7 @@ import {
   Stack,
   Menu,
   Portal,
+  Spinner,
 
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
@@ -37,7 +38,7 @@ const CreateWorkflows = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const { data } = useSelector((state) => state.workflows);
+  const { data, isLoading } = useSelector((state) => state.workflows);
 
   useEffect(() => {
     dispatch(getWorkFlow());
@@ -48,7 +49,7 @@ const CreateWorkflows = () => {
 
     dispatch(
       createWorkflows({
-        title: workflowName,
+        title: workflowName
       })
     )
       .unwrap()
@@ -89,7 +90,7 @@ const CreateWorkflows = () => {
     try {
       await dispatch(updateWorkFlowStatus(payload));
     } catch (error) {
-    console.log(error);
+      console.log(error);
     }
   };
 
@@ -106,8 +107,8 @@ const CreateWorkflows = () => {
         bg="white"
       >
         <Box>
-          <Heading size="md">{__("Workflows", "zaplane")}</Heading>
-          <Text fontSize="sm" color="gray.500">
+          <Heading margin='0' size="md">{__("Workflows", "zaplane")}</Heading>
+          <Text fontSize="sm" margin='0' color="gray.500">
             {__("Automate actions between your apps", "zaplane")}
           </Text>
         </Box>
@@ -124,9 +125,9 @@ const CreateWorkflows = () => {
                 <Menu.Item onClick={() => setIsModalOpen(true)}>
                   {__("Create from Scratch", "zaplane")}
                 </Menu.Item>
-                <Menu.Item>
+                {/* <Menu.Item>
                   {__("Create with AI", "zaplane")}
-                </Menu.Item>
+                </Menu.Item> */}
               </Menu.Content>
             </Menu.Positioner>
           </Portal>
@@ -141,7 +142,7 @@ const CreateWorkflows = () => {
           boxShadow="sm"
         >
           <Box px={5} py={4} borderBottom="1px solid" borderColor="gray.200">
-            <Heading size="sm">
+            <Heading size="sm" margin='0'>
               {__("Workflow List", "zaplane")}
             </Heading>
           </Box>
@@ -149,65 +150,99 @@ const CreateWorkflows = () => {
           <Table.Root size="sm">
             <Table.Header bg="gray.50">
               <Table.Row>
-                <Table.ColumnHeader width="25%">Title</Table.ColumnHeader>
-                <Table.ColumnHeader width="25%">Name</Table.ColumnHeader>
-                <Table.ColumnHeader width="25%">Status</Table.ColumnHeader>
-                <Table.ColumnHeader width="25%" textAlign="end">
+                <Table.ColumnHeader textAlign="center">
+                  Title
+                </Table.ColumnHeader>
+                <Table.ColumnHeader textAlign="center">
+                  Status
+                </Table.ColumnHeader>
+                <Table.ColumnHeader textAlign="center">
                   Actions
                 </Table.ColumnHeader>
               </Table.Row>
             </Table.Header>
 
             <Table.Body>
-              {Array.isArray(data) && data?.map((item) => (
-                <Table.Row key={item.id} _hover={{ bg: "gray.50" }}>
-                  <Table.Cell>
-                    <Text fontWeight="500">{item.title}</Text>
-                  </Table.Cell>
-                  <Table.Cell color="gray.600">
-                    {item.name}
-                  </Table.Cell>
-                  <Table.Cell>
-                    <Box w='109px'>
-                      <Select
-                        options={statusOptions}
-                        value={statusOptions.find(opt => opt.value === item.status)}
-                        onChange={(selected) =>
-                          onSubmitHandler(item, selected.value)
-                        }
-                        isClearable={false}
-                        isSearchable={false}
-                        placeholder="Select status"
-                      />
-                    </Box>
-                  </Table.Cell>
-                  <Table.Cell textAlign="end">
-                    <Stack direction="row" spacing={2} justify="flex-end">
-                      <Button
-                        size="xs"
-                        variant="outline"
-                        onClick={() =>
-                          navigate(
-                            `${route_path}admin.php?page=zaplane-workflows&action=edit&id=${item.id}`
-                          )
-                        }
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        size="xs"
-                        colorScheme="red"
-                        variant="ghost"
-                        onClick={() => workflowDeleteHandler(item.id)}
-                      >
-                        Delete
-                      </Button>
-                    </Stack>
+              {isLoading && (
+                <Table.Row>
+                  <Table.Cell colSpan={3}>
+                    <Flex align="center" justify="center" h="200px">
+                      <Spinner size="lg" />
+                    </Flex>
                   </Table.Cell>
                 </Table.Row>
-              ))}
+              )}
+              {!isLoading && !data?.length && (
+                <Table.Row>
+                  <Table.Cell colSpan={3}>
+                    <Flex align="center" justify="center" h="200px">
+                      <Text color="gray.500">No data found</Text>
+                    </Flex>
+                  </Table.Cell>
+                </Table.Row>
+              )}
+              {!isLoading &&
+                data.map((item) => (
+                  <Table.Row
+                    key={item.id}
+                    _hover={{ bg: "gray.50" }}
+                  >
+                    <Table.Cell>
+                      <Flex justify="center" align="center">
+                        <Text fontWeight="500" m={0}>
+                          {item.title}
+                        </Text>
+                      </Flex>
+                    </Table.Cell>
+                    <Table.Cell>
+                      <Flex justify="center" align="center">
+                        <Box w="120px">
+                          <Select
+                            options={statusOptions}
+                            value={statusOptions.find(
+                              (opt) => opt.value === item.status
+                            )}
+                            onChange={(selected) =>
+                              onSubmitHandler(item, selected.value)
+                            }
+                            isClearable={false}
+                            isSearchable={false}
+                          />
+                        </Box>
+                      </Flex>
+                    </Table.Cell>
+                    <Table.Cell>
+                      <Flex justify="center" align="center">
+                        <Stack direction="row" spacing={2}>
+                          <Button
+                            size="xs"
+                            variant="outline"
+                            onClick={() =>
+                              navigate(
+                                `${route_path}admin.php?page=zaplane-workflows&action=edit&id=${item.id}`
+                              )
+                            }
+                          >
+                            Edit
+                          </Button>
+
+                          <Button
+                            size="xs"
+                            colorScheme="red"
+                            variant="ghost"
+                            onClick={() => workflowDeleteHandler(item.id)}
+                          >
+                            Delete
+                          </Button>
+                        </Stack>
+                      </Flex>
+                    </Table.Cell>
+                  </Table.Row>
+                ))}
             </Table.Body>
+
           </Table.Root>
+
         </Box>
       </Box>
       <WPModal

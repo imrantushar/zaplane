@@ -322,6 +322,7 @@ const workflowsSlice = createSlice({
 			})
 			.addCase(getWorkFlow.fulfilled, (state, action) => {
 				state.data = [...action.payload].reverse();
+				state.isLoading=false
 			})
 
 			.addCase(getSingleWorkFlow.fulfilled, (state, action) => {
