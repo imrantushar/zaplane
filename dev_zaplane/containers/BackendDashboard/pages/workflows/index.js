@@ -181,7 +181,7 @@ const CreateWorkflows = () => {
                   </Table.Cell>
                 </Table.Row>
               )}
-              {!isLoading &&
+              {!isLoading && Array.isArray(data) &&
                 data.map((item) => (
                   <Table.Row
                     key={item.id}

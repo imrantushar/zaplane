@@ -1889,7 +1889,7 @@ const CreateWorkflows = () => {
                   })
                 })
               })
-            }), !isLoading && data.map(item => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_20__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.TableRow, {
+            }), !isLoading && Array.isArray(data) && data.map(item => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_20__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.TableRow, {
               _hover: {
                 bg: "gray.50"
               },
