@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-01-12 05:04:55",
+    "generated_at": "2026-01-12 06:42:57",
     "integrations": {
         "wordpress": {
             "slug": "wordpress",
@@ -105,7 +105,7 @@
                 },
                 "deleted_post": {
                     "key": "deleted_post",
-                    "label": "Post Deleted",
+                    "label": "Before Deleted Post",
                     "hook": "before_delete_post",
                     "schema": [],
                     "outputs": [
@@ -196,10 +196,19 @@
                         "main"
                     ]
                 },
-                "customizer_registration": {
-                    "key": "customizer_registration",
+                "customize_register": {
+                    "key": "customize_register",
                     "label": "Customizer Registration",
-                    "hook": "customizer_registration",
+                    "hook": "customize_register",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "rest_api_init": {
+                    "key": "rest_api_init",
+                    "label": "REST API Init",
+                    "hook": "rest_api_init",
                     "schema": [],
                     "outputs": [
                         "main"
@@ -216,7 +225,7 @@
                 },
                 "edit_attachment": {
                     "key": "edit_attachment",
-                    "label": "Media Edit",
+                    "label": "Attachment Edit",
                     "hook": "edit_attachment",
                     "schema": [],
                     "outputs": [
@@ -226,16 +235,16 @@
                 "save_attachment": {
                     "key": "save_attachment",
                     "label": "Attachment Save",
-                    "hook": "save_post",
+                    "hook": "attachment_fields_to_save",
                     "schema": [],
                     "outputs": [
                         "main"
                     ]
                 },
-                "update_attachment": {
-                    "key": "update_attachment",
+                "attachment_updated": {
+                    "key": "attachment_updated",
                     "label": "Attachment Update",
-                    "hook": "save_post",
+                    "hook": "attachment_updated",
                     "schema": [],
                     "outputs": [
                         "main"
@@ -250,6 +259,15 @@
                         "main"
                     ]
                 },
+                "media_edit": {
+                    "key": "media_edit",
+                    "label": "Media Edit",
+                    "hook": "edit_attachment",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
                 "media_upload_tabs": {
                     "key": "media_upload_tabs",
                     "label": "Media Tabs",
@@ -259,10 +277,28 @@
                         "main"
                     ]
                 },
-                "intermediate_image_sizes": {
-                    "key": "intermediate_image_sizes",
+                "image_sizes": {
+                    "key": "image_sizes",
                     "label": "Image Sizes",
-                    "hook": "intermediate_image_sizes",
+                    "hook": "image_size_names_choose",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "wp_insert_post": {
+                    "key": "wp_insert_post",
+                    "label": "WP Insert Post",
+                    "hook": "wp_insert_post",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "wp_insert_comment": {
+                    "key": "wp_insert_comment",
+                    "label": "WP Insert Comment",
+                    "hook": "wp_insert_comment",
                     "schema": [],
                     "outputs": [
                         "main"
