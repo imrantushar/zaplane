@@ -43,6 +43,14 @@ class Wordpress extends IntegrationBase {
             'signup_extra_fields' => ['label' => 'Signup Extra Fields', 'hook' => 'signup_extra_fields'],
             'signup_finished' => ['label' => 'Signup Finished', 'hook' => 'signup_finished'],
             'signup_header' => ['label' => 'Signup Header', 'hook' => 'signup_header'],
+            'create_term' => ['label' => 'Term Creation', 'hook' => 'create_term'],
+            'created_term' => ['label' => 'Term Created', 'hook' => 'created_term'],
+            'edit_term' => ['label' => 'Term Edit', 'hook' => 'edit_term'],
+            'edited_term' => ['label' => 'Term Edited', 'hook' => 'edited_term'],
+            'saved_term' => ['label' => 'Term Update', 'hook' => 'saved_term'],
+            'delete_term' => ['label' => 'Term Deletion', 'hook' => 'delete_term'],
+            'delete_term_taxonomy' => ['label' => 'Delete Term Taxonomy', 'hook' => 'delete_term_taxonomy'],
+            'generate_rewrite_rules' => ['label' => 'Rewrite Rules', 'hook' => 'generate_rewrite_rules'],
             'add_action' => ['label' => 'Add Action', 'hook' => 'add_action'],
             'do_action' => ['label' => 'Do Action', 'hook' => 'do_action'],
             'add_meta_boxes' => ['label' => 'Meta Box Setup', 'hook' => 'add_meta_boxes'],
@@ -84,17 +92,6 @@ class Wordpress extends IntegrationBase {
             ];
         }
 
-        if ( $trigger === 'add_action' ) {
-            return [
-                [
-                    'key' => 'hook_name',
-                    'label' => 'Hook Name',
-                    'type' => 'text',
-                    'required' => true,
-                ],
-            ];
-        }
-
         if ( $trigger === 'do_action' ) {
             return [
                 [
@@ -106,8 +103,23 @@ class Wordpress extends IntegrationBase {
             ];
         }
 
+        if ( $trigger === 'add_action' ) {
+            return [
+                [
+                    'key' => 'hook_name',
+                    'label' => 'Hook Name',
+                    'type' => 'text',
+                    'required' => true,
+                ],
+            ];
+        }
+
         return [];
     }
+
+    /* =====================================================
+     * TRIGGER PAYLOAD
+     * ===================================================== */
 
     public static function resolve_trigger( array $node, array $args ) {
   
@@ -117,7 +129,7 @@ class Wordpress extends IntegrationBase {
             case 'post_updated':
 
                 $post = get_post( $args[0] ?? 0 );
-                if ( ! $post ) return false;
+                 if ( ! $post ) return false;
 
                 // Apply trigger filters
                 if ( ! empty($node['config']['post_type']) && $post->post_type !== $node['config']['post_type'] ) {
@@ -151,34 +163,30 @@ class Wordpress extends IntegrationBase {
 
             case 'set_user_role':
 
-                $payload = static::get_user_payload( $args[0] ?? 0 );
-                if ( ! $payload ) return false;
+                $user_data = static::get_user_payload( $args[0] ?? 0 ) ?: [];
 
-                $role = $args[1] ?? '';
-                $payload['role'] = $role ?: ( $payload['role'] ?? '' );
-                $payload['old_roles'] = $args[2] ?? [];
+                $user_data['role'] = $args[1] ?? ( $user_data['role'] ?? '' );
+                $user_data['old_roles'] = $args[2] ?? [];
 
-                return $payload;
+                return $user_data ?: false;
 
             case 'show_user_profile':
             case 'edit_user_profile':
-                return static::get_user_payload( $args[0] ?? 0 ) ?: false;
+                return static::get_user_payload( $args[0] ?? 0 );
 
             case 'personal_options_update':
             case 'edit_user_profile_update':
-                return static::get_user_payload( $args[0] ?? 0 ) ?: false;
+                return static::get_user_payload( $args[0] ?? 0 );
 
             case 'profile_update':
-                $payload = static::get_user_payload( $args[0] ?? 0 );
-                if ( ! $payload ) return false;
-
-                $old_user = $args[1] ?? null;
-                if ( $old_user instanceof \WP_User ) {
-                    $payload['old_email'] = $old_user->user_email;
-                    $payload['old_role'] = $old_user->roles[0] ?? '';
-                }
-
-                return $payload;
+                $old_user = (object) ( $args[1] ?? [] );
+                return static::get_user_payload(
+                    $args[0] ?? 0,
+                    [
+                        'old_email' => $old_user->user_email ?? '',
+                        'old_role' => $old_user->roles[0] ?? '',
+                    ]
+                );
 
             case 'remove_user_from_blog':
                 return static::get_user_payload(
@@ -187,15 +195,13 @@ class Wordpress extends IntegrationBase {
                         'blog_id' => $args[1] ?? 0,
                         'reassign' => $args[2] ?? 0,
                     ]
-                ) ?: false;
+                );
 
             case 'delete_user':
                 return static::get_user_payload(
                     $args[2] ?? ( $args[0] ?? 0 ),
-                    [
-                        'reassign' => $args[1] ?? 0,
-                    ]
-                ) ?: false;
+                    [ 'reassign' => $args[1] ?? 0 ]
+                );
 
             case 'login_footer':
             case 'login_form':
@@ -211,55 +217,93 @@ class Wordpress extends IntegrationBase {
                 ];
 
             case 'retrieve_password':
-                return static::get_user_payload( $args[0] ?? '' ) ?: [
+                $user_payload = static::get_user_payload( $args[0] ?? '' );
+                return $user_payload ?: [
                     'event' => $node['event'],
-                    'user_login' => (string) ( $args[0] ?? '' ),
+                    'user_login' => $args[0] ?? '',
                 ];
 
             case 'password_reset':
-                return static::get_user_payload( $args[0] ?? 0 ) ?: false;
+                return static::get_user_payload( $args[0] ?? 0 );
 
             case 'after_password_reset':
                 return static::get_user_payload(
                     $args[0] ?? 0,
+                    [ 'after_reset' => true ]
+                );
+
+            case 'create_term':
+            case 'created_term':
+            case 'edit_term':
+            case 'edited_term':
+                return self::get_term_payload(
+                    $args[0] ?? 0,
+                    $args[2] ?? '',
+                    $args[1] ?? 0,
+                    [ 'args' => $args[3] ?? [] ]
+                );
+
+            case 'saved_term':
+                if ( empty( $args[3] ) ) return false;
+
+                return self::get_term_payload(
+                    $args[0] ?? 0,
+                    $args[2] ?? '',
+                    $args[1] ?? 0,
                     [
-                        'after_reset' => true,
+                        'update' => true,
+                        'args' => $args[4] ?? [],
                     ]
-                ) ?: false;
+                );
+
+            case 'delete_term':
+                return self::get_term_payload(
+                    $args[0] ?? 0,
+                    $args[2] ?? '',
+                    $args[1] ?? 0,
+                    [
+                        'deleted' => true,
+                        'object_ids' => $args[4] ?? [],
+                    ],
+                    $args[3] ?? null
+                );
+
+            case 'delete_term_taxonomy':
+                return self::get_term_payload( 0, '', $args[0] ?? 0 );
+
+            case 'generate_rewrite_rules':
+                $rewrite = (object) ( $args[0] ?? [] );
+                return [
+                    'event' => $node['event'],
+                    'rules_count' => count( (array) ( $rewrite->rules ?? [] ) ),
+                    'permalink_structure' => $rewrite->permalink_structure ?? '',
+                ];
 
             case 'add_action':
-                $hook_name = (string) ( $args[0] ?? '' );
-                if ( ! empty( $node['config']['hook_name'] ) && $hook_name !== $node['config']['hook_name'] ) {
-                    return false;
-                }
-
+                $hook = $args[0] ?? '';
                 return [
-                    'hook_name' => $hook_name,
+                    'hook_name' => $hook,
                     'callback' => $args[1] ?? null,
-                    'priority' => (int) ( $args[2] ?? 10 ),
-                    'accepted_args' => (int) ( $args[3] ?? 1 ),
+                    'priority' => $args[2] ?? 10,
+                    'accepted_args' => $args[3] ?? 1,
                 ];
 
             case 'do_action':
-                $hook_name = (string) ( $args[0] ?? '' );
-                if ( ! empty( $node['config']['hook_name'] ) && $hook_name !== $node['config']['hook_name'] ) {
-                    return false;
-                }
-
+                $hook = $args[0] ?? '';
                 return [
-                    'hook_name' => $hook_name,
+                    'hook_name' => $hook,
                     'args' => array_slice( $args, 1 ),
                 ];
 
             case 'add_meta_boxes':
-                $post_type = (string) ( $args[0] ?? '' );
-                $post = $args[1] ?? null;
+                $post_type = $args[0] ?? '';
+                $post = (object) ( $args[1] ?? [] );
 
                 return [
                     'post_type' => $post_type,
-                    'post_id' => $post instanceof \WP_Post ? $post->ID : 0,
-                    'post_title' => $post instanceof \WP_Post ? $post->post_title : '',
-                    'post_status' => $post instanceof \WP_Post ? $post->post_status : '',
+                    'post_id' => $post->ID ?? 0,
+                    'post_title' => $post->post_title ?? '',
+                    'post_status' => $post->post_status ?? '',
                 ];
 
             case 'add_option':
@@ -276,38 +320,30 @@ class Wordpress extends IntegrationBase {
             case 'delete_post_meta':
                 return [
                     'meta_ids' => $args[0] ?? [],
-                    'post_id' => (int) ( $args[1] ?? 0 ),
-                    'meta_key' => (string) ( $args[2] ?? '' ),
+                    'post_id' => $args[1] ?? 0,
+                    'meta_key' => $args[2] ?? '',
                     'meta_value' => $args[3] ?? null,
                 ];
 
             case 'admin_post':
                 return [
-                    'action' => (string) ( $_REQUEST['action'] ?? '' ),
+                    'action' => $_REQUEST['action'] ?? '',
                 ];
 
             case 'wp_delete_site':
-                $site = $args[0] ?? null;
-                if ( $site instanceof \WP_Site ) {
-                    return [
-                        'blog_id' => (int) $site->blog_id,
-                        'site_id' => (int) $site->site_id,
-                        'domain' => (string) $site->domain,
-                        'path' => (string) $site->path,
-                        'registered' => (string) $site->registered,
-                        'deleted' => (string) $site->deleted,
-                    ];
-                }
+                $site = (object) ( $args[0] ?? [] );
                 return [
-                    'blog_id' => 0,
+                    'blog_id' => $site->blog_id ?? 0,
+                    'site_id' => $site->site_id ?? 0,
+                    'domain' => $site->domain ?? '',
+                    'path' => $site->path ?? '',
+                    'registered' => $site->registered ?? '',
+                    'deleted' => $site->deleted ?? '',
                 ];
 
             case 'signup_blogform':
                 $errors = $args[0] ?? null;
-                $error_messages = [];
-                if ( $errors instanceof \WP_Error ) {
-                    $error_messages = $errors->get_error_messages();
-                }
+                $error_messages = is_object( $errors ) ? $errors->get_error_messages() : [];
                 return [
                     'event' => $node['event'],
                     'error_messages' => $error_messages,
@@ -414,6 +450,7 @@ class Wordpress extends IntegrationBase {
         return [
             'post_types' => [ self::class, 'query_post_types' ],
             'posts'      => [ self::class, 'query_posts' ],
+            'terms'      => [ self::class, 'query_terms' ],
             'users'      => [ self::class, 'query_users' ],
         ];
     }
@@ -443,10 +480,36 @@ class Wordpress extends IntegrationBase {
         ], $posts);
     }
 
+    public static function query_terms( $query ) {
+        $term_args = [
+            'taxonomy'   => $query['where']['taxonomy'] ?? 'category',
+            'search'     => $query['search'] ?? '',
+            'number'     => $query['limit'] ?? 20,
+            'hide_empty' => $query['where']['hide_empty'] ?? false,
+            'parent'     => (int) ( $query['where']['parent'] ?? 0 ),
+            'include'    => $query['where']['include'] ?? [],
+        ];
+
+        $terms = get_terms( $term_args );
+        return array_map(
+            fn( $term ) => [
+                'term_id'          => $term->term_id,
+                'term_taxonomy_id' => $term->term_taxonomy_id,
+                'taxonomy'         => $term->taxonomy,
+                'name'             => $term->name,
+                'slug'             => $term->slug,
+                'description'      => $term->description,
+                'parent'           => $term->parent,
+                'count'            => $term->count,
+            ],
+            $terms
+        );
+    }
+
     public static function query_users( $q ) {
         $q = is_array( $q ) ? $q : [];
         $users = $q['users'] ?? get_users( [ 'search' => $q['search'] ?? '' ] );
-        return array_map( function( $user ) {
+         return array_map( function( $user ) {
             $data = (array) $user->data;
             unset( $data['user_pass'], $data['user_activation_key'] );
 
@@ -473,20 +536,30 @@ class Wordpress extends IntegrationBase {
     }
 
     // Resolve user and reuse query_users payload
-    private static function get_user_payload( $user_id_or_login, array $extra = [] ): ?array {
-        if ( $user_id_or_login instanceof \WP_User ) {
-            $user = $user_id_or_login;
-        } elseif ( is_numeric( $user_id_or_login ) ) {
-            $user = get_userdata( (int) $user_id_or_login );
-        } else {
-            $user = get_user_by( 'login', (string) $user_id_or_login );
+    public static function get_user_payload( $user_ref, array $extra_data = [] ): ?array {
+        $resolved_user = $user_ref;
+        if ( is_numeric( $user_ref ) ) {
+            $resolved_user = get_userdata( (int) $user_ref );
+        } elseif ( ! is_object( $user_ref ) ) {
+            $resolved_user = get_user_by( 'login', (string) $user_ref );
         }
 
-        if ( ! $user ) {
-            return null;
-        }
+        $user_payload = $resolved_user ? static::query_users( [ 'users' => [ $resolved_user ] ] ) : [];
+        return $user_payload ? array_merge( $user_payload[0], $extra_data ) : null;
+    }
 
-        $payload = static::query_users( [ 'users' => [ $user ] ] );
-        return $payload ? array_merge( $payload[0], $extra ) : null;
+    public static function get_term_payload( $term_id, $taxonomy, $term_taxonomy_id = 0, array $extra_data = [], $term_object = null ) {
+        $term_id = $term_object->term_id ?? $term_id;
+        $taxonomy = $term_object->taxonomy ?? $taxonomy;
+
+        $terms = self::query_terms( [
+            'where' => [
+                'taxonomy' => $taxonomy,
+                'include' => $term_id ? [ (int) $term_id ] : [],
+            ],
+            'limit' => 1,
+        ] );
+
+        return array_merge( $terms[0] ?? [], $extra_data );
     }
 }

@@ -292,10 +292,82 @@
                         "main"
                     ]
                 },
-                "add_action": {
-                    "key": "add_action",
-                    "label": "Add Action",
-                    "hook": "add_action",
+                "create_term": {
+                    "key": "create_term",
+                    "label": "Term Creation",
+                    "hook": "create_term",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "created_term": {
+                    "key": "created_term",
+                    "label": "Term Created",
+                    "hook": "created_term",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "edit_term": {
+                    "key": "edit_term",
+                    "label": "Term Edit",
+                    "hook": "edit_term",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "edited_term": {
+                    "key": "edited_term",
+                    "label": "Term Edited",
+                    "hook": "edited_term",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "saved_term": {
+                    "key": "saved_term",
+                    "label": "Term Update",
+                    "hook": "saved_term",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_term": {
+                    "key": "delete_term",
+                    "label": "Term Deletion",
+                    "hook": "delete_term",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_term_taxonomy": {
+                    "key": "delete_term_taxonomy",
+                    "label": "Delete Term Taxonomy",
+                    "hook": "delete_term_taxonomy",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "generate_rewrite_rules": {
+                    "key": "generate_rewrite_rules",
+                    "label": "Rewrite Rules",
+                    "hook": "generate_rewrite_rules",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "do_action": {
+                    "key": "do_action",
+                    "label": "Do Action",
+                    "hook": "do_action",
                     "schema": [
                         {
                             "key": "hook_name",
@@ -308,10 +380,10 @@
                         "main"
                     ]
                 },
-                "do_action": {
-                    "key": "do_action",
-                    "label": "Do Action",
-                    "hook": "do_action",
+                "add_action": {
+                    "key": "add_action",
+                    "label": "Add Action",
+                    "hook": "add_action",
                     "schema": [
                         {
                             "key": "hook_name",
