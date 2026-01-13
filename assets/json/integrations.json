@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-01-12 12:08:55",
+    "generated_at": "2026-01-13 05:47:43",
     "integrations": {
         "wordpress": {
             "slug": "wordpress",
@@ -371,6 +371,144 @@
                     "key": "delete_option",
                     "label": "Option Delete",
                     "hook": "delete_option",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "wp_login": {
+                    "key": "wp_login",
+                    "label": "WP login",
+                    "hook": "wp_login",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "wp_login_failed": {
+                    "key": "wp_login_failed",
+                    "label": "WP Login Failed",
+                    "hook": "wp_login_failed",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "wp_logout": {
+                    "key": "wp_logout",
+                    "label": "WP Logout",
+                    "hook": "wp_logout",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "validate_reset": {
+                    "key": "validate_reset",
+                    "label": "Validate Reset",
+                    "hook": "validate_password_reset",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "activate_user": {
+                    "key": "activate_user",
+                    "label": "Activate User",
+                    "hook": "wpmu_activate_user",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_blog_public": {
+                    "key": "update_blog_public",
+                    "label": "Update Blog Public",
+                    "hook": "update_blog_public",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_blog_status": {
+                    "key": "update_blog_status",
+                    "label": "Update Blog Status",
+                    "hook": "update_blog_status",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "new_blog": {
+                    "key": "new_blog",
+                    "label": "New Blog",
+                    "hook": "wpmu_new_blog",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "transition_post_status": {
+                    "key": "transition_post_status",
+                    "label": "On Post Status Update",
+                    "hook": "transition_post_status",
+                    "schema": [
+                        {
+                            "key": "post_type",
+                            "label": "Post Type",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "post_types",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "post_status",
+                            "label": "Post Status",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Publish",
+                                    "value": "publish"
+                                },
+                                {
+                                    "label": "Draft",
+                                    "value": "draft"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "post_revision": {
+                    "key": "post_revision",
+                    "label": "Revision Creation",
+                    "hook": "_wp_put_post_revision",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "set_user_role": {
+                    "key": "set_user_role",
+                    "label": "Set User Role",
+                    "hook": "set_user_role",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add_user_role": {
+                    "key": "add_user_role",
+                    "label": "User Added to a Role",
+                    "hook": "add_user_role",
                     "schema": [],
                     "outputs": [
                         "main"

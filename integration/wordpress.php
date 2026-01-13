@@ -1,6 +1,7 @@
 <?php
 namespace Zaplane\Integration;
 
+use WP_Post;
 use WP_User;
 use Zaplane\Classes\IntegrationBase;
 
@@ -52,7 +53,15 @@ class Wordpress extends IntegrationBase {
             'wp_login'                    => ['label' => 'WP login',                     'hook' => 'wp_login'],
             'wp_login_failed'             => ['label' => 'WP Login Failed',              'hook' => 'wp_login_failed'],
             'wp_logout'                   => ['label' => 'WP Logout',                    'hook' => 'wp_logout'],
-            // 'validate_reset'               => ['label' => 'Validate Reset',                'hook' => 'validate_password_reset'],
+            'validate_reset'              => ['label' => 'Validate Reset',               'hook' => 'validate_password_reset'],
+            'activate_user'               => ['label' => 'Activate User',                'hook' => 'wpmu_activate_user'],
+            'update_blog_public'          => ['label' => 'Update Blog Public',           'hook' => 'update_blog_public'],
+            'update_blog_status'          => ['label' => 'Update Blog Status',           'hook' => 'update_blog_status'],
+            'new_blog'                    => ['label' => 'New Blog',                     'hook' => 'wpmu_new_blog'],
+            'transition_post_status'      => ['label' => 'On Post Status Update',        'hook' => 'transition_post_status'],
+            'post_revision'               => ['label' => 'Revision Creation',            'hook' => '_wp_put_post_revision'],
+            'set_user_role'               => ['label' => 'Set User Role',                'hook' => 'set_user_role'],
+            'add_user_role'               => ['label' => 'User Added to a Role',                'hook' => 'add_user_role'],
         ];
     }
 
@@ -114,6 +123,31 @@ class Wordpress extends IntegrationBase {
                         'select'      => [ 'file', 'name' ],
                     ],
                     'required' => true,
+                ],
+            ];
+        }
+
+        if ( $trigger === 'transition_post_status' ) {
+            return [
+                [
+                    'key'   => 'post_type',
+                    'label' => 'Post Type',
+                    'type'  => 'select',
+                    'dynamic' => [
+                        'integration' => 'wordpress',
+                        'query'       => 'post_types',
+                        'select'      => ['name','label'],
+                    ],
+                    'required' => true,
+                ],
+                [
+                    'key'   => 'post_status',
+                    'label' => 'Post Status',
+                    'type'  => 'select',
+                    'options' => [
+                        ['label'=>'Publish','value'=>'publish'],
+                        ['label'=>'Draft','value'=>'draft'],
+                    ]
                 ],
             ];
         }
@@ -466,8 +500,110 @@ class Wordpress extends IntegrationBase {
                     'ip_address' => $_SERVER['REMOTE_ADDR'] ?? '',
                 ];
 
-            
+            case 'validate_reset' : 
+                $user = $args[0] ?? null;
+                if ( ! $user || ! $user instanceof WP_User ) return false;
+                
+                return [
+                    'user_id'      => $user->ID,
+                    'user_login'   => $user->user_login,
+                    'user_email'   => $user->user_email,
+                    'display_name' => $user->display_name,
+                ];
 
+            case 'activate_user' : 
+                $user_id = $args[0] ?? 0;
+                if ( ! $user_id ) return false;
+                $user = get_user_by( 'id', $user_id );
+                if ( ! $user ) return false;
+
+                return [
+                    'user_id'      => $user->ID,
+                    'user_login'   => $user->user_login,
+                    'user_email'   => $user->user_email,
+                    'display_name' => $user->display_name,
+                ];
+
+            case 'update_blog_public' :
+                $blog_id = $args[0] ?? 0;
+                $public  = $args[1] ?? 0;
+                if ( ! $blog_id ) return false;
+
+                return [
+                    'blog_id' => $blog_id,
+                    'is_public' => $public,
+                ];
+
+            case 'update_blog_status' :
+                $blog_id    = $args[0] ?? 0;
+                $new_status = $args[1] ?? 0;
+                $old_status = $args[2] ?? 0;
+                if ( ! $blog_id ) return false;
+
+                return [
+                    'blog_id' => $blog_id,
+                    'new_status' => $new_status,
+                    'old_status' => $old_status,
+                ];
+
+            case 'new_blog' : 
+                $blog_id = $args[0] ?? 0;
+                $user_id = $args[1] ?? 0;
+                $domain  = $args[2] ?? '';
+                $path    = $args[3] ?? '';
+                $site_id = $args[4] ?? 0;
+                $meta    = $args[5] ?? [];
+                if ( ! $blog_id ) return false;
+
+                return [
+                    'blog_id' => $blog_id,
+                    'user_id' => $user_id,
+                    'domain'  => $domain,
+                    'path'    => $path,
+                    'site_id' => $site_id,
+                    'meta'    => $meta,
+                ];
+
+            case 'transition_post_status' :
+                $new_status = $args[0] ?? '';
+                $old_status = $args[1] ?? '';
+                $post       = $args[2] ?? null;
+                if ( ! $post || ! $post instanceof WP_Post ) return false;
+
+                return [
+                    'post_id'    => $post->ID,
+                    'post_title' => $post->post_title,
+                    'post_type'  => $post->post_type,
+                    'old_status' => $old_status,
+                    'new_status' => $new_status,
+                ];
+
+            case 'post_revision' :
+                $revision_id = $args[0] ?? '';
+                $post        = $args[1] ?? null;
+                if ( ! $post || ! $post instanceof WP_Post ) return false;
+
+                return [
+                    'revision_id' => $revision_id,
+                    'post_id'     => $post->ID,
+                    'post_title'  => $post->post_title,
+                    'post_type'   => $post->post_type,
+                ];
+
+            case 'set_user_role' :
+            case 'add_user_role' :
+                $user_id = $args[0] ?? 0;
+                $role = $args[1] ?? '';
+                $user = $args[2] ?? null;
+                if ( ! $user || ! $user instanceof WP_User ) return false;
+
+                return [
+                    'user_id'      => $user_id,
+                    'role'         => $role,
+                    'user_login'   => $user->user_login,
+                    'user_email'   => $user->user_email,
+                    'display_name' => $user->display_name,
+                ];
         }
 
         return false;
