@@ -18,6 +18,7 @@ import {
 import { nodeLogsRunDetails } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
 import LogDetails from "@ZAPComponents/LogDetails";
 import { getDuration } from "../workflows/workFlowMotion/helper";
+import ZAPLoading from "@ZAPComponents/Loading";
 
 const Logs = () => {
     const dispatch = useDispatch();
@@ -47,9 +48,7 @@ const Logs = () => {
 
     if (isLoading) {
         return (
-            <Flex align="center" justify="center" h="300px">
-                <Spinner size="xl" />
-            </Flex>
+            <ZAPLoading />
         );
     }
 
@@ -70,12 +69,9 @@ const Logs = () => {
             p={6}
             minHeight="100vh"
         >
-            {/* Title */}
             <Text fontSize="lg" fontWeight="600" mb={4}>
                 Workflow Logs
             </Text>
-
-            {/* Table */}
             <Table.Root size="sm" variant="outline">
                 <Table.Header bg="gray.50">
                     <Table.Row>

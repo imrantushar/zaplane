@@ -29,6 +29,7 @@ import {
 } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
 import { FiMoreVertical } from "react-icons/fi";
 import { showNotification } from "@ZAPRedux/Slices/notificationSlice/notificationSlice";
+import ZAPLoading from "@ZAPComponents/Loading";
 
 
 const CreateWorkflows = () => {
@@ -166,9 +167,7 @@ const CreateWorkflows = () => {
               {isLoading && (
                 <Table.Row>
                   <Table.Cell colSpan={3}>
-                    <Flex align="center" justify="center" h="200px">
-                      <Spinner size="lg" />
-                    </Flex>
+                     <ZAPLoading />
                   </Table.Cell>
                 </Table.Row>
               )}

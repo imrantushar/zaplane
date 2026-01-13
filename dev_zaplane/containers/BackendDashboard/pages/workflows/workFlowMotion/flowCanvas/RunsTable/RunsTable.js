@@ -16,6 +16,7 @@ import {
 } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
 import LogDetails from "@ZAPComponents/LogDetails";
 import { getDuration } from "../../helper";
+import ZAPLoading from "@ZAPComponents/Loading";
 
 
 
@@ -52,9 +53,7 @@ const RunsTable = ({ runs = [] }) => {
 
   if (isLoading) {
     return (
-      <Flex align="center" justify="center" h="100%">
-        <Spinner size="xl" />
-      </Flex>
+        <ZAPLoading />
 
     );
   }
