@@ -615,13 +615,25 @@ class Wordpress extends IntegrationBase {
 
     public static function get_actions(): array {
         return [
-            'create_post'       => ['label' => 'Create Post'],
-            'update_option'     => ['label' => 'Update Option'],
-            'update_post_title' => ['label' => 'Update Post Title'],
-            'delete_post'       => ['label' => 'Delete Post'],
-            'activate_plugin'   => ['label' => 'Activate Plugin'],
-            'deactivate_plugin' => ['label' => 'Deactivate Plugin'],
-            'switch_theme'      => ['label' => 'Theme Switch'],
+            'create_post'          => ['label' => 'Create Post'],
+            'update_option'        => ['label' => 'Update Option'],
+            'update_post_title'    => ['label' => 'Update Post Title'],
+            'update_post'          => ['label' => 'Update Post'],
+            'update_post_status'   => ['label' => 'Update Post Status'],
+            'delete_post'          => ['label' => 'Delete Post'],
+            'posts_all'            => ['label' => 'Post (All)'],
+            'post_single'          => ['label' => 'Post (Single)'],
+            'posts_by_post_type'   => ['label' => 'Posts by Post Type'],
+            'posts_by_metadata'    => ['label' => 'Posts by Metadata'],
+            'posts_metadata_all'   => ['label' => 'Post Metadata (All)'],
+            'post_metadata_single' => ['label' => 'Post Metadata (Single)'],
+            'post_permalink'       => ['label' => 'Post Permalink'],
+            'post_content'         => ['label' => 'Post Content'],
+            'post_excerpt'         => ['label' => 'Post Excerpt'],
+            'post_status'          => ['label' => 'Post Status'],
+            'activate_plugin'      => ['label' => 'Activate Plugin'],
+            'deactivate_plugin'    => ['label' => 'Deactivate Plugin'],
+            'switch_theme'         => ['label' => 'Theme Switch'],
         ];
     }
 
@@ -659,7 +671,7 @@ class Wordpress extends IntegrationBase {
                     'label'   => 'Status',
                     'type'    => 'select',
                     'options' => [
-                        ['label' => 'Draft', 'value'   => 'draft' ],
+                        ['label' => 'Draft',   'value' => 'draft' ],
                         ['label' => 'Publish', 'value' => 'publish' ],
                     ],
                 ],
@@ -708,6 +720,198 @@ class Wordpress extends IntegrationBase {
                     'required' => true,
                 ],
             ]; 
+        }
+
+        if ( $action === 'update_post' ) {
+            return [
+                [
+                    'key'      => 'post_id',
+                    'label'    => 'Post ID to Update',
+                    'type'     => 'expression', 
+                    'required' => true,
+                ],
+                [
+                    'key'      => 'post_title',
+                    'label'    => 'New Post Title',
+                    'type'     => 'expression',
+                    'required' => true, 
+                ],
+                [
+                    'key'      => 'post_content',
+                    'label'    => 'New Post Content',
+                    'type'     => 'expression',
+                    'required' => true,                 
+                ],
+                [
+                    'key'     => 'post_type',
+                    'label'   => 'Post Type',
+                    'type'    => 'select',
+                    'dynamic' => [
+                        'integration' => 'wordpress',
+                        'query'       => 'post_types',
+                        'select'      => [ 'name', 'label' ],
+                    ],
+                    'required' => true,
+                ],
+                [
+                    'key'     => 'post_status',
+                    'label'   => 'Status',
+                    'type'    => 'select',
+                    'options' => [
+                        ['label' => 'Draft',   'value' => 'draft' ],
+                        ['label' => 'Publish', 'value' => 'publish' ],
+                    ],
+                ],
+            ];
+        }
+
+        if ( $action === 'update_post_status' ) {
+            return [
+                [
+                    'key'      => 'post_id',
+                    'label'    => 'Post ID to Update',
+                    'type'     => 'expression', 
+                    'required' => true,
+                ],
+                [
+                    'key'     => 'post_status',
+                    'label'   => 'Status',
+                    'type'    => 'select',
+                    'options' => [
+                        ['label' => 'Publish', 'value' => 'publish' ],
+                        ['label' => 'Pending', 'value' => 'pending' ],
+                        ['label' => 'Private', 'value' => 'private' ],
+                        ['label' => 'Draft',   'value' => 'draft' ],
+                    ],
+                ],
+            ];
+        }
+
+        if ( $action === 'post_single' ) {
+            return [
+                [
+                    'key'      => 'post_id',
+                    'label'    => 'Post ID',
+                    'type'     => 'expression', 
+                    'required' => true,
+                ],
+            ];
+        }
+
+        if ( $action === 'posts_by_post_type' ) {
+            return [
+                [
+                    'key'     => 'post_type',
+                    'label'   => 'Post Type',
+                    'type'    => 'select',
+                    'dynamic' => [
+                        'integration' => 'wordpress',
+                        'query'       => 'post_types',
+                        'select'      => [ 'name', 'label' ],
+                    ],
+                    'required' => true,
+                ],
+            ];
+        }
+
+        if ( $action === 'posts_by_metadata' ) {
+            return [
+                [
+                    'key'     => 'post_type',
+                    'label'   => 'Post Type',
+                    'type'    => 'select',
+                    'dynamic' => [
+                        'integration' => 'wordpress',
+                        'query'       => 'post_types',
+                        'select'      => [ 'name', 'label' ],
+                    ],
+                    'required' => true,
+                ],
+                [
+                    'key'      => 'meta_kry',
+                    'label'    => 'Post Meta Key',
+                    'type'     => 'expression',
+                    'required' => true,                 
+                ],
+                [
+                    'key'      => 'meta_value',
+                    'label'    => 'Post Meta Value',
+                    'type'     => 'expression',
+                    'required' => true,                 
+                ],
+            ];
+        }
+
+        if ( $action === 'posts_metadata_all' ) {
+            return [
+                [
+                    'key'      => 'post_id',
+                    'label'    => 'Post ID',
+                    'type'     => 'expression', 
+                    'required' => true,
+                ],
+            ];
+        }
+
+        if ( $action === 'post_metadata_single' ) {
+            return [
+                [
+                    'key'      => 'post_id',
+                    'label'    => 'Post ID',
+                    'type'     => 'expression', 
+                    'required' => true,
+                ],
+                [
+                    'key'      => 'meta_kry',
+                    'label'    => 'Post Meta Key',
+                    'type'     => 'expression',
+                    'required' => true,                 
+                ],
+            ];
+        }
+
+        if ( $action === 'post_permalink' ) {
+            return [
+                [
+                    'key'      => 'post_id',
+                    'label'    => 'Post ID',
+                    'type'     => 'expression', 
+                    'required' => true,
+                ],
+            ];
+        }
+
+        if ( $action === 'post_content' ) {
+            return [
+                [
+                    'key'      => 'post_id',
+                    'label'    => 'Post ID',
+                    'type'     => 'expression', 
+                    'required' => true,
+                ],
+            ];
+        }
+
+        if ( $action === 'post_excerpt' ) {
+            return [
+                [
+                    'key'      => 'post_id',
+                    'label'    => 'Post ID',
+                    'type'     => 'expression', 
+                    'required' => true,
+                ],
+            ];
+        }
+
+        if ( $action === 'post_status' ) {
+            return [
+                [
+                    'key'      => 'post_id',
+                    'label'    => 'Post ID',
+                    'type'     => 'expression', 
+                    'required' => true,
+                ],
+            ];
         }
 
         if ( $action === 'activate_plugin' ) {
@@ -794,6 +998,214 @@ class Wordpress extends IntegrationBase {
             case 'delete_post':
                 wp_delete_post( $config['post_id'], true );
                 return ['port'=>'main','data'=>['post_id'=>$config['post_id']]];
+
+            case 'update_post':
+                wp_update_post([
+                    'ID'           => $config['post_id'],
+                    'post_title'   => $config['post_title'],
+                    'post_type'    => $config['post_type'],
+                    'post_content' => $config['post_content'],
+                    'post_status'  => $config['post_status'],
+                ]);
+                return ['port' => 'main', 'data' => []];
+
+            case 'update_post_status':
+                wp_update_post([
+                    'ID'          => $config['post_id'],
+                    'post_status' => $config['post_status'],
+                ]);
+                return ['port' => 'main', 'data' => []];
+
+            case 'posts_all':
+                $posts = get_posts([
+                    'post_type'   => 'post',
+                    'post_status' => 'any',
+                    'numberposts' => -1,
+                ]);
+                $post_details = array_map( function($post) {
+                    return [
+                        'ID'                    => $post->ID,
+                        'post_author'           => $post->post_author,
+                        'post_date'             => $post->post_date,
+                        'post_date_gmt'         => $post->post_date_gmt,
+                        'post_content'          => $post->post_content,
+                        'post_title'            => $post->post_title,
+                        'post_excerpt'          => $post->post_excerpt,
+                        'post_status'           => $post->post_status,
+                        'comment_status'        => $post->comment_status,
+                        'ping_status'           => $post->ping_status,
+                        'post_password'         => $post->post_password,
+                        'post_name'             => $post->post_name,
+                        'to_ping'               => $post->to_ping,
+                        'pinged'                => $post->pinged,
+                        'post_modified'         => $post->post_modified,
+                        'post_modified_gmt'     => $post->post_modified_gmt,
+                        'post_content_filtered' => $post->post_content_filtered,
+                        'post_parent'           => $post->post_parent,
+                        'guid'                  => $post->guid,
+                        'menu_order'            => $post->menu_order,
+                        'post_type'             => $post->post_type,
+                        'post_mime_type'        => $post->post_mime_type,
+                        'comment_count'         => $post->comment_count,
+                        'filter'                => 'raw',
+                    ];
+                }, $posts );
+                return ['port' => 'main', 'data' => $post_details];
+
+            case 'post_single':
+                $post_id = $config['post_id'] ?? 0;
+                $post = get_post( $post_id );
+                if ( ! $post ) return ['port' => 'main', 'data' => []];
+                $post_details = [
+                        'ID'                    => $post->ID,
+                        'post_author'           => $post->post_author,
+                        'post_date'             => $post->post_date,
+                        'post_date_gmt'         => $post->post_date_gmt,
+                        'post_content'          => $post->post_content,
+                        'post_title'            => $post->post_title,
+                        'post_excerpt'          => $post->post_excerpt,
+                        'post_status'           => $post->post_status,
+                        'comment_status'        => $post->comment_status,
+                        'ping_status'           => $post->ping_status,
+                        'post_password'         => $post->post_password,
+                        'post_name'             => $post->post_name,
+                        'to_ping'               => $post->to_ping,
+                        'pinged'                => $post->pinged,
+                        'post_modified'         => $post->post_modified,
+                        'post_modified_gmt'     => $post->post_modified_gmt,
+                        'post_content_filtered' => $post->post_content_filtered,
+                        'post_parent'           => $post->post_parent,
+                        'guid'                  => $post->guid,
+                        'menu_order'            => $post->menu_order,
+                        'post_type'             => $post->post_type,
+                        'post_mime_type'        => $post->post_mime_type,
+                        'comment_count'         => $post->comment_count,
+                        'filter'                => 'raw',
+                    ];
+                return ['port' => 'main', 'data' => $post_details];
+
+            case 'posts_by_post_type':
+                $post_type = $config['post_type'];
+                $posts = get_posts([
+                    'post_type'      => $post_type,
+                    'post_status'    => 'any',
+                    'posts_per_page' => -1,
+                ]);
+                $post_details = [];
+                foreach ( $posts as $post ) {
+                $post_details[] = [
+                        'ID'                    => $post->ID,
+                        'post_author'           => $post->post_author,
+                        'post_date'             => $post->post_date,
+                        'post_date_gmt'         => $post->post_date_gmt,
+                        'post_content'          => $post->post_content,
+                        'post_title'            => $post->post_title,
+                        'post_excerpt'          => $post->post_excerpt,
+                        'post_status'           => $post->post_status,
+                        'comment_status'        => $post->comment_status,
+                        'ping_status'           => $post->ping_status,
+                        'post_password'         => $post->post_password,
+                        'post_name'             => $post->post_name,
+                        'to_ping'               => $post->to_ping,
+                        'pinged'                => $post->pinged,
+                        'post_modified'         => $post->post_modified,
+                        'post_modified_gmt'     => $post->post_modified_gmt,
+                        'post_content_filtered' => $post->post_content_filtered,
+                        'post_parent'           => $post->post_parent,
+                        'guid'                  => $post->guid,
+                        'menu_order'            => $post->menu_order,
+                        'post_type'             => $post->post_type,
+                        'post_mime_type'        => $post->post_mime_type,
+                        'comment_count'         => $post->comment_count,
+                        'filter'                => 'raw',
+                    ];
+                }
+                return ['port' => 'main', 'data' => $post_details];
+
+            case 'posts_by_metadata':
+                $post_type  = $config['post_type'];
+                $meta_key   = $config['meta_key'];
+                $meta_value = $config['meta_value'];
+                $posts = get_posts([
+                    'post_type'      => $post_type,
+                    'post_status'    => 'any',
+                    'posts_per_page' => -1,
+                    'meta_query' => [
+                        [
+                            'key'     => $meta_key,
+                            'value'   => $meta_value,
+                            'compare' => '=',
+                        ],
+                    ],
+                ]);
+                $post_details = [];
+                foreach ( $posts as $post ) {
+                $post_details[] = [
+                        'ID'                    => $post->ID,
+                        'post_author'           => $post->post_author,
+                        'post_date'             => $post->post_date,
+                        'post_date_gmt'         => $post->post_date_gmt,
+                        'post_content'          => $post->post_content,
+                        'post_title'            => $post->post_title,
+                        'post_excerpt'          => $post->post_excerpt,
+                        'post_status'           => $post->post_status,
+                        'comment_status'        => $post->comment_status,
+                        'ping_status'           => $post->ping_status,
+                        'post_password'         => $post->post_password,
+                        'post_name'             => $post->post_name,
+                        'to_ping'               => $post->to_ping,
+                        'pinged'                => $post->pinged,
+                        'post_modified'         => $post->post_modified,
+                        'post_modified_gmt'     => $post->post_modified_gmt,
+                        'post_content_filtered' => $post->post_content_filtered,
+                        'post_parent'           => $post->post_parent,
+                        'guid'                  => $post->guid,
+                        'menu_order'            => $post->menu_order,
+                        'post_type'             => $post->post_type,
+                        'post_mime_type'        => $post->post_mime_type,
+                        'comment_count'         => $post->comment_count,
+                        'filter'                => 'raw',
+                    ];
+                }
+                return ['port' => 'main', 'data' => $post_details];
+            
+            case 'posts_metadata_all':
+                $post_id      = $config['post_id'] ?? 0;
+                $meta         = get_post_meta( $post_id );
+                $meta_details = [];
+                foreach ( $meta as $key => $values ) {
+                    $meta_details[] = [
+                        'meta_key'   => $key,
+                        'meta_value' => maybe_unserialize( $values ),
+                    ];
+                }
+                return ['port' => 'main', 'data' => $meta_details];
+
+            case 'post_metadata_single':
+                $post_id = $config['post_id'] ?? 0;
+                $meta_key = $config['meta_key'] ?? '';
+                $meta_value = maybe_unserialize( get_post_meta( $post_id, $meta_key, true ) );
+                return ['port' => 'main', 'data' => ['meta_key' => $meta_key, 'meta_value' => $meta_value, ] ];
+
+            case 'post_permalink':
+                $post_id = $config['post_id'] ?? 0;
+                $permalink = get_permalink( $post_id );
+                return ['port' => 'main', 'data' => ['post_id' => $post_id, 'permalink' => $permalink, ] ];
+
+            case 'post_content':
+                $post_id = $config['post_id'] ?? 0;
+                $post = get_post( $post_id );
+                return ['port' => 'main', 'data' => ['post_id' => $post_id, 'post_content' => $post->post_content, ] ];
+
+            case 'post_excerpt':
+                $post_id = $config['post_id'] ?? 0;
+                $post = get_post( $post_id );
+                return ['port' => 'main', 'data' => ['post_id' => $post_id, 'post_excerpt' => $post->post_excerpt, ] ];
+
+            case 'post_status':
+                $post_id = $config['post_id'] ?? 0;
+                $post = get_post( $post_id );
+                return ['port' => 'main', 'data' => ['post_id' => $post_id, 'post_status' => $post->post_status, ] ];
 
             case 'activate_plugin' : 
                 if ( $plugin = $config['plugin'] ?? '' ) {

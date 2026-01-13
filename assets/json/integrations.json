@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-01-13 05:47:43",
+    "generated_at": "2026-01-13 12:07:19",
     "integrations": {
         "wordpress": {
             "slug": "wordpress",
@@ -606,6 +606,100 @@
                         "main"
                     ]
                 },
+                "update_post": {
+                    "key": "update_post",
+                    "label": "Update Post",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "Post ID to Update",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "post_title",
+                            "label": "New Post Title",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "post_content",
+                            "label": "New Post Content",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "post_type",
+                            "label": "Post Type",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "post_types",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "post_status",
+                            "label": "Status",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Draft",
+                                    "value": "draft"
+                                },
+                                {
+                                    "label": "Publish",
+                                    "value": "publish"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_post_status": {
+                    "key": "update_post_status",
+                    "label": "Update Post Status",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "Post ID to Update",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "post_status",
+                            "label": "Status",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Publish",
+                                    "value": "publish"
+                                },
+                                {
+                                    "label": "Pending",
+                                    "value": "pending"
+                                },
+                                {
+                                    "label": "Private",
+                                    "value": "private"
+                                },
+                                {
+                                    "label": "Draft",
+                                    "value": "draft"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
                 "delete_post": {
                     "key": "delete_post",
                     "label": "Delete Post",
@@ -613,6 +707,183 @@
                         {
                             "key": "post_id",
                             "label": "Post ID to Delete",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "posts_all": {
+                    "key": "posts_all",
+                    "label": "Post (All)",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "post_single": {
+                    "key": "post_single",
+                    "label": "Post (Single)",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "Post ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "posts_by_post_type": {
+                    "key": "posts_by_post_type",
+                    "label": "Posts by Post Type",
+                    "schema": [
+                        {
+                            "key": "post_type",
+                            "label": "Post Type",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "post_types",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "posts_by_metadata": {
+                    "key": "posts_by_metadata",
+                    "label": "Posts by Metadata",
+                    "schema": [
+                        {
+                            "key": "post_type",
+                            "label": "Post Type",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "post_types",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "meta_kry",
+                            "label": "Post Meta Key",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "meta_value",
+                            "label": "Post Meta Value",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "posts_metadata_all": {
+                    "key": "posts_metadata_all",
+                    "label": "Post Metadata (All)",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "Post ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "post_metadata_single": {
+                    "key": "post_metadata_single",
+                    "label": "Post Metadata (Single)",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "Post ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "meta_kry",
+                            "label": "Post Meta Key",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "post_permalink": {
+                    "key": "post_permalink",
+                    "label": "Post Permalink",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "Post ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "post_content": {
+                    "key": "post_content",
+                    "label": "Post Content",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "Post ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "post_excerpt": {
+                    "key": "post_excerpt",
+                    "label": "Post Excerpt",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "Post ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "post_status": {
+                    "key": "post_status",
+                    "label": "Post Status",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "Post ID",
                             "type": "expression",
                             "required": true
                         }
