@@ -173,6 +173,921 @@
                     "outputs": [
                         "main"
                     ]
+                },
+                "create_user": {
+                    "key": "create_user",
+                    "label": "Create User",
+                    "schema": [
+                        {
+                            "key": "user_login",
+                            "label": "Username",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "user_email",
+                            "label": "Email",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "user_pass",
+                            "label": "Password",
+                            "type": "text"
+                        },
+                        {
+                            "key": "display_name",
+                            "label": "Display Name",
+                            "type": "text"
+                        },
+                        {
+                            "key": "first_name",
+                            "label": "First Name",
+                            "type": "text"
+                        },
+                        {
+                            "key": "last_name",
+                            "label": "Last Name",
+                            "type": "text"
+                        },
+                        {
+                            "key": "role",
+                            "label": "Role",
+                            "type": "text"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_user": {
+                    "key": "update_user",
+                    "label": "Update User",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "user_email",
+                            "label": "Email",
+                            "type": "text"
+                        },
+                        {
+                            "key": "user_pass",
+                            "label": "Password",
+                            "type": "text"
+                        },
+                        {
+                            "key": "display_name",
+                            "label": "Display Name",
+                            "type": "text"
+                        },
+                        {
+                            "key": "first_name",
+                            "label": "First Name",
+                            "type": "text"
+                        },
+                        {
+                            "key": "last_name",
+                            "label": "Last Name",
+                            "type": "text"
+                        },
+                        {
+                            "key": "role",
+                            "label": "Role",
+                            "type": "text"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_user": {
+                    "key": "delete_user",
+                    "label": "Delete User",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "reassign",
+                            "label": "Reassign User ID",
+                            "type": "expression"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_users": {
+                    "key": "get_users",
+                    "label": "Get All Users",
+                    "schema": [
+                        {
+                            "key": "search",
+                            "label": "Search",
+                            "type": "text"
+                        },
+                        {
+                            "key": "number",
+                            "label": "Limit",
+                            "type": "expression"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_users_by_role": {
+                    "key": "get_users_by_role",
+                    "label": "Get All Users by Role",
+                    "schema": [
+                        {
+                            "key": "role",
+                            "label": "Role",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "search",
+                            "label": "Search",
+                            "type": "text"
+                        },
+                        {
+                            "key": "number",
+                            "label": "Limit",
+                            "type": "expression"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_user_by_id": {
+                    "key": "get_user_by_id",
+                    "label": "Get User by ID",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_user_by_email": {
+                    "key": "get_user_by_email",
+                    "label": "Get User by Email",
+                    "schema": [
+                        {
+                            "key": "user_email",
+                            "label": "Email",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_user_by_field": {
+                    "key": "get_user_by_field",
+                    "label": "Get User by Field",
+                    "schema": [
+                        {
+                            "key": "field",
+                            "label": "Field",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "value",
+                            "label": "Value",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_user_meta_all": {
+                    "key": "get_user_meta_all",
+                    "label": "Get User Metadata (All)",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_user_meta_single": {
+                    "key": "get_user_meta_single",
+                    "label": "Get User Metadata (Single)",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "meta_key",
+                            "label": "Meta Key",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_user_meta": {
+                    "key": "update_user_meta",
+                    "label": "Update User Metadata",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "meta_key",
+                            "label": "Meta Key",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "meta_value",
+                            "label": "Meta Value",
+                            "type": "expression"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_role": {
+                    "key": "create_role",
+                    "label": "Create Role",
+                    "schema": [
+                        {
+                            "key": "role",
+                            "label": "Role",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "display_name",
+                            "label": "Display Name",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "capabilities",
+                            "label": "Capabilities (comma separated)",
+                            "type": "text"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_role": {
+                    "key": "delete_role",
+                    "label": "Delete Role",
+                    "schema": [
+                        {
+                            "key": "role",
+                            "label": "Role",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add_user_role": {
+                    "key": "add_user_role",
+                    "label": "Add User Role",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "role",
+                            "label": "Role",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "remove_user_role": {
+                    "key": "remove_user_role",
+                    "label": "Remove User Role",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "role",
+                            "label": "Role",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_user_role": {
+                    "key": "update_user_role",
+                    "label": "Update User Role",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "role",
+                            "label": "Role",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_roles": {
+                    "key": "get_roles",
+                    "label": "Get All Roles",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_caps": {
+                    "key": "get_caps",
+                    "label": "Get All Capabilities",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_role_caps": {
+                    "key": "get_role_caps",
+                    "label": "Get Role Capabilities",
+                    "schema": [
+                        {
+                            "key": "role",
+                            "label": "Role",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add_role_caps": {
+                    "key": "add_role_caps",
+                    "label": "Add Role Capabilities",
+                    "schema": [
+                        {
+                            "key": "role",
+                            "label": "Role",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "caps",
+                            "label": "Capabilities (comma separated)",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "remove_role_caps": {
+                    "key": "remove_role_caps",
+                    "label": "Remove Role Capabilities",
+                    "schema": [
+                        {
+                            "key": "role",
+                            "label": "Role",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "caps",
+                            "label": "Capabilities (comma separated)",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_user_caps": {
+                    "key": "get_user_caps",
+                    "label": "Get User Capabilities",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add_user_caps": {
+                    "key": "add_user_caps",
+                    "label": "Add User Capabilities",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "caps",
+                            "label": "Capabilities (comma separated)",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "remove_user_caps": {
+                    "key": "remove_user_caps",
+                    "label": "Remove User Capabilities",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "caps",
+                            "label": "Capabilities (comma separated)",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_term": {
+                    "key": "get_term",
+                    "label": "Get Term (Single)",
+                    "schema": [
+                        {
+                            "key": "term_id",
+                            "label": "Term ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "taxonomy",
+                            "label": "Taxonomy",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_terms_by_taxonomy": {
+                    "key": "get_terms_by_taxonomy",
+                    "label": "Get Term by Taxonomy",
+                    "schema": [
+                        {
+                            "key": "taxonomy",
+                            "label": "Taxonomy",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_term_by_field": {
+                    "key": "get_term_by_field",
+                    "label": "Get Term by Field",
+                    "schema": [
+                        {
+                            "key": "field",
+                            "label": "Field",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "value",
+                            "label": "Value",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "taxonomy",
+                            "label": "Taxonomy",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_term": {
+                    "key": "create_term",
+                    "label": "Create New Term",
+                    "schema": [
+                        {
+                            "key": "name",
+                            "label": "Name",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "taxonomy",
+                            "label": "Taxonomy",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "slug",
+                            "label": "Slug",
+                            "type": "text"
+                        },
+                        {
+                            "key": "parent",
+                            "label": "Parent ID",
+                            "type": "expression"
+                        },
+                        {
+                            "key": "description",
+                            "label": "Description",
+                            "type": "textarea"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_term": {
+                    "key": "update_term",
+                    "label": "Update Term",
+                    "schema": [
+                        {
+                            "key": "term_id",
+                            "label": "Term ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "taxonomy",
+                            "label": "Taxonomy",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "name",
+                            "label": "Name",
+                            "type": "text"
+                        },
+                        {
+                            "key": "slug",
+                            "label": "Slug",
+                            "type": "text"
+                        },
+                        {
+                            "key": "parent",
+                            "label": "Parent ID",
+                            "type": "expression"
+                        },
+                        {
+                            "key": "description",
+                            "label": "Description",
+                            "type": "textarea"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_term": {
+                    "key": "delete_term",
+                    "label": "Delete Term",
+                    "schema": [
+                        {
+                            "key": "term_id",
+                            "label": "Term ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "taxonomy",
+                            "label": "Taxonomy",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "register_taxonomy": {
+                    "key": "register_taxonomy",
+                    "label": "Register Taxonomy",
+                    "schema": [
+                        {
+                            "key": "taxonomy",
+                            "label": "Taxonomy",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "object_type",
+                            "label": "Object Type (comma separated)",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "args",
+                            "label": "Args (JSON)",
+                            "type": "text"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "unregister_taxonomy": {
+                    "key": "unregister_taxonomy",
+                    "label": "Unregister Taxonomy",
+                    "schema": [
+                        {
+                            "key": "taxonomy",
+                            "label": "Taxonomy",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_taxonomies": {
+                    "key": "get_taxonomies",
+                    "label": "Get Taxonomy (All)",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_taxonomy": {
+                    "key": "get_taxonomy",
+                    "label": "Get Taxonomy (Single)",
+                    "schema": [
+                        {
+                            "key": "taxonomy",
+                            "label": "Taxonomy",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add_taxonomy_to_post": {
+                    "key": "add_taxonomy_to_post",
+                    "label": "Add Taxonomy to Post",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "Post ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "taxonomy",
+                            "label": "Taxonomy",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "terms",
+                            "label": "Terms (comma separated)",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "append",
+                            "label": "Append (true/false)",
+                            "type": "text"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "remove_taxonomy_from_post": {
+                    "key": "remove_taxonomy_from_post",
+                    "label": "Remove Taxonomy from Post",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "Post ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "taxonomy",
+                            "label": "Taxonomy",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "terms",
+                            "label": "Terms (comma separated)",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_category": {
+                    "key": "create_category",
+                    "label": "Create Category",
+                    "schema": [
+                        {
+                            "key": "name",
+                            "label": "Name",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "slug",
+                            "label": "Slug",
+                            "type": "text"
+                        },
+                        {
+                            "key": "parent",
+                            "label": "Parent ID",
+                            "type": "expression"
+                        },
+                        {
+                            "key": "description",
+                            "label": "Description",
+                            "type": "textarea"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_category": {
+                    "key": "update_category",
+                    "label": "Update Category",
+                    "schema": [
+                        {
+                            "key": "term_id",
+                            "label": "Category ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "name",
+                            "label": "Name",
+                            "type": "text"
+                        },
+                        {
+                            "key": "slug",
+                            "label": "Slug",
+                            "type": "text"
+                        },
+                        {
+                            "key": "parent",
+                            "label": "Parent ID",
+                            "type": "expression"
+                        },
+                        {
+                            "key": "description",
+                            "label": "Description",
+                            "type": "textarea"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_category": {
+                    "key": "delete_category",
+                    "label": "Delete Category",
+                    "schema": [
+                        {
+                            "key": "term_id",
+                            "label": "Category ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add_category_to_post": {
+                    "key": "add_category_to_post",
+                    "label": "Add Category to Post",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "Post ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "categories",
+                            "label": "Categories (comma separated)",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "append",
+                            "label": "Append (true/false)",
+                            "type": "text"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_categories": {
+                    "key": "get_categories",
+                    "label": "Get Category (All)",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_category": {
+                    "key": "get_category",
+                    "label": "Get Category (Single)",
+                    "schema": [
+                        {
+                            "key": "category_id",
+                            "label": "Category ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
                 }
             }
         },
