@@ -19,6 +19,7 @@ import { nodeLogsRunDetails } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice
 import LogDetails from "@ZAPComponents/LogDetails";
 import { getDuration } from "../workflows/workFlowMotion/helper";
 import ZAPLoading from "@ZAPComponents/Loading";
+import ZAPTable from "@ZAPComponents/Table";
 
 const Logs = () => {
     const dispatch = useDispatch();
@@ -72,84 +73,67 @@ const Logs = () => {
             <Text fontSize="lg" fontWeight="600" mb={4}>
                 Workflow Logs
             </Text>
-            <Table.Root size="sm" variant="outline">
-                <Table.Header bg="gray.50">
-                    <Table.Row>
-                        <Table.ColumnHeader>CREATED AT</Table.ColumnHeader>
-                        <Table.ColumnHeader>STATUS</Table.ColumnHeader>
-                        <Table.ColumnHeader>DURATION / SIZE</Table.ColumnHeader>
-                        <Table.ColumnHeader>ACTIONS</Table.ColumnHeader>
-                    </Table.Row>
-                </Table.Header>
-
-                <Table.Body>
-                    {data.map((row) => (
-                        <Table.Row key={row.id}>
-                            <Table.Cell>
+            <ZAPTable
+                data={data}
+                rowKey="id"
+                variant="outline"
+                size="sm"
+                columns={[
+                    {
+                        label: "CREATED AT",
+                        key: "started_at",
+                        render: (row) => <Text fontSize="sm">{row.started_at || "--"}</Text>,
+                    },
+                    {
+                        label: "STATUS",
+                        key: "status",
+                        render: (row) => (
+                            <HStack spacing={2}>
+                                <Box
+                                    w="8px"
+                                    h="8px"
+                                    borderRadius="full"
+                                    bg={isSuccess(row.status) ? "green.500" : "red.500"}
+                                />
                                 <Text fontSize="sm">
-                                    {row.started_at || "--"}
+                                    {isSuccess(row.status) ? "Success" : "Failed"}
                                 </Text>
-                            </Table.Cell>
+                            </HStack>
+                        ),
+                    },
+                    {
+                        label: "DURATION / SIZE",
+                        key: "duration",
+                        render: (row) => (
+                            <Text fontSize="sm">{getDuration(row.started_at, row.finished_at)}</Text>
+                        ),
+                    },
+                ]}
+                actionsRenderer={(row) => (
+                    <>
+                        <Button
+                            size="xs"
+                            variant="outline"
+                            onClick={() => {
+                                setActiveRunId(row.id);
+                                setShowDetails(true);
+                                dispatch(nodeLogsRunDetails(row.id));
+                            }}
+                        >
+                            Details
+                        </Button>
 
-                            <Table.Cell>
-                                <HStack spacing={2}>
-                                    <Box
-                                        w="8px"
-                                        h="8px"
-                                        borderRadius="full"
-                                        bg={
-                                            isSuccess(row.status)
-                                                ? "green.500"
-                                                : "red.500"
-                                        }
-                                    />
-                                    <Text fontSize="sm">
-                                        {isSuccess(row.status)
-                                            ? "Success"
-                                            : "Failed"}
-                                    </Text>
-                                </HStack>
-                            </Table.Cell>
+                        <Button
+                            size="xs"
+                            variant="outline"
+                            onClick={() => dispatch(retryNodeRun(row.id))}
+                        >
+                            Re-execute
+                        </Button>
+                    </>
+                )}
+            />
 
-                            <Table.Cell>
-                                <Text fontSize="sm">
-                                    {getDuration(
-                                        row.started_at,
-                                        row.finished_at
-                                    )}
-                                </Text>
-                            </Table.Cell>
-                            <Table.Cell>
-                                <HStack spacing={2}>
-                                    <Button
-                                        size="xs"
-                                        variant="outline"
-                                        onClick={() => {
-                                            setActiveRunId(row.id);
-                                            setShowDetails(true);
-                                            dispatch(
-                                                nodeLogsRunDetails(row.id)
-                                            );
-                                        }}
-                                    >
-                                        Details
-                                    </Button>
-
-                                    <Button
-                                        size="xs"
-                                        variant="outline"
-                                        onClick={() =>
-                                            dispatch(retryNodeRun(row.id))
-                                        }
-                                    >
-                                        Re-execute
-                                    </Button>
-                                </HStack>
-                            </Table.Cell>
-                        </Table.Row>
-                    ))}
-                </Table.Body>
-            </Table.Root>
         </Box>
     );
 };
