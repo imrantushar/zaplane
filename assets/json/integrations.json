@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-01-13 12:07:19",
+    "generated_at": "2026-01-13 12:50:23",
     "integrations": {
         "wordpress": {
             "slug": "wordpress",
@@ -888,6 +888,14 @@
                             "required": true
                         }
                     ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "post_type_all": {
+                    "key": "post_type_all",
+                    "label": "Post Type (All)",
+                    "schema": [],
                     "outputs": [
                         "main"
                     ]

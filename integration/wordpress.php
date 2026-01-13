@@ -631,6 +631,7 @@ class Wordpress extends IntegrationBase {
             'post_content'         => ['label' => 'Post Content'],
             'post_excerpt'         => ['label' => 'Post Excerpt'],
             'post_status'          => ['label' => 'Post Status'],
+            'post_type_all'        => ['label' => 'Post Type (All)'],
             'activate_plugin'      => ['label' => 'Activate Plugin'],
             'deactivate_plugin'    => ['label' => 'Deactivate Plugin'],
             'switch_theme'         => ['label' => 'Theme Switch'],
@@ -1207,6 +1208,28 @@ class Wordpress extends IntegrationBase {
                 $post = get_post( $post_id );
                 return ['port' => 'main', 'data' => ['post_id' => $post_id, 'post_status' => $post->post_status, ] ];
 
+            case 'post_type_all':
+                $types = get_post_types( [], 'objects' );
+                $post_types = [];
+                foreach ( $types as $typ_name => $typ_object ) {
+                    $post_types[ $typ_name ] = [
+                        'name'            => $typ_object->name,
+                        'label'           => $typ_object->label,
+                        'description'     => $typ_object->description,
+                        'hierarchical'    => $typ_object->hierarchical,
+                        'rest_base'       => $typ_object->rest_base,
+                        'show_in_rest'    => $typ_object->show_in_rest,
+                        'public'          => $typ_object->public,
+                        'capability_type' => $typ_object->capability_type,
+                        'capabilities'    => $typ_object->cap,
+                        'labels'          => (array) $typ_object->labels,
+                        'supports'        => $typ_object->supports ?? [],
+                        'menu_icon'       => $typ_object->menu_icon ?? '',
+                        'menu_position'   => $typ_object->menu_position ?? null,
+                    ];
+                }
+                return ['port'=>'main', 'data'=> $post_types];
+
             case 'activate_plugin' : 
                 if ( $plugin = $config['plugin'] ?? '' ) {
                     activate_plugin( $plugin );
@@ -1352,5 +1375,3 @@ class Wordpress extends IntegrationBase {
         return $result;
     }
 }
-
-
