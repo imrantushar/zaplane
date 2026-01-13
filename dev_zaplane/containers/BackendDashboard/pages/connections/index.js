@@ -27,11 +27,12 @@ import {
 } from "@ZAPRedux/Slices/connectionsSlice/connectionsSlice";
 
 import WPModal from "@ZAPComponents/Modal/WPModal";
+import ZAPText from "@ZAPComponents/Text";
 
 const Connections = () => {
     const dispatch = useDispatch();
     const connections = useSelector((state) => state.connections?.list || []);
-    const authFields = useSelector((state) => state.connections?.authFields || {});
+    const {authFields ,isLoading} = useSelector((state) => state.connections);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedApp, setSelectedApp] = useState(null);
@@ -53,73 +54,20 @@ const Connections = () => {
         const type = selectedAuthType || undefined;
 
         dispatch(fetchAuthFields({ app: selectedApp.value, authType: type }))
-            .unwrap()
-            .then((data) => {
-                if (!selectedAuthType && data.auth_type === "both") {
-                    setSelectedAuthType("api_key");
-                } else if (!selectedAuthType) {
-                    setSelectedAuthType(data.auth_type);
-                }
-            })
-            .finally(() => setLoadingFields(false));
+        // .unwrap()
+        // .then((data) => {
+        //     if (!selectedAuthType && data.auth_type === "both") {
+        //         setSelectedAuthType("api_key");
+        //     } else if (!selectedAuthType) {
+        //         setSelectedAuthType(data.auth_type);
+        //     }
+        // })
+        // .finally(() => setLoadingFields(false));
     }, [selectedApp, selectedAuthType, dispatch]);
+    console.log(authFields.available_auth_types
+        , 'poppppp')
 
-    // Update nested credentials
-    const handleChangeCredential = (path, value) => {
-        setCredentials((prev) => {
-            const updated = { ...prev };
-            let temp = updated;
-            path.forEach((k, i) => {
-                if (i === path.length - 1) {
-                    temp[k] = value;
-                } else {
-                    temp[k] = temp[k] || {};
-                    temp = temp[k];
-                }
-            });
-            return updated;
-        });
-    };
 
-    // Recursive renderer for fields
-    const renderFields = (fields, path = [], level = 0) => {
-        return Object.entries(fields).map(([key, field]) => {
-            const currentPath = [...path, key];
-
-            // If field is nested object (no type), render its children recursively
-            if (typeof field === "object" && !field.type) {
-                return (
-                    <Box key={currentPath.join(".")} pl={level * 6} mb={2} borderLeft={level ? "2px solid #eee" : undefined}>
-                        <Text fontWeight="bold" mb={1}>
-                            {key} (Level {level + 1})
-                        </Text>
-                        {renderFields(field, currentPath, level + 1)}
-                    </Box>
-                );
-            }
-
-            // Normal input field
-            const value = currentPath.reduce((acc, k) => acc?.[k] ?? "", credentials);
-
-            return (
-                <Box key={currentPath.join(".")} pl={level * 6} mb={2}>
-                    <Text>{field.label} (Level {level + 1})</Text>
-                    <Input
-                        type={field.type === "password" ? "password" : "text"}
-                        placeholder={field.placeholder || ""}
-                        required={field.required}
-                        value={value}
-                        onChange={(e) => handleChangeCredential(currentPath, e.target.value)}
-                    />
-                    {field.help && (
-                        <Text fontSize="xs" color="gray.500">
-                            {field.help}
-                        </Text>
-                    )}
-                </Box>
-            );
-        });
-    };
 
     const handleConnect = async () => {
         if (!selectedApp || !selectedAuthType) return;
@@ -179,7 +127,8 @@ const Connections = () => {
             }
         }
     };
-
+    const authTypes = authFields?.available_auth_types || {};
+    console.log(authFields, 'fileddddd auth')
     return (
         <Box p={6} borderWidth="1px" borderRadius="md" boxShadow="sm">
             <VStack align="stretch" spacing={6}>
@@ -263,27 +212,53 @@ const Connections = () => {
                             }}
                             options={[{ value: "slack", label: "Slack" }]}
                         />
+                        {Object.keys(authTypes).map((key) => (
+                            <Button
+                                key={key}
+                                variant={selectedAuthType === key ? "solid" : "outline"}
+                                colorScheme="blue"
+                                onClick={() => {
+                                    setSelectedAuthType(key);
+                                    setCredentials({});
+                                }}
+                            >
+                                {key}
+                            </Button>
+                        ))}
+                        {/* Dynamic Auth Fields */}
+                        { authFields?.auth_fields && selectedAuthType && (
+                            <VStack spacing={3} align="stretch" pt={3}>
+                                {Object.entries(authFields.auth_fields).map(
+                                    ([fieldKey, field]) => {
+                                        const value = credentials[fieldKey] || "";
 
-                        {/* Auth Type Selector */}
-                        {authFields && Object.keys(authFields).length > 0 && (
-                            <VStack align="stretch" spacing={2}>
-                                {Object.keys(authFields).length > 1 && (
-                                    <Text fontWeight="bold">{__("Authentication Method", "zaplane")}</Text>
+                                        return (
+                                            <Box key={fieldKey}>
+                                                <ZAPText fontWeight="bold">{field.label}</ZAPText>
+                                                <Input
+                                                    type={field.type === "password" ? "password" : "text"}
+                                                    placeholder={field.placeholder || ""}
+                                                    value={value}
+                                                    onChange={(e) =>
+                                                        setCredentials((prev) => ({
+                                                            ...prev,
+                                                            [fieldKey]: e.target.value,
+                                                        }))
+                                                    }
+                                                />
+                                                {field.help && (
+                                                    <ZAPText fontSize="sm" color="gray.500">
+                                                        {field.help}
+                                                    </ZAPText>
+                                                )}
+                                            </Box>
+                                        );
+                                    }
                                 )}
-                                {Object.keys(authFields).map((key) => (
-                                    <Button
-                                        key={key}
-                                        variant={selectedAuthType === key ? "solid" : "outline"}
-                                        onClick={() => setSelectedAuthType(key)}
-                                    >
-                                        {key}
-                                    </Button>
-                                ))}
                             </VStack>
                         )}
+ 
 
-                        {/* Dynamic Fields */}
-                        {loadingFields ? <Spinner /> : selectedAuthType && authFields && renderFields(authFields)}
 
                         <Button
                             width="220px"

@@ -9,6 +9,7 @@ export const fetchConnections = createAsyncThunk(
   async (_, thunkAPI) => {
     try {
       const res = await API.get(namespace + 'connections');
+	  console.log(res,'resssssssssssss')
       return res.data.connections || [];
     } catch (e) {
       return handleSliceError(thunkAPI, e);
@@ -140,7 +141,7 @@ const connectionsSlice = createSlice({
         state.list = action.payload;
       })
       .addCase(fetchAuthFields.fulfilled, (state, action) => {
-        state.authFields = action.payload.auth_fields || {};
+        state.authFields = action.payload || {};
       })
 
       .addCase(initOAuth.fulfilled, (state, action) => {
