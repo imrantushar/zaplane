@@ -1,668 +1,655 @@
 {
-    "version": "0.0.1",
-    "generated_at": "2026-01-03 04:20:07",
-    "integrations": {
-        "wordpress": {
-            "slug": "wordpress",
-            "name": "Wordpress",
-            "icon": "",
-            "triggers": {
-                "publish_post": {
-                    "key": "publish_post",
-                    "label": "Post Published",
-                    "hook": "publish_post",
-                    "schema": [
-                        {
-                            "key": "post_type",
-                            "label": "Post Type",
-                            "type": "select",
-                            "dynamic": {
-                                "integration": "wordpress",
-                                "query": "post_types",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            },
-                            "required": true
-                        },
-                        {
-                            "key": "post_status",
-                            "label": "Post Status",
-                            "type": "select",
-                            "options": [
-                                {
-                                    "label": "Publish",
-                                    "value": "publish"
-                                },
-                                {
-                                    "label": "Draft",
-                                    "value": "draft"
-                                }
-                            ]
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "post_updated": {
-                    "key": "post_updated",
-                    "label": "Post Updated",
-                    "hook": "post_updated",
-                    "schema": [
-                        {
-                            "key": "post_type",
-                            "label": "Post Type",
-                            "type": "select",
-                            "dynamic": {
-                                "integration": "wordpress",
-                                "query": "post_types",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            },
-                            "required": true
-                        },
-                        {
-                            "key": "post_status",
-                            "label": "Post Status",
-                            "type": "select",
-                            "options": [
-                                {
-                                    "label": "Publish",
-                                    "value": "publish"
-                                },
-                                {
-                                    "label": "Draft",
-                                    "value": "draft"
-                                }
-                            ]
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "user_register": {
-                    "key": "user_register",
-                    "label": "User Registered",
-                    "hook": "user_register",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "comment_post": {
-                    "key": "comment_post",
-                    "label": "Comment Post",
-                    "hook": "comment_post",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "transition_post_status": {
-                    "key": "transition_post_status",
-                    "label": "Post Status Updated",
-                    "hook": "transition_post_status",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "wp_insert_post": {
-                    "key": "wp_insert_post",
-                    "label": "Revision Creation",
-                    "hook": "wp_insert_post",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "wp_trash_post":{
-                    "key": "wp_trash_post",
-                    "label": "Trashed Post" ,
-                    "hook": "wp_trash_post",
-                    "schema":[],
-                    "outputs": ["main"]
-                } ,
-                "before_delete_post": {
-                    "key": "before_delete_post",
-                    "label": "Post Deleted",
-                    "hook": "before_delete_post",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "delete_post": {
-                    "key": "delete_post",
-                    "label": "Delete Post",
-                    "hook": "delete_post",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "pre_comment_approved": {
-                    "key": "pre_comment_approved",
-                    "label": "Pre-Approve Comment",
-                    "hook": "pre_comment_approved",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "edit_comment": {
-                    "key": "edit_comment",
-                    "label": "Edit Comment",
-                    "hook": "edit_comment",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "delete_comment": {
-                    "key": "delete_comment",
-                    "label": "Comment Deletion",
-                    "hook": "delete_comment",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
+	"version": "0.0.1",
+	"generated_at": "2026-01-03 04:20:07",
+	"integrations": {
+		"wordpress": {
+			"slug": "wordpress",
+			"name": "Wordpress",
+			"icon": "",
+			"triggers": {
+				"publish_post": {
+					"key": "publish_post",
+					"label": "Post Published",
+					"hook": "publish_post",
+					"schema": [
+						{
+							"key": "post_type",
+							"label": "Post Type",
+							"type": "select",
+							"dynamic": {
+								"integration": "wordpress",
+								"query": "post_types",
+								"select": ["name", "label"]
+							},
+							"required": true
+						},
+						{
+							"key": "post_status",
+							"label": "Post Status",
+							"type": "select",
+							"options": [
+								{
+									"label": "Publish",
+									"value": "publish"
+								},
+								{
+									"label": "Draft",
+									"value": "draft"
+								}
+							]
+						}
+					],
+					"outputs": ["main"]
+				},
+				"post_updated": {
+					"key": "post_updated",
+					"label": "Post Updated",
+					"hook": "post_updated",
+					"schema": [
+						{
+							"key": "post_type",
+							"label": "Post Type",
+							"type": "select",
+							"dynamic": {
+								"integration": "wordpress",
+								"query": "post_types",
+								"select": ["name", "label"]
+							},
+							"required": true
+						},
+						{
+							"key": "post_status",
+							"label": "Post Status",
+							"type": "select",
+							"options": [
+								{
+									"label": "Publish",
+									"value": "publish"
+								},
+								{
+									"label": "Draft",
+									"value": "draft"
+								}
+							]
+						}
+					],
+					"outputs": ["main"]
+				},
+				"user_register": {
+					"key": "user_register",
+					"label": "User Registered",
+					"hook": "user_register",
+					"schema": [],
+					"outputs": ["main"]
+				},
+				"comment_post": {
+					"key": "comment_post",
+					"label": "Comment Post",
+					"hook": "comment_post",
+					"schema": [],
+					"outputs": ["main"]
+				},
+				"transition_post_status": {
+					"key": "transition_post_status",
+					"label": "Post Status Updated",
+					"hook": "transition_post_status",
+					"schema": [],
+					"outputs": ["main"]
+				},
+				"wp_insert_post": {
+					"key": "wp_insert_post",
+					"label": "Revision Creation",
+					"hook": "wp_insert_post",
+					"schema": [],
+					"outputs": ["main"]
+				},
+				"wp_trash_post": {
+					"key": "wp_trash_post",
+					"label": "Trashed Post",
+					"hook": "wp_trash_post",
+					"schema": [],
+					"outputs": ["main"]
+				},
+				"before_delete_post": {
+					"key": "before_delete_post",
+					"label": "Post Deleted",
+					"hook": "before_delete_post",
+					"schema": [],
+					"outputs": ["main"]
+				},
+				"delete_post": {
+					"key": "delete_post",
+					"label": "Delete Post",
+					"hook": "delete_post",
+					"schema": [],
+					"outputs": ["main"]
+				},
+				"pre_comment_approved": {
+					"key": "pre_comment_approved",
+					"label": "Pre-Approve Comment",
+					"hook": "pre_comment_approved",
+					"schema": [],
+					"outputs": ["main"]
+				},
+				"edit_comment": {
+					"key": "edit_comment",
+					"label": "Edit Comment",
+					"hook": "edit_comment",
+					"schema": [],
+					"outputs": ["main"]
+				},
+				"delete_comment": {
+					"key": "delete_comment",
+					"label": "Comment Deletion",
+					"hook": "delete_comment",
+					"schema": [],
+					"outputs": ["main"]
+				},
 
-                "trashed_comment": {
-                    "key": "trashed_comment",
-                    "label": "Comment Trashed",
-                    "hook": "trashed_comment",
-                    "schema": [
-                        {
-                            "key": "post_type",
-                            "label": "Post Type",
-                            "type": "select",
-                            "dynamic": {
-                                "integration": "wordpress",
-                                "query": "post_types",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            },
-                            "required": false
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "untrashed_comment": {
-                    "key": "untrashed_comment",
-                    "label": "Comment Untrashed",
-                    "hook": "untrashed_comment",
-                    "schema": [
-                        {
-                            "key": "post_type",
-                            "label": "Post Type",
-                            "type": "select",
-                            "dynamic": {
-                                "integration": "wordpress",
-                                "query": "post_types",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            },
-                            "required": false
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "transition_comment_status": {
-                    "key": "transition_comment_status",
-                    "label": "Comment Status Changed",
-                    "hook": "transition_comment_status",
-                    "schema": [
-                        {
-                            "key": "from_status",
-                            "label": "From Status",
-                            "type": "select",
-                            "options": [
-                                {
-                                    "label": "Approved",
-                                    "value": "1"
-                                },
-                                {
-                                    "label": "Pending",
-                                    "value": "0"
-                                },
-                                {
-                                    "label": "Spam",
-                                    "value": "spam"
-                                },
-                                {
-                                    "label": "Trash",
-                                    "value": "trash"
-                                }
-                            ]
-                        },
-                        {
-                            "key": "to_status",
-                            "label": "To Status",
-                            "type": "select",
-                            "options": [
-                                {
-                                    "label": "Approved",
-                                    "value": "1"
-                                },
-                                {
-                                    "label": "Pending",
-                                    "value": "0"
-                                },
-                                {
-                                    "label": "Spam",
-                                    "value": "spam"
-                                },
-                                {
-                                    "label": "Trash",
-                                    "value": "trash"
-                                }
-                            ]
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "untrashed_post": {
-                    "key": "untrashed_post",
-                    "label": "Post Untrashed",
-                    "hook": "untrashed_post",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "wp_update_comment_count": {
-                    "key": "wp_update_comment_count",
-                    "label": "Comment Count Updated",
-                    "hook": "wp_update_comment_count",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "wp_set_comment_status": {
-                    "key": "wp_set_comment_status",
-                    "label": "Comment Status Set",
-                    "hook": "wp_set_comment_status",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                } ,
-                 "wp_login": {
-                    "key": "wp_login",
-                    "label": "User Login",
-                    "hook": "wp_login",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                } ,
-                 "wp_login_failed": {
-                    "key": "wp_login_failed",
-                    "label": "User Login failed",
-                    "hook": "wp_login_failed",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                } ,
-                 "wp_logout": {
-                    "key": "wp_logout",
-                    "label": "User Log Out",
-                    "hook": "wp_logout",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                }
-            },
-            "actions": {
-                "create_post": {
-                    "key": "create_post",
-                    "label": "Create Post",
-                    "schema": [
-                        {
-                            "key": "post_title",
-                            "label": "Title",
-                            "type": "expression",
-                            "required": true
-                        },
-                        {
-                            "key": "post_content",
-                            "label": "Content",
-                            "type": "textarea"
-                        },
-                        {
-                            "key": "post_type",
-                            "label": "Post Type",
-                            "type": "select",
-                            "dynamic": {
-                                "integration": "wordpress",
-                                "query": "post_types",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            },
-                            "required": true
-                        },
-                        {
-                            "key": "post_status",
-                            "label": "Status",
-                            "type": "select",
-                            "options": [
-                                {
-                                    "label": "Draft",
-                                    "value": "draft"
-                                },
-                                {
-                                    "label": "Publish",
-                                    "value": "publish"
-                                }
-                            ]
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "update_option": {
-                    "key": "update_option",
-                    "label": "Update Option",
-                    "schema": [
-                        {
-                            "key": "option_name",
-                            "label": "Option",
-                            "type": "text",
-                            "required": true
-                        },
-                        {
-                            "key": "value",
-                            "label": "Value",
-                            "type": "expression"
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                } ,
-              "untrash_post": {
-                    "key": "untrash_post",
-                    "label": "Untrash Post",
-                    "schema": [
-                        {
-                            "key": "post_id",
-                            "label": "Post ID",
-                            "type": "expression",
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "untrash_comment": {
-                    "key": "untrash_comment",
-                    "label": "Untrash Comment",
-                    "schema": [
-                        {
-                            "key": "comment_id",
-                            "label": "Comment ID",
-                            "type": "expression",
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "update_comment_count": {
-                    "key": "update_comment_count",
-                    "label": "Update Comment Count",
-                    "schema": [
-                        {
-                            "key": "post_id",
-                            "label": "Post ID",
-                            "type": "expression",
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "set_comment_status": {
-                    "key": "set_comment_status",
-                    "label": "Set Comment Status",
-                    "schema": [
-                        {
-                            "key": "comment_id",
-                            "label": "Comment ID",
-                            "type": "expression",
-                            "required": true
-                        },
-                        {
-                            "key": "status",
-                            "label": "Status",
-                            "type": "select",
-                            "options": [
-                                {
-                                    "label": "Approved",
-                                    "value": "1"
-                                },
-                                {
-                                    "label": "Pending",
-                                    "value": "0"
-                                },
-                                {
-                                    "label": "Spam",
-                                    "value": "spam"
-                                },
-                                {
-                                    "label": "Trash",
-                                    "value": "trash"
-                                }
-                            ],
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                }
-            
-              
-            }
-        },
-        "woo": {
-            "slug": "woo",
-            "name": "Woocommerce",
-            "icon": "",
-            "triggers": {
-                "new_order": {
-                    "key": "new_order",
-                    "label": "New Order",
-                    "hook": "woocommerce_new_order",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "order_status_changed": {
-                    "key": "order_status_changed",
-                    "label": "Order Status Changed",
-                    "hook": "woocommerce_order_status_changed",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                }
-            },
-            "actions": {
-                "create_order": {
-                    "key": "create_order",
-                    "label": "Create Order",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "update_order": {
-                    "key": "update_order",
-                    "label": "Update Order",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                }
-            }
-        },
-        "slack": {
-            "slug": "slack",
-            "name": "Slack",
-            "icon": "",
-            "triggers": {
-                "message_received": {
-                    "key": "message_received",
-                    "label": "Message Received",
-                    "hook": "slack_webhook_message",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                }
-            },
-            "actions": {
-                "send_message": {
-                    "key": "send_message",
-                    "label": "Send Message",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                }
-            }
-        },
-        "gmail": {
-            "slug": "gmail",
-            "name": "Gmail",
-            "icon": "",
-            "triggers": {
-                "new_email": {
-                    "key": "new_email",
-                    "label": "New Email",
-                    "hook": "gmail_new_email",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                }
-            },
-            "actions": {
-                "send_email": {
-                    "key": "send_email",
-                    "label": "Send Email",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                }
-            }
-        },
-        "trello": {
-            "slug": "trello",
-            "name": "Trello",
-            "icon": "",
-            "triggers": {
-                "card_created": {
-                    "key": "card_created",
-                    "label": "Card Created",
-                    "hook": "trello_webhook",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                }
-            },
-            "actions": {
-                "create_card": {
-                    "key": "create_card",
-                    "label": "Create Card",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                }
-            }
-        },
-        "stripe": {
-            "slug": "stripe",
-            "name": "Stripe",
-            "icon": "",
-            "triggers": {
-                "payment_succeeded": {
-                    "key": "payment_succeeded",
-                    "label": "Payment Succeeded",
-                    "hook": "stripe_webhook",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                }
-            },
-            "actions": {
-                "charge_customer": {
-                    "key": "charge_customer",
-                    "label": "Charge Customer",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                }
-            }
-        },
-        "mailerlite": {
-            "slug": "mailerlite",
-            "name": "Mailerlite",
-            "icon": "",
-            "triggers": {
-                "subscriber_added": {
-                    "key": "subscriber_added",
-                    "label": "Subscriber Added",
-                    "hook": "mailerlite_webhook",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                }
-            },
-            "actions": {
-                "add_subscriber": {
-                    "key": "add_subscriber",
-                    "label": "Add Subscriber",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                }
-            }
-        }
-    }
+				"trashed_comment": {
+					"key": "trashed_comment",
+					"label": "Comment Trashed",
+					"hook": "trashed_comment",
+					"schema": [
+						{
+							"key": "post_type",
+							"label": "Post Type",
+							"type": "select",
+							"dynamic": {
+								"integration": "wordpress",
+								"query": "post_types",
+								"select": ["name", "label"]
+							},
+							"required": false
+						}
+					],
+					"outputs": ["main"]
+				},
+				"untrashed_comment": {
+					"key": "untrashed_comment",
+					"label": "Comment Untrashed",
+					"hook": "untrashed_comment",
+					"schema": [
+						{
+							"key": "post_type",
+							"label": "Post Type",
+							"type": "select",
+							"dynamic": {
+								"integration": "wordpress",
+								"query": "post_types",
+								"select": ["name", "label"]
+							},
+							"required": false
+						}
+					],
+					"outputs": ["main"]
+				},
+				"transition_comment_status": {
+					"key": "transition_comment_status",
+					"label": "Comment Status Changed",
+					"hook": "transition_comment_status",
+					"schema": [
+						{
+							"key": "from_status",
+							"label": "From Status",
+							"type": "select",
+							"options": [
+								{
+									"label": "Approved",
+									"value": "1"
+								},
+								{
+									"label": "Pending",
+									"value": "0"
+								},
+								{
+									"label": "Spam",
+									"value": "spam"
+								},
+								{
+									"label": "Trash",
+									"value": "trash"
+								}
+							]
+						},
+						{
+							"key": "to_status",
+							"label": "To Status",
+							"type": "select",
+							"options": [
+								{
+									"label": "Approved",
+									"value": "1"
+								},
+								{
+									"label": "Pending",
+									"value": "0"
+								},
+								{
+									"label": "Spam",
+									"value": "spam"
+								},
+								{
+									"label": "Trash",
+									"value": "trash"
+								}
+							]
+						}
+					],
+					"outputs": ["main"]
+				},
+				"untrashed_post": {
+					"key": "untrashed_post",
+					"label": "Post Untrashed",
+					"hook": "untrashed_post",
+					"schema": [],
+					"outputs": ["main"]
+				},
+				"wp_update_comment_count": {
+					"key": "wp_update_comment_count",
+					"label": "Comment Count Updated",
+					"hook": "wp_update_comment_count",
+					"schema": [],
+					"outputs": ["main"]
+				},
+				"wp_set_comment_status": {
+					"key": "wp_set_comment_status",
+					"label": "Comment Status Set",
+					"hook": "wp_set_comment_status",
+					"schema": [],
+					"outputs": ["main"]
+				},
+				"wp_login": {
+					"key": "wp_login",
+					"label": "User Login",
+					"hook": "wp_login",
+					"schema": [],
+					"outputs": ["main"]
+				},
+				"wp_login_failed": {
+					"key": "wp_login_failed",
+					"label": "User Login failed",
+					"hook": "wp_login_failed",
+					"schema": [],
+					"outputs": ["main"]
+				},
+				"wp_logout": {
+					"key": "wp_logout",
+					"label": "User Log Out",
+					"hook": "wp_logout",
+					"schema": [],
+					"outputs": ["main"]
+				},
+				"update_blog_public": {
+					"key": "update_blog_public",
+					"label": "Update Blog Public",
+					"hook": "update_blog_public",
+					"schema": [],
+					"outputs": ["main"]
+				},
+				"update_blog_status": {
+					"key": "update_blog_status",
+					"label": "Update Blog Status",
+					"hook": "update_blog_status",
+					"schema": [],
+					"outputs": ["main"]
+				},
+				"update_option": {
+					"key": "update_option",
+					"label": "Update Option",
+					"hook": "update_option",
+					"schema": [],
+					"outputs": ["main"]
+				},
+				"upgrader_process_complete": {
+					"key": "upgrader_process_complete",
+					"label": "Upgrader Process Complete",
+					"hook": "upgrader_process_complete",
+					"schema": [],
+					"outputs": ["main"]
+				},
+				"wp_after_insert_post": {
+					"key": "wp_after_insert_post",
+					"label": "WP After Insert Post",
+					"hook": "wp_after_insert_post",
+					"schema": [],
+					"outputs": ["main"]
+				},
+				"wp_authenticate": {
+					"key": "wp_authenticate",
+					"label": "WP Authenticate",
+					"hook": "wp_authenticate",
+					"schema": [],
+					"outputs": ["main"]
+				},
+				"validate_password_reset": {
+					"key": "validate_password_reset",
+					"label": "Validate Password Reset",
+					"hook": "validate_password_reset",
+					"schema": [],
+					"outputs": ["main"]
+				},
+				"wpmu_activate_user": {
+					"key": "wpmu_activate_user",
+					"label": "Activate User",
+					"hook": "wpmu_activate_user",
+					"schema": [],
+					"outputs": ["main"]
+				},
+				"wp_update_user": {
+					"key": "wp_update_user",
+					"label": "Update User",
+					"hook": "wp_update_user",
+					"schema": [],
+					"outputs": ["main"]
+				},
+				"wpmu_delete_user": {
+					"key": "wpmu_delete_user",
+					"label": "Delete User",
+					"hook": "wpmu_delete_user",
+					"schema": [],
+					"outputs": ["main"]
+				},
+				"wpmu_new_blog": {
+					"key": "wpmu_new_blog",
+					"label": "New Blog Created",
+					"hook": "wpmu_new_blog",
+					"schema": [],
+					"outputs": ["main"]
+				},
+				"wpmu_new_user": {
+					"key": "wpmu_new_user",
+					"label": "New User Created",
+					"hook": "wpmu_new_user",
+					"schema": [],
+					"outputs": ["main"]
+				}
+			},
+			"actions": {
+				"create_post": {
+					"key": "create_post",
+					"label": "Create Post",
+					"schema": [
+						{
+							"key": "post_title",
+							"label": "Title",
+							"type": "expression",
+							"required": true
+						},
+						{
+							"key": "post_content",
+							"label": "Content",
+							"type": "textarea"
+						},
+						{
+							"key": "post_type",
+							"label": "Post Type",
+							"type": "select",
+							"dynamic": {
+								"integration": "wordpress",
+								"query": "post_types",
+								"select": ["name", "label"]
+							},
+							"required": true
+						},
+						{
+							"key": "post_status",
+							"label": "Status",
+							"type": "select",
+							"options": [
+								{
+									"label": "Draft",
+									"value": "draft"
+								},
+								{
+									"label": "Publish",
+									"value": "publish"
+								}
+							]
+						}
+					],
+					"outputs": ["main"]
+				},
+				"update_option": {
+					"key": "update_option",
+					"label": "Update Option",
+					"schema": [
+						{
+							"key": "option_name",
+							"label": "Option",
+							"type": "text",
+							"required": true
+						},
+						{
+							"key": "value",
+							"label": "Value",
+							"type": "expression"
+						}
+					],
+					"outputs": ["main"]
+				},
+				"untrash_post": {
+					"key": "untrash_post",
+					"label": "Untrash Post",
+					"schema": [
+						{
+							"key": "post_id",
+							"label": "Post ID",
+							"type": "expression",
+							"required": true
+						}
+					],
+					"outputs": ["main"]
+				},
+				"untrash_comment": {
+					"key": "untrash_comment",
+					"label": "Untrash Comment",
+					"schema": [
+						{
+							"key": "comment_id",
+							"label": "Comment ID",
+							"type": "expression",
+							"required": true
+						}
+					],
+					"outputs": ["main"]
+				},
+				"update_comment_count": {
+					"key": "update_comment_count",
+					"label": "Update Comment Count",
+					"schema": [
+						{
+							"key": "post_id",
+							"label": "Post ID",
+							"type": "expression",
+							"required": true
+						}
+					],
+					"outputs": ["main"]
+				},
+				"set_comment_status": {
+					"key": "set_comment_status",
+					"label": "Set Comment Status",
+					"schema": [
+						{
+							"key": "comment_id",
+							"label": "Comment ID",
+							"type": "expression",
+							"required": true
+						},
+						{
+							"key": "status",
+							"label": "Status",
+							"type": "select",
+							"options": [
+								{
+									"label": "Approved",
+									"value": "1"
+								},
+								{
+									"label": "Pending",
+									"value": "0"
+								},
+								{
+									"label": "Spam",
+									"value": "spam"
+								},
+								{
+									"label": "Trash",
+									"value": "trash"
+								}
+							],
+							"required": true
+						}
+					],
+					"outputs": ["main"]
+				}
+			}
+		},
+		"woo": {
+			"slug": "woo",
+			"name": "Woocommerce",
+			"icon": "",
+			"triggers": {
+				"new_order": {
+					"key": "new_order",
+					"label": "New Order",
+					"hook": "woocommerce_new_order",
+					"schema": [],
+					"outputs": ["main"]
+				},
+				"order_status_changed": {
+					"key": "order_status_changed",
+					"label": "Order Status Changed",
+					"hook": "woocommerce_order_status_changed",
+					"schema": [],
+					"outputs": ["main"]
+				}
+			},
+			"actions": {
+				"create_order": {
+					"key": "create_order",
+					"label": "Create Order",
+					"schema": [],
+					"outputs": ["main"]
+				},
+				"update_order": {
+					"key": "update_order",
+					"label": "Update Order",
+					"schema": [],
+					"outputs": ["main"]
+				}
+			}
+		},
+		"slack": {
+			"slug": "slack",
+			"name": "Slack",
+			"icon": "",
+			"triggers": {
+				"message_received": {
+					"key": "message_received",
+					"label": "Message Received",
+					"hook": "slack_webhook_message",
+					"schema": [],
+					"outputs": ["main"]
+				}
+			},
+			"actions": {
+				"send_message": {
+					"key": "send_message",
+					"label": "Send Message",
+					"schema": [],
+					"outputs": ["main"]
+				}
+			}
+		},
+		"gmail": {
+			"slug": "gmail",
+			"name": "Gmail",
+			"icon": "",
+			"triggers": {
+				"new_email": {
+					"key": "new_email",
+					"label": "New Email",
+					"hook": "gmail_new_email",
+					"schema": [],
+					"outputs": ["main"]
+				}
+			},
+			"actions": {
+				"send_email": {
+					"key": "send_email",
+					"label": "Send Email",
+					"schema": [],
+					"outputs": ["main"]
+				}
+			}
+		},
+		"trello": {
+			"slug": "trello",
+			"name": "Trello",
+			"icon": "",
+			"triggers": {
+				"card_created": {
+					"key": "card_created",
+					"label": "Card Created",
+					"hook": "trello_webhook",
+					"schema": [],
+					"outputs": ["main"]
+				}
+			},
+			"actions": {
+				"create_card": {
+					"key": "create_card",
+					"label": "Create Card",
+					"schema": [],
+					"outputs": ["main"]
+				}
+			}
+		},
+		"stripe": {
+			"slug": "stripe",
+			"name": "Stripe",
+			"icon": "",
+			"triggers": {
+				"payment_succeeded": {
+					"key": "payment_succeeded",
+					"label": "Payment Succeeded",
+					"hook": "stripe_webhook",
+					"schema": [],
+					"outputs": ["main"]
+				}
+			},
+			"actions": {
+				"charge_customer": {
+					"key": "charge_customer",
+					"label": "Charge Customer",
+					"schema": [],
+					"outputs": ["main"]
+				}
+			}
+		},
+		"mailerlite": {
+			"slug": "mailerlite",
+			"name": "Mailerlite",
+			"icon": "",
+			"triggers": {
+				"subscriber_added": {
+					"key": "subscriber_added",
+					"label": "Subscriber Added",
+					"hook": "mailerlite_webhook",
+					"schema": [],
+					"outputs": ["main"]
+				}
+			},
+			"actions": {
+				"add_subscriber": {
+					"key": "add_subscriber",
+					"label": "Add Subscriber",
+					"schema": [],
+					"outputs": ["main"]
+				}
+			}
+		}
+	}
 }

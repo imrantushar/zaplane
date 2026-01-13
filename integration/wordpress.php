@@ -38,6 +38,18 @@ class Wordpress extends IntegrationBase {
              'wp_login'                 => ['label' => 'User Logged in',           'hook' => 'wp_login'],
              'wp_login_failed'                 => ['label' => 'User Logged Failed', 'hook' => 'wp_login_failed'],
              'wp_logout'                => ['label' => 'User logout',               'hook' => 'wp_logout'],
+            'update_blog_public'        => ['label' => 'Update Blog Public',       'hook' => 'update_blog_public'],
+            'update_blog_status'        => ['label' => 'Update Blog Status',       'hook' => 'update_blog_status'],
+            'update_option'             => ['label' => 'Update Option',            'hook' => 'update_option'],
+            'upgrader_process_complete' => ['label' => 'Upgrader Process Complete', 'hook' => 'upgrader_process_complete'],
+            'wp_after_insert_post'      => ['label' => 'WP After Insert Post',     'hook' => 'wp_after_insert_post'],
+            'wp_authenticate'           => ['label' => 'WP Authenticate',          'hook' => 'wp_authenticate'],
+            'validate_password_reset'   => ['label' => 'Validate Password Reset',  'hook' => 'validate_password_reset'],
+             'wpmu_activate_user'       => ['label' => 'Activate User',            'hook'  => 'wpmu_activate_user'],
+            'wp_update_user'            => ['label' => 'Update User',              'hook'  => 'wp_update_user' ],
+            'wpmu_delete_user'          => ['label' => 'Delete User',              'hook'  => 'wpmu_delete_user'],
+            'wpmu_new_blog'             => ['label' => 'New Blog Created',         'hook'  => 'wpmu_new_blog'],
+            'wpmu_new_user'             => ['label' => 'New User Created',         'hook'  => 'wpmu_new_user' ],
 
         ];
     }
@@ -404,6 +416,154 @@ class Wordpress extends IntegrationBase {
             'roles'       => $user->roles,
             'logout_time' => current_time('mysql'),
         ];
+
+            case 'update_blog_public':
+
+                $blog_id = $args[0] ?? 0;
+                $value = $args[1] ?? '';
+
+                return [
+                    'blog_id' => $blog_id,
+                    'public_value' => $value,
+                    'timestamp' => current_time('mysql'),
+                ];
+
+            case 'update_blog_status':
+
+                $blog_id = $args[0] ?? 0;
+                $pref = $args[1] ?? '';
+                $value = $args[2] ?? '';
+
+                return [
+                    'blog_id' => $blog_id,
+                    'preference' => $pref,
+                    'value' => $value,
+                    'timestamp' => current_time('mysql'),
+                ];
+
+            case 'update_option':
+
+                $option = $args[0] ?? '';
+                $old_value = $args[1] ?? null;
+                $value = $args[2] ?? null;
+
+                return [
+                    'option_name' => $option,
+                    'old_value' => $old_value,
+                    'new_value' => $value,
+                    'timestamp' => current_time('mysql'),
+                ];
+
+            case 'upgrader_process_complete':
+
+                $upgrader = $args[0] ?? null;
+                $hook_extra = $args[1] ?? [];
+
+                return [
+                    'upgrader_type' => get_class($upgrader) ?? 'unknown',
+                    'action' => $hook_extra['action'] ?? '',
+                    'type' => $hook_extra['type'] ?? '',
+                    'bulk' => $hook_extra['bulk'] ?? false,
+                    'plugins' => $hook_extra['plugins'] ?? [],
+                    'themes' => $hook_extra['themes'] ?? [],
+                    'timestamp' => current_time('mysql'),
+                ];
+
+            case 'wp_after_insert_post':
+
+                $post_id = $args[0] ?? 0;
+                $post = get_post( $post_id );
+                $update = $args[1] ?? false;
+                
+                if ( ! $post ) return false;
+
+                return [
+                    'post_id'    => $post->ID,
+                    'post_title' => $post->post_title,
+                    'post_type'  => $post->post_type,
+                    'status'     => $post->post_status,
+                    'is_update'  => $update,
+                    'timestamp'  => current_time('mysql'),
+                ];
+
+            case 'wp_authenticate':
+
+                $user_login = $args[0] ?? '';
+                $user_password = $args[1] ?? '';
+
+                return [
+                    'username' => $user_login,
+                    'password_length' => strlen($user_password),
+                    'timestamp' => current_time('mysql'),
+                ];
+
+            case 'validate_password_reset':
+
+                $errors = $args[0] ?? null;
+                $user = $args[1] ?? null;
+
+                $error_codes = [];
+                if ( $errors instanceof \WP_Error ) {
+                    $error_codes = $errors->get_error_codes();
+                }
+
+                $user_data = [];
+                if ( $user instanceof \WP_User ) {
+                    $user_data = [
+                        'user_id' => $user->ID,
+                        'username' => $user->user_login,
+                        'email' => $user->user_email,
+                    ];
+                }
+
+                return [
+                    'has_errors' => !empty($error_codes),
+                    'error_codes' => $error_codes,
+                    'user_data' => $user_data,
+                    'timestamp' => current_time('mysql'),
+                ];
+ case 'wpmu_activate_user':
+        return [
+            'user_id'   => $args[0] ?? 0,
+            'password'  => $args[1] ?? '',
+            'meta'      => $args[2] ?? [],
+            'timestamp' => current_time( 'mysql' ),
+        ];
+
+    case 'wp_update_user':
+        return [
+            'user_id'       => $args[0] ?? 0,
+            'userdata'      => $args[1] ?? [],
+            'userdata_raw'  => $args[2] ?? [],
+            'timestamp'     => current_time( 'mysql' ),
+        ];
+
+    case 'wpmu_delete_user':
+        return [
+            'user_id'   => $args[0] ?? 0,
+            'user'      => $args[1] ?? null,
+            'timestamp' => current_time( 'mysql' ),
+        ];
+
+    case 'wpmu_new_blog':
+        return [
+            'site_id'    => $args[0] ?? 0,
+            'user_id'    => $args[1] ?? 0,
+            'domain'     => $args[2] ?? '',
+            'path'       => $args[3] ?? '',
+            'network_id' => $args[4] ?? 0,
+            'meta'       => $args[5] ?? [],
+            'timestamp'  => current_time( 'mysql' ),
+        ];
+
+    case 'wpmu_new_user':
+        return [
+            'user_id'   => $args[0] ?? 0,
+            'timestamp' => current_time( 'mysql' ),
+        ];
+
+
+
 
         }
 
