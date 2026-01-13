@@ -8,4 +8,3 @@ assets/js/*.txt
 **/*.map
 assets/css/backend-dist.css
 assets/css/frontend-dist.css
-docs/
