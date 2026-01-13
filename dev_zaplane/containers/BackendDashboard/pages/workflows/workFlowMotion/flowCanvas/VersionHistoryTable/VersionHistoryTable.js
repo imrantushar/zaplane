@@ -7,6 +7,7 @@ import {
   Flex,
   Spinner,
 } from "@chakra-ui/react";
+import ZAPLoading from "@ZAPComponents/Loading";
 import { getPreviewOldVersion, versionActive } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
 import { CheckCircle, Eye } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
@@ -32,9 +33,7 @@ const VersionHistoryTable = ({
  
    if (isLoading) {
      return (
-       <Flex align="center" justify="center" h="100%">
-         <Spinner size="sm" />
-       </Flex>
+         <ZAPLoading />
  
      );
    }

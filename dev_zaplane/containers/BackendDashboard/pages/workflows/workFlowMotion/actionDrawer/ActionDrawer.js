@@ -10,6 +10,8 @@ import {
     Code
 } from "@chakra-ui/react";
 import ZAPDrawer from "@ZAPComponents/Drawer";
+import LabeledInput from "@ZAPComponents/LabeledInput";
+import ZAPText from "@ZAPComponents/Text";
 import {
     fetchDynamic,
     workFLowSingeNodeExction
@@ -49,7 +51,7 @@ export default function ActionDrawer({
     const [dynamicOptions, setDynamicOptions] = useState({});
     const [loadingFields, setLoadingFields] = useState({});
 
-   console.log(context,'contexttttt');
+    console.log(context, 'contexttttt');
     useEffect(() => {
         if (!open || !node?.data || source === "add") return;
         const nodeData = node.data;
@@ -199,46 +201,41 @@ export default function ActionDrawer({
             case "text":
             case "expression":
                 return (
-                    <Box>
-                        <Text fontSize="sm">{field.label}</Text>
-                        <Input
-                            size="sm"
-                            value={values[field.key] || ""}
-                            onChange={(e) =>
-                                setFieldValue(field.key, e.target.value)
-                            }
-                        />
-                    </Box>
+                    <LabeledInput
+                        label={field.label}
+                        placeholder={field.placeholder || ""}
+                        value={values[field.key] || ""}
+                        onChange={(e) =>
+                            setFieldValue(field.key, e.target.value)
+                        }
+                        type={field.type || "text"}
+                    />
                 );
 
             case "number":
                 return (
-                    <Box>
-                        <Text fontSize="sm">{field.label}</Text>
-                        <Input
-                            size="sm"
-                            type="number"
-                            value={values[field.key] || ""}
-                            onChange={(e) =>
-                                setFieldValue(field.key, e.target.value)
-                            }
-                        />
-                    </Box>
+                    <LabeledInput
+                        label={field.label}
+                        placeholder={field.placeholder || ""}
+                        value={values[field.key] || ""}
+                        onChange={(e) =>
+                            setFieldValue(field.key, e.target.value)
+                        }
+                        type="number"
+                    />
                 );
 
             case "textarea":
                 return (
-                    <Box>
-                        <Text fontSize="sm">{field.label}</Text>
-                        <Input
-                            as="textarea"
-                            size="sm"
-                            value={values[field.key] || ""}
-                            onChange={(e) =>
-                                setFieldValue(field.key, e.target.value)
-                            }
-                        />
-                    </Box>
+                    <LabeledInput
+                        label={field.label}
+                        placeholder={field.placeholder || ""}
+                        value={values[field.key] || ""}
+                        onChange={(e) =>
+                            setFieldValue(field.key, e.target.value)
+                        }
+                        type="textarea"
+                    />
                 );
 
             case "select":
@@ -250,7 +247,7 @@ export default function ActionDrawer({
 
                     return (
                         <Box>
-                            <Text fontSize="sm">{field.label}</Text>
+                            <ZAPText>{field.label}</ZAPText>
                             <Select
                                 options={options}
                                 value={
@@ -272,7 +269,7 @@ export default function ActionDrawer({
 
                     return (
                         <Box>
-                            <Text fontSize="sm">{field.label}</Text>
+                            <ZAPText>{field.label}</ZAPText>
                             <Select
                                 options={opts}
                                 isLoading={loadingFields[key]}
@@ -389,7 +386,7 @@ export default function ActionDrawer({
 
                     <Tabs.Content value="select">
                         <Box mb={4}>
-                            <Text fontSize="sm">Action Type</Text>
+                            <ZAPText mb='4px'>Action Type</ZAPText>
                             <Select
                                 options={actionOptions}
                                 value={
