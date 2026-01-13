@@ -11,6 +11,7 @@ import {
 } from "@chakra-ui/react";
 import ZAPDrawer from "@ZAPComponents/Drawer";
 import LabeledInput from "@ZAPComponents/LabeledInput";
+import ZAPLabeledSelect from "@ZAPComponents/LabeledSelect";
 import ZAPText from "@ZAPComponents/Text";
 import {
     fetchDynamic,
@@ -21,6 +22,7 @@ import { useFormikContext } from "formik";
 import { useEffect, useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
 import Select from "react-select";
+import ActionFieldRenderer from "../Components/ActionFieldRenderer/ActionFieldRenderer";
 
 const APPS = Object.entries(integrations.apps || {}).map(([key, value]) => ({
     id: value.slug || key,
@@ -38,7 +40,6 @@ export default function ActionDrawer({
     onClose,
     updateNodeData,
     createActionNode,
-    createConditionNode,
     singleData
 }) {
     const { source, node } = context;
@@ -196,105 +197,6 @@ export default function ActionDrawer({
     };
 
 
-    const renderField = (field) => {
-        switch (field.type) {
-            case "text":
-            case "expression":
-                return (
-                    <LabeledInput
-                        label={field.label}
-                        placeholder={field.placeholder || ""}
-                        value={values[field.key] || ""}
-                        onChange={(e) =>
-                            setFieldValue(field.key, e.target.value)
-                        }
-                        type={field.type || "text"}
-                    />
-                );
-
-            case "number":
-                return (
-                    <LabeledInput
-                        label={field.label}
-                        placeholder={field.placeholder || ""}
-                        value={values[field.key] || ""}
-                        onChange={(e) =>
-                            setFieldValue(field.key, e.target.value)
-                        }
-                        type="number"
-                    />
-                );
-
-            case "textarea":
-                return (
-                    <LabeledInput
-                        label={field.label}
-                        placeholder={field.placeholder || ""}
-                        value={values[field.key] || ""}
-                        onChange={(e) =>
-                            setFieldValue(field.key, e.target.value)
-                        }
-                        type="textarea"
-                    />
-                );
-
-            case "select":
-                if (field.options) {
-                    const options = field.options.map(opt => ({
-                        label: opt.label,
-                        value: opt.value,
-                    }));
-
-                    return (
-                        <Box>
-                            <ZAPText>{field.label}</ZAPText>
-                            <Select
-                                options={options}
-                                value={
-                                    options.find(
-                                        o => o.value === values[field.key]
-                                    ) || null
-                                }
-                                onChange={(opt) =>
-                                    setFieldValue(field.key, opt?.value)
-                                }
-                            />
-                        </Box>
-                    );
-                }
-
-                if (field.dynamic) {
-                    const key = getKey(field);
-                    const opts = dynamicOptions[key] || [];
-
-                    return (
-                        <Box>
-                            <ZAPText>{field.label}</ZAPText>
-                            <Select
-                                options={opts}
-                                isLoading={loadingFields[key]}
-                                value={
-                                    opts.find(
-                                        o => o.value === values[field.key]
-                                    ) || null
-                                }
-                                onMenuOpen={() =>
-                                    fetchDynamicOptions(field)
-                                }
-                                onChange={(opt) =>
-                                    setFieldValue(field.key, opt?.value)
-                                }
-                            />
-                        </Box>
-                    );
-                }
-                return null;
-
-            default:
-                return null;
-        }
-    };
-
     const handleContinue = () => {
         if (step === "select") return setStep("configure");
         if (step === "configure") return setStep("test");
@@ -383,27 +285,31 @@ export default function ActionDrawer({
                         <Tabs.Trigger value="configure">Configure</Tabs.Trigger>
                         <Tabs.Trigger value="test">Test</Tabs.Trigger>
                     </Tabs.List>
- 
+
                     <Tabs.Content value="select">
-                        <Box mb={4}>
-                            <ZAPText mb='4px'>Action Type</ZAPText>
-                            <Select
-                                options={actionOptions}
-                                value={
-                                    actionOptions.find(
-                                        o => o.value === values.actionType
-                                    ) || null
-                                }
-                                onChange={(opt) =>
-                                    setFieldValue("actionType", opt?.value)
-                                }
-                            />
-                        </Box>
+                        <ZAPLabeledSelect
+                            label="Action Type"
+                            options={actionOptions}
+                            value={values.actionType}
+                            onChange={(val) => setFieldValue("actionType", val)}
+                            placeholder="Select Action Type"
+                            isClearable={true}
+                            mb={4}
+                        />
+
 
                         <Flex direction="column" gap={4}>
                             {selectedActionFields.map(field => (
                                 <Box key={field.key}>
-                                    {renderField(field)}
+                                    <ActionFieldRenderer
+                                        field={field}
+                                        value={values[field.key]}
+                                        setFieldValue={setFieldValue}
+                                        getKey={getKey}
+                                        dynamicOptions={dynamicOptions}
+                                        loadingFields={loadingFields}
+                                        fetchDynamicOptions={fetchDynamicOptions}
+                                    />
                                 </Box>
                             ))}
                         </Flex>

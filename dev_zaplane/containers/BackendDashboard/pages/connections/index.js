@@ -40,13 +40,10 @@ const Connections = () => {
     const [credentials, setCredentials] = useState({});
     const [loadingOAuth, setLoadingOAuth] = useState(false);
     const [loadingFields, setLoadingFields] = useState(false);
-
-    // Load connections
     useEffect(() => {
         dispatch(fetchConnections());
     }, [dispatch]);
 
-    // Fetch auth fields when app or auth type changes
     useEffect(() => {
         if (!selectedApp) return;
 
@@ -64,11 +61,7 @@ const Connections = () => {
         // })
         // .finally(() => setLoadingFields(false));
     }, [selectedApp, selectedAuthType, dispatch]);
-    console.log(authFields.available_auth_types
-        , 'poppppp')
-
-
-
+   
     const handleConnect = async () => {
         if (!selectedApp || !selectedAuthType) return;
 
@@ -98,7 +91,7 @@ const Connections = () => {
                             setCredentials({});
                         }
                     }
-                };
+                }; 
 
                 window.addEventListener("message", handler);
             } catch (e) {
@@ -132,7 +125,6 @@ const Connections = () => {
     return (
         <Box p={6} borderWidth="1px" borderRadius="md" boxShadow="sm">
             <VStack align="stretch" spacing={6}>
-                {/* Header */}
                 <HStack justify="space-between">
                     <Text fontSize="xl" fontWeight="bold">
                         {__("Connections", "zaplane")}
@@ -147,7 +139,6 @@ const Connections = () => {
                     </Button>
                 </HStack>
 
-                {/* Connections List */}
                 {connections.length === 0 ? (
                     <Text color="gray.500">{__("No connections found", "zaplane")}</Text>
                 ) : (
@@ -191,8 +182,6 @@ const Connections = () => {
                     </VStack>
                 )}
             </VStack>
-
-            {/* Create Credential Modal */}
             <WPModal
                 title={__("Create credential", "zaplane")}
                 isOpen={isModalOpen}
@@ -225,7 +214,6 @@ const Connections = () => {
                                 {key}
                             </Button>
                         ))}
-                        {/* Dynamic Auth Fields */}
                         { authFields?.auth_fields && selectedAuthType && (
                             <VStack spacing={3} align="stretch" pt={3}>
                                 {Object.entries(authFields.auth_fields).map(
