@@ -2,8 +2,11 @@
 namespace Zaplane\Integration;
 
 use Zaplane\Classes\IntegrationBase;
+use Zaplane\Classes\WordpressHelpers;
 
 if ( ! defined( 'ABSPATH' ) ) exit;
+
+require_once ZAPLANE_INCLUDES_DIR_PATH . 'classes/wordpressHelper.php';
 
 class Wordpress extends IntegrationBase {
 
@@ -21,6 +24,43 @@ class Wordpress extends IntegrationBase {
             'post_updated'  => ['label' => 'Post Updated',   'hook' => 'post_updated'],
             'user_register' => ['label' => 'User Registered','hook' => 'user_register'],
             'comment_post'  => ['label' => 'Comment Added',  'hook' => 'comment_post'],
+             'set_user_role'  => ['label' => 'User Role Updated',  'hook' => 'set_user_role'],
+            'show_user_profile' => ['label' => 'User Profile Show', 'hook' => 'show_user_profile'],
+            'edit_user_profile' => ['label' => 'User Profile Edit', 'hook' => 'edit_user_profile'],
+            'personal_options_update' => ['label' => 'Personal Options Update', 'hook' => 'personal_options_update'],
+            'edit_user_profile_update' => ['label' => 'Edit User', 'hook' => 'edit_user_profile_update'],
+            'profile_update' => ['label' => 'Profile Update', 'hook' => 'profile_update'],
+            'remove_user_from_blog' => ['label' => 'Remove Blog User', 'hook' => 'remove_user_from_blog'],
+            'delete_user' => ['label' => 'Delete User', 'hook' => 'delete_user'],
+            'login_footer' => ['label' => 'Login Footer', 'hook' => 'login_footer'],
+            'login_form' => ['label' => 'Login Form', 'hook' => 'login_form'],
+            'login_head' => ['label' => 'Login Head', 'hook' => 'login_head'],
+            'login_init' => ['label' => 'Login Initialization', 'hook' => 'login_init'],
+            'lostpassword_form' => ['label' => 'Lost Password Form', 'hook' => 'lostpassword_form'],
+            'retrieve_password' => ['label' => 'Password Retrieval', 'hook' => 'retrieve_password'],
+            'password_reset' => ['label' => 'Password Reset', 'hook' => 'password_reset'],
+            'after_password_reset' => ['label' => 'After Password Reset', 'hook' => 'after_password_reset'],
+            'register_form' => ['label' => 'Registration Form', 'hook' => 'register_form'],
+            'signup_blogform' => ['label' => 'Signup Blog Form', 'hook' => 'signup_blogform'],
+            'signup_extra_fields' => ['label' => 'Signup Extra Fields', 'hook' => 'signup_extra_fields'],
+            'signup_finished' => ['label' => 'Signup Finished', 'hook' => 'signup_finished'],
+            'signup_header' => ['label' => 'Signup Header', 'hook' => 'signup_header'],
+            'create_term' => ['label' => 'Term Creation', 'hook' => 'create_term'],
+            'created_term' => ['label' => 'Term Created', 'hook' => 'created_term'],
+            'edit_term' => ['label' => 'Term Edit', 'hook' => 'edit_term'],
+            'edited_term' => ['label' => 'Term Edited', 'hook' => 'edited_term'],
+            'saved_term' => ['label' => 'Term Update', 'hook' => 'saved_term'],
+            'delete_term' => ['label' => 'Term Deletion', 'hook' => 'delete_term'],
+            'delete_term_taxonomy' => ['label' => 'Delete Term Taxonomy', 'hook' => 'delete_term_taxonomy'],
+            'generate_rewrite_rules' => ['label' => 'Rewrite Rules', 'hook' => 'generate_rewrite_rules'],
+            'add_action' => ['label' => 'Add Action', 'hook' => 'add_action'],
+            'do_action' => ['label' => 'Do Action', 'hook' => 'do_action'],
+            'add_meta_boxes' => ['label' => 'Meta Box Setup', 'hook' => 'add_meta_boxes'],
+            'add_option' => ['label' => 'Option Addition', 'hook' => 'add_option'],
+            'delete_option' => ['label' => 'Option Deletion', 'hook' => 'delete_option'],
+            'delete_post_meta' => ['label' => 'Post Option Delete', 'hook' => 'delete_post_meta'],
+            'admin_post' => ['label' => 'Admin Post Action', 'hook' => 'admin_post'],
+            'wp_delete_site' => ['label' => 'Site Deletion', 'hook' => 'wp_delete_site'],
         ];
     }
 
@@ -53,7 +93,27 @@ class Wordpress extends IntegrationBase {
                 ]
             ];
         }
+        if ( $trigger === 'do_action' ) {
+            return [
+                [
+                    'key' => 'hook_name',
+                    'label' => "Hook Name (Use this code to trigger the action: do_action('hook_name', 1, ['key' => 'value']))",
+                    'type' => 'text',
+                    'required' => true,
+                ],
+            ];
+        }
 
+        if ( $trigger === 'add_action' ) {
+            return [
+                [
+                    'key' => 'hook_name',
+                    'label' => 'Hook Name',
+                    'type' => 'text',
+                    'required' => true,
+                ],
+            ];
+        }
         return [];
     }
 
@@ -105,6 +165,192 @@ class Wordpress extends IntegrationBase {
                     'comment_id' => $comment->comment_ID,
                     'post_id'    => $comment->comment_post_ID,
                     'content'    => $comment->comment_content,
+                ];
+            case 'set_user_role':
+                $user_data = WordpressHelpers::get_user_payload( $args[0] ?? 0 );
+                if ( ! $user_data ) {
+                    return false;
+                }
+                $user_data['role'] = $args[1] ?? ( $user_data['role'] ?? '' );
+                $user_data['old_roles'] = $args[2] ?? [];
+                return $user_data;
+
+            case 'show_user_profile':
+            case 'edit_user_profile':
+                return WordpressHelpers::get_user_payload( $args[0] ?? 0 );
+
+            case 'personal_options_update':
+            case 'edit_user_profile_update':
+                return WordpressHelpers::get_user_payload( $args[0] ?? 0 );
+
+            case 'profile_update':
+                $old_user = (object) ( $args[1] ?? [] );
+                return WordpressHelpers::get_user_payload(
+                    $args[0] ?? 0,
+                    [
+                        'old_email' => $old_user->user_email ?? '',
+                        'old_role' => $old_user->roles[0] ?? '',
+                    ]
+                );
+
+            case 'remove_user_from_blog':
+                return WordpressHelpers::get_user_payload(
+                    $args[0] ?? 0,
+                    [
+                        'blog_id' => $args[1] ?? 0,
+                        'reassign' => $args[2] ?? 0,
+                    ]
+                );
+
+            case 'delete_user':
+                return WordpressHelpers::get_user_payload(
+                    $args[2] ?? ( $args[0] ?? 0 ),
+                    [ 'reassign' => $args[1] ?? 0 ]
+                );
+
+            case 'login_footer':
+            case 'login_form':
+            case 'login_head':
+            case 'login_init':
+            case 'lostpassword_form':
+            case 'register_form':
+            case 'signup_extra_fields':
+            case 'signup_finished':
+            case 'signup_header':
+                return [
+                    'event' => $node['event'],
+                ];
+
+            case 'retrieve_password':
+                return WordpressHelpers::get_user_payload( $args[0] ?? '' ) ?: [
+                    'event' => $node['event'],
+                    'user_login' => $args[0] ?? '',
+                ];
+
+            case 'password_reset':
+                return WordpressHelpers::get_user_payload( $args[0] ?? 0 );
+
+            case 'after_password_reset':
+                return WordpressHelpers::get_user_payload(
+                    $args[0] ?? 0,
+                    [ 'after_reset' => true ]
+                );
+
+            case 'create_term':
+            case 'created_term':
+            case 'edit_term':
+            case 'edited_term':
+                return WordpressHelpers::get_term_payload(
+                    $args[0] ?? 0,
+                    $args[2] ?? '',
+                    $args[1] ?? 0,
+                    [ 'args' => $args[3] ?? [] ]
+                );
+
+            case 'saved_term':
+                if ( empty( $args[3] ) ) {
+                    return false;
+                }
+                return WordpressHelpers::get_term_payload(
+                    $args[0] ?? 0,
+                    $args[2] ?? '',
+                    $args[1] ?? 0,
+                    [
+                        'update' => true,
+                        'args' => $args[4] ?? [],
+                    ]
+                );
+
+            case 'delete_term':
+                return WordpressHelpers::get_term_payload(
+                    $args[0] ?? 0,
+                    $args[2] ?? '',
+                    $args[1] ?? 0,
+                    [
+                        'deleted' => true,
+                        'object_ids' => $args[4] ?? [],
+                    ],
+                    $args[3] ?? null
+                );
+
+            case 'delete_term_taxonomy':
+                return WordpressHelpers::get_term_payload( 0, '', $args[0] ?? 0 );
+
+            case 'generate_rewrite_rules':
+                $rewrite = (object) ( $args[0] ?? [] );
+                return [
+                    'event' => $node['event'],
+                    'rules_count' => count( (array) ( $rewrite->rules ?? [] ) ),
+                    'permalink_structure' => $rewrite->permalink_structure ?? '',
+                ];
+
+            case 'add_action':
+                $hook = $args[0] ?? '';
+                return [
+                    'hook_name' => $hook,
+                    'callback' => $args[1] ?? null,
+                    'priority' => $args[2] ?? 10,
+                    'accepted_args' => $args[3] ?? 1,
+                ];
+
+            case 'do_action':
+                $hook = $args[0] ?? '';
+                return [
+                    'hook_name' => $hook,
+                    'args' => array_slice( $args, 1 ),
+                ];
+
+            case 'add_meta_boxes':
+                $post_type = $args[0] ?? '';
+                $post = (object) ( $args[1] ?? [] );
+                return [
+                    'post_type' => $post_type,
+                    'post_id' => $post->ID ?? 0,
+                    'post_title' => $post->post_title ?? '',
+                    'post_status' => $post->post_status ?? '',
+                ];
+
+            case 'add_option':
+                return [
+                    'option_name' => (string) ( $args[0] ?? '' ),
+                    'value' => $args[1] ?? null,
+                ];
+
+            case 'delete_option':
+                return [
+                    'option_name' => (string) ( $args[0] ?? '' ),
+                ];
+
+            case 'delete_post_meta':
+                return [
+                    'meta_ids' => $args[0] ?? [],
+                    'post_id' => $args[1] ?? 0,
+                    'meta_key' => $args[2] ?? '',
+                    'meta_value' => $args[3] ?? null,
+                ];
+
+            case 'admin_post':
+                return [
+                    'action' => $_REQUEST['action'] ?? '',
+                ];
+
+            case 'wp_delete_site':
+                $site = (object) ( $args[0] ?? [] );
+                return [
+                    'blog_id' => $site->blog_id ?? 0,
+                    'site_id' => $site->site_id ?? 0,
+                    'domain' => $site->domain ?? '',
+                    'path' => $site->path ?? '',
+                    'registered' => $site->registered ?? '',
+                    'deleted' => $site->deleted ?? '',
+                ];
+
+            case 'signup_blogform':
+                $errors = $args[0] ?? null;
+                $error_messages = is_object( $errors ) ? $errors->get_error_messages() : [];
+                return [
+                    'event' => $node['event'],
+                    'error_messages' => $error_messages,
                 ];
         }
 
@@ -161,6 +407,13 @@ class Wordpress extends IntegrationBase {
             'add_category_to_post' => ['label'=>'Add Category to Post'],
             'get_categories' => ['label'=>'Get Category (All)'],
             'get_category' => ['label'=>'Get Category (Single)'],
+            'create_post_tag' => ['label'=>'Create Post Tag'],
+            'update_post_tag' => ['label'=>'Update Post Tag'],
+            'delete_post_tag' => ['label'=>'Delete Post Tag'],
+            'add_tags_to_post' => ['label'=>'Add Tags to Post'],
+            'remove_tags_from_post' => ['label'=>'Remove Tags from Post'],
+            'get_post_tags' => ['label'=>'Get Post Tag (All)'],
+            'get_post_tag' => ['label'=>'Get Post Tag (Single)'],
         ];
     }
 
@@ -498,6 +751,54 @@ class Wordpress extends IntegrationBase {
             ];
         }
 
+        if ( $action === 'create_post_tag' ) {
+            return [
+                ['key'=>'name','label'=>'Name','type'=>'text','required'=>true],
+                ['key'=>'slug','label'=>'Slug','type'=>'text'],
+                ['key'=>'description','label'=>'Description','type'=>'textarea'],
+            ];
+        }
+
+        if ( $action === 'update_post_tag' ) {
+            return [
+                ['key'=>'term_id','label'=>'Tag ID','type'=>'expression','required'=>true],
+                ['key'=>'name','label'=>'Name','type'=>'text'],
+                ['key'=>'slug','label'=>'Slug','type'=>'text'],
+                ['key'=>'description','label'=>'Description','type'=>'textarea'],
+            ];
+        }
+
+        if ( $action === 'delete_post_tag' ) {
+            return [
+                ['key'=>'term_id','label'=>'Tag ID','type'=>'expression','required'=>true],
+            ];
+        }
+
+        if ( $action === 'add_tags_to_post' ) {
+            return [
+                ['key'=>'post_id','label'=>'Post ID','type'=>'expression','required'=>true],
+                ['key'=>'tags','label'=>'Tags (comma separated)','type'=>'text','required'=>true],
+                ['key'=>'append','label'=>'Append (true/false)','type'=>'text'],
+            ];
+        }
+
+        if ( $action === 'remove_tags_from_post' ) {
+            return [
+                ['key'=>'post_id','label'=>'Post ID','type'=>'expression','required'=>true],
+                ['key'=>'tags','label'=>'Tags (comma separated)','type'=>'text','required'=>true],
+            ];
+        }
+
+        if ( $action === 'get_post_tags' ) {
+            return [];
+        }
+
+        if ( $action === 'get_post_tag' ) {
+            return [
+                ['key'=>'term_id','label'=>'Tag ID','type'=>'expression','required'=>true],
+            ];
+        }
+
         return [];
     }
 
@@ -525,159 +826,79 @@ class Wordpress extends IntegrationBase {
                 return ['port'=>'main','data'=>[]];
 
             case 'create_user':
-                $role = WordpressHelpers::resolve_role_key( $config['role'] ?? '', true );
-                $user_id = wp_insert_user( [
-                    'user_login' => $config['user_login'] ?? '',
-                    'user_email' => $config['user_email'] ?? '',
-                    'user_pass' => $config['user_pass'] ?? '',
-                    'display_name' => $config['display_name'] ?? '',
-                    'first_name' => $config['first_name'] ?? '',
-                    'last_name' => $config['last_name'] ?? '',
-                    'role' => $role,
-                ] );
-                return ['port'=>'main','data'=>$user_id];
+                return ['port'=>'main','data'=>wp_insert_user( $config )];
 
             case 'update_user':
-                $data = [
-                    'ID' => (int) ( $config['user_id'] ?? 0 ),
-                ];
-                foreach ( ['user_email','user_pass','display_name','first_name','last_name','role'] as $field ) {
-                    if ( array_key_exists( $field, $config ) ) {
-                        $data[$field] = $config[$field];
-                    }
-                }
-                if ( array_key_exists( 'role', $data ) ) {
-                    $role = WordpressHelpers::resolve_role_key( $data['role'], true );
-                    if ( $role !== '' ) {
-                        $data['role'] = $role;
-                    } else {
-                        unset( $data['role'] );
-                    }
-                }
-                $updated = wp_update_user( $data );
-                return ['port'=>'main','data'=>$updated];
+                $config['ID'] = $config['user_id'];
+                return ['port'=>'main','data'=>wp_update_user( $config )];
 
             case 'delete_user':
-                $user_id = (int) ( $config['user_id'] ?? 0 );
-                $reassign = $config['reassign'] ?? null;
-                $deleted = $user_id ? wp_delete_user( $user_id, $reassign ? (int) $reassign : null ) : false;
-                return ['port'=>'main','data'=>$deleted];
+                return ['port'=>'main','data'=>wp_delete_user( $config['user_id'], $config['reassign'] ?? null )];
 
             case 'get_users':
-                $args = [];
-                if ( ! empty( $config['search'] ) ) {
-                    $args['search'] = '*' . $config['search'] . '*';
-                }
-                if ( ! empty( $config['number'] ) ) {
-                    $args['number'] = (int) $config['number'];
-                }
-                $users = get_users( $args );
-                return ['port'=>'main','data'=>static::query_users( [ 'users' => $users ] )];
+                return ['port'=>'main','data'=>static::query_users( [ 'users' => get_users( $config ) ] )];
 
             case 'get_users_by_role':
-                $args = [
-                    'role' => $config['role'] ?? '',
-                ];
-                if ( ! empty( $config['search'] ) ) {
-                    $args['search'] = '*' . $config['search'] . '*';
-                }
-                if ( ! empty( $config['number'] ) ) {
-                    $args['number'] = (int) $config['number'];
-                }
-                $users = get_users( $args );
-                return ['port'=>'main','data'=>static::query_users( [ 'users' => $users ] )];
+                return ['port'=>'main','data'=>static::query_users( [ 'users' => get_users( $config ) ] )];
 
             case 'get_user_by_id':
-                $user = get_userdata( (int) ( $config['user_id'] ?? 0 ) );
-                return ['port'=>'main','data'=>WordpressHelpers::get_user_payload( $user )];
+                return ['port'=>'main','data'=>WordpressHelpers::get_user_payload( get_userdata( $config['user_id'] ) )];
 
             case 'get_user_by_email':
-                $user = get_user_by( 'email', (string) ( $config['user_email'] ?? '' ) );
-                return ['port'=>'main','data'=>WordpressHelpers::get_user_payload( $user )];
+                return ['port'=>'main',
+                'data'=>WordpressHelpers::get_user_payload( get_user_by( 'email',
+                 $config['user_email'] ) )
+                ];
 
             case 'get_user_by_field':
-                $user = get_user_by( (string) ( $config['field'] ?? '' ), $config['value'] ?? '' );
-                return ['port'=>'main','data'=>WordpressHelpers::get_user_payload( $user )];
+                return ['port'=>'main',
+                'data'=>WordpressHelpers::get_user_payload( get_user_by( $config['field'],
+                 $config['value'] ) )];
 
             case 'get_user_meta_all':
-                return ['port'=>'main','data'=>get_user_meta( (int) ( $config['user_id'] ?? 0 ) )];
+                return ['port'=>'main','data'=>get_user_meta( $config['user_id'] )];
 
             case 'get_user_meta_single':
-                return ['port'=>'main','data'=>get_user_meta( (int) ( $config['user_id'] ?? 0 ), (string) ( $config['meta_key'] ?? '' ), true )];
+                return ['port'=>'main','data'=>get_user_meta( $config['user_id'],
+                 $config['meta_key'], true 
+                 )];
 
             case 'update_user_meta':
-                $updated = update_user_meta(
-                    (int) ( $config['user_id'] ?? 0 ),
-                    (string) ( $config['meta_key'] ?? '' ),
-                    $config['meta_value'] ?? null
-                );
-                return ['port'=>'main','data'=>$updated];
+                return ['port'=>'main','data'=>update_user_meta( $config['user_id'], 
+                $config['meta_key'], 
+                $config['meta_value'] ?? null
+                 )];
 
             case 'create_role':
-                $role_input = (string) ( $config['role'] ?? '' );
-                $role_key = sanitize_key( $role_input );
-                $display_name = (string) ( $config['display_name'] ?? '' );
-                $display_name = $display_name !== '' ? $display_name : $role_input;
-                $caps = WordpressHelpers::normalize_caps( $config['capabilities'] ?? [] );
-
-                $role = add_role( $role_key, $display_name, $caps );
-                if ( ! $role ) {
-                    $role = get_role( $role_key );
-                    if ( $role ) {
-                        if ( $display_name !== '' ) {
-                            WordpressHelpers::set_role_display_name( $role_key, $display_name );
-                        }
-                        if ( $caps ) {
-                            foreach ( $caps as $cap => $grant ) {
-                                if ( $grant ) {
-                                    $role->add_cap( $cap );
-                                } else {
-                                    $role->remove_cap( $cap );
-                                }
-                            }
-                        }
-                    }
-                }
-
-                return ['port'=>'main','data'=>WordpressHelpers::format_role_payload( $role_key, $role )];
+                $role_key = sanitize_key( $config['role'] );
+                return ['port'=>'main','data'=>WordpressHelpers::format_role_payload(
+                    $role_key,
+                    add_role( 
+                        $role_key, 
+                        $config['display_name'], 
+                        WordpressHelpers::normalize_caps( $config['capabilities'] ) )
+                )];
 
             case 'delete_role':
-                $removed = remove_role( (string) ( $config['role'] ?? '' ) );
-                return ['port'=>'main','data'=>$removed];
+                return ['port'=>'main','data'=>remove_role( $config['role'] )];
 
             case 'add_user_role':
-                $user = get_userdata( (int) ( $config['user_id'] ?? 0 ) );
-                $role = WordpressHelpers::resolve_role_key( $config['role'] ?? '', true );
-                if ( $user ) {
-                    if ( $role !== '' ) {
-                        $user->add_role( $role );
-                    }
-                }
+                $user = get_userdata( $config['user_id'] );
+                $user->add_role( $config['role'] );
                 return ['port'=>'main','data'=>(bool) $user];
 
             case 'remove_user_role':
-                $user = get_userdata( (int) ( $config['user_id'] ?? 0 ) );
-                $role = WordpressHelpers::resolve_role_key( $config['role'] ?? '', true );
-                if ( $user ) {
-                    if ( $role !== '' ) {
-                        $user->remove_role( $role );
-                    }
-                }
+                $user = get_userdata( $config['user_id'] );
+                $user->remove_role( $config['role'] );
                 return ['port'=>'main','data'=>(bool) $user];
 
             case 'update_user_role':
-                $user = get_userdata( (int) ( $config['user_id'] ?? 0 ) );
-                $role = WordpressHelpers::resolve_role_key( $config['role'] ?? '', true );
-                if ( $user ) {
-                    if ( $role !== '' ) {
-                        $user->set_role( $role );
-                    }
-                }
+                $user = get_userdata( $config['user_id'] );
+                $user->set_role( $config['role'] );
                 return ['port'=>'main','data'=>(bool) $user];
 
             case 'get_roles':
-                $roles = wp_roles()->roles ?? [];
-                return ['port'=>'main','data'=>$roles];
+                return ['port'=>'main','data'=>wp_roles()->roles ?? []];
 
             case 'get_caps':
                 $roles = wp_roles()->roles ?? [];
@@ -692,67 +913,59 @@ class Wordpress extends IntegrationBase {
                 return ['port'=>'main','data'=>array_keys( $caps )];
 
             case 'get_role_caps':
-                $role = get_role( (string) ( $config['role'] ?? '' ) );
-                $caps = $role ? array_keys( $role->capabilities ?? [] ) : [];
-                return ['port'=>'main','data'=>$caps];
+                $role = get_role( $config['role'] );
+                return ['port'=>'main','data'=>array_keys( $role->capabilities )];
 
             case 'add_role_caps':
-                $role = get_role( (string) ( $config['role'] ?? '' ) );
-                if ( $role ) {
-                    foreach ( WordpressHelpers::normalize_list( $config['caps'] ?? [] ) as $cap ) {
+                $role = get_role( $config['role'] );
+                foreach ( WordpressHelpers::normalize_list( $config['caps'] ) as $cap ) {
                         $role->add_cap( $cap );
                     }
-                }
-                return ['port'=>'main','data'=>(bool) $role];
+                return ['port'=>'main','data'=>true];
 
             case 'remove_role_caps':
-                $role = get_role( (string) ( $config['role'] ?? '' ) );
-                if ( $role ) {
-                    foreach ( WordpressHelpers::normalize_list( $config['caps'] ?? [] ) as $cap ) {
+                $role = get_role( $config['role'] );
+                foreach ( WordpressHelpers::normalize_list( $config['caps'] ) as $cap ) {
                         $role->remove_cap( $cap );
                     }
-                }
-                return ['port'=>'main','data'=>(bool) $role];
+                return ['port'=>'main','data'=>true];
 
             case 'get_user_caps':
-                $user = get_userdata( (int) ( $config['user_id'] ?? 0 ) );
-                return ['port'=>'main','data'=>$user ? array_keys( $user->allcaps ?? [] ) : []];
+                $user = get_userdata( $config['user_id'] );
+                return ['port'=>'main','data'=>array_keys( $user->allcaps )];
 
             case 'add_user_caps':
-                $user = get_userdata( (int) ( $config['user_id'] ?? 0 ) );
-                if ( $user ) {
-                    foreach ( WordpressHelpers::normalize_list( $config['caps'] ?? [] ) as $cap ) {
+                $user = get_userdata( $config['user_id'] );
+                foreach ( WordpressHelpers::normalize_list( $config['caps'] ) as $cap ) {
                         $user->add_cap( $cap );
                     }
-                }
-                return ['port'=>'main','data'=>(bool) $user];
+                return ['port'=>'main','data'=>true];
 
             case 'remove_user_caps':
-                $user = get_userdata( (int) ( $config['user_id'] ?? 0 ) );
-                if ( $user ) {
-                    foreach ( WordpressHelpers::normalize_list( $config['caps'] ?? [] ) as $cap ) {
+                $user = get_userdata( $config['user_id'] );
+                foreach ( WordpressHelpers::normalize_list( $config['caps'] ) as $cap ) {
                         $user->remove_cap( $cap );
                     }
-                }
-                return ['port'=>'main','data'=>(bool) $user];
+                return ['port'=>'main','data'=>true];
 
             case 'get_term':
-                $term = get_term( (int) ( $config['term_id'] ?? 0 ), (string) ( $config['taxonomy'] ?? '' ) );
-                return ['port'=>'main','data'=>$term];
+                return ['port'=>'main','data'=>get_term( $config['term_id'], $config['taxonomy'] )];
 
             case 'get_terms_by_taxonomy':
-                $terms = get_terms( [
+                return ['port'=>'main','data'=>get_terms( [
                     'taxonomy' => $config['taxonomy'] ?? '',
                     'hide_empty' => false,
-                ] );
-                return ['port'=>'main','data'=>$terms];
+                ] )];
 
             case 'get_term_by_field':
-                $term = get_term_by( $config['field'] ?? '', $config['value'] ?? '', $config['taxonomy'] ?? '' );
-                return ['port'=>'main','data'=>$term];
+                return ['port'=>'main','data'=>get_term_by(
+                    $config['field'] ?? '',
+                    $config['value'] ?? '',
+                    $config['taxonomy'] ?? ''
+                )];
 
             case 'create_term':
-                $created = wp_insert_term(
+                return ['port'=>'main','data'=>wp_insert_term(
                     $config['name'] ?? '',
                     $config['taxonomy'] ?? '',
                     [
@@ -760,11 +973,10 @@ class Wordpress extends IntegrationBase {
                         'parent' => $config['parent'] ?? 0,
                         'description' => $config['description'] ?? '',
                     ]
-                );
-                return ['port'=>'main','data'=>$created];
+                )];
 
             case 'update_term':
-                $updated = wp_update_term(
+                return ['port'=>'main','data'=>wp_update_term(
                     $config['term_id'] ?? 0,
                     $config['taxonomy'] ?? '',
                     [
@@ -773,15 +985,13 @@ class Wordpress extends IntegrationBase {
                         'description' => $config['description'] ?? '',
                         'parent' => $config['parent'] ?? 0,
                     ]
-                );
-                return ['port'=>'main','data'=>$updated];
+                )];
 
             case 'delete_term':
-                $deleted = wp_delete_term(
+                return ['port'=>'main','data'=>wp_delete_term(
                     $config['term_id'] ?? 0,
                     $config['taxonomy'] ?? ''
-                );
-                return ['port'=>'main','data'=>$deleted];
+                )];
 
             case 'register_taxonomy':
                 $registered = register_taxonomy(
@@ -859,6 +1069,51 @@ class Wordpress extends IntegrationBase {
 
             case 'get_category':
                 return ['port'=>'main','data'=>get_category( (int) ( $config['category_id'] ?? 0 ) )];
+
+            case 'create_post_tag':
+                return ['port'=>'main','data'=>wp_insert_term(
+                    $config['name'],
+                    'post_tag',
+                    [
+                        'slug' => $config['slug'],
+                        'description' => $config['description'],
+                    ]
+                )];
+
+            case 'update_post_tag':
+                return ['port'=>'main','data'=>wp_update_term(
+                    $config['term_id'],
+                    'post_tag',
+                    [
+                        'name' => $config['name'],
+                        'slug' => $config['slug'],
+                        'description' => $config['description'],
+                    ]
+                )];
+
+            case 'delete_post_tag':
+                return ['port'=>'main',
+                'data'=>wp_delete_term( $config['term_id'], 'post_tag' )];
+
+            case 'add_tags_to_post':
+                return ['port'=>'main','data'=>wp_set_post_tags(
+                    $config['post_id'],
+                    WordpressHelpers::normalize_list( $config['tags'] ),
+                    $config['append']
+                )];
+
+            case 'remove_tags_from_post':
+                return ['port'=>'main','data'=>wp_remove_object_terms(
+                    $config['post_id'],
+                    WordpressHelpers::normalize_list( $config['tags'] ),
+                    'post_tag'
+                )];
+
+            case 'get_post_tags':
+                return ['port'=>'main','data'=>get_terms( [ 'taxonomy' => 'post_tag' ] )];
+
+            case 'get_post_tag':
+                return ['port'=>'main','data'=>get_term( $config['term_id'], 'post_tag' )];
         }
 
         return ['port'=>'main','data'=>$input];
@@ -1028,114 +1283,4 @@ class Wordpress extends IntegrationBase {
         return $items;
     }
 
-}
-
-class WordpressHelpers {
-    public static function get_user_payload( $user_ref, array $extra_data = [] ): ?array {
-        $user = null;
-        if ( is_numeric( $user_ref ) ) {
-            $user = get_userdata( (int) $user_ref );
-        } elseif ( is_object( $user_ref ) ) {
-            $user = $user_ref;
-        } else {
-            $user = get_user_by( 'login', (string) $user_ref );
-        }
-
-        if ( ! $user ) {
-            return null;
-        }
-
-        $user_payload = Wordpress::query_users( [ 'users' => [ $user ] ] );
-        if ( ! $user_payload ) {
-            return null;
-        }
-
-        return array_merge( $user_payload[0], $extra_data );
-    }
-
-    public static function get_term_payload( $term_id, $taxonomy, $term_taxonomy_id = 0, array $extra_data = [], $term_object = null ) {
-        if ( $term_object ) {
-            $term_id = $term_object->term_id;
-            $taxonomy = $term_object->taxonomy;
-        }
-
-        $include = [];
-        if ( $term_id ) {
-            $include[] = (int) $term_id;
-        }
-
-        $terms = Wordpress::query_terms( [
-            'where' => [
-                'taxonomy' => $taxonomy,
-                'include' => $include,
-            ],
-            'limit' => 1,
-        ] );
-
-        $term = [];
-        if ( ! empty( $terms ) ) {
-            $term = $terms[0];
-        }
-
-        if ( $extra_data ) {
-            $term = array_merge( $term, $extra_data );
-        }
-
-        return $term;
-    }
-
-    public static function normalize_list( $value ): array {
-        if ( is_string( $value ) ) {
-            return array_map( 'trim', explode( ',', $value ) );
-        }
-
-        return (array) $value;
-    }
-
-    public static function normalize_caps( $value ): array {
-        return array_fill_keys( self::normalize_list( $value ), true );
-    }
-
-    public static function normalize_taxonomy_args( $value ): array {
-        return is_array( $value ) ? $value : [];
-    }
-
-    public static function set_role_display_name( string $role_key, string $display_name ): void {
-        $roles = wp_roles();
-        $roles->roles[ $role_key ]['name'] = $display_name;
-        $roles->role_names[ $role_key ] = $display_name;
-        update_option( $roles->role_key, $roles->roles, true );
-    }
-
-    public static function format_role_payload( string $role_key, $role ): ?array {
-        if ( ! $role ) {
-            return null;
-        }
-
-        return [
-            'role' => $role_key,
-            'display_name' => $role->name,
-            'capabilities' => array_keys( $role->capabilities ),
-        ];
-    }
-
-    public static function resolve_role_key( $role_input, bool $require_existing = false ): string {
-        $role = trim( (string) $role_input );
-        if ( $role === '' ) {
-            return '';
-        }
-        $roles = wp_roles();
-        $key = sanitize_key( $role );
-        if ( isset( $roles->roles[ $key ] ) ) {
-            return $key;
-        }
-
-        foreach ( $roles->role_names as $key => $name ) {
-            if ( strcasecmp( (string) $name, $role ) === 0 ) {
-                return $key;
-            }
-        }
-
-        return $require_existing ? '' : $key;
-    }
 }
