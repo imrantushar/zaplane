@@ -1381,21 +1381,21 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/text/index.js");
 /* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/badge/badge.js");
 /* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/button/button.js");
-/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/button/icon-button.js");
-/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/flex/flex.js");
-/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/input/input.js");
-/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/stack/h-stack.js");
-/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/stack/v-stack.js");
-/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
-/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_11___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_11__);
-/* harmony import */ var react_icons_fa__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! react-icons/fa */ "./node_modules/react-icons/fa/index.mjs");
-/* harmony import */ var react_icons_fi__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! react-icons/fi */ "./node_modules/react-icons/fi/index.mjs");
-/* harmony import */ var react_select__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! react-select */ "./node_modules/react-select/dist/react-select.esm.js");
-/* harmony import */ var _ZAPRedux_Slices_connectionsSlice_connectionsSlice__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! @ZAPRedux/Slices/connectionsSlice/connectionsSlice */ "./dev_zaplane/redux/Slices/connectionsSlice/connectionsSlice.js");
-/* harmony import */ var _ZAPComponents_Modal_WPModal__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! @ZAPComponents/Modal/WPModal */ "./dev_zaplane/components/Modal/WPModal.js");
-/* harmony import */ var _ZAPComponents_Text__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! @ZAPComponents/Text */ "./dev_zaplane/components/Text/index.js");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__);
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/input/input.js");
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/stack/h-stack.js");
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/stack/v-stack.js");
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_9___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_9__);
+/* harmony import */ var react_icons_fa__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! react-icons/fa */ "./node_modules/react-icons/fa/index.mjs");
+/* harmony import */ var react_icons_fi__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! react-icons/fi */ "./node_modules/react-icons/fi/index.mjs");
+/* harmony import */ var react_select__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! react-select */ "./node_modules/react-select/dist/react-select.esm.js");
+/* harmony import */ var _ZAPRedux_Slices_connectionsSlice_connectionsSlice__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! @ZAPRedux/Slices/connectionsSlice/connectionsSlice */ "./dev_zaplane/redux/Slices/connectionsSlice/connectionsSlice.js");
+/* harmony import */ var _ZAPComponents_Modal_WPModal__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! @ZAPComponents/Modal/WPModal */ "./dev_zaplane/components/Modal/WPModal.js");
+/* harmony import */ var _ZAPComponents_Text__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! @ZAPComponents/Text */ "./dev_zaplane/components/Text/index.js");
+/* harmony import */ var _ZAPComponents_Table__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! @ZAPComponents/Table */ "./dev_zaplane/components/Table/index.js");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_17___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_17__);
+
 
 
 
@@ -1421,13 +1421,13 @@ const Connections = () => {
   const [loadingOAuth, setLoadingOAuth] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
   const [loadingFields, setLoadingFields] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
-    dispatch((0,_ZAPRedux_Slices_connectionsSlice_connectionsSlice__WEBPACK_IMPORTED_MODULE_15__.fetchConnections)());
+    dispatch((0,_ZAPRedux_Slices_connectionsSlice_connectionsSlice__WEBPACK_IMPORTED_MODULE_13__.fetchConnections)());
   }, [dispatch]);
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
     if (!selectedApp) return;
     setLoadingFields(true);
     const type = selectedAuthType || undefined;
-    dispatch((0,_ZAPRedux_Slices_connectionsSlice_connectionsSlice__WEBPACK_IMPORTED_MODULE_15__.fetchAuthFields)({
+    dispatch((0,_ZAPRedux_Slices_connectionsSlice_connectionsSlice__WEBPACK_IMPORTED_MODULE_13__.fetchAuthFields)({
       app: selectedApp.value,
       authType: type
     }));
@@ -1446,7 +1446,7 @@ const Connections = () => {
     if (selectedAuthType === "oauth2") {
       try {
         setLoadingOAuth(true);
-        const res = await dispatch((0,_ZAPRedux_Slices_connectionsSlice_connectionsSlice__WEBPACK_IMPORTED_MODULE_15__.initOAuth)({
+        const res = await dispatch((0,_ZAPRedux_Slices_connectionsSlice_connectionsSlice__WEBPACK_IMPORTED_MODULE_13__.initOAuth)({
           app: selectedApp.value,
           name: selectedApp.label,
           credentials
@@ -1457,7 +1457,7 @@ const Connections = () => {
             window.removeEventListener("message", handler);
             popup?.close();
             if (event.data.data?.success) {
-              dispatch((0,_ZAPRedux_Slices_connectionsSlice_connectionsSlice__WEBPACK_IMPORTED_MODULE_15__.fetchConnections)());
+              dispatch((0,_ZAPRedux_Slices_connectionsSlice_connectionsSlice__WEBPACK_IMPORTED_MODULE_13__.fetchConnections)());
               setIsModalOpen(false);
               setSelectedApp(null);
               setSelectedAuthType(null);
@@ -1473,13 +1473,13 @@ const Connections = () => {
       }
     } else {
       try {
-        await dispatch((0,_ZAPRedux_Slices_connectionsSlice_connectionsSlice__WEBPACK_IMPORTED_MODULE_15__.createTokenConnection)({
+        await dispatch((0,_ZAPRedux_Slices_connectionsSlice_connectionsSlice__WEBPACK_IMPORTED_MODULE_13__.createTokenConnection)({
           app: selectedApp.value,
           name: selectedApp.label,
           authType: selectedAuthType,
           credentials
         })).unwrap();
-        dispatch((0,_ZAPRedux_Slices_connectionsSlice_connectionsSlice__WEBPACK_IMPORTED_MODULE_15__.fetchConnections)());
+        dispatch((0,_ZAPRedux_Slices_connectionsSlice_connectionsSlice__WEBPACK_IMPORTED_MODULE_13__.fetchConnections)());
         setIsModalOpen(false);
         setSelectedApp(null);
         setSelectedAuthType(null);
@@ -1491,81 +1491,124 @@ const Connections = () => {
   };
   const authTypes = authFields?.available_auth_types || {};
   console.log(authFields, 'fileddddd auth');
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Box, {
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_17__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Box, {
     p: 6,
     borderWidth: "1px",
     borderRadius: "md",
     boxShadow: "sm",
-    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_10__.VStack, {
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_17__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_8__.VStack, {
       align: "stretch",
       spacing: 6,
-      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_9__.HStack, {
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_17__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_7__.HStack, {
         justify: "space-between",
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Text, {
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_17__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Text, {
           fontSize: "xl",
           fontWeight: "bold",
-          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_11__.__)("Connections", "zaplane")
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.Button, {
-          leftIcon: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(react_icons_fa__WEBPACK_IMPORTED_MODULE_12__.FaSlack, {}),
+          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_9__.__)("Connections", "zaplane")
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_17__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.Button, {
+          leftIcon: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_17__.jsx)(react_icons_fa__WEBPACK_IMPORTED_MODULE_10__.FaSlack, {}),
           variant: "outline",
           onClick: () => setIsModalOpen(true),
-          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_11__.__)("Create credential", "zaplane")
+          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_9__.__)("Create credential", "zaplane")
         })]
-      }), connections.length === 0 ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Text, {
+      }), connections.length === 0 ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_17__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Text, {
         color: "gray.500",
-        children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_11__.__)("No connections found", "zaplane")
-      }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_10__.VStack, {
-        align: "stretch",
-        spacing: 3,
-        children: connections.map(conn => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_7__.Flex, {
-          p: 4,
-          borderWidth: "1px",
-          borderRadius: "md",
-          justify: "space-between",
-          align: "center",
-          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_9__.HStack, {
+        children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_9__.__)("No connections found", "zaplane")
+      }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_17__.jsx)(_ZAPComponents_Table__WEBPACK_IMPORTED_MODULE_16__["default"], {
+        data: connections,
+        rowKey: "id",
+        variant: "outline",
+        size: "sm",
+        columns: [{
+          label: "APP / NAME",
+          key: "name",
+          render: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_17__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_7__.HStack, {
             spacing: 3,
-            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(react_icons_fa__WEBPACK_IMPORTED_MODULE_12__.FaSlack, {
+            children: [row.app === "slack" && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_17__.jsx)(react_icons_fa__WEBPACK_IMPORTED_MODULE_10__.FaSlack, {
               color: "#4A154B"
-            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Box, {
-              children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Text, {
-                fontWeight: "medium",
-                children: conn.name
-              }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Badge, {
-                colorScheme: conn.status === "active" ? "green" : "gray",
-                children: conn.status
-              })]
+            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_17__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Text, {
+              fontSize: "sm",
+              fontWeight: "medium",
+              children: row.name
             })]
-          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_9__.HStack, {
-            spacing: 2,
-            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_6__.IconButton, {
-              size: "sm",
-              icon: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(react_icons_fi__WEBPACK_IMPORTED_MODULE_13__.FiRefreshCw, {}),
-              "aria-label": "Test connection",
-              onClick: () => dispatch((0,_ZAPRedux_Slices_connectionsSlice_connectionsSlice__WEBPACK_IMPORTED_MODULE_15__.testConnection)(conn.id))
-            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_6__.IconButton, {
-              size: "sm",
-              colorScheme: "red",
-              icon: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(react_icons_fi__WEBPACK_IMPORTED_MODULE_13__.FiTrash2, {}),
-              "aria-label": "Delete connection",
-              onClick: () => dispatch((0,_ZAPRedux_Slices_connectionsSlice_connectionsSlice__WEBPACK_IMPORTED_MODULE_15__.deleteConnection)(conn.id))
-            })]
+          })
+        }, {
+          label: "AUTH TYPE",
+          key: "auth_type",
+          render: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_17__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Text, {
+            fontSize: "sm",
+            children: row.auth_type || "--"
+          })
+        }, {
+          label: "STATUS",
+          key: "status",
+          render: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_17__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Badge, {
+            colorScheme: row.status === "active" ? "green" : "gray",
+            children: row.status
+          })
+        }, {
+          label: "LAST USED",
+          key: "last_used_at",
+          render: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_17__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Text, {
+            fontSize: "sm",
+            children: row.last_used_at || "--"
+          })
+        }, {
+          label: "LAST TESTED",
+          key: "last_tested_at",
+          render: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_17__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Text, {
+            fontSize: "sm",
+            children: row.last_tested_at || "--"
+          })
+        }, {
+          label: "LAST TEST STATUS",
+          key: "last_test_status",
+          render: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_17__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Badge, {
+            colorScheme: row.last_test_status === "success" ? "green" : "red",
+            children: row.last_test_status || "--"
+          })
+        }, {
+          label: "CREATED AT",
+          key: "created_at",
+          render: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_17__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Text, {
+            fontSize: "sm",
+            children: row.created_at || "--"
+          })
+        }],
+        actionsRenderer: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_17__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_17__.Fragment, {
+          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_17__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.Button, {
+            size: "xs",
+            variant: "outline",
+            leftIcon: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_17__.jsx)(react_icons_fi__WEBPACK_IMPORTED_MODULE_11__.FiRefreshCw, {}),
+            onClick: () => dispatch((0,_ZAPRedux_Slices_connectionsSlice_connectionsSlice__WEBPACK_IMPORTED_MODULE_13__.testConnection)(row.id)),
+            children: "Test"
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_17__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.Button, {
+            size: "xs",
+            colorScheme: "red",
+            leftIcon: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_17__.jsx)(react_icons_fi__WEBPACK_IMPORTED_MODULE_11__.FiTrash2, {}),
+            onClick: () => {
+              const confirmDelete = window.confirm("Are you sure you want to delete this connection? This action cannot be undone.");
+              if (confirmDelete) {
+                dispatch((0,_ZAPRedux_Slices_connectionsSlice_connectionsSlice__WEBPACK_IMPORTED_MODULE_13__.deleteConnection)(row.id));
+              }
+            },
+            children: "Delete"
           })]
-        }, conn.id))
+        })
       })]
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_ZAPComponents_Modal_WPModal__WEBPACK_IMPORTED_MODULE_16__["default"], {
-      title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_11__.__)("Create credential", "zaplane"),
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_17__.jsx)(_ZAPComponents_Modal_WPModal__WEBPACK_IMPORTED_MODULE_14__["default"], {
+      title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_9__.__)("Create credential", "zaplane"),
       isOpen: isModalOpen,
       onRequestClose: () => setIsModalOpen(false),
       size: "medium",
-      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Box, {
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_17__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Box, {
         px: 4,
-        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_10__.VStack, {
+        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_17__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_8__.VStack, {
           spacing: 4,
           align: "stretch",
-          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Text, {
-            children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_11__.__)("Select an app or service to connect", "zaplane")
-          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(react_select__WEBPACK_IMPORTED_MODULE_14__["default"], {
+          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_17__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Text, {
+            children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_9__.__)("Select an app or service to connect", "zaplane")
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_17__.jsx)(react_select__WEBPACK_IMPORTED_MODULE_12__["default"], {
             value: selectedApp,
             onChange: val => {
               setSelectedApp(val);
@@ -1576,7 +1619,7 @@ const Connections = () => {
               value: "slack",
               label: "Slack"
             }]
-          }), Object.keys(authTypes).map(key => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.Button, {
+          }), Object.keys(authTypes).map(key => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_17__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.Button, {
             variant: selectedAuthType === key ? "solid" : "outline",
             colorScheme: "blue",
             onClick: () => {
@@ -1584,17 +1627,17 @@ const Connections = () => {
               setCredentials({});
             },
             children: key
-          }, key)), authFields?.auth_fields && selectedAuthType && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_10__.VStack, {
+          }, key)), authFields?.auth_fields && selectedAuthType && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_17__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_8__.VStack, {
             spacing: 3,
             align: "stretch",
             pt: 3,
             children: Object.entries(authFields.auth_fields).map(([fieldKey, field]) => {
               const value = credentials[fieldKey] || "";
-              return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Box, {
-                children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_ZAPComponents_Text__WEBPACK_IMPORTED_MODULE_17__["default"], {
+              return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_17__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Box, {
+                children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_17__.jsx)(_ZAPComponents_Text__WEBPACK_IMPORTED_MODULE_15__["default"], {
                   fontWeight: "bold",
                   children: field.label
-                }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_8__.Input, {
+                }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_17__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_6__.Input, {
                   type: field.type === "password" ? "password" : "text",
                   placeholder: field.placeholder || "",
                   value: value,
@@ -1602,20 +1645,20 @@ const Connections = () => {
                     ...prev,
                     [fieldKey]: e.target.value
                   }))
-                }), field.help && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_ZAPComponents_Text__WEBPACK_IMPORTED_MODULE_17__["default"], {
+                }), field.help && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_17__.jsx)(_ZAPComponents_Text__WEBPACK_IMPORTED_MODULE_15__["default"], {
                   fontSize: "sm",
                   color: "gray.500",
                   children: field.help
                 })]
               }, fieldKey);
             })
-          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.Button, {
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_17__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.Button, {
             width: "220px",
             colorScheme: "blue",
             onClick: handleConnect,
             isLoading: loadingOAuth,
             isDisabled: !selectedApp || !selectedAuthType,
-            children: selectedAuthType === "oauth2" ? (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_11__.__)("Connect with OAuth", "zaplane") : (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_11__.__)("Save Connection", "zaplane")
+            children: selectedAuthType === "oauth2" ? (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_9__.__)("Connect with OAuth", "zaplane") : (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_9__.__)("Save Connection", "zaplane")
           })]
         })
       })

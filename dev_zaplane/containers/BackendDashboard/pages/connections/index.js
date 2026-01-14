@@ -28,11 +28,12 @@ import {
 
 import WPModal from "@ZAPComponents/Modal/WPModal";
 import ZAPText from "@ZAPComponents/Text";
+import ZAPTable from "@ZAPComponents/Table";
 
 const Connections = () => {
     const dispatch = useDispatch();
     const connections = useSelector((state) => state.connections?.list || []);
-    const {authFields ,isLoading} = useSelector((state) => state.connections);
+    const { authFields, isLoading } = useSelector((state) => state.connections);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedApp, setSelectedApp] = useState(null);
@@ -61,7 +62,7 @@ const Connections = () => {
         // })
         // .finally(() => setLoadingFields(false));
     }, [selectedApp, selectedAuthType, dispatch]);
-   
+
     const handleConnect = async () => {
         if (!selectedApp || !selectedAuthType) return;
 
@@ -91,7 +92,7 @@ const Connections = () => {
                             setCredentials({});
                         }
                     }
-                }; 
+                };
 
                 window.addEventListener("message", handler);
             } catch (e) {
@@ -142,44 +143,92 @@ const Connections = () => {
                 {connections.length === 0 ? (
                     <Text color="gray.500">{__("No connections found", "zaplane")}</Text>
                 ) : (
-                    <VStack align="stretch" spacing={3}>
-                        {connections.map((conn) => (
-                            <Flex
-                                key={conn.id}
-                                p={4}
-                                borderWidth="1px"
-                                borderRadius="md"
-                                justify="space-between"
-                                align="center"
-                            >
-                                <HStack spacing={3}>
-                                    <FaSlack color="#4A154B" />
-                                    <Box>
-                                        <Text fontWeight="medium">{conn.name}</Text>
-                                        <Badge colorScheme={conn.status === "active" ? "green" : "gray"}>
-                                            {conn.status}
-                                        </Badge>
-                                    </Box>
-                                </HStack>
+                    <ZAPTable
+                        data={connections}
+                        rowKey="id"
+                        variant="outline"
+                        size="sm"
+                        columns={[
+                            {
+                                label: "APP / NAME",
+                                key: "name",
+                                render: (row) => (
+                                    <HStack spacing={3}>
+                                        {row.app === "slack" && <FaSlack color="#4A154B" />}
+                                        <Text fontSize="sm" fontWeight="medium">
+                                            {row.name}
+                                        </Text>
+                                    </HStack>
+                                ),
+                            },
+                            {
+                                label: "AUTH TYPE",
+                                key: "auth_type",
+                                render: (row) => <Text fontSize="sm">{row.auth_type || "--"}</Text>,
+                            },
+                            {
+                                label: "STATUS",
+                                key: "status",
+                                render: (row) => (
+                                    <Badge colorScheme={row.status === "active" ? "green" : "gray"}>
+                                        {row.status}
+                                    </Badge>
+                                ),
+                            },
+                            {
+                                label: "LAST USED",
+                                key: "last_used_at",
+                                render: (row) => <Text fontSize="sm">{row.last_used_at || "--"}</Text>,
+                            },
+                            {
+                                label: "LAST TESTED",
+                                key: "last_tested_at",
+                                render: (row) => <Text fontSize="sm">{row.last_tested_at || "--"}</Text>,
+                            },
+                            {
+                                label: "LAST TEST STATUS",
+                                key: "last_test_status",
+                                render: (row) => (
+                                    <Badge colorScheme={row.last_test_status === "success" ? "green" : "red"}>
+                                        {row.last_test_status || "--"}
+                                    </Badge>
+                                ),
+                            },
+                            {
+                                label: "CREATED AT",
+                                key: "created_at",
+                                render: (row) => <Text fontSize="sm">{row.created_at || "--"}</Text>,
+                            },
+                        ]}
+                        actionsRenderer={(row) => (
+                            <>
+                                <Button
+                                    size="xs"
+                                    variant="outline"
+                                    leftIcon={<FiRefreshCw />}
+                                    onClick={() => dispatch(testConnection(row.id))}
+                                >
+                                    Test
+                                </Button>
 
-                                <HStack spacing={2}>
-                                    <IconButton
-                                        size="sm"
-                                        icon={<FiRefreshCw />}
-                                        aria-label="Test connection"
-                                        onClick={() => dispatch(testConnection(conn.id))}
-                                    />
-                                    <IconButton
-                                        size="sm"
-                                        colorScheme="red"
-                                        icon={<FiTrash2 />}
-                                        aria-label="Delete connection"
-                                        onClick={() => dispatch(deleteConnection(conn.id))}
-                                    />
-                                </HStack>
-                            </Flex>
-                        ))}
-                    </VStack>
+                                <Button
+                                    size="xs"
+                                    colorScheme="red"
+                                    leftIcon={<FiTrash2 />}
+                                    onClick={() => {
+                                        const confirmDelete = window.confirm(
+                                            "Are you sure you want to delete this connection? This action cannot be undone."
+                                        );
+                                        if (confirmDelete) {
+                                            dispatch(deleteConnection(row.id));
+                                        }
+                                    }}
+                                >
+                                    Delete
+                                </Button>
+                            </>
+                        )}
+                    />
                 )}
             </VStack>
             <WPModal
@@ -214,7 +263,7 @@ const Connections = () => {
                                 {key}
                             </Button>
                         ))}
-                        { authFields?.auth_fields && selectedAuthType && (
+                        {authFields?.auth_fields && selectedAuthType && (
                             <VStack spacing={3} align="stretch" pt={3}>
                                 {Object.entries(authFields.auth_fields).map(
                                     ([fieldKey, field]) => {
@@ -245,7 +294,7 @@ const Connections = () => {
                                 )}
                             </VStack>
                         )}
- 
+
 
 
                         <Button
