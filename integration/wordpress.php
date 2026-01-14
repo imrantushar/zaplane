@@ -20,7 +20,7 @@ class Wordpress extends IntegrationBase {
             'publish_post'              => ['label' => 'Post Published',           'hook' => 'publish_post'],
             'post_updated'              => ['label' => 'Post Updated',             'hook' => 'post_updated'],
             'transition_post_status'    => ['label' => 'Post Status Updated',      'hook' => 'transition_post_status'],
-            'wp_trash_post'    => ['label' => 'Post Status Updated',                'hook' => 'wp_trash_post'],           
+            'wp_trash_post'             => ['label' => 'Post Status Updated',      'hook' => 'wp_trash_post'],           
             'wp_insert_post'            => ['label' => 'Revision Creation',        'hook' => 'wp_insert_post'],
             'before_delete_post'        => ['label' => 'Post Deleted',             'hook' => 'before_delete_post'],
             'delete_post'               => ['label' => 'Delete Post',              'hook' => 'delete_post'],
@@ -45,11 +45,13 @@ class Wordpress extends IntegrationBase {
             'wp_after_insert_post'      => ['label' => 'WP After Insert Post',     'hook' => 'wp_after_insert_post'],
             'wp_authenticate'           => ['label' => 'WP Authenticate',          'hook' => 'wp_authenticate'],
             'validate_password_reset'   => ['label' => 'Validate Password Reset',  'hook' => 'validate_password_reset'],
-             'wpmu_activate_user'       => ['label' => 'Activate User',            'hook'  => 'wpmu_activate_user'],
-            'wp_update_user'            => ['label' => 'Update User',              'hook'  => 'wp_update_user' ],
-            'wpmu_delete_user'          => ['label' => 'Delete User',              'hook'  => 'wpmu_delete_user'],
-            'wpmu_new_blog'             => ['label' => 'New Blog Created',         'hook'  => 'wpmu_new_blog'],
-            'wpmu_new_user'             => ['label' => 'New User Created',         'hook'  => 'wpmu_new_user' ],
+            'wpmu_activate_user'        => ['label' => 'Activate User',            'hook' => 'wpmu_activate_user'],
+            'wp_update_user'            => ['label' => 'Update User',              'hook' => 'wp_update_user'],
+            'wpmu_delete_user'          => ['label' => 'Delete User',              'hook' => 'wpmu_delete_user'],
+            'wpmu_new_blog'             => ['label' => 'New Blog Created',         'hook' => 'wpmu_new_blog'],
+            'wpmu_new_user'             => ['label' => 'New User Created',         'hook' => 'wpmu_new_user'],
+            'wp_insert_comment'         => ['label' => 'Comment Created',          'hook' => 'wp_insert_comment'],
+            'comment_reply'             => ['label' => 'Comment Reply',            'hook' => 'comment_reply'],
 
         ];
     }
@@ -151,7 +153,12 @@ class Wordpress extends IntegrationBase {
                 if ( ! empty($node['config']['post_status']) && $post->post_status !== $node['config']['post_status'] ) {
                     return false;
                 }
-
+        error_log('check comment_id:' . print_r([
+                    'post_id'    => $post->ID,
+                    'post_title' => $post->post_title,
+                    'post_type'  => $post->post_type,
+                    'status'     => $post->post_status,
+                ], true));
                 return [
                     'post_id'    => $post->ID,
                     'post_title' => $post->post_title,
@@ -405,9 +412,7 @@ class Wordpress extends IntegrationBase {
             'user_exists'=> username_exists( $user_login ) ? true : false, // optional
         ];
        case 'wp_logout':
-        $user = wp_get_current_user();
-        error_log('chck user:' . print_r($user,true));
-    
+        $user = wp_get_current_user();    
         if (! $user instanceof \WP_User || $user->ID !== 0) return false;
         return [
             'user_id'     => $user->ID,
@@ -421,7 +426,7 @@ class Wordpress extends IntegrationBase {
 
                 $blog_id = $args[0] ?? 0;
                 $value = $args[1] ?? '';
-
+       
                 return [
                     'blog_id' => $blog_id,
                     'public_value' => $value,
@@ -474,7 +479,8 @@ class Wordpress extends IntegrationBase {
                 $post_id = $args[0] ?? 0;
                 $post = get_post( $post_id );
                 $update = $args[1] ?? false;
-                
+
+         
                 if ( ! $post ) return false;
 
                 return [
@@ -539,6 +545,12 @@ class Wordpress extends IntegrationBase {
         ];
 
     case 'wpmu_delete_user':
+          error_log('check blog_id:' . print_r( [
+            'user_id'   => $args[0] ?? 0,
+            'user'      => $args[1] ?? null,
+            'timestamp' => current_time( 'mysql' ),
+        ] , true));
+
         return [
             'user_id'   => $args[0] ?? 0,
             'user'      => $args[1] ?? null,
@@ -562,6 +574,41 @@ class Wordpress extends IntegrationBase {
             'timestamp' => current_time( 'mysql' ),
         ];
 
+    case 'wp_insert_comment':
+        $comment_id = $args[0] ?? 0;
+        $comment = get_comment($comment_id);
+        if (!$comment) return false;
+        return [
+            'comment_id' => $comment->comment_ID,
+            'post_id' => $comment->comment_post_ID,
+            'author' => $comment->comment_author,
+            'author_email' => $comment->comment_author_email,
+            'content' => $comment->comment_content,
+            'timestamp' => current_time('mysql'),
+        ];
+
+    case 'comment_reply':
+        $comment_id = $args[0] ?? 0;
+        $parent_id = $args[1] ?? 0;
+        $comment = get_comment($comment_id);
+        error_log('check comment_id:' . print_r([
+            'comment_id' => $comment->comment_ID,
+            'parent_id' => $parent_id,
+            'post_id' => $comment->comment_post_ID,
+            'author' => $comment->comment_author,
+            'content' => $comment->comment_content,
+            'timestamp' => current_time('mysql'),
+        ], true));
+        if (!$comment) return false;
+        return [
+            'comment_id' => $comment->comment_ID,
+            'parent_id' => $parent_id,
+            'post_id' => $comment->comment_post_ID,
+            'author' => $comment->comment_author,
+            'content' => $comment->comment_content,
+            'timestamp' => current_time('mysql'),
+        ];
+
 
 
 
@@ -576,13 +623,21 @@ class Wordpress extends IntegrationBase {
 
     public static function get_actions(): array {
         return [
-            'create_post'   => ['label'=>'Create Post'],
-            'update_option' => ['label'=>'Update Option'],
-            'untrash_post'          => ['label'=>'Untrash Post'],
-            'untrash_comment'       => ['label'=>'Untrash Comment'],
-            'update_comment_count'  => ['label'=>'Update Comment Count'],
-            'set_comment_status'    => ['label'=>'Set Comment Status'],
-
+            'create_post'               => ['label'=>'Create Post'],
+            'update_option'             => ['label'=>'Update Option'],
+            'untrash_post'              => ['label'=>'Untrash Post'],
+            'untrash_comment'           => ['label'=>'Untrash Comment'],
+            'update_comment_count'      => ['label'=>'Update Comment Count'],
+            'set_comment_status'        => ['label'=>'Set Comment Status'],
+            'get_post_comments_all'     => ['label'=>'Get Post Comments (All)'],
+            'get_post_comments_single'  => ['label'=>'Get Post Comments (Single Post)'],
+            'get_user_comments'         => ['label'=>'Get User Comments'],
+            'get_user_comments_email'   => ['label'=>'Get User Comments (By Email)'],
+            'get_comment_metadata_all'  => ['label'=>'Get Comment Metadata (All)'],
+            'get_comment_metadata_single' => ['label'=>'Get Comment Metadata (Single)'],
+            'create_comment'            => ['label'=>'Create New Comment'],
+            'reply_comment'             => ['label'=>'Reply To Comment'],
+            'delete_comment'            => ['label'=>'Delete Comment'],
         ];
     }
 
@@ -692,6 +747,54 @@ class Wordpress extends IntegrationBase {
             ];
         }
 
+        if ( $action === 'get_post_comments_single' ) {
+            return [
+                ['key'=>'post_id','label'=>'Post ID','type'=>'expression','required'=>true],
+            ];
+        }
+
+        if ( $action === 'get_user_comments' ) {
+            return [
+                ['key'=>'user_id','label'=>'User ID','type'=>'expression','required'=>true],
+            ];
+        }
+
+        if ( $action === 'get_user_comments_email' ) {
+            return [
+                ['key'=>'email','label'=>'Email','type'=>'expression','required'=>true],
+            ];
+        }
+
+        if ( $action === 'get_comment_metadata_single' ) {
+            return [
+                ['key'=>'comment_id','label'=>'Comment ID','type'=>'expression','required'=>true],
+            ];
+        }
+
+        if ( $action === 'create_comment' ) {
+            return [
+                ['key'=>'post_id','label'=>'Post ID','type'=>'expression','required'=>true],
+                ['key'=>'author_name','label'=>'Author Name','type'=>'expression','required'=>true],
+                ['key'=>'author_email','label'=>'Author Email','type'=>'expression','required'=>true],
+                ['key'=>'content','label'=>'Comment Content','type'=>'textarea','required'=>true],
+            ];
+        }
+
+        if ( $action === 'reply_comment' ) {
+            return [
+                ['key'=>'parent_id','label'=>'Parent Comment ID','type'=>'expression','required'=>true],
+                ['key'=>'author_name','label'=>'Author Name','type'=>'expression','required'=>true],
+                ['key'=>'author_email','label'=>'Author Email','type'=>'expression','required'=>true],
+                ['key'=>'content','label'=>'Reply Content','type'=>'textarea','required'=>true],
+            ];
+        }
+
+        if ( $action === 'delete_comment' ) {
+            return [
+                ['key'=>'comment_id','label'=>'Comment ID','type'=>'expression','required'=>true],
+            ];
+        }
+
         return [];
     }
 
@@ -735,7 +838,62 @@ class Wordpress extends IntegrationBase {
 
             case 'set_comment_status':
                 $result = wp_set_comment_status( $config['comment_id'], $config['status'] );
-                return ['port'=>'main','data'=>['success'=>(bool)$result,'comment_id'=>$config['comment_id'],'status'=>$config['status']]];                
+                return ['port'=>'main','data'=>['success'=>(bool)$result,'comment_id'=>$config['comment_id'],'status'=>$config['status']]];
+
+            case 'get_post_comments_all':
+                $comments = get_comments();
+                return ['port'=>'main','data'=>['comments'=>$comments]];
+
+            case 'get_post_comments_single':
+                $comments = get_comments(['post_id'=>$config['post_id']]);
+                return ['port'=>'main','data'=>['comments'=>$comments,'post_id'=>$config['post_id']]];
+
+            case 'get_user_comments':
+                $comments = get_comments(['user_id'=>$config['user_id']]);
+                return ['port'=>'main','data'=>['comments'=>$comments,'user_id'=>$config['user_id']]];
+
+            case 'get_user_comments_email':
+                $comments = get_comments(['author_email'=>$config['email']]);
+                return ['port'=>'main','data'=>['comments'=>$comments,'email'=>$config['email']]];
+
+            case 'get_comment_metadata_all':
+                $comments = get_comments();
+                $metadata = [];
+                foreach($comments as $comment) {
+                    $metadata[] = ['comment_id'=>$comment->comment_ID,'meta'=>get_comment_meta($comment->comment_ID)];
+                }
+                return ['port'=>'main','data'=>['metadata'=>$metadata]];
+
+            case 'get_comment_metadata_single':
+                $meta = get_comment_meta($config['comment_id']);
+                return ['port'=>'main','data'=>['comment_id'=>$config['comment_id'],'metadata'=>$meta]];
+
+            case 'create_comment':
+                $comment_id = wp_insert_comment([
+                    'comment_post_ID'=>$config['post_id'],
+                    'comment_author'=>$config['author_name'],
+                    'comment_author_email'=>$config['author_email'],
+                    'comment_content'=>$config['content'],
+                    'comment_approved'=>1
+                ]);
+                return ['port'=>'main','data'=>['comment_id'=>$comment_id]];
+
+            case 'reply_comment':
+                $parent = get_comment($config['parent_id']);
+                $comment_id = wp_insert_comment([
+                    'comment_post_ID'=>$parent->comment_post_ID,
+                    'comment_parent'=>$config['parent_id'],
+                    'comment_author'=>$config['author_name'],
+                    'comment_author_email'=>$config['author_email'],
+                    'comment_content'=>$config['content'],
+                    'comment_approved'=>1
+                ]);
+                return ['port'=>'main','data'=>['comment_id'=>$comment_id,'parent_id'=>$config['parent_id']]];
+
+            case 'delete_comment':
+                $result = wp_delete_comment($config['comment_id'],true);
+                return ['port'=>'main','data'=>['success'=>(bool)$result,'comment_id'=>$config['comment_id']]];
+                
         }
 
         return ['port'=>'main','data'=>$input];

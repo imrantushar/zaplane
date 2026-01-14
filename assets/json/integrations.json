@@ -363,6 +363,20 @@
 					"hook": "wpmu_new_user",
 					"schema": [],
 					"outputs": ["main"]
+				},
+				"wp_insert_comment": {
+					"key": "wp_insert_comment",
+					"label": "Comment Created",
+					"hook": "wp_insert_comment",
+					"schema": [],
+					"outputs": ["main"]
+				},
+				"comment_reply": {
+					"key": "comment_reply",
+					"label": "Comment Reply",
+					"hook": "comment_reply",
+					"schema": [],
+					"outputs": ["main"]
 				}
 			},
 			"actions": {
@@ -499,6 +513,145 @@
 									"value": "trash"
 								}
 							],
+							"required": true
+						}
+					],
+					"outputs": ["main"]
+				},
+				"get_post_comments_all": {
+					"key": "get_post_comments_all",
+					"label": "Get Post Comments (All)",
+					"schema": [],
+					"outputs": ["main"]
+				},
+				"get_post_comments_single": {
+					"key": "get_post_comments_single",
+					"label": "Get Post Comments (Single Post)",
+					"schema": [
+						{
+							"key": "post_id",
+							"label": "Post ID",
+							"type": "expression",
+							"required": true
+						}
+					],
+					"outputs": ["main"]
+				},
+				"get_user_comments": {
+					"key": "get_user_comments",
+					"label": "Get User Comments",
+					"schema": [
+						{
+							"key": "user_id",
+							"label": "User ID",
+							"type": "expression",
+							"required": true
+						}
+					],
+					"outputs": ["main"]
+				},
+				"get_user_comments_email": {
+					"key": "get_user_comments_email",
+					"label": "Get User Comments (By Email)",
+					"schema": [
+						{
+							"key": "email",
+							"label": "Email",
+							"type": "expression",
+							"required": true
+						}
+					],
+					"outputs": ["main"]
+				},
+				"get_comment_metadata_all": {
+					"key": "get_comment_metadata_all",
+					"label": "Get Comment Metadata (All)",
+					"schema": [],
+					"outputs": ["main"]
+				},
+				"get_comment_metadata_single": {
+					"key": "get_comment_metadata_single",
+					"label": "Get Comment Metadata (Single)",
+					"schema": [
+						{
+							"key": "comment_id",
+							"label": "Comment ID",
+							"type": "expression",
+							"required": true
+						}
+					],
+					"outputs": ["main"]
+				},
+				"create_comment": {
+					"key": "create_comment",
+					"label": "Create New Comment",
+					"schema": [
+						{
+							"key": "post_id",
+							"label": "Post ID",
+							"type": "expression",
+							"required": true
+						},
+						{
+							"key": "author_name",
+							"label": "Author Name",
+							"type": "expression",
+							"required": true
+						},
+						{
+							"key": "author_email",
+							"label": "Author Email",
+							"type": "expression",
+							"required": true
+						},
+						{
+							"key": "content",
+							"label": "Comment Content",
+							"type": "textarea",
+							"required": true
+						}
+					],
+					"outputs": ["main"]
+				},
+				"reply_comment": {
+					"key": "reply_comment",
+					"label": "Reply To Comment",
+					"schema": [
+						{
+							"key": "parent_id",
+							"label": "Parent Comment ID",
+							"type": "expression",
+							"required": true
+						},
+						{
+							"key": "author_name",
+							"label": "Author Name",
+							"type": "expression",
+							"required": true
+						},
+						{
+							"key": "author_email",
+							"label": "Author Email",
+							"type": "expression",
+							"required": true
+						},
+						{
+							"key": "content",
+							"label": "Reply Content",
+							"type": "textarea",
+							"required": true
+						}
+					],
+					"outputs": ["main"]
+				},
+				"delete_comment": {
+					"key": "delete_comment",
+					"label": "Delete Comment",
+					"schema": [
+						{
+							"key": "comment_id",
+							"label": "Comment ID",
+							"type": "expression",
 							"required": true
 						}
 					],
