@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-01-13 12:50:23",
+    "generated_at": "2026-01-14 07:01:37",
     "integrations": {
         "wordpress": {
             "slug": "wordpress",
@@ -706,7 +706,7 @@
                     "schema": [
                         {
                             "key": "post_id",
-                            "label": "Post ID to Delete",
+                            "label": "Post ID",
                             "type": "expression",
                             "required": true
                         }
@@ -896,6 +896,206 @@
                     "key": "post_type_all",
                     "label": "Post Type (All)",
                     "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "post_type_single": {
+                    "key": "post_type_single",
+                    "label": "Post Type (Single Post)",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "Post ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "register_post_type": {
+                    "key": "register_post_type",
+                    "label": "Register Post Type",
+                    "schema": [
+                        {
+                            "key": "slug",
+                            "label": "Post Type Slug",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "label",
+                            "label": "Label",
+                            "type": "text",
+                            "required": false,
+                            "default": ""
+                        },
+                        {
+                            "key": "hierarchical",
+                            "label": "Hierarchy (Category Style)",
+                            "type": "boolean",
+                            "required": false
+                        },
+                        {
+                            "key": "public",
+                            "label": "Public",
+                            "type": "boolean",
+                            "required": false,
+                            "default": true
+                        },
+                        {
+                            "key": "show_in_rest",
+                            "label": "Show in REST API",
+                            "type": "boolean",
+                            "required": false,
+                            "default": true
+                        },
+                        {
+                            "key": "show_ui",
+                            "label": "Show UI",
+                            "type": "boolean",
+                            "required": false,
+                            "default": true
+                        },
+                        {
+                            "key": "show_in_menu",
+                            "label": "Show In Menu",
+                            "type": "boolean",
+                            "required": false,
+                            "default": true
+                        },
+                        {
+                            "key": "show_in_nav_menus",
+                            "label": "Show In Nav Menus",
+                            "type": "boolean",
+                            "required": false,
+                            "default": true
+                        },
+                        {
+                            "key": "show_in_admin_bar",
+                            "label": "Show In Admin Bar",
+                            "type": "boolean",
+                            "required": false,
+                            "default": true
+                        },
+                        {
+                            "key": "menu_icon",
+                            "label": "Menu Icon",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "menu_position",
+                            "label": "Menu Position",
+                            "type": "number",
+                            "required": false
+                        },
+                        {
+                            "key": "supports",
+                            "label": "Supports",
+                            "type": "multiselect",
+                            "option": [
+                                "title",
+                                "editor",
+                                "thumbnail",
+                                "excerpt",
+                                "comments",
+                                "revisions",
+                                "author",
+                                "custom-fields"
+                            ],
+                            "default": [
+                                "title",
+                                "editor"
+                            ],
+                            "required": false
+                        },
+                        {
+                            "key": "capability_type",
+                            "label": "Capability Type",
+                            "type": "text",
+                            "required": false,
+                            "default": "post"
+                        },
+                        {
+                            "key": "description",
+                            "label": "Description",
+                            "type": "textarea",
+                            "required": false,
+                            "default": ""
+                        },
+                        {
+                            "key": "rewrite_slug",
+                            "label": "Custom URL Slug",
+                            "type": "textarea",
+                            "required": false,
+                            "default": ""
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "unregister_post_type": {
+                    "key": "unregister_post_type",
+                    "label": "Unregister Post Type",
+                    "schema": [
+                        {
+                            "key": "post_type",
+                            "label": "Post Type",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "post_types",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add_post_type_support": {
+                    "key": "add_post_type_support",
+                    "label": "Add Post Type Features",
+                    "schema": [
+                        {
+                            "key": "post_type",
+                            "label": "Post Type",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "post_types",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "features",
+                            "label": "Features (Supports)",
+                            "type": "multiselect",
+                            "option": [
+                                "title",
+                                "editor",
+                                "thumbnail",
+                                "excerpt",
+                                "comments",
+                                "revisions",
+                                "author",
+                                "custom-fields"
+                            ],
+                            "required": false
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]

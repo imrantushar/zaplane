@@ -70,7 +70,7 @@ class Wordpress extends IntegrationBase {
      */
     public static function get_trigger_config_schema( string $trigger ): array {
 
-        if ( in_array( $trigger, ['publish_post','post_updated'], true ) ) {
+        if ( in_array( $trigger, ['publish_post','post_updated', 'transition_post_status'], true ) ) {
             return [
                 [
                     'key'   => 'post_type',
@@ -123,31 +123,6 @@ class Wordpress extends IntegrationBase {
                         'select'      => [ 'file', 'name' ],
                     ],
                     'required' => true,
-                ],
-            ];
-        }
-
-        if ( $trigger === 'transition_post_status' ) {
-            return [
-                [
-                    'key'   => 'post_type',
-                    'label' => 'Post Type',
-                    'type'  => 'select',
-                    'dynamic' => [
-                        'integration' => 'wordpress',
-                        'query'       => 'post_types',
-                        'select'      => ['name','label'],
-                    ],
-                    'required' => true,
-                ],
-                [
-                    'key'   => 'post_status',
-                    'label' => 'Post Status',
-                    'type'  => 'select',
-                    'options' => [
-                        ['label'=>'Publish','value'=>'publish'],
-                        ['label'=>'Draft','value'=>'draft'],
-                    ]
                 ],
             ];
         }
@@ -206,18 +181,11 @@ class Wordpress extends IntegrationBase {
                 ];
 
             case 'trashed_post' :
-                $post = get_post( $args[0] ?? 0 );
-                if ( ! $post) return false;
-
-                return [
-                    'post_id'    => $post->ID,
-                    'post_title' => $post->post_title,
-                    'post_type'  => $post->post_type,
-                    'status'     => $post->post_status,
-                ];
-
             case 'deleted_post':
-                $post = get_post( $args[0] ?? 0 );
+            case 'save_post' :
+            case 'wp_insert_post' :
+                $post_id = $args[0] ?? 0;
+                $post    = get_post( $post_id );
                 if ( ! $post) return false;
 
                 return [
@@ -227,32 +195,44 @@ class Wordpress extends IntegrationBase {
                     'status'     => $post->post_status,
                 ];
 
-            case 'save_post' :
-                $post = get_post( $args[0] ?? 0 );
-                if ( ! $post ) return false;
+            // case 'deleted_post':
+            //     $post = get_post( $args[0] ?? 0 );
+            //     if ( ! $post) return false;
 
-                return [
-                    'post_id'    => $post->ID,
-                    'post_title' => $post->post_title,
-                    'post_type'  => $post->post_type,
-                    'status'     => $post->post_status,
-                ];
+            //     return [
+            //         'post_id'    => $post->ID,
+            //         'post_title' => $post->post_title,
+            //         'post_type'  => $post->post_type,
+            //         'status'     => $post->post_status,
+            //     ];
+
+            // case 'save_post' :
+            //     $post = get_post( $args[0] ?? 0 );
+            //     if ( ! $post ) return false;
+
+            //     return [
+            //         'post_id'    => $post->ID,
+            //         'post_title' => $post->post_title,
+            //         'post_type'  => $post->post_type,
+            //         'status'     => $post->post_status,
+            //     ];
 
             case 'activated_plugin' :
-                $plugin = $args[0] ?? 0;
-                if ( ! $plugin ) return false;
-
-                return [
-                    'plugin' => $plugin,
-                ];
-
             case 'deactivate_plugin' :
                 $plugin = $args[0] ?? 0;
                 if ( ! $plugin ) return false;
-                
+
                 return [
                     'plugin' => $plugin,
                 ];
+
+            // case 'deactivate_plugin' :
+            //     $plugin = $args[0] ?? 0;
+            //     if ( ! $plugin ) return false;
+                
+            //     return [
+            //         'plugin' => $plugin,
+            //     ];
 
             case 'switch_theme' :
                 $theme = $args[0] ?? 0;
@@ -384,19 +364,19 @@ class Wordpress extends IntegrationBase {
                     'time'       => current_time( 'mysql' ),
                 ];
 
-            case 'wp_insert_post' :
-                $post_id = $args[0] ?? 0;
-                $post    = get_post( $post_id );
-                if ( ! $post ) return false;
+            // case 'wp_insert_post' :
+            //     $post_id = $args[0] ?? 0;
+            //     $post    = get_post( $post_id );
+            //     if ( ! $post ) return false;
 
-                return [
-                    'post_id'    => $post->ID,
-                    'post_title' => $post->post_title,
-                    'post_type'  => $post->post_type,
-                    'status'     => $post->post_status,
-                    'created_at' => $post->post_date,
-                    'author_id'  => $post->post_author,
-                ];
+            //     return [
+            //         'post_id'    => $post->ID,
+            //         'post_title' => $post->post_title,
+            //         'post_type'  => $post->post_type,
+            //         'status'     => $post->post_status,
+            //         'created_at' => $post->post_date,
+            //         'author_id'  => $post->post_author,
+            //     ];
 
             case 'wp_insert_comment' :
                 $comment_id = $args[0] ?? 0;
@@ -480,6 +460,8 @@ class Wordpress extends IntegrationBase {
                 ];
             
             case 'wp_login' :
+            case 'validate_reset' :
+            case 'activate_user' :  
                 $user = $args[0] ?? 0;
                 if ( ! $user || $user instanceof WP_User ) return false;
 
@@ -500,29 +482,29 @@ class Wordpress extends IntegrationBase {
                     'ip_address' => $_SERVER['REMOTE_ADDR'] ?? '',
                 ];
 
-            case 'validate_reset' : 
-                $user = $args[0] ?? null;
-                if ( ! $user || ! $user instanceof WP_User ) return false;
+            // case 'validate_reset' : 
+            //     $user = $args[0] ?? null;
+            //     if ( ! $user || ! $user instanceof WP_User ) return false;
                 
-                return [
-                    'user_id'      => $user->ID,
-                    'user_login'   => $user->user_login,
-                    'user_email'   => $user->user_email,
-                    'display_name' => $user->display_name,
-                ];
+            //     return [
+            //         'user_id'      => $user->ID,
+            //         'user_login'   => $user->user_login,
+            //         'user_email'   => $user->user_email,
+            //         'display_name' => $user->display_name,
+            //     ];
 
-            case 'activate_user' : 
-                $user_id = $args[0] ?? 0;
-                if ( ! $user_id ) return false;
-                $user = get_user_by( 'id', $user_id );
-                if ( ! $user ) return false;
+            // case 'activate_user' : 
+            //     $user_id = $args[0] ?? 0;
+            //     if ( ! $user_id ) return false;
+            //     $user = get_user_by( 'id', $user_id );
+            //     if ( ! $user ) return false;
 
-                return [
-                    'user_id'      => $user->ID,
-                    'user_login'   => $user->user_login,
-                    'user_email'   => $user->user_email,
-                    'display_name' => $user->display_name,
-                ];
+            //     return [
+            //         'user_id'      => $user->ID,
+            //         'user_login'   => $user->user_login,
+            //         'user_email'   => $user->user_email,
+            //         'display_name' => $user->display_name,
+            //     ];
 
             case 'update_blog_public' :
                 $blog_id = $args[0] ?? 0;
@@ -632,6 +614,10 @@ class Wordpress extends IntegrationBase {
             'post_excerpt'         => ['label' => 'Post Excerpt'],
             'post_status'          => ['label' => 'Post Status'],
             'post_type_all'        => ['label' => 'Post Type (All)'],
+            'post_type_single'        => ['label' => 'Post Type (Single Post)'],
+            'register_post_type'        => ['label' => 'Register Post Type'],
+            'unregister_post_type'        => ['label' => 'Unregister Post Type'],
+            'add_post_type_support'        => ['label' => 'Add Post Type Features'],
             'activate_plugin'      => ['label' => 'Activate Plugin'],
             'deactivate_plugin'    => ['label' => 'Deactivate Plugin'],
             'switch_theme'         => ['label' => 'Theme Switch'],
@@ -711,16 +697,27 @@ class Wordpress extends IntegrationBase {
                 ],
             ];
         }
-        
-        if ( $action === 'delete_post' ) {
+
+        $post_id_actions = [
+                'delete_post',
+                'post_single',
+                'posts_metadata_all',
+                'post_permalink',
+                'post_content',
+                'post_excerpt',
+                'post_status',
+                'post_type_single',
+        ];
+
+        if ( in_array( $action, $post_id_actions, true ) ) {
             return [
                 [
                     'key'      => 'post_id',
-                    'label'    => 'Post ID to Delete',
+                    'label'    => 'Post ID',
                     'type'     => 'expression', 
                     'required' => true,
                 ],
-            ]; 
+            ];
         }
 
         if ( $action === 'update_post' ) {
@@ -788,17 +785,6 @@ class Wordpress extends IntegrationBase {
             ];
         }
 
-        if ( $action === 'post_single' ) {
-            return [
-                [
-                    'key'      => 'post_id',
-                    'label'    => 'Post ID',
-                    'type'     => 'expression', 
-                    'required' => true,
-                ],
-            ];
-        }
-
         if ( $action === 'posts_by_post_type' ) {
             return [
                 [
@@ -843,17 +829,6 @@ class Wordpress extends IntegrationBase {
             ];
         }
 
-        if ( $action === 'posts_metadata_all' ) {
-            return [
-                [
-                    'key'      => 'post_id',
-                    'label'    => 'Post ID',
-                    'type'     => 'expression', 
-                    'required' => true,
-                ],
-            ];
-        }
-
         if ( $action === 'post_metadata_single' ) {
             return [
                 [
@@ -871,46 +846,148 @@ class Wordpress extends IntegrationBase {
             ];
         }
 
-        if ( $action === 'post_permalink' ) {
+        if ( $action === 'register_post_type' ) {
             return [
                 [
-                    'key'      => 'post_id',
-                    'label'    => 'Post ID',
-                    'type'     => 'expression', 
+                    'key'      => 'slug',
+                    'label'    => 'Post Type Slug',
+                    'type'     => 'text',
+                    'required' => true, 
+                ],
+                [
+                    'key'      => 'label',
+                    'label'    => 'Label',
+                    'type'     => 'text',
+                    'required' => false,
+                    'default'  => '',
+                ],
+                [
+                    'key'      => 'hierarchical',
+                    'label'    => 'Hierarchy (Category Style)',
+                    'type'     => 'boolean',
+                    'required' => false, 
+                ],
+                [
+                    'key'      => 'public',
+                    'label'    => 'Public',
+                    'type'     => 'boolean',
+                    'required' => false, 
+                    'default'  => true,
+                ],
+                [
+                    'key'      => 'show_in_rest',
+                    'label'    => 'Show in REST API',
+                    'type'     => 'boolean',
+                    'required' => false, 
+                    'default'  => true,
+                ],
+                [
+                    'key'      => 'show_ui',
+                    'label'    => 'Show UI',
+                    'type'     => 'boolean',
+                    'required' => false, 
+                    'default'  => true,
+                ],
+                [
+                    'key'      => 'show_in_menu',
+                    'label'    => 'Show In Menu',
+                    'type'     => 'boolean',
+                    'required' => false, 
+                    'default'  => true,
+                ],
+                [
+                    'key'      => 'show_in_nav_menus',
+                    'label'    => 'Show In Nav Menus',
+                    'type'     => 'boolean',
+                    'required' => false, 
+                    'default'  => true,
+                ],
+                [
+                    'key'      => 'show_in_admin_bar',
+                    'label'    => 'Show In Admin Bar',
+                    'type'     => 'boolean',
+                    'required' => false, 
+                    'default'  => true,
+                ],
+                [
+                    'key'      => 'menu_icon',
+                    'label'    => 'Menu Icon',
+                    'type'     => 'text',
+                    'required' => false, 
+                ],
+                [
+                    'key'      => 'menu_position',
+                    'label'    => 'Menu Position',
+                    'type'     => 'number',
+                    'required' => false, 
+                ],
+                [
+                    'key'      => 'supports',
+                    'label'    => 'Supports',
+                    'type'     => 'multiselect',
+                    'option'   => [ 'title', 'editor', 'thumbnail', 'excerpt', 'comments', 'revisions', 'author', 'custom-fields' ],
+                    'default'  => ['title', 'editor' ],
+                    'required' => false, 
+                ],
+                [
+                    'key'      => 'capability_type',
+                    'label'    => 'Capability Type',
+                    'type'     => 'text',
+                    'required' => false, 
+                    'default'  => 'post',
+                ],
+                [
+                    'key'      => 'description',
+                    'label'    => 'Description',
+                    'type'     => 'textarea',
+                    'required' => false, 
+                    'default'  => '',
+                ],
+                [
+                    'key'      => 'rewrite_slug',
+                    'label'    => 'Custom URL Slug',
+                    'type'     => 'textarea',
+                    'required' => false, 
+                    'default'  => '',
+                ],
+            ];
+        }
+
+        if ( $action === 'unregister_post_type' ) {
+            return [
+                [
+                    'key'     => 'post_type',
+                    'label'   => 'Post Type',
+                    'type'    => 'select',
+                    'dynamic' => [
+                        'integration' => 'wordpress',
+                        'query'       => 'post_types',
+                        'select'      => [ 'name', 'label' ],
+                    ],
                     'required' => true,
                 ],
             ];
         }
 
-        if ( $action === 'post_content' ) {
+        if ( $action === 'add_post_type_support' ) {
             return [
                 [
-                    'key'      => 'post_id',
-                    'label'    => 'Post ID',
-                    'type'     => 'expression', 
+                    'key'     => 'post_type',
+                    'label'   => 'Post Type',
+                    'type'    => 'select',
+                    'dynamic' => [
+                        'integration' => 'wordpress',
+                        'query'       => 'post_types',
+                        'select'      => [ 'name', 'label' ],
+                    ],
                     'required' => true,
                 ],
-            ];
-        }
-
-        if ( $action === 'post_excerpt' ) {
-            return [
                 [
-                    'key'      => 'post_id',
-                    'label'    => 'Post ID',
-                    'type'     => 'expression', 
-                    'required' => true,
-                ],
-            ];
-        }
-
-        if ( $action === 'post_status' ) {
-            return [
-                [
-                    'key'      => 'post_id',
-                    'label'    => 'Post ID',
-                    'type'     => 'expression', 
-                    'required' => true,
+                    'key'      => 'features',
+                    'label'    => 'Features (Supports)',
+                    'type'     => 'multiselect',
+                    'option'   => [ 'title', 'editor', 'thumbnail', 'excerpt', 'comments', 'revisions', 'author', 'custom-fields' ],
+                    'required' => false, 
                 ],
             ];
         }
@@ -1229,6 +1306,74 @@ class Wordpress extends IntegrationBase {
                     ];
                 }
                 return ['port'=>'main', 'data'=> $post_types];
+
+            case 'post_type_single':
+                $post_id = $config['post_id'] ?? 0;
+                $post_type = get_post_type( $post_id );
+                $typ_object = get_post_type_object( $post_type );
+                return ['port'=>'main', 'data'=> [
+                    'post_id'      => $post_id,
+                    'post_type'    => $post_type,
+                    'label'        => $typ_object->label,
+                    'public'       => $typ_object->public,
+                    'show_in_rest' => $typ_object->show_in_rest,
+                    'rest_base'    => $typ_object->rest_base,
+                    'capability_type' => $typ_object->capability_type,
+                    'hierarchical'    => $typ_object->hierarchical,
+                    'supports'        => $typ_object->supports,
+                ]];
+
+            case 'register_post_type':
+                $slug               = $config['slug'] ?? '';
+                $label              = $config['label'] ?? ucfirst( $slug );
+                $hierarchical       = $config['hierarchical'] ?? false;
+                $public             = $config['public'] ?? true;
+                $show_in_rest       = $config['show_in_rest'] ?? true;
+                $show_ui            = $config['show_ui'] ?? true;
+                $show_in_menu       = $config['show_in_menu'] ?? true;
+                $show_in_nav_menus  = $config['show_in_nav_menus'] ?? true;
+                $show_in_admin_bar  = $config['show_in_admin_bar'] ?? true;
+                $menu_icon          = $config['menu_icon'] ?? '';
+                $menu_position      = $config['menu_position'] ?? null;
+                $supports           = $config['supports'] ?? ['title', 'editor'];
+                $capability_type    = $config['capability_type'] ?? 'post';
+                $description        = $config['description'] ?? '';
+                $rewrite_slug       = $config['rewrite_slug'] ?? $slug;
+                $args = [
+                    'label'             => $label,
+                    'public'            => $public,
+                    'hierarchical'      => $hierarchical,
+                    'show_ui'           => $show_ui,
+                    'show_in_menu'      => $show_in_menu,
+                    'show_in_nav_menus' => $show_in_nav_menus,
+                    'show_in_admin_bar' => $show_in_admin_bar,
+                    'menu_icon'         => $menu_icon,
+                    'menu_position'     => $menu_position,
+                    'supports'          => $supports,
+                    'capability_type'   => $capability_type,
+                    'description'       => $description,
+                    'show_in_rest'      => $show_in_rest,
+                    'rewrite_slug'      => ['slug' => $rewrite_slug],
+                ];
+                $result = register_post_type( $slug, $args );
+                if ( is_wp_error( $result ) ) {
+                    return ['port'=>'main', 'data'=>['error'=>$result->get_error_message()]];
+                }
+                return ['port'=>'main', 'data'=>['success' => true, 'post_type' => $slug, 'args' => $args ]];
+
+            case 'unregister_post_type':
+                $post_type = $config['post_type'] ?? '';
+                $result = unregister_post_type( $post_type );
+                return ['port'=>'main', 'data'=>['result'=>$result]];
+
+            case 'add_post_type_support':
+                $post_type = $config['post_type'] ?? '';
+                $features = $config['features'] ?? [];
+                foreach ( $features as $feature ) {
+                    add_post_type_support( $post_type, $feature );
+                }
+                return ['port'=>'main', 'data'=>['success' => true, 'post_type' => $post_type, 'features' => $features ]];
+
 
             case 'activate_plugin' : 
                 if ( $plugin = $config['plugin'] ?? '' ) {
