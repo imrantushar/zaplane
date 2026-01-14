@@ -9,7 +9,6 @@ export const fetchConnections = createAsyncThunk(
   async (_, thunkAPI) => {
     try {
       const res = await API.get(namespace + 'connections');
-	  console.log(res,'resssssssssssss')
       return res.data.connections || [];
     } catch (e) {
       return handleSliceError(thunkAPI, e);
@@ -113,6 +112,40 @@ export const deleteConnection = createAsyncThunk(
     }
   }
 );
+// Get single connection
+export const fetchSingleConnection = createAsyncThunk(
+  'connections/fetchSingleConnection',
+  async (id, thunkAPI) => {
+    try {
+      const res = await API.get(namespace + `connections/${id}`);
+      return res.data;
+    } catch (e) {
+      return handleSliceError(thunkAPI, e);
+    }
+  }
+);
+
+// Update connection
+export const updateConnection = createAsyncThunk(
+  'connections/updateConnection',
+  async ({ id, payload }, thunkAPI) => {
+    try {
+      const res = await API.put(
+        namespace + `connections/${id}`,
+        payload
+      );
+
+      handleSliceSuccess(
+        thunkAPI,
+        __('Connection updated successfully', 'workflow')
+      );
+
+      return res.data;
+    } catch (e) {
+      return handleSliceError(thunkAPI, e);
+    }
+  }
+);
 const connectionsSlice = createSlice({
   name: 'connections',
   initialState: {
@@ -121,6 +154,7 @@ const connectionsSlice = createSlice({
     oauthData: null,
     loading: false,
     error: null,
+    singleData:[],
   },
   reducers: {
     resetAuthFields: (state) => {
@@ -132,10 +166,6 @@ const connectionsSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchConnections.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
       .addCase(fetchConnections.fulfilled, (state, action) => {
         state.loading = false;
         state.list = action.payload;
@@ -160,7 +190,22 @@ const connectionsSlice = createSlice({
       })
       .addCase(deleteConnection.fulfilled, (state, action) => {
         state.list = state.list.filter(c => c.id !== action.payload);
-      });
+      })
+      .addCase(fetchSingleConnection.fulfilled, (state, action) => {
+      state.loading = false;
+      state.singleData = action.payload;
+    })
+    .addCase(updateConnection.fulfilled, (state, action) => {
+      const index = state.list.findIndex(
+        (c) => c.id === action.payload.id
+      );
+      if (index !== -1) {
+        state.list[index] = action.payload;
+      }
+      if (state.singleData?.id === action.payload.id) {
+        state.singleData = action.payload;
+      }
+    })
   },
 });
 

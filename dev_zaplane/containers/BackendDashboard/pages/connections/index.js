@@ -7,14 +7,21 @@ import {
     HStack,
     Text,
     Badge,
-    IconButton,
     Flex,
     Input,
     Spinner,
 } from "@chakra-ui/react";
 import { __ } from "@wordpress/i18n";
 import { FaSlack } from "react-icons/fa";
-import { FiTrash2, FiRefreshCw } from "react-icons/fi";
+import {
+    FiTrash2, FiRefreshCw, FiEye, FiLink,
+    FiLock,
+    FiCalendar,
+    FiClock,
+    FiCheckCircle,
+    FiEdit,
+    FiPlay
+} from "react-icons/fi";
 import Select from "react-select";
 
 import {
@@ -24,23 +31,41 @@ import {
     createTokenConnection,
     testConnection,
     deleteConnection,
+    fetchSingleConnection,
+    updateConnection,
 } from "@ZAPRedux/Slices/connectionsSlice/connectionsSlice";
 
 import WPModal from "@ZAPComponents/Modal/WPModal";
 import ZAPText from "@ZAPComponents/Text";
 import ZAPTable from "@ZAPComponents/Table";
 
+const statusOptions = [
+    { value: "active", label: "Active" },
+    { value: "inactive", label: "Inactive" },
+];
+
 const Connections = () => {
     const dispatch = useDispatch();
-    const connections = useSelector((state) => state.connections?.list || []);
-    const { authFields, isLoading } = useSelector((state) => state.connections);
+
+    const connections = useSelector(
+        (state) => state.connections?.list || []
+    );
+    const singleData = useSelector(
+        (state) => state.connections?.singleData
+    );
+
+    const { authFields } = useSelector(
+        (state) => state.connections
+    );
 
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [detailsOpen, setDetailsOpen] = useState(false);
+
     const [selectedApp, setSelectedApp] = useState(null);
     const [selectedAuthType, setSelectedAuthType] = useState(null);
     const [credentials, setCredentials] = useState({});
     const [loadingOAuth, setLoadingOAuth] = useState(false);
-    const [loadingFields, setLoadingFields] = useState(false);
+
     useEffect(() => {
         dispatch(fetchConnections());
     }, [dispatch]);
@@ -48,27 +73,33 @@ const Connections = () => {
     useEffect(() => {
         if (!selectedApp) return;
 
-        setLoadingFields(true);
-        const type = selectedAuthType || undefined;
-
-        dispatch(fetchAuthFields({ app: selectedApp.value, authType: type }))
-        // .unwrap()
-        // .then((data) => {
-        //     if (!selectedAuthType && data.auth_type === "both") {
-        //         setSelectedAuthType("api_key");
-        //     } else if (!selectedAuthType) {
-        //         setSelectedAuthType(data.auth_type);
-        //     }
-        // })
-        // .finally(() => setLoadingFields(false));
+        dispatch(
+            fetchAuthFields({
+                app: selectedApp.value,
+                authType: selectedAuthType || undefined,
+            })
+        );
     }, [selectedApp, selectedAuthType, dispatch]);
 
+    const handleStatusChange = (row, selected) => {
+        dispatch(
+            updateConnection({
+                id: row.id,
+                payload: { status: selected.value },
+            })
+        );
+    };
+    const openDetails = (row) => {
+        dispatch(fetchSingleConnection(row.id));
+        setDetailsOpen(true);
+    };
     const handleConnect = async () => {
         if (!selectedApp || !selectedAuthType) return;
 
         if (selectedAuthType === "oauth2") {
             try {
                 setLoadingOAuth(true);
+
                 const res = await dispatch(
                     initOAuth({
                         app: selectedApp.value,
@@ -77,7 +108,11 @@ const Connections = () => {
                     })
                 ).unwrap();
 
-                const popup = window.open(res.auth_url, "oauth_popup", "width=600,height=700");
+                const popup = window.open(
+                    res.auth_url,
+                    "oauth_popup",
+                    "width=600,height=700"
+                );
 
                 const handler = (event) => {
                     if (event.data?.type === "zaplane_oauth_callback") {
@@ -87,44 +122,34 @@ const Connections = () => {
                         if (event.data.data?.success) {
                             dispatch(fetchConnections());
                             setIsModalOpen(false);
-                            setSelectedApp(null);
-                            setSelectedAuthType(null);
-                            setCredentials({});
                         }
                     }
                 };
 
                 window.addEventListener("message", handler);
             } catch (e) {
-                console.error("OAuth failed", e);
+                console.error(e);
             } finally {
                 setLoadingOAuth(false);
             }
         } else {
-            try {
-                await dispatch(
-                    createTokenConnection({
-                        app: selectedApp.value,
-                        name: selectedApp.label,
-                        authType: selectedAuthType,
-                        credentials,
-                    })
-                ).unwrap();
-
-                dispatch(fetchConnections());
-                setIsModalOpen(false);
-                setSelectedApp(null);
-                setSelectedAuthType(null);
-                setCredentials({});
-            } catch (e) {
-                console.error("Token connection failed", e);
-            }
+            await dispatch(
+                createTokenConnection({
+                    app: selectedApp.value,
+                    name: selectedApp.label,
+                    authType: selectedAuthType,
+                    credentials,
+                })
+            );
+            dispatch(fetchConnections());
+            setIsModalOpen(false);
         }
     };
+
     const authTypes = authFields?.available_auth_types || {};
-    console.log(authFields, 'fileddddd auth')
+
     return (
-        <Box p={6} borderWidth="1px" borderRadius="md" boxShadow="sm">
+        <Box p={6} borderWidth="1px" borderRadius="md">
             <VStack align="stretch" spacing={6}>
                 <HStack justify="space-between">
                     <Text fontSize="xl" fontWeight="bold">
@@ -140,97 +165,189 @@ const Connections = () => {
                     </Button>
                 </HStack>
 
-                {connections.length === 0 ? (
-                    <Text color="gray.500">{__("No connections found", "zaplane")}</Text>
-                ) : (
-                    <ZAPTable
-                        data={connections}
-                        rowKey="id"
-                        variant="outline"
-                        size="sm"
-                        columns={[
-                            {
-                                label: "APP / NAME",
-                                key: "name",
-                                render: (row) => (
-                                    <HStack spacing={3}>
-                                        {row.app === "slack" && <FaSlack color="#4A154B" />}
-                                        <Text fontSize="sm" fontWeight="medium">
-                                            {row.name}
-                                        </Text>
-                                    </HStack>
-                                ),
-                            },
-                            {
-                                label: "AUTH TYPE",
-                                key: "auth_type",
-                                render: (row) => <Text fontSize="sm">{row.auth_type || "--"}</Text>,
-                            },
-                            {
-                                label: "STATUS",
-                                key: "status",
-                                render: (row) => (
-                                    <Badge colorScheme={row.status === "active" ? "green" : "gray"}>
-                                        {row.status}
-                                    </Badge>
-                                ),
-                            },
-                            {
-                                label: "LAST USED",
-                                key: "last_used_at",
-                                render: (row) => <Text fontSize="sm">{row.last_used_at || "--"}</Text>,
-                            },
-                            {
-                                label: "LAST TESTED",
-                                key: "last_tested_at",
-                                render: (row) => <Text fontSize="sm">{row.last_tested_at || "--"}</Text>,
-                            },
-                            {
-                                label: "LAST TEST STATUS",
-                                key: "last_test_status",
-                                render: (row) => (
-                                    <Badge colorScheme={row.last_test_status === "success" ? "green" : "red"}>
-                                        {row.last_test_status || "--"}
-                                    </Badge>
-                                ),
-                            },
-                            {
-                                label: "CREATED AT",
-                                key: "created_at",
-                                render: (row) => <Text fontSize="sm">{row.created_at || "--"}</Text>,
-                            },
-                        ]}
-                        actionsRenderer={(row) => (
-                            <>
-                                <Button
-                                    size="xs"
-                                    variant="outline"
-                                    leftIcon={<FiRefreshCw />}
-                                    onClick={() => dispatch(testConnection(row.id))}
-                                >
-                                    Test
-                                </Button>
-
-                                <Button
-                                    size="xs"
-                                    colorScheme="red"
-                                    leftIcon={<FiTrash2 />}
-                                    onClick={() => {
-                                        const confirmDelete = window.confirm(
-                                            "Are you sure you want to delete this connection? This action cannot be undone."
-                                        );
-                                        if (confirmDelete) {
-                                            dispatch(deleteConnection(row.id));
+                <ZAPTable
+                    data={connections}
+                    rowKey="id"
+                    size="sm"
+                    columns={[
+                        {
+                            label: "APP / NAME",
+                            key: "name",
+                            render: (row) => (
+                                <HStack>
+                                    {row.app === "slack" && <FaSlack />}
+                                    <Text>{row.name}</Text>
+                                </HStack>
+                            ),
+                        },
+                        {
+                            label: "AUTH TYPE",
+                            key: "auth_type",
+                            render: (row) => row.auth_type,
+                        },
+                        {
+                            label: "CREATED AT",
+                            key: "created_at",
+                            render: (row) => row.created_at || "--",
+                        },
+                        {
+                            label: "STATUS",
+                            key: "status",
+                            render: (row) => (
+                                <Box w="140px">
+                                    <Select
+                                        options={statusOptions}
+                                        value={statusOptions.find(
+                                            (o) => o.value === row.status
+                                        )}
+                                        onChange={(s) =>
+                                            handleStatusChange(row, s)
                                         }
-                                    }}
-                                >
-                                    Delete
-                                </Button>
-                            </>
-                        )}
-                    />
-                )}
+                                        isSearchable={false}
+                                    />
+                                </Box>
+                            ),
+                        },
+                    ]}
+                    actionsRenderer={(row) => (
+                        <> <Button
+                            size="xs"
+                            onClick={() => dispatch(testConnection(row.id))}
+                            leftIcon={<FiRefreshCw />}
+                        >
+                            Test
+                        </Button>
+                            <Button
+                                size="xs"
+                                onClick={() => openDetails(row)}
+                                leftIcon={<FiEye />}
+                            >
+                                Details
+                            </Button>
+                            <Button
+                                size="xs"
+                                colorScheme="red"
+                                leftIcon={<FiTrash2 />}
+                                onClick={() =>
+                                    dispatch(deleteConnection(row.id))
+                                }
+                            >
+                                Delete
+                            </Button>
+                        </>
+                    )}
+                />
             </VStack>
+            <WPModal
+                title={__("Connection Details", "zaplane")}
+                isOpen={detailsOpen}
+                onRequestClose={() => setDetailsOpen(false)}
+            >
+                {!singleData ? (
+                    <Flex justify="center" align="center" py={12}>
+                        <Spinner size="lg" />
+                    </Flex>
+                ) : (
+                    <Box>
+                        {/* Top Card */}
+                        <Box
+                            p={5}
+                            borderRadius="lg"
+                            bg="white"
+                            borderWidth="1px"
+                            mb={5}
+                            boxShadow="sm"
+                        >
+                            <Flex justify="space-between" align="center">
+                                <Box>
+                                    <ZAPText fontSize="xl" fontWeight="semibold">
+                                        {singleData.name}
+                                    </ZAPText>
+                                    <ZAPText fontSize="sm" color="gray.500">
+                                        {singleData.app} connection
+                                    </ZAPText>
+                                </Box>
+
+                                <Badge
+                                    px={4}
+                                    py={1.5}
+                                    fontSize="sm"
+                                    borderRadius="full"
+                                    colorScheme={
+                                        singleData.status === "active"
+                                            ? "green"
+                                            : "gray"
+                                    }
+                                    textTransform="capitalize"
+                                >
+                                    {singleData.status}
+                                </Badge>
+                            </Flex>
+                        </Box>
+                        <Flex gap={4} wrap="wrap">
+                            <Box
+                                flex="1 1 45%"
+                                p={4}
+                                borderRadius="lg"
+                                borderWidth="1px"
+                                bg="gray.50"
+                            >
+                                <ZAPText fontSize="xs" color="gray.500">
+                                    AUTH TYPE
+                                </ZAPText>
+                                <ZAPText fontSize="md" fontWeight="medium">
+                                    {singleData.auth_type}
+                                </ZAPText>
+                            </Box>
+
+                            <Box
+                                flex="1 1 45%"
+                                p={4}
+                                borderRadius="lg"
+                                borderWidth="1px"
+                                bg="gray.50"
+                            >
+                                <ZAPText fontSize="xs" color="gray.500">
+                                    CREATED AT
+                                </ZAPText>
+                                <ZAPText fontSize="md" fontWeight="medium">
+                                    {singleData.created_at}
+                                </ZAPText>
+                            </Box>
+
+                            <Box
+                                flex="1 1 45%"
+                                p={4}
+                                borderRadius="lg"
+                                borderWidth="1px"
+                                bg="gray.50"
+                            >
+                                <ZAPText fontSize="xs" color="gray.500">
+                                    LAST USED
+                                </ZAPText>
+                                <Text fontSize="md" fontWeight="medium">
+                                    {singleData.last_used_at || "--"}
+                                </Text>
+                            </Box>
+
+                            <Box
+                                flex="1 1 45%"
+                                p={4}
+                                borderRadius="lg"
+                                borderWidth="1px"
+                                bg="gray.50"
+                            >
+                                <ZAPText fontSize="xs" color="gray.500">
+                                    LAST TESTED
+                                </ZAPText>
+                                <ZAPText fontSize="md" fontWeight="medium">
+                                    {singleData.last_tested_at || "--"}
+                                </ZAPText>
+                            </Box>
+                        </Flex>
+                    </Box>
+                )}
+            </WPModal>
             <WPModal
                 title={__("Create credential", "zaplane")}
                 isOpen={isModalOpen}
