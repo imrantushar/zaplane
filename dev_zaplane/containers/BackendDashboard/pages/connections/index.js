@@ -48,17 +48,9 @@ const statusOptions = [
 const Connections = () => {
     const dispatch = useDispatch();
 
-    const connections = useSelector(
-        (state) => state.connections?.list || []
+    const{ connections,singleData,authFields} = useSelector(
+        (state) => state.connections || []
     );
-    const singleData = useSelector(
-        (state) => state.connections?.singleData
-    );
-
-    const { authFields } = useSelector(
-        (state) => state.connections
-    );
-
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [detailsOpen, setDetailsOpen] = useState(false);
 
