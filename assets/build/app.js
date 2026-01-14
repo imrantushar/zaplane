@@ -2513,7 +2513,7 @@ function ActionDrawer({
   const [selectedItem, setSelectedItem] = (0,react__WEBPACK_IMPORTED_MODULE_14__.useState)(null);
   const [dynamicOptions, setDynamicOptions] = (0,react__WEBPACK_IMPORTED_MODULE_14__.useState)({});
   const [loadingFields, setLoadingFields] = (0,react__WEBPACK_IMPORTED_MODULE_14__.useState)({});
-  console.log(context, 'contexttttt');
+  const isTrigger = node?.data?.action === "trigger" && source === "node";
   (0,react__WEBPACK_IMPORTED_MODULE_14__.useEffect)(() => {
     if (!open || !node?.data || source === "add") return;
     const nodeData = node.data;
@@ -2576,8 +2576,7 @@ function ActionDrawer({
         value: a.key
       }));
     }
-    const isTriggerNode = node?.data?.action === "trigger" && source === "node";
-    if (isTriggerNode) {
+    if (isTrigger) {
       return Object.values(integration.triggers || {}).map(t => ({
         label: t.label,
         value: t.key
@@ -2596,8 +2595,7 @@ function ActionDrawer({
     if (mode === "tools") {
       return integration.actions?.[values.actionType]?.schema || [];
     }
-    const isTriggerNode = node?.data?.action === "trigger" && source === "node";
-    if (isTriggerNode) {
+    if (isTrigger) {
       return integration.triggers?.[values.actionType]?.schema || [];
     }
     return integration.actions?.[values.actionType]?.schema || [];
@@ -2669,7 +2667,7 @@ function ActionDrawer({
         justifyContent: "left",
         onClick: () => setMode("app"),
         children: "Apps"
-      }), TOOLS.map(tool => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Button, {
+      }), (node?.data?.action !== "trigger" || source === "add") && TOOLS.map(tool => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Button, {
         w: "100%",
         justifyContent: "space-between",
         onClick: () => {

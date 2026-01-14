@@ -53,7 +53,9 @@ export default function ActionDrawer({
     const [dynamicOptions, setDynamicOptions] = useState({});
     const [loadingFields, setLoadingFields] = useState({});
 
-    console.log(context, 'contexttttt');
+    const isTrigger =
+    node?.data?.action === "trigger" && source === "node";
+
     useEffect(() => {
         if (!open || !node?.data || source === "add") return;
         const nodeData = node.data;
@@ -102,7 +104,7 @@ export default function ActionDrawer({
     const LIST =
         mode === "app"
             ? APPS
-            : mode === "tools"
+            : mode === "tools" 
                 ? TOOLS
                 : [];
 
@@ -137,10 +139,9 @@ export default function ActionDrawer({
             }));
         }
 
-        const isTriggerNode =
-            node?.data?.action === "trigger" && source === "node";
+       
 
-        if (isTriggerNode) {
+        if (isTrigger) {
             return Object.values(integration.triggers || {}).map(t => ({
                 label: t.label,
                 value: t.key,
@@ -162,10 +163,7 @@ export default function ActionDrawer({
             return integration.actions?.[values.actionType]?.schema || [];
         }
 
-        const isTriggerNode =
-            node?.data?.action === "trigger" && source === "node";
-
-        if (isTriggerNode) {
+        if (isTrigger) {
             return integration.triggers?.[values.actionType]?.schema || [];
         }
 
@@ -245,7 +243,7 @@ export default function ActionDrawer({
                         Apps
                     </Button>
 
-                    {TOOLS.map(tool => (
+                    {(node?.data?.action !== "trigger" || source === "add") && TOOLS.map(tool => (
                         <Button
                             key={tool.id}
                             w="100%"
