@@ -23,6 +23,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
 import Select from "react-select";
 import ActionFieldRenderer from "../Components/ActionFieldRenderer/ActionFieldRenderer";
+import ZAPTab from "@ZAPComponents/Tab";
 
 const APPS = Object.entries(integrations.apps || {}).map(([key, value]) => ({
     id: value.slug || key,
@@ -279,62 +280,82 @@ export default function ActionDrawer({
             )}
 
             {selectedItem && (
-                <Tabs.Root value={step} isManual>
-                    <Tabs.List mb={4}>
-                        <Tabs.Trigger value="select">Select</Tabs.Trigger>
-                        <Tabs.Trigger value="configure">Configure</Tabs.Trigger>
-                        <Tabs.Trigger value="test">Test</Tabs.Trigger>
-                    </Tabs.List>
-
-                    <Tabs.Content value="select">
-                        <ZAPLabeledSelect
-                            label="Action Type"
-                            options={actionOptions}
-                            value={values.actionType}
-                            onChange={(val) => setFieldValue("actionType", val)}
-                            placeholder="Select Action Type"
-                            isClearable={true}
-                            mb={4}
-                        />
-
-
-                        <Flex direction="column" gap={4}>
-                            {selectedActionFields.map(field => (
-                                <Box key={field.key}>
-                                    <ActionFieldRenderer
-                                        field={field}
-                                        value={values[field.key]}
-                                        setFieldValue={setFieldValue}
-                                        getKey={getKey}
-                                        dynamicOptions={dynamicOptions}
-                                        loadingFields={loadingFields}
-                                        fetchDynamicOptions={fetchDynamicOptions}
+                <ZAPTab
+                    value={step}
+                    tabs={[
+                        {
+                            value: "select",
+                            label: "Select",
+                            content: (
+                                <>
+                                    <ZAPLabeledSelect
+                                        label="Action Type"
+                                        options={actionOptions}
+                                        value={values.actionType}
+                                        onChange={(val) =>
+                                            setFieldValue("actionType", val)
+                                        }
+                                        placeholder="Select Action Type"
+                                        isClearable
+                                        mb={4}
                                     />
-                                </Box>
-                            ))}
-                        </Flex>
-                    </Tabs.Content>
 
-                    <Tabs.Content value="test">
-                        <Button
-                            mb={4}
-                            onClick={() =>
-                                dispatch(
-                                    workFLowSingeNodeExction({
-                                        workflow_hash: singleData?.version?.hash,
-                                        node_key: node?.id,
-                                        input: values,
-                                    })
-                                )
-                            }
-                        >
-                            Run test
-                        </Button>
+                                    <Flex direction="column" gap={4}>
+                                        {selectedActionFields.map(field => (
+                                            <Box key={field.key}>
+                                                <ActionFieldRenderer
+                                                    field={field}
+                                                    value={values[field.key]}
+                                                    setFieldValue={setFieldValue}
+                                                    getKey={getKey}
+                                                    dynamicOptions={dynamicOptions}
+                                                    loadingFields={loadingFields}
+                                                    fetchDynamicOptions={fetchDynamicOptions}
+                                                />
+                                            </Box>
+                                        ))}
+                                    </Flex>
+                                </>
+                            ),
+                        },
+                        {
+                            value: "configure",
+                            label: "Configure",
+                            content: (
+                                <Text fontSize="sm" color="gray.500">
+                                    Configure step (future use)
+                                </Text>
+                            ),
+                        },
+                        {
+                            value: "test",
+                            label: "Test",
+                            content: (
+                                <>
+                                    <Button
+                                        mb={4}
+                                        onClick={() =>
+                                            dispatch(
+                                                workFLowSingeNodeExction({
+                                                    workflow_hash:
+                                                        singleData?.version?.hash,
+                                                    node_key: node?.id,
+                                                    input: values,
+                                                })
+                                            )
+                                        }
+                                    >
+                                        Run test
+                                    </Button>
 
-                        <Code w="100%">Output</Code>
-                    </Tabs.Content>
-                </Tabs.Root>
+                                    <Code w="100%">Output</Code>
+                                </>
+                            ),
+                        },
+                    ]}
+                />
             )}
+
         </ZAPDrawer>
     );
 }
