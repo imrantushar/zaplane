@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-01-14 07:01:37",
+    "generated_at": "2026-01-14 10:09:20",
     "integrations": {
         "wordpress": {
             "slug": "wordpress",
@@ -1163,6 +1163,94 @@
                                 ]
                             },
                             "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_post_tag": {
+                    "key": "create_post_tag",
+                    "label": "Create Post Tag",
+                    "schema": [
+                        {
+                            "key": "name",
+                            "label": "Tag Name",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "slug",
+                            "label": "Tag Slug",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "description",
+                            "label": "Description",
+                            "type": "textarea",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add_media_image": {
+                    "key": "add_media_image",
+                    "label": "Add New Image",
+                    "schema": [
+                        {
+                            "key": "image_url",
+                            "label": "Image URL",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "image_title",
+                            "label": "Image Title",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "alternative_text",
+                            "label": "Alternative Text",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "caption",
+                            "label": "Caption",
+                            "type": "textarea",
+                            "required": false
+                        },
+                        {
+                            "key": "description",
+                            "label": "Description",
+                            "type": "textarea",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_media": {
+                    "key": "delete_media",
+                    "label": "Delete Media",
+                    "schema": [
+                        {
+                            "key": "attachment_id",
+                            "label": "Attachment ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "force_delete",
+                            "label": "Force Delete",
+                            "type": "boolean",
+                            "default": false,
+                            "required": false
                         }
                     ],
                     "outputs": [

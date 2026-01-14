@@ -2,6 +2,7 @@
 namespace Zaplane\Integration;
 
 use WP_Post;
+use WP_Query;
 use WP_User;
 use Zaplane\Classes\IntegrationBase;
 
@@ -597,30 +598,37 @@ class Wordpress extends IntegrationBase {
 
     public static function get_actions(): array {
         return [
-            'create_post'          => ['label' => 'Create Post'],
-            'update_option'        => ['label' => 'Update Option'],
-            'update_post_title'    => ['label' => 'Update Post Title'],
-            'update_post'          => ['label' => 'Update Post'],
-            'update_post_status'   => ['label' => 'Update Post Status'],
-            'delete_post'          => ['label' => 'Delete Post'],
-            'posts_all'            => ['label' => 'Post (All)'],
-            'post_single'          => ['label' => 'Post (Single)'],
-            'posts_by_post_type'   => ['label' => 'Posts by Post Type'],
-            'posts_by_metadata'    => ['label' => 'Posts by Metadata'],
-            'posts_metadata_all'   => ['label' => 'Post Metadata (All)'],
-            'post_metadata_single' => ['label' => 'Post Metadata (Single)'],
-            'post_permalink'       => ['label' => 'Post Permalink'],
-            'post_content'         => ['label' => 'Post Content'],
-            'post_excerpt'         => ['label' => 'Post Excerpt'],
-            'post_status'          => ['label' => 'Post Status'],
-            'post_type_all'        => ['label' => 'Post Type (All)'],
-            'post_type_single'        => ['label' => 'Post Type (Single Post)'],
-            'register_post_type'        => ['label' => 'Register Post Type'],
-            'unregister_post_type'        => ['label' => 'Unregister Post Type'],
-            'add_post_type_support'        => ['label' => 'Add Post Type Features'],
-            'activate_plugin'      => ['label' => 'Activate Plugin'],
-            'deactivate_plugin'    => ['label' => 'Deactivate Plugin'],
-            'switch_theme'         => ['label' => 'Theme Switch'],
+            'create_post'           => ['label' => 'Create Post'],
+            'update_option'         => ['label' => 'Update Option'],
+            'update_post_title'     => ['label' => 'Update Post Title'],
+            'update_post'           => ['label' => 'Update Post'],
+            'update_post_status'    => ['label' => 'Update Post Status'],
+            'delete_post'           => ['label' => 'Delete Post'],
+            'posts_all'             => ['label' => 'Post (All)'],
+            'post_single'           => ['label' => 'Post (Single)'],
+            'posts_by_post_type'    => ['label' => 'Posts by Post Type'],
+            'posts_by_metadata'     => ['label' => 'Posts by Metadata'],
+            'posts_metadata_all'    => ['label' => 'Post Metadata (All)'],
+            'post_metadata_single'  => ['label' => 'Post Metadata (Single)'],
+            'post_permalink'        => ['label' => 'Post Permalink'],
+            'post_content'          => ['label' => 'Post Content'],
+            'post_excerpt'          => ['label' => 'Post Excerpt'],
+            'post_status'           => ['label' => 'Post Status'],
+            'post_type_all'         => ['label' => 'Post Type (All)'],
+            'post_type_single'      => ['label' => 'Post Type (Single Post)'],
+            'register_post_type'    => ['label' => 'Register Post Type'],
+            'unregister_post_type'  => ['label' => 'Unregister Post Type'],
+            'add_post_type_support' => ['label' => 'Add Post Type Features'],
+            'activate_plugin'       => ['label' => 'Activate Plugin'],
+            'deactivate_plugin'     => ['label' => 'Deactivate Plugin'],
+            'switch_theme'          => ['label' => 'Theme Switch'],
+            'create_post_tag'       => ['label' => 'Create Post Tag'],
+            'add_media_image'       => ['label' => 'Add New Image'],
+            'delete_media'          => ['label' => 'Delete Media'],
+            'rename_media'          => ['label' => 'Rename Media'],
+            'get_media_all'         => ['label' => 'Get Media (All)'],
+            'get_media_by_title'    => ['label' => 'Get Media (By Title)'],
+            'get_media_by_id'       => ['label' => 'Get Media (By ID)'],
         ];
     }
 
@@ -1040,6 +1048,122 @@ class Wordpress extends IntegrationBase {
             ];
         }
 
+        if ( $action === 'create_post_tag' ) {
+            return [
+                [
+                    'key'      => 'name',
+                    'label'    => 'Tag Name',
+                    'type'     => 'text',
+                    'required' => true,
+                ],
+                [
+                    'key'      => 'slug',
+                    'label'    => 'Tag Slug',
+                    'type'     => 'text',
+                    'required' => false,
+                ],
+                [
+                    'key'      => 'description',
+                    'label'    => 'Description',
+                    'type'     => 'textarea',
+                    'required' => false,
+                ],
+
+            ];
+        }
+
+        if ( $action === 'add_media_image' ) {
+            return [
+                [
+                    'key'      => 'image_url',
+                    'label'    => 'Image URL',
+                    'type'     => 'text',
+                    'required' => true,
+                ],
+                [
+                    'key'      => 'image_title',
+                    'label'    => 'Image Title',
+                    'type'     => 'text',
+                    'required' => false,
+                ],
+                [
+                    'key'      => 'alternative_text',
+                    'label'    => 'Alternative Text',
+                    'type'     => 'text',
+                    'required' => false,
+                ],
+                [
+                    'key'      => 'caption',
+                    'label'    => 'Caption',
+                    'type'     => 'textarea',
+                    'required' => false,
+                ],
+                [
+                    'key'      => 'description',
+                    'label'    => 'Description',
+                    'type'     => 'textarea',
+                    'required' => false,
+                ],
+            ];
+        }
+
+        if ( $action === 'delete_media' ) {
+            return [
+                [
+                    'key'      => 'media_id',
+                    'label'    => 'Media ID',
+                    'type'     => 'expression', 
+                    'required' => true,
+                ],
+                [
+                    'key'      => 'force_delete',
+                    'label'    => 'Force Delete',
+                    'type'     => 'boolean',
+                    'default'  => false,
+                    'required' => false,
+                ],
+            ];
+        }
+
+        if ( $action === 'rename_media' ) {
+            return [
+                [
+                    'key'      => 'media_id',
+                    'label'    => 'Media ID',
+                    'type'     => 'expression', 
+                    'required' => true,
+                ],
+                [
+                    'key'      => 'new_title',
+                    'label'    => 'New Title',
+                    'type'     => 'expression',
+                    'required' => false,
+                ],
+            ];
+        }
+
+        if ( $action === 'get_media_by_title' ) {
+            return [
+                [
+                    'key'      => 'title',
+                    'label'    => 'Media Title',
+                    'type'     => 'text',
+                    'required' => true,
+                ],
+            ];
+        }
+
+        if ( $action === 'get_media_by_id' ) {
+            return [
+                [
+                    'key'      => 'media_id',
+                    'label'    => 'Media ID',
+                    'type'     => 'number',
+                    'required' => true,
+                ],
+            ];
+        }
+
         return [];
     }
 
@@ -1392,8 +1516,131 @@ class Wordpress extends IntegrationBase {
                     switch_theme( $theme );
                 }
                 return ['port'=>'main', 'data'=>['theme'=>$theme]];
-        }
 
+            case 'create_post_tag':
+                $name        = $config['name'] ?? '';
+                $slug        = $config['slug'] ?? '';
+                $description = $config['description'] ?? '';
+                $result      = wp_insert_term(
+                    $name, 
+                    'post_tag', 
+                    [ 
+                        'slug'        => $slug ? : sanitize_title( $name ),
+                        'description' => $description,
+                    ] ); 
+                return ['port'=>'main', 'data'=>['success' => true, 'tag_id' => $result['term_id'], 'name' => $name, 'slug' => $slug ? : sanitize_title( $name ), 'description' => $description ]];    
+            
+            case 'add_media_image':
+                $image_url        = $config['image_url'] ?? '';
+                $image_title      = $config['image_title'] ?? '';
+                $alternative_text = $config['alternative_text'] ?? '';
+                $caption          = $config['caption'] ?? '';
+                $description      = $config['description'] ?? '';
+
+                require_once ABSPATH . 'wp-admin/includes/file.php';
+                require_once ABSPATH . 'wp-admin/includes/media.php';
+                require_once ABSPATH . 'wp-admin/includes/image.php';
+
+                $attachment_id = media_sideload_image( $image_url, 0, $image_title, 'id' );
+                wp_update_post( [
+                    'ID'           => $attachment_id,
+                    'post_title'   => $image_title,
+                    'post_excerpt' => $caption,
+                    'post_content' => $description
+                ] );
+                if ( $alternative_text ) {
+                    update_post_meta( $attachment_id, '_wp_attachment_image_alt', $alternative_text );
+                }
+                return ['port'=>'main', 'data'=>[
+                    'success'          => true, 
+                    'attachment_id'    => $attachment_id, 
+                    'image_url'        => wp_get_attachment_url( $attachment_id ), 
+                    'image_title'      => $image_title,
+                    'alternative_text' => $alternative_text,
+                    'caption'          => $caption, 
+                    'description'      => $description,
+                    ]];
+
+                case 'delete_media':
+                    $attachment_id = $config['attachment_id'] ?? 0;
+                    $force_delete  = $config['force_delete'] ?? false;
+                    $result        = wp_delete_attachment( $attachment_id, $force_delete );
+                    return ['port'=>'main', 'data'=>[ 'success' => $result ? true : false,  'attachment_id' => $attachment_id,  'force_delete'  => (bool) $force_delete,  ]];
+                    
+                case 'rename_media':
+                    $media_id  = $config['media_id'] ?? 0;
+                    $new_title = $config['new_title'] ?? '';
+                    $result    = wp_update_post([
+                        'ID'         => $media_id,
+                        'post_title' => $new_title,
+                    ]);
+                    return ['port'=>'main', 'data'=>[ 'success' => $result ? true : false,  'media_id' => $media_id,  'new_title'  => $new_title,  ]];
+
+                case 'get_media_all':
+                    $media_posts = get_posts([
+                        'post_type'      => 'attachment',
+                        'post_status'    => 'inherit',
+                        'posts_per_page' => -1,
+                        'orderby'       => 'date',
+                        'order'          => 'DESC',
+                    ]);
+                    $media_items = [];
+                    foreach ( $media_posts as $media ) {
+                        $media_items[] = [
+                            'ID'          => $media->ID,
+                            'title'       => $media->post_title,
+                            'url'         => wp_get_attachment_url( $media->ID ),
+                            'type'        => $media->post_mime_type,
+                            'alt_text'    => get_post_meta( $media->ID, '_wp_attachment_image_alt', true ),
+                            'caption'     => wp_get_attachment_caption( $media->ID ),
+                            'description' => $media->post_content,
+                            'date'        => $media->post_date,                        
+                        ];
+                    }
+                    return ['port' => 'main', 'data' => $media_items];
+                    
+                case 'get_media_by_title':
+                    $title       = $config['title'] ?? '';
+                    $media_posts = get_posts([
+                        'post_type'      => 'attachment',
+                        'post_status'    => 'inherit',
+                        'posts_per_page' => -1,
+                        's'              => $title,
+                        'orderby'       => 'date',
+                        'order'          => 'DESC',
+                    ]);
+                    $media_items = [];
+                    foreach ( $media_posts as $media ) {
+                        $media_items[] = [
+                            'ID'          => $media->ID,
+                            'title'       => $media->post_title,
+                            'url'         => wp_get_attachment_url( $media->ID ),
+                            'type'        => $media->post_mime_type,
+                            'alt_text'    => get_post_meta( $media->ID, '_wp_attachment_image_alt', true ),
+                            'caption'     => wp_get_attachment_caption( $media->ID ),
+                            'description' => $media->post_content,
+                            'date'        => $media->post_date,                        
+                        ];
+                    }
+                    return ['port' => 'main', 'data' => $media_items];
+
+                case 'get_media_by_id':
+                    $media_id   = $config['media_id'] ?? 0;
+                    $media      = get_post( $media_id );
+                    $media_item = [
+                        'ID'          => $media->ID,
+                            'title'       => $media->post_title,
+                            'url'         => wp_get_attachment_url( $media->ID ),
+                            'type'        => $media->post_mime_type,
+                            'alt_text'    => get_post_meta( $media->ID, '_wp_attachment_image_alt', true ),
+                            'caption'     => wp_get_attachment_caption( $media->ID ),
+                            'description' => $media->post_content,
+                            'date'        => $media->post_date,                        
+                        ];
+                    }
+                    return ['port' => 'main', 'data' => $media_item];
+
+        }
         return ['port'=>'main','data'=>$input];
     }
 
