@@ -22,7 +22,6 @@ class Wordpress extends IntegrationBase {
             'transition_post_status'    => ['label' => 'Post Status Updated',      'hook' => 'transition_post_status'],
             'wp_trash_post'             => ['label' => 'Post Status Updated',      'hook' => 'wp_trash_post'],           
             'wp_insert_post'            => ['label' => 'Revision Creation',        'hook' => 'wp_insert_post'],
-            'before_delete_post'        => ['label' => 'Post Deleted',             'hook' => 'before_delete_post'],
             'delete_post'               => ['label' => 'Delete Post',              'hook' => 'delete_post'],
             'user_register'             => ['label' => 'User Registered',          'hook' => 'user_register'],
             'comment_post'              => ['label' => 'Comment Post',             'hook' => 'comment_post'],
@@ -211,7 +210,6 @@ class Wordpress extends IntegrationBase {
                     'status'     => $post->post_status,
 
                 ];
-            case 'before_delete_post':
             case 'delete_post':
 
                 $post = get_post( $args[0] ?? 0 );
@@ -228,6 +226,13 @@ class Wordpress extends IntegrationBase {
 
                 $approved = $args[0] ?? null;
                 $comment_data = $args[1] ?? [];
+                 error_log('check pre_comment_approved:' . print_r([
+                    'approved'       => $approved,
+                    'comment_author' => $comment_data['comment_author'] ?? '',
+                    'comment_email'  => $comment_data['comment_author_email'] ?? '',
+                    'comment_content'=> $comment_data['comment_content'] ?? '',
+                    'post_id'        => $comment_data['comment_post_ID'] ?? 0,
+                ] , true));
 
                 return [
                     'approved'       => $approved,
@@ -725,6 +730,7 @@ class Wordpress extends IntegrationBase {
 
 
         if ( $action === 'set_comment_status' ) {
+            
             return [
                 [
                     'key'=>'comment_id',
@@ -850,10 +856,12 @@ class Wordpress extends IntegrationBase {
 
             case 'get_user_comments':
                 $comments = get_comments(['user_id'=>$config['user_id']]);
+                
                 return ['port'=>'main','data'=>['comments'=>$comments,'user_id'=>$config['user_id']]];
 
             case 'get_user_comments_email':
                 $comments = get_comments(['author_email'=>$config['email']]);
+                error_log('check comments:' . print_r( ['port'=>'main','data'=>['comments'=>$comments,'email'=>$config['email']]] , true));
                 return ['port'=>'main','data'=>['comments'=>$comments,'email'=>$config['email']]];
 
             case 'get_comment_metadata_all':
@@ -862,10 +870,11 @@ class Wordpress extends IntegrationBase {
                 foreach($comments as $comment) {
                     $metadata[] = ['comment_id'=>$comment->comment_ID,'meta'=>get_comment_meta($comment->comment_ID)];
                 }
+              
                 return ['port'=>'main','data'=>['metadata'=>$metadata]];
 
             case 'get_comment_metadata_single':
-                $meta = get_comment_meta($config['comment_id']);
+                $meta = get_comment_meta($config['comment_id']);               
                 return ['port'=>'main','data'=>['comment_id'=>$config['comment_id'],'metadata'=>$meta]];
 
             case 'create_comment':
@@ -875,7 +884,7 @@ class Wordpress extends IntegrationBase {
                     'comment_author_email'=>$config['author_email'],
                     'comment_content'=>$config['content'],
                     'comment_approved'=>1
-                ]);
+                ]);        
                 return ['port'=>'main','data'=>['comment_id'=>$comment_id]];
 
             case 'reply_comment':
@@ -888,10 +897,12 @@ class Wordpress extends IntegrationBase {
                     'comment_content'=>$config['content'],
                     'comment_approved'=>1
                 ]);
+              
                 return ['port'=>'main','data'=>['comment_id'=>$comment_id,'parent_id'=>$config['parent_id']]];
 
             case 'delete_comment':
                 $result = wp_delete_comment($config['comment_id'],true);
+
                 return ['port'=>'main','data'=>['success'=>(bool)$result,'comment_id'=>$config['comment_id']]];
                 
         }
