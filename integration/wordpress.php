@@ -1637,9 +1637,7 @@ class Wordpress extends IntegrationBase {
                             'description' => $media->post_content,
                             'date'        => $media->post_date,                        
                         ];
-                    }
                     return ['port' => 'main', 'data' => $media_item];
-
         }
         return ['port'=>'main','data'=>$input];
     }
