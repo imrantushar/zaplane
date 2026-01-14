@@ -9,7 +9,7 @@ class CreateConnectionsTable {
     public static function up( $prefix, $charset_collate ) {
         $table_name = $prefix . ZAPLANE_PLUGIN_SLUG . '_connections';
         $sql        = "CREATE TABLE IF NOT EXISTS $table_name (
-            id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+            id BIGINT UNSIGNED AUTO_INCREMENT,
             user_id BIGINT UNSIGNED NOT NULL,
             app VARCHAR(100) NOT NULL,
             name VARCHAR(255) NOT NULL,
