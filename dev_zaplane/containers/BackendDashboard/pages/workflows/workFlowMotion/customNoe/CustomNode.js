@@ -24,6 +24,7 @@ export default function CustomNode({ id, data, xPos, yPos }) {
 
   const sourceX = xPos + NODE_WIDTH;
   const sourceY = yPos + NODE_HEIGHT / 2;
+  
 
   return (
     <Box
@@ -47,12 +48,10 @@ export default function CustomNode({ id, data, xPos, yPos }) {
           >
             {data.action || "Action"}
           </Text>
-          {/* <Text borderRadius="full" fontSize="sm" fontWeight="medium" margin={0}>
-            {data.order || 1}
-          </Text> */}
         </HStack>
       </NodeToolbar>
-      <NodeToolbar
+       {
+            data.action !== 'trigger' &&  <NodeToolbar
         isVisible={hovered}
         position={Position.Bottom}
         align="end"
@@ -72,6 +71,8 @@ export default function CustomNode({ id, data, xPos, yPos }) {
           {!data?.action && <Icon as={FaRegCopy} boxSize={4} />}
         </HStack>
       </NodeToolbar>
+          }
+     
       <Box
         bg="white"
         border="1px solid"
