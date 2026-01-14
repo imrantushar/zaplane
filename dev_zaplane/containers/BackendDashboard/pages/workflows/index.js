@@ -30,6 +30,7 @@ import {
 import { FiMoreVertical } from "react-icons/fi";
 import { showNotification } from "@ZAPRedux/Slices/notificationSlice/notificationSlice";
 import ZAPLoading from "@ZAPComponents/Loading";
+import ZAPTable from "@ZAPComponents/Table";
 
 
 const CreateWorkflows = () => {
@@ -148,99 +149,69 @@ const CreateWorkflows = () => {
             </Heading>
           </Box>
 
-          <Table.Root size="sm">
-            <Table.Header bg="gray.50">
-              <Table.Row>
-                <Table.ColumnHeader textAlign="center">
-                  Title
-                </Table.ColumnHeader>
-                <Table.ColumnHeader textAlign="center">
-                  Status
-                </Table.ColumnHeader>
-                <Table.ColumnHeader textAlign="center">
-                  Actions
-                </Table.ColumnHeader>
-              </Table.Row>
-            </Table.Header>
+          <ZAPTable
+            data={data}
+            rowKey="id"
+            size="sm"
+            variant="line"
+            columns={[
+              {
+                label: __("Title", "zaplane"),
+                key: "title",
+                textAlign: "center",
+                render: (row) => (
+                  <Text fontWeight="500" m={0}>
+                    {row.title}
+                  </Text>
+                ),
+              },
+              {
+                label: __("Status", "zaplane"),
+                key: "status",
+                textAlign: "center",
+                render: (row) => (
+                  <Box w="120px" mx="auto">
+                    <Select
+                      options={statusOptions}
+                      value={statusOptions.find(
+                        (opt) => opt.value === row.status
+                      )}
+                      onChange={(selected) =>
+                        onSubmitHandler(row, selected.value)
+                      }
+                      isClearable={false}
+                      isSearchable={false}
+                    />
+                  </Box>
+                ),
+              },
+            ]}
+            actionsRenderer={(row) => (
+              <Box>
+                <Button
+                  size="xs"
+                  variant="outline"
+                  onClick={() =>
+                    navigate(
+                      `${route_path}admin.php?page=zaplane-workflows&action=edit&id=${row.id}`
+                    )
+                  }
+                >
+                  Edit
+                </Button>
 
-            <Table.Body>
-              {isLoading && (
-                <Table.Row>
-                  <Table.Cell colSpan={3}>
-                     <ZAPLoading />
-                  </Table.Cell>
-                </Table.Row>
-              )}
-              {!isLoading && !data?.length && (
-                <Table.Row>
-                  <Table.Cell colSpan={3}>
-                    <Flex align="center" justify="center" h="200px">
-                      <Text color="gray.500">No data found</Text>
-                    </Flex>
-                  </Table.Cell>
-                </Table.Row>
-              )}
-              {!isLoading && Array.isArray(data) &&
-                data.map((item) => (
-                  <Table.Row
-                    key={item.id}
-                    _hover={{ bg: "gray.50" }}
-                  >
-                    <Table.Cell>
-                      <Flex justify="center" align="center">
-                        <Text fontWeight="500" m={0}>
-                          {item.title}
-                        </Text>
-                      </Flex>
-                    </Table.Cell>
-                    <Table.Cell>
-                      <Flex justify="center" align="center">
-                        <Box w="120px">
-                          <Select
-                            options={statusOptions}
-                            value={statusOptions.find(
-                              (opt) => opt.value === item.status
-                            )}
-                            onChange={(selected) =>
-                              onSubmitHandler(item, selected.value)
-                            }
-                            isClearable={false}
-                            isSearchable={false}
-                          />
-                        </Box>
-                      </Flex>
-                    </Table.Cell>
-                    <Table.Cell>
-                      <Flex justify="center" align="center">
-                        <Stack direction="row" spacing={2}>
-                          <Button
-                            size="xs"
-                            variant="outline"
-                            onClick={() =>
-                              navigate(
-                                `${route_path}admin.php?page=zaplane-workflows&action=edit&id=${item.id}`
-                              )
-                            }
-                          >
-                            Edit
-                          </Button>
+                <Button
+                  size="xs"
+                  colorScheme="red"
+                  variant="ghost"
+                  onClick={() => workflowDeleteHandler(row.id)}
+                >
+                  Delete
+                </Button>
+              </Box>
+            )}
+          />
 
-                          <Button
-                            size="xs"
-                            colorScheme="red"
-                            variant="ghost"
-                            onClick={() => workflowDeleteHandler(item.id)}
-                          >
-                            Delete
-                          </Button>
-                        </Stack>
-                      </Flex>
-                    </Table.Cell>
-                  </Table.Row>
-                ))}
-            </Table.Body>
-
-          </Table.Root>
 
         </Box>
       </Box>

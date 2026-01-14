@@ -11,7 +11,7 @@ export default function ZAPTable({
   data = [],
   columns = [],
   rowKey = "id",
-  actionsRenderer, // function(row) => ReactNode
+  actionsRenderer, 
   caption,
   variant = "line",
   size = "sm",
@@ -32,7 +32,7 @@ export default function ZAPTable({
             </Table.ColumnHeader>
           ))}
           {actionsRenderer && (
-            <Table.ColumnHeader textAlign="right">
+            <Table.ColumnHeader textAlign="center">
               Actions
             </Table.ColumnHeader>
           )}
@@ -48,8 +48,8 @@ export default function ZAPTable({
               </Table.Cell>
             ))}
             {actionsRenderer && (
-              <Table.Cell textAlign="right">
-                <HStack justify="flex-end" spacing="1">
+              <Table.Cell textAlign="center">
+                <HStack justify="center" spacing="1">
                   {actionsRenderer(row)}
                 </HStack>
               </Table.Cell>
