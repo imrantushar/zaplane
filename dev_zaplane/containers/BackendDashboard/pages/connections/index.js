@@ -38,6 +38,7 @@ import {
 import WPModal from "@ZAPComponents/Modal/WPModal";
 import ZAPText from "@ZAPComponents/Text";
 import ZAPTable from "@ZAPComponents/Table";
+import ConnectionDetails from "./ConnectionDetails/ConnectionDetails";
 
 const statusOptions = [
     { value: "active", label: "Active" },
@@ -238,117 +239,11 @@ const Connections = () => {
                     )}
                 />
             </VStack>
-            <WPModal
-                title={__("Connection Details", "zaplane")}
+            <ConnectionDetails
                 isOpen={detailsOpen}
-                onRequestClose={() => setDetailsOpen(false)}
-            >
-                {!singleData ? (
-                    <Flex justify="center" align="center" py={12}>
-                        <Spinner size="lg" />
-                    </Flex>
-                ) : (
-                    <Box>
-                        {/* Top Card */}
-                        <Box
-                            p={5}
-                            borderRadius="lg"
-                            bg="white"
-                            borderWidth="1px"
-                            mb={5}
-                            boxShadow="sm"
-                        >
-                            <Flex justify="space-between" align="center">
-                                <Box>
-                                    <ZAPText fontSize="xl" fontWeight="semibold">
-                                        {singleData.name}
-                                    </ZAPText>
-                                    <ZAPText fontSize="sm" color="gray.500">
-                                        {singleData.app} connection
-                                    </ZAPText>
-                                </Box>
-
-                                <Badge
-                                    px={4}
-                                    py={1.5}
-                                    fontSize="sm"
-                                    borderRadius="full"
-                                    colorScheme={
-                                        singleData.status === "active"
-                                            ? "green"
-                                            : "gray"
-                                    }
-                                    textTransform="capitalize"
-                                >
-                                    {singleData.status}
-                                </Badge>
-                            </Flex>
-                        </Box>
-                        <Flex gap={4} wrap="wrap">
-                            <Box
-                                flex="1 1 45%"
-                                p={4}
-                                borderRadius="lg"
-                                borderWidth="1px"
-                                bg="gray.50"
-                            >
-                                <ZAPText fontSize="xs" color="gray.500">
-                                    AUTH TYPE
-                                </ZAPText>
-                                <ZAPText fontSize="md" fontWeight="medium">
-                                    {singleData.auth_type}
-                                </ZAPText>
-                            </Box>
-
-                            <Box
-                                flex="1 1 45%"
-                                p={4}
-                                borderRadius="lg"
-                                borderWidth="1px"
-                                bg="gray.50"
-                            >
-                                <ZAPText fontSize="xs" color="gray.500">
-                                    CREATED AT
-                                </ZAPText>
-                                <ZAPText fontSize="md" fontWeight="medium">
-                                    {singleData.created_at}
-                                </ZAPText>
-                            </Box>
-
-                            <Box
-                                flex="1 1 45%"
-                                p={4}
-                                borderRadius="lg"
-                                borderWidth="1px"
-                                bg="gray.50"
-                            >
-                                <ZAPText fontSize="xs" color="gray.500">
-                                    LAST USED
-                                </ZAPText>
-                                <Text fontSize="md" fontWeight="medium">
-                                    {singleData.last_used_at || "--"}
-                                </Text>
-                            </Box>
-
-                            <Box
-                                flex="1 1 45%"
-                                p={4}
-                                borderRadius="lg"
-                                borderWidth="1px"
-                                bg="gray.50"
-                            >
-                                <ZAPText fontSize="xs" color="gray.500">
-                                    LAST TESTED
-                                </ZAPText>
-                                <ZAPText fontSize="md" fontWeight="medium">
-                                    {singleData.last_tested_at || "--"}
-                                </ZAPText>
-                            </Box>
-                        </Flex>
-                    </Box>
-                )}
-            </WPModal>
-            <WPModal
+                onClose={() => setDetailsOpen(false)}
+                singleData={singleData}
+            />            <WPModal
                 title={__("Create credential", "zaplane")}
                 isOpen={isModalOpen}
                 onRequestClose={() => setIsModalOpen(false)}
