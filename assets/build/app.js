@@ -2811,7 +2811,7 @@ function ActionDrawer({
         label: "Select",
         content: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.Fragment, {
           children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_ZAPComponents_LabeledSelect__WEBPACK_IMPORTED_MODULE_9__["default"], {
-            label: "Action Type",
+            label: isTrigger ? "Trigger Type" : "Action Type",
             options: actionOptions,
             value: values.actionType,
             onChange: val => setFieldValue("actionType", val),

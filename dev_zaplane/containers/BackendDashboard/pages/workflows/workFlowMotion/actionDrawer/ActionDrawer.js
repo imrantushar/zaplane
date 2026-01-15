@@ -287,7 +287,8 @@ export default function ActionDrawer({
                             content: (
                                 <>
                                     <ZAPLabeledSelect
-                                        label="Action Type"
+                                        label={isTrigger?"Trigger Type":"Action Type"
+                                        }
                                         options={actionOptions}
                                         value={values.actionType}
                                         onChange={(val) =>
