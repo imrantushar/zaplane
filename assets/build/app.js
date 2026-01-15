@@ -1585,7 +1585,6 @@ const Connections = () => {
       authType: selectedAuthType || undefined
     }));
   }, [selectedApp, selectedAuthType, dispatch]);
-  console.log(authFields, 'authFields');
   const handleStatusChange = (row, selected) => {
     dispatch((0,_ZAPRedux_Slices_connectionsSlice_connectionsSlice__WEBPACK_IMPORTED_MODULE_14__.updateConnection)({
       id: row.id,

@@ -74,7 +74,6 @@ const Connections = () => {
             })
         );
     }, [selectedApp, selectedAuthType, dispatch]);
-    console.log(authFields, 'authFields')
 
     const handleStatusChange = (row, selected) => {
         dispatch(
