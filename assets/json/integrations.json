@@ -82,7 +82,7 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                         "main"
                     ]
                 },
                 "user_register": {
