@@ -376,6 +376,11 @@ class Wordpress extends IntegrationBase {
             'get_user_meta_all' => ['label'=>'Get User Metadata (All)'],
             'get_user_meta_single' => ['label'=>'Get User Metadata (Single)'],
             'update_user_meta' => ['label'=>'Update User Metadata'],
+            'send_password_reset_email' => ['label'=>'Send Password Reset Email'],
+            'authenticate_user' => ['label'=>'Authenticate User'],
+            'logout_user' => ['label'=>'Logout User'],
+            'activate_user' => ['label'=>'Activate User'],
+            'deactivate_user' => ['label'=>'Deactivate User'],
             'create_role' => ['label'=>'Create Role'],
             'delete_role' => ['label'=>'Delete Role'],
             'add_user_role' => ['label'=>'Add User Role'],
@@ -401,6 +406,8 @@ class Wordpress extends IntegrationBase {
             'get_taxonomy' => ['label'=>'Get Taxonomy (Single)'],
             'add_taxonomy_to_post' => ['label'=>'Add Taxonomy to Post'],
             'remove_taxonomy_from_post' => ['label'=>'Remove Taxonomy from Post'],
+            'bulk_assign_terms_to_posts' => ['label'=>'Bulk Assign Terms to Posts'],
+            'bulk_remove_terms_from_posts' => ['label'=>'Bulk Remove Terms from Posts'],
             'create_category' => ['label'=>'Create Category'],
             'update_category' => ['label'=>'Update Category'],
             'delete_category' => ['label'=>'Delete Category'],
@@ -414,6 +421,10 @@ class Wordpress extends IntegrationBase {
             'remove_tags_from_post' => ['label'=>'Remove Tags from Post'],
             'get_post_tags' => ['label'=>'Get Post Tag (All)'],
             'get_post_tag' => ['label'=>'Get Post Tag (Single)'],
+            'create_site' => ['label'=>'Create New Site'],
+            'delete_site' => ['label'=>'Delete Site'],
+            'add_user_to_site' => ['label'=>'Add User to Site'],
+            'remove_user_from_site' => ['label'=>'Remove User from Site'],
         ];
     }
 
@@ -548,6 +559,37 @@ class Wordpress extends IntegrationBase {
                 ['key'=>'user_id','label'=>'User ID','type'=>'expression','required'=>true],
                 ['key'=>'meta_key','label'=>'Meta Key','type'=>'text','required'=>true],
                 ['key'=>'meta_value','label'=>'Meta Value','type'=>'expression'],
+            ];
+        }
+
+        if ( $action === 'send_password_reset_email' ) {
+            return [
+                ['key'=>'user_login','label'=>'Username or Email','type'=>'text','required'=>true],
+            ];
+        }
+
+        if ( $action === 'authenticate_user' ) {
+            return [
+                ['key'=>'user_login','label'=>'Username or Email','type'=>'text','required'=>true],
+                ['key'=>'user_password','label'=>'Password','type'=>'text','required'=>true],
+                ['key'=>'remember','label'=>'Remember (true/false)','type'=>'text'],
+                ['key'=>'secure_cookie','label'=>'Secure Cookie (true/false)','type'=>'text'],
+            ];
+        }
+
+        if ( $action === 'logout_user' ) {
+            return [];
+        }
+
+        if ( $action === 'activate_user' ) {
+            return [
+                ['key'=>'user_id','label'=>'User ID','type'=>'expression','required'=>true],
+            ];
+        }
+
+        if ( $action === 'deactivate_user' ) {
+            return [
+                ['key'=>'user_id','label'=>'User ID','type'=>'expression','required'=>true],
             ];
         }
 
@@ -799,6 +841,38 @@ class Wordpress extends IntegrationBase {
             ];
         }
 
+        if ( $action === 'create_site' ) {
+            return [
+                ['key'=>'domain','label'=>'Domain','type'=>'text','required'=>true],
+                ['key'=>'path','label'=>'Path','type'=>'text','required'=>true],
+                ['key'=>'title','label'=>'Title','type'=>'text','required'=>true],
+                ['key'=>'user_id','label'=>'User ID','type'=>'expression','required'=>true],
+                ['key'=>'site_id','label'=>'Site ID','type'=>'expression'],
+            ];
+        }
+
+        if ( $action === 'delete_site' ) {
+            return [
+                ['key'=>'blog_id','label'=>'Blog ID','type'=>'expression','required'=>true],
+                ['key'=>'drop','label'=>'Drop Tables (true/false)','type'=>'text'],
+            ];
+        }
+
+        if ( $action === 'add_user_to_site' ) {
+            return [
+                ['key'=>'blog_id','label'=>'Blog ID','type'=>'expression','required'=>true],
+                ['key'=>'user_id','label'=>'User ID','type'=>'expression','required'=>true],
+                ['key'=>'role','label'=>'Role','type'=>'text','required'=>true],
+            ];
+        }
+
+        if ( $action === 'remove_user_from_site' ) {
+            return [
+                ['key'=>'blog_id','label'=>'Blog ID','type'=>'expression','required'=>true],
+                ['key'=>'user_id','label'=>'User ID','type'=>'expression','required'=>true],
+            ];
+        }
+
         return [];
     }
 
@@ -868,6 +942,34 @@ class Wordpress extends IntegrationBase {
                 $config['meta_key'], 
                 $config['meta_value'] ?? null
                  )];
+
+            case 'send_password_reset_email':
+                return ['port'=>'main','data'=>retrieve_password( $config['user_login'] ?? '' )];
+
+            case 'authenticate_user':
+                $creds = [
+                    'user_login' => $config['user_login'] ?? '',
+                    'user_password' => $config['user_password'] ?? '',
+                    'remember' => ! empty( $config['remember'] ),
+                ];
+                $secure_cookie = ! empty( $config['secure_cookie'] );
+                return ['port'=>'main','data'=>wp_signon( $creds, $secure_cookie )];
+
+            case 'logout_user':
+                wp_logout();
+                return ['port'=>'main','data'=>true];
+
+            case 'activate_user':
+                return ['port'=>'main','data'=>wp_update_user( [
+                    'ID' => $config['user_id'] ?? 0,
+                    'user_status' => 0,
+                ] )];
+
+            case 'deactivate_user':
+                return ['port'=>'main','data'=>wp_update_user( [
+                    'ID' => $config['user_id'] ?? 0,
+                    'user_status' => 1,
+                ] )];
 
             case 'create_role':
                 $role_key = sanitize_key( $config['role'] );
@@ -953,114 +1055,127 @@ class Wordpress extends IntegrationBase {
 
             case 'get_terms_by_taxonomy':
                 return ['port'=>'main','data'=>get_terms( [
-                    'taxonomy' => $config['taxonomy'] ?? '',
+                    'taxonomy' => $config['taxonomy'],
                     'hide_empty' => false,
                 ] )];
 
             case 'get_term_by_field':
                 return ['port'=>'main','data'=>get_term_by(
-                    $config['field'] ?? '',
-                    $config['value'] ?? '',
-                    $config['taxonomy'] ?? ''
+                    $config['field'],
+                    $config['value'],
+                    $config['taxonomy']
                 )];
 
             case 'create_term':
                 return ['port'=>'main','data'=>wp_insert_term(
-                    $config['name'] ?? '',
-                    $config['taxonomy'] ?? '',
+                    $config['name'],
+                    $config['taxonomy'],
                     [
-                        'slug' => $config['slug'] ?? '',
-                        'parent' => $config['parent'] ?? 0,
-                        'description' => $config['description'] ?? '',
+                        'slug' => $config['slug'],
+                        'parent' => $config['parent'],
+                        'description' => $config['description'],
                     ]
                 )];
 
             case 'update_term':
                 return ['port'=>'main','data'=>wp_update_term(
-                    $config['term_id'] ?? 0,
-                    $config['taxonomy'] ?? '',
+                    $config['term_id'],
+                    $config['taxonomy'],
                     [
-                        'name' => $config['name'] ?? '',
-                        'slug' => $config['slug'] ?? '',
-                        'description' => $config['description'] ?? '',
-                        'parent' => $config['parent'] ?? 0,
+                        'name' => $config['name'],
+                        'slug' => $config['slug'],
+                        'description' => $config['description'],
+                        'parent' => $config['parent'],
                     ]
                 )];
 
             case 'delete_term':
                 return ['port'=>'main','data'=>wp_delete_term(
-                    $config['term_id'] ?? 0,
-                    $config['taxonomy'] ?? ''
+                    $config['term_id'],
+                    $config['taxonomy']
                 )];
 
             case 'register_taxonomy':
-                $registered = register_taxonomy(
-                    $config['taxonomy'] ?? '',
-                    WordpressHelpers::normalize_list( $config['object_type'] ?? [] ),
-                    WordpressHelpers::normalize_taxonomy_args( $config['args'] ?? [] )
-                );
-                return ['port'=>'main','data'=>$registered];
+                return ['port'=>'main','data'=>register_taxonomy(
+                    $config['taxonomy'],
+                    WordpressHelpers::normalize_list( $config['object_type'] ),
+                    WordpressHelpers::normalize_taxonomy_args( $config['args'] )
+                )];
 
             case 'unregister_taxonomy':
-                $unregistered = unregister_taxonomy( $config['taxonomy'] ?? '' );
-                return ['port'=>'main','data'=>$unregistered];
+                return ['port'=>'main','data'=>unregister_taxonomy( $config['taxonomy'] )];
 
             case 'get_taxonomies':
                 return ['port'=>'main','data'=>get_taxonomies( [], 'objects' )];
 
             case 'get_taxonomy':
-                return ['port'=>'main','data'=>get_taxonomy( $config['taxonomy'] ?? '' )];
+                return ['port'=>'main','data'=>get_taxonomy( $config['taxonomy'] )];
 
             case 'add_taxonomy_to_post':
-                $terms = WordpressHelpers::normalize_list( $config['terms'] ?? [] );
-                $append = isset( $config['append'] ) ? (bool) $config['append'] : true;
                 $added = wp_set_object_terms(
-                    (int) ( $config['post_id'] ?? 0 ),
-                    $terms,
-                    $config['taxonomy'] ?? '',
-                    $append
+                    $config['post_id'],
+                    WordpressHelpers::normalize_list( $config['terms'] ),
+                    $config['taxonomy'],
+                    $config['append']
                 );
                 return ['port'=>'main','data'=>$added];
 
             case 'remove_taxonomy_from_post':
-                $terms = WordpressHelpers::normalize_list( $config['terms'] ?? [] );
                 $removed = wp_remove_object_terms(
-                    (int) ( $config['post_id'] ?? 0 ),
-                    $terms,
-                    $config['taxonomy'] ?? ''
+                    $config['post_id'],
+                    WordpressHelpers::normalize_list( $config['terms'] ),
+                    $config['taxonomy']
                 );
                 return ['port'=>'main','data'=>$removed];
 
+            case 'bulk_assign_terms_to_posts':
+                $post_ids = WordpressHelpers::normalize_list( $config['post_ids'] );
+                $terms = WordpressHelpers::normalize_list( $config['terms'] );
+                $taxonomy = $config['taxonomy'];
+                $append = $config['append'];
+                $results = [];
+                foreach ( $post_ids as $post_id ) {
+                    $results[ $post_id ] = wp_set_object_terms( $post_id, $terms, $taxonomy, $append );
+                }
+                return ['port'=>'main','data'=>$results];
+
+            case 'bulk_remove_terms_from_posts':
+                $post_ids = WordpressHelpers::normalize_list( $config['post_ids'] );
+                $terms = WordpressHelpers::normalize_list( $config['terms'] );
+                $taxonomy = $config['taxonomy'];
+                $results = [];
+                foreach ( $post_ids as $post_id ) {
+                    $results[ $post_id ] = wp_remove_object_terms( $post_id, $terms, $taxonomy );
+                }
+                return ['port'=>'main','data'=>$results];
+
             case 'create_category':
                 $created = wp_insert_category( [
-                    'cat_name' => $config['name'] ?? '',
-                    'category_description' => $config['description'] ?? '',
-                    'category_parent' => $config['parent'] ?? 0,
-                    'category_nicename' => $config['slug'] ?? '',
+                    'cat_name' => $config['name'],
+                    'category_description' => $config['description'],
+                    'category_parent' => $config['parent'],
+                    'category_nicename' => $config['slug'],
                 ] );
                 return ['port'=>'main','data'=>$created];
 
             case 'update_category':
                 $updated = wp_update_category( [
-                    'cat_ID' => $config['term_id'] ?? 0,
-                    'cat_name' => $config['name'] ?? '',
-                    'category_nicename' => $config['slug'] ?? '',
-                    'category_parent' => $config['parent'] ?? 0,
-                    'category_description' => $config['description'] ?? '',
+                    'cat_ID' => $config['term_id'],
+                    'cat_name' => $config['name'],
+                    'category_nicename' => $config['slug'],
+                    'category_parent' => $config['parent'],
+                    'category_description' => $config['description'],
                 ] );
                 return ['port'=>'main','data'=>$updated];
 
             case 'delete_category':
-                $deleted = wp_delete_term( (int) ( $config['term_id'] ?? 0 ), 'category' );
-                return ['port'=>'main','data'=>$deleted];
+                return ['port'=>'main','data'=>wp_delete_term( $config['term_id'], 'category' )];
 
             case 'add_category_to_post':
-                $categories = WordpressHelpers::normalize_list( $config['categories'] ?? [] );
-                $append = isset( $config['append'] ) ? (bool) $config['append'] : true;
                 $added = wp_set_post_categories(
-                    (int) ( $config['post_id'] ?? 0 ),
-                    $categories,
-                    $append
+                    $config['post_id'],
+                    WordpressHelpers::normalize_list( $config['categories'] ),
+                    $config['append']
                 );
                 return ['port'=>'main','data'=>$added];
 
@@ -1068,7 +1183,7 @@ class Wordpress extends IntegrationBase {
                 return ['port'=>'main','data'=>get_categories( [ 'hide_empty' => false ] )];
 
             case 'get_category':
-                return ['port'=>'main','data'=>get_category( (int) ( $config['category_id'] ?? 0 ) )];
+                return ['port'=>'main','data'=>get_category( $config['category_id'] )];
 
             case 'create_post_tag':
                 return ['port'=>'main','data'=>wp_insert_term(
@@ -1114,6 +1229,35 @@ class Wordpress extends IntegrationBase {
 
             case 'get_post_tag':
                 return ['port'=>'main','data'=>get_term( $config['term_id'], 'post_tag' )];
+
+            case 'create_site':
+                return ['port'=>'main','data'=>wpmu_create_blog(
+                    $config['domain'],
+                    $config['path'],
+                    $config['title'],
+                    $config['user_id'],
+                    [],
+                    $config['site_id'] ?? get_current_network_id()
+                )];
+
+            case 'delete_site':
+                return ['port'=>'main','data'=>wpmu_delete_blog(
+                    $config['blog_id'],
+                    $config['drop']
+                )];
+
+            case 'add_user_to_site':
+                return ['port'=>'main','data'=>add_user_to_blog(
+                    $config['blog_id'],
+                    $config['user_id'],
+                    $config['role']
+                )];
+
+            case 'remove_user_from_site':
+                return ['port'=>'main','data'=>remove_user_from_blog(
+                    $config['user_id'],
+                    $config['blog_id']
+                )];
         }
 
         return ['port'=>'main','data'=>$input];

@@ -1575,6 +1575,255 @@
                     "outputs": [
                         "main"
                     ]
+                },
+                "send_password_reset_email": {
+                    "key": "send_password_reset_email",
+                    "label": "Send Password Reset Email",
+                    "schema": [
+                        {
+                            "key": "user_login",
+                            "label": "Username or Email",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "authenticate_user": {
+                    "key": "authenticate_user",
+                    "label": "Authenticate User",
+                    "schema": [
+                        {
+                            "key": "user_login",
+                            "label": "Username or Email",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "user_password",
+                            "label": "Password",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "remember",
+                            "label": "Remember (true/false)",
+                            "type": "text"
+                        },
+                        {
+                            "key": "secure_cookie",
+                            "label": "Secure Cookie (true/false)",
+                            "type": "text"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "logout_user": {
+                    "key": "logout_user",
+                    "label": "Logout User",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "activate_user": {
+                    "key": "activate_user",
+                    "label": "Activate User",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "deactivate_user": {
+                    "key": "deactivate_user",
+                    "label": "Deactivate User",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "bulk_assign_terms_to_posts": {
+                    "key": "bulk_assign_terms_to_posts",
+                    "label": "Bulk Assign Terms to Posts",
+                    "schema": [
+                        {
+                            "key": "post_ids",
+                            "label": "Post IDs (comma separated)",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "taxonomy",
+                            "label": "Taxonomy",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "terms",
+                            "label": "Terms (comma separated)",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "append",
+                            "label": "Append (true/false)",
+                            "type": "text"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "bulk_remove_terms_from_posts": {
+                    "key": "bulk_remove_terms_from_posts",
+                    "label": "Bulk Remove Terms from Posts",
+                    "schema": [
+                        {
+                            "key": "post_ids",
+                            "label": "Post IDs (comma separated)",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "taxonomy",
+                            "label": "Taxonomy",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "terms",
+                            "label": "Terms (comma separated)",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_site": {
+                    "key": "create_site",
+                    "label": "Create New Site",
+                    "schema": [
+                        {
+                            "key": "domain",
+                            "label": "Domain",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "path",
+                            "label": "Path",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "title",
+                            "label": "Title",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "site_id",
+                            "label": "Site ID",
+                            "type": "expression"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_site": {
+                    "key": "delete_site",
+                    "label": "Delete Site",
+                    "schema": [
+                        {
+                            "key": "blog_id",
+                            "label": "Blog ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "drop",
+                            "label": "Drop Tables (true/false)",
+                            "type": "text"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add_user_to_site": {
+                    "key": "add_user_to_site",
+                    "label": "Add User to Site",
+                    "schema": [
+                        {
+                            "key": "blog_id",
+                            "label": "Blog ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "role",
+                            "label": "Role",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "remove_user_from_site": {
+                    "key": "remove_user_from_site",
+                    "label": "Remove User from Site",
+                    "schema": [
+                        {
+                            "key": "blog_id",
+                            "label": "Blog ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
                 }
             }
         },
