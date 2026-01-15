@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-01-15 06:58:36",
+    "generated_at": "2026-01-15 12:39:17",
     "integrations": {
         "wordpress": {
             "slug": "wordpress",
@@ -606,6 +606,27 @@
                         "main"
                     ]
                 },
+                "update_page_title": {
+                    "key": "update_page_title",
+                    "label": "Update Page Title",
+                    "schema": [
+                        {
+                            "key": "page_id",
+                            "label": "Page ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "page_title",
+                            "label": "New Page Title",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
                 "update_post": {
                     "key": "update_post",
                     "label": "Update Post",
@@ -674,6 +695,44 @@
                         },
                         {
                             "key": "post_status",
+                            "label": "Status",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Publish",
+                                    "value": "publish"
+                                },
+                                {
+                                    "label": "Pending",
+                                    "value": "pending"
+                                },
+                                {
+                                    "label": "Private",
+                                    "value": "private"
+                                },
+                                {
+                                    "label": "Draft",
+                                    "value": "draft"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_page_status": {
+                    "key": "update_page_status",
+                    "label": "Update Page Status",
+                    "schema": [
+                        {
+                            "key": "page_id",
+                            "label": "Page ID to Update",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "page_status",
                             "label": "Status",
                             "type": "select",
                             "options": [
@@ -905,7 +964,7 @@
                     "schema": [
                         {
                             "key": "post_id",
-                            "label": "Post ID",
+                            "label": "Page ID",
                             "type": "expression",
                             "required": true
                         }
@@ -920,7 +979,7 @@
                     "schema": [
                         {
                             "key": "post_id",
-                            "label": "Post ID",
+                            "label": "Page ID",
                             "type": "expression",
                             "required": true
                         }
@@ -935,7 +994,7 @@
                     "schema": [
                         {
                             "key": "post_id",
-                            "label": "Post ID",
+                            "label": "Page ID",
                             "type": "expression",
                             "required": true
                         }
@@ -950,7 +1009,7 @@
                     "schema": [
                         {
                             "key": "post_id",
-                            "label": "Post ID",
+                            "label": "Page ID",
                             "type": "expression",
                             "required": true
                         }
@@ -1240,15 +1299,39 @@
                             "key": "supports",
                             "label": "Supports",
                             "type": "multiselect",
-                            "option": [
-                                "title",
-                                "editor",
-                                "thumbnail",
-                                "excerpt",
-                                "comments",
-                                "revisions",
-                                "author",
-                                "custom-fields"
+                            "options": [
+                                {
+                                    "label": "Title",
+                                    "value": "title"
+                                },
+                                {
+                                    "label": "Editor",
+                                    "value": "editor"
+                                },
+                                {
+                                    "label": "Thumbnail",
+                                    "value": "thumbnail"
+                                },
+                                {
+                                    "label": "Excerpt",
+                                    "value": "excerpt"
+                                },
+                                {
+                                    "label": "Comments",
+                                    "value": "comments"
+                                },
+                                {
+                                    "label": "Revisions",
+                                    "value": "revisions"
+                                },
+                                {
+                                    "label": "Author",
+                                    "value": "author"
+                                },
+                                {
+                                    "label": "Custom-Fields",
+                                    "value": "custom-fields"
+                                }
                             ],
                             "default": [
                                 "title",
@@ -1327,15 +1410,39 @@
                             "key": "features",
                             "label": "Features (Supports)",
                             "type": "multiselect",
-                            "option": [
-                                "title",
-                                "editor",
-                                "thumbnail",
-                                "excerpt",
-                                "comments",
-                                "revisions",
-                                "author",
-                                "custom-fields"
+                            "options": [
+                                {
+                                    "label": "Title",
+                                    "value": "title"
+                                },
+                                {
+                                    "label": "Editor",
+                                    "value": "editor"
+                                },
+                                {
+                                    "label": "Thumbnail",
+                                    "value": "thumbnail"
+                                },
+                                {
+                                    "label": "Excerpt",
+                                    "value": "excerpt"
+                                },
+                                {
+                                    "label": "Comments",
+                                    "value": "comments"
+                                },
+                                {
+                                    "label": "Revisions",
+                                    "value": "revisions"
+                                },
+                                {
+                                    "label": "Author",
+                                    "value": "author"
+                                },
+                                {
+                                    "label": "Custom-Fields",
+                                    "value": "custom-fields"
+                                }
                             ],
                             "required": false
                         }
@@ -1346,7 +1453,7 @@
                 },
                 "approve_comment": {
                     "key": "approve_comment",
-                    "label": " Approve Comment",
+                    "label": "Approve Comment",
                     "schema": [
                         {
                             "key": "comment_id",
@@ -1392,6 +1499,66 @@
                 "unmark_comment_spam": {
                     "key": "unmark_comment_spam",
                     "label": "Unmark Comment as Spam",
+                    "schema": [
+                        {
+                            "key": "comment_id",
+                            "label": "Comment ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "trash_comment": {
+                    "key": "trash_comment",
+                    "label": "Trash Comment",
+                    "schema": [
+                        {
+                            "key": "comment_id",
+                            "label": "Comment ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "restore_comment": {
+                    "key": "restore_comment",
+                    "label": "Restore Comment from Trash",
+                    "schema": [
+                        {
+                            "key": "comment_id",
+                            "label": "Comment ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_trash_comment": {
+                    "key": "delete_trash_comment",
+                    "label": "Delete Trash Comment",
+                    "schema": [
+                        {
+                            "key": "comment_id",
+                            "label": "Comment ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_comment": {
+                    "key": "delete_comment",
+                    "label": "Delete Comment",
                     "schema": [
                         {
                             "key": "comment_id",

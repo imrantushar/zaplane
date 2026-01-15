@@ -601,9 +601,10 @@ class Wordpress extends IntegrationBase {
             'create_post'               => ['label' => 'Create Post'],
             'update_option'             => ['label' => 'Update Option'],
             'update_post_title'         => ['label' => 'Update Post Title'],
+            'update_page_title'         => ['label' => 'Update Page Title'],
             'update_post'               => ['label' => 'Update Post'],
             'update_post_status'        => ['label' => 'Update Post Status'],
-            'update_post_status'        => ['label' => 'Update Post Status'],
+            'update_page_status'        => ['label' => 'Update Page Status'],
             'duplicate_post'            => ['label' => 'Duplicate Post'],
             'schedule_post'             => ['label' => 'Schedule Post'],
             'unschedule_post'           => ['label' => 'Unschedule Post'],
@@ -632,10 +633,14 @@ class Wordpress extends IntegrationBase {
             'register_post_type'        => ['label' => 'Register Post Type'],
             'unregister_post_type'      => ['label' => 'Unregister Post Type'],
             'add_post_type_support'     => ['label' => 'Add Post Type Features'],
-            'approve_comment'           => ['label' => ' Approve Comment'],
+            'approve_comment'           => ['label' => 'Approve Comment'],
             'unapproved_comment'        => ['label' => 'Unapproved Comment'],
             'mark_comment_spam'         => ['label' => 'Mark Comment as Spam'],
             'unmark_comment_spam'       => ['label' => 'Unmark Comment as Spam'],
+            'trash_comment'             => ['label' => 'Trash Comment'],
+            'restore_comment'           => ['label' => 'Restore Comment from Trash'],
+            'delete_trash_comment'      => ['label' => 'Delete Trash Comment'],
+            'delete_comment'            => ['label' => 'Delete Comment'],
             'activate_plugin'           => ['label' => 'Activate Plugin'],
             'deactivate_plugin'         => ['label' => 'Deactivate Plugin'],
             'switch_theme'              => ['label' => 'Theme Switch'],
@@ -717,6 +722,23 @@ class Wordpress extends IntegrationBase {
                 [
                     'key'      => 'post_title',
                     'label'    => 'New Post Title',
+                    'type'     => 'expression',
+                    'required' => true,
+                ],
+            ];
+        }
+
+        if ( $action === 'update_page_title' ) {
+            return [
+                [
+                    'key'      => 'page_id',
+                    'label'    => 'Page ID',
+                    'type'     => 'expression',
+                    'required' => true,
+                ],
+                [
+                    'key'      => 'page_title',
+                    'label'    => 'New Page Title',
                     'type'     => 'expression',
                     'required' => true,
                 ],
@@ -819,10 +841,6 @@ class Wordpress extends IntegrationBase {
             'restore_post',
             'delete_trash_post',
             'delete_post',
-            'trash_page',
-            'restore_page',
-            'delete_trash_page',
-            'delete_page',
             'post_single',
             'posts_metadata_all',
             'post_permalink',
@@ -837,6 +855,24 @@ class Wordpress extends IntegrationBase {
                 [
                     'key'      => 'post_id',
                     'label'    => 'Post ID',
+                    'type'     => 'expression', 
+                    'required' => true,
+                ],
+            ];
+        }
+
+        $post_id_actions = [
+            'trash_page',
+            'restore_page',
+            'delete_trash_page',
+            'delete_page',
+        ];
+
+        if ( in_array( $action, $post_id_actions, true ) ) {
+            return [
+                [
+                    'key'      => 'post_id',
+                    'label'    => 'Page ID',
                     'type'     => 'expression', 
                     'required' => true,
                 ],
@@ -896,6 +932,28 @@ class Wordpress extends IntegrationBase {
                 ],
                 [
                     'key'     => 'post_status',
+                    'label'   => 'Status',
+                    'type'    => 'select',
+                    'options' => [
+                        ['label' => 'Publish', 'value' => 'publish' ],
+                        ['label' => 'Pending', 'value' => 'pending' ],
+                        ['label' => 'Private', 'value' => 'private' ],
+                        ['label' => 'Draft',   'value' => 'draft' ],
+                    ],
+                ],
+            ];
+        }
+
+        if ( $action === 'update_page_status' ) {
+            return [
+                [
+                    'key'      => 'page_id',
+                    'label'    => 'Page ID to Update',
+                    'type'     => 'expression', 
+                    'required' => true,
+                ],
+                [
+                    'key'     => 'page_status',
                     'label'   => 'Status',
                     'type'    => 'select',
                     'options' => [
@@ -1127,6 +1185,10 @@ class Wordpress extends IntegrationBase {
             'unapproved_comment',
             'mark_comment_spam',
             'unmark_comment_spam',
+            'trash_comment',
+            'restore_comment',
+            'delete_trash_comment',
+            'delete_comment',
         ];
 
         if ( in_array( $action, $comment_actions, true ) ) {
@@ -1337,6 +1399,13 @@ class Wordpress extends IntegrationBase {
                 ]);
                 return ['port'=>'main','data'=>[]];
 
+            case 'update_page_title':
+                wp_update_post([
+                    'ID'         => $config['page_id'] ,
+                    'post_title' => $config['page_title'],
+                ]);
+                return ['port'=>'main','data'=>[]];
+
             case 'duplicate_post':
                 $post_id    = $config['post_id'] ?? 0;
                 $new_title = $config['new_title'] ?? '';
@@ -1428,6 +1497,22 @@ class Wordpress extends IntegrationBase {
                 wp_delete_post( $config['post_id'], true );
                 return ['port'=>'main','data'=>['post_id'=>$config['post_id']]];
 
+            case 'trash_comment':
+                wp_trash_comment( $config['comment_id'] ?? 0 );
+                return ['port'=>'main','data'=>['comment_id'=>$config['comment_id']]];
+
+            case 'restore_comment':
+                wp_untrash_comment( $config['comment_id'] ?? 0 );
+                return ['port'=>'main','data'=>['comment_id'=>$config['comment_id']]];
+
+            case 'delete_trash_comment':
+                wp_delete_comment( $config['comment_id'] ?? 0 );
+                return ['port'=>'main','data'=>['comment_id'=>$config['comment_id']]];
+
+            case 'delete_comment':
+                wp_delete_comment( $config['comment_id'], true );
+                return ['port'=>'main','data'=>['post_id'=>$config['comment_id']]];
+
             case 'update_post':
                 wp_update_post([
                     'ID'           => $config['post_id'],
@@ -1442,6 +1527,13 @@ class Wordpress extends IntegrationBase {
                 wp_update_post([
                     'ID'          => $config['post_id'],
                     'post_status' => $config['post_status'],
+                ]);
+                return ['port' => 'main', 'data' => []];
+
+            case 'update_page_status':
+                wp_update_post([
+                    'ID'          => $config['page_id'],
+                    'post_status' => $config['page_status'],
                 ]);
                 return ['port' => 'main', 'data' => []];
 
