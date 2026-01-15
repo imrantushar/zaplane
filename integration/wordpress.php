@@ -635,7 +635,7 @@ class Wordpress extends IntegrationBase {
             'approve_comment'           => ['label' => ' Approve Comment'],
             'unapproved_comment'        => ['label' => 'Unapproved Comment'],
             'mark_comment_spam'         => ['label' => 'Mark Comment as Spam'],
-            'unmark_comment_spam'         => ['label' => 'Unmark Comment as Spam'],
+            'unmark_comment_spam'       => ['label' => 'Unmark Comment as Spam'],
             'activate_plugin'           => ['label' => 'Activate Plugin'],
             'deactivate_plugin'         => ['label' => 'Deactivate Plugin'],
             'switch_theme'              => ['label' => 'Theme Switch'],
@@ -814,22 +814,22 @@ class Wordpress extends IntegrationBase {
         }
 
         $post_id_actions = [
-                'unschedule_post',
-                'trash_post',
-                'restore_post',
-                'delete_trash_post',
-                'delete_post',
-                'trash_page',
-                'restore_page',
-                'delete_trash_page',
-                'delete_page',
-                'post_single',
-                'posts_metadata_all',
-                'post_permalink',
-                'post_content',
-                'post_excerpt',
-                'post_status',
-                'post_type_single',
+            'unschedule_post',
+            'trash_post',
+            'restore_post',
+            'delete_trash_post',
+            'delete_post',
+            'trash_page',
+            'restore_page',
+            'delete_trash_page',
+            'delete_page',
+            'post_single',
+            'posts_metadata_all',
+            'post_permalink',
+            'post_content',
+            'post_excerpt',
+            'post_status',
+            'post_type_single',
         ];
 
         if ( in_array( $action, $post_id_actions, true ) ) {
@@ -908,7 +908,12 @@ class Wordpress extends IntegrationBase {
             ];
         }
 
-        if ( $action === 'posts_by_post_type' ) {
+        $post_type_actions = [
+            'posts_by_post_type',
+            'unregister_post_type'
+        ];
+
+        if ( in_array( $action, $post_type_actions, true ) ) {
             return [
                 [
                     'key'     => 'post_type',
@@ -1048,7 +1053,16 @@ class Wordpress extends IntegrationBase {
                     'key'      => 'supports',
                     'label'    => 'Supports',
                     'type'     => 'multiselect',
-                    'option'   => [ 'title', 'editor', 'thumbnail', 'excerpt', 'comments', 'revisions', 'author', 'custom-fields' ],
+                    'options' => [
+                        ['label' => 'Title', 'value' => 'title' ],
+                        ['label' => 'Editor', 'value' => 'editor' ],
+                        ['label' => 'Thumbnail', 'value' => 'thumbnail' ],
+                        ['label' => 'Excerpt',   'value' => 'excerpt' ],
+                        ['label' => 'Comments',   'value' => 'comments' ],
+                        ['label' => 'Revisions',   'value' => 'revisions' ],
+                        ['label' => 'Author',   'value' => 'author' ],
+                        ['label' => 'Custom-Fields',   'value' => 'custom-fields' ],
+                    ],
                     'default'  => ['title', 'editor' ],
                     'required' => false, 
                 ],
@@ -1076,22 +1090,6 @@ class Wordpress extends IntegrationBase {
             ];
         }
 
-        if ( $action === 'unregister_post_type' ) {
-            return [
-                [
-                    'key'     => 'post_type',
-                    'label'   => 'Post Type',
-                    'type'    => 'select',
-                    'dynamic' => [
-                        'integration' => 'wordpress',
-                        'query'       => 'post_types',
-                        'select'      => [ 'name', 'label' ],
-                    ],
-                    'required' => true,
-                ],
-            ];
-        }
-
         if ( $action === 'add_post_type_support' ) {
             return [
                 [
@@ -1109,7 +1107,16 @@ class Wordpress extends IntegrationBase {
                     'key'      => 'features',
                     'label'    => 'Features (Supports)',
                     'type'     => 'multiselect',
-                    'option'   => [ 'title', 'editor', 'thumbnail', 'excerpt', 'comments', 'revisions', 'author', 'custom-fields' ],
+                    'options' => [
+                        ['label' => 'Title', 'value' => 'title' ],
+                        ['label' => 'Editor', 'value' => 'editor' ],
+                        ['label' => 'Thumbnail', 'value' => 'thumbnail' ],
+                        ['label' => 'Excerpt',   'value' => 'excerpt' ],
+                        ['label' => 'Comments',   'value' => 'comments' ],
+                        ['label' => 'Revisions',   'value' => 'revisions' ],
+                        ['label' => 'Author',   'value' => 'author' ],
+                        ['label' => 'Custom-Fields',   'value' => 'custom-fields' ],
+                    ],
                     'required' => false, 
                 ],
             ];
