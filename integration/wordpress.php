@@ -152,12 +152,7 @@ class Wordpress extends IntegrationBase {
                 if ( ! empty($node['config']['post_status']) && $post->post_status !== $node['config']['post_status'] ) {
                     return false;
                 }
-        error_log('check comment_id:' . print_r([
-                    'post_id'    => $post->ID,
-                    'post_title' => $post->post_title,
-                    'post_type'  => $post->post_type,
-                    'status'     => $post->post_status,
-                ], true));
+
                 return [
                     'post_id'    => $post->ID,
                     'post_title' => $post->post_title,
@@ -226,13 +221,6 @@ class Wordpress extends IntegrationBase {
 
                 $approved = $args[0] ?? null;
                 $comment_data = $args[1] ?? [];
-                 error_log('check pre_comment_approved:' . print_r([
-                    'approved'       => $approved,
-                    'comment_author' => $comment_data['comment_author'] ?? '',
-                    'comment_email'  => $comment_data['comment_author_email'] ?? '',
-                    'comment_content'=> $comment_data['comment_content'] ?? '',
-                    'post_id'        => $comment_data['comment_post_ID'] ?? 0,
-                ] , true));
 
                 return [
                     'approved'       => $approved,
@@ -550,11 +538,6 @@ class Wordpress extends IntegrationBase {
         ];
 
     case 'wpmu_delete_user':
-          error_log('check blog_id:' . print_r( [
-            'user_id'   => $args[0] ?? 0,
-            'user'      => $args[1] ?? null,
-            'timestamp' => current_time( 'mysql' ),
-        ] , true));
 
         return [
             'user_id'   => $args[0] ?? 0,
@@ -596,14 +579,6 @@ class Wordpress extends IntegrationBase {
         $comment_id = $args[0] ?? 0;
         $parent_id = $args[1] ?? 0;
         $comment = get_comment($comment_id);
-        error_log('check comment_id:' . print_r([
-            'comment_id' => $comment->comment_ID,
-            'parent_id' => $parent_id,
-            'post_id' => $comment->comment_post_ID,
-            'author' => $comment->comment_author,
-            'content' => $comment->comment_content,
-            'timestamp' => current_time('mysql'),
-        ], true));
         if (!$comment) return false;
         return [
             'comment_id' => $comment->comment_ID,
@@ -643,6 +618,12 @@ class Wordpress extends IntegrationBase {
             'create_comment'            => ['label'=>'Create New Comment'],
             'reply_comment'             => ['label'=>'Reply To Comment'],
             'delete_comment'            => ['label'=>'Delete Comment'],
+            'add_plugin_theme_option'   => ['label'=>'Add Option'],
+            'update_option_advanced'         => ['label' => 'Update Option'],
+            'delete_option'             => ['label'=>'Delete Option'],
+            'generate_attachment_metadata' => ['label'=>'Generate Attachment Metadata'],
+            'regenerate_image_sizes'    => ['label'=>'Resize / Regenerate Image Sizes'],
+            'set_featured_image'        => ['label'=>'Set Media Featured Image'],
         ];
     }
 
@@ -687,12 +668,6 @@ class Wordpress extends IntegrationBase {
             ];
         }
 
-        if ( $action === 'update_option' ) {
-            return [
-                ['key'=>'option_name','label'=>'Option','type'=>'text','required'=>true],
-                ['key'=>'value','label'=>'Value','type'=>'expression'],
-            ];
-        }
    if ( $action === 'untrash_post' ) {
             return [
                 [
@@ -801,6 +776,44 @@ class Wordpress extends IntegrationBase {
             ];
         }
 
+        if ($action === 'add_plugin_theme_option' ) {
+          
+            return [
+                ['key'=>'option_name','label'=>'Option','type'=>'text','required'=>true],
+                ['key'=>'value','label'=>'Value','type'=>'expression'],
+            ];
+        }
+        if ( $action === 'update_option_advanced' ) {
+    return [
+        ['key' => 'option_name', 'label' => 'Option Name', 'type' => 'text', 'required' => true],
+        ['key' => 'value', 'label' => 'New Value', 'type' => 'expression'],
+    ];
+}
+        if ($action === 'delete_option' ) {
+            return [
+                ['key'=>'option_name','label'=>'Option','type'=>'text','required'=>true],
+            ];
+        }
+
+        if ($action === 'generate_attachment_metadata' ) {
+            return [
+                ['key'=>'attachment_id','label'=>'Attachment ID','type'=>'expression','required'=>true],
+            ];
+        }
+
+        if ($action === 'regenerate_image_sizes' ) {
+            return [
+                ['key'=>'attachment_id','label'=>'Attachment ID','type'=>'expression','required'=>true],
+            ];
+        }
+
+        if ($action === 'set_featured_image' ) {   
+            return [
+                ['key'=>'post_id','label'=>'Post ID','type'=>'expression','required'=>true],
+                ['key'=>'attachment_id','label'=>'Attachment ID','type'=>'expression','required'=>true],
+            ];
+        }
+
         return [];
     }
 
@@ -823,9 +836,7 @@ class Wordpress extends IntegrationBase {
                 ]);
                 return ['port'=>'main','data'=>['post_id'=>$id]];
 
-            case 'update_option':
-                update_option( $config['option_name'], $config['value'] );
-                return ['port'=>'main','data'=>[]];
+
            case 'untrash_post':
                 $result = wp_untrash_post( $config['post_id'] );
                 return ['port'=>'main','data'=>['success'=>(bool)$result,'post_id'=>$config['post_id']]];
@@ -861,7 +872,6 @@ class Wordpress extends IntegrationBase {
 
             case 'get_user_comments_email':
                 $comments = get_comments(['author_email'=>$config['email']]);
-                error_log('check comments:' . print_r( ['port'=>'main','data'=>['comments'=>$comments,'email'=>$config['email']]] , true));
                 return ['port'=>'main','data'=>['comments'=>$comments,'email'=>$config['email']]];
 
             case 'get_comment_metadata_all':
@@ -902,8 +912,35 @@ class Wordpress extends IntegrationBase {
 
             case 'delete_comment':
                 $result = wp_delete_comment($config['comment_id'],true);
-
                 return ['port'=>'main','data'=>['success'=>(bool)$result,'comment_id'=>$config['comment_id']]];
+
+            case 'add_plugin_theme_option':
+                add_option($config['option_name'],$config['value']);
+                return ['port'=>'main','data'=>['option_name'=>$config['option_name']]];
+            case 'update_option_advanced':
+                update_option( $config['option_name'], $config['value'] );
+                return ['port'=>'main','data'=>['option_name'=>$config['option_name'],'value'=>$config['value']]];
+
+            case 'delete_option':
+                $result = delete_option($config['option_name']);
+                return ['port'=>'main','data'=>['success'=>(bool)$result,'option_name'=>$config['option_name']]];
+
+            case 'generate_attachment_metadata':
+                $file = get_attached_file($config['attachment_id']);
+                $metadata = wp_generate_attachment_metadata($config['attachment_id'],$file);
+                wp_update_attachment_metadata($config['attachment_id'],$metadata);
+                return ['port'=>'main','data'=>['attachment_id'=>$config['attachment_id'],'metadata'=>$metadata]];
+
+            case 'regenerate_image_sizes':
+                require_once(ABSPATH.'wp-admin/includes/image.php');
+                $file = get_attached_file($config['attachment_id']);
+                $metadata = wp_generate_attachment_metadata($config['attachment_id'],$file);
+                wp_update_attachment_metadata($config['attachment_id'],$metadata);
+                return ['port'=>'main','data'=>['attachment_id'=>$config['attachment_id'],'metadata'=>$metadata,'success'=>!empty($metadata)]];
+
+            case 'set_featured_image':
+                $result = set_post_thumbnail($config['post_id'],$config['attachment_id']);
+                return ['port'=>'main','data'=>['success'=>(bool)$result,'post_id'=>$config['post_id'],'attachment_id'=>$config['attachment_id']]];
                 
         }
 

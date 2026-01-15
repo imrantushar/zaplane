@@ -418,24 +418,7 @@
 					],
 					"outputs": ["main"]
 				},
-				"update_option": {
-					"key": "update_option",
-					"label": "Update Option",
-					"schema": [
-						{
-							"key": "option_name",
-							"label": "Option",
-							"type": "text",
-							"required": true
-						},
-						{
-							"key": "value",
-							"label": "Value",
-							"type": "expression"
-						}
-					],
-					"outputs": ["main"]
-				},
+			
 				"untrash_post": {
 					"key": "untrash_post",
 					"label": "Untrash Post",
@@ -645,6 +628,100 @@
 						{
 							"key": "comment_id",
 							"label": "Comment ID",
+							"type": "expression",
+							"required": true
+						}
+					],
+					"outputs": ["main"]
+				},
+				"add_plugin_theme_option": {
+					"key": "add_plugin_theme_option",
+					"label": "Add Option",
+					"schema": [
+						{
+							"key": "option_name",
+							"label": "Option",
+							"type": "text",
+							"required": true
+						},
+						{
+							"key": "value",
+							"label": "Value",
+							"type": "expression"
+						}
+					],
+					"outputs": ["main"]
+				},
+				"update_option_advanced": {
+					"key": "update_option_advanced",
+					"label": "Update Option",
+					"schema": [
+						{
+							"key": "option_name",
+							"label": "Option",
+							"type": "text",
+							"required": true
+						},
+						{
+							"key": "value",
+							"label": "Value",
+							"type": "expression"
+						}
+					],
+					"outputs": ["main"]
+				},
+				"delete_option": {
+					"key": "delete_option",
+					"label": "Delete Option",
+					"schema": [
+						{
+							"key": "option_name",
+							"label": "Option",
+							"type": "text",
+							"required": true
+						}
+					],
+					"outputs": ["main"]
+				},
+				"generate_attachment_metadata": {
+					"key": "generate_attachment_metadata",
+					"label": "Generate Attachment Metadata",
+					"schema": [
+						{
+							"key": "attachment_id",
+							"label": "Attachment ID",
+							"type": "expression",
+							"required": true
+						}
+					],
+					"outputs": ["main"]
+				},
+				"regenerate_image_sizes": {
+					"key": "regenerate_image_sizes",
+					"label": "Resize / Regenerate Image Sizes",
+					"schema": [
+						{
+							"key": "attachment_id",
+							"label": "Attachment ID",
+							"type": "expression",
+							"required": true
+						}
+					],
+					"outputs": ["main"]
+				},
+				"set_featured_image": {
+					"key": "set_featured_image",
+					"label": "Set Media Featured Image",
+					"schema": [
+						{
+							"key": "post_id",
+							"label": "Post ID",
+							"type": "expression",
+							"required": true
+						},
+						{
+							"key": "attachment_id",
+							"label": "Attachment ID",
 							"type": "expression",
 							"required": true
 						}
