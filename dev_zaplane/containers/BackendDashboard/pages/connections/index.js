@@ -48,7 +48,7 @@ const statusOptions = [
 const Connections = () => {
     const dispatch = useDispatch();
 
-    const{ connections,singleData,authFields} = useSelector(
+    const{ list,singleData,authFields} = useSelector(
         (state) => state.connections || []
     );
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -73,6 +73,7 @@ const Connections = () => {
             })
         );
     }, [selectedApp, selectedAuthType, dispatch]);
+    console.log(list,'authFields')
 
     const handleStatusChange = (row, selected) => {
         dispatch(
@@ -159,7 +160,7 @@ const Connections = () => {
                 </HStack>
 
                 <ZAPTable
-                    data={connections}
+                    data={list}
                     rowKey="id"
                     size="sm"
                     columns={[

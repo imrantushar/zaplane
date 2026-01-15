@@ -1562,11 +1562,11 @@ const statusOptions = [{
 }];
 const Connections = () => {
   const dispatch = (0,react_redux__WEBPACK_IMPORTED_MODULE_1__.useDispatch)();
-  const connections = (0,react_redux__WEBPACK_IMPORTED_MODULE_1__.useSelector)(state => state.connections?.list || []);
-  const singleData = (0,react_redux__WEBPACK_IMPORTED_MODULE_1__.useSelector)(state => state.connections?.singleData);
   const {
+    list,
+    singleData,
     authFields
-  } = (0,react_redux__WEBPACK_IMPORTED_MODULE_1__.useSelector)(state => state.connections);
+  } = (0,react_redux__WEBPACK_IMPORTED_MODULE_1__.useSelector)(state => state.connections || []);
   const [isModalOpen, setIsModalOpen] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
   const [detailsOpen, setDetailsOpen] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
   const [selectedApp, setSelectedApp] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(null);
@@ -1583,6 +1583,7 @@ const Connections = () => {
       authType: selectedAuthType || undefined
     }));
   }, [selectedApp, selectedAuthType, dispatch]);
+  console.log(list, 'authFields');
   const handleStatusChange = (row, selected) => {
     dispatch((0,_ZAPRedux_Slices_connectionsSlice_connectionsSlice__WEBPACK_IMPORTED_MODULE_12__.updateConnection)({
       id: row.id,
@@ -1654,7 +1655,7 @@ const Connections = () => {
           children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_8__.__)("Create credential", "zaplane")
         })]
       }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_17__.jsx)(_ZAPComponents_Table__WEBPACK_IMPORTED_MODULE_15__["default"], {
-        data: connections,
+        data: list,
         rowKey: "id",
         size: "sm",
         columns: [{
