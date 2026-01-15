@@ -215,12 +215,19 @@ export default function ActionDrawer({
 
         resetAll();
     };
-
+    console.log(mode, 'modeeee')
     return (
         <ZAPDrawer
             open={open}
             onClose={resetAll}
-            title={!mode ? "Choose Type" : selectedItem?.name}
+            title={
+                !mode
+                    ? "Add Action"
+                    : selectedItem?.name
+                        ? selectedItem.name
+                        : "App"
+            }
+
             placement="end"
             size="md"
             footer={
@@ -252,9 +259,13 @@ export default function ActionDrawer({
                                 setSelectedItem(item);
                                 setSearch("");
                             }}
+                            background="white"
+                            _hover={{
+                                    bg: "var(--zaplane-body-background)",
+                                }}
                         >
-                            <ZAPText>{item.name}</ZAPText>
-                            <ZAPText fontSize="xs" color="gray.400">
+                            <ZAPText color='black'>{item.name}</ZAPText>
+                            <ZAPText fontSize="xs" color="black">
                                 {item.type === "tools" ? "Tool" : "App"}
                             </ZAPText>
                         </Button>

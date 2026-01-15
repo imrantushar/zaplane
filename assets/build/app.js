@@ -2787,10 +2787,11 @@ function ActionDrawer({
     }
     resetAll();
   };
+  console.log(mode, 'modeeee');
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsxs)(_ZAPComponents_Drawer__WEBPACK_IMPORTED_MODULE_7__["default"], {
     open: open,
     onClose: resetAll,
-    title: !mode ? "Choose Type" : selectedItem?.name,
+    title: !mode ? "Add Action" : selectedItem?.name ? selectedItem.name : "App",
     placement: "end",
     size: "md",
     footer: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.HStack, {
@@ -2818,11 +2819,16 @@ function ActionDrawer({
           setSelectedItem(item);
           setSearch("");
         },
+        background: "white",
+        _hover: {
+          bg: "var(--zaplane-body-background)"
+        },
         children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_ZAPComponents_Text__WEBPACK_IMPORTED_MODULE_10__["default"], {
+          color: "black",
           children: item.name
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_ZAPComponents_Text__WEBPACK_IMPORTED_MODULE_10__["default"], {
           fontSize: "xs",
-          color: "gray.400",
+          color: "black",
           children: item.type === "tools" ? "Tool" : "App"
         })]
       }, `${item.type}-${item.id}`))
