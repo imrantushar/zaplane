@@ -32,26 +32,13 @@ const VersionHistoryTable = ({
     };
   };
 
-  if (isLoading) {
-    return (
-      <ZAPLoading />
-
-    );
-  }
-  if (!versions.length) {
-    return (
-      <Flex align="center" justify="center" h="100%">
-        <Text>Right now Have no Version</Text>
-      </Flex>
-
-    );
-  }
-
   return (
     <ZAPTable
       data={versions}         
       rowKey="id"             
-      variant="line"          
+      variant="line"
+      isLoading={isLoading}
+      noDataText={"Right now Have no Version"}        
       size="sm"                
       caption="Version History" 
       columns={[

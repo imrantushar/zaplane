@@ -906,59 +906,87 @@ const ZAPTab = ({
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (/* binding */ ZAPTable)
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/stack/h-stack.js");
-/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/table/table.js");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/flex/flex.js");
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/stack/h-stack.js");
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/table/table.js");
+/* harmony import */ var _ZAPComponents_Loading__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @ZAPComponents/Loading */ "./dev_zaplane/components/Loading/index.js");
+/* harmony import */ var _ZAPComponents_Text__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @ZAPComponents/Text */ "./dev_zaplane/components/Text/index.js");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__);
 
 
 
-function ZAPTable({
+
+
+const ZAPTable = ({
   data = [],
   columns = [],
   rowKey = "id",
   actionsRenderer,
   caption,
   variant = "line",
-  size = "sm"
-}) {
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.TableRoot, {
+  size = "sm",
+  isLoading = false,
+  noDataText = "No data have"
+}) => {
+  const colSpan = columns.length + (actionsRenderer ? 1 : 0);
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.TableRoot, {
     size: size,
     variant: variant,
-    children: [caption && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.TableCaption, {
+    children: [caption && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.TableCaption, {
       children: caption
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.TableHeader, {
-      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.TableRow, {
-        children: [columns.map((col, i) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.TableColumnHeader, {
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.TableHeader, {
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.TableRow, {
+        children: [columns.map((col, i) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.TableColumnHeader, {
           textAlign: col.textAlign || "left",
           w: col.width,
           children: col.label
-        }, i)), actionsRenderer && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.TableColumnHeader, {
+        }, i)), actionsRenderer && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.TableColumnHeader, {
           textAlign: "center",
           children: "Actions"
         })]
       })
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.TableBody, {
-      children: Array.isArray(data) && data?.map(row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.TableRow, {
-        children: [columns.map((col, i) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.TableCell, {
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.TableBody, {
+      children: [isLoading && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.TableRow, {
+        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.TableCell, {
+          colSpan: colSpan,
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Flex, {
+            justify: "center",
+            py: 6,
+            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_ZAPComponents_Loading__WEBPACK_IMPORTED_MODULE_4__["default"], {})
+          })
+        })
+      }), !isLoading && Array.isArray(data) && data.map(row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.TableRow, {
+        children: [columns.map((col, i) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.TableCell, {
           textAlign: col.textAlign || "left",
           children: col.render ? col.render(row) : row[col.key] || "--"
-        }, i)), actionsRenderer && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.TableCell, {
+        }, i)), actionsRenderer && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.TableCell, {
           textAlign: "center",
-          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.HStack, {
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.HStack, {
             justify: "center",
             spacing: "1",
             children: actionsRenderer(row)
           })
         })]
-      }, row[rowKey]))
+      }, row[rowKey])), !isLoading && Array.isArray(data) && data.length === 0 && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.TableRow, {
+        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.TableCell, {
+          colSpan: colSpan,
+          textAlign: "center",
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_ZAPComponents_Text__WEBPACK_IMPORTED_MODULE_5__["default"], {
+            fontSize: "sm",
+            color: "gray.500",
+            children: noDataText
+          })
+        })
+      })]
     })]
   });
-}
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (ZAPTable);
 
 /***/ },
 
@@ -2421,7 +2449,8 @@ const CreateWorkflows = () => {
               onClick: () => workflowDeleteHandler(row.id),
               children: "Delete"
             })]
-          })
+          }),
+          isLoading: isLoading
         })]
       })
     }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_ZAPComponents_Modal_WPModal__WEBPACK_IMPORTED_MODULE_13__["default"], {
@@ -3684,18 +3713,17 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/text/index.js");
 /* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/badge/badge.js");
 /* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/button/button.js");
-/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/flex/flex.js");
-/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/stack/h-stack.js");
-/* harmony import */ var react_redux__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/dist/react-redux.mjs");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! react */ "react");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_6__);
-/* harmony import */ var _ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @ZAPRedux/Slices/workFlowSlice/workFlowSlice */ "./dev_zaplane/redux/Slices/workFlowSlice/workFlowSlice.js");
-/* harmony import */ var _ZAPComponents_LogDetails__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @ZAPComponents/LogDetails */ "./dev_zaplane/components/LogDetails/index.js");
-/* harmony import */ var _helper__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../../helper */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/helper.js");
-/* harmony import */ var _ZAPComponents_Loading__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @ZAPComponents/Loading */ "./dev_zaplane/components/Loading/index.js");
-/* harmony import */ var _ZAPComponents_Table__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @ZAPComponents/Table */ "./dev_zaplane/components/Table/index.js");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__);
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/stack/h-stack.js");
+/* harmony import */ var react_redux__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/dist/react-redux.mjs");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var _ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @ZAPRedux/Slices/workFlowSlice/workFlowSlice */ "./dev_zaplane/redux/Slices/workFlowSlice/workFlowSlice.js");
+/* harmony import */ var _ZAPComponents_LogDetails__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @ZAPComponents/LogDetails */ "./dev_zaplane/components/LogDetails/index.js");
+/* harmony import */ var _helper__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../../helper */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/helper.js");
+/* harmony import */ var _ZAPComponents_Loading__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @ZAPComponents/Loading */ "./dev_zaplane/components/Loading/index.js");
+/* harmony import */ var _ZAPComponents_Table__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @ZAPComponents/Table */ "./dev_zaplane/components/Table/index.js");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__);
 
 
 
@@ -3708,12 +3736,12 @@ __webpack_require__.r(__webpack_exports__);
 const RunsTable = ({
   runs = []
 }) => {
-  const dispatch = (0,react_redux__WEBPACK_IMPORTED_MODULE_5__.useDispatch)();
-  const [showDetails, setShowDetails] = (0,react__WEBPACK_IMPORTED_MODULE_6__.useState)(false);
-  const [activeRunId, setActiveRunId] = (0,react__WEBPACK_IMPORTED_MODULE_6__.useState)(null);
+  const dispatch = (0,react_redux__WEBPACK_IMPORTED_MODULE_4__.useDispatch)();
+  const [showDetails, setShowDetails] = (0,react__WEBPACK_IMPORTED_MODULE_5__.useState)(false);
+  const [activeRunId, setActiveRunId] = (0,react__WEBPACK_IMPORTED_MODULE_5__.useState)(null);
   const {
     isLoading
-  } = (0,react_redux__WEBPACK_IMPORTED_MODULE_5__.useSelector)(state => state.workflows);
+  } = (0,react_redux__WEBPACK_IMPORTED_MODULE_4__.useSelector)(state => state.workflows);
   const statusStyle = status => {
     switch (status) {
       case "completed":
@@ -3739,7 +3767,7 @@ const RunsTable = ({
     }
   };
   if (showDetails) {
-    return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_ZAPComponents_LogDetails__WEBPACK_IMPORTED_MODULE_8__["default"], {
+    return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_ZAPComponents_LogDetails__WEBPACK_IMPORTED_MODULE_7__["default"], {
       runId: activeRunId,
       onBack: () => {
         setShowDetails(false);
@@ -3747,36 +3775,25 @@ const RunsTable = ({
       }
     });
   }
-  if (isLoading) {
-    return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_ZAPComponents_Loading__WEBPACK_IMPORTED_MODULE_10__["default"], {});
-  }
-  if (!runs.length) {
-    return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Flex, {
-      align: "center",
-      justify: "center",
-      h: "100%",
-      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Text, {
-        children: "No History available"
-      })
-    });
-  }
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_ZAPComponents_Table__WEBPACK_IMPORTED_MODULE_11__["default"], {
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_ZAPComponents_Table__WEBPACK_IMPORTED_MODULE_10__["default"], {
     data: runs,
     rowKey: "id",
     variant: "line",
+    isLoading: isLoading,
+    noDataText: "Have no History Yet",
     size: "sm",
     caption: "Workflow Execution History",
     columns: [{
       label: "Run ID",
       key: "id",
-      render: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Text, {
+      render: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Text, {
         fontWeight: "medium",
         children: ["#", row.id]
       })
     }, {
       label: "Status",
       key: "status",
-      render: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Badge, {
+      render: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Badge, {
         px: "2",
         py: "0.5",
         rounded: "md",
@@ -3788,32 +3805,32 @@ const RunsTable = ({
     }, {
       label: "Duration",
       key: "duration",
-      render: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Text, {
+      render: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Text, {
         textAlign: "center",
         fontSize: "sm",
-        children: (0,_helper__WEBPACK_IMPORTED_MODULE_9__.getDuration)(row.started_at, row.finished_at)
+        children: (0,_helper__WEBPACK_IMPORTED_MODULE_8__.getDuration)(row.started_at, row.finished_at)
       })
     }],
-    actionsRenderer: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.HStack, {
+    actionsRenderer: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.HStack, {
       justify: "flex-end",
       spacing: "1",
-      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Button, {
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Button, {
         size: "xs",
         variant: "outline",
         onClick: () => {
           setActiveRunId(row.id);
           setShowDetails(true);
-          dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_7__.nodeLogsRunDetails)(row.id));
+          dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_6__.nodeLogsRunDetails)(row.id));
         },
         children: "Details"
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Button, {
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Button, {
         size: "xs",
         variant: "outline",
-        onClick: () => dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_7__.getSingleRun)(row.id)),
+        onClick: () => dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_6__.getSingleRun)(row.id)),
         children: "Re-execute"
       })]
     }),
-    footerRenderer: () => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Text, {
+    footerRenderer: () => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Text, {
       fontSize: "sm",
       color: "gray.600",
       children: ["Total Runs: ", runs.length]
@@ -3838,16 +3855,15 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/text/index.js");
 /* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/badge/badge.js");
 /* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/button/button.js");
-/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/flex/flex.js");
-/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/stack/h-stack.js");
-/* harmony import */ var _ZAPComponents_Loading__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @ZAPComponents/Loading */ "./dev_zaplane/components/Loading/index.js");
-/* harmony import */ var _ZAPComponents_Table__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @ZAPComponents/Table */ "./dev_zaplane/components/Table/index.js");
-/* harmony import */ var _ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @ZAPRedux/Slices/workFlowSlice/workFlowSlice */ "./dev_zaplane/redux/Slices/workFlowSlice/workFlowSlice.js");
-/* harmony import */ var lucide_react__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! lucide-react */ "./node_modules/lucide-react/dist/esm/icons/circle-check-big.js");
-/* harmony import */ var lucide_react__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! lucide-react */ "./node_modules/lucide-react/dist/esm/icons/eye.js");
-/* harmony import */ var react_redux__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/dist/react-redux.mjs");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__);
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/stack/h-stack.js");
+/* harmony import */ var _ZAPComponents_Loading__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @ZAPComponents/Loading */ "./dev_zaplane/components/Loading/index.js");
+/* harmony import */ var _ZAPComponents_Table__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @ZAPComponents/Table */ "./dev_zaplane/components/Table/index.js");
+/* harmony import */ var _ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @ZAPRedux/Slices/workFlowSlice/workFlowSlice */ "./dev_zaplane/redux/Slices/workFlowSlice/workFlowSlice.js");
+/* harmony import */ var lucide_react__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! lucide-react */ "./node_modules/lucide-react/dist/esm/icons/circle-check-big.js");
+/* harmony import */ var lucide_react__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! lucide-react */ "./node_modules/lucide-react/dist/esm/icons/eye.js");
+/* harmony import */ var react_redux__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/dist/react-redux.mjs");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__);
 
 
 
@@ -3859,10 +3875,10 @@ const VersionHistoryTable = ({
   versions = [],
   id
 }) => {
-  const dispatch = (0,react_redux__WEBPACK_IMPORTED_MODULE_10__.useDispatch)();
+  const dispatch = (0,react_redux__WEBPACK_IMPORTED_MODULE_9__.useDispatch)();
   const {
     isLoading
-  } = (0,react_redux__WEBPACK_IMPORTED_MODULE_10__.useSelector)(state => state.workflows);
+  } = (0,react_redux__WEBPACK_IMPORTED_MODULE_9__.useSelector)(state => state.workflows);
   const statusStyle = isActive => {
     if (isActive === "1") {
       return {
@@ -3875,43 +3891,32 @@ const VersionHistoryTable = ({
       bg: "gray.100"
     };
   };
-  if (isLoading) {
-    return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_ZAPComponents_Loading__WEBPACK_IMPORTED_MODULE_5__["default"], {});
-  }
-  if (!versions.length) {
-    return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Flex, {
-      align: "center",
-      justify: "center",
-      h: "100%",
-      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Text, {
-        children: "Right now Have no Version"
-      })
-    });
-  }
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_ZAPComponents_Table__WEBPACK_IMPORTED_MODULE_6__["default"], {
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_ZAPComponents_Table__WEBPACK_IMPORTED_MODULE_5__["default"], {
     data: versions,
     rowKey: "id",
     variant: "line",
+    isLoading: isLoading,
+    noDataText: "Right now Have no Version",
     size: "sm",
     caption: "Version History",
     columns: [{
       label: "ID",
       key: "id",
-      render: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Text, {
+      render: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Text, {
         fontWeight: "medium",
         children: ["#", row.id]
       })
     }, {
       label: "Graph Hash",
       key: "graph_hash",
-      render: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Text, {
+      render: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Text, {
         fontSize: "sm",
         children: [row.graph_hash.slice(0, 12), "\u2026"]
       })
     }, {
       label: "Status",
       key: "is_active",
-      render: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Badge, {
+      render: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Badge, {
         px: "2",
         py: "0.5",
         rounded: "md",
@@ -3922,31 +3927,31 @@ const VersionHistoryTable = ({
     }, {
       label: "Created At",
       key: "created_at",
-      render: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Text, {
+      render: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Text, {
         children: row.created_at
       })
     }],
-    actionsRenderer: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.HStack, {
+    actionsRenderer: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.HStack, {
       justify: "flex-end",
       spacing: 1,
-      children: [row.is_active !== "1" && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Button, {
+      children: [row.is_active !== "1" && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Button, {
         size: "xs",
         variant: "outline",
-        onClick: () => dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_7__.versionActive)({
+        onClick: () => dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_6__.versionActive)({
           id,
           versionID: row.id
         })),
-        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(lucide_react__WEBPACK_IMPORTED_MODULE_8__["default"], {
+        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(lucide_react__WEBPACK_IMPORTED_MODULE_7__["default"], {
           size: 14
         })
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Button, {
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Button, {
         size: "xs",
         variant: "ghost",
-        onClick: () => dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_7__.getPreviewOldVersion)({
+        onClick: () => dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_6__.getPreviewOldVersion)({
           id,
           versionID: row.id
         })),
-        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(lucide_react__WEBPACK_IMPORTED_MODULE_9__["default"], {
+        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(lucide_react__WEBPACK_IMPORTED_MODULE_8__["default"], {
           size: 14
         })
       })]
