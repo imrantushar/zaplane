@@ -632,6 +632,10 @@ class Wordpress extends IntegrationBase {
             'register_post_type'        => ['label' => 'Register Post Type'],
             'unregister_post_type'      => ['label' => 'Unregister Post Type'],
             'add_post_type_support'     => ['label' => 'Add Post Type Features'],
+            'approve_comment'           => ['label' => ' Approve Comment'],
+            'unapproved_comment'        => ['label' => 'Unapproved Comment'],
+            'mark_comment_spam'         => ['label' => 'Mark Comment as Spam'],
+            'unmark_comment_spam'         => ['label' => 'Unmark Comment as Spam'],
             'activate_plugin'           => ['label' => 'Activate Plugin'],
             'deactivate_plugin'         => ['label' => 'Deactivate Plugin'],
             'switch_theme'              => ['label' => 'Theme Switch'],
@@ -1107,6 +1111,24 @@ class Wordpress extends IntegrationBase {
                     'type'     => 'multiselect',
                     'option'   => [ 'title', 'editor', 'thumbnail', 'excerpt', 'comments', 'revisions', 'author', 'custom-fields' ],
                     'required' => false, 
+                ],
+            ];
+        }
+
+        $comment_actions = [
+            'approve_comment',
+            'unapproved_comment',
+            'mark_comment_spam',
+            'unmark_comment_spam',
+        ];
+
+        if ( in_array( $action, $comment_actions, true ) ) {
+            return [
+                [
+                    'key'     => 'comment_id',
+                    'label'   => 'Comment ID',
+                    'type'    => 'expression',
+                    'required' => true,
                 ],
             ];
         }
@@ -1695,7 +1717,34 @@ class Wordpress extends IntegrationBase {
                     add_post_type_support( $post_type, $feature );
                 }
                 return ['port'=>'main', 'data'=>['success' => true, 'post_type' => $post_type, 'features' => $features ]];
-
+            
+            case 'approve_comment':
+                $comment_id = $config['comment_id'] ?? 0;
+                if ( $comment_id ) {
+                    wp_set_comment_status( $comment_id, 'approve' );
+                }
+                return ['port'=>'main', 'data'=>['success' => true, 'comment_id' => $comment_id, 'status' => 'approve' ]];
+            
+            case 'unapproved_comment':
+                $comment_id = $config['comment_id'] ?? 0;
+                if ( $comment_id ) {
+                    wp_set_comment_status( $comment_id, 'hold' );
+                }
+                return ['port'=>'main', 'data'=>['success' => true, 'comment_id' => $comment_id, 'status' => 'unapproved' ]];
+            
+            case 'mark_comment_spam':
+                $comment_id = $config['comment_id'] ?? 0;
+                if ( $comment_id ) {
+                    wp_spam_comment( $comment_id );
+                }
+                return ['port'=>'main', 'data'=>['success' => true, 'comment_id' => $comment_id, 'status' => 'spam' ]];
+            
+            case 'unmark_comment_spam':
+                $comment_id = $config['comment_id'] ?? 0;
+                if ( $comment_id ) {
+                    wp_unspam_comment( $comment_id );
+                }
+                return ['port'=>'main', 'data'=>['success' => true, 'comment_id' => $comment_id, 'status' => 'approve' ]];
 
             case 'activate_plugin' : 
                 if ( $plugin = $config['plugin'] ?? '' ) {

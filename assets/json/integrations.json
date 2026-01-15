@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-01-15 06:31:39",
+    "generated_at": "2026-01-15 06:58:36",
     "integrations": {
         "wordpress": {
             "slug": "wordpress",
@@ -1338,6 +1338,66 @@
                                 "custom-fields"
                             ],
                             "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "approve_comment": {
+                    "key": "approve_comment",
+                    "label": " Approve Comment",
+                    "schema": [
+                        {
+                            "key": "comment_id",
+                            "label": "Comment ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "unapproved_comment": {
+                    "key": "unapproved_comment",
+                    "label": "Unapproved Comment",
+                    "schema": [
+                        {
+                            "key": "comment_id",
+                            "label": "Comment ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "mark_comment_spam": {
+                    "key": "mark_comment_spam",
+                    "label": "Mark Comment as Spam",
+                    "schema": [
+                        {
+                            "key": "comment_id",
+                            "label": "Comment ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "unmark_comment_spam": {
+                    "key": "unmark_comment_spam",
+                    "label": "Unmark Comment as Spam",
+                    "schema": [
+                        {
+                            "key": "comment_id",
+                            "label": "Comment ID",
+                            "type": "expression",
+                            "required": true
                         }
                     ],
                     "outputs": [
