@@ -24,6 +24,7 @@ import { useDispatch } from "react-redux";
 import Select from "react-select";
 import ActionFieldRenderer from "../Components/ActionFieldRenderer/ActionFieldRenderer";
 import ZAPTab from "@ZAPComponents/Tab";
+import { IoIosArrowForward } from "react-icons/io";
 
 const APPS = Object.entries(integrations.apps || {}).map(([key, value]) => ({
     id: value.slug || key,
@@ -238,7 +239,7 @@ export default function ActionDrawer({
                 placeholder="Search apps or tools..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                
+
             />
             {search && (
                 <VStack spacing={2} align="stretch">
@@ -252,26 +253,42 @@ export default function ActionDrawer({
                                 setSearch("");
                             }}
                         >
-                            <Text>{item.name}</Text>
-                            <Text fontSize="xs" color="gray.400">
+                            <ZAPText>{item.name}</ZAPText>
+                            <ZAPText fontSize="xs" color="gray.400">
                                 {item.type === "tools" ? "Tool" : "App"}
-                            </Text>
+                            </ZAPText>
                         </Button>
                     ))}
                 </VStack>
             )}
             {!mode && !search && (
                 <VStack spacing={4}>
-                    <Button w="100%" justifyContent="left" onClick={() => setMode("app")}>
-                        Apps
+                    <Button
+                        w="100%"
+                        background="white"
+                        color="black"
+                        justifyContent="space-between"
+                        transition="all 0.2s ease"
+                        _hover={{
+                            bg: "var(--zaplane-body-background)",
+                            "& svg": { transform: "translateX(4px)" },
+                        }}
+                        onClick={() => setMode("app")}>
+                        <span>Apps</span>
+                        <IoIosArrowForward />
                     </Button>
 
                     {(node?.data?.action !== "trigger" || source === "add") &&
                         TOOLS.map(tool => (
                             <Button
+                                background="white"
+                                color="black"
                                 key={tool.id}
                                 justifyContent="left"
                                 w="100%"
+                                _hover={{
+                                    bg: "var(--zaplane-body-background)",
+                                }}
                                 onClick={() => {
                                     setMode("tools");
                                     setSelectedItem(tool);
@@ -287,10 +304,15 @@ export default function ActionDrawer({
                 <VStack>
                     {LIST.map(item => (
                         <Button
+                            background="white"
+                            color="black"
                             key={item.id}
                             w="100%"
                             onClick={() => setSelectedItem(item)}
                             justifyContent="left"
+                            _hover={{
+                                bg: "var(--zaplane-body-background)",
+                            }}
                         >
                             {item.name}
                         </Button>
