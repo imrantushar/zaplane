@@ -2563,11 +2563,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* binding */ ActionDrawer)
 /* harmony export */ });
-/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/box/index.js");
-/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/text/index.js");
-/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/button/button.js");
-/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/code/code.js");
-/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/flex/flex.js");
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/text/index.js");
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/button/button.js");
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/code/code.js");
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/flex/flex.js");
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/input/input.js");
 /* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/stack/h-stack.js");
 /* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/stack/v-stack.js");
 /* harmony import */ var _ZAPComponents_Drawer__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @ZAPComponents/Drawer */ "./dev_zaplane/components/Drawer/index.js");
@@ -2629,30 +2629,19 @@ function ActionDrawer({
   const [selectedItem, setSelectedItem] = (0,react__WEBPACK_IMPORTED_MODULE_14__.useState)(null);
   const [dynamicOptions, setDynamicOptions] = (0,react__WEBPACK_IMPORTED_MODULE_14__.useState)({});
   const [loadingFields, setLoadingFields] = (0,react__WEBPACK_IMPORTED_MODULE_14__.useState)({});
+  const [search, setSearch] = (0,react__WEBPACK_IMPORTED_MODULE_14__.useState)("");
   const isTrigger = node?.data?.action === "trigger" && source === "node";
   (0,react__WEBPACK_IMPORTED_MODULE_14__.useEffect)(() => {
     if (!open || !node?.data || source === "add") return;
     const nodeData = node.data;
-    let detectedMode = null;
-    let detectedItem = null;
-    detectedItem = TOOLS.find(t => t.name === nodeData.app || t.id === nodeData.app);
+    let detectedItem = TOOLS.find(t => t.name === nodeData.app || t.id === nodeData.app) || APPS.find(a => a.name === nodeData.app || a.id === nodeData.app);
     if (detectedItem) {
-      detectedMode = "tools";
-    } else {
-      detectedItem = APPS.find(a => a.name === nodeData.app || a.id === nodeData.app);
-      detectedMode = "app";
+      setMode(TOOLS.includes(detectedItem) ? "tools" : "app");
+      setSelectedItem(detectedItem);
     }
-
-    //set state
-    setMode(detectedMode);
-    setSelectedItem(detectedItem || null);
-    setStep("select");
-
-    //action type
     if (nodeData.event) {
       setFieldValue("actionType", nodeData.event);
     }
-    //default config
     if (nodeData.config) {
       Object.entries(nodeData.config).forEach(([key, value]) => {
         setFieldValue(key, value);
@@ -2663,16 +2652,30 @@ function ActionDrawer({
     setMode(null);
     setStep("select");
     setSelectedItem(null);
+    setSearch("");
     resetForm();
     onClose();
   };
   const LIST = mode === "app" ? APPS : mode === "tools" ? TOOLS : [];
+
+  // search list)
+  const SEARCH_LIST = (0,react__WEBPACK_IMPORTED_MODULE_14__.useMemo)(() => {
+    if (!search) return [];
+    const q = search.toLowerCase();
+    const apps = APPS.map(a => ({
+      ...a,
+      type: "app"
+    }));
+    const tools = isTrigger ? [] : TOOLS.map(t => ({
+      ...t,
+      type: "tools"
+    }));
+    return [...apps, ...tools].filter(item => item.name.toLowerCase().includes(q));
+  }, [search, isTrigger]);
   const getIntegration = () => {
     if (!selectedItem?.id) return null;
     return mode === "tools" ? _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_12__.integrations.tools?.[selectedItem.id] : _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_12__.integrations.apps?.[selectedItem.id];
   };
-
-  // toll action auto seleted
   (0,react__WEBPACK_IMPORTED_MODULE_14__.useEffect)(() => {
     if (mode !== "tools" || !selectedItem) return;
     const tool = _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_12__.integrations.tools?.[selectedItem.id];
@@ -2681,8 +2684,6 @@ function ActionDrawer({
       setFieldValue("actionType", actions[0].key);
     }
   }, [mode, selectedItem]);
-
-  //    action option
   const actionOptions = (0,react__WEBPACK_IMPORTED_MODULE_14__.useMemo)(() => {
     const integration = getIntegration();
     if (!integration) return [];
@@ -2703,8 +2704,6 @@ function ActionDrawer({
       value: a.key
     }));
   }, [selectedItem, mode, node]);
-
-  // shema shows
   const selectedActionFields = (0,react__WEBPACK_IMPORTED_MODULE_14__.useMemo)(() => {
     const integration = getIntegration();
     if (!integration || !values?.actionType) return [];
@@ -2716,8 +2715,6 @@ function ActionDrawer({
     }
     return integration.actions?.[values.actionType]?.schema || [];
   }, [selectedItem, values?.actionType, mode, node]);
-
-  // dainamic filed
   const getKey = field => `${mode}:${selectedItem?.id}:${field.key}`;
   const fetchDynamicOptions = async field => {
     if (!field.dynamic) return;
@@ -2767,38 +2764,60 @@ function ActionDrawer({
     size: "md",
     footer: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.HStack, {
       justify: "space-between",
-      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Button, {
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Button, {
         variant: "ghost",
         onClick: resetAll,
         children: "Cancel"
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Button, {
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Button, {
         onClick: handleContinue,
         children: step === "test" ? "Submit" : "Continue"
       })]
     }),
-    children: [!mode && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_6__.VStack, {
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Input, {
+      placeholder: "Search apps or tools...",
+      value: search,
+      onChange: e => setSearch(e.target.value)
+    }), search && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_6__.VStack, {
+      spacing: 2,
+      align: "stretch",
+      children: SEARCH_LIST.map(item => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Button, {
+        justifyContent: "space-between",
+        onClick: () => {
+          setMode(item.type);
+          setSelectedItem(item);
+          setSearch("");
+        },
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Text, {
+          children: item.name
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Text, {
+          fontSize: "xs",
+          color: "gray.400",
+          children: item.type === "tools" ? "Tool" : "App"
+        })]
+      }, `${item.type}-${item.id}`))
+    }), !mode && !search && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_6__.VStack, {
       spacing: 4,
-      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Button, {
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Button, {
         w: "100%",
         justifyContent: "left",
         onClick: () => setMode("app"),
         children: "Apps"
-      }), (node?.data?.action !== "trigger" || source === "add") && TOOLS.map(tool => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Button, {
+      }), (node?.data?.action !== "trigger" || source === "add") && TOOLS.map(tool => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Button, {
+        justifyContent: "left",
         w: "100%",
-        justifyContent: "space-between",
         onClick: () => {
           setMode("tools");
           setSelectedItem(tool);
         },
         children: tool.name
       }, tool.id))]
-    }), mode && !selectedItem && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_6__.VStack, {
-      children: [LIST.map(item => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Button, {
-        justifyContent: "left",
+    }), mode && !selectedItem && !search && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_6__.VStack, {
+      children: [LIST.map(item => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Button, {
         w: "100%",
         onClick: () => setSelectedItem(item),
+        justifyContent: "left",
         children: item.name
-      }, item.id)), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Button, {
+      }, item.id)), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Button, {
         size: "sm",
         variant: "ghost",
         onClick: () => setMode(null),
@@ -2818,35 +2837,32 @@ function ActionDrawer({
             placeholder: "Select Action Type",
             isClearable: true,
             mb: 4
-          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Flex, {
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Flex, {
             direction: "column",
             gap: 4,
-            children: selectedActionFields.map(field => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
-              children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_Components_ActionFieldRenderer_ActionFieldRenderer__WEBPACK_IMPORTED_MODULE_16__["default"], {
-                field: field,
-                value: values[field.key],
-                setFieldValue: setFieldValue,
-                getKey: getKey,
-                dynamicOptions: dynamicOptions,
-                loadingFields: loadingFields,
-                fetchDynamicOptions: fetchDynamicOptions
-              })
+            children: selectedActionFields.map(field => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_Components_ActionFieldRenderer_ActionFieldRenderer__WEBPACK_IMPORTED_MODULE_16__["default"], {
+              field: field,
+              value: values[field.key],
+              setFieldValue: setFieldValue,
+              getKey: getKey,
+              dynamicOptions: dynamicOptions,
+              loadingFields: loadingFields,
+              fetchDynamicOptions: fetchDynamicOptions
             }, field.key))
           })]
         })
       }, {
         value: "configure",
         label: "Configure",
-        content: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
+        content: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Text, {
           fontSize: "sm",
-          color: "gray.500",
-          children: "Configure step (future use)"
+          children: "Configure step"
         })
       }, {
         value: "test",
         label: "Test",
         content: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.Fragment, {
-          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Button, {
+          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Button, {
             mb: 4,
             onClick: () => dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_11__.workFLowSingeNodeExction)({
               workflow_hash: singleData?.version?.hash,
@@ -2854,7 +2870,7 @@ function ActionDrawer({
               input: values
             })),
             children: "Run test"
-          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Code, {
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Code, {
             w: "100%",
             children: "Output"
           })]
