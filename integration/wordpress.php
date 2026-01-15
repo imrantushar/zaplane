@@ -62,7 +62,7 @@ class Wordpress extends IntegrationBase {
             'transition_post_status'      => ['label' => 'On Post Status Update',        'hook' => 'transition_post_status'],
             'post_revision'               => ['label' => 'Revision Creation',            'hook' => '_wp_put_post_revision'],
             'set_user_role'               => ['label' => 'Set User Role',                'hook' => 'set_user_role'],
-            'add_user_role'               => ['label' => 'User Added to a Role',                'hook' => 'add_user_role'],
+            'add_user_role'               => ['label' => 'User Added to a Role',         'hook' => 'add_user_role'],
         ];
     }
 
@@ -598,37 +598,50 @@ class Wordpress extends IntegrationBase {
 
     public static function get_actions(): array {
         return [
-            'create_post'           => ['label' => 'Create Post'],
-            'update_option'         => ['label' => 'Update Option'],
-            'update_post_title'     => ['label' => 'Update Post Title'],
-            'update_post'           => ['label' => 'Update Post'],
-            'update_post_status'    => ['label' => 'Update Post Status'],
-            'delete_post'           => ['label' => 'Delete Post'],
-            'posts_all'             => ['label' => 'Post (All)'],
-            'post_single'           => ['label' => 'Post (Single)'],
-            'posts_by_post_type'    => ['label' => 'Posts by Post Type'],
-            'posts_by_metadata'     => ['label' => 'Posts by Metadata'],
-            'posts_metadata_all'    => ['label' => 'Post Metadata (All)'],
-            'post_metadata_single'  => ['label' => 'Post Metadata (Single)'],
-            'post_permalink'        => ['label' => 'Post Permalink'],
-            'post_content'          => ['label' => 'Post Content'],
-            'post_excerpt'          => ['label' => 'Post Excerpt'],
-            'post_status'           => ['label' => 'Post Status'],
-            'post_type_all'         => ['label' => 'Post Type (All)'],
-            'post_type_single'      => ['label' => 'Post Type (Single Post)'],
-            'register_post_type'    => ['label' => 'Register Post Type'],
-            'unregister_post_type'  => ['label' => 'Unregister Post Type'],
-            'add_post_type_support' => ['label' => 'Add Post Type Features'],
-            'activate_plugin'       => ['label' => 'Activate Plugin'],
-            'deactivate_plugin'     => ['label' => 'Deactivate Plugin'],
-            'switch_theme'          => ['label' => 'Theme Switch'],
-            'create_post_tag'       => ['label' => 'Create Post Tag'],
-            'add_media_image'       => ['label' => 'Add New Image'],
-            'delete_media'          => ['label' => 'Delete Media'],
-            'rename_media'          => ['label' => 'Rename Media'],
-            'get_media_all'         => ['label' => 'Get Media (All)'],
-            'get_media_by_title'    => ['label' => 'Get Media (By Title)'],
-            'get_media_by_id'       => ['label' => 'Get Media (By ID)'],
+            'create_post'               => ['label' => 'Create Post'],
+            'update_option'             => ['label' => 'Update Option'],
+            'update_post_title'         => ['label' => 'Update Post Title'],
+            'update_post'               => ['label' => 'Update Post'],
+            'update_post_status'        => ['label' => 'Update Post Status'],
+            'update_post_status'        => ['label' => 'Update Post Status'],
+            'duplicate_post'            => ['label' => 'Duplicate Post'],
+            'schedule_post'             => ['label' => 'Schedule Post'],
+            'unschedule_post'           => ['label' => 'Unschedule Post'],
+            'update_post_feature_image' => ['label' => 'Update Post Featured Image'],
+            'change_post_author'        => ['label' => 'Change Post Author'],
+            'trash_post'                => ['label' => 'Trash Post'],
+            'restore_post'              => ['label' => 'Restore Post from Trash'],
+            'delete_trash_post'         => ['label' => 'Delete Trash Post'],
+            'delete_post'               => ['label' => 'Delete Post'],
+            'trash_page'                => ['label' => 'Trash Page'],
+            'restore_page'              => ['label' => 'Restore Page from Trash'],
+            'delete_trash_page'         => ['label' => 'Delete Trash Page'],
+            'delete_page'               => ['label' => 'Delete Page'],
+            'posts_all'                 => ['label' => 'Post (All)'],
+            'post_single'               => ['label' => 'Post (Single)'],
+            'posts_by_post_type'        => ['label' => 'Posts by Post Type'],
+            'posts_by_metadata'         => ['label' => 'Posts by Metadata'],
+            'posts_metadata_all'        => ['label' => 'Post Metadata (All)'],
+            'post_metadata_single'      => ['label' => 'Post Metadata (Single)'],
+            'post_permalink'            => ['label' => 'Post Permalink'],
+            'post_content'              => ['label' => 'Post Content'],
+            'post_excerpt'              => ['label' => 'Post Excerpt'],
+            'post_status'               => ['label' => 'Post Status'],
+            'post_type_all'             => ['label' => 'Post Type (All)'],
+            'post_type_single'          => ['label' => 'Post Type (Single Post)'],
+            'register_post_type'        => ['label' => 'Register Post Type'],
+            'unregister_post_type'      => ['label' => 'Unregister Post Type'],
+            'add_post_type_support'     => ['label' => 'Add Post Type Features'],
+            'activate_plugin'           => ['label' => 'Activate Plugin'],
+            'deactivate_plugin'         => ['label' => 'Deactivate Plugin'],
+            'switch_theme'              => ['label' => 'Theme Switch'],
+            'create_post_tag'           => ['label' => 'Create Post Tag'],
+            'add_media_image'           => ['label' => 'Add New Image'],
+            'delete_media'              => ['label' => 'Delete Media'],
+            'rename_media'              => ['label' => 'Rename Media'],
+            'get_media_all'             => ['label' => 'Get Media (All)'],
+            'get_media_by_title'        => ['label' => 'Get Media (By Title)'],
+            'get_media_by_id'           => ['label' => 'Get Media (By ID)'],
         ];
     }
 
@@ -706,8 +719,106 @@ class Wordpress extends IntegrationBase {
             ];
         }
 
+        if ( $action === 'duplicate_post' ) {
+            return [
+                [
+                    'key'      => 'post_id',
+                    'label'    => 'Post / Page ID',
+                    'type'     => 'expression',
+                    'required' => true,
+                ],
+                [
+                    'key'      => 'post_title',
+                    'label'    => 'New Post Title',
+                    'type'     => 'expression',
+                    'required' => true,
+                ],
+                [
+                    'key'     => 'post_status',
+                    'label'   => 'Status',
+                    'type'    => 'select',
+                    'options' => [
+                        ['label' => 'Publish', 'value' => 'publish' ],
+                        ['label' => 'Pending', 'value' => 'pending' ],
+                        ['label' => 'Private', 'value' => 'private' ],
+                        ['label' => 'Draft',   'value' => 'draft' ],
+                    ],
+                    'default' => 'draft',
+                ],
+            ];
+        }
+
+        if ( $action === 'schedule_post' ) {
+            return [
+                [
+                    'key'      => 'post_id',
+                    'label'    => 'Post ID',
+                    'type'     => 'expression',
+                    'required' => true,
+                ],
+                [
+                    'key'      => 'schedule_date',
+                    'label'    => 'Schedule Date & Time',
+                    'type'     => 'datetime',
+                    'required' => true,
+                ],
+                [
+                    'key'     => 'post_status',
+                    'label'   => 'Status',
+                    'type'    => 'select',
+                    'options' => [
+                        ['label' => 'Future', 'value' => 'future' ],
+                        ['label' => 'Draft',   'value' => 'draft' ],
+                    ],
+                    'default' => 'future',
+                ],
+            ];
+        }
+
+        if ( $action === 'update_post_feature_image' ) {
+            return [
+                [
+                    'key'      => 'post_id',
+                    'label'    => 'Post ID',
+                    'type'     => 'expression',
+                    'required' => true,
+                ],
+                [
+                    'key'      => 'image_id',
+                    'label'    => 'Featured Image ID',
+                    'type'     => 'expression',
+                    'required' => true,
+                ],
+            ];
+        }
+
+        if ( $action === 'change_post_author' ) {
+            return [
+                [
+                    'key'      => 'post_id',
+                    'label'    => 'Post ID',
+                    'type'     => 'expression',
+                    'required' => true,
+                ],
+                [
+                    'key'      => 'author_id',
+                    'label'    => 'Author ID',
+                    'type'     => 'expression',
+                    'required' => true,
+                ],
+            ];
+        }
+
         $post_id_actions = [
+                'unschedule_post',
+                'trash_post',
+                'restore_post',
+                'delete_trash_post',
                 'delete_post',
+                'trash_page',
+                'restore_page',
+                'delete_trash_page',
+                'delete_page',
                 'post_single',
                 'posts_metadata_all',
                 'post_permalink',
@@ -1197,7 +1308,94 @@ class Wordpress extends IntegrationBase {
                 ]);
                 return ['port'=>'main','data'=>[]];
 
+            case 'duplicate_post':
+                $post_id    = $config['post_id'] ?? 0;
+                $new_title = $config['new_title'] ?? '';
+                $status     = $config['status'] ?? 'draft';
+                $post       = get_post( $post_id );
+                $new_post   = [
+                    'post_type'    => $post->post_type,
+                    'post_title'   => $new_title ? : $post->post_title . '(copy)',
+                    'post_content' => $post->post_content,
+                    'post_status'       => $status,
+                    'post_author'       => $post->post_author,
+                ];
+                $new_post_id = wp_insert_post( $new_post );
+
+                $taxonomies = get_object_taxonomies( $post->post_type );
+                foreach ( $taxonomies as $taxonomy ) {
+                    $terms = wp_get_object_terms( $post_id, $taxonomy, ['fields' => 'slug'] );
+                    wp_set_object_terms( $new_post_id, $terms, $taxonomy);
+                }
+
+                $meta = get_post_meta( $post_id );
+                foreach ( $meta as $key => $values ) {
+                    foreach ( $values as $value ) {
+                        add_post_meta( $new_post_id, $key, maybe_unserialize( $value ) );
+                    }
+                }
+                return ['port'=>'main', 'data'=>['success' => true, 'post_id' => $post_id, 'new_id' => $new_post_id, 'new_title' => $new_title ? : $post->post_title . '(copy)', ]];
+
+            case 'schedule_post':
+                $post_id       = $config['post_id'] ?? 0;
+                $schedule_date = $config['schedule_date'] ?? '';
+                $status        = $config['status'] ?? 'future';
+                $post_data     = [
+                    'ID'            => $post_id,
+                    'post_status'   => $status,
+                    'post_date'     => $schedule_date,
+                    'post_date_gmt' => get_gmt_from_date( $schedule_date ),
+                ];
+                $result = wp_update_post( $post_data, true );
+                return ['port'=>'main', 'data'=>['success' => true, 'post_id' => $post_id, 'schedule_for' => $schedule_date, 'status' => $status, ]];
+            
+            case 'unschedule_post':
+                $post_id       = $config['post_id'] ?? 0;
+                $post_data     = [
+                    'ID'            => $post_id,
+                    'post_status'   => 'draft',
+                    'post_date'     => current_time('mysql'),
+                    'post_date_gmt' => current_time('mysql', 1),
+                ];
+                $result = wp_update_post( $post_data, true );
+                return ['port'=>'main', 'data'=>['success' => true, 'post_id' => $post_id, 'status' => 'draft', ]];
+            
+            case 'update_post_feature_image':
+                $post_id       = $config['post_id'] ?? 0;
+                $image_id      = $config['image_id'] ?? 0;
+                if ( $post_id && $image_id ) {
+                    set_post_thumbnail( $post_id, $image_id );
+                }
+                return ['port'=>'main', 'data'=>['success' => true, 'post_id' => $post_id, 'image_id' => $image_id, ]];
+            
+            case 'change_post_author':
+                $post_id       = $config['post_id'] ?? 0;
+                $author_id      = $config['author_id'] ?? 0;
+                if ( $post_id && $author_id ) {
+                    wp_update_post([ 
+                        'ID'        => $post_id, 
+                        'post_author' => $author_id 
+                    ]);
+                }
+                return ['port'=>'main', 'data'=>['success' => true, 'post_id' => $post_id, 'author_id' => $author_id, ]];
+
+            case 'trash_post':
+            case 'trash_page':
+                wp_trash_post( $config['post_id'] ?? 0 );
+                return ['port'=>'main','data'=>['post_id'=>$config['post_id']]];
+
+            case 'restore_post':
+            case 'restore_page':
+                wp_untrash_post( $config['post_id'] ?? 0 );
+                return ['port'=>'main','data'=>['post_id'=>$config['post_id']]];
+
+            case 'delete_trash_post':
+            case 'delete_trash_page':
+                wp_delete_post( $config['post_id'] ?? 0 );
+                return ['port'=>'main','data'=>['post_id'=>$config['post_id']]];
+
             case 'delete_post':
+            case 'delete_page':
                 wp_delete_post( $config['post_id'], true );
                 return ['port'=>'main','data'=>['post_id'=>$config['post_id']]];
 
