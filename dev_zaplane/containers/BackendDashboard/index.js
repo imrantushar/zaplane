@@ -7,6 +7,7 @@ import Notification from '@ZAPComponents/Notification';
 import Logs from './pages/logs';
 import Queue from './pages/queue';
 import Setting from './pages/setting';
+import Connections from './pages/connections';
 
 
 
@@ -22,8 +23,8 @@ const renderSwitch = (page, id, action, path) => {
 			return <CreateWorkflows />;
 		case 'zaplane-logs':
 			return <Logs />;
-		case 'zaplane-queue':
-			return <Queue />;
+		case 'zaplane-connections':
+			return <Connections />;
 		case 'zaplane-settings':
 			return <Setting />;
 

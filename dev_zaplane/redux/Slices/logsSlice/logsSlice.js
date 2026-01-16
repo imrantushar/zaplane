@@ -86,6 +86,7 @@ const logSlice = createSlice({
 	name: 'logs',
 	initialState: {
 		data: [],
+		isLoading:true
 
 	},
 	reducers: {
@@ -95,6 +96,7 @@ const logSlice = createSlice({
 		builder
 			.addCase(getRunsList.fulfilled, (state, action) => {
 				state.data = action.payload;
+				state.isLoading =false
 			})
 			
 
