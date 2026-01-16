@@ -1,8 +1,5 @@
 import {
-    Drawer,
-    Portal,
     Button,
-    CloseButton,
     VStack,
     Text,
     Box,
@@ -13,24 +10,31 @@ import {
     Code
 } from "@chakra-ui/react";
 import ZAPDrawer from "@ZAPComponents/Drawer";
-import { fetchDynamic, getSingleRun, getSingleRunDetails, getSingleRunNode, liveMonitor, singleNodeRun } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
+import LabeledInput from "@ZAPComponents/LabeledInput";
+import ZAPLabeledSelect from "@ZAPComponents/LabeledSelect";
+import ZAPText from "@ZAPComponents/Text";
+import {
+    fetchDynamic,
+    workFLowSingeNodeExction
+} from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
 import { integrations } from "@ZAPUtils/helper";
 import { useFormikContext } from "formik";
 import { useEffect, useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
 import Select from "react-select";
+import ActionFieldRenderer from "../Components/ActionFieldRenderer/ActionFieldRenderer";
+import ZAPTab from "@ZAPComponents/Tab";
+import { IoIosArrowForward } from "react-icons/io";
 
-const APPS = Object.entries(integrations?.integrations || {}).map(
-    ([key, value]) => ({
-        id: value.slug || key,
-        name: value.name,
-    })
-);
+const APPS = Object.entries(integrations.apps || {}).map(([key, value]) => ({
+    id: value.slug || key,
+    name: value.name,
+}));
 
-const TOOLS = [
-    // { id: "condition", name: "Condition" },
-    { id: "router", name: "Router" },
-];
+const TOOLS = Object.entries(integrations.tools || {}).map(([key, value]) => ({
+    id: value.slug || key,
+    name: value.name,
+}));
 
 export default function ActionDrawer({
     open,
@@ -38,140 +42,145 @@ export default function ActionDrawer({
     onClose,
     updateNodeData,
     createActionNode,
-    createConditionNode,
+    singleData
 }) {
     const { source, node } = context;
+    const dispatch = useDispatch();
+    const { values, setFieldValue, resetForm } = useFormikContext();
+
     const [mode, setMode] = useState(null);
     const [step, setStep] = useState("select");
     const [selectedItem, setSelectedItem] = useState(null);
     const [dynamicOptions, setDynamicOptions] = useState({});
     const [loadingFields, setLoadingFields] = useState({});
-    const { values, setFieldValue, resetForm } = useFormikContext();
-    const dispatch = useDispatch()
+    const [search, setSearch] = useState("");
 
-    const [conditions, setConditions] = useState([
-        // {
-        //     id: crypto.randomUUID(),
-        //     type: "AND",
-        //     rules: [
-        //         {
-        //             id: crypto.randomUUID(),
-        //             field: "",
-        //             operator: "",
-        //             value: "",
-        //         },
-        //     ],
-        // },
-    ]);
+    const isTrigger =
+        node?.data?.action === "trigger" && source === "node";
 
-    // const addAndCondition = (groupId) => {
-    //     setConditions((prev) =>
-    //         prev.map((g) =>
-    //             g.id === groupId
-    //                 ? {
-    //                     ...g,
-    //                     rules: [
-    //                         ...g.rules,
-    //                         { id: crypto.randomUUID(), field: "", operator: "", value: "" },
-    //                     ],
-    //                 }
-    //                 : g
-    //         )
-    //     );
-    // };
+    useEffect(() => {
+        if (!open || !node?.data || source === "add") return;
 
-    // const addOrGroup = () => {
-    //     setConditions((prev) => [
-    //         ...prev,
-    //         {
-    //             id: crypto.randomUUID(),
-    //             type: "OR",
-    //             rules: [{ id: crypto.randomUUID(), field: "", operator: "", value: "" }],
-    //         },
-    //     ]);
-    // };
+        const nodeData = node.data;
+        let detectedItem =
+            TOOLS.find(t => t.name === nodeData.app || t.id === nodeData.app) ||
+            APPS.find(a => a.name === nodeData.app || a.id === nodeData.app);
 
-    // const updateRule = (groupId, ruleId, key, value) => {
-    //     setConditions((prev) =>
-    //         prev.map((g) =>
-    //             g.id === groupId
-    //                 ? {
-    //                     ...g,
-    //                     rules: g.rules.map((r) => (r.id === ruleId ? { ...r, [key]: value } : r)),
-    //                 }
-    //                 : g
-    //         )
-    //     );
-    // };
+        if (detectedItem) {
+            setMode(TOOLS.includes(detectedItem) ? "tools" : "app");
+            setSelectedItem(detectedItem);
+        }
 
-    // const removeRule = (groupId, ruleId) => {
-    //     setConditions((prev) =>
-    //         prev.map((g) =>
-    //             g.id === groupId
-    //                 ? { ...g, rules: g.rules.filter((r) => r.id !== ruleId) }
-    //                 : g
-    //         )
-    //     );
-    // };
+        if (nodeData.event) {
+            setFieldValue("actionType", nodeData.event);
+        }
+
+        if (nodeData.config) {
+            Object.entries(nodeData.config).forEach(([key, value]) => {
+                setFieldValue(key, value);
+            });
+        }
+    }, [open, node?.data]);
 
     const resetAll = () => {
         setMode(null);
         setStep("select");
         setSelectedItem(null);
-        onClose();
-        // setConditions([
-        //     {
-        //         id: crypto.randomUUID(),
-        //         rules: [{ id: crypto.randomUUID(), field: "", operator: "", value: "" }],
-        //     },
-        // ]);
+        setSearch("");
         resetForm();
+        onClose();
     };
 
-    const LIST = mode === "app" && APPS;
-    const actionOptions = useMemo(() => {
-        if (!selectedItem?.id) return [];
-        const integration = integrations?.integrations?.[selectedItem.id];
-        if (!integration) return [];
-        const isTriggerNode = node?.data?.action === "trigger" && source === "node";
+    const LIST =
+        mode === "app"
+            ? APPS
+            : mode === "tools"
+                ? TOOLS
+                : [];
 
-        if (isTriggerNode) {
-            return Object.values(integration.triggers || {}).map((t) => ({
+    // search list)
+    const SEARCH_LIST = useMemo(() => {
+        if (!search) return [];
+
+        const q = search.toLowerCase();
+
+        const apps = APPS.map(a => ({ ...a, type: "app" }));
+
+        const tools =
+            isTrigger
+                ? []
+                : TOOLS.map(t => ({ ...t, type: "tools" }));
+
+        return [...apps, ...tools].filter(item =>
+            item.name.toLowerCase().includes(q)
+        );
+    }, [search, isTrigger]);
+
+
+    const getIntegration = () => {
+        if (!selectedItem?.id) return null;
+        return mode === "tools"
+            ? integrations.tools?.[selectedItem.id]
+            : integrations.apps?.[selectedItem.id];
+    };
+
+    useEffect(() => {
+        if (mode !== "tools" || !selectedItem) return;
+        const tool = integrations.tools?.[selectedItem.id];
+        const actions = Object.values(tool?.actions || {});
+        if (actions.length === 1) {
+            setFieldValue("actionType", actions[0].key);
+        }
+    }, [mode, selectedItem]);
+
+    const actionOptions = useMemo(() => {
+        const integration = getIntegration();
+        if (!integration) return [];
+
+        if (mode === "tools") {
+            return Object.values(integration.actions || {}).map(a => ({
+                label: a.label,
+                value: a.key,
+            }));
+        }
+
+        if (isTrigger) {
+            return Object.values(integration.triggers || {}).map(t => ({
                 label: t.label,
                 value: t.key,
             }));
         }
-        return Object.values(integration.actions || {}).map((a) => ({
+
+        return Object.values(integration.actions || {}).map(a => ({
             label: a.label,
             value: a.key,
         }));
-    }, [selectedItem, context?.node]);
+    }, [selectedItem, mode, node]);
+
     const selectedActionFields = useMemo(() => {
-        if (!selectedItem?.id || !values?.actionType) return [];
+        const integration = getIntegration();
+        if (!integration || !values?.actionType) return [];
 
-        const integration = integrations?.integrations?.[selectedItem.id];
-        if (!integration) return [];
+        if (mode === "tools") {
+            return integration.actions?.[values.actionType]?.schema || [];
+        }
 
-        const isTriggerNode = node?.data?.action === "trigger" && source === "node";
-
-
-        if (isTriggerNode) {
+        if (isTrigger) {
             return integration.triggers?.[values.actionType]?.schema || [];
         }
 
         return integration.actions?.[values.actionType]?.schema || [];
-    }, [selectedItem, values?.actionType, context?.node]);
+    }, [selectedItem, values?.actionType, mode, node]);
+
     const getKey = (field) =>
-        `${context?.node?.data?.action}:${selectedItem?.id}:${field.key}`;
+        `${mode}:${selectedItem?.id}:${field.key}`;
 
     const fetchDynamicOptions = async (field) => {
         if (!field.dynamic) return;
-
         const key = getKey(field);
         if (dynamicOptions[key]) return;
 
         setLoadingFields(p => ({ ...p, [key]: true }));
-
         const res = await fetchDynamic(field.dynamic);
 
         setDynamicOptions(p => ({
@@ -181,243 +190,142 @@ export default function ActionDrawer({
                 label: i[field.dynamic.select[1]],
             })),
         }));
-
         setLoadingFields(p => ({ ...p, [key]: false }));
-    };
-    const renderField = (field, values, setFieldValue) => {
-        switch (field.type) {
-            case "text":
-            case "expression":
-                return (
-                    <Box>
-                        <Text fontSize="sm" margin="0 0 4px 0">{field.label}</Text>
-                        <Input
-                            size="sm"
-                            value={values[field.key] || ""}
-                            onChange={(e) =>
-                                setFieldValue(field.key, e.target.value)
-                            }
-                            placeholder={field.label}
-                        />
-                    </Box>
-                );
-
-            case "textarea":
-                return (
-                    <Box>
-                        <Text fontSize="sm" margin="0 0 4px 0">{field.label}</Text>
-                        <Input
-                            as="textarea"
-                            size="sm"
-                            value={values[field.key] || ""}
-                            onChange={(e) =>
-                                setFieldValue(field.key, e.target.value)
-                            }
-                            placeholder={field.label}
-                        />
-                    </Box>
-                );
-
-            case "select":
-                if (field.options) {
-                    const options = field.options.map((opt) => ({
-                        value: opt.value,
-                        label: opt.label,
-                    }));
-
-                    return (
-                        <Box>
-                            <Text fontSize="sm" margin="0 0 4px 0">{field.label}</Text>
-                            <Select
-                                options={options}
-                                value={
-                                    options.find(
-                                        (opt) =>
-                                            opt.value === values[field.key]
-                                    ) || null
-                                }
-                                onChange={(opt) =>
-                                    setFieldValue(field.key, opt.value)
-                                }
-                            />
-                        </Box>
-                    );
-                }
-                if (field.dynamic) {
-                    const key = getKey(field);
-                    const opts = dynamicOptions[key] || [];
-
-                    return (
-                        <Box>
-                            <Text fontSize="sm" margin="0 0 4px 0">
-                                {field.label}
-                                {field.required && " *"}
-                            </Text>
-
-                            <Select
-                                options={opts}
-                                isLoading={loadingFields[key]}
-                                value={
-                                    opts.find(
-                                        (opt) =>
-                                            opt.value === values[field.key]
-                                    ) || null
-                                }
-                                onMenuOpen={() =>
-                                    fetchDynamicOptions(field)
-                                }
-                                onChange={(opt) =>
-                                    setFieldValue(field.key, opt?.value)
-                                }
-                            />
-                        </Box>
-                    );
-                }
-
-                return null;
-
-            default:
-                return null;
-        }
     };
 
     const handleContinue = () => {
-        if (step === "select") setStep("configure");
-        else if (step === "configure") setStep("test");
-        else if (step === "test") {
-            if (selectedItem.id === "condition") {
-                createConditionNode({ conditions });
-                resetAll();
-                return;
-            }
+        if (step === "select") return setStep("configure");
+        if (step === "configure") return setStep("test");
 
-            const payload = {
-                app: selectedItem.name,
-                name: selectedItem.name,
-                event: values?.actionType,
-                config: selectedActionFields.reduce((acc, field) => {
-                    acc[field.key] = values[field.key];
-                    return acc;
-                }, {}),
-            };
-            const triggerPayload = {
-                app: selectedItem.name,
-                name: selectedItem.name,
-                event: values?.actionType,
-                config: selectedActionFields.reduce((acc, field) => {
-                    acc[field.key] = values[field.key];
-                    return acc;
-                }, {}),
-            };
+        const payload = {
+            app: selectedItem.name,
+            name: selectedItem.name,
+            event: values.actionType,
+            config: selectedActionFields.reduce((acc, f) => {
+                acc[f.key] = values[f.key];
+                return acc;
+            }, {}),
+        };
 
-            if (context?.source === "node") {
-                if (node?.data?.action === "trigger") {
-                    updateNodeData(triggerPayload);
-                } else {
-                    updateNodeData(payload);
-                }
-            } else {
-                createActionNode(payload);
-            }
-
-            resetAll();
+        if (context?.source === "node") {
+            updateNodeData(payload);
+        } else {
+            createActionNode(payload);
         }
+
+        resetAll();
     };
-    const isContinueDisabled = () => {
-        if (step === "select") return !values.actionType;
-        if (step === "configure") return !values.connection;
-        return false;
-    };
-    useEffect(() => {
-        if (!open) return;
-        if (context?.source === "node" && node?.data?.app) {
-            const matchedApp = APPS.find(
-                (app) =>
-                    app.name === node.data.app ||
-                    app.id === node.data.app?.toLowerCase()
-            );
-
-            if (matchedApp) {
-                setMode("app");
-                setSelectedItem(matchedApp);
-                setStep("select");
-                if (node?.data?.config) {
-                    Object.entries(node.data.config).forEach(([key, value]) => {
-                        setFieldValue(key, value);
-                    });
-                }
-
-                if (node?.data?.event) {
-                    setFieldValue("actionType", node.data.event);
-                }
-            }
-        }
-    }, [open, node]);
-    console.log(node);
-
+    console.log(mode, 'modeeee')
     return (
         <ZAPDrawer
             open={open}
             onClose={resetAll}
             title={
                 !mode
-                    ? "Choose Type"
-                    : !selectedItem
-                        ? `Select ${mode}`
-                        : selectedItem.name
+                    ? "Add Action"
+                    : selectedItem?.name
+                        ? selectedItem.name
+                        : "App"
             }
+
             placement="end"
             size="md"
-            closeOnOverlayClick={true}
             footer={
-                <HStack justify="space-between" w="full">
+                <HStack justify="space-between">
                     <Button variant="ghost" onClick={resetAll}>
                         Cancel
                     </Button>
-                    <Button
-                        colorScheme="blue"
-                        onClick={handleContinue}
-                        isDisabled={isContinueDisabled()}
-                    >
+                    <Button onClick={handleContinue}>
                         {step === "test" ? "Submit" : "Continue"}
                     </Button>
                 </HStack>
             }
         >
-            {!mode && (
-                <VStack spacing={4}>
-                    <Button w="100%" justifyContent="left" onClick={() => setMode("app")}>
-                        Apps
-                    </Button>
-                    {TOOLS.map((item) => (
+            {/* search filed */}
+            <Input
+                placeholder="Search apps or tools..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+
+            />
+            {search && (
+                <VStack spacing={2} align="stretch">
+                    {SEARCH_LIST.map(item => (
                         <Button
-                            key={item.id}
-                            width="100%"
+                            key={`${item.type}-${item.id}`}
                             justifyContent="space-between"
                             onClick={() => {
+                                setMode(item.type);
                                 setSelectedItem(item);
-                                setStep("select");
-                                setMode("tools");
+                                setSearch("");
                             }}
+                            background="white"
+                            _hover={{
+                                    bg: "var(--zaplane-body-background)",
+                                }}
                         >
-                            {item.name}
+                            <ZAPText color='black'>{item.name}</ZAPText>
+                            <ZAPText fontSize="xs" color="black">
+                                {item.type === "tools" ? "Tool" : "App"}
+                            </ZAPText>
                         </Button>
                     ))}
                 </VStack>
             )}
+            {!mode && !search && (
+                <VStack spacing={4}>
+                    <Button
+                        w="100%"
+                        background="white"
+                        color="black"
+                        justifyContent="space-between"
+                        transition="all 0.2s ease"
+                        _hover={{
+                            bg: "var(--zaplane-body-background)",
+                            "& svg": { transform: "translateX(4px)" },
+                        }}
+                        onClick={() => setMode("app")}>
+                        <span>Apps</span>
+                        <IoIosArrowForward />
+                    </Button>
 
-            {mode && !selectedItem && (
-                <VStack align="stretch">
-                    {LIST.map((item) => (
+                    {(node?.data?.action !== "trigger" || source === "add") &&
+                        TOOLS.map(tool => (
+                            <Button
+                                background="white"
+                                color="black"
+                                key={tool.id}
+                                justifyContent="left"
+                                w="100%"
+                                _hover={{
+                                    bg: "var(--zaplane-body-background)",
+                                }}
+                                onClick={() => {
+                                    setMode("tools");
+                                    setSelectedItem(tool);
+                                }}
+                            >
+                                {tool.name}
+                            </Button>
+                        ))}
+                </VStack>
+            )}
+
+            {mode && !selectedItem && !search && (
+                <VStack>
+                    {LIST.map(item => (
                         <Button
+                            background="white"
+                            color="black"
                             key={item.id}
-                            justifyContent="space-between"
-                            onClick={() => {
-                                setSelectedItem(item);
-                                setStep("select");
+                            w="100%"
+                            onClick={() => setSelectedItem(item)}
+                            justifyContent="left"
+                            _hover={{
+                                bg: "var(--zaplane-body-background)",
                             }}
                         >
-                            {item.name} →
+                            {item.name}
                         </Button>
                     ))}
                     <Button size="sm" variant="ghost" onClick={() => setMode(null)}>
@@ -427,181 +335,74 @@ export default function ActionDrawer({
             )}
 
             {selectedItem && (
-                <Tabs.Root value={step} isManual>
-                    <Tabs.List mb={4}>
-                        <Tabs.Trigger value="select">Select</Tabs.Trigger>
-                        <Tabs.Trigger value="configure">Configure</Tabs.Trigger>
-                        <Tabs.Trigger value="test">Test</Tabs.Trigger>
-                        <Tabs.Indicator />
-                    </Tabs.List>
-
-                    <Tabs.Content value="select">
-                        {selectedItem.id === "condition" ? (
-                            <>Condition</>
-                        ) : (
-                            <Flex direction="column" gap={4}>
-                                <Box>
-                                    <Text mb={0}>
-                                        {node?.data?.action === "trigger" && source === "node"
-                                            ? "Trigger Type"
-                                            : "Action Type"}
-                                    </Text>
-                                    <Select
+                <ZAPTab
+                    value={step}
+                    tabs={[
+                        {
+                            value: "select",
+                            label: "Select",
+                            content: (
+                                <>
+                                    <ZAPLabeledSelect
+                                        label={isTrigger ? "Trigger Type" : "Action Type"}
                                         options={actionOptions}
-                                        value={
-                                            actionOptions.find(
-                                                (opt) => opt.value === values.actionType
-                                            ) || null
+                                        value={values.actionType}
+                                        onChange={(val) =>
+                                            setFieldValue("actionType", val)
                                         }
-                                        onChange={(opt) => setFieldValue("actionType", opt?.value)}
-                                    />
-                                </Box>
-
-                                {selectedActionFields.map((field) => (
-                                    <Box key={field.key}>
-                                        {renderField(field, values, setFieldValue)}
-                                    </Box>
-                                ))}
-                            </Flex>
-                        )}
-                    </Tabs.Content>
-
-                    <Tabs.Content value="configure">
-                        {selectedItem.id === "condition" ? (
-                            <VStack align="stretch" gap={4}>
-                                {conditions.map((group, gi) => (
-                                    <Box
-                                        key={group.id}
-                                        border="1px solid #E2E8F0"
-                                        p={3}
-                                        rounded="md"
-                                    >
-                                        {group.rules.map((rule) => (
-                                            <HStack key={rule.id} mb={2}>
-                                                <Box width="35%">
-                                                    <Input
-                                                        placeholder="Condition"
-                                                        value={rule.field}
-                                                        onChange={(e) =>
-                                                            updateRule(group.id, rule.id, "field", e.target.value)
-                                                        }
-                                                    />
-                                                </Box>
-                                                <Box width="35%">
-                                                    <Select
-                                                        placeholder="Operator"
-                                                        options={[
-                                                            { value: "equals", label: "Equals" },
-                                                            { value: "contains", label: "Contains" },
-                                                        ]}
-                                                        onChange={(opt) =>
-                                                            updateRule(group.id, rule.id, "operator", opt.value)
-                                                        }
-                                                    />
-                                                </Box>
-                                                <Box width="35%">
-                                                    <Input
-                                                        placeholder="Value"
-                                                        value={rule.value}
-                                                        onChange={(e) =>
-                                                            updateRule(group.id, rule.id, "value", e.target.value)
-                                                        }
-                                                    />
-                                                </Box>
-                                                <Button
-                                                    size="sm"
-                                                    colorScheme="red"
-                                                    onClick={() => removeRule(group.id, rule.id)}
-                                                >
-                                                    ✕
-                                                </Button>
-                                            </HStack>
-                                        ))}
-                                        <Button size="sm" variant="outline" onClick={() => addAndCondition(group.id)}>
-                                            + And
-                                        </Button>
-                                        {gi !== conditions.length - 1 && (
-                                            <Text
-                                                textAlign="center"
-                                                my={2}
-                                                fontSize="sm"
-                                                color="gray.500"
-                                            >
-                                                OR
-                                            </Text>
-                                        )}
-                                    </Box>
-                                ))}
-                                <Button variant="outline" onClick={addOrGroup}>
-                                    + Or Group
-                                </Button>
-                            </VStack>
-                        ) : (
-                            <Text margin="0">There have only config data</Text>
-                        )}
-                    </Tabs.Content>
-
-                    <Tabs.Content value="test">
-                        <Box>
-                            <Button onClick={() => dispatch(singleNodeRun(node?.id))}>
-                                Run test
-                            </Button>
-
-                            <Text>Response</Text>
-
-                            <Box
-                                border="1px solid"
-                                borderColor="gray.200"
-                                borderRadius="md"
-                                bg="gray.50"
-                                p={4}
-                            >
-                                <Tabs.Root defaultValue="output">
-                                    <Tabs.List
-                                        display="flex"
-                                        gap={6}
-                                        borderBottom="1px solid"
-                                        borderColor="gray.200"
+                                        placeholder="Select Action Type"
+                                        isClearable
                                         mb={4}
-                                        position="relative"
+                                    />
+
+                                    <Flex direction="column" gap={4}>
+                                        {selectedActionFields.map(field => (
+                                            <ActionFieldRenderer
+                                                key={field.key}
+                                                field={field}
+                                                value={values[field.key]}
+                                                setFieldValue={setFieldValue}
+                                                getKey={getKey}
+                                                dynamicOptions={dynamicOptions}
+                                                loadingFields={loadingFields}
+                                                fetchDynamicOptions={fetchDynamicOptions}
+                                            />
+                                        ))}
+                                    </Flex>
+                                </>
+                            ),
+                        },
+                        {
+                            value: "configure",
+                            label: "Configure",
+                            content: <Text fontSize="sm">Configure step</Text>,
+                        },
+                        {
+                            value: "test",
+                            label: "Test",
+                            content: (
+                                <>
+                                    <Button
+                                        mb={4}
+                                        onClick={() =>
+                                            dispatch(
+                                                workFLowSingeNodeExction({
+                                                    workflow_hash: singleData?.version?.hash,
+                                                    node_key: node?.id,
+                                                    input: values,
+                                                })
+                                            )
+                                        }
                                     >
-                                        <Tabs.Trigger value="input">Input</Tabs.Trigger>
-                                        <Tabs.Trigger value="output">Output</Tabs.Trigger>
-                                        <Tabs.Indicator height="2px" bg="blue.500" borderRadius="full" />
-                                    </Tabs.List>
-
-                                    <Tabs.Content value="input">
-                                        <Box
-                                            bg="white"
-                                            border="1px solid"
-                                            borderColor="gray.200"
-                                            borderRadius="md"
-                                            p={3}
-                                            fontSize="sm"
-                                        >
-                                            <Code>input</Code>
-                                        </Box>
-                                    </Tabs.Content>
-
-                                    <Tabs.Content value="output">
-                                        <Box
-                                            bg="white"
-                                            border="1px solid"
-                                            borderColor="gray.200"
-                                            borderRadius="md"
-                                            p={3}
-                                            fontSize="sm"
-                                        >
-                                            <Code>output</Code>
-                                        </Box>
-                                    </Tabs.Content>
-                                </Tabs.Root>
-                            </Box>
-                        </Box>
-                    </Tabs.Content>
-                </Tabs.Root>
+                                        Run test
+                                    </Button>
+                                    <Code w="100%">Output</Code>
+                                </>
+                            ),
+                        },
+                    ]}
+                />
             )}
-
         </ZAPDrawer>
     );
 }

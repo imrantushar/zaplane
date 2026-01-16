@@ -7,6 +7,7 @@ import workflowsReducer from './Slices/workFlowSlice/workFlowSlice';
 import logsReducer from './Slices/logsSlice/logsSlice';
 import queueReducer from './Slices/queueSlice/queueSlice';
 import executionReducer from './Slices/executionSlice/executionSlice';
+import connectionsReducer from './Slices/connectionsSlice/connectionsSlice';
 import settingReducer from './Slices/settingSlice/settingSlice';
 import notificationReducer from './Slices/notificationSlice/notificationSlice';
 
@@ -28,6 +29,7 @@ export const store = configureStore({
         logs:logsReducer,
         queue:queueReducer,
         execution:executionReducer,
+        connections:connectionsReducer,
         setting:settingReducer
         // Future reducers will be added here (e.g., points, settings)
     },

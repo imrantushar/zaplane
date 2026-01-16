@@ -145,10 +145,10 @@ export const getSingleRun = createAsyncThunk(
 		}
 	}
 );
+// workflow exctions api
 export const workFLowExction = createAsyncThunk(
   'zaplane/workFLowExction',
   async (payload, thunkAPI) => {
-    console.log(payload, 'pay');
 
     try {
       const res = await API.post(
@@ -164,29 +164,56 @@ export const workFLowExction = createAsyncThunk(
     }
   }
 );
+export const workFLowSingeNodeExction = createAsyncThunk(
+  'zaplane/workFLowSingeNodeExction',
+  async (payload, thunkAPI) => {
 
+    try {
+      const res = await API.post(
+        namespace + 'execute-node',
+        payload
+      );
+      return res.data;
 
+    } catch (e) {
+      return handleSliceError(thunkAPI, e);
+    }
+  }
+);
+// work flow listnner
+export const workflowNodeListiner = createAsyncThunk(
+	'zaplane/workflowNodeListiner',
+	async (id, thunkAPI) => {
+		try {
+			const res = await API.get(
+				namespace + `node-listiner/${id}`
+			);
+			return res.data;
+		} catch (e) {
+			return handleSliceError(thunkAPI, e);
+		}
+	}
+);
+export const workflowNodeListinerStop = createAsyncThunk(
+	'zaplane/workflowNodeListinerStop',
+	async (id, thunkAPI) => {
+		try {
+			const res = await API.get(
+				namespace + `node-listiner/${id}/stop`
+			);
+			return res.data;
+		} catch (e) {
+			return handleSliceError(thunkAPI, e);
+		}
+	}
+);
+// log api
 export const nodeLogsRunDetails = createAsyncThunk(
 	'zaplane/nodeLogsRunDetails',
 	async (runId, thunkAPI) => {
 		try {
 			const res = await API.get(
 				namespace + `runs/${parseInt(runId)}`
-			);
-
-			return res.data;
-
-		} catch (e) {
-			return handleSliceError(thunkAPI, e);
-		}
-	}
-);
-export const singleNodeRun = createAsyncThunk(
-	'zaplane/singleNodeRun',
-	async (runId, thunkAPI) => {
-		try {
-			const res = await API.get(
-				namespace + `node-runs/${runId}`
 			);
 
 			return res.data;
@@ -211,6 +238,7 @@ export const getNodeLogDetails = createAsyncThunk(
 		}
 	}
 );
+// version releted api
 export const getAllVersion = createAsyncThunk(
 	'zaplane/getAllVersion',
 	async (runId, thunkAPI) => {
@@ -267,7 +295,8 @@ const workflowsSlice = createSlice({
 		data: [],
 		runs: [],
 		versions: [],
-		nodeDetails: []
+		nodeDetails: [],
+		isLoading:true
 
 
 	},
@@ -281,6 +310,7 @@ const workflowsSlice = createSlice({
 			})
 			.addCase(getWorkFlow.fulfilled, (state, action) => {
 				state.data = [...action.payload].reverse();
+				state.isLoading=false
 			})
 
 			.addCase(getSingleWorkFlow.fulfilled, (state, action) => {
@@ -309,6 +339,7 @@ const workflowsSlice = createSlice({
 			})
 			.addCase(getRunWorkFlow.fulfilled, (state, action) => {
 				state.runs = action.payload;
+				state.isLoading=false
 			})
 			.addCase(getPreviewOldVersion.fulfilled, (state, action) => {
 				if (!state.data.length) return;
@@ -321,6 +352,7 @@ const workflowsSlice = createSlice({
 			})
 			.addCase(getAllVersion.fulfilled, (state, action) => {
 				state.versions = action.payload;
+				state.isLoading=false
 			})
 			.addCase(versionActive.fulfilled, (state, action) => {
 				const activeVersionId = action.meta.arg.versionID;

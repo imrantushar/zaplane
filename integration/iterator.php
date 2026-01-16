@@ -13,6 +13,10 @@ class Iterator extends IntegrationBase {
         return 'iterator';
     }
 
+    public static function get_category(): string {
+        return 'tool';
+    }
+
     public static function get_output_ports(): array {
         return [ 'loop', 'done' ];
     }
