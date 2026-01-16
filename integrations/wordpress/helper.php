@@ -1,11 +1,11 @@
 <?php
-namespace Zaplane\Integration\Wordpress;
+namespace Zaplane\Integrations\Wordpress;
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-use Zaplane\Integration\Wordpress\QueryTrait;
+use Zaplane\Integrations\Wordpress\QueryTrait;
 
 Trait Helper {
     use QueryTrait;

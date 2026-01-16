@@ -42,6 +42,11 @@ class ZaplaneIntegrationJsonGenerator {
                     continue;
                 }
 
+                if(!isset($trigger['hook'])){
+                    error_log(print_r('Hook Name missing:', true));
+                    error_log(print_r($trigger, true));
+                }
+
                 $integration['triggers'][ $key ] = [
                     'key'     => $key,
                     'label'   => $trigger['label'],

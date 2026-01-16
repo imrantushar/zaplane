@@ -1,5 +1,5 @@
 <?php
-namespace Zaplane\Integration;
+namespace Zaplane\Integrations;
 
 use Zaplane\Classes\IntegrationBase;
 

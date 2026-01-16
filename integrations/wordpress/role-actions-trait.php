@@ -1,5 +1,5 @@
 <?php
-namespace Zaplane\Integration\Wordpress;
+namespace Zaplane\Integrations\Wordpress;
 
 use Zaplane\Traits\ActionResponseTrait;
 

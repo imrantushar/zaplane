@@ -1,20 +1,20 @@
 <?php
-namespace Zaplane\Integration;
+namespace Zaplane\Integrations;
 
 
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 use Zaplane\Classes\IntegrationBase;
-use Zaplane\Integration\Wordpress\PostActionsTrait;
-use Zaplane\Integration\Wordpress\TaxonomyActionsTrait;
-use Zaplane\Integration\Wordpress\UserActionsTrait;
-use Zaplane\Integration\Wordpress\RoleActionsTrait;
-use Zaplane\Integration\Wordpress\OptionActionsTrait;
-use Zaplane\Integration\Wordpress\MediaActionsTrait;
-use Zaplane\Integration\Wordpress\CommentActionsTrait;
-use Zaplane\Integration\Wordpress\QueryTrait;
-use Zaplane\Integration\Wordpress\Helper;
+use Zaplane\Integrations\Wordpress\PostActionsTrait;
+use Zaplane\Integrations\Wordpress\TaxonomyActionsTrait;
+use Zaplane\Integrations\Wordpress\UserActionsTrait;
+use Zaplane\Integrations\Wordpress\RoleActionsTrait;
+use Zaplane\Integrations\Wordpress\OptionActionsTrait;
+use Zaplane\Integrations\Wordpress\MediaActionsTrait;
+use Zaplane\Integrations\Wordpress\CommentActionsTrait;
+use Zaplane\Integrations\Wordpress\QueryTrait;
+use Zaplane\Integrations\Wordpress\Helper;
 
 
 class Wordpress extends IntegrationBase {

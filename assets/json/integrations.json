@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-01-08 10:08:42",
+    "generated_at": "2026-01-16 13:42:41",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -83,7 +83,61 @@
                         }
                     ],
                     "outputs": [
-                         "main"
+                        "main"
+                    ]
+                },
+                "transition_post_status": {
+                    "key": "transition_post_status",
+                    "label": "Post Status Updated",
+                    "hook": "transition_post_status",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "wp_insert_post": {
+                    "key": "wp_insert_post",
+                    "label": "Post Inserted",
+                    "hook": "wp_insert_post",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "wp_after_insert_post": {
+                    "key": "wp_after_insert_post",
+                    "label": "WP After Insert Post",
+                    "hook": "wp_after_insert_post",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "wp_trash_post": {
+                    "key": "wp_trash_post",
+                    "label": "Post Trashed",
+                    "hook": "wp_trash_post",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "untrashed_post": {
+                    "key": "untrashed_post",
+                    "label": "Post Untrashed",
+                    "hook": "untrashed_post",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_post": {
+                    "key": "delete_post",
+                    "label": "Delete Post",
+                    "hook": "delete_post",
+                    "schema": [],
+                    "outputs": [
+                        "main"
                     ]
                 },
                 "user_register": {
@@ -95,16 +149,7 @@
                         "main"
                     ]
                 },
-                "comment_post": {
-                    "key": "comment_post",
-                    "label": "Comment Added",
-                    "hook": "comment_post",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                 "set_user_role": {
+                "set_user_role": {
                     "key": "set_user_role",
                     "label": "User Role Updated",
                     "hook": "set_user_role",
@@ -113,46 +158,19 @@
                         "main"
                     ]
                 },
-                "show_user_profile": {
-                    "key": "show_user_profile",
-                    "label": "User Profile Show",
-                    "hook": "show_user_profile",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "edit_user_profile": {
-                    "key": "edit_user_profile",
-                    "label": "User Profile Edit",
-                    "hook": "edit_user_profile",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "personal_options_update": {
-                    "key": "personal_options_update",
-                    "label": "Personal Options Update",
-                    "hook": "personal_options_update",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "edit_user_profile_update": {
-                    "key": "edit_user_profile_update",
-                    "label": "Edit User",
-                    "hook": "edit_user_profile_update",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
                 "profile_update": {
                     "key": "profile_update",
-                    "label": "Profile Update",
+                    "label": "Profile Updated",
                     "hook": "profile_update",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "wp_update_user": {
+                    "key": "wp_update_user",
+                    "label": "Update User",
+                    "hook": "wp_update_user",
                     "schema": [],
                     "outputs": [
                         "main"
@@ -176,118 +194,213 @@
                         "main"
                     ]
                 },
-                "login_footer": {
-                    "key": "login_footer",
-                    "label": "Login Footer",
-                    "hook": "login_footer",
+                "wpmu_delete_user": {
+                    "key": "wpmu_delete_user",
+                    "label": "Delete User (MU)",
+                    "hook": "wpmu_delete_user",
                     "schema": [],
                     "outputs": [
                         "main"
                     ]
                 },
-                "login_form": {
-                    "key": "login_form",
-                    "label": "Login Form",
-                    "hook": "login_form",
+                "wpmu_new_user": {
+                    "key": "wpmu_new_user",
+                    "label": "New User Created",
+                    "hook": "wpmu_new_user",
                     "schema": [],
                     "outputs": [
                         "main"
                     ]
                 },
-                "login_head": {
-                    "key": "login_head",
-                    "label": "Login Head",
-                    "hook": "login_head",
+                "wpmu_activate_user": {
+                    "key": "wpmu_activate_user",
+                    "label": "Activate User",
+                    "hook": "wpmu_activate_user",
                     "schema": [],
                     "outputs": [
                         "main"
                     ]
                 },
-                "login_init": {
-                    "key": "login_init",
-                    "label": "Login Initialization",
-                    "hook": "login_init",
+                "wp_login": {
+                    "key": "wp_login",
+                    "label": "User Logged In",
+                    "hook": "wp_login",
                     "schema": [],
                     "outputs": [
                         "main"
                     ]
                 },
-                "lostpassword_form": {
-                    "key": "lostpassword_form",
-                    "label": "Lost Password Form",
-                    "hook": "lostpassword_form",
+                "wp_login_failed": {
+                    "key": "wp_login_failed",
+                    "label": "Login Failed",
+                    "hook": "wp_login_failed",
                     "schema": [],
                     "outputs": [
                         "main"
                     ]
                 },
-                "retrieve_password": {
-                    "key": "retrieve_password",
-                    "label": "Password Retrieval",
-                    "hook": "retrieve_password",
+                "wp_logout": {
+                    "key": "wp_logout",
+                    "label": "User Logged Out",
+                    "hook": "wp_logout",
                     "schema": [],
                     "outputs": [
                         "main"
                     ]
                 },
-                "password_reset": {
-                    "key": "password_reset",
-                    "label": "Password Reset",
-                    "hook": "password_reset",
+                "wp_authenticate": {
+                    "key": "wp_authenticate",
+                    "label": "WP Authenticate",
+                    "hook": "wp_authenticate",
                     "schema": [],
                     "outputs": [
                         "main"
                     ]
                 },
-                "after_password_reset": {
-                    "key": "after_password_reset",
-                    "label": "After Password Reset",
-                    "hook": "after_password_reset",
+                "comment_post": {
+                    "key": "comment_post",
+                    "label": "Comment Added",
+                    "hook": "comment_post",
                     "schema": [],
                     "outputs": [
                         "main"
                     ]
                 },
-                "register_form": {
-                    "key": "register_form",
-                    "label": "Registration Form",
-                    "hook": "register_form",
+                "wp_insert_comment": {
+                    "key": "wp_insert_comment",
+                    "label": "Comment Created",
+                    "hook": "wp_insert_comment",
                     "schema": [],
                     "outputs": [
                         "main"
                     ]
                 },
-                "signup_blogform": {
-                    "key": "signup_blogform",
-                    "label": "Signup Blog Form",
-                    "hook": "signup_blogform",
+                "edit_comment": {
+                    "key": "edit_comment",
+                    "label": "Edit Comment",
+                    "hook": "edit_comment",
                     "schema": [],
                     "outputs": [
                         "main"
                     ]
                 },
-                "signup_extra_fields": {
-                    "key": "signup_extra_fields",
-                    "label": "Signup Extra Fields",
-                    "hook": "signup_extra_fields",
+                "delete_comment": {
+                    "key": "delete_comment",
+                    "label": "Delete Comment",
+                    "hook": "delete_comment",
                     "schema": [],
                     "outputs": [
                         "main"
                     ]
                 },
-                "signup_finished": {
-                    "key": "signup_finished",
-                    "label": "Signup Finished",
-                    "hook": "signup_finished",
-                    "schema": [],
+                "trashed_comment": {
+                    "key": "trashed_comment",
+                    "label": "Comment Trashed",
+                    "hook": "trashed_comment",
+                    "schema": [
+                        {
+                            "key": "post_type",
+                            "label": "Post Type",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "post_types",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
                 },
-                "signup_header": {
-                    "key": "signup_header",
-                    "label": "Signup Header",
-                    "hook": "signup_header",
+                "untrashed_comment": {
+                    "key": "untrashed_comment",
+                    "label": "Comment Untrashed",
+                    "hook": "untrashed_comment",
+                    "schema": [
+                        {
+                            "key": "post_type",
+                            "label": "Post Type",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "post_types",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "transition_comment_status": {
+                    "key": "transition_comment_status",
+                    "label": "Comment Status Changed",
+                    "hook": "transition_comment_status",
+                    "schema": [
+                        {
+                            "key": "from_status",
+                            "label": "From Status",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Approved",
+                                    "value": "1"
+                                },
+                                {
+                                    "label": "Pending",
+                                    "value": "0"
+                                },
+                                {
+                                    "label": "Spam",
+                                    "value": "spam"
+                                },
+                                {
+                                    "label": "Trash",
+                                    "value": "trash"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "to_status",
+                            "label": "To Status",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Approved",
+                                    "value": "1"
+                                },
+                                {
+                                    "label": "Pending",
+                                    "value": "0"
+                                },
+                                {
+                                    "label": "Spam",
+                                    "value": "spam"
+                                },
+                                {
+                                    "label": "Trash",
+                                    "value": "trash"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "pre_comment_approved": {
+                    "key": "pre_comment_approved",
+                    "label": "Pre-Approve Comment",
+                    "hook": "pre_comment_approved",
                     "schema": [],
                     "outputs": [
                         "main"
@@ -295,7 +408,7 @@
                 },
                 "create_term": {
                     "key": "create_term",
-                    "label": "Term Creation",
+                    "label": "Create Term",
                     "hook": "create_term",
                     "schema": [],
                     "outputs": [
@@ -313,7 +426,7 @@
                 },
                 "edit_term": {
                     "key": "edit_term",
-                    "label": "Term Edit",
+                    "label": "Edit Term",
                     "hook": "edit_term",
                     "schema": [],
                     "outputs": [
@@ -331,7 +444,7 @@
                 },
                 "saved_term": {
                     "key": "saved_term",
-                    "label": "Term Update",
+                    "label": "Term Updated",
                     "hook": "saved_term",
                     "schema": [],
                     "outputs": [
@@ -340,67 +453,8 @@
                 },
                 "delete_term": {
                     "key": "delete_term",
-                    "label": "Term Deletion",
+                    "label": "Delete Term",
                     "hook": "delete_term",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "delete_term_taxonomy": {
-                    "key": "delete_term_taxonomy",
-                    "label": "Delete Term Taxonomy",
-                    "hook": "delete_term_taxonomy",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "generate_rewrite_rules": {
-                    "key": "generate_rewrite_rules",
-                    "label": "Rewrite Rules",
-                    "hook": "generate_rewrite_rules",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "do_action": {
-                    "key": "do_action",
-                    "label": "Do Action",
-                    "hook": "do_action",
-                    "schema": [
-                        {
-                            "key": "hook_name",
-                            "label": "Hook Name (Use this code to trigger the action: do_action('hook_name', 1, ['key' => 'value']))",
-                            "type": "text",
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "add_action": {
-                    "key": "add_action",
-                    "label": "Add Action",
-                    "hook": "add_action",
-                    "schema": [
-                        {
-                            "key": "hook_name",
-                            "label": "Hook Name",
-                            "type": "text",
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "add_meta_boxes": {
-                    "key": "add_meta_boxes",
-                    "label": "Meta Box Setup",
-                    "hook": "add_meta_boxes",
                     "schema": [],
                     "outputs": [
                         "main"
@@ -408,8 +462,17 @@
                 },
                 "add_option": {
                     "key": "add_option",
-                    "label": "Option Addition",
+                    "label": "Add Option",
                     "hook": "add_option",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_option": {
+                    "key": "update_option",
+                    "label": "Update Option",
+                    "hook": "update_option",
                     "schema": [],
                     "outputs": [
                         "main"
@@ -417,35 +480,26 @@
                 },
                 "delete_option": {
                     "key": "delete_option",
-                    "label": "Option Deletion",
+                    "label": "Delete Option",
                     "hook": "delete_option",
                     "schema": [],
                     "outputs": [
                         "main"
                     ]
                 },
-                "delete_post_meta": {
-                    "key": "delete_post_meta",
-                    "label": "Post Option Delete",
-                    "hook": "delete_post_meta",
+                "upgrader_process_complete": {
+                    "key": "upgrader_process_complete",
+                    "label": "Upgrader Complete",
+                    "hook": "upgrader_process_complete",
                     "schema": [],
                     "outputs": [
                         "main"
                     ]
                 },
-                "admin_post": {
-                    "key": "admin_post",
-                    "label": "Admin Post Action",
-                    "hook": "admin_post",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "wp_delete_site": {
-                    "key": "wp_delete_site",
-                    "label": "Site Deletion",
-                    "hook": "wp_delete_site",
+                "generate_rewrite_rules": {
+                    "key": "generate_rewrite_rules",
+                    "label": "Rewrite Rules Generated",
+                    "hook": "generate_rewrite_rules",
                     "schema": [],
                     "outputs": [
                         "main"
@@ -472,6 +526,7 @@
                             "key": "post_type",
                             "label": "Post Type",
                             "type": "select",
+                            "required": true,
                             "dynamic": {
                                 "integration": "wordpress",
                                 "query": "post_types",
@@ -479,8 +534,7 @@
                                     "name",
                                     "label"
                                 ]
-                            },
-                            "required": true
+                            }
                         },
                         {
                             "key": "post_status",
@@ -505,19 +559,7 @@
                 "update_option": {
                     "key": "update_option",
                     "label": "Update Option",
-                    "schema": [
-                        {
-                            "key": "option_name",
-                            "label": "Option",
-                            "type": "text",
-                            "required": true
-                        },
-                        {
-                            "key": "value",
-                            "label": "Value",
-                            "type": "expression"
-                        }
-                    ],
+                    "schema": [],
                     "outputs": [
                         "main"
                     ]
@@ -636,18 +678,7 @@
                 "get_users": {
                     "key": "get_users",
                     "label": "Get All Users",
-                    "schema": [
-                        {
-                            "key": "search",
-                            "label": "Search",
-                            "type": "text"
-                        },
-                        {
-                            "key": "number",
-                            "label": "Limit",
-                            "type": "expression"
-                        }
-                    ],
+                    "schema": [],
                     "outputs": [
                         "main"
                     ]
@@ -655,24 +686,7 @@
                 "get_users_by_role": {
                     "key": "get_users_by_role",
                     "label": "Get All Users by Role",
-                    "schema": [
-                        {
-                            "key": "role",
-                            "label": "Role",
-                            "type": "text",
-                            "required": true
-                        },
-                        {
-                            "key": "search",
-                            "label": "Search",
-                            "type": "text"
-                        },
-                        {
-                            "key": "number",
-                            "label": "Limit",
-                            "type": "expression"
-                        }
-                    ],
+                    "schema": [],
                     "outputs": [
                         "main"
                     ]
@@ -680,14 +694,7 @@
                 "get_user_by_id": {
                     "key": "get_user_by_id",
                     "label": "Get User by ID",
-                    "schema": [
-                        {
-                            "key": "user_id",
-                            "label": "User ID",
-                            "type": "expression",
-                            "required": true
-                        }
-                    ],
+                    "schema": [],
                     "outputs": [
                         "main"
                     ]
@@ -695,14 +702,7 @@
                 "get_user_by_email": {
                     "key": "get_user_by_email",
                     "label": "Get User by Email",
-                    "schema": [
-                        {
-                            "key": "user_email",
-                            "label": "Email",
-                            "type": "text",
-                            "required": true
-                        }
-                    ],
+                    "schema": [],
                     "outputs": [
                         "main"
                     ]
@@ -710,20 +710,7 @@
                 "get_user_by_field": {
                     "key": "get_user_by_field",
                     "label": "Get User by Field",
-                    "schema": [
-                        {
-                            "key": "field",
-                            "label": "Field",
-                            "type": "text",
-                            "required": true
-                        },
-                        {
-                            "key": "value",
-                            "label": "Value",
-                            "type": "text",
-                            "required": true
-                        }
-                    ],
+                    "schema": [],
                     "outputs": [
                         "main"
                     ]
@@ -731,14 +718,7 @@
                 "get_user_meta_all": {
                     "key": "get_user_meta_all",
                     "label": "Get User Metadata (All)",
-                    "schema": [
-                        {
-                            "key": "user_id",
-                            "label": "User ID",
-                            "type": "expression",
-                            "required": true
-                        }
-                    ],
+                    "schema": [],
                     "outputs": [
                         "main"
                     ]
@@ -746,20 +726,7 @@
                 "get_user_meta_single": {
                     "key": "get_user_meta_single",
                     "label": "Get User Metadata (Single)",
-                    "schema": [
-                        {
-                            "key": "user_id",
-                            "label": "User ID",
-                            "type": "expression",
-                            "required": true
-                        },
-                        {
-                            "key": "meta_key",
-                            "label": "Meta Key",
-                            "type": "text",
-                            "required": true
-                        }
-                    ],
+                    "schema": [],
                     "outputs": [
                         "main"
                     ]
@@ -767,812 +734,7 @@
                 "update_user_meta": {
                     "key": "update_user_meta",
                     "label": "Update User Metadata",
-                    "schema": [
-                        {
-                            "key": "user_id",
-                            "label": "User ID",
-                            "type": "expression",
-                            "required": true
-                        },
-                        {
-                            "key": "meta_key",
-                            "label": "Meta Key",
-                            "type": "text",
-                            "required": true
-                        },
-                        {
-                            "key": "meta_value",
-                            "label": "Meta Value",
-                            "type": "expression"
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "create_role": {
-                    "key": "create_role",
-                    "label": "Create Role",
-                    "schema": [
-                        {
-                            "key": "role",
-                            "label": "Role",
-                            "type": "text",
-                            "required": true
-                        },
-                        {
-                            "key": "display_name",
-                            "label": "Display Name",
-                            "type": "text",
-                            "required": true
-                        },
-                        {
-                            "key": "capabilities",
-                            "label": "Capabilities (comma separated)",
-                            "type": "text"
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "delete_role": {
-                    "key": "delete_role",
-                    "label": "Delete Role",
-                    "schema": [
-                        {
-                            "key": "role",
-                            "label": "Role",
-                            "type": "text",
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "add_user_role": {
-                    "key": "add_user_role",
-                    "label": "Add User Role",
-                    "schema": [
-                        {
-                            "key": "user_id",
-                            "label": "User ID",
-                            "type": "expression",
-                            "required": true
-                        },
-                        {
-                            "key": "role",
-                            "label": "Role",
-                            "type": "text",
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "remove_user_role": {
-                    "key": "remove_user_role",
-                    "label": "Remove User Role",
-                    "schema": [
-                        {
-                            "key": "user_id",
-                            "label": "User ID",
-                            "type": "expression",
-                            "required": true
-                        },
-                        {
-                            "key": "role",
-                            "label": "Role",
-                            "type": "text",
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "update_user_role": {
-                    "key": "update_user_role",
-                    "label": "Update User Role",
-                    "schema": [
-                        {
-                            "key": "user_id",
-                            "label": "User ID",
-                            "type": "expression",
-                            "required": true
-                        },
-                        {
-                            "key": "role",
-                            "label": "Role",
-                            "type": "text",
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "get_roles": {
-                    "key": "get_roles",
-                    "label": "Get All Roles",
                     "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "get_caps": {
-                    "key": "get_caps",
-                    "label": "Get All Capabilities",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "get_role_caps": {
-                    "key": "get_role_caps",
-                    "label": "Get Role Capabilities",
-                    "schema": [
-                        {
-                            "key": "role",
-                            "label": "Role",
-                            "type": "text",
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "add_role_caps": {
-                    "key": "add_role_caps",
-                    "label": "Add Role Capabilities",
-                    "schema": [
-                        {
-                            "key": "role",
-                            "label": "Role",
-                            "type": "text",
-                            "required": true
-                        },
-                        {
-                            "key": "caps",
-                            "label": "Capabilities (comma separated)",
-                            "type": "text",
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "remove_role_caps": {
-                    "key": "remove_role_caps",
-                    "label": "Remove Role Capabilities",
-                    "schema": [
-                        {
-                            "key": "role",
-                            "label": "Role",
-                            "type": "text",
-                            "required": true
-                        },
-                        {
-                            "key": "caps",
-                            "label": "Capabilities (comma separated)",
-                            "type": "text",
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "get_user_caps": {
-                    "key": "get_user_caps",
-                    "label": "Get User Capabilities",
-                    "schema": [
-                        {
-                            "key": "user_id",
-                            "label": "User ID",
-                            "type": "expression",
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "add_user_caps": {
-                    "key": "add_user_caps",
-                    "label": "Add User Capabilities",
-                    "schema": [
-                        {
-                            "key": "user_id",
-                            "label": "User ID",
-                            "type": "expression",
-                            "required": true
-                        },
-                        {
-                            "key": "caps",
-                            "label": "Capabilities (comma separated)",
-                            "type": "text",
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "remove_user_caps": {
-                    "key": "remove_user_caps",
-                    "label": "Remove User Capabilities",
-                    "schema": [
-                        {
-                            "key": "user_id",
-                            "label": "User ID",
-                            "type": "expression",
-                            "required": true
-                        },
-                        {
-                            "key": "caps",
-                            "label": "Capabilities (comma separated)",
-                            "type": "text",
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "get_term": {
-                    "key": "get_term",
-                    "label": "Get Term (Single)",
-                    "schema": [
-                        {
-                            "key": "term_id",
-                            "label": "Term ID",
-                            "type": "expression",
-                            "required": true
-                        },
-                        {
-                            "key": "taxonomy",
-                            "label": "Taxonomy",
-                            "type": "text",
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "get_terms_by_taxonomy": {
-                    "key": "get_terms_by_taxonomy",
-                    "label": "Get Term by Taxonomy",
-                    "schema": [
-                        {
-                            "key": "taxonomy",
-                            "label": "Taxonomy",
-                            "type": "text",
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "get_term_by_field": {
-                    "key": "get_term_by_field",
-                    "label": "Get Term by Field",
-                    "schema": [
-                        {
-                            "key": "field",
-                            "label": "Field",
-                            "type": "text",
-                            "required": true
-                        },
-                        {
-                            "key": "value",
-                            "label": "Value",
-                            "type": "text",
-                            "required": true
-                        },
-                        {
-                            "key": "taxonomy",
-                            "label": "Taxonomy",
-                            "type": "text",
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "create_term": {
-                    "key": "create_term",
-                    "label": "Create New Term",
-                    "schema": [
-                        {
-                            "key": "name",
-                            "label": "Name",
-                            "type": "text",
-                            "required": true
-                        },
-                        {
-                            "key": "taxonomy",
-                            "label": "Taxonomy",
-                            "type": "text",
-                            "required": true
-                        },
-                        {
-                            "key": "slug",
-                            "label": "Slug",
-                            "type": "text"
-                        },
-                        {
-                            "key": "parent",
-                            "label": "Parent ID",
-                            "type": "expression"
-                        },
-                        {
-                            "key": "description",
-                            "label": "Description",
-                            "type": "textarea"
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "update_term": {
-                    "key": "update_term",
-                    "label": "Update Term",
-                    "schema": [
-                        {
-                            "key": "term_id",
-                            "label": "Term ID",
-                            "type": "expression",
-                            "required": true
-                        },
-                        {
-                            "key": "taxonomy",
-                            "label": "Taxonomy",
-                            "type": "text",
-                            "required": true
-                        },
-                        {
-                            "key": "name",
-                            "label": "Name",
-                            "type": "text"
-                        },
-                        {
-                            "key": "slug",
-                            "label": "Slug",
-                            "type": "text"
-                        },
-                        {
-                            "key": "parent",
-                            "label": "Parent ID",
-                            "type": "expression"
-                        },
-                        {
-                            "key": "description",
-                            "label": "Description",
-                            "type": "textarea"
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "delete_term": {
-                    "key": "delete_term",
-                    "label": "Delete Term",
-                    "schema": [
-                        {
-                            "key": "term_id",
-                            "label": "Term ID",
-                            "type": "expression",
-                            "required": true
-                        },
-                        {
-                            "key": "taxonomy",
-                            "label": "Taxonomy",
-                            "type": "text",
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "register_taxonomy": {
-                    "key": "register_taxonomy",
-                    "label": "Register Taxonomy",
-                    "schema": [
-                        {
-                            "key": "taxonomy",
-                            "label": "Taxonomy",
-                            "type": "text",
-                            "required": true
-                        },
-                        {
-                            "key": "object_type",
-                            "label": "Object Type (comma separated)",
-                            "type": "text",
-                            "required": true
-                        },
-                        {
-                            "key": "args",
-                            "label": "Args (JSON)",
-                            "type": "text"
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "unregister_taxonomy": {
-                    "key": "unregister_taxonomy",
-                    "label": "Unregister Taxonomy",
-                    "schema": [
-                        {
-                            "key": "taxonomy",
-                            "label": "Taxonomy",
-                            "type": "text",
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "get_taxonomies": {
-                    "key": "get_taxonomies",
-                    "label": "Get Taxonomy (All)",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "get_taxonomy": {
-                    "key": "get_taxonomy",
-                    "label": "Get Taxonomy (Single)",
-                    "schema": [
-                        {
-                            "key": "taxonomy",
-                            "label": "Taxonomy",
-                            "type": "text",
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "add_taxonomy_to_post": {
-                    "key": "add_taxonomy_to_post",
-                    "label": "Add Taxonomy to Post",
-                    "schema": [
-                        {
-                            "key": "post_id",
-                            "label": "Post ID",
-                            "type": "expression",
-                            "required": true
-                        },
-                        {
-                            "key": "taxonomy",
-                            "label": "Taxonomy",
-                            "type": "text",
-                            "required": true
-                        },
-                        {
-                            "key": "terms",
-                            "label": "Terms (comma separated)",
-                            "type": "text",
-                            "required": true
-                        },
-                        {
-                            "key": "append",
-                            "label": "Append (true/false)",
-                            "type": "text"
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "remove_taxonomy_from_post": {
-                    "key": "remove_taxonomy_from_post",
-                    "label": "Remove Taxonomy from Post",
-                    "schema": [
-                        {
-                            "key": "post_id",
-                            "label": "Post ID",
-                            "type": "expression",
-                            "required": true
-                        },
-                        {
-                            "key": "taxonomy",
-                            "label": "Taxonomy",
-                            "type": "text",
-                            "required": true
-                        },
-                        {
-                            "key": "terms",
-                            "label": "Terms (comma separated)",
-                            "type": "text",
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "create_category": {
-                    "key": "create_category",
-                    "label": "Create Category",
-                    "schema": [
-                        {
-                            "key": "name",
-                            "label": "Name",
-                            "type": "text",
-                            "required": true
-                        },
-                        {
-                            "key": "slug",
-                            "label": "Slug",
-                            "type": "text"
-                        },
-                        {
-                            "key": "parent",
-                            "label": "Parent ID",
-                            "type": "expression"
-                        },
-                        {
-                            "key": "description",
-                            "label": "Description",
-                            "type": "textarea"
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "update_category": {
-                    "key": "update_category",
-                    "label": "Update Category",
-                    "schema": [
-                        {
-                            "key": "term_id",
-                            "label": "Category ID",
-                            "type": "expression",
-                            "required": true
-                        },
-                        {
-                            "key": "name",
-                            "label": "Name",
-                            "type": "text"
-                        },
-                        {
-                            "key": "slug",
-                            "label": "Slug",
-                            "type": "text"
-                        },
-                        {
-                            "key": "parent",
-                            "label": "Parent ID",
-                            "type": "expression"
-                        },
-                        {
-                            "key": "description",
-                            "label": "Description",
-                            "type": "textarea"
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "delete_category": {
-                    "key": "delete_category",
-                    "label": "Delete Category",
-                    "schema": [
-                        {
-                            "key": "term_id",
-                            "label": "Category ID",
-                            "type": "expression",
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "add_category_to_post": {
-                    "key": "add_category_to_post",
-                    "label": "Add Category to Post",
-                    "schema": [
-                        {
-                            "key": "post_id",
-                            "label": "Post ID",
-                            "type": "expression",
-                            "required": true
-                        },
-                        {
-                            "key": "categories",
-                            "label": "Categories (comma separated)",
-                            "type": "text",
-                            "required": true
-                        },
-                        {
-                            "key": "append",
-                            "label": "Append (true/false)",
-                            "type": "text"
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "get_categories": {
-                    "key": "get_categories",
-                    "label": "Get Category (All)",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "get_category": {
-                    "key": "get_category",
-                    "label": "Get Category (Single)",
-                    "schema": [
-                        {
-                            "key": "category_id",
-                            "label": "Category ID",
-                            "type": "expression",
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "create_post_tag": {
-                    "key": "create_post_tag",
-                    "label": "Create Post Tag",
-                    "schema": [
-                        {
-                            "key": "name",
-                            "label": "Name",
-                            "type": "text",
-                            "required": true
-                        },
-                        {
-                            "key": "slug",
-                            "label": "Slug",
-                            "type": "text"
-                        },
-                        {
-                            "key": "description",
-                            "label": "Description",
-                            "type": "textarea"
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "update_post_tag": {
-                    "key": "update_post_tag",
-                    "label": "Update Post Tag",
-                    "schema": [
-                        {
-                            "key": "term_id",
-                            "label": "Tag ID",
-                            "type": "expression",
-                            "required": true
-                        },
-                        {
-                            "key": "name",
-                            "label": "Name",
-                            "type": "text"
-                        },
-                        {
-                            "key": "slug",
-                            "label": "Slug",
-                            "type": "text"
-                        },
-                        {
-                            "key": "description",
-                            "label": "Description",
-                            "type": "textarea"
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "delete_post_tag": {
-                    "key": "delete_post_tag",
-                    "label": "Delete Post Tag",
-                    "schema": [
-                        {
-                            "key": "term_id",
-                            "label": "Tag ID",
-                            "type": "expression",
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "add_tags_to_post": {
-                    "key": "add_tags_to_post",
-                    "label": "Add Tags to Post",
-                    "schema": [
-                        {
-                            "key": "post_id",
-                            "label": "Post ID",
-                            "type": "expression",
-                            "required": true
-                        },
-                        {
-                            "key": "tags",
-                            "label": "Tags (comma separated)",
-                            "type": "text",
-                            "required": true
-                        },
-                        {
-                            "key": "append",
-                            "label": "Append (true/false)",
-                            "type": "text"
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "remove_tags_from_post": {
-                    "key": "remove_tags_from_post",
-                    "label": "Remove Tags from Post",
-                    "schema": [
-                        {
-                            "key": "post_id",
-                            "label": "Post ID",
-                            "type": "expression",
-                            "required": true
-                        },
-                        {
-                            "key": "tags",
-                            "label": "Tags (comma separated)",
-                            "type": "text",
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "get_post_tags": {
-                    "key": "get_post_tags",
-                    "label": "Get Post Tag (All)",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "get_post_tag": {
-                    "key": "get_post_tag",
-                    "label": "Get Post Tag (Single)",
-                    "schema": [
-                        {
-                            "key": "term_id",
-                            "label": "Tag ID",
-                            "type": "expression",
-                            "required": true
-                        }
-                    ],
                     "outputs": [
                         "main"
                     ]
@@ -1580,14 +742,7 @@
                 "send_password_reset_email": {
                     "key": "send_password_reset_email",
                     "label": "Send Password Reset Email",
-                    "schema": [
-                        {
-                            "key": "user_login",
-                            "label": "Username or Email",
-                            "type": "text",
-                            "required": true
-                        }
-                    ],
+                    "schema": [],
                     "outputs": [
                         "main"
                     ]
@@ -1610,12 +765,12 @@
                         },
                         {
                             "key": "remember",
-                            "label": "Remember (true/false)",
+                            "label": "Remember",
                             "type": "text"
                         },
                         {
                             "key": "secure_cookie",
-                            "label": "Secure Cookie (true/false)",
+                            "label": "Secure Cookie",
                             "type": "text"
                         }
                     ],
@@ -1661,34 +816,210 @@
                         "main"
                     ]
                 },
+                "create_role": {
+                    "key": "create_role",
+                    "label": "Create Role",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_role": {
+                    "key": "delete_role",
+                    "label": "Delete Role",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add_user_role": {
+                    "key": "add_user_role",
+                    "label": "Add User Role",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "remove_user_role": {
+                    "key": "remove_user_role",
+                    "label": "Remove User Role",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_user_role": {
+                    "key": "update_user_role",
+                    "label": "Update User Role",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_roles": {
+                    "key": "get_roles",
+                    "label": "Get All Roles",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_caps": {
+                    "key": "get_caps",
+                    "label": "Get All Capabilities",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_role_caps": {
+                    "key": "get_role_caps",
+                    "label": "Get Role Capabilities",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add_role_caps": {
+                    "key": "add_role_caps",
+                    "label": "Add Role Capabilities",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "remove_role_caps": {
+                    "key": "remove_role_caps",
+                    "label": "Remove Role Capabilities",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_user_caps": {
+                    "key": "get_user_caps",
+                    "label": "Get User Capabilities",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add_user_caps": {
+                    "key": "add_user_caps",
+                    "label": "Add User Capabilities",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "remove_user_caps": {
+                    "key": "remove_user_caps",
+                    "label": "Remove User Capabilities",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_term": {
+                    "key": "get_term",
+                    "label": "Get Term (Single)",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_terms_by_taxonomy": {
+                    "key": "get_terms_by_taxonomy",
+                    "label": "Get Term by Taxonomy",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_term_by_field": {
+                    "key": "get_term_by_field",
+                    "label": "Get Term by Field",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_term": {
+                    "key": "create_term",
+                    "label": "Create New Term",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_term": {
+                    "key": "update_term",
+                    "label": "Update Term",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_term": {
+                    "key": "delete_term",
+                    "label": "Delete Term",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "register_taxonomy": {
+                    "key": "register_taxonomy",
+                    "label": "Register Taxonomy",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "unregister_taxonomy": {
+                    "key": "unregister_taxonomy",
+                    "label": "Unregister Taxonomy",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_taxonomies": {
+                    "key": "get_taxonomies",
+                    "label": "Get Taxonomy (All)",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_taxonomy": {
+                    "key": "get_taxonomy",
+                    "label": "Get Taxonomy (Single)",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add_taxonomy_to_post": {
+                    "key": "add_taxonomy_to_post",
+                    "label": "Add Taxonomy to Post",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "remove_taxonomy_from_post": {
+                    "key": "remove_taxonomy_from_post",
+                    "label": "Remove Taxonomy from Post",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
                 "bulk_assign_terms_to_posts": {
                     "key": "bulk_assign_terms_to_posts",
                     "label": "Bulk Assign Terms to Posts",
-                    "schema": [
-                        {
-                            "key": "post_ids",
-                            "label": "Post IDs (comma separated)",
-                            "type": "text",
-                            "required": true
-                        },
-                        {
-                            "key": "taxonomy",
-                            "label": "Taxonomy",
-                            "type": "text",
-                            "required": true
-                        },
-                        {
-                            "key": "terms",
-                            "label": "Terms (comma separated)",
-                            "type": "text",
-                            "required": true
-                        },
-                        {
-                            "key": "append",
-                            "label": "Append (true/false)",
-                            "type": "text"
-                        }
-                    ],
+                    "schema": [],
                     "outputs": [
                         "main"
                     ]
@@ -1696,26 +1027,111 @@
                 "bulk_remove_terms_from_posts": {
                     "key": "bulk_remove_terms_from_posts",
                     "label": "Bulk Remove Terms from Posts",
-                    "schema": [
-                        {
-                            "key": "post_ids",
-                            "label": "Post IDs (comma separated)",
-                            "type": "text",
-                            "required": true
-                        },
-                        {
-                            "key": "taxonomy",
-                            "label": "Taxonomy",
-                            "type": "text",
-                            "required": true
-                        },
-                        {
-                            "key": "terms",
-                            "label": "Terms (comma separated)",
-                            "type": "text",
-                            "required": true
-                        }
-                    ],
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_category": {
+                    "key": "create_category",
+                    "label": "Create Category",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_category": {
+                    "key": "update_category",
+                    "label": "Update Category",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_category": {
+                    "key": "delete_category",
+                    "label": "Delete Category",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add_category_to_post": {
+                    "key": "add_category_to_post",
+                    "label": "Add Category to Post",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_categories": {
+                    "key": "get_categories",
+                    "label": "Get Category (All)",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_category": {
+                    "key": "get_category",
+                    "label": "Get Category (Single)",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_post_tag": {
+                    "key": "create_post_tag",
+                    "label": "Create Post Tag",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_post_tag": {
+                    "key": "update_post_tag",
+                    "label": "Update Post Tag",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_post_tag": {
+                    "key": "delete_post_tag",
+                    "label": "Delete Post Tag",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add_tags_to_post": {
+                    "key": "add_tags_to_post",
+                    "label": "Add Tags to Post",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "remove_tags_from_post": {
+                    "key": "remove_tags_from_post",
+                    "label": "Remove Tags from Post",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_post_tags": {
+                    "key": "get_post_tags",
+                    "label": "Get Post Tag (All)",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_post_tag": {
+                    "key": "get_post_tag",
+                    "label": "Get Post Tag (Single)",
+                    "schema": [],
                     "outputs": [
                         "main"
                     ]
@@ -1723,37 +1139,7 @@
                 "create_site": {
                     "key": "create_site",
                     "label": "Create New Site",
-                    "schema": [
-                        {
-                            "key": "domain",
-                            "label": "Domain",
-                            "type": "text",
-                            "required": true
-                        },
-                        {
-                            "key": "path",
-                            "label": "Path",
-                            "type": "text",
-                            "required": true
-                        },
-                        {
-                            "key": "title",
-                            "label": "Title",
-                            "type": "text",
-                            "required": true
-                        },
-                        {
-                            "key": "user_id",
-                            "label": "User ID",
-                            "type": "expression",
-                            "required": true
-                        },
-                        {
-                            "key": "site_id",
-                            "label": "Site ID",
-                            "type": "expression"
-                        }
-                    ],
+                    "schema": [],
                     "outputs": [
                         "main"
                     ]
@@ -1761,19 +1147,7 @@
                 "delete_site": {
                     "key": "delete_site",
                     "label": "Delete Site",
-                    "schema": [
-                        {
-                            "key": "blog_id",
-                            "label": "Blog ID",
-                            "type": "expression",
-                            "required": true
-                        },
-                        {
-                            "key": "drop",
-                            "label": "Drop Tables (true/false)",
-                            "type": "text"
-                        }
-                    ],
+                    "schema": [],
                     "outputs": [
                         "main"
                     ]
@@ -1781,22 +1155,286 @@
                 "add_user_to_site": {
                     "key": "add_user_to_site",
                     "label": "Add User to Site",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "remove_user_from_site": {
+                    "key": "remove_user_from_site",
+                    "label": "Remove User from Site",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "untrash_post": {
+                    "key": "untrash_post",
+                    "label": "Untrash Post",
                     "schema": [
                         {
-                            "key": "blog_id",
-                            "label": "Blog ID",
+                            "key": "post_id",
+                            "label": "Post ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "untrash_comment": {
+                    "key": "untrash_comment",
+                    "label": "Untrash Comment",
+                    "schema": [
+                        {
+                            "key": "comment_id",
+                            "label": "Comment ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_comment_count": {
+                    "key": "update_comment_count",
+                    "label": "Update Comment Count",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "Post ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "set_comment_status": {
+                    "key": "set_comment_status",
+                    "label": "Set Comment Status",
+                    "schema": [
+                        {
+                            "key": "comment_id",
+                            "label": "Comment ID",
                             "type": "expression",
                             "required": true
                         },
                         {
-                            "key": "user_id",
-                            "label": "User ID",
+                            "key": "status",
+                            "label": "Status",
+                            "type": "select",
+                            "required": true,
+                            "options": [
+                                {
+                                    "label": "Approved",
+                                    "value": "1"
+                                },
+                                {
+                                    "label": "Pending",
+                                    "value": "0"
+                                },
+                                {
+                                    "label": "Spam",
+                                    "value": "spam"
+                                },
+                                {
+                                    "label": "Trash",
+                                    "value": "trash"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_post_comments_all": {
+                    "key": "get_post_comments_all",
+                    "label": "Get Post Comments (All)",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_post_comments_single": {
+                    "key": "get_post_comments_single",
+                    "label": "Get Post Comments (Single Post)",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_user_comments": {
+                    "key": "get_user_comments",
+                    "label": "Get User Comments",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_user_comments_email": {
+                    "key": "get_user_comments_email",
+                    "label": "Get User Comments (By Email)",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_comment_metadata_all": {
+                    "key": "get_comment_metadata_all",
+                    "label": "Get Comment Metadata (All)",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_comment_metadata_single": {
+                    "key": "get_comment_metadata_single",
+                    "label": "Get Comment Metadata (Single)",
+                    "schema": [
+                        {
+                            "key": "comment_id",
+                            "label": "Comment ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_comment": {
+                    "key": "create_comment",
+                    "label": "Create New Comment",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "Post ID",
                             "type": "expression",
                             "required": true
                         },
                         {
-                            "key": "role",
-                            "label": "Role",
+                            "key": "author_name",
+                            "label": "Author Name",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "author_email",
+                            "label": "Author Email",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "content",
+                            "label": "Comment Content",
+                            "type": "textarea",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "reply_comment": {
+                    "key": "reply_comment",
+                    "label": "Reply To Comment",
+                    "schema": [
+                        {
+                            "key": "parent_id",
+                            "label": "Parent Comment ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "author_name",
+                            "label": "Author Name",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "author_email",
+                            "label": "Author Email",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "content",
+                            "label": "Reply Content",
+                            "type": "textarea",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_comment": {
+                    "key": "delete_comment",
+                    "label": "Delete Comment",
+                    "schema": [
+                        {
+                            "key": "comment_id",
+                            "label": "Comment ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add_plugin_theme_option": {
+                    "key": "add_plugin_theme_option",
+                    "label": "Add Option",
+                    "schema": [
+                        {
+                            "key": "option_name",
+                            "label": "Option",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "value",
+                            "label": "Value",
+                            "type": "expression"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_option_advanced": {
+                    "key": "update_option_advanced",
+                    "label": "Update Option",
+                    "schema": [
+                        {
+                            "key": "option_name",
+                            "label": "Option Name",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "value",
+                            "label": "New Value",
+                            "type": "expression"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_option": {
+                    "key": "delete_option",
+                    "label": "Delete Option",
+                    "schema": [
+                        {
+                            "key": "option_name",
+                            "label": "Option",
                             "type": "text",
                             "required": true
                         }
@@ -1805,19 +1443,49 @@
                         "main"
                     ]
                 },
-                "remove_user_from_site": {
-                    "key": "remove_user_from_site",
-                    "label": "Remove User from Site",
+                "generate_attachment_metadata": {
+                    "key": "generate_attachment_metadata",
+                    "label": "Generate Attachment Metadata",
                     "schema": [
                         {
-                            "key": "blog_id",
-                            "label": "Blog ID",
+                            "key": "attachment_id",
+                            "label": "Attachment ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "regenerate_image_sizes": {
+                    "key": "regenerate_image_sizes",
+                    "label": "Resize / Regenerate Image Sizes",
+                    "schema": [
+                        {
+                            "key": "attachment_id",
+                            "label": "Attachment ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "set_featured_image": {
+                    "key": "set_featured_image",
+                    "label": "Set Media Featured Image",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "Post ID",
                             "type": "expression",
                             "required": true
                         },
                         {
-                            "key": "user_id",
-                            "label": "User ID",
+                            "key": "attachment_id",
+                            "label": "Attachment ID",
                             "type": "expression",
                             "required": true
                         }
@@ -1875,7 +1543,7 @@
         "slack": {
             "slug": "slack",
             "name": "Slack",
-            "icon": "",
+            "icon": "slack",
             "category": "app",
             "triggers": {
                 "message_received": {
@@ -1892,7 +1560,41 @@
                 "send_message": {
                     "key": "send_message",
                     "label": "Send Message",
-                    "schema": [],
+                    "schema": {
+                        "channel": {
+                            "type": "text",
+                            "label": "Channel",
+                            "placeholder": "#general or channel ID",
+                            "required": true
+                        },
+                        "text": {
+                            "type": "textarea",
+                            "label": "Message",
+                            "placeholder": "Enter your message...",
+                            "required": true
+                        }
+                    },
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "send_dm": {
+                    "key": "send_dm",
+                    "label": "Send Direct Message",
+                    "schema": {
+                        "user_id": {
+                            "type": "text",
+                            "label": "User ID",
+                            "placeholder": "Slack user ID",
+                            "required": true
+                        },
+                        "text": {
+                            "type": "textarea",
+                            "label": "Message",
+                            "placeholder": "Enter your message...",
+                            "required": true
+                        }
+                    },
                     "outputs": [
                         "main"
                     ]

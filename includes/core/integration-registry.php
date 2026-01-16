@@ -2,16 +2,16 @@
 
 return [
     // tool
-    'condition' => ['file' => 'condition.php', 'class' => \Zaplane\Integration\Condition::class],
-    'delay' => ['file' => 'delay.php', 'class' => \Zaplane\Integration\Delay::class],
-    'iterator' => ['file' => 'iterator.php', 'class' => \Zaplane\Integration\Iterator::class],
+    'condition' => ['file' => 'condition.php', 'class' => \Zaplane\Integrations\Condition::class],
+    'delay' => ['file' => 'delay.php', 'class' => \Zaplane\Integrations\Delay::class],
+    'iterator' => ['file' => 'iterator.php', 'class' => \Zaplane\Integrations\Iterator::class],
     // apps
-    'wordpress' => ['file' => 'wordpress.php', 'class' => \Zaplane\Integration\Wordpress::class],
-    'woo'       => ['file' => 'woo.php', 'class' => \Zaplane\Integration\Woo::class],
-    'slack'     => ['file' => 'slack.php', 'class' => \Zaplane\Integration\Slack::class],
-    'trello'    => ['file' => 'trello.php', 'class' => \Zaplane\Integration\Trello::class],
-    'stripe'    => ['file' => 'stripe.php', 'class' => \Zaplane\Integration\Stripe::class],
-    'Http' => ['file' => 'http.php', 'class' => \Zaplane\Integration\Http::class],
-    'variable' => ['file' => 'variable.php', 'class' => \Zaplane\Integration\variable::class],
-    'webhook' => ['file' => 'webhook.php', 'class' => \Zaplane\Integration\webhook::class],
+    'wordpress' => ['file' => 'wordpress.php', 'class' => \Zaplane\Integrations\Wordpress::class],
+    'woo'       => ['file' => 'woo.php', 'class' => \Zaplane\Integrations\Woo::class],
+    'slack'     => ['file' => 'slack.php', 'class' => \Zaplane\Integrations\Slack::class],
+    'trello'    => ['file' => 'trello.php', 'class' => \Zaplane\Integrations\Trello::class],
+    'stripe'    => ['file' => 'stripe.php', 'class' => \Zaplane\Integrations\Stripe::class],
+    'Http' => ['file' => 'http.php', 'class' => \Zaplane\Integrations\Http::class],
+    'variable' => ['file' => 'variable.php', 'class' => \Zaplane\Integrations\variable::class],
+    'webhook' => ['file' => 'webhook.php', 'class' => \Zaplane\Integrations\webhook::class],
 ];

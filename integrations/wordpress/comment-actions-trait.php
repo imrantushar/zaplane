@@ -1,5 +1,5 @@
 <?php
-namespace Zaplane\Integration\Wordpress;
+namespace Zaplane\Integrations\Wordpress;
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
