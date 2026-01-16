@@ -14,7 +14,7 @@ class CreateWorkFlowsTable {
             title VARCHAR(255) NOT NULL,
             name VARCHAR(255) NOT NULL,
             status ENUM('active','paused','draft') DEFAULT 'draft',
-            flow_json LONGTEXT NULL,
+            -- flow_json LONGTEXT NULL,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 

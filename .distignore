@@ -4,6 +4,7 @@
 assets/css/backend-dist.css
 assets/css/frontend-dist.css
 assets/scss
+docs/
 package-lock.json
 package.json
 webpack.config.js
@@ -22,3 +23,5 @@ vendor
 .DS_Store
 .eslintignore
 .eslintrc.js
+dev-cli.php
+includes/dev-cli

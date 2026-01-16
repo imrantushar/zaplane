@@ -11,6 +11,7 @@ import {
   Stack,
   Menu,
   Portal,
+  Spinner,
 
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
@@ -24,9 +25,12 @@ import {
   deleteWorkFlow,
   getWorkFlow,
   updateWorkFlow,
+  updateWorkFlowStatus,
 } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
 import { FiMoreVertical } from "react-icons/fi";
 import { showNotification } from "@ZAPRedux/Slices/notificationSlice/notificationSlice";
+import ZAPLoading from "@ZAPComponents/Loading";
+import ZAPTable from "@ZAPComponents/Table";
 
 
 const CreateWorkflows = () => {
@@ -36,8 +40,7 @@ const CreateWorkflows = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  // Redux code untouched
-  const { data } = useSelector((state) => state.workflows);
+  const { data, isLoading } = useSelector((state) => state.workflows);
 
   useEffect(() => {
     dispatch(getWorkFlow());
@@ -48,10 +51,7 @@ const CreateWorkflows = () => {
 
     dispatch(
       createWorkflows({
-        title: workflowName,
-        name: workflowName,
-        status: "active",
-        flow_json: JSON.stringify(),
+        title: workflowName
       })
     )
       .unwrap()
@@ -85,16 +85,14 @@ const CreateWorkflows = () => {
     if (!item?.id || !status) return;
 
     const payload = {
-      title: item.title,
-      name: item.title,
       status: status,
-      flow_json: item.flow_json ?? null,
+      id: item.id,
     };
 
     try {
-      await dispatch(updateWorkFlow({ id: item.id, payload })).unwrap();
+      await dispatch(updateWorkFlowStatus(payload));
     } catch (error) {
-    console.log(error);
+      console.log(error);
     }
   };
 
@@ -111,8 +109,8 @@ const CreateWorkflows = () => {
         bg="white"
       >
         <Box>
-          <Heading size="md">{__("Workflows", "zaplane")}</Heading>
-          <Text fontSize="sm" color="gray.500">
+          <Heading margin='0' size="md">{__("Workflows", "zaplane")}</Heading>
+          <Text fontSize="sm" margin='0' color="gray.500">
             {__("Automate actions between your apps", "zaplane")}
           </Text>
         </Box>
@@ -129,9 +127,9 @@ const CreateWorkflows = () => {
                 <Menu.Item onClick={() => setIsModalOpen(true)}>
                   {__("Create from Scratch", "zaplane")}
                 </Menu.Item>
-                <Menu.Item>
+                {/* <Menu.Item>
                   {__("Create with AI", "zaplane")}
-                </Menu.Item>
+                </Menu.Item> */}
               </Menu.Content>
             </Menu.Positioner>
           </Portal>
@@ -146,73 +144,95 @@ const CreateWorkflows = () => {
           boxShadow="sm"
         >
           <Box px={5} py={4} borderBottom="1px solid" borderColor="gray.200">
-            <Heading size="sm">
+            <Heading size="sm" margin='0'>
               {__("Workflow List", "zaplane")}
             </Heading>
           </Box>
 
-          <Table.Root size="sm">
-            <Table.Header bg="gray.50">
-              <Table.Row>
-                <Table.ColumnHeader width="25%">Title</Table.ColumnHeader>
-                <Table.ColumnHeader width="25%">Name</Table.ColumnHeader>
-                <Table.ColumnHeader width="25%">Status</Table.ColumnHeader>
-                <Table.ColumnHeader width="25%" textAlign="end">
-                  Actions
-                </Table.ColumnHeader>
-              </Table.Row>
-            </Table.Header>
+          <ZAPTable
+            data={data}
+            rowKey="id"
+            size="sm"
+            variant="line"
+            columns={[
+              {
+                label: __("Title", "zaplane"),
+                key: "title",
+                textAlign: "center",
+                render: (row) => (
+                  <Text fontWeight="500" m={0}>
+                    {row.title}
+                  </Text>
+                ),
+              },
+              {
+                label: __("Created At", "zaplane"),
+                key: "created_at",
+                textAlign: "center",
+                render: (row) => (
+                  <Text fontSize="sm">
+                    {row.created_at}
+                  </Text>
+                ),
+              },
 
-            <Table.Body>
-              {Array.isArray(data) && data?.map((item) => (
-                <Table.Row key={item.id} _hover={{ bg: "gray.50" }}>
-                  <Table.Cell>
-                    <Text fontWeight="500">{item.title}</Text>
-                  </Table.Cell>
-                  <Table.Cell color="gray.600">
-                    {item.name}
-                  </Table.Cell>
-                  <Table.Cell>
-                    <Box w='109px'>
-                      <Select
-                        options={statusOptions}
-                        value={statusOptions.find(opt => opt.value === item.status)}
-                        onChange={(selected) =>
-                          onSubmitHandler(item, selected.value)
-                        }
-                        isClearable={false}
-                        isSearchable={false}
-                        placeholder="Select status"
-                      />
-                    </Box>
-                  </Table.Cell>
-                  <Table.Cell textAlign="end">
-                    <Stack direction="row" spacing={2} justify="flex-end">
-                      <Button
-                        size="xs"
-                        variant="outline"
-                        onClick={() =>
-                          navigate(
-                            `${route_path}admin.php?page=zaplane-workflows&action=edit&id=${item.id}`
-                          )
-                        }
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        size="xs"
-                        colorScheme="red"
-                        variant="ghost"
-                        onClick={() => workflowDeleteHandler(item.id)}
-                      >
-                        Delete
-                      </Button>
-                    </Stack>
-                  </Table.Cell>
-                </Table.Row>
-              ))}
-            </Table.Body>
-          </Table.Root>
+              {
+                label: __("Updated At", "zaplane"),
+                key: "updated_at",
+                textAlign: "center",
+                render: (row) => (
+                  <Text fontSize="sm">
+                    {row.updated_at}
+                  </Text>
+                ),
+              },
+                {
+                label: __("Status", "zaplane"),
+                key: "status",
+                textAlign: "center",
+                render: (row) => (
+                  <Box w="120px" mx="auto">
+                    <Select
+                      options={statusOptions}
+                      value={statusOptions.find(
+                        (opt) => opt.value === row.status
+                      )}
+                      onChange={(selected) =>
+                        onSubmitHandler(row, selected.value)
+                      }
+                      isClearable={false}
+                      isSearchable={false}
+                    />
+                  </Box>
+                ),
+              },
+            ]}
+            actionsRenderer={(row) => (
+              <Box>
+                <Button
+                  size="xs"
+                  variant="outline"
+                  onClick={() =>
+                    navigate(
+                      `${route_path}admin.php?page=zaplane-workflows&action=edit&id=${row.id}`
+                    )
+                  }
+                >
+                  Edit
+                </Button>
+
+                <Button
+                  size="xs"
+                  colorScheme="red"
+                  variant="ghost"
+                  onClick={() => workflowDeleteHandler(row.id)}
+                >
+                  Delete
+                </Button>
+              </Box>
+            )}
+            isLoading={isLoading}
+          />
         </Box>
       </Box>
       <WPModal

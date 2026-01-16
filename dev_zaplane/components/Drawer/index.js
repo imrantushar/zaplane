@@ -1,0 +1,85 @@
+
+
+import {
+    CloseButton,
+    Drawer,
+    Portal,
+    Text,
+} from "@chakra-ui/react";
+
+
+const ZAPDrawer = ({
+    trigger,
+    children,
+    title,
+    footer,
+    placement = "end",
+    size = "md",
+    closeOnOverlayClick = false,
+    zIndex = 9999,
+    onClose,
+    open,
+}) => {
+    return (
+        <Drawer.Root
+            placement={placement}
+            size={size}
+            open={open}
+            modal={false}
+            closeOnInteractOutside={closeOnOverlayClick}
+            closeOnOverlayClick={closeOnOverlayClick}
+            onOpenChange={(details) => {
+                if (!details.open) {
+                    onClose?.();
+                }
+            }}
+
+        >
+            {closeOnOverlayClick && <Drawer.Backdrop />}
+            <Drawer.Trigger asChild>
+                {trigger}
+            </Drawer.Trigger>
+
+            <Portal>
+                <Drawer.Positioner marginTop='32px' zIndex={"99999999"}
+                    pointerEvents="none">
+                    <Drawer.Content pointerEvents="auto">
+                        {title && (
+                            <Drawer.Header>
+                                <Drawer.Title margin='0' >{title}</Drawer.Title>
+                                <Drawer.CloseTrigger asChild>
+                                    <CloseButton size="sm" />
+                                </Drawer.CloseTrigger>
+                            </Drawer.Header>
+                        )}
+
+                        <Drawer.Context>
+                            {(store) => (
+                                <>
+                                    <Drawer.Body spaceY="3">
+                                        {typeof children === "function"
+                                            ? children(store)
+                                            : children}
+                                    </Drawer.Body>
+
+                                    {/* 👉 Footer Section */}
+                                    {footer && (
+                                        <Drawer.Footer>
+                                            {typeof footer === "function"
+                                                ? footer(store)
+                                                : footer}
+                                        </Drawer.Footer>
+                                    )}
+                                </>
+                            )}
+                        </Drawer.Context>
+
+
+                    </Drawer.Content>
+                </Drawer.Positioner>
+            </Portal>
+        </Drawer.Root>
+    );
+};
+
+export default ZAPDrawer;
