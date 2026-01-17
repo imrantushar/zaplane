@@ -86,6 +86,7 @@ class Autoload {
         $this->add_namespace_directory('Zaplane\\Database\\ORM', ZAPLANE_ROOT_DIR_PATH . 'includes/database/orm/');
         $this->add_namespace_directory('Zaplane\\Database\\Migrations', ZAPLANE_ROOT_DIR_PATH . 'includes/database/migrations/');
         $this->add_namespace_directory('Zaplane\\Models', ZAPLANE_ROOT_DIR_PATH . 'includes/models/');
+        $this->add_namespace_directory('Zaplane\\Models\\WordPress', ZAPLANE_ROOT_DIR_PATH . 'includes/models/wordpress/');
         $this->add_namespace_directory('Zaplane\\Console', ZAPLANE_ROOT_DIR_PATH . 'includes/console/');
         $this->add_namespace_directory('Zaplane\\Console\\Commands', ZAPLANE_ROOT_DIR_PATH . 'includes/console/commands/');
     }

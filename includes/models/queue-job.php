@@ -3,6 +3,7 @@
 namespace Zaplane\Models;
 
 use Zaplane\Database\ORM\Model;
+use Zaplane\Database\ORM\Collection;
 
 if (!defined('ABSPATH')) exit;
 
@@ -115,7 +116,7 @@ class QueueJob extends Model
             ->get();
     }
 
-    public static function forRun(int $runId): array
+    public static function forRun(int $runId): Collection
     {
         return static::where('run_id', $runId)->get();
     }

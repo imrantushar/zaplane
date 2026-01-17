@@ -45,9 +45,18 @@ abstract class Model implements JsonSerializable
         return $query;
     }
 
-    public static function all(): array
+    public static function all(): Collection
     {
         return static::query()->get();
+    }
+
+    /**
+     * Get all models as a Collection.
+     * @deprecated Since all() now returns Collection, use all() instead
+     */
+    public static function collect(): Collection
+    {
+        return static::all();
     }
 
     public static function find(int $id): ?self
@@ -65,10 +74,10 @@ abstract class Model implements JsonSerializable
         return $result;
     }
 
-    public static function findMany(array $ids): array
+    public static function findMany(array $ids): Collection
     {
         if (empty($ids)) {
-            return [];
+            return new Collection([]);
         }
         return static::query()->whereIn(static::$primaryKey, $ids)->get();
     }
@@ -532,6 +541,41 @@ abstract class Model implements JsonSerializable
         }
 
         return $array;
+    }
+
+    /**
+     * Get only the specified attributes.
+     */
+    public function only($keys): array
+    {
+        $keys = is_array($keys) ? $keys : func_get_args();
+        $array = [];
+
+        foreach ($keys as $key) {
+            if (array_key_exists($key, $this->attributes)) {
+                $array[$key] = $this->getAttribute($key);
+            }
+        }
+
+        return $array;
+    }
+
+    /**
+     * Get all attributes except the specified ones.
+     */
+    public function except($keys): array
+    {
+        $keys = is_array($keys) ? $keys : func_get_args();
+
+        return array_diff_key($this->toArray(), array_flip($keys));
+    }
+
+    /**
+     * Get all attributes as a Collection.
+     */
+    public function toCollection(): Collection
+    {
+        return new Collection($this->toArray());
     }
 
     public function jsonSerialize(): array

@@ -293,7 +293,7 @@ class QueryBuilder
         return $this;
     }
 
-    public function get(): array
+    public function get(): Collection
     {
         global $wpdb;
 
@@ -307,20 +307,29 @@ class QueryBuilder
         $results = $wpdb->get_results($sql, ARRAY_A);
 
         if ($this->modelClass && $results) {
-            return array_map(fn($row) => $this->modelClass::hydrate($row), $results);
+            return new Collection(array_map(fn($row) => $this->modelClass::hydrate($row), $results));
         }
 
-        return $results ?: [];
+        return new Collection($results ?: []);
     }
 
-    public function first(): ?array
+    /**
+     * Get the results as a Collection.
+     * @deprecated Since get() now returns Collection, use get() instead
+     */
+    public function collect(): Collection
+    {
+        return $this->get();
+    }
+
+    public function first()
     {
         $this->limit(1);
         $results = $this->get();
-        return $results[0] ?? null;
+        return $results->first();
     }
 
-    public function find(int $id): ?array
+    public function find(int $id)
     {
         return $this->where('id', $id)->first();
     }
@@ -336,23 +345,31 @@ class QueryBuilder
 
     public function value(string $column)
     {
+        // Temporarily disable model hydration for scalar value retrieval
+        $originalModel = $this->modelClass;
+        $this->modelClass = null;
         $result = $this->select($column)->first();
+        $this->modelClass = $originalModel;
         return $result[$column] ?? null;
     }
 
-    public function pluck(string $column, ?string $key = null): array
+    public function pluck(string $column, ?string $key = null): Collection
     {
+        // Temporarily disable model hydration for pluck
+        $originalModel = $this->modelClass;
+        $this->modelClass = null;
         $results = $this->select($key ? [$column, $key] : [$column])->get();
+        $this->modelClass = $originalModel;
 
         if ($key) {
             $plucked = [];
-            foreach ($results as $row) {
+            foreach ($results->all() as $row) {
                 $plucked[$row[$key]] = $row[$column];
             }
-            return $plucked;
+            return new Collection($plucked);
         }
 
-        return array_column($results, $column);
+        return new Collection(array_column($results->all(), $column));
     }
 
     public function count(string $column = '*'): int

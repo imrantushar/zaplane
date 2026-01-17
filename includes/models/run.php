@@ -3,6 +3,7 @@
 namespace Zaplane\Models;
 
 use Zaplane\Database\ORM\Model;
+use Zaplane\Database\ORM\Collection;
 
 if (!defined('ABSPATH')) exit;
 
@@ -93,7 +94,7 @@ class Run extends Model
             ->get();
     }
 
-    public static function recent(int $limit = 100): array
+    public static function recent(int $limit = 100): Collection
     {
         return static::orderBy('id', 'desc')->limit($limit)->get();
     }

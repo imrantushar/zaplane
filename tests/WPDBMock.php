@@ -8,6 +8,7 @@ class WPDBMock
     public ?int $insert_id = null;
     public array $tables = [];
     private array $lastQuery = [];
+    private int $resultsIndex = 0;
 
     public function __construct()
     {
@@ -19,6 +20,7 @@ class WPDBMock
         $this->tables = [];
         $this->insert_id = null;
         $this->lastQuery = [];
+        $this->resultsIndex = 0;
     }
 
     public function setTable(string $name, array $rows): void
@@ -48,7 +50,21 @@ class WPDBMock
 
     public function get_results(string $query, $output = OBJECT): array
     {
-        return $this->tables['results'] ?? [];
+        // Support sequential results for tests with multiple queries
+        if (isset($this->tables['results_sequence']) && is_array($this->tables['results_sequence'])) {
+            $results = $this->tables['results_sequence'][$this->resultsIndex] ?? [];
+            $this->resultsIndex++;
+        } else {
+            $results = $this->tables['results'] ?? [];
+        }
+
+        if ($output === ARRAY_A) {
+            return array_map(function ($row) {
+                return is_object($row) ? (array) $row : $row;
+            }, $results);
+        }
+
+        return $results;
     }
 
     public function get_row(string $query, $output = OBJECT, int $offset = 0)

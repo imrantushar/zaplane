@@ -1,29 +1,31 @@
 <?php
+
 namespace Zaplane\Classes;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
+use Zaplane\Models\Workflow;
+use Zaplane\Models\WorkflowVersion;
+
+if (!defined('ABSPATH')) {
+    exit;
 }
 
-class Query {  
-
-    public static function get_active_trigger_events(): array {
-        global $wpdb;
-
-        $rows = $wpdb->get_results("
-            SELECT wv.graph_json
-            FROM {$wpdb->prefix}zaplane_workflows w
-            JOIN {$wpdb->prefix}zaplane_workflow_versions wv 
-            ON w.id = wv.workflow_id
-            WHERE w.status='active' AND wv.is_active=1
-        ", ARRAY_A);
-
+class Query
+{
+    public static function get_active_trigger_events(): array
+    {
+        $activeWorkflows = Workflow::active();
         $events = [];
-        foreach ($rows as $r) {
-            $g = json_decode($r['graph_json'], true);
-            foreach ($g['nodes'] ?? [] as $n) {
-                if (($n['type'] ?? '') === 'trigger' && !empty($n['data']['event'])) {
-                    $events[] = $n['data']['event'];
+
+        foreach ($activeWorkflows as $workflow) {
+            $version = $workflow->activeVersion();
+            if (!$version) {
+                continue;
+            }
+
+            $graph = $version->getGraph();
+            foreach ($graph['nodes'] ?? [] as $node) {
+                if (($node['type'] ?? '') === 'trigger' && !empty($node['data']['event'])) {
+                    $events[] = $node['data']['event'];
                 }
             }
         }
@@ -31,27 +33,25 @@ class Query {
         return array_unique($events);
     }
 
-    public static function get_active_workflows_for_event(string $event): array {
-        global $wpdb;
-
-        $rows = $wpdb->get_results("
-            SELECT w.id,w.user_id,wv.graph_json,wv.graph_hash
-            FROM {$wpdb->prefix}zaplane_workflows w
-            JOIN {$wpdb->prefix}zaplane_workflow_versions wv 
-            ON w.id=wv.workflow_id
-            WHERE w.status='active' AND wv.is_active=1
-        ", ARRAY_A);
-
+    public static function get_active_workflows_for_event(string $event): array
+    {
+        $activeWorkflows = Workflow::active();
         $out = [];
-        foreach ($rows as $r) {
-            $g = json_decode($r['graph_json'], true);
-            foreach ($g['nodes'] ?? [] as $n) {
-                if (($n['type'] ?? '') === 'trigger' && ($n['data']['event'] ?? '') === $event) {
+
+        foreach ($activeWorkflows as $workflow) {
+            $version = $workflow->activeVersion();
+            if (!$version) {
+                continue;
+            }
+
+            $graph = $version->getGraph();
+            foreach ($graph['nodes'] ?? [] as $node) {
+                if (($node['type'] ?? '') === 'trigger' && ($node['data']['event'] ?? '') === $event) {
                     $out[] = [
-                        'workflow_version_hash' => $r['graph_hash'],
-                        'id' => $n['id'],
-                        'app' => $n['data']['app'] ?? '',
-                        'graph_node' => $n
+                        'workflow_version_hash' => $version->graph_hash,
+                        'id' => $node['id'],
+                        'app' => $node['data']['app'] ?? '',
+                        'graph_node' => $node,
                     ];
                 }
             }

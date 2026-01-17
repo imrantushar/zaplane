@@ -3,6 +3,7 @@
 namespace Zaplane\Models;
 
 use Zaplane\Database\ORM\Model;
+use Zaplane\Database\ORM\Collection;
 
 if (!defined('ABSPATH')) exit;
 
@@ -42,12 +43,12 @@ class ExecutionEdge extends Model
         return $this->payload_json ?? [];
     }
 
-    public static function forRun(int $runId): array
+    public static function forRun(int $runId): Collection
     {
         return static::where('run_id', $runId)->get();
     }
 
-    public static function fromNode(int $nodeRunId): array
+    public static function fromNode(int $nodeRunId): Collection
     {
         return static::where('from_node_run_id', $nodeRunId)->get();
     }
