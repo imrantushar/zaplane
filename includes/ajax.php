@@ -23,6 +23,7 @@ class Ajax implements ModuleInterface {
     }
 
     public function register_hooks(): void {
-        new \Zaplane\Ajax\Workflows();
+        $workflows = new \Zaplane\Ajax\Workflows();
+        $workflows->dispatch_actions();
     }
 }

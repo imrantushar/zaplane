@@ -3,6 +3,7 @@
 namespace Zaplane\Models;
 
 use Zaplane\Framework\Database\ORM\Model;
+use Zaplane\Framework\Database\ORM\Collection;
 
 if (!defined('ABSPATH')) exit;
 
@@ -22,7 +23,7 @@ class Workflow extends Model
         'user_id' => 'integer',
     ];
 
-    public function versions(): array
+    public function versions(): Collection
     {
         return WorkflowVersion::where('workflow_id', $this->id)->orderBy('id', 'desc')->get();
     }
@@ -34,11 +35,11 @@ class Workflow extends Model
             ->first();
     }
 
-    public function runs(): array
+    public function runs()
     {
         $version = $this->activeVersion();
         if (!$version) {
-            return [];
+            return collect([]);
         }
         return Run::where('workflow_version_hash', $version->graph_hash)
             ->orderBy('id', 'desc')
@@ -72,12 +73,12 @@ class Workflow extends Model
         return $this->status === 'draft';
     }
 
-    public static function forUser(int $userId): array
+    public static function forUser(int $userId): Collection
     {
         return static::where('user_id', $userId)->orderBy('id', 'desc')->get();
     }
 
-    public static function active(): array
+    public static function active(): Collection
     {
         return static::where('status', 'active')->get();
     }

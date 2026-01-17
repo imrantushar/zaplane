@@ -13,7 +13,13 @@ class Query
 {
     public static function get_active_trigger_events(): array
     {
-        $activeWorkflows = Workflow::active();
+        try {
+            $activeWorkflows = Workflow::active();
+        } catch (\Exception $e) {
+            // Tables might not exist yet during installation
+            return [];
+        }
+
         $events = [];
 
         foreach ($activeWorkflows as $workflow) {
@@ -35,7 +41,13 @@ class Query
 
     public static function get_active_workflows_for_event(string $event): array
     {
-        $activeWorkflows = Workflow::active();
+        try {
+            $activeWorkflows = Workflow::active();
+        } catch (\Exception $e) {
+            // Tables might not exist yet during installation
+            return [];
+        }
+
         $out = [];
 
         foreach ($activeWorkflows as $workflow) {

@@ -34,6 +34,11 @@ class Automation
 
     public function boot(): void
     {
+        // Don't register automation hooks during WP-CLI execution
+        if (defined('WP_CLI') && WP_CLI) {
+            return;
+        }
+
         add_action('init', [$this, 'dispatch_active_triggers']);
         add_action('zaplane_execute_node_run', [$this, 'dispatch_node_run'], 10, 1);
         add_action('zaplane_workflow_updated', [$this, 'reload_triggers']);

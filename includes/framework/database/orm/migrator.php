@@ -247,8 +247,12 @@ class Migrator
 
     protected function getClassNameFromFile(string $name): string
     {
+        // Remove the timestamp prefix (YYYY_MM_DD_HHMMSS)
+        // Migration format: 2024_01_01_000001_create_workflows_table
         $parts = explode('_', $name);
-        array_shift($parts);
+
+        // Remove first 4 parts (year, month, day, time)
+        array_splice($parts, 0, 4);
 
         $className = '';
         foreach ($parts as $part) {

@@ -8,9 +8,9 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 
 class IntegrationsController extends WP_REST_Controller {
 
-    protected Container $container;
+    protected ?Container $container = null;
 
-    public function __construct(Container $container) {
+    public function __construct(?Container $container = null) {
         $this->container = $container;
     }
 
