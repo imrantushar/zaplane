@@ -3,8 +3,8 @@
 namespace Zaplane\Tests\Unit;
 
 use Zaplane\Tests\TestCase;
-use Zaplane\Classes\Encryption;
-use Zaplane\Exceptions\EncryptionException;
+use Zaplane\Framework\Classes\Encryption;
+use Zaplane\Framework\Exceptions\EncryptionException;
 
 class EncryptionTest extends TestCase
 {

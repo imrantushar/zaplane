@@ -3,8 +3,8 @@
 namespace Zaplane\Tests\Unit;
 
 use Zaplane\Tests\TestCase;
-use Zaplane\Database\ORM\Model;
-use Zaplane\Database\ORM\QueryBuilder;
+use Zaplane\Framework\Database\ORM\Model;
+use Zaplane\Framework\Database\ORM\QueryBuilder;
 
 class TestModel extends Model
 {

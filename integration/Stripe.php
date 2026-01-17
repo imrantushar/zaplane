@@ -1,7 +1,7 @@
 <?php
 namespace Zaplane\Integration;
 
-use Zaplane\Classes\IntegrationBase;
+use Zaplane\Framework\Classes\IntegrationBase;
 
 class Stripe extends IntegrationBase {
 

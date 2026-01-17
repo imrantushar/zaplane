@@ -2,8 +2,8 @@
 
 namespace Zaplane\Models;
 
-use Zaplane\Database\ORM\Model;
-use Zaplane\Database\ORM\Collection;
+use Zaplane\Framework\Database\ORM\Model;
+use Zaplane\Framework\Database\ORM\Collection;
 
 if (!defined('ABSPATH')) exit;
 

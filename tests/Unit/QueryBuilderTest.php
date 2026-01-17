@@ -3,8 +3,8 @@
 namespace Zaplane\Tests\Unit;
 
 use Zaplane\Tests\TestCase;
-use Zaplane\Database\ORM\QueryBuilder;
-use Zaplane\Database\ORM\RawExpression;
+use Zaplane\Framework\Database\ORM\QueryBuilder;
+use Zaplane\Framework\Database\ORM\RawExpression;
 
 class QueryBuilderTest extends TestCase
 {

@@ -2,7 +2,7 @@
 
 namespace Zaplane\Models;
 
-use Zaplane\Database\ORM\Model;
+use Zaplane\Framework\Database\ORM\Model;
 use Zaplane\Encryption;
 
 if (!defined('ABSPATH')) exit;

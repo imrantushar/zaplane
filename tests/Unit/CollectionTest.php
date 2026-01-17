@@ -3,7 +3,7 @@
 namespace Zaplane\Tests\Unit;
 
 use Zaplane\Tests\TestCase;
-use Zaplane\Database\ORM\Collection;
+use Zaplane\Framework\Database\ORM\Collection;
 
 class CollectionTest extends TestCase
 {

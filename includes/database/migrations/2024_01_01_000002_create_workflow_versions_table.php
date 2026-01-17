@@ -2,9 +2,9 @@
 
 namespace Zaplane\Database\Migrations;
 
-use Zaplane\Database\ORM\Migration;
-use Zaplane\Database\ORM\Schema;
-use Zaplane\Database\ORM\Blueprint;
+use Zaplane\Framework\Database\ORM\Migration;
+use Zaplane\Framework\Database\ORM\Schema;
+use Zaplane\Framework\Database\ORM\Blueprint;
 
 if (!defined('ABSPATH')) exit;
 

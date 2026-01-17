@@ -3,14 +3,14 @@
 namespace Zaplane\Tests\Unit;
 
 use Zaplane\Tests\TestCase;
-use Zaplane\Exceptions\ZaplaneException;
-use Zaplane\Exceptions\ValidationException;
-use Zaplane\Exceptions\IntegrationException;
-use Zaplane\Exceptions\OAuthException;
-use Zaplane\Exceptions\WorkflowException;
-use Zaplane\Exceptions\EncryptionException;
-use Zaplane\Exceptions\DatabaseException;
-use Zaplane\Exceptions\ConnectionException;
+use Zaplane\Framework\Exceptions\ZaplaneException;
+use Zaplane\Framework\Exceptions\ValidationException;
+use Zaplane\Framework\Exceptions\IntegrationException;
+use Zaplane\Framework\Exceptions\OAuthException;
+use Zaplane\Framework\Exceptions\WorkflowException;
+use Zaplane\Framework\Exceptions\EncryptionException;
+use Zaplane\Framework\Exceptions\DatabaseException;
+use Zaplane\Framework\Exceptions\ConnectionException;
 
 class ExceptionsTest extends TestCase
 {

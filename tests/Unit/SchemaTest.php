@@ -3,7 +3,7 @@
 namespace Zaplane\Tests\Unit;
 
 use Zaplane\Tests\TestCase;
-use Zaplane\Database\ORM\Schema;
+use Zaplane\Framework\Database\ORM\Schema;
 
 class SchemaTest extends TestCase
 {

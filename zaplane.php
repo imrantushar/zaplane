@@ -29,7 +29,7 @@ define( 'ZAPLANE_ASSETS_DIR_PATH', ZAPLANE_ROOT_DIR_PATH . 'assets/' );
 define( 'ZAPLANE_ASSETS_URI', ZAPLANE_PLUGIN_ROOT_URI . 'assets/' );
 
 // Include the main bootstrap class
-require_once __DIR__ . '/includes/core/zaplane.php';
+require_once __DIR__ . '/includes/framework/core/zaplane.php';
 
 // Development Purpose CLI Command
 if(file_exists(__DIR__ . '/dev-cli.php')){
@@ -39,7 +39,7 @@ if(file_exists(__DIR__ . '/dev-cli.php')){
 // Register WP-CLI commands
 if (defined('WP_CLI') && WP_CLI) {
     add_action('plugins_loaded', function () {
-        \Zaplane\Console\Kernel::getInstance()->boot();
+        \Zaplane\Framework\Console\Kernel::getInstance()->boot();
     });
 }
 

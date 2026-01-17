@@ -3,8 +3,8 @@
 namespace Zaplane\Tests\Unit;
 
 use Zaplane\Tests\TestCase;
-use Zaplane\Database\ORM\Blueprint;
-use Zaplane\Database\ORM\ColumnDefinition;
+use Zaplane\Framework\Database\ORM\Blueprint;
+use Zaplane\Framework\Database\ORM\ColumnDefinition;
 
 class BlueprintTest extends TestCase
 {

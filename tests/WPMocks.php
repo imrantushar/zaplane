@@ -308,4 +308,25 @@ namespace {
     if (!defined('AUTH_KEY')) {
         define('AUTH_KEY', 'test-auth-key-for-phpunit-testing');
     }
+
+    if (!defined('WP_CONTENT_DIR')) {
+        define('WP_CONTENT_DIR', sys_get_temp_dir() . '/wp-content');
+    }
+
+    if (!function_exists('wp_mkdir_p')) {
+        function wp_mkdir_p(string $target): bool
+        {
+            if (is_dir($target)) {
+                return true;
+            }
+            return @mkdir($target, 0755, true);
+        }
+    }
+
+    if (!function_exists('wp_timezone_string')) {
+        function wp_timezone_string(): string
+        {
+            return 'UTC';
+        }
+    }
 }

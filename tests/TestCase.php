@@ -3,7 +3,7 @@
 namespace Zaplane\Tests;
 
 use PHPUnit\Framework\TestCase as BaseTestCase;
-use Zaplane\Database\ORM\Schema;
+use Zaplane\Framework\Database\ORM\Schema;
 
 abstract class TestCase extends BaseTestCase
 {

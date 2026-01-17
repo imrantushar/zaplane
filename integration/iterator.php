@@ -5,7 +5,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use Zaplane\Classes\IntegrationBase;
+use Zaplane\Framework\Classes\IntegrationBase;
 
 class Iterator extends IntegrationBase {
 

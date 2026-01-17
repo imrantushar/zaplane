@@ -2,7 +2,7 @@
 
 namespace Zaplane;
 
-use Zaplane\Database\ORM\Migrator;
+use Zaplane\Framework\Database\ORM\Migrator;
 
 if (!defined('ABSPATH')) exit;
 

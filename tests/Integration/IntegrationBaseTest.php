@@ -3,7 +3,7 @@
 namespace Zaplane\Tests\Integration;
 
 use Zaplane\Tests\TestCase;
-use Zaplane\Classes\IntegrationBase;
+use Zaplane\Framework\Classes\IntegrationBase;
 
 class TestIntegration extends IntegrationBase
 {

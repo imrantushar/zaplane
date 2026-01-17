@@ -1,8 +1,8 @@
 <?php
 namespace Zaplane\Integration;
 
-use Zaplane\Classes\IntegrationBase;
-use Zaplane\Classes\Expression;
+use Zaplane\Framework\Classes\IntegrationBase;
+use Zaplane\Framework\Classes\Expression;
 
 class Http extends IntegrationBase {
 

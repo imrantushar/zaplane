@@ -4,7 +4,7 @@ namespace Zaplane\Tests\API;
 
 use Zaplane\Tests\TestCase;
 use Zaplane\Tests\WPDBMock;
-use Zaplane\Modules\API\WorkflowsController;
+use Zaplane\API\WorkflowsController;
 
 class WorkflowsControllerTest extends TestCase
 {

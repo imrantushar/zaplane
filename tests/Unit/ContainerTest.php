@@ -3,8 +3,8 @@
 namespace Zaplane\Tests\Unit;
 
 use Zaplane\Tests\TestCase;
-use Zaplane\Classes\Container;
-use Zaplane\Exceptions\ZaplaneException;
+use Zaplane\Framework\Classes\Container;
+use Zaplane\Framework\Exceptions\ZaplaneException;
 
 class ContainerTest extends TestCase
 {
