@@ -36,6 +36,13 @@ if(file_exists(__DIR__ . '/dev-cli.php')){
     require_once __DIR__ . '/dev-cli.php';
 }
 
+// Register WP-CLI commands
+if (defined('WP_CLI') && WP_CLI) {
+    add_action('plugins_loaded', function () {
+        \Zaplane\Console\Kernel::getInstance()->boot();
+    });
+}
+
 // Activation hook
 register_activation_hook(ZAPLANE_PLUGIN_FILE, function () {
     \Zaplane\Installer::init()->run();

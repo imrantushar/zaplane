@@ -1,0 +1,14 @@
+<?php
+
+namespace Zaplane\Database\ORM;
+
+if (!defined('ABSPATH')) exit;
+
+abstract class Migration
+{
+    abstract public function up(): void;
+
+    public function down(): void
+    {
+    }
+}

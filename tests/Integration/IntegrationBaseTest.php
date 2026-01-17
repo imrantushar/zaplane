@@ -55,7 +55,7 @@ class CustomIntegration extends IntegrationBase
         return 'api_key';
     }
 
-    public static function get_auth_fields(): array
+    public static function get_auth_fields(?string $auth_type = null): array
     {
         return [
             'api_key' => [

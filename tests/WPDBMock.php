@@ -86,4 +86,14 @@ class WPDBMock
     {
         return $this->tables['query_result'] ?? 1;
     }
+
+    public function get_charset_collate(): string
+    {
+        return 'utf8mb4_unicode_520_ci';
+    }
+
+    public function get_col(string $query): array
+    {
+        return $this->tables['col'] ?? [];
+    }
 }

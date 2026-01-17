@@ -27,9 +27,9 @@ class SlackIntegrationTest extends TestCase
         $this->assertTrue(Slack::requires_connection());
     }
 
-    public function testGetAuthTypeReturnsOAuth2(): void
+    public function testGetAuthTypeReturnsBoth(): void
     {
-        $this->assertEquals('oauth2', Slack::get_auth_type());
+        $this->assertEquals('both', Slack::get_auth_type());
     }
 
     public function testGetTriggersReturnsExpectedFormat(): void
@@ -147,7 +147,7 @@ class SlackIntegrationTest extends TestCase
         $result = Slack::test_connection($credentials);
 
         $this->assertFalse($result['success']);
-        $this->assertStringContainsString('missing', $result['message']);
+        $this->assertStringContainsString('No access token', $result['message']);
     }
 
     public function testTestConnectionFailsWithEmptyToken(): void
