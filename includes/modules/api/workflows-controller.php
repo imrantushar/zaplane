@@ -112,7 +112,6 @@ class WorkflowsController extends WP_REST_Controller
         return rest_ensure_response($workflow->toArray());
     }
 
-                'user_id' => get_current_user_id(),
     public function create_item($request)
     {
         $workflow = Workflow::create([
