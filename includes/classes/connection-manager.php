@@ -6,11 +6,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use Zaplane\Core\IntegrationLoader;
+use Zaplane\Exceptions\ConnectionException;
+use Zaplane\Exceptions\EncryptionException;
+use Zaplane\Exceptions\IntegrationException;
 
-/**
- * Connection Manager Service
- * Handles CRUD operations for integration connections
- */
 class ConnectionManager {
 
 	private string $table_name;
@@ -20,30 +19,18 @@ class ConnectionManager {
 		$this->table_name = $wpdb->prefix . ZAPLANE_PLUGIN_SLUG . '_connections';
 	}
 
-	/**
-	 * Create a new connection
-	 *
-	 * @param int    $user_id     WordPress user ID
-	 * @param string $app         Integration slug (e.g., 'slack', 'gmail')
-	 * @param string $name        User-defined connection name
-	 * @param string $auth_type   'api_key' | 'oauth2' | 'basic'
-	 * @param array  $credentials Plain credentials to encrypt
-	 */
 	public function create( int $user_id, string $app, string $name, string $auth_type, array $credentials ) {
 		global $wpdb;
 
-		// Validate integration exists (ensure registry is loaded first)
-		IntegrationLoader::init();
 		$integration = IntegrationLoader::get( $app );
 		if ( ! $integration ) {
-			return new \WP_Error( 'invalid_app', 'Integration not found: ' . $app );
+			throw IntegrationException::notFound( $app );
 		}
 
-		// Encrypt credentials
 		try {
 			$encrypted = Encryption::encrypt( $credentials );
-		} catch ( \Exception $e ) {
-			return new \WP_Error( 'encryption_failed', $e->getMessage() );
+		} catch ( EncryptionException $e ) {
+			throw ConnectionException::createFailed( $app, $e->getMessage() );
 		}
 
 		$result = $wpdb->insert(
@@ -61,19 +48,12 @@ class ConnectionManager {
 		);
 
 		if ( $result === false ) {
-			return new \WP_Error( 'db_error', 'Failed to create connection' );
+			throw ConnectionException::createFailed( $app, 'Database insert failed' );
 		}
 
 		return (int) $wpdb->insert_id;
 	}
 
-	/**
-	 * Get a single connection by ID
-	 *
-	 * @param int  $id      Connection ID
-	 * @param bool $decrypt Whether to decrypt credentials
-	 * @return array|null Connection data or null
-	 */
 	public function get( int $id, bool $decrypt = false ): ?array {
 		global $wpdb;
 
@@ -89,25 +69,17 @@ class ConnectionManager {
 		if ( $decrypt && ! empty( $row['encrypted_credentials'] ) ) {
 			try {
 				$row['credentials'] = Encryption::decrypt( $row['encrypted_credentials'] );
-			} catch ( \Exception $e ) {
+			} catch ( EncryptionException $e ) {
 				$row['credentials'] = array();
 				$row['decrypt_error'] = $e->getMessage();
 			}
 		}
 
-		// Never expose encrypted_credentials in output
 		unset( $row['encrypted_credentials'] );
 
 		return $row;
 	}
 
-	/**
-	 * Get all connections for a user
-	 *
-	 * @param int         $user_id WordPress user ID
-	 * @param string|null $app     Optional: filter by integration
-	 * @return array List of connections (credentials excluded)
-	 */
 	public function get_user_connections( int $user_id, ?string $app = null ): array {
 		global $wpdb;
 
@@ -131,13 +103,6 @@ class ConnectionManager {
 		) ?: array();
 	}
 
-	/**
-	 * Update connection metadata (not credentials)
-	 *
-	 * @param int   $id   Connection ID
-	 * @param array $data Fields to update (name, status)
-	 * @return bool Success
-	 */
 	public function update( int $id, array $data ): bool {
 		global $wpdb;
 
@@ -159,19 +124,12 @@ class ConnectionManager {
 		return $result !== false;
 	}
 
-	/**
-	 * Update connection credentials (re-encrypts)
-	 *
-	 * @param int   $id          Connection ID
-	 * @param array $credentials New credentials
-	 * @return bool Success
-	 */
 	public function update_credentials( int $id, array $credentials ): bool {
 		global $wpdb;
 
 		try {
 			$encrypted = Encryption::encrypt( $credentials );
-		} catch ( \Exception $e ) {
+		} catch ( EncryptionException $e ) {
 			return false;
 		}
 
@@ -186,12 +144,6 @@ class ConnectionManager {
 		return $result !== false;
 	}
 
-	/**
-	 * Delete a connection
-	 *
-	 * @param int $id Connection ID
-	 * @return bool Success
-	 */
 	public function delete( int $id ): bool {
 		global $wpdb;
 
@@ -204,13 +156,6 @@ class ConnectionManager {
 		return $result !== false;
 	}
 
-	/**
-	 * Verify user owns connection
-	 *
-	 * @param int $connection_id Connection ID
-	 * @param int $user_id       WordPress user ID
-	 * @return bool
-	 */
 	public function user_owns_connection( int $connection_id, int $user_id ): bool {
 		global $wpdb;
 
@@ -224,48 +169,28 @@ class ConnectionManager {
 		return (int) $owner_id === $user_id;
 	}
 
-	/**
-	 * Test a connection
-	 *
-	 * @param int $id Connection ID
-	 * @return array Test result ['success', 'message', 'details']
-	 */
 	public function test( int $id ): array {
 		global $wpdb;
 
 		$connection = $this->get( $id, true );
 
 		if ( ! $connection ) {
-			return array(
-				'success' => false,
-				'message' => 'Connection not found',
-				'details' => array(),
-			);
+			throw ConnectionException::notFound( $id );
 		}
 
 		if ( isset( $connection['decrypt_error'] ) ) {
-			return array(
-				'success' => false,
-				'message' => 'Failed to decrypt credentials: ' . $connection['decrypt_error'],
-				'details' => array(),
-			);
+			throw ConnectionException::testFailed( $id, 'Failed to decrypt credentials: ' . $connection['decrypt_error'] );
 		}
 
 		IntegrationLoader::init();
 		$integration = IntegrationLoader::get( $connection['app'] );
 
 		if ( ! $integration ) {
-			return array(
-				'success' => false,
-				'message' => 'Integration not found: ' . $connection['app'],
-				'details' => array(),
-			);
+			throw IntegrationException::notFound( $connection['app'] );
 		}
 
-		// Call integration's test_connection method
 		$result = $integration::test_connection( $connection['credentials'] ?? array() );
 
-		// Update test status
 		$wpdb->update(
 			$this->table_name,
 			array(
@@ -280,35 +205,25 @@ class ConnectionManager {
 		return $result;
 	}
 
-	/**
-	 * Get credentials for workflow execution
-	 * Handles OAuth token refresh automatically
-	 *
-	 * @param int $id Connection ID
-	 * @return array Decrypted, valid credentials
-	 * @throws \Exception on failure
-	 */
 	public function get_execution_credentials( int $id ): array {
 		global $wpdb;
 
 		$connection = $this->get( $id, true );
 
 		if ( ! $connection ) {
-			throw new \Exception( 'Connection not found' );
+			throw ConnectionException::notFound( $id );
 		}
 
 		if ( isset( $connection['decrypt_error'] ) ) {
-			throw new \Exception( 'Failed to decrypt credentials' );
+			throw EncryptionException::decryptionFailed( $connection['decrypt_error'] );
 		}
 
 		$credentials = $connection['credentials'] ?? array();
 
-		// Check if OAuth token needs refresh
 		if ( $connection['auth_type'] === 'oauth2' ) {
 			$credentials = $this->refresh_oauth_if_needed( $id, $connection, $credentials );
 		}
 
-		// Update last used timestamp
 		$wpdb->update(
 			$this->table_name,
 			array( 'last_used_at' => current_time( 'mysql' ) ),
@@ -320,18 +235,9 @@ class ConnectionManager {
 		return $credentials;
 	}
 
-	/**
-	 * Refresh OAuth token if expired
-	 *
-	 * @param int   $id          Connection ID
-	 * @param array $connection  Connection data
-	 * @param array $credentials Current credentials
-	 * @return array Updated credentials
-	 */
 	private function refresh_oauth_if_needed( int $id, array $connection, array $credentials ): array {
 		global $wpdb;
 
-		// Check if token has expires_at and is expired
 		$expires_at = $connection['oauth_expires_at'] ?? null;
 
 		if ( ! $expires_at ) {
@@ -339,17 +245,16 @@ class ConnectionManager {
 		}
 
 		$expires_timestamp = strtotime( $expires_at );
-		$buffer = 5 * MINUTE_IN_SECONDS; // Refresh 5 minutes before expiry
+		$buffer = 5 * MINUTE_IN_SECONDS;
 
 		if ( $expires_timestamp > ( time() + $buffer ) ) {
-			return $credentials; // Token still valid
+			return $credentials;
 		}
 
-		// Token expired or expiring soon - refresh it
 		$refresh_token = $credentials['refresh_token'] ?? null;
 
 		if ( ! $refresh_token ) {
-			return $credentials; // No refresh token available
+			return $credentials;
 		}
 
 		IntegrationLoader::init();
@@ -362,13 +267,10 @@ class ConnectionManager {
 		try {
 			$new_tokens = $integration::refresh_oauth_token( $refresh_token );
 
-			// Merge new tokens with existing credentials
 			$credentials = array_merge( $credentials, $new_tokens );
 
-			// Update stored credentials
 			$this->update_credentials( $id, $credentials );
 
-			// Update expiry time if provided
 			if ( isset( $new_tokens['expires_in'] ) ) {
 				$new_expiry = gmdate( 'Y-m-d H:i:s', time() + (int) $new_tokens['expires_in'] );
 				$wpdb->update(
@@ -379,21 +281,13 @@ class ConnectionManager {
 					array( '%d' )
 				);
 			}
-		} catch ( \Exception $e ) {
-			// Log refresh failure but return existing credentials
+		} catch ( \Throwable $e ) {
 			error_log( 'Zaplane OAuth refresh failed for connection ' . $id . ': ' . $e->getMessage() );
 		}
 
 		return $credentials;
 	}
 
-	/**
-	 * Set OAuth expiry time for a connection
-	 *
-	 * @param int $id         Connection ID
-	 * @param int $expires_in Seconds until expiry
-	 * @return bool Success
-	 */
 	public function set_oauth_expiry( int $id, int $expires_in ): bool {
 		global $wpdb;
 

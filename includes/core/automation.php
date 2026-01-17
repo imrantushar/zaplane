@@ -3,6 +3,8 @@ namespace Zaplane\Core;
 
 use Zaplane\Classes\Container;
 use Zaplane\Classes\Query;
+use Zaplane\Exceptions\WorkflowException;
+use Zaplane\Exceptions\IntegrationException;
 
 if (!defined('ABSPATH')) exit;
 
@@ -29,8 +31,6 @@ class Automation {
         add_action('zaplane_execute_node_run', [$this,'dispatch_node_run'], 10, 1);
         add_action('zaplane_workflow_updated', [$this,'reload_triggers']);
     }
-
-    /* ---------------- TRIGGERS ---------------- */
 
     public function reload_triggers() {
         foreach ($this->registered_hooks as $event => $cb) {
@@ -80,8 +80,6 @@ class Automation {
         $this->spawn_node_run($run_id,$trigger['id'],$payload,null);
     }
 
-    /* ---------------- NODE SPAWN ---------------- */
-
     public function spawn_node_run(int $run_id,string $node_key,array $input,?int $parent){
         global $wpdb;
 
@@ -103,15 +101,13 @@ class Automation {
         );
     }
 
-    /* ---------------- WORKER ---------------- */
-
     public function dispatch_node_run(int $node_run_id){
         global $wpdb;
 
         $locked=$wpdb->query(
             $wpdb->prepare(
-                "UPDATE wp_zaplane_node_runs 
-                 SET status='running' 
+                "UPDATE wp_zaplane_node_runs
+                 SET status='running'
                  WHERE id=%d AND status='pending'",
                 $node_run_id
             )
@@ -135,7 +131,7 @@ class Automation {
         );
 
         $graph=$this->load_graph($run['workflow_version_hash']);
-        $node=$this->find_node($graph,$nr['node_key']);
+        $node=$this->find_node($graph,$nr['node_key'],(int)$nr['run_id']);
         $input=json_decode($nr['input_json'],true);
 
         try{
@@ -143,6 +139,9 @@ class Automation {
                 $output=$input;
             }else{
                 $integration=$this->container->get('integrations')->get(strtolower($node['data']['app']));
+                if (!$integration) {
+                    throw IntegrationException::notFound($node['data']['app']);
+                }
                 $output=$integration::execute_node($node,$input);
             }
 
@@ -155,9 +154,18 @@ class Automation {
             $this->spawn_children($nr,$output,$graph,$run);
 
         }catch(\Throwable $e){
+            $error_data = [
+                'error' => $e->getMessage(),
+                'error_code' => method_exists($e, 'getErrorCode') ? $e->getErrorCode() : 'unknown',
+            ];
+
+            if (method_exists($e, 'getContext')) {
+                $error_data['context'] = $e->getContext();
+            }
+
             $wpdb->update("wp_zaplane_node_runs",[
                 'status'=>'failed',
-                'output_json'=>json_encode(['error'=>$e->getMessage()]),
+                'output_json'=>json_encode($error_data),
                 'finished_at'=>current_time('mysql')
             ],['id'=>$nr['id']]);
         }
@@ -206,10 +214,10 @@ class Automation {
         );
     }
 
-    private function find_node($graph,$key){
+    private function find_node($graph,$key,int $run_id = 0){
         foreach($graph['nodes'] as $n){
             if((string)$n['id']===(string)$key) return $n;
         }
-        throw new \Exception("Node not found");
+        throw WorkflowException::nodeNotFound($run_id, $key);
     }
 }

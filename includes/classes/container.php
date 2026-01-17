@@ -3,6 +3,8 @@ namespace Zaplane\Classes;
 
 if (!defined('ABSPATH')) exit;
 
+use Zaplane\Exceptions\ZaplaneException;
+
 class Container {
 
     protected array $services = [];
@@ -18,7 +20,7 @@ class Container {
         }
 
         if (!isset($this->services[$name])) {
-            throw new \Exception("Service {$name} not registered.");
+            throw new ZaplaneException("Service {$name} not registered.", ['service' => $name]);
         }
 
         $this->instances[$name] = ($this->services[$name])($this);

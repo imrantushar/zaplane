@@ -5,6 +5,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+use Zaplane\Exceptions\EncryptionException;
+
 /**
  * Encryption utility for secure credential storage
  * Uses AES-256-GCM authenticated encryption
@@ -58,7 +60,7 @@ class Encryption {
 		);
 
 		if ( $ciphertext === false ) {
-			throw new \Exception( 'Encryption failed' );
+			throw EncryptionException::encryptionFailed();
 		}
 
 		// Combine IV + tag + ciphertext and encode
@@ -79,7 +81,7 @@ class Encryption {
 		$combined = base64_decode( $encrypted );
 
 		if ( $combined === false || strlen( $combined ) < 28 ) {
-			throw new \Exception( 'Invalid encrypted data format' );
+			throw EncryptionException::invalidFormat();
 		}
 
 		// Extract IV (12 bytes), tag (16 bytes), and ciphertext
@@ -97,13 +99,13 @@ class Encryption {
 		);
 
 		if ( $plaintext === false ) {
-			throw new \Exception( 'Decryption failed - data may be corrupted or tampered' );
+			throw EncryptionException::dataCorrupted();
 		}
 
 		$data = json_decode( $plaintext, true );
 
 		if ( json_last_error() !== JSON_ERROR_NONE ) {
-			throw new \Exception( 'Decrypted data is not valid JSON' );
+			throw EncryptionException::invalidJson();
 		}
 
 		return $data;
