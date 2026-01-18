@@ -3,7 +3,7 @@ import { Box } from "@chakra-ui/react";
 import Select from "react-select";
 import ZAPText from "@ZAPComponents/Text";
 
-const ZAPLabeledSelect = ({
+const ZAPSelect = ({
   label,
   options = [],
   value,
@@ -12,11 +12,12 @@ const ZAPLabeledSelect = ({
   onMenuOpen,
   mb = 0,
   placeholder,
-  isClearable = false
+  isClearable = false,
+  style,
 }) => {
   return (
-    <Box mb={mb}>
-      {label && <ZAPText mb="4px">{label}</ZAPText>}
+    <Box mb={mb} style={style}>
+      {label && <ZAPText fontWeight="600" fontSize="0.875rem" mb="4px">{label}</ZAPText>}
 
       <Select
         options={options}
@@ -31,4 +32,4 @@ const ZAPLabeledSelect = ({
   );
 };
 
-export default ZAPLabeledSelect;
+export default ZAPSelect;

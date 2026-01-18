@@ -17,7 +17,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { route_path } from "@ZAPUtils/helper";
 import { useDispatch, useSelector } from "react-redux";
-import LabeledInput from "@ZAPComponents/LabeledInput";
+import ZAPInput from "@ZAPComponents/ZAPInput";
 import WPModal from "@ZAPComponents/Modal/WPModal";
 import Select from "react-select";
 import {
@@ -242,7 +242,7 @@ const CreateWorkflows = () => {
         size="medium"
       >
         <Box px={4}>
-          <LabeledInput
+          <ZAPInput
             label={__("Workflow Name", "zaplane")}
             placeholder={__("Enter workflow name", "zaplane")}
             value={workflowName}
