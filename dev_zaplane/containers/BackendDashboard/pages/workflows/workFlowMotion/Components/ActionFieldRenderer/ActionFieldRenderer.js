@@ -1,5 +1,5 @@
-import LabeledInput from "@ZAPComponents/LabeledInput";
-import ZAPLabeledSelect from "@ZAPComponents/LabeledSelect";
+import ZAPInput from "@ZAPComponents/ZAPInput";
+import ZAPSelect from "@ZAPComponents/ZAPSelect";
 import ConditionGroupField from "../ConditionGroupField/ConditionGroupField";
 
 const ActionFieldRenderer = ({
@@ -15,7 +15,7 @@ const ActionFieldRenderer = ({
     case "text":
     case "expression":
       return (
-        <LabeledInput
+        <ZAPInput
           label={field.label}
           placeholder={field.placeholder || ""}
           value={value || ""}
@@ -26,7 +26,7 @@ const ActionFieldRenderer = ({
 
     case "number":
       return (
-        <LabeledInput
+        <ZAPInput
           label={field.label}
           placeholder={field.placeholder || ""}
           value={value || ""}
@@ -37,7 +37,7 @@ const ActionFieldRenderer = ({
 
     case "textarea":
       return (
-        <LabeledInput
+        <ZAPInput
           label={field.label}
           placeholder={field.placeholder || ""}
           value={value || ""}
@@ -55,7 +55,7 @@ const ActionFieldRenderer = ({
         }));
 
         return (
-          <ZAPLabeledSelect
+          <ZAPSelect
             label={field.label}
             options={options}
             value={value}
@@ -71,7 +71,7 @@ const ActionFieldRenderer = ({
         const key = getKey(field);
 
         return (
-          <ZAPLabeledSelect
+          <ZAPSelect
             label={field.label}
             options={dynamicOptions[key] || []}
             value={value}

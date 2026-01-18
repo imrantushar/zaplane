@@ -218,121 +218,6 @@ const ZAPDrawer = ({
 
 /***/ },
 
-/***/ "./dev_zaplane/components/LabeledInput/index.js"
-/*!******************************************************!*\
-  !*** ./dev_zaplane/components/LabeledInput/index.js ***!
-  \******************************************************/
-(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/text/index.js");
-/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/flex/flex.js");
-/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/input/input.js");
-/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/textarea/textarea.js");
-/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
-/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_5__);
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__);
-
-
-
-
-const LabeledInput = ({
-  label,
-  placeholder,
-  value,
-  onChange,
-  type = 'text',
-  style,
-  inputStyle,
-  textAreaSize
-}) => {
-  const InputComponent = type === 'textarea' ? _chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Textarea : _chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Input;
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Flex, {
-    as: "label",
-    direction: "column",
-    gap: 2,
-    style: {
-      ...style
-    },
-    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
-      fontWeight: "600",
-      fontSize: "0.875rem",
-      margin: 0,
-      children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_5__.__)(label, 'zaplane')
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(InputComponent, {
-      className: "zaplane-input",
-      type: type !== "textarea" ? type : undefined,
-      placeholder: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_5__.__)(placeholder, 'zaplane'),
-      value: value,
-      onChange: onChange,
-      style: {
-        ...inputStyle
-      }
-    })]
-  });
-};
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (LabeledInput);
-
-/***/ },
-
-/***/ "./dev_zaplane/components/LabeledSelect/index.js"
-/*!*******************************************************!*\
-  !*** ./dev_zaplane/components/LabeledSelect/index.js ***!
-  \*******************************************************/
-(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/box/index.js");
-/* harmony import */ var react_select__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-select */ "./node_modules/react-select/dist/react-select.esm.js");
-/* harmony import */ var _ZAPComponents_Text__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @ZAPComponents/Text */ "./dev_zaplane/components/Text/index.js");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__);
-
-
-
-
-const ZAPLabeledSelect = ({
-  label,
-  options = [],
-  value,
-  onChange,
-  isLoading = false,
-  onMenuOpen,
-  mb = 0,
-  placeholder,
-  isClearable = false
-}) => {
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
-    mb: mb,
-    children: [label && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_ZAPComponents_Text__WEBPACK_IMPORTED_MODULE_2__["default"], {
-      mb: "4px",
-      children: label
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(react_select__WEBPACK_IMPORTED_MODULE_1__["default"], {
-      options: options,
-      isLoading: isLoading,
-      placeholder: placeholder,
-      isClearable: isClearable,
-      value: options.find(o => o.value === value) || null,
-      onMenuOpen: onMenuOpen,
-      onChange: opt => onChange?.(opt?.value)
-    })]
-  });
-};
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (ZAPLabeledSelect);
-
-/***/ },
-
 /***/ "./dev_zaplane/components/Labels/ZAPLabel.js"
 /*!***************************************************!*\
   !*** ./dev_zaplane/components/Labels/ZAPLabel.js ***!
@@ -1148,6 +1033,121 @@ TopBar.propTypes = propTypes;
 __webpack_require__.r(__webpack_exports__);
 // extracted by mini-css-extract-plugin
 
+
+/***/ },
+
+/***/ "./dev_zaplane/components/ZAPInput/index.js"
+/*!**************************************************!*\
+  !*** ./dev_zaplane/components/ZAPInput/index.js ***!
+  \**************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/text/index.js");
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/flex/flex.js");
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/input/input.js");
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/textarea/textarea.js");
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__);
+
+
+
+
+const ZAPInput = ({
+  label,
+  placeholder,
+  value,
+  onChange,
+  type = 'text',
+  style,
+  inputStyle,
+  textAreaSize
+}) => {
+  const InputComponent = type === 'textarea' ? _chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Textarea : _chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Input;
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Flex, {
+    as: "label",
+    direction: "column",
+    gap: 2,
+    style: {
+      ...style
+    },
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
+      fontWeight: "600",
+      fontSize: "0.875rem",
+      margin: 0,
+      children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_5__.__)(label, 'zaplane')
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(InputComponent, {
+      className: "zaplane-input",
+      type: type !== "textarea" ? type : undefined,
+      placeholder: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_5__.__)(placeholder, 'zaplane'),
+      value: value,
+      onChange: onChange,
+      style: {
+        ...inputStyle
+      }
+    })]
+  });
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (ZAPInput);
+
+/***/ },
+
+/***/ "./dev_zaplane/components/ZAPSelect/index.js"
+/*!***************************************************!*\
+  !*** ./dev_zaplane/components/ZAPSelect/index.js ***!
+  \***************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/box/index.js");
+/* harmony import */ var react_select__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-select */ "./node_modules/react-select/dist/react-select.esm.js");
+/* harmony import */ var _ZAPComponents_Text__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @ZAPComponents/Text */ "./dev_zaplane/components/Text/index.js");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__);
+
+
+
+
+const ZAPSelect = ({
+  label,
+  options = [],
+  value,
+  onChange,
+  isLoading = false,
+  onMenuOpen,
+  mb = 0,
+  placeholder,
+  isClearable = false
+}) => {
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
+    mb: mb,
+    children: [label && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_ZAPComponents_Text__WEBPACK_IMPORTED_MODULE_2__["default"], {
+      mb: "4px",
+      children: label
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(react_select__WEBPACK_IMPORTED_MODULE_1__["default"], {
+      options: options,
+      isLoading: isLoading,
+      placeholder: placeholder,
+      isClearable: isClearable,
+      value: options.find(o => o.value === value) || null,
+      onMenuOpen: onMenuOpen,
+      onChange: opt => onChange?.(opt?.value)
+    })]
+  });
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (ZAPSelect);
 
 /***/ },
 
@@ -2259,7 +2259,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react_router_dom__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! react-router-dom */ "./node_modules/react-router/dist/index.js");
 /* harmony import */ var _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @ZAPUtils/helper */ "./dev_zaplane/utils/helper.js");
 /* harmony import */ var react_redux__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/dist/react-redux.mjs");
-/* harmony import */ var _ZAPComponents_LabeledInput__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @ZAPComponents/LabeledInput */ "./dev_zaplane/components/LabeledInput/index.js");
+/* harmony import */ var _ZAPComponents_ZAPInput__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @ZAPComponents/ZAPInput */ "./dev_zaplane/components/ZAPInput/index.js");
 /* harmony import */ var _ZAPComponents_Modal_WPModal__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! @ZAPComponents/Modal/WPModal */ "./dev_zaplane/components/Modal/WPModal.js");
 /* harmony import */ var react_select__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! react-select */ "./node_modules/react-select/dist/react-select.esm.js");
 /* harmony import */ var _ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! @ZAPRedux/Slices/workFlowSlice/workFlowSlice */ "./dev_zaplane/redux/Slices/workFlowSlice/workFlowSlice.js");
@@ -2460,7 +2460,7 @@ const CreateWorkflows = () => {
       size: "medium",
       children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Box, {
         px: 4,
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_ZAPComponents_LabeledInput__WEBPACK_IMPORTED_MODULE_12__["default"], {
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_ZAPComponents_ZAPInput__WEBPACK_IMPORTED_MODULE_12__["default"], {
           label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)("Workflow Name", "zaplane"),
           placeholder: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)("Enter workflow name", "zaplane"),
           value: workflowName,
@@ -2499,8 +2499,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _ZAPComponents_LabeledInput__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @ZAPComponents/LabeledInput */ "./dev_zaplane/components/LabeledInput/index.js");
-/* harmony import */ var _ZAPComponents_LabeledSelect__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @ZAPComponents/LabeledSelect */ "./dev_zaplane/components/LabeledSelect/index.js");
+/* harmony import */ var _ZAPComponents_ZAPInput__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @ZAPComponents/ZAPInput */ "./dev_zaplane/components/ZAPInput/index.js");
+/* harmony import */ var _ZAPComponents_ZAPSelect__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @ZAPComponents/ZAPSelect */ "./dev_zaplane/components/ZAPSelect/index.js");
 /* harmony import */ var _ConditionGroupField_ConditionGroupField__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../ConditionGroupField/ConditionGroupField */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/Components/ConditionGroupField/ConditionGroupField.js");
 /* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
 /* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__);
@@ -2520,7 +2520,7 @@ const ActionFieldRenderer = ({
   switch (field.type) {
     case "text":
     case "expression":
-      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_ZAPComponents_LabeledInput__WEBPACK_IMPORTED_MODULE_0__["default"], {
+      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_ZAPComponents_ZAPInput__WEBPACK_IMPORTED_MODULE_0__["default"], {
         label: field.label,
         placeholder: field.placeholder || "",
         value: value || "",
@@ -2528,7 +2528,7 @@ const ActionFieldRenderer = ({
         onChange: e => setFieldValue(field.key, e.target.value)
       });
     case "number":
-      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_ZAPComponents_LabeledInput__WEBPACK_IMPORTED_MODULE_0__["default"], {
+      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_ZAPComponents_ZAPInput__WEBPACK_IMPORTED_MODULE_0__["default"], {
         label: field.label,
         placeholder: field.placeholder || "",
         value: value || "",
@@ -2536,7 +2536,7 @@ const ActionFieldRenderer = ({
         onChange: e => setFieldValue(field.key, e.target.value)
       });
     case "textarea":
-      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_ZAPComponents_LabeledInput__WEBPACK_IMPORTED_MODULE_0__["default"], {
+      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_ZAPComponents_ZAPInput__WEBPACK_IMPORTED_MODULE_0__["default"], {
         label: field.label,
         placeholder: field.placeholder || "",
         value: value || "",
@@ -2550,7 +2550,7 @@ const ActionFieldRenderer = ({
           label: opt.label,
           value: opt.value
         }));
-        return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_ZAPComponents_LabeledSelect__WEBPACK_IMPORTED_MODULE_1__["default"], {
+        return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_ZAPComponents_ZAPSelect__WEBPACK_IMPORTED_MODULE_1__["default"], {
           label: field.label,
           options: options,
           value: value,
@@ -2563,7 +2563,7 @@ const ActionFieldRenderer = ({
       // dynamic options
       if (field.dynamic) {
         const key = getKey(field);
-        return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_ZAPComponents_LabeledSelect__WEBPACK_IMPORTED_MODULE_1__["default"], {
+        return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_ZAPComponents_ZAPSelect__WEBPACK_IMPORTED_MODULE_1__["default"], {
           label: field.label,
           options: dynamicOptions[key] || [],
           value: value,
@@ -2610,13 +2610,16 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/box/index.js");
 /* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/text/index.js");
 /* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/button/button.js");
-/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/input/input.js");
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/flex/flex.js");
 /* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/stack/h-stack.js");
 /* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/stack/v-stack.js");
-/* harmony import */ var react_icons_fi__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! react-icons/fi */ "./node_modules/react-icons/fi/index.mjs");
-/* harmony import */ var react_select__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! react-select */ "./node_modules/react-select/dist/react-select.esm.js");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__);
+/* harmony import */ var _ZAPComponents_ZAPInput__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @ZAPComponents/ZAPInput */ "./dev_zaplane/components/ZAPInput/index.js");
+/* harmony import */ var _ZAPComponents_ZAPSelect__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @ZAPComponents/ZAPSelect */ "./dev_zaplane/components/ZAPSelect/index.js");
+/* harmony import */ var react_icons_fi__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! react-icons/fi */ "./node_modules/react-icons/fi/index.mjs");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__);
+
+
 
 
 
@@ -2696,71 +2699,79 @@ function ConditionGroupField({
     newVal[gIndex] = newVal[gIndex].filter((_, i) => i !== rIndex);
     update(newVal);
   };
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.VStack, {
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.VStack, {
     align: "stretch",
     spacing: 4,
-    children: [val[0].map((rule, i) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.HStack, {
-      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Input, {
-        value: rule.left,
+    children: [val[0].map((rule, i) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.HStack, {
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_ZAPComponents_ZAPInput__WEBPACK_IMPORTED_MODULE_6__["default"], {
+        label: "Condition",
         placeholder: "Condition",
+        value: rule.left,
         onChange: e => updateRule(i, "left", e.target.value)
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
-        width: "200px",
-        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(react_select__WEBPACK_IMPORTED_MODULE_7__["default"], {
-          value: OPERATORS.find(op => op.value === rule.operator),
-          onChange: selected => updateRule(i, "operator", selected.value),
-          options: OPERATORS
-        })
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Input, {
-        value: rule.right,
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_ZAPComponents_ZAPSelect__WEBPACK_IMPORTED_MODULE_7__["default"], {
+        label: "Operator",
+        options: OPERATORS,
+        value: OPERATORS.find(op => op.value === rule.operator),
+        onChange: selected => updateRule(i, "operator", selected.value)
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_ZAPComponents_ZAPInput__WEBPACK_IMPORTED_MODULE_6__["default"], {
+        label: "value",
         placeholder: "Value",
+        value: rule.right,
         onChange: e => updateRule(i, "right", e.target.value)
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Button, {
-        onClick: addRule,
-        children: "AND"
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Button, {
-        colorScheme: "red",
-        variant: "ghost",
-        size: "sm",
-        onClick: () => deleteRule(i),
-        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(react_icons_fi__WEBPACK_IMPORTED_MODULE_6__.FiTrash2, {})
-      })]
-    }, i)), val.slice(1).map((group, gIndex) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
-      p: 3,
-      borderWidth: "1px",
-      borderRadius: "md",
-      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
-        fontWeight: "bold",
-        mb: 2,
-        children: "OR"
-      }), group.map((rule, rIndex) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.HStack, {
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Input, {
-          value: rule.left,
-          placeholder: "Condition",
-          onChange: e => updateOrRule(gIndex + 1, rIndex, "left", e.target.value)
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
-          width: "200px",
-          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(react_select__WEBPACK_IMPORTED_MODULE_7__["default"], {
-            value: OPERATORS.find(op => op.value === rule.operator),
-            onChange: selected => updateOrRule(gIndex + 1, rIndex, "operator", selected.value),
-            options: OPERATORS
-          })
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Input, {
-          value: rule.right,
-          placeholder: "Value",
-          onChange: e => updateOrRule(gIndex + 1, rIndex, "right", e.target.value)
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Button, {
-          onClick: () => addOrRule(gIndex + 1),
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Flex, {
+        gap: 2,
+        marginTop: "25px",
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Button, {
+          onClick: addRule,
           children: "AND"
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Button, {
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Button, {
           colorScheme: "red",
           variant: "ghost",
           size: "sm",
-          onClick: () => deleteOrRule(gIndex + 1, rIndex),
-          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(react_icons_fi__WEBPACK_IMPORTED_MODULE_6__.FiTrash2, {})
+          onClick: () => deleteRule(i),
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(react_icons_fi__WEBPACK_IMPORTED_MODULE_8__.FiTrash2, {})
+        })]
+      })]
+    }, i)), val.slice(1).map((group, gIndex) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
+      p: 3,
+      borderWidth: "1px",
+      borderRadius: "md",
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
+        fontWeight: "bold",
+        mb: 2,
+        children: "OR"
+      }), group.map((rule, rIndex) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.HStack, {
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_ZAPComponents_ZAPInput__WEBPACK_IMPORTED_MODULE_6__["default"], {
+          label: "Condition",
+          value: rule.left,
+          placeholder: "Condition",
+          onChange: e => updateOrRule(gIndex + 1, rIndex, "left", e.target.value)
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_ZAPComponents_ZAPSelect__WEBPACK_IMPORTED_MODULE_7__["default"], {
+          label: "Operator",
+          options: OPERATORS,
+          value: OPERATORS.find(op => op.value === rule.operator),
+          onChange: selected => updateOrRule(gIndex + 1, rIndex, "operator", selected.value)
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_ZAPComponents_ZAPInput__WEBPACK_IMPORTED_MODULE_6__["default"], {
+          label: "value",
+          value: rule.right,
+          placeholder: "Value",
+          onChange: e => updateOrRule(gIndex + 1, rIndex, "right", e.target.value)
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Flex, {
+          gap: 2,
+          marginTop: "25px",
+          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Button, {
+            onClick: () => addOrRule(gIndex + 1),
+            children: "AND"
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Button, {
+            colorScheme: "red",
+            variant: "ghost",
+            size: "sm",
+            onClick: () => deleteOrRule(gIndex + 1, rIndex),
+            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(react_icons_fi__WEBPACK_IMPORTED_MODULE_8__.FiTrash2, {})
+          })]
         })]
       }, rIndex))]
-    }, gIndex)), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Button, {
+    }, gIndex)), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Button, {
       size: "sm",
       width: "100px",
       onClick: addOrGroup,
@@ -2790,8 +2801,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/stack/h-stack.js");
 /* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/stack/v-stack.js");
 /* harmony import */ var _ZAPComponents_Drawer__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @ZAPComponents/Drawer */ "./dev_zaplane/components/Drawer/index.js");
-/* harmony import */ var _ZAPComponents_LabeledInput__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @ZAPComponents/LabeledInput */ "./dev_zaplane/components/LabeledInput/index.js");
-/* harmony import */ var _ZAPComponents_LabeledSelect__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @ZAPComponents/LabeledSelect */ "./dev_zaplane/components/LabeledSelect/index.js");
+/* harmony import */ var _ZAPComponents_ZAPInput__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @ZAPComponents/ZAPInput */ "./dev_zaplane/components/ZAPInput/index.js");
+/* harmony import */ var _ZAPComponents_ZAPSelect__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @ZAPComponents/ZAPSelect */ "./dev_zaplane/components/ZAPSelect/index.js");
 /* harmony import */ var _ZAPComponents_Text__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @ZAPComponents/Text */ "./dev_zaplane/components/Text/index.js");
 /* harmony import */ var _ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @ZAPRedux/Slices/workFlowSlice/workFlowSlice */ "./dev_zaplane/redux/Slices/workFlowSlice/workFlowSlice.js");
 /* harmony import */ var _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @ZAPUtils/helper */ "./dev_zaplane/utils/helper.js");
@@ -2983,7 +2994,7 @@ function ActionDrawer({
     onClose: resetAll,
     title: !mode ? "Add Action" : selectedItem?.name ? selectedItem.name : "App",
     placement: "end",
-    size: "xl",
+    size: "md",
     footer: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.HStack, {
       justify: "space-between",
       children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Button, {
@@ -3077,7 +3088,7 @@ function ActionDrawer({
         value: "select",
         label: "Select",
         content: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.Fragment, {
-          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_ZAPComponents_LabeledSelect__WEBPACK_IMPORTED_MODULE_9__["default"], {
+          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_ZAPComponents_ZAPSelect__WEBPACK_IMPORTED_MODULE_9__["default"], {
             label: isTrigger ? "Trigger Type" : "Action Type",
             options: actionOptions,
             value: values.actionType,

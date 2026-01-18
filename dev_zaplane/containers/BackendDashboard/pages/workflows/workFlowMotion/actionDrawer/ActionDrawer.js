@@ -10,8 +10,8 @@ import {
     Code
 } from "@chakra-ui/react";
 import ZAPDrawer from "@ZAPComponents/Drawer";
-import LabeledInput from "@ZAPComponents/LabeledInput";
-import ZAPLabeledSelect from "@ZAPComponents/LabeledSelect";
+import ZAPInput from "@ZAPComponents/ZAPInput";
+import ZAPSelect from "@ZAPComponents/ZAPSelect";
 import ZAPText from "@ZAPComponents/Text";
 import {
     fetchDynamic,
@@ -229,7 +229,7 @@ export default function ActionDrawer({
             }
 
             placement="end"
-            size="xl"
+            size="md"
             footer={
                 <HStack justify="space-between">
                     <Button variant="ghost" onClick={resetAll}>
@@ -343,7 +343,7 @@ export default function ActionDrawer({
                             label: "Select",
                             content: (
                                 <>
-                                    <ZAPLabeledSelect
+                                    <ZAPSelect
                                         label={isTrigger ? "Trigger Type" : "Action Type"}
                                         options={actionOptions}
                                         value={values.actionType}

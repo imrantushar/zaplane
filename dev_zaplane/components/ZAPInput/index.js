@@ -2,7 +2,7 @@ import React from 'react';
 import { Flex, Text, Input, Textarea } from '@chakra-ui/react';
 import { __ } from '@wordpress/i18n';
 
-const LabeledInput = ({
+const ZAPInput = ({
   label,
   placeholder,
   value,
@@ -35,4 +35,4 @@ const LabeledInput = ({
   );
 };
 
-export default LabeledInput;
+export default ZAPInput;

@@ -3,7 +3,7 @@ import { Box } from "@chakra-ui/react";
 import Select from "react-select";
 import ZAPText from "@ZAPComponents/Text";
 
-const ZAPLabeledSelect = ({
+const ZAPSelect = ({
   label,
   options = [],
   value,
@@ -31,4 +31,4 @@ const ZAPLabeledSelect = ({
   );
 };
 
-export default ZAPLabeledSelect;
+export default ZAPSelect;
