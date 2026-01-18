@@ -107,7 +107,7 @@ export default function ConditionGroupField({ value=[[{}]], onChange, field }) {
                 </Flex>
             ))}
             {value.slice(1).map((group, gIndex) => (
-                <Box key={gIndex} p={3}>
+                <Box key={gIndex}>
                     <Flex align="center">
                         <Box flex="1" h="1px" bg="gray.300" />
                         <ZAPText mx={3} fontSize="sm" color="gray.500">
