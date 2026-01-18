@@ -215,7 +215,7 @@ export default function ActionDrawer({
 
         resetAll();
     };
-    console.log(mode, 'modeeee')
+    console.log(values, 'values')
     return (
         <ZAPDrawer
             open={open}
@@ -229,7 +229,7 @@ export default function ActionDrawer({
             }
 
             placement="end"
-            size="md"
+            size="xl"
             footer={
                 <HStack justify="space-between">
                     <Button variant="ghost" onClick={resetAll}>

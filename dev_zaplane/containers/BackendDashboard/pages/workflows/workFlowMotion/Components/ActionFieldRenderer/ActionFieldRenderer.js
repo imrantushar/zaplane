@@ -1,5 +1,6 @@
 import LabeledInput from "@ZAPComponents/LabeledInput";
 import ZAPLabeledSelect from "@ZAPComponents/LabeledSelect";
+import ConditionGroupField from "../ConditionGroupField/ConditionGroupField";
 
 const ActionFieldRenderer = ({
   field,
@@ -84,6 +85,21 @@ const ActionFieldRenderer = ({
       }
 
       return null;
+    case "condition_group":
+      return (
+        <ConditionGroupField
+          value={
+            value || {
+              logic: "AND",
+              rules: [{ left: "", operator: "==", right: "" }],
+              groups: [],
+            }
+          }
+          onChange={(val) =>
+            setFieldValue(field.key, val)
+          }
+        />
+      );
 
     default:
       return null;
