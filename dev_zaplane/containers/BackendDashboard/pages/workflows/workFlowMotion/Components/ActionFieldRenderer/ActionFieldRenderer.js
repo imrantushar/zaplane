@@ -89,15 +89,12 @@ const ActionFieldRenderer = ({
       return (
         <ConditionGroupField
           value={
-            value || {
-              logic: "AND",
-              rules: [{ left: "", operator: "==", right: "" }],
-              groups: [],
-            }
+            value
           }
           onChange={(val) =>
             setFieldValue(field.key, val)
           }
+          field={field}
         />
       );
 

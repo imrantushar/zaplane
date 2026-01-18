@@ -1,139 +1,182 @@
 import {
     Box,
     Button,
-    HStack,
-    VStack,
-    Input,
-    Text,
     Flex,
+    Text,
 } from "@chakra-ui/react";
+import { FiTrash2 } from "react-icons/fi";
 import ZAPInput from "@ZAPComponents/ZAPInput";
 import ZAPSelect from "@ZAPComponents/ZAPSelect";
-import { FiTrash2 } from "react-icons/fi";
-import Select from "react-select";
+import ZAPText from "@ZAPComponents/Text";
 
-const OPERATORS = [
-    { label: "==", value: "==" },
-    { label: "!=", value: "!=" },
-    { label: "<", value: "<" },
-    { label: ">", value: ">" },
-    { label: "<=", value: "<=" },
-    { label: ">=", value: ">=" },
-];
 
-export default function ConditionGroupField({ value, onChange }) {
-    const val = value && value.length ? value : [[{ left: "", operator: "==", right: "" }]];
+export default function ConditionGroupField({ value=[[{}]], onChange, field }) {
     const update = (newVal) => onChange(newVal);
+
+    const leftField = field.fields.find((f) => f.key === "left");
+    const operatorField = field.fields.find((f) => f.key === "operator");
+    const rightField = field.fields.find((f) => f.key === "right");
+
+
     const addRule = () => {
-        const newVal = [...val];
+        const newVal = [...value];
         newVal[0].push({ left: "", operator: "==", right: "" });
         update(newVal);
     };
 
     const deleteRule = (index) => {
-        const newVal = [...val];
+        const newVal = [...value];
         newVal[0] = newVal[0].filter((_, i) => i !== index);
         update(newVal);
     };
 
-    const updateRule = (index, key, val_) => {
-        const newVal = [...val];
-        newVal[0][index][key] = val_;
+    const updateRule = (index, key, value_) => {
+        const newVal = [...value];
+        newVal[0][index][key] = value_;
         update(newVal);
     };
     const addOrGroup = () => {
-        const newVal = [...val, [{ left: "", operator: "==", right: "" }]];
-        update(newVal);
-    };
-
-    const updateOrRule = (gIndex, rIndex, key, val_) => {
-        const newVal = [...val];
-        newVal[gIndex][rIndex][key] = val_;
+        const newVal = [...value, [{ left: "", operator: "==", right: "" }]];
         update(newVal);
     };
 
     const addOrRule = (gIndex) => {
-        const newVal = [...val];
+        const newVal = [...value];
         newVal[gIndex].push({ left: "", operator: "==", right: "" });
         update(newVal);
     };
 
+    const updateOrRule = (gIndex, rIndex, key, value_) => {
+        const newVal = [...value];
+        newVal[gIndex][rIndex][key] = value_;
+        update(newVal);
+    };
+
     const deleteOrRule = (gIndex, rIndex) => {
-        const newVal = [...val];
+        const newVal = [...value];
         newVal[gIndex] = newVal[gIndex].filter((_, i) => i !== rIndex);
         update(newVal);
     };
 
+
     return (
-        <Flex flexDirection="column" gap="10px">
-            {val[0].map((rule, i) => (
+        <Flex direction="column" gap={4}>
+            {value[0].map((rule, i) => (
                 <Flex key={i} gap={4} align="flex-end">
+
                     <ZAPInput
-                        label="Condition"
-                        placeholder="Condition"
-                        value={rule.left}
+                        label={"Condition"}
+                        placeholder={"Here to add data"}
                         style={{ width: "30%" }}
-                        onChange={(e) => updateRule(i, "left", e.target.value)}
+                        value={rule.left}
+                        onChange={(e) =>
+                            updateRule(i, "left", e.target.value)
+                        }
                     />
                     <ZAPSelect
-                        label="Operator"
-                        options={OPERATORS}
+                        label={operatorField.label}
                         style={{ width: "30%" }}
-                        value={OPERATORS.find(op => op.value === rule.operator)}
-                        onChange={(selected) => updateRule(i, "operator", selected.value)}
+                        options={operatorField.options}
+                        value={rule.operator || null}
+                        onChange={(selected) =>
+                            updateRule(i, "operator", selected)
+                        }
                     />
+
                     <ZAPInput
-                        label="value"
-                        placeholder="Value"
+                        label={"Value"}
+                        placeholder={"Here to add data"}
                         style={{ width: "30%" }}
                         value={rule.right}
-                        onChange={(e) => updateRule(i, "right", e.target.value)} />
-                    <Flex gap={2} marginTop="25px">
+                        onChange={(e) =>
+                            updateRule(i, "right", e.target.value)
+                        }
+                    />
+
+                    <Flex gap={2} mt="25px">
                         <Button onClick={addRule}>AND</Button>
-                        <Button colorScheme="red" variant="ghost" size="sm" onClick={() => deleteRule(i)}>
+                        <Button
+                            colorScheme="red"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => deleteRule(i)}
+                        >
                             <FiTrash2 />
                         </Button>
                     </Flex>
                 </Flex>
             ))}
-            {val.slice(1).map((group, gIndex) => (
-                <Box key={gIndex} p={3} borderWidth="1px" gap="5px" borderRadius="md">
-                    <Text fontWeight="bold" mb={2}>OR</Text>
+            {value.slice(1).map((group, gIndex) => (
+                <Box key={gIndex} p={3}>
+                    <Flex align="center">
+                        <Box flex="1" h="1px" bg="gray.300" />
+                        <ZAPText mx={3} fontSize="sm" color="gray.500">
+                            OR
+                        </ZAPText>
+                        <Box flex="1" h="1px" bg="gray.300" />
+                    </Flex>
+
                     {group.map((rule, rIndex) => (
-                        <HStack key={rIndex}>
+                        <Flex key={rIndex} gap={4} align="flex-end">
+
                             <ZAPInput
+                                label={"Condtion"}
+                                placeholder={"Here to add data"}
                                 style={{ width: "30%" }}
-                                label="Condition"
                                 value={rule.left}
-                                placeholder="Condition"
-                                onChange={(e) => updateOrRule(gIndex + 1, rIndex, "left", e.target.value)}
+                                onChange={(e) =>
+                                    updateOrRule(gIndex + 1, rIndex, "left", e.target.value)
+                                }
                             />
+
                             <ZAPSelect
-                                label="Operator"
-                                style={{width:"30%"}}
-                                options={OPERATORS}
-                                value={OPERATORS.find(op => op.value === rule.operator)}
-                                onChange={(selected) => updateOrRule(gIndex + 1, rIndex, "operator", selected.value)}
+                                label={operatorField.label}
+                                style={{ width: "30%" }}
+                                options={operatorField.options}
+                                value={rule.operator || null}
+                                onChange={(selected) =>
+                                    updateOrRule(
+                                        gIndex + 1,
+                                        rIndex,
+                                        "operator",
+                                        selected
+                                    )
+                                }
                             />
+
                             <ZAPInput
-                                label="value"
+                                label={"Value"}
+                                placeholder={"Here to add data"}
+                                style={{ width: "30%" }}
                                 value={rule.right}
-                                style={{width:"30%"}}
-                                placeholder="Value"
-                                onChange={(e) => updateOrRule(gIndex + 1, rIndex, "right", e.target.value)}
+                                onChange={(e) =>
+                                    updateOrRule(gIndex + 1, rIndex, "right", e.target.value)
+                                }
                             />
-                            <Flex gap={2} marginTop="25px">
-                                <Button onClick={() => addOrRule(gIndex + 1)}>AND</Button>
-                                <Button colorScheme="red" variant="ghost" size="sm" onClick={() => deleteOrRule(gIndex + 1, rIndex)}>
+
+                            <Flex gap={2} mt="25px">
+                                <Button onClick={() => addOrRule(gIndex + 1)}>
+                                    AND
+                                </Button>
+                                <Button
+                                    colorScheme="red"
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() =>
+                                        deleteOrRule(gIndex + 1, rIndex)
+                                    }
+                                >
                                     <FiTrash2 />
                                 </Button>
                             </Flex>
-                        </HStack>
+                        </Flex>
                     ))}
                 </Box>
             ))}
 
-            <Button size="sm" width="100px" onClick={addOrGroup}>+ Or Group</Button>
+            <Button width="120px" size="sm" onClick={addOrGroup}>
+                + Or Group
+            </Button>
         </Flex>
     );
 }
