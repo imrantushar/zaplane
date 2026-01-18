@@ -1,6 +1,7 @@
 import React from 'react';
 import { Flex, Text, Input, Textarea } from '@chakra-ui/react';
 import { __ } from '@wordpress/i18n';
+import ZAPText from '@ZAPComponents/Text';
 
 const ZAPInput = ({
   label,
@@ -18,9 +19,9 @@ const ZAPInput = ({
 
   return (
     <Flex as="label" direction="column"  gap={2} style={{ ...style }}>
-      <Text fontWeight="600" fontSize="0.875rem" margin={0}>
+      <ZAPText fontWeight="600" fontSize="0.875rem" >
         {__(label, 'zaplane')}
-      </Text>
+      </ZAPText>
 
       <InputComponent
         className="zaplane-input"

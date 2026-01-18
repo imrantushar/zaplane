@@ -229,7 +229,7 @@ export default function ActionDrawer({
             }
 
             placement="end"
-            size="md"
+            size="xl"
             footer={
                 <HStack justify="space-between">
                     <Button variant="ghost" onClick={resetAll}>

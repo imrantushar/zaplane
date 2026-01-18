@@ -65,31 +65,27 @@ export default function ConditionGroupField({ value, onChange }) {
     };
 
     return (
-        <VStack align="stretch" spacing={4}>
+        <Flex flexDirection="column" gap="10px">
             {val[0].map((rule, i) => (
-                <HStack key={i}>
+                <Flex key={i} gap={4} align="flex-end">
                     <ZAPInput
                         label="Condition"
                         placeholder="Condition"
                         value={rule.left}
+                        style={{ width: "30%" }}
                         onChange={(e) => updateRule(i, "left", e.target.value)}
                     />
-                    {/* <Box width="200px">
-                        <Select
-                            value={OPERATORS.find(op => op.value === rule.operator)}
-                            onChange={(selected) => updateRule(i, "operator", selected.value)}
-                            options={OPERATORS}
-                        />
-                    </Box> */}
                     <ZAPSelect
                         label="Operator"
                         options={OPERATORS}
+                        style={{ width: "30%" }}
                         value={OPERATORS.find(op => op.value === rule.operator)}
                         onChange={(selected) => updateRule(i, "operator", selected.value)}
                     />
                     <ZAPInput
                         label="value"
                         placeholder="Value"
+                        style={{ width: "30%" }}
                         value={rule.right}
                         onChange={(e) => updateRule(i, "right", e.target.value)} />
                     <Flex gap={2} marginTop="25px">
@@ -98,28 +94,23 @@ export default function ConditionGroupField({ value, onChange }) {
                             <FiTrash2 />
                         </Button>
                     </Flex>
-                </HStack>
+                </Flex>
             ))}
             {val.slice(1).map((group, gIndex) => (
-                <Box key={gIndex} p={3} borderWidth="1px" borderRadius="md">
+                <Box key={gIndex} p={3} borderWidth="1px" gap="5px" borderRadius="md">
                     <Text fontWeight="bold" mb={2}>OR</Text>
                     {group.map((rule, rIndex) => (
                         <HStack key={rIndex}>
                             <ZAPInput
+                                style={{ width: "30%" }}
                                 label="Condition"
                                 value={rule.left}
                                 placeholder="Condition"
                                 onChange={(e) => updateOrRule(gIndex + 1, rIndex, "left", e.target.value)}
                             />
-                            {/* <Box width="200px">
-                                <Select
-                                    value={OPERATORS.find(op => op.value === rule.operator)}
-                                    onChange={(selected) => updateOrRule(gIndex + 1, rIndex, "operator", selected.value)}
-                                    options={OPERATORS}
-                                />
-                            </Box> */}
                             <ZAPSelect
                                 label="Operator"
+                                style={{width:"30%"}}
                                 options={OPERATORS}
                                 value={OPERATORS.find(op => op.value === rule.operator)}
                                 onChange={(selected) => updateOrRule(gIndex + 1, rIndex, "operator", selected.value)}
@@ -127,6 +118,7 @@ export default function ConditionGroupField({ value, onChange }) {
                             <ZAPInput
                                 label="value"
                                 value={rule.right}
+                                style={{width:"30%"}}
                                 placeholder="Value"
                                 onChange={(e) => updateOrRule(gIndex + 1, rIndex, "right", e.target.value)}
                             />
@@ -142,6 +134,6 @@ export default function ConditionGroupField({ value, onChange }) {
             ))}
 
             <Button size="sm" width="100px" onClick={addOrGroup}>+ Or Group</Button>
-        </VStack>
+        </Flex>
     );
 }

@@ -12,11 +12,12 @@ const ZAPSelect = ({
   onMenuOpen,
   mb = 0,
   placeholder,
-  isClearable = false
+  isClearable = false,
+  style,
 }) => {
   return (
-    <Box mb={mb}>
-      {label && <ZAPText mb="4px">{label}</ZAPText>}
+    <Box mb={mb} style={style}>
+      {label && <ZAPText fontWeight="600" fontSize="0.875rem" mb="4px">{label}</ZAPText>}
 
       <Select
         options={options}
