@@ -52,26 +52,15 @@ const RunsTable = ({ runs = [] }) => {
     );
   }
 
-  if (isLoading) {
-    return (
-      <ZAPLoading />
-
-    );
-  }
-  if (!runs.length) {
-    return (
-      <Flex align="center" justify="center" h="100%">
-        <Text>No History available</Text>
-      </Flex>
-
-    );
-  }
+  
 
   return (
     <ZAPTable
       data={runs}
       rowKey="id"
       variant="line"
+      isLoading={isLoading}
+      noDataText='Have no History Yet'
       size="sm"
       caption="Workflow Execution History"
       columns={[

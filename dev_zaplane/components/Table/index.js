@@ -5,17 +5,24 @@ import {
   HStack,
   Button,
   Badge,
+  Flex,
 } from "@chakra-ui/react";
+import ZAPLoading from "@ZAPComponents/Loading";
+import ZAPText from "@ZAPComponents/Text";
 
-export default function ZAPTable({
+const ZAPTable = ({
   data = [],
   columns = [],
   rowKey = "id",
-  actionsRenderer, 
+  actionsRenderer,
   caption,
   variant = "line",
   size = "sm",
-}) {
+  isLoading = false,
+  noDataText="No data have"
+}) => {
+  const colSpan = columns.length + (actionsRenderer ? 1 : 0);
+
   return (
     <Table.Root size={size} variant={variant}>
       {caption && <Table.Caption>{caption}</Table.Caption>}
@@ -40,23 +47,46 @@ export default function ZAPTable({
       </Table.Header>
 
       <Table.Body>
-        {data.map((row) => (
-          <Table.Row key={row[rowKey]}>
-            {columns.map((col, i) => (
-              <Table.Cell key={i} textAlign={col.textAlign || "left"}>
-                {col.render ? col.render(row) : row[col.key] || "--"}
-              </Table.Cell>
-            ))}
-            {actionsRenderer && (
-              <Table.Cell textAlign="center">
-                <HStack justify="center" spacing="1">
-                  {actionsRenderer(row)}
-                </HStack>
-              </Table.Cell>
-            )}
+        {isLoading && (
+          <Table.Row>
+            <Table.Cell colSpan={colSpan}>
+              <Flex justify="center" py={6}>
+                <ZAPLoading />
+              </Flex>
+            </Table.Cell>
           </Table.Row>
-        ))}
+        )}
+        {!isLoading &&
+          Array.isArray(data) &&
+          data.map((row) => (
+            <Table.Row key={row[rowKey]}>
+              {columns.map((col, i) => (
+                <Table.Cell key={i} textAlign={col.textAlign || "left"}>
+                  {col.render ? col.render(row) : row[col.key] || "--"}
+                </Table.Cell>
+              ))}
+
+              {actionsRenderer && (
+                <Table.Cell textAlign="center">
+                  <HStack justify="center" spacing="1">
+                    {actionsRenderer(row)}
+                  </HStack>
+                </Table.Cell>
+              )}
+            </Table.Row>
+          ))}
+        {!isLoading && Array.isArray(data) && data.length === 0 && (
+          <Table.Row>
+            <Table.Cell colSpan={colSpan} textAlign="center">
+              <ZAPText fontSize="sm" color="gray.500">
+                {noDataText}
+              </ZAPText>
+            </Table.Cell>
+          </Table.Row>
+        )}
       </Table.Body>
     </Table.Root>
   );
-}
+};
+
+export default ZAPTable;

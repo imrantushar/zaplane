@@ -70,7 +70,7 @@ class Autoload {
                 }
             }
         }
-    }
+    }x
 
     /**
      * Constructor: register autoloader

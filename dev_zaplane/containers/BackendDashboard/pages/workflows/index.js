@@ -166,6 +166,27 @@ const CreateWorkflows = () => {
                 ),
               },
               {
+                label: __("Created At", "zaplane"),
+                key: "created_at",
+                textAlign: "center",
+                render: (row) => (
+                  <Text fontSize="sm">
+                    {row.created_at}
+                  </Text>
+                ),
+              },
+
+              {
+                label: __("Updated At", "zaplane"),
+                key: "updated_at",
+                textAlign: "center",
+                render: (row) => (
+                  <Text fontSize="sm">
+                    {row.updated_at}
+                  </Text>
+                ),
+              },
+                {
                 label: __("Status", "zaplane"),
                 key: "status",
                 textAlign: "center",
@@ -210,9 +231,8 @@ const CreateWorkflows = () => {
                 </Button>
               </Box>
             )}
+            isLoading={isLoading}
           />
-
-
         </Box>
       </Box>
       <WPModal
