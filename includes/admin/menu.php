@@ -5,7 +5,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use Zaplane\Framework\Classes\Helper;
+use Zaplane\Utils\Helper;
 
 class Menu { 
     public function register(){

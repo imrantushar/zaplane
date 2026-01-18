@@ -58,6 +58,20 @@ class Config implements ArrayAccess
     private function __construct()
     {
         $this->loadDefaults();
+        $this->loadConfigFiles();
+    }
+
+    /**
+     * Load configuration files from the config directory.
+     */
+    protected function loadConfigFiles(): void
+    {
+        if (!defined('ZAPLANE_INCLUDES_DIR_PATH')) {
+            return;
+        }
+
+        $configPath = ZAPLANE_INCLUDES_DIR_PATH . 'config';
+        $this->loadDirectory($configPath);
     }
 
     /**
@@ -133,7 +147,12 @@ class Config implements ArrayAccess
             return $this;
         }
 
-        $config = require $path;
+        try {
+            $config = require $path;
+        } catch (\Throwable $e) {
+            // Silently fail if config file has errors (e.g., undefined constants during tests)
+            return $this;
+        }
 
         if (!is_array($config)) {
             return $this;

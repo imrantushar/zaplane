@@ -37,6 +37,9 @@ final class Zaplane {
 
     private function load_dependencies(): void {
         require_once ZAPLANE_INCLUDES_DIR_PATH . 'autoload.php';
+        require_once ZAPLANE_FRAMEWORK_DIR_PATH . 'functions.php';
+        require_once ZAPLANE_INCLUDES_DIR_PATH . 'utils/functions.php';
+        require_once ZAPLANE_INCLUDES_DIR_PATH . 'utils/helper.php';
     }
 
     private function boot_container(): Container {

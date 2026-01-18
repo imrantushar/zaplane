@@ -13,30 +13,6 @@ use Zaplane\Framework\Logging\LogManager;
 
 if (!defined('ABSPATH')) exit;
 
-if (!function_exists('config')) {
-    /**
-     * Laravel-like config helper function.
-     *
-     * @param string|null $key The configuration key (dot notation supported)
-     * @param mixed $default Default value if key doesn't exist
-     * @return mixed
-     *
-     * Usage:
-     *   config('app.name')           // Get a value
-     *   config('app.debug', false)   // Get with default
-     */
-    function config(?string $key = null, $default = null)
-    {
-        $config = Config::getInstance();
-
-        if ($key === null) {
-            return $config;
-        }
-
-        return $config->get($key, $default);
-    }
-}
-
 if (!function_exists('zaplane_config')) {
     /**
      * Get a configuration value or the Config instance.

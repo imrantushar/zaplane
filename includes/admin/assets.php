@@ -1,7 +1,7 @@
 <?php
 namespace Zaplane\Admin;
 
-use Zaplane\Framework\Classes\Helper;
+use Zaplane\Utils\Helper;
 
 if (!defined('ABSPATH')) exit;
 

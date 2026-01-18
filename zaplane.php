@@ -24,6 +24,7 @@ define('ZAPLANE_PLUGIN_FILE', __FILE__);
 define('ZAPLANE_PLUGIN_ROOT_URI', plugins_url( '/', __FILE__ ) );
 define('ZAPLANE_ROOT_DIR_PATH', plugin_dir_path(__FILE__));
 define('ZAPLANE_INCLUDES_DIR_PATH', ZAPLANE_ROOT_DIR_PATH . 'includes/');
+define('ZAPLANE_FRAMEWORK_DIR_PATH', ZAPLANE_ROOT_DIR_PATH . 'includes/framework/');
 define('ZAPLANE_INTEGRATION_DIR_PATH', ZAPLANE_ROOT_DIR_PATH . 'integration/');
 define( 'ZAPLANE_ASSETS_DIR_PATH', ZAPLANE_ROOT_DIR_PATH . 'assets/' );
 define( 'ZAPLANE_ASSETS_URI', ZAPLANE_PLUGIN_ROOT_URI . 'assets/' );
