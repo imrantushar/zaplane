@@ -711,34 +711,22 @@ class Wordpress extends IntegrationBase {
             ];
         }
 
-        if ( $action === 'update_post_title' ) {
+        $title_action = [
+            'update_post_title',
+            'update_page_title',
+        ]; 
+
+        if ( in_array( $action, $title_action, true ) ) {
             return [
                 [
                     'key'      => 'post_id',
-                    'label'    => 'Post ID',
+                    'label'    => 'ID',
                     'type'     => 'expression',
                     'required' => true,
                 ],
                 [
                     'key'      => 'post_title',
-                    'label'    => 'New Post Title',
-                    'type'     => 'expression',
-                    'required' => true,
-                ],
-            ];
-        }
-
-        if ( $action === 'update_page_title' ) {
-            return [
-                [
-                    'key'      => 'page_id',
-                    'label'    => 'Page ID',
-                    'type'     => 'expression',
-                    'required' => true,
-                ],
-                [
-                    'key'      => 'page_title',
-                    'label'    => 'New Page Title',
+                    'label'    => 'New Title',
                     'type'     => 'expression',
                     'required' => true,
                 ],
@@ -755,7 +743,7 @@ class Wordpress extends IntegrationBase {
                 ],
                 [
                     'key'      => 'post_title',
-                    'label'    => 'New Post Title',
+                    'label'    => 'New Title',
                     'type'     => 'expression',
                     'required' => true,
                 ],
@@ -848,20 +836,6 @@ class Wordpress extends IntegrationBase {
             'post_excerpt',
             'post_status',
             'post_type_single',
-        ];
-
-        if ( in_array( $action, $post_id_actions, true ) ) {
-            return [
-                [
-                    'key'      => 'post_id',
-                    'label'    => 'Post ID',
-                    'type'     => 'expression', 
-                    'required' => true,
-                ],
-            ];
-        }
-
-        $post_id_actions = [
             'trash_page',
             'restore_page',
             'delete_trash_page',
@@ -872,7 +846,7 @@ class Wordpress extends IntegrationBase {
             return [
                 [
                     'key'      => 'post_id',
-                    'label'    => 'Page ID',
+                    'label'    => 'ID',
                     'type'     => 'expression', 
                     'required' => true,
                 ],
@@ -922,38 +896,21 @@ class Wordpress extends IntegrationBase {
             ];
         }
 
-        if ( $action === 'update_post_status' ) {
+        $status_action = [
+            'update_post_status',
+            'update_page_status',
+        ];
+
+        if ( in_array( $action, $status_action, true ) ) {
             return [
                 [
                     'key'      => 'post_id',
-                    'label'    => 'Post ID to Update',
+                    'label'    => 'Update ID',
                     'type'     => 'expression', 
                     'required' => true,
                 ],
                 [
                     'key'     => 'post_status',
-                    'label'   => 'Status',
-                    'type'    => 'select',
-                    'options' => [
-                        ['label' => 'Publish', 'value' => 'publish' ],
-                        ['label' => 'Pending', 'value' => 'pending' ],
-                        ['label' => 'Private', 'value' => 'private' ],
-                        ['label' => 'Draft',   'value' => 'draft' ],
-                    ],
-                ],
-            ];
-        }
-
-        if ( $action === 'update_page_status' ) {
-            return [
-                [
-                    'key'      => 'page_id',
-                    'label'    => 'Page ID to Update',
-                    'type'     => 'expression', 
-                    'required' => true,
-                ],
-                [
-                    'key'     => 'page_status',
                     'label'   => 'Status',
                     'type'    => 'select',
                     'options' => [
@@ -1393,16 +1350,10 @@ class Wordpress extends IntegrationBase {
                 return ['port'=>'main','data'=>[]];
 
             case 'update_post_title':
+            case 'update_page_title':
                 wp_update_post([
                     'ID'         => $config['post_id'] ,
                     'post_title' => $config['post_title'],
-                ]);
-                return ['port'=>'main','data'=>[]];
-
-            case 'update_page_title':
-                wp_update_post([
-                    'ID'         => $config['page_id'] ,
-                    'post_title' => $config['page_title'],
                 ]);
                 return ['port'=>'main','data'=>[]];
 
@@ -1415,8 +1366,8 @@ class Wordpress extends IntegrationBase {
                     'post_type'    => $post->post_type,
                     'post_title'   => $new_title ? : $post->post_title . '(copy)',
                     'post_content' => $post->post_content,
-                    'post_status'       => $status,
-                    'post_author'       => $post->post_author,
+                    'post_status'  => $status,
+                    'post_author'  => $post->post_author,
                 ];
                 $new_post_id = wp_insert_post( $new_post );
 
@@ -1524,16 +1475,10 @@ class Wordpress extends IntegrationBase {
                 return ['port' => 'main', 'data' => []];
 
             case 'update_post_status':
+            case 'update_page_status':
                 wp_update_post([
                     'ID'          => $config['post_id'],
                     'post_status' => $config['post_status'],
-                ]);
-                return ['port' => 'main', 'data' => []];
-
-            case 'update_page_status':
-                wp_update_post([
-                    'ID'          => $config['page_id'],
-                    'post_status' => $config['page_status'],
                 ]);
                 return ['port' => 'main', 'data' => []];
 

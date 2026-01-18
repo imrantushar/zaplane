@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-01-15 12:39:17",
+    "generated_at": "2026-01-18 07:09:52",
     "integrations": {
         "wordpress": {
             "slug": "wordpress",
@@ -591,13 +591,13 @@
                     "schema": [
                         {
                             "key": "post_id",
-                            "label": "Post ID",
+                            "label": "ID",
                             "type": "expression",
                             "required": true
                         },
                         {
                             "key": "post_title",
-                            "label": "New Post Title",
+                            "label": "New Title",
                             "type": "expression",
                             "required": true
                         }
@@ -611,14 +611,14 @@
                     "label": "Update Page Title",
                     "schema": [
                         {
-                            "key": "page_id",
-                            "label": "Page ID",
+                            "key": "post_id",
+                            "label": "ID",
                             "type": "expression",
                             "required": true
                         },
                         {
-                            "key": "page_title",
-                            "label": "New Page Title",
+                            "key": "post_title",
+                            "label": "New Title",
                             "type": "expression",
                             "required": true
                         }
@@ -689,7 +689,7 @@
                     "schema": [
                         {
                             "key": "post_id",
-                            "label": "Post ID to Update",
+                            "label": "Update ID",
                             "type": "expression",
                             "required": true
                         },
@@ -726,13 +726,13 @@
                     "label": "Update Page Status",
                     "schema": [
                         {
-                            "key": "page_id",
-                            "label": "Page ID to Update",
+                            "key": "post_id",
+                            "label": "Update ID",
                             "type": "expression",
                             "required": true
                         },
                         {
-                            "key": "page_status",
+                            "key": "post_status",
                             "label": "Status",
                             "type": "select",
                             "options": [
@@ -771,7 +771,7 @@
                         },
                         {
                             "key": "post_title",
-                            "label": "New Post Title",
+                            "label": "New Title",
                             "type": "expression",
                             "required": true
                         },
@@ -847,7 +847,7 @@
                     "schema": [
                         {
                             "key": "post_id",
-                            "label": "Post ID",
+                            "label": "ID",
                             "type": "expression",
                             "required": true
                         }
@@ -904,7 +904,7 @@
                     "schema": [
                         {
                             "key": "post_id",
-                            "label": "Post ID",
+                            "label": "ID",
                             "type": "expression",
                             "required": true
                         }
@@ -919,7 +919,7 @@
                     "schema": [
                         {
                             "key": "post_id",
-                            "label": "Post ID",
+                            "label": "ID",
                             "type": "expression",
                             "required": true
                         }
@@ -934,7 +934,7 @@
                     "schema": [
                         {
                             "key": "post_id",
-                            "label": "Post ID",
+                            "label": "ID",
                             "type": "expression",
                             "required": true
                         }
@@ -949,7 +949,7 @@
                     "schema": [
                         {
                             "key": "post_id",
-                            "label": "Post ID",
+                            "label": "ID",
                             "type": "expression",
                             "required": true
                         }
@@ -964,7 +964,7 @@
                     "schema": [
                         {
                             "key": "post_id",
-                            "label": "Page ID",
+                            "label": "ID",
                             "type": "expression",
                             "required": true
                         }
@@ -979,7 +979,7 @@
                     "schema": [
                         {
                             "key": "post_id",
-                            "label": "Page ID",
+                            "label": "ID",
                             "type": "expression",
                             "required": true
                         }
@@ -994,7 +994,7 @@
                     "schema": [
                         {
                             "key": "post_id",
-                            "label": "Page ID",
+                            "label": "ID",
                             "type": "expression",
                             "required": true
                         }
@@ -1009,7 +1009,7 @@
                     "schema": [
                         {
                             "key": "post_id",
-                            "label": "Page ID",
+                            "label": "ID",
                             "type": "expression",
                             "required": true
                         }
@@ -1032,7 +1032,7 @@
                     "schema": [
                         {
                             "key": "post_id",
-                            "label": "Post ID",
+                            "label": "ID",
                             "type": "expression",
                             "required": true
                         }
@@ -1105,7 +1105,7 @@
                     "schema": [
                         {
                             "key": "post_id",
-                            "label": "Post ID",
+                            "label": "ID",
                             "type": "expression",
                             "required": true
                         }
@@ -1141,7 +1141,7 @@
                     "schema": [
                         {
                             "key": "post_id",
-                            "label": "Post ID",
+                            "label": "ID",
                             "type": "expression",
                             "required": true
                         }
@@ -1156,7 +1156,7 @@
                     "schema": [
                         {
                             "key": "post_id",
-                            "label": "Post ID",
+                            "label": "ID",
                             "type": "expression",
                             "required": true
                         }
@@ -1171,7 +1171,7 @@
                     "schema": [
                         {
                             "key": "post_id",
-                            "label": "Post ID",
+                            "label": "ID",
                             "type": "expression",
                             "required": true
                         }
@@ -1186,7 +1186,7 @@
                     "schema": [
                         {
                             "key": "post_id",
-                            "label": "Post ID",
+                            "label": "ID",
                             "type": "expression",
                             "required": true
                         }
@@ -1209,7 +1209,7 @@
                     "schema": [
                         {
                             "key": "post_id",
-                            "label": "Post ID",
+                            "label": "ID",
                             "type": "expression",
                             "required": true
                         }
