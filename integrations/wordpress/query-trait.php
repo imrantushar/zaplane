@@ -151,4 +151,31 @@ trait QueryTrait {
         }
         return $items;
     }
+
+    public static function query_active_plugins( $q ) {
+        if ( ! function_exists( 'is_plugin_active' ) ) {
+            require_once ABSPATH . 'wp-admin/includes/plugin.php';
+        }
+
+        $all_plugins   = get_plugins();
+        $active_plugin = get_option( 'active_plugins', [] );
+        $result        = [];
+
+        foreach ( $active_plugin as $plugin ) {
+            if ( ! isset( $all_plugins[ $plugin ] ) ) {
+                continue;
+            }
+
+            if ( $plugin === 'zaplane/zaplane.php' ) {
+                continue;
+            }
+
+            $result[] = [
+                'file' => $plugin,
+                'name' => $all_plugins[ $plugin ][ 'Name' ],
+            ];
+        }
+
+        return $result;
+    }
 }

@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-01-16 13:42:41",
+    "generated_at": "2026-01-18 12:45:16",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -140,6 +140,123 @@
                         "main"
                     ]
                 },
+                "deleted_post": {
+                    "key": "deleted_post",
+                    "label": "Before Deleted Post",
+                    "hook": "before_delete_post",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "save_post": {
+                    "key": "save_post",
+                    "label": "Save Post",
+                    "hook": "save_post",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "post_revision": {
+                    "key": "post_revision",
+                    "label": "Revision Creation",
+                    "hook": "_wp_put_post_revision",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add_attachment": {
+                    "key": "add_attachment",
+                    "label": "Add Attachment",
+                    "hook": "add_attachment",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "edit_attachment": {
+                    "key": "edit_attachment",
+                    "label": "Attachment Edit",
+                    "hook": "edit_attachment",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "save_attachment": {
+                    "key": "save_attachment",
+                    "label": "Attachment Save",
+                    "hook": "attachment_fields_to_save",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "attachment_updated": {
+                    "key": "attachment_updated",
+                    "label": "Attachment Update",
+                    "hook": "attachment_updated",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "attachment_count": {
+                    "key": "attachment_count",
+                    "label": "Attachment Count",
+                    "hook": "wp_count_attachments",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "attachment_metadata": {
+                    "key": "attachment_metadata",
+                    "label": "Generate Attachment Metadata",
+                    "hook": "wp_generate_attachment_metadata",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_attachment": {
+                    "key": "delete_attachment",
+                    "label": "Media Deletion",
+                    "hook": "delete_attachment",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "media_edit": {
+                    "key": "media_edit",
+                    "label": "Media Edit",
+                    "hook": "edit_attachment",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "media_upload_tabs": {
+                    "key": "media_upload_tabs",
+                    "label": "Media Tabs",
+                    "hook": "media_upload_tabs",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "image_sizes": {
+                    "key": "image_sizes",
+                    "label": "Image Sizes",
+                    "hook": "image_size_names_choose",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
                 "user_register": {
                     "key": "user_register",
                     "label": "User Registered",
@@ -221,6 +338,42 @@
                         "main"
                     ]
                 },
+                "create_application_password": {
+                    "key": "create_application_password",
+                    "label": "Create Application Password",
+                    "hook": "wp_create_application_password",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_application_password": {
+                    "key": "update_application_password",
+                    "label": "Update Application Password",
+                    "hook": "wp_update_application_password",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_application_password": {
+                    "key": "delete_application_password",
+                    "label": "Delete Application Password",
+                    "hook": "wp_delete_application_password",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add_user_role": {
+                    "key": "add_user_role",
+                    "label": "User Added to a Role",
+                    "hook": "add_user_role",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
                 "wp_login": {
                     "key": "wp_login",
                     "label": "User Logged In",
@@ -252,6 +405,15 @@
                     "key": "wp_authenticate",
                     "label": "WP Authenticate",
                     "hook": "wp_authenticate",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "validate_reset": {
+                    "key": "validate_reset",
+                    "label": "Validate Reset",
+                    "hook": "validate_password_reset",
                     "schema": [],
                     "outputs": [
                         "main"
@@ -460,6 +622,63 @@
                         "main"
                     ]
                 },
+                "activated_plugin": {
+                    "key": "activated_plugin",
+                    "label": "Activate Plugin",
+                    "hook": "activated_plugin",
+                    "schema": [
+                        {
+                            "key": "plugin",
+                            "label": "Inactive Plugin",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "inactive_plugins",
+                                "select": [
+                                    "file",
+                                    "name"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "deactivate_plugin": {
+                    "key": "deactivate_plugin",
+                    "label": "Deactivate Plugin",
+                    "hook": "deactivate_plugin",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "switch_theme": {
+                    "key": "switch_theme",
+                    "label": "Theme Switch",
+                    "hook": "switch_theme",
+                    "schema": [
+                        {
+                            "key": "theme",
+                            "label": "Theme Switch",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "deactivate_theme",
+                                "select": [
+                                    "file",
+                                    "name"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
                 "add_option": {
                     "key": "add_option",
                     "label": "Add Option",
@@ -500,6 +719,60 @@
                     "key": "generate_rewrite_rules",
                     "label": "Rewrite Rules Generated",
                     "hook": "generate_rewrite_rules",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "switch_blog": {
+                    "key": "switch_blog",
+                    "label": "Blog Switch",
+                    "hook": "switch_blog",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "customize_register": {
+                    "key": "customize_register",
+                    "label": "Customizer Registration",
+                    "hook": "customize_register",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "rest_api_init": {
+                    "key": "rest_api_init",
+                    "label": "REST API Init",
+                    "hook": "rest_api_init",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_blog_public": {
+                    "key": "update_blog_public",
+                    "label": "Update Blog Public",
+                    "hook": "update_blog_public",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_blog_status": {
+                    "key": "update_blog_status",
+                    "label": "Update Blog Status",
+                    "hook": "update_blog_status",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "new_blog": {
+                    "key": "new_blog",
+                    "label": "New Blog",
+                    "hook": "wpmu_new_blog",
                     "schema": [],
                     "outputs": [
                         "main"

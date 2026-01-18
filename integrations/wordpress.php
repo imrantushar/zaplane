@@ -47,6 +47,21 @@ class Wordpress extends IntegrationBase {
             'wp_trash_post'          => ['label' => 'Post Trashed', 'hook' => 'wp_trash_post'],
             'untrashed_post'         => ['label' => 'Post Untrashed', 'hook' => 'untrashed_post'],
             'delete_post'            => ['label' => 'Delete Post', 'hook' => 'delete_post'],
+            'deleted_post'           => ['label' => 'Before Deleted Post', 'hook' => 'before_delete_post'],
+            'save_post'              => ['label' => 'Save Post', 'hook' => 'save_post'],
+            'post_revision'               => ['label' => 'Revision Creation',            'hook' => '_wp_put_post_revision'],
+
+            //Media
+            'add_attachment'              => ['label' => 'Add Attachment',               'hook' => 'add_attachment'],
+            'edit_attachment'             => ['label' => 'Attachment Edit',              'hook' => 'edit_attachment'],
+            'save_attachment'             => ['label' => 'Attachment Save',              'hook' => 'attachment_fields_to_save'],
+            'attachment_updated'          => ['label' => 'Attachment Update',            'hook' => 'attachment_updated'],
+            'attachment_count'            => ['label' => 'Attachment Count',             'hook' => 'wp_count_attachments'],
+            'attachment_metadata'         => ['label' => 'Generate Attachment Metadata', 'hook' => 'wp_generate_attachment_metadata'],
+            'delete_attachment'           => ['label' => 'Media Deletion',               'hook' => 'delete_attachment'],
+            'media_edit'                  => ['label' => 'Media Edit',                   'hook' => 'edit_attachment'],
+            'media_upload_tabs'           => ['label' => 'Media Tabs',                   'hook' => 'media_upload_tabs'],
+            'image_sizes'                 => ['label' => 'Image Sizes',                  'hook' => 'image_size_names_choose'],
 
             // Users
             'user_register'          => ['label' => 'User Registered', 'hook' => 'user_register'],
@@ -58,12 +73,17 @@ class Wordpress extends IntegrationBase {
             'wpmu_delete_user'       => ['label' => 'Delete User (MU)', 'hook' => 'wpmu_delete_user'],
             'wpmu_new_user'          => ['label' => 'New User Created', 'hook' => 'wpmu_new_user'],
             'wpmu_activate_user'     => ['label' => 'Activate User', 'hook' => 'wpmu_activate_user'],
+            'create_application_password' => ['label' => 'Create Application Password',  'hook' => 'wp_create_application_password'],
+            'update_application_password' => ['label' => 'Update Application Password',  'hook' => 'wp_update_application_password'],
+            'delete_application_password' => ['label' => 'Delete Application Password',  'hook' => 'wp_delete_application_password'],
+            'add_user_role'               => ['label' => 'User Added to a Role',         'hook' => 'add_user_role'],
 
             // Auth
             'wp_login'               => ['label' => 'User Logged In', 'hook' => 'wp_login'],
             'wp_login_failed'        => ['label' => 'Login Failed', 'hook' => 'wp_login_failed'],
             'wp_logout'              => ['label' => 'User Logged Out', 'hook' => 'wp_logout'],
             'wp_authenticate'        => ['label' => 'WP Authenticate', 'hook' => 'wp_authenticate'],
+            'validate_reset'              => ['label' => 'Validate Reset',               'hook' => 'validate_password_reset'],
 
             // Comments
             'comment_post'           => ['label' => 'Comment Added', 'hook' => 'comment_post'],
@@ -83,12 +103,24 @@ class Wordpress extends IntegrationBase {
             'saved_term'             => ['label' => 'Term Updated', 'hook' => 'saved_term'],
             'delete_term'            => ['label' => 'Delete Term', 'hook' => 'delete_term'],
 
+            //Plugin // Theme
+            'activated_plugin'      => ['label' => 'Activate Plugin', 'hook' => 'activated_plugin'],
+            'deactivate_plugin'     => ['label' => 'Deactivate Plugin', 'hook' => 'deactivate_plugin'],
+            'switch_theme'                => ['label' => 'Theme Switch', 'hook' => 'switch_theme'],
+            
+
             // Options / System
             'add_option'             => ['label' => 'Add Option', 'hook' => 'add_option'],
             'update_option'          => ['label' => 'Update Option', 'hook' => 'update_option'],
             'delete_option'          => ['label' => 'Delete Option', 'hook' => 'delete_option'],
             'upgrader_process_complete' => ['label' => 'Upgrader Complete', 'hook' => 'upgrader_process_complete'],
             'generate_rewrite_rules' => ['label' => 'Rewrite Rules Generated', 'hook' => 'generate_rewrite_rules'],
+            'switch_blog'            => ['label' => 'Blog Switch', 'hook' => 'switch_blog'],
+            'customize_register'     => ['label' => 'Customizer Registration', 'hook' => 'customize_register'],
+            'rest_api_init'          => ['label' => 'REST API Init', 'hook' => 'rest_api_init'],
+            'update_blog_public'          => ['label' => 'Update Blog Public',           'hook' => 'update_blog_public'],
+            'update_blog_status'          => ['label' => 'Update Blog Status',           'hook' => 'update_blog_status'],
+            'new_blog'                    => ['label' => 'New Blog',                     'hook' => 'wpmu_new_blog'],
         ];
     }
 
@@ -177,6 +209,40 @@ class Wordpress extends IntegrationBase {
             ];
         }
 
+        if ( $trigger === 'activated_plugin' ) {
+            return [
+                [
+                    'key'     => 'plugin',
+                    'label'   => 'Inactive Plugin',
+                    'type'    => 'select',
+                    'dynamic' =>[
+                        'integration' => 'wordpress',
+                        'query'       => 'inactive_plugins',
+                        'select'      => [ 'file', 'name' ],
+                    ],
+                    'required' => true,
+                ],
+            ];
+            return[];
+        }
+
+        if ( $trigger === 'switch_theme' ) {
+            return [
+                [
+                    'key'     => 'theme',
+                    'label'   => 'Theme Switch',
+                    'type'    => 'select',
+                    'dynamic' => [
+                        'integration' => 'wordpress',
+                        'query'       => 'deactivate_theme',
+                        'select'      => [ 'file', 'name' ],
+                    ],
+                    'required' => true,
+                ],
+            ];
+            return [];
+        }
+
         if ( $trigger === 'add_action' ) {
             return [
                 [
@@ -202,6 +268,22 @@ class Wordpress extends IntegrationBase {
         ];
     }
 
+    private static function resolve_media_payload( int $attachment_id ) {
+        if ( ! $attachment_id ) return false;
+
+        $attachment = get_post( $attachment_id );
+        if ( ! $attachment || $attachment->post_type !== 'attachment' ) return false;
+
+        return [
+            'attachment_id' => $attachment_id,
+            'post_title'    => $attachment->post_title,
+            'mime_type'     => get_post_mime_type( $attachment_id ),
+            'url'           => wp_get_attachment_url( $attachment_id ),
+            'user_id'       => get_current_user_id(),
+            'time'          => current_time( 'mysql' ),
+        ];
+    }
+
     private static function resolve_comment_payload( int $comment_id ) {
         $comment = get_comment( $comment_id );
         if ( ! $comment ) return false;
@@ -209,7 +291,7 @@ class Wordpress extends IntegrationBase {
         return [
             'comment_id' => $comment->comment_ID,
             'post_id'    => $comment->comment_post_ID,
-            'content'    => $comment->comment_content,
+            'content'    => $comment->comment_content, 
             'status'     => $comment->comment_approved,
             'author'     => $comment->comment_author,
         ];
@@ -231,6 +313,8 @@ class Wordpress extends IntegrationBase {
             case 'delete_post':
             case 'untrashed_post':
             case 'wp_trash_post':
+            case 'deleted_post':
+            case 'save_post':
                 return self::resolve_post_payload( $args[0] ?? 0 );
 
             case 'transition_post_status':
@@ -265,6 +349,104 @@ class Wordpress extends IntegrationBase {
                     self::resolve_post_payload( $post->ID ),
                     [ 'is_update' => $args[1] ?? false ]
                 );
+            
+            case 'update_blog_status' :
+                $blog_id    = $args[0] ?? 0;
+                $new_status = $args[1] ?? 0;
+                $old_status = $args[2] ?? 0;
+                if ( ! $blog_id ) return false;
+
+                return [
+                    'blog_id' => $blog_id,
+                    'new_status' => $new_status,
+                    'old_status' => $old_status,
+                ];
+
+            /* ---------------- MEDIA ---------------- */
+
+            case 'add_attachment' : 
+            case 'edit_attachment' : 
+            case 'attachment_updated' :
+            case 'media_edit' :
+                return self::resolve_media_payload( $args[0] ?? 0 );
+
+            case 'save_attachment' : 
+                $post_id = $args[0] ?? 0;
+                $attachment = $args[1] ?? [];
+                if ( ! $post_id ) return false;
+
+                $attachment_post = get_post( $post_id );
+                if ( ! $attachment_post || $attachment_post->post_type !== 'attachment' ) return false;
+
+                return [
+                    'attachment_id' => $post_id,
+                    'post_title'    => $attachment_post->post_title,
+                    'mime_type'     => get_post_mime_type( $post_id ),
+                    'url'           => wp_get_attachment_url( $post_id ),
+                    'user_id'       => get_current_user_id(),
+                    'time'          => current_time( 'mysql' ),
+                    'fields'        => $attachment,
+                ];
+
+            case 'attachment_count' :
+                $post_type = $args[0] ?? 0;
+                $count = wp_count_attachments( $post_type );
+
+                return [
+                    'post_type' => $post_type,
+                    'counts'    => (array) $count,
+                    'time'     => current_time( 'mysql' ), 
+                ];
+
+            case 'attachment_metadata' :
+                $metadata = $args[0] ?? [];
+                $attachment_id = $args[1] ?? 0;
+                if ( ! $attachment_id || empty( $metadata ) ) return false;
+
+                $attachment = get_post( $attachment_id );
+                if ( ! $attachment || $attachment->post_type !== 'attachment' ) return false;
+
+                return [
+                    'attachment_id' => $attachment_id,
+                    'post_title'    => $attachment->post_title,
+                    'mime_type'     => get_post_mime_type( $attachment_id ),
+                    'url'           => wp_get_attachment_url( $attachment_id ),
+                    'matadata'      => $metadata,
+                    'user_id'       => get_current_user_id(),
+                    'time'          => current_time( 'mysql' ),
+                ];
+            
+            case 'delete_attachment' :
+                $attachment_id = $args[0] ?? 0;
+                if ( ! $attachment_id ) return false;
+
+                return [
+                    'attachment_id' => $attachment_id,
+                    'user_id'       => get_current_user_id(),
+                    'time'          => current_time( 'mysql' ),
+                ];
+
+            case 'media_upload_tabs' : 
+                $tabs = $args[0] ?? [];
+                if ( empty( $tabs ) || ! is_array( $tabs) ) return false;
+
+                return [
+                    'tabs'         => $tabs,
+                    'tabs_keys'    => array_keys( $tabs ),
+                    'count'        => count( $tabs ),
+                    'triggered_at' => current_time( 'mysql' ),
+                ];
+            
+            case 'image_sizes' : 
+                $sizes = $args[0] ?? [];
+                if ( empty( $sizes ) || ! is_array( $sizes ) ) return false;
+
+                return [
+                    'sizes'      => $sizes,
+                    'sizes_keys' => array_keys( $sizes ),
+                    'count'      => count( $sizes ),
+                    'time'       => current_time( 'mysql' ),
+                ];
 
             /* ---------------- COMMENTS ---------------- */
 
@@ -291,11 +473,31 @@ class Wordpress extends IntegrationBase {
             case 'wp_set_comment_status':
                 return self::resolve_comment_payload( $args[0] ?? 0 );
 
+            /* ---------------- Plugin / Theme  ---------------- */
+
+            case 'activated_plugin' :
+            case 'deactivate_plugin' :
+                $plugin = $args[0] ?? 0;
+                if ( ! $plugin ) return false;
+
+                return [
+                    'plugin' => $plugin,
+                ];
+
+            case 'switch_theme' :
+                $theme = $args[0] ?? 0;
+                if ( ! $theme ) return false;
+                
+                return [
+                    'theme' => $theme,
+                ];
+
             /* ---------------- USERS ---------------- */
 
             case 'user_register':
             case 'profile_update':
             case 'set_user_role':
+            case 'add_user_role':
             case 'delete_user':
             case 'wpmu_delete_user':
             case 'wp_update_user':
@@ -303,6 +505,7 @@ class Wordpress extends IntegrationBase {
                 return self::get_user_payload( $args[0] ?? 0 );
 
             case 'wp_login':
+            case 'validate_reset' :
                 $user = $args[1] ?? null;
                 if ( ! $user instanceof \WP_User ) return false;
 
@@ -326,6 +529,41 @@ class Wordpress extends IntegrationBase {
                 return [
                     'user_id'  => $user->ID,
                     'username' => $user->user_login,
+                ];
+
+             case 'create_application_password' :
+                $user_id      = $args[0] ?? 0;
+                $new_password = $args[1] ?? '';
+                if ( ! $user_id || empty( $new_password ) ) return false;
+                $user = get_userdata( $user_id );
+                if ( ! $user ) return false;
+
+                return [
+                    'user_id'      => $user_id,
+                    'user_login'   => $user->user_login,
+                    'new_password' => $new_password,
+                    'time'         => current_time( 'mysql' ),
+                ];
+
+            case 'update_application_password' :
+                $user_id = $args[0] ?? 0;
+                $item    = $args[1] ?? null;
+                if ( ! $user_id || empty( $item ) ) return false;
+
+                return [
+                    'user_id'   => $user_id,
+                    'item_name' => $item['name'] ?? '',
+                    'item_id'   => $item['uuid'] ?? '',
+                    'time'      => current_time( 'mysql' ),
+                ];
+
+            case 'delete_application_password' :
+                $user_id = $args[0] ?? 0;
+                $uuid    = $args[1] ?? '';
+                if ( ! $user_id ) return false;
+                return [
+                    'user_id' => $user_id,
+                    'uuid'    => $uuid,
                 ];
 
             /* ---------------- TERMS ---------------- */
@@ -361,6 +599,69 @@ class Wordpress extends IntegrationBase {
             case 'generate_rewrite_rules':
                 return [ 'event' => $node['event'] ];
 
+            case 'switch_blog' :
+                $blog = $args[0] ?? 0;
+                if ( ! $blog ) return false;
+
+                return [
+                    'blog_id'   => $blog,
+                    'blog_url'  => get_home_url( $blog ),
+                    'blog_name' => get_blog_option( $blog, 'blogname' ),
+                ];
+
+            case 'customize_register' :
+                $customize = $args[0] ?? null;
+                if ( ! $customize ) return false;
+
+                return [
+                    'message' => 'Customize Registration',
+                    'time'    => current_time( 'mysql' ),
+                ];
+
+            case 'rest_api_init' :
+                return [
+                    'time' => current_time( 'mysql' ),
+                ];
+
+            case 'update_blog_public' :
+                $blog_id = $args[0] ?? 0;
+                $public  = $args[1] ?? 0;
+                if ( ! $blog_id ) return false;
+
+                return [
+                    'blog_id' => $blog_id,
+                    'is_public' => $public,
+                ];
+
+            case 'update_blog_status' :
+                $blog_id    = $args[0] ?? 0;
+                $new_status = $args[1] ?? 0;
+                $old_status = $args[2] ?? 0;
+                if ( ! $blog_id ) return false;
+
+                return [
+                    'blog_id' => $blog_id,
+                    'new_status' => $new_status,
+                    'old_status' => $old_status,
+                ];
+
+            case 'new_blog' : 
+                $blog_id = $args[0] ?? 0;
+                $user_id = $args[1] ?? 0;
+                $domain  = $args[2] ?? '';
+                $path    = $args[3] ?? '';
+                $site_id = $args[4] ?? 0;
+                $meta    = $args[5] ?? [];
+                if ( ! $blog_id ) return false;
+
+                return [
+                    'blog_id' => $blog_id,
+                    'user_id' => $user_id,
+                    'domain'  => $domain,
+                    'path'    => $path,
+                    'site_id' => $site_id,
+                    'meta'    => $meta,
+                ];
         }
 
         return false;
@@ -638,6 +939,7 @@ class Wordpress extends IntegrationBase {
             'categories' => [ self::class, 'query_categories' ],
             'roles'      => [ self::class, 'query_roles' ],
             'caps'       => [ self::class, 'query_caps' ],
+            'active_plugins' => [ self::class, 'query_active_plugins' ],
         ];
     }
 
