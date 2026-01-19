@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import Modal from 'react-modal';
 import { __ } from '@wordpress/i18n';
-import OptionMenu from '@QLComponents/OptionMenu';
+import OptionMenu from '@ZAPComponents/OptionMenu';
 import { suffixClassNames, contentClassNames } from './helper';
 import { CloseButton } from '@chakra-ui/react';
 import './styles.scss';
@@ -25,8 +25,8 @@ const propTypes = {
 };
 
 // Need to manage common id - future will be improve here
-if ( document.getElementById( 'quizleapwrap' ) ) {
-	Modal.setAppElement( '#quizleapwrap' );
+if ( document.getElementById( 'zaplane-app' ) ) {
+	Modal.setAppElement( '#zaplane-app' );
 }
 
 export default function ReactModal( {
@@ -67,10 +67,10 @@ export default function ReactModal( {
 	} );
 
 	const iconOptions = [
-		'quizleap-icon quizleap-icon--large-screen',
-		'quizleap-icon quizleap-icon--medium-screen',
-		'quizleap-icon quizleap-icon--small-screen',
-		'quizleap-icon quizleap-icon--columns',
+		'zaplane-icon zaplane-icon--large-screen',
+		'zaplane-icon zaplane-icon--medium-screen',
+		'zaplane-icon zaplane-icon--small-screen',
+		'zaplane-icon zaplane-icon--columns',
 	];
 
 	const toggleIcon = ( index ) => {
@@ -96,9 +96,9 @@ export default function ReactModal( {
 		? [
 				{
 					type: 'button',
-					label: <span>{ __( 'Full screen', 'quizleap' ) }</span>,
+					label: <span>{ __( 'Full screen', 'zaplane' ) }</span>,
 					icon: (
-						<span className="quizleap-icon quizleap-icon--large-screen" />
+						<span className="zaplane-icon zaplane-icon--large-screen" />
 					),
 					onClick: () => toggleIcon( 0 ),
 				},
@@ -108,9 +108,9 @@ export default function ReactModal( {
 		? [
 				{
 					type: 'button',
-					label: <span>{ __( 'Small screen', 'quizleap' ) }</span>,
+					label: <span>{ __( 'Small screen', 'zaplane' ) }</span>,
 					icon: (
-						<span className="quizleap-icon quizleap-icon--small-screen" />
+						<span className="zaplane-icon zaplane-icon--small-screen" />
 					),
 					onClick: () => toggleIcon( 2 ),
 				},
@@ -136,21 +136,21 @@ export default function ReactModal( {
 			>
 				<div className={ modalClass }>
 					{ isEnabledHeader && (
-						<div className="quizleap-react-modal__head">
+						<div className="zaplane-react-modal__head">
 							{ title && (
 								<>
-									<h3 className="quizleap-react-modal__head-title">
+									<h3 className="zaplane-react-modal__head-title">
 										{ title }
 									</h3>
 									{ subtitle && (
 										<p>
-											<span className="quizleap-icon quizleap-icon--angle-right"></span>
+											<span className="zaplane-icon zaplane-icon--angle-right"></span>
 											{ subtitle }
 										</p>
 									) }
 								</>
 							) }
-							<div className="quizleap-react-modal-buttons">
+							<div className="zaplane-react-modal-buttons">
 								{ isEnabledResizer && (
 									<OptionMenu
 										icon={
@@ -166,12 +166,12 @@ export default function ReactModal( {
 													<span>
 														{ __(
 															'Medium screen',
-															'quizleap'
+															'zaplane'
 														) }
 													</span>
 												),
 												icon: (
-													<span className="quizleap-icon quizleap-icon--medium-screen" />
+													<span className="zaplane-icon zaplane-icon--medium-screen" />
 												),
 												onClick: () => toggleIcon( 1 ),
 											},

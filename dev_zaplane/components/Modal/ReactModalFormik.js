@@ -29,13 +29,14 @@ const propTypes = {
 };
 
 // Need to manage common id - future will be improve here
-if ( document.getElementById( 'quizleapwrap' ) ) {
-	Modal.setAppElement( '#quizleapwrap' );
-} else if ( document.getElementById( 'quizleapModalWrap' ) ) {
-	Modal.setAppElement( '#quizleapModalWrap' );
-} else if ( document.getElementById( 'quizleapFrontendWrap' ) ) {
-	Modal.setAppElement( '#quizleapFrontendWrap' );
-}
+if ( document.getElementById( 'zaplane-app' ) ) {
+	Modal.setAppElement( '#zaplane-app' );
+} 
+// else if ( document.getElementById( 'zaplaneModalWrap' ) ) {
+// 	Modal.setAppElement( '#zaplaneModalWrap' );
+// } else if ( document.getElementById( 'zaplaneFrontendWrap' ) ) {
+// 	Modal.setAppElement( '#zaplaneFrontendWrap' );
+// }
 
 export default function ReactModalFormik( {
 	children,
@@ -48,8 +49,8 @@ export default function ReactModalFormik( {
 	isEnabledResizer = true,
 	onAfterOpen,
 	onRequestClose,
-	cancelButtonLabel = __( 'Cancel', 'quizleap' ),
-	submitButtonLabel = __( 'Update', 'quizleap' ),
+	cancelButtonLabel = __( 'Cancel', 'zaplane' ),
+	submitButtonLabel = __( 'Update', 'zaplane' ),
 	size = 'medium',
 	formik = {},
 	style = {
@@ -75,10 +76,10 @@ export default function ReactModalFormik( {
 	} );
 
 	const iconOptions = [
-		'quizleap-icon quizleap-icon--large-screen',
-		'quizleap-icon quizleap-icon--medium-screen',
-		'quizleap-icon quizleap-icon--small-screen',
-		'quizleap-icon quizleap-icon--columns',
+		'zaplane-icon zaplane-icon--large-screen',
+		'zaplane-icon zaplane-icon--medium-screen',
+		'zaplane-icon zaplane-icon--small-screen',
+		'zaplane-icon zaplane-icon--columns',
 	];
 
 	const toggleIcon = ( index ) => {
@@ -103,9 +104,9 @@ export default function ReactModalFormik( {
 		? [
 				{
 					type: 'button',
-					label: <span>{ __( 'Full screen', 'quizleap' ) }</span>,
+					label: <span>{ __( 'Full screen', 'zaplane' ) }</span>,
 					icon: (
-						<span className="quizleap-icon quizleap-icon--large-screen" />
+						<span className="zaplane-icon zaplane-icon--large-screen" />
 					),
 					onClick: () => toggleIcon( 0 ),
 				},
@@ -116,9 +117,9 @@ export default function ReactModalFormik( {
 		? [
 				{
 					type: 'button',
-					label: <span>{ __( 'Small screen', 'quizleap' ) }</span>,
+					label: <span>{ __( 'Small screen', 'zaplane' ) }</span>,
 					icon: (
-						<span className="quizleap-icon quizleap-icon--small-screen" />
+						<span className="zaplane-icon zaplane-icon--small-screen" />
 					),
 					onClick: () => toggleIcon( 2 ),
 				},
@@ -148,13 +149,13 @@ export default function ReactModalFormik( {
 					{ ( { isSubmitting, handleSubmit } ) => (
 						<Form>
 							<div className={ modalClass }>
-								<div className="quizleap-react-modal__head">
+								<div className="zaplane-react-modal__head">
 									{ title && (
-										<h3 className="quizleap-react-modal__head-title">
+										<h3 className="zaplane-react-modal__head-title">
 											{ title }
 										</h3>
 									) }
-									<div className="quizleap-react-modal-buttons">
+									<div className="zaplane-react-modal-buttons">
 										{ isEnabledResizer && (
 											<OptionMenu
 												icon={
@@ -171,12 +172,12 @@ export default function ReactModalFormik( {
 															<span>
 																{ __(
 																	'Medium screen',
-																	'quizleap'
+																	'zaplane'
 																) }
 															</span>
 														),
 														icon: (
-															<span className="quizleap-icon quizleap-icon--medium-screen" />
+															<span className="zaplane-icon zaplane-icon--medium-screen" />
 														),
 														onClick: () =>
 															toggleIcon( 1 ),
@@ -196,7 +197,7 @@ export default function ReactModalFormik( {
 									{ children }
 								</div>
 								{ isEnabledFooter && (
-									<div className="quizleap-react-modal__footer">
+									<div className="zaplane-react-modal__footer">
 										{ cancelButtonLabel && (
 											<Button
 												{ ...outlineBtn }

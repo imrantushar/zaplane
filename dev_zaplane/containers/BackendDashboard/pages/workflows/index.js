@@ -31,6 +31,7 @@ import { FiMoreVertical } from "react-icons/fi";
 import { showNotification } from "@ZAPRedux/Slices/notificationSlice/notificationSlice";
 import ZAPLoading from "@ZAPComponents/Loading";
 import ZAPTable from "@ZAPComponents/Table";
+import ReactModal from "@ZAPComponents/Modal/ReactModal";
 
 
 const CreateWorkflows = () => {
@@ -235,7 +236,7 @@ const CreateWorkflows = () => {
           />
         </Box>
       </Box>
-      <WPModal
+      <ReactModal
         title={__("Create Workflow", "zaplane")}
         isOpen={isModalOpen}
         onRequestClose={() => setIsModalOpen(false)}
@@ -262,7 +263,7 @@ const CreateWorkflows = () => {
             </Button>
           </Flex>
         </Box>
-      </WPModal>
+      </ReactModal>
     </>
   );
 };
