@@ -19,7 +19,7 @@ const AdminMenu = () => {
 	const path = location.get( 'path' );
 	useEffect( () => {
 		document.title =
-			adminmenu[ page ]?.title + ' - ' + __( 'Gamify', 'zaplane' );
+			adminmenu[ page ]?.title + ' - ' + __( 'Zaplane', 'zaplane' );
 	}, [ page ] );
 
 	return (
