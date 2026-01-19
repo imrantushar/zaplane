@@ -2996,6 +2996,7 @@ function ActionDrawer({
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsxs)(_ZAPComponents_Drawer__WEBPACK_IMPORTED_MODULE_7__["default"], {
     open: open,
     onClose: resetAll,
+    closeOnOverlayClick: true,
     title: !mode ? "Add Action" : selectedItem?.name ? selectedItem.name : "App",
     placement: "end",
     size: "xl",

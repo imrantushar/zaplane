@@ -219,6 +219,7 @@ export default function ActionDrawer({
         <ZAPDrawer
             open={open}
             onClose={resetAll}
+            closeOnOverlayClick={true}
             title={
                 !mode
                     ? "Add Action"
