@@ -2607,182 +2607,127 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/box/index.js");
 /* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/button/button.js");
 /* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/flex/flex.js");
-/* harmony import */ var react_icons_fi__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! react-icons/fi */ "./node_modules/react-icons/fi/index.mjs");
-/* harmony import */ var _ZAPComponents_ZAPInput__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @ZAPComponents/ZAPInput */ "./dev_zaplane/components/ZAPInput/index.js");
-/* harmony import */ var _ZAPComponents_ZAPSelect__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @ZAPComponents/ZAPSelect */ "./dev_zaplane/components/ZAPSelect/index.js");
-/* harmony import */ var _ZAPComponents_Text__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @ZAPComponents/Text */ "./dev_zaplane/components/Text/index.js");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__);
+/* harmony import */ var formik__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! formik */ "./node_modules/formik/dist/formik.esm.js");
+/* harmony import */ var react_icons_fi__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! react-icons/fi */ "./node_modules/react-icons/fi/index.mjs");
+/* harmony import */ var _ZAPComponents_ZAPInput__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @ZAPComponents/ZAPInput */ "./dev_zaplane/components/ZAPInput/index.js");
+/* harmony import */ var _ZAPComponents_ZAPSelect__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @ZAPComponents/ZAPSelect */ "./dev_zaplane/components/ZAPSelect/index.js");
+/* harmony import */ var _ZAPComponents_Text__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @ZAPComponents/Text */ "./dev_zaplane/components/Text/index.js");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__);
 
 
 
 
 
 
+
+const EMPTY_RULE = {
+  left: "",
+  operator: "==",
+  right: ""
+};
 function ConditionGroupField({
-  value = [[{}]],
+  value = [[{
+    ...EMPTY_RULE
+  }]],
   onChange,
   field
 }) {
-  const update = newVal => onChange(newVal);
-  const leftField = field.fields.find(f => f.key === "left");
   const operatorField = field.fields.find(f => f.key === "operator");
-  const rightField = field.fields.find(f => f.key === "right");
-  const addRule = () => {
-    const newVal = [...value];
-    newVal[0].push({
-      left: "",
-      operator: "==",
-      right: ""
-    });
-    update(newVal);
-  };
-  const deleteRule = index => {
-    const newVal = [...value];
-    newVal[0] = newVal[0].filter((_, i) => i !== index);
-    update(newVal);
-  };
-  const updateRule = (index, key, value_) => {
-    const newVal = [...value];
-    newVal[0][index][key] = value_;
-    update(newVal);
-  };
-  const addOrGroup = () => {
-    const newVal = [...value, [{
-      left: "",
-      operator: "==",
-      right: ""
-    }]];
-    update(newVal);
-  };
-  const addOrRule = gIndex => {
-    const newVal = [...value];
-    newVal[gIndex].push({
-      left: "",
-      operator: "==",
-      right: ""
-    });
-    update(newVal);
-  };
-  const updateOrRule = (gIndex, rIndex, key, value_) => {
-    const newVal = [...value];
-    newVal[gIndex][rIndex][key] = value_;
-    update(newVal);
-  };
-  const deleteOrRule = (gIndex, rIndex) => {
-    const newVal = [...value];
-    newVal[gIndex] = newVal[gIndex].filter((_, i) => i !== rIndex);
-    update(newVal);
-  };
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Flex, {
-    direction: "column",
-    gap: 4,
-    children: [value[0].map((rule, i) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Flex, {
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(formik__WEBPACK_IMPORTED_MODULE_3__.FieldArray, {
+    name: field.key,
+    children: groupHelpers => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Flex, {
+      direction: "column",
       gap: 4,
-      align: "flex-end",
-      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_ZAPComponents_ZAPInput__WEBPACK_IMPORTED_MODULE_4__["default"], {
-        label: "Condition",
-        placeholder: "Here to add data",
-        style: {
-          width: "30%"
-        },
-        value: rule.left,
-        onChange: e => updateRule(i, "left", e.target.value)
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_ZAPComponents_ZAPSelect__WEBPACK_IMPORTED_MODULE_5__["default"], {
-        label: operatorField.label,
-        style: {
-          width: "30%"
-        },
-        options: operatorField.options,
-        value: rule.operator || null,
-        onChange: selected => updateRule(i, "operator", selected)
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_ZAPComponents_ZAPInput__WEBPACK_IMPORTED_MODULE_4__["default"], {
-        label: "Value",
-        placeholder: "Here to add data",
-        style: {
-          width: "30%"
-        },
-        value: rule.right,
-        onChange: e => updateRule(i, "right", e.target.value)
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Flex, {
-        gap: 2,
-        mt: "25px",
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Button, {
-          onClick: addRule,
-          children: "AND"
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Button, {
-          colorScheme: "red",
-          variant: "ghost",
-          size: "sm",
-          onClick: () => deleteRule(i),
-          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(react_icons_fi__WEBPACK_IMPORTED_MODULE_3__.FiTrash2, {})
-        })]
-      })]
-    }, i)), value.slice(1).map((group, gIndex) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
-      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Flex, {
-        align: "center",
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
-          flex: "1",
-          h: "1px",
-          bg: "gray.300"
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_ZAPComponents_Text__WEBPACK_IMPORTED_MODULE_6__["default"], {
-          mx: 3,
-          fontSize: "sm",
-          color: "gray.500",
-          children: "OR"
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
-          flex: "1",
-          h: "1px",
-          bg: "gray.300"
-        })]
-      }), group.map((rule, rIndex) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Flex, {
-        gap: 4,
-        align: "flex-end",
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_ZAPComponents_ZAPInput__WEBPACK_IMPORTED_MODULE_4__["default"], {
-          label: "Condtion",
-          placeholder: "Here to add data",
-          style: {
-            width: "30%"
-          },
-          value: rule.left,
-          onChange: e => updateOrRule(gIndex + 1, rIndex, "left", e.target.value)
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_ZAPComponents_ZAPSelect__WEBPACK_IMPORTED_MODULE_5__["default"], {
-          label: operatorField.label,
-          style: {
-            width: "30%"
-          },
-          options: operatorField.options,
-          value: rule.operator || null,
-          onChange: selected => updateOrRule(gIndex + 1, rIndex, "operator", selected)
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_ZAPComponents_ZAPInput__WEBPACK_IMPORTED_MODULE_4__["default"], {
-          label: "Value",
-          placeholder: "Here to add data",
-          style: {
-            width: "30%"
-          },
-          value: rule.right,
-          onChange: e => updateOrRule(gIndex + 1, rIndex, "right", e.target.value)
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Flex, {
-          gap: 2,
-          mt: "25px",
-          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Button, {
-            onClick: () => addOrRule(gIndex + 1),
-            children: "AND"
-          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Button, {
-            colorScheme: "red",
-            variant: "ghost",
-            size: "sm",
-            onClick: () => deleteOrRule(gIndex + 1, rIndex),
-            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(react_icons_fi__WEBPACK_IMPORTED_MODULE_3__.FiTrash2, {})
+      children: [value.map((group, gIndex) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
+        children: [gIndex > 0 && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Flex, {
+          align: "center",
+          my: 3,
+          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
+            flex: "1",
+            h: "1px",
+            bg: "gray.300"
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_ZAPComponents_Text__WEBPACK_IMPORTED_MODULE_7__["default"], {
+            mx: 3,
+            fontSize: "sm",
+            children: "OR"
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
+            flex: "1",
+            h: "1px",
+            bg: "gray.300"
           })]
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(formik__WEBPACK_IMPORTED_MODULE_3__.FieldArray, {
+          name: `${field.key}.${gIndex}`,
+          children: ruleHelpers => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.Fragment, {
+            children: group.map((rule, rIndex) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Flex, {
+              gap: 4,
+              align: "flex-end",
+              children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_ZAPComponents_ZAPInput__WEBPACK_IMPORTED_MODULE_5__["default"], {
+                label: "Condition",
+                value: rule.left,
+                onChange: e => ruleHelpers.replace(rIndex, {
+                  ...rule,
+                  left: e.target.value
+                }),
+                style: {
+                  width: "30%"
+                }
+              }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_ZAPComponents_ZAPSelect__WEBPACK_IMPORTED_MODULE_6__["default"], {
+                label: operatorField.label,
+                options: operatorField.options,
+                value: rule.operator,
+                onChange: val => ruleHelpers.replace(rIndex, {
+                  ...rule,
+                  operator: val
+                }),
+                style: {
+                  width: "30%"
+                }
+              }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_ZAPComponents_ZAPInput__WEBPACK_IMPORTED_MODULE_5__["default"], {
+                label: "Value",
+                value: rule.right,
+                onChange: e => ruleHelpers.replace(rIndex, {
+                  ...rule,
+                  right: e.target.value
+                }),
+                style: {
+                  width: "30%"
+                }
+              }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Flex, {
+                gap: 2,
+                mt: "25px",
+                children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Button, {
+                  type: "button",
+                  onClick: () => ruleHelpers.push({
+                    ...EMPTY_RULE
+                  }),
+                  children: "AND"
+                }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Button, {
+                  type: "button",
+                  colorScheme: "red",
+                  variant: "ghost",
+                  size: "sm",
+                  onClick: () => {
+                    ruleHelpers.remove(rIndex);
+                    if (group.length === 1 && gIndex > 0) {
+                      groupHelpers.remove(gIndex);
+                    }
+                  },
+                  children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(react_icons_fi__WEBPACK_IMPORTED_MODULE_4__.FiTrash2, {})
+                })]
+              })]
+            }, rIndex))
+          })
         })]
-      }, rIndex))]
-    }, gIndex)), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Button, {
-      width: "120px",
-      size: "sm",
-      onClick: addOrGroup,
-      children: "+ Or Group"
-    })]
+      }, gIndex)), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Button, {
+        size: "sm",
+        width: "140px",
+        onClick: () => groupHelpers.push([{
+          ...EMPTY_RULE
+        }]),
+        children: "+ OR Group"
+      })]
+    })
   });
 }
 
