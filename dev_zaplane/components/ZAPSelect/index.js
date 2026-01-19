@@ -24,6 +24,8 @@ const ZAPSelect = ({
         isLoading={isLoading}
         placeholder={placeholder}
         isClearable={isClearable}
+        className="zaplane-select"
+        classNamePrefix="zaplane-select"
         value={options.find(o => o.value === value) || null}
         onMenuOpen={onMenuOpen}
         onChange={(opt) => onChange?.(opt?.value)}

@@ -60,7 +60,7 @@ export default function FlowCanvas({ id }) {
             type: 'custom',
             data: {
                 app: "Select an app",
-                action: 'trigger',
+                action: 'Trigger',
                 config: {}
             },
             position: { x: 125, y: 300 },

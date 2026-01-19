@@ -24,7 +24,7 @@ const ZAPInput = ({
       </ZAPText>
 
       <InputComponent
-        className="zaplane-input"
+        className={type === 'textarea' ? 'zaplane-textarea' : 'zaplane-input'}
         type={type !== "textarea" ? type : undefined}
         placeholder={__(placeholder, 'zaplane')}
         value={value}

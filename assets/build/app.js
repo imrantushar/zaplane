@@ -1597,7 +1597,7 @@ const ZAPInput = ({
       fontSize: "0.875rem",
       children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)(label, 'zaplane')
     }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(InputComponent, {
-      className: "zaplane-input",
+      className: type === 'textarea' ? 'zaplane-textarea' : 'zaplane-input',
       type: type !== "textarea" ? type : undefined,
       placeholder: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)(placeholder, 'zaplane'),
       value: value,
@@ -1657,6 +1657,8 @@ const ZAPSelect = ({
       isLoading: isLoading,
       placeholder: placeholder,
       isClearable: isClearable,
+      className: "zaplane-select",
+      classNamePrefix: "zaplane-select",
       value: options.find(o => o.value === value) || null,
       onMenuOpen: onMenuOpen,
       onChange: opt => onChange?.(opt?.value)
@@ -4061,7 +4063,7 @@ function FlowCanvas({
     type: 'custom',
     data: {
       app: "Select an app",
-      action: 'trigger',
+      action: 'Trigger',
       config: {}
     },
     position: {
@@ -4721,11 +4723,19 @@ const VersionHistoryTable = ({
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   applyStyles: () => (/* binding */ applyStyles),
 /* harmony export */   getDuration: () => (/* binding */ getDuration),
 /* harmony export */   mapEdgesForBackend: () => (/* binding */ mapEdgesForBackend),
 /* harmony export */   mapNodesForBackend: () => (/* binding */ mapNodesForBackend),
 /* harmony export */   toggleFullscreenMode: () => (/* binding */ toggleFullscreenMode)
 /* harmony export */ });
+function applyStyles(el, styles = {}) {
+  if (!el) return;
+  Object.entries(styles).forEach(([key, value]) => {
+    el.style[key] = value;
+  });
+}
+;
 const toggleFullscreenMode = (containerRef, isFullscreen, setIsFullscreen) => {
   if (!containerRef.current) return;
   const elem = containerRef.current;
@@ -4735,12 +4745,11 @@ const toggleFullscreenMode = (containerRef, isFullscreen, setIsFullscreen) => {
   const wpAdminBar = document.getElementById("wpadminbar");
   const adminMenuBack = document.getElementById("adminmenuback");
   const adminMenuWrap = document.getElementById("adminmenuwrap");
-  const applyStyles = (el, styles = {}) => {
-    if (!el) return;
-    Object.entries(styles).forEach(([key, value]) => {
-      el.style[key] = value;
-    });
-  };
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen();
+  } else {
+    document.exitFullscreen();
+  }
   const isEnter = !isFullscreen;
   applyStyles(elem, {
     position: isEnter ? "fixed" : "",
@@ -4762,7 +4771,7 @@ const toggleFullscreenMode = (containerRef, isFullscreen, setIsFullscreen) => {
     marginLeft: isEnter ? "0" : ""
   });
   applyStyles(wpAdminBar, {
-    top: isEnter ? "0" : ""
+    display: isEnter ? "none" : ""
   });
   setIsFullscreen(isEnter);
 };
