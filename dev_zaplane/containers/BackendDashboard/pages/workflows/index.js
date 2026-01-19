@@ -240,7 +240,8 @@ const CreateWorkflows = () => {
         title={__("Create Workflow", "zaplane")}
         isOpen={isModalOpen}
         onRequestClose={() => setIsModalOpen(false)}
-        size="medium"
+        isLargeAvailable={false}
+        size="small"
       >
         <Box px={4}>
           <ZAPInput

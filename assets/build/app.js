@@ -137,6 +137,162 @@ const theme = (0,_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.createSystem)(_ch
 
 /***/ },
 
+/***/ "./dev_zaplane/components/Button/index.js"
+/*!************************************************!*\
+  !*** ./dev_zaplane/components/Button/index.js ***!
+  \************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var prop_types__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! prop-types */ "./node_modules/prop-types/index.js");
+/* harmony import */ var prop_types__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(prop_types__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @wordpress/components */ "@wordpress/components");
+/* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__);
+
+
+
+
+
+const propTypes = {
+  label: prop_types__WEBPACK_IMPORTED_MODULE_1___default().oneOfType([(prop_types__WEBPACK_IMPORTED_MODULE_1___default().object), (prop_types__WEBPACK_IMPORTED_MODULE_1___default().string)]),
+  size: (prop_types__WEBPACK_IMPORTED_MODULE_1___default().string),
+  className: (prop_types__WEBPACK_IMPORTED_MODULE_1___default().string),
+  preset: (prop_types__WEBPACK_IMPORTED_MODULE_1___default().string),
+  bg: (prop_types__WEBPACK_IMPORTED_MODULE_1___default().string),
+  onClick: (prop_types__WEBPACK_IMPORTED_MODULE_1___default().func),
+  type: (prop_types__WEBPACK_IMPORTED_MODULE_1___default().string),
+  link: (prop_types__WEBPACK_IMPORTED_MODULE_1___default().string),
+  isLoading: (prop_types__WEBPACK_IMPORTED_MODULE_1___default().bool),
+  loadingLabel: (prop_types__WEBPACK_IMPORTED_MODULE_1___default().string),
+  loadingStatus: (prop_types__WEBPACK_IMPORTED_MODULE_1___default().string),
+  icon: (prop_types__WEBPACK_IMPORTED_MODULE_1___default().any),
+  iconPosition: (prop_types__WEBPACK_IMPORTED_MODULE_1___default().string),
+  border: (prop_types__WEBPACK_IMPORTED_MODULE_1___default().string),
+  borderRadius: (prop_types__WEBPACK_IMPORTED_MODULE_1___default().string),
+  isCircle: (prop_types__WEBPACK_IMPORTED_MODULE_1___default().bool),
+  isDisabled: (prop_types__WEBPACK_IMPORTED_MODULE_1___default().bool),
+  style: (prop_types__WEBPACK_IMPORTED_MODULE_1___default().object),
+  suffix: (prop_types__WEBPACK_IMPORTED_MODULE_1___default().string),
+  prefix: (prop_types__WEBPACK_IMPORTED_MODULE_1___default().string),
+  target: (prop_types__WEBPACK_IMPORTED_MODULE_1___default().string),
+  isPro: (prop_types__WEBPACK_IMPORTED_MODULE_1___default().bool)
+};
+const Button = ({
+  label = '',
+  size = 'md',
+  className = '',
+  preset = 'purple',
+  onClick = () => {},
+  type = 'button',
+  link = '#',
+  isLoading = false,
+  loadingLabel = null,
+  icon = null,
+  iconPosition = null,
+  isCircle = false,
+  border = null,
+  isDisabled = false,
+  borderRadius = null,
+  style = {},
+  suffix = '',
+  target = '',
+  isPro = true,
+  id,
+  prefix = ''
+}) => {
+  const buttonClasses = [`zaplane-btn zaplane-btn--${size}`];
+  if (preset) {
+    buttonClasses.push('zaplane-btn--preset-' + preset);
+  }
+  if (iconPosition) {
+    buttonClasses.push('zaplane-btn--icon-' + iconPosition);
+  }
+  if (isCircle) {
+    buttonClasses.push('zaplane-btn--circle');
+  }
+  if (border) {
+    buttonClasses.push('zaplane-btn--border-' + border);
+  }
+  if (borderRadius) {
+    buttonClasses.push('zaplane-btn--border-' + borderRadius);
+  }
+  if (isDisabled) {
+    buttonClasses.push('zaplane-btn--disabled');
+  }
+  if (suffix) {
+    buttonClasses.push('zaplane-btn--' + suffix);
+  }
+  if (prefix) {
+    buttonClasses.push('zaplane-btn--' + prefix);
+  }
+  if ('link' === type) {
+    const targetAttribute = target ? {
+      target
+    } : {};
+    return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)("a", {
+      href: link,
+      className: className ? className : buttonClasses.join(' '),
+      type: type,
+      onClick: onClick,
+      disabled: isDisabled || isLoading,
+      style: style,
+      rel: "noreferrer",
+      id: id,
+      ...targetAttribute,
+      children: [iconPosition !== 'right' && icon, isLoading ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.Fragment, {
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.Spinner, {}), loadingLabel && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("span", {
+          className: "zaplane-btn--label",
+          children: loadingLabel
+        })]
+      }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.Fragment, {
+        children: label && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("span", {
+          className: "zaplane-btn--label",
+          children: label
+        })
+      }), iconPosition === 'right' && icon, !isPro && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("span", {
+        className: "zaplane-pro-badge",
+        children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('PRO', 'zaplane')
+      })]
+    });
+  }
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)("button", {
+    className: className ? className : buttonClasses.join(' '),
+    type: type,
+    onClick: onClick,
+    disabled: isDisabled || isLoading,
+    style: style,
+    id: id,
+    children: [iconPosition !== 'right' && !isLoading && icon, isLoading ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.Fragment, {
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.Spinner, {}), loadingLabel && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("span", {
+        className: "zaplane-btn--label",
+        children: loadingLabel
+      })]
+    }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.Fragment, {
+      children: label && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("span", {
+        className: "zaplane-btn--label",
+        children: label
+      })
+    }), iconPosition === 'right' && !isLoading && icon, !isPro && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("span", {
+      className: "zaplane-pro-badge",
+      children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('PRO', 'zaplane')
+    })]
+  });
+};
+Button.propTypes = propTypes;
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Button);
+
+/***/ },
+
 /***/ "./dev_zaplane/components/Drawer/index.js"
 /*!************************************************!*\
   !*** ./dev_zaplane/components/Drawer/index.js ***!
@@ -969,7 +1125,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _styles_scss__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./styles.scss */ "./dev_zaplane/components/OptionMenu/styles.scss");
 /* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! react-dom */ "react-dom");
 /* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(react_dom__WEBPACK_IMPORTED_MODULE_3__);
-Object(function webpackMissingModule() { var e = new Error("Cannot find module '@ZAPComponents/Button'"); e.code = 'MODULE_NOT_FOUND'; throw e; }());
+/* harmony import */ var _ZAPComponents_Button__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @ZAPComponents/Button */ "./dev_zaplane/components/Button/index.js");
 /* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
 /* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__);
 
@@ -1045,7 +1201,7 @@ const OptionMenu = props => {
             className: `${alwaysShowOptions ? 'zaplane-dropdown-menu__inline-form' : 'zaplane-more-options__item'}`,
             action: item.action,
             method: item.method,
-            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(Object(function webpackMissingModule() { var e = new Error("Cannot find module '@ZAPComponents/Button'"); e.code = 'MODULE_NOT_FOUND'; throw e; }()), {
+            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(_ZAPComponents_Button__WEBPACK_IMPORTED_MODULE_4__["default"], {
               preset: "transparent",
               iconPosition: "left",
               ...item,
@@ -1055,7 +1211,7 @@ const OptionMenu = props => {
             })]
           }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsxs)("li", {
             className: `${alwaysShowOptions ? 'zaplane-dropdown-menu__inline-form' : 'zaplane-more-options__item'}`,
-            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(Object(function webpackMissingModule() { var e = new Error("Cannot find module '@ZAPComponents/Button'"); e.code = 'MODULE_NOT_FOUND'; throw e; }()), {
+            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(_ZAPComponents_Button__WEBPACK_IMPORTED_MODULE_4__["default"], {
               preset: "transparent",
               iconPosition: "left",
               ...item,
@@ -2818,7 +2974,8 @@ const CreateWorkflows = () => {
       title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)("Create Workflow", "zaplane"),
       isOpen: isModalOpen,
       onRequestClose: () => setIsModalOpen(false),
-      size: "medium",
+      isLargeAvailable: false,
+      size: "small",
       children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_20__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Box, {
         px: 4,
         children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_20__.jsx)(_ZAPComponents_ZAPInput__WEBPACK_IMPORTED_MODULE_12__["default"], {

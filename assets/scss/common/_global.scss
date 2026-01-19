@@ -1,5 +1,5 @@
 :root {
-    --zaplane-font: "Roboto", sans-serif;
+    --zaplane-font: "Inter", sans-serif;
     --zaplane-primary: #006BFF;
     --zaplane-second-primary: #8F7EE7;
     --zaplane-border-color: #CBD1D7;
@@ -23,3 +23,4 @@
 
 
 @import './classLibrary';
+@import './button';
