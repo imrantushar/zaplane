@@ -3,7 +3,7 @@
 namespace Zaplane\Tests\Integration;
 
 use Zaplane\Tests\TestCase;
-use Zaplane\Integration\Slack;
+use Zaplane\Integrations\Slack;
 
 class SlackIntegrationTest extends TestCase
 {
