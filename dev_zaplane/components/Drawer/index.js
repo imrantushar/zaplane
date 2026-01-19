@@ -41,7 +41,7 @@ const ZAPDrawer = ({
             </Drawer.Trigger>
 
             <Portal>
-                <Drawer.Positioner marginTop='32px' zIndex={"99999999"}
+                <Drawer.Positioner marginTop='32px' height='calc(100vh - 32px)' zIndex={"99999999"}
                     pointerEvents="none">
                     <Drawer.Content pointerEvents="auto">
                         {title && (
@@ -61,8 +61,6 @@ const ZAPDrawer = ({
                                             ? children(store)
                                             : children}
                                     </Drawer.Body>
-
-                                    {/* 👉 Footer Section */}
                                     {footer && (
                                         <Drawer.Footer>
                                             {typeof footer === "function"
