@@ -2113,7 +2113,6 @@ const Setting = () => {
     data,
     loading
   } = (0,react_redux__WEBPACK_IMPORTED_MODULE_1__.useSelector)(state => state.setting);
-  console.log(data);
   const [method, setMethod] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)('GET');
   const [path, setPath] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)('');
   const [body, setBody] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)('');
@@ -2789,7 +2788,6 @@ function ActionDrawer({
     }
     resetAll();
   };
-  console.log(mode, 'modeeee');
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsxs)(_ZAPComponents_Drawer__WEBPACK_IMPORTED_MODULE_7__["default"], {
     open: open,
     onClose: resetAll,
@@ -3647,7 +3645,6 @@ function FlowCanvas({
                 const paylod = {
                   workflow_hash: singleData?.version?.hash
                 };
-                console.log(paylod, "pp");
                 dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_15__.workFLowExction)(paylod));
               },
               children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("🔄 Replay ", "zaplane")
@@ -4061,7 +4058,6 @@ const getDuration = (start, end) => {
   if (mins > 0) {
     return `${mins}m ${secs}s`;
   }
-  console.log(secs, 'k');
   return `${secs}s`;
 };
 const mapNodesForBackend = nodes => {
@@ -4973,7 +4969,6 @@ const getPreviewOldVersion = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.cr
   id,
   versionID
 }, thunkAPI) => {
-  console.log(id, versionID, 'boom');
   try {
     const res = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.get(_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.namespace + `workflows/${id}/versions/${parseInt(versionID)}`);
     (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.handleSliceSuccess)(thunkAPI, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)(' fetched prevews version successfully', 'workflow'));
