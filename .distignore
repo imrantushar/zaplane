@@ -23,5 +23,5 @@ vendor
 .DS_Store
 .eslintignore
 .eslintrc.js
-dev-cli.php
-includes/dev-cli
+includes/commands
+includes/framework/console
