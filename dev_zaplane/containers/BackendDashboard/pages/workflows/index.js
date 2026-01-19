@@ -31,6 +31,7 @@ import { FiMoreVertical } from "react-icons/fi";
 import { showNotification } from "@ZAPRedux/Slices/notificationSlice/notificationSlice";
 import ZAPLoading from "@ZAPComponents/Loading";
 import ZAPTable from "@ZAPComponents/Table";
+import ZAPText from "@ZAPComponents/Text";
 
 
 const CreateWorkflows = () => {
@@ -160,9 +161,9 @@ const CreateWorkflows = () => {
                 key: "title",
                 textAlign: "center",
                 render: (row) => (
-                  <Text fontWeight="500" m={0}>
+                  <ZAPText fontWeight="500" >
                     {row.title}
-                  </Text>
+                  </ZAPText>
                 ),
               },
               {
@@ -170,9 +171,9 @@ const CreateWorkflows = () => {
                 key: "created_at",
                 textAlign: "center",
                 render: (row) => (
-                  <Text fontSize="sm">
+                  <ZAPText fontSize="sm">
                     {row.created_at}
-                  </Text>
+                  </ZAPText>
                 ),
               },
 
@@ -181,9 +182,9 @@ const CreateWorkflows = () => {
                 key: "updated_at",
                 textAlign: "center",
                 render: (row) => (
-                  <Text fontSize="sm">
+                  <ZAPText fontSize="sm">
                     {row.updated_at}
-                  </Text>
+                  </ZAPText>
                 ),
               },
                 {
@@ -218,7 +219,7 @@ const CreateWorkflows = () => {
                     )
                   }
                 >
-                  Edit
+                  {__('Edit', 'zaplane')}
                 </Button>
 
                 <Button
@@ -227,7 +228,7 @@ const CreateWorkflows = () => {
                   variant="ghost"
                   onClick={() => workflowDeleteHandler(row.id)}
                 >
-                  Delete
+                  {__('Delete', 'zaplane')}
                 </Button>
               </Box>
             )}

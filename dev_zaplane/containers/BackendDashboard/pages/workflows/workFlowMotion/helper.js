@@ -39,43 +39,55 @@ export const toggleFullscreenMode = (containerRef, isFullscreen, setIsFullscreen
   setIsFullscreen(isEnter);
 };
 export const getDuration = (start, end) => {
-    if (!start || !end) return "--";
+  if (!start || !end) return "--";
 
-    const startTime = new Date(start.replace(" ", "T"));
-    const endTime = new Date(end.replace(" ", "T"));
+  const startTime = new Date(start.replace(" ", "T"));
+  const endTime = new Date(end.replace(" ", "T"));
 
-    if (isNaN(startTime) || isNaN(endTime)) return "--";
+  if (isNaN(startTime) || isNaN(endTime)) return "--";
 
-    const diffMs = endTime - startTime;
-    const seconds = Math.floor(diffMs / 1000);
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
+  const diffMs = endTime - startTime;
+  const seconds = Math.floor(diffMs / 1000);
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
 
-    if (mins > 0) {
-        return `${mins}m ${secs}s`;
-    }
+  if (mins > 0) {
+    return `${mins}m ${secs}s`;
+  }
 
-    return `${secs}s`;
+  return `${secs}s`;
 };
 export const mapNodesForBackend = (nodes) => {
-            return nodes.map(({
-                dragging,
-                selected,
-                measured,
-                data,
-                ...node
-            }) => {
-                const backendType = data?.action?.toLowerCase();
-                const cleanedData = { ...data };
-                delete cleanedData.action;
+  return nodes.map(({
+    dragging,
+    selected,
+    measured,
+    data,
+    ...node
+  }) => {
+    const backendType = data?.action?.toLowerCase();
+    const cleanedData = { ...data };
+    delete cleanedData.action;
 
-                return {
-                    ...node,
-                    type: backendType,
-                    data: cleanedData,
-                };
-            });
-        };
+    return {
+      ...node,
+      type: backendType,
+      data: cleanedData,
+    };
+  });
+};
 export const mapEdgesForBackend = (edges) => {
-            return edges.map(({ type, ...edge }) => edge);
-        };
+  return edges.map(({ type, ...edge }) => edge);
+};
+export const statusStyle = (status) => {
+  switch (status) {
+    case "completed":
+      return { color: "green.600", bg: "green.50" };
+    case "running":
+      return { color: "blue.600", bg: "blue.50" };
+    case "failed":
+      return { color: "red.600", bg: "red.50" };
+    default:
+      return { color: "gray.600", bg: "gray.50" };
+  }
+};

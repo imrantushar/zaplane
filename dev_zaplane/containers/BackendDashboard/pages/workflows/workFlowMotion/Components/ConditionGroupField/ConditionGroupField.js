@@ -5,6 +5,7 @@ import { FiTrash2 } from "react-icons/fi";
 import ZAPInput from "@ZAPComponents/ZAPInput";
 import ZAPSelect from "@ZAPComponents/ZAPSelect";
 import ZAPText from "@ZAPComponents/Text";
+import { __ } from "@wordpress/i18n";
 
 const EMPTY_RULE = { left: "", operator: "==", right: "" };
 
@@ -77,7 +78,7 @@ export default function ConditionGroupField({
                                                             ruleHelpers.push({ ...EMPTY_RULE })
                                                         }
                                                     >
-                                                        AND
+                                                        {__("Add", "zaplane")}
                                                     </Button>
                                                     <Button
                                                         type="button"
@@ -108,7 +109,7 @@ export default function ConditionGroupField({
                             groupHelpers.push([{ ...EMPTY_RULE }])
                         }
                     >
-                        + OR Group
+                        {__("OR Group", "zaplane")}
                     </Button>
                 </Flex>
             )}

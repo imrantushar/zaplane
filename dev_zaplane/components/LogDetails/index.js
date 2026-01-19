@@ -6,6 +6,7 @@ import {
   Text,
   VStack,
 } from "@chakra-ui/react";
+import { __ } from "@wordpress/i18n";
 import { useSelector } from "react-redux";
 
 const LogDetails = ({ runId, onBack }) => {
@@ -21,11 +22,12 @@ const LogDetails = ({ runId, onBack }) => {
         color="blue.500"
         onClick={onBack}
       >
-        ← Back to Runs
+        {__('← Back to Runs', 'zaplane')}
       </Text>
 
       <Text mb="4" fontWeight="bold">
-        Run ID: #{runId}
+        
+        {__(`Run ID: ${runId}`, 'zaplane')}
       </Text>
 
       <Accordion.Root collapsible>
@@ -39,9 +41,11 @@ const LogDetails = ({ runId, onBack }) => {
                 <HStack flex="1" justify="space-between">
                   <HStack>
                     <Text fontWeight="medium">
-                      Node #{log.node_key}
+                      {__(`Node ${log.node_key}`, 'zaplane')}
                     </Text>
-                    <Badge>Log {log.id}</Badge>
+                    <Badge>
+                      {__(`Log ${log.id}`, 'zaplane')}
+                    </Badge>
                   </HStack>
 
                   <Badge
@@ -70,7 +74,7 @@ const LogDetails = ({ runId, onBack }) => {
                       bg="gray.50"
                     >
                       <Text fontWeight="bold" mb="2">
-                        Input
+                        {__('Input', 'zaplane')}
                       </Text>
                       <pre>{JSON.stringify(input, null, 2)}</pre>
                     </Box>
@@ -83,7 +87,7 @@ const LogDetails = ({ runId, onBack }) => {
                       bg="gray.50"
                     >
                       <Text fontWeight="bold" mb="2">
-                        Output
+                          {__('Output', 'zaplane')}
                       </Text>
                       <pre>{JSON.stringify(output, null, 2)}</pre>
                     </Box>

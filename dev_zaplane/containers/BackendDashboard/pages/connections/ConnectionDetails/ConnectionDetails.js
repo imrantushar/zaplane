@@ -47,12 +47,10 @@ const ConnectionDetails = ({ isOpen, onClose, singleData }) => {
               </Badge>
             </Flex>
           </Box>
-
-          {/* Info Boxes */}
           <Flex gap={4} wrap="wrap">
             <Box flex="1 1 45%" p={4} borderRadius="lg" borderWidth="1px" bg="gray.50">
               <ZAPText fontSize="xs" color="gray.500">
-                AUTH TYPE
+                  {__('AUTH TYPE', 'zaplane')}
               </ZAPText>
               <ZAPText fontSize="md" fontWeight="medium">
                 {singleData.auth_type}
@@ -61,25 +59,25 @@ const ConnectionDetails = ({ isOpen, onClose, singleData }) => {
 
             <Box flex="1 1 45%" p={4} borderRadius="lg" borderWidth="1px" bg="gray.50">
               <ZAPText fontSize="xs" color="gray.500">
-                CREATED AT
+                  {__('CREATED AT', 'zaplane')}
               </ZAPText>
               <ZAPText fontSize="md" fontWeight="medium">
-                {singleData.created_at}
+                {__(singleData.created_at, "zaplane")}
               </ZAPText>
             </Box>
 
             <Box flex="1 1 45%" p={4} borderRadius="lg" borderWidth="1px" bg="gray.50">
               <ZAPText fontSize="xs" color="gray.500">
-                LAST USED
+                  {__('LAST USED', 'zaplane')}
               </ZAPText>
               <Text fontSize="md" fontWeight="medium">
-                {singleData.last_used_at || "--"}
+                {__(singleData.last_used_at || "--", "zaplane")}
               </Text>
             </Box>
 
             <Box flex="1 1 45%" p={4} borderRadius="lg" borderWidth="1px" bg="gray.50">
               <ZAPText fontSize="xs" color="gray.500">
-                LAST TESTED
+                {__('LAST TESTED', 'zaplane')}
               </ZAPText>
               <ZAPText fontSize="md" fontWeight="medium">
                 {singleData.last_tested_at || "--"}

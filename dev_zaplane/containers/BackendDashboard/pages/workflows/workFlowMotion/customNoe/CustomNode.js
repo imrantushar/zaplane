@@ -9,6 +9,7 @@ import { Box, Text, HStack, Icon, Badge, Button } from "@chakra-ui/react";
 import { RiDeleteBin7Line } from "react-icons/ri";
 import { FaRegCopy } from "react-icons/fa";
 import FloatingEdge from "../floatingEdge/FloatingEdge";
+import ZAPText from "@ZAPComponents/Text";
 
 // import FloatingEdge from "./FloatingEdge";
 
@@ -40,7 +41,7 @@ export default function CustomNode({ id, data, xPos, yPos }) {
         offset={10}
       >
         <HStack>
-          <Text
+          <ZAPText
             borderRadius="full"
             p="4px 8px"
             fontWeight="medium"
@@ -48,7 +49,7 @@ export default function CustomNode({ id, data, xPos, yPos }) {
             margin={0}
           >
             {data.action || "Action"}
-          </Text>
+          </ZAPText>
         </HStack>
       </NodeToolbar>
        {
@@ -100,9 +101,9 @@ export default function CustomNode({ id, data, xPos, yPos }) {
           />
         )}
 
-        <Text m={0} fontSize="sm" fontWeight="medium">
+        <ZAPText m={0} fontSize="sm" fontWeight="medium">
           {data.app}
-        </Text>
+        </ZAPText>
         {!data.conditions && (
           <Handle
             type="source"

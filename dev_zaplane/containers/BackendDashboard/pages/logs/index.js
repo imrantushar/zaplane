@@ -20,6 +20,7 @@ import LogDetails from "@ZAPComponents/LogDetails";
 import { getDuration } from "../workflows/workFlowMotion/helper";
 import ZAPLoading from "@ZAPComponents/Loading";
 import ZAPTable from "@ZAPComponents/Table";
+import { __ } from "@wordpress/i18n";
 
 const Logs = () => {
     const dispatch = useDispatch();
@@ -56,7 +57,7 @@ const Logs = () => {
     if (!data?.length) {
         return (
             <Flex align="center" justify="center" h="300px">
-                <Text>No data found</Text>
+                <Text>{__("No data found", "zaplane")}</Text>
             </Flex>
         );
     }
@@ -71,7 +72,7 @@ const Logs = () => {
             minHeight="100vh"
         >
             <Text fontSize="lg" fontWeight="600" mb={4}>
-                Workflow Logs
+                {__('Workflow Logs', 'zaplane')}
             </Text>
             <ZAPTable
                 data={data}
@@ -120,7 +121,7 @@ const Logs = () => {
                                 dispatch(nodeLogsRunDetails(row.id));
                             }}
                         >
-                            Details
+                            {__('Details', 'zaplane')}
                         </Button>
 
                         <Button
@@ -128,7 +129,7 @@ const Logs = () => {
                             variant="outline"
                             onClick={() => dispatch(retryNodeRun(row.id))}
                         >
-                            Re-execute
+                            {__('Re-execute', 'zaplane')}
                         </Button>
                     </>
                 )}

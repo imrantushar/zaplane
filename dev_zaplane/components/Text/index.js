@@ -1,5 +1,6 @@
 import React from "react";
 import { Text } from "@chakra-ui/react";
+import { __ } from "@wordpress/i18n";
 
 const ZAPText = ({
   children,
@@ -34,7 +35,7 @@ const ZAPText = ({
       {...variants[variant]}
       {...props}
     >
-      {children}
+      {__(children, 'zaplane')}
     </Text>
   );
 };

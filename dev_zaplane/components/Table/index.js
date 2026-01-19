@@ -9,6 +9,7 @@ import {
 } from "@chakra-ui/react";
 import ZAPLoading from "@ZAPComponents/Loading";
 import ZAPText from "@ZAPComponents/Text";
+import { __ } from "@wordpress/i18n";
 
 const ZAPTable = ({
   data = [],
@@ -40,7 +41,7 @@ const ZAPTable = ({
           ))}
           {actionsRenderer && (
             <Table.ColumnHeader textAlign="center">
-              Actions
+              {__('Actions', 'zaplane')}
             </Table.ColumnHeader>
           )}
         </Table.Row>
