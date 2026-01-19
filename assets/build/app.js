@@ -578,7 +578,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react_modal__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(react_modal__WEBPACK_IMPORTED_MODULE_2__);
 /* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
 /* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__);
-Object(function webpackMissingModule() { var e = new Error("Cannot find module '@ZAPComponents/OptionMenu'"); e.code = 'MODULE_NOT_FOUND'; throw e; }());
+/* harmony import */ var _ZAPComponents_OptionMenu__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @ZAPComponents/OptionMenu */ "./dev_zaplane/components/OptionMenu/index.js");
 /* harmony import */ var _helper__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./helper */ "./dev_zaplane/components/Modal/helper.js");
 /* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/button/close-button.js");
 /* harmony import */ var _styles_scss__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./styles.scss */ "./dev_zaplane/components/Modal/styles.scss");
@@ -711,7 +711,7 @@ function ReactModal({
             })]
           }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)("div", {
             className: "zaplane-react-modal-buttons",
-            children: [isEnabledResizer && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(Object(function webpackMissingModule() { var e = new Error("Cannot find module '@ZAPComponents/OptionMenu'"); e.code = 'MODULE_NOT_FOUND'; throw e; }()), {
+            children: [isEnabledResizer && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_ZAPComponents_OptionMenu__WEBPACK_IMPORTED_MODULE_4__["default"], {
               icon: iconOptions[devicePreview?.activeIconIndex],
               options: [...showLargeTab, {
                 type: 'button',
@@ -948,6 +948,154 @@ const Notification = () => {
   });
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Notification);
+
+/***/ },
+
+/***/ "./dev_zaplane/components/OptionMenu/index.js"
+/*!****************************************************!*\
+  !*** ./dev_zaplane/components/OptionMenu/index.js ***!
+  \****************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var prop_types__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! prop-types */ "./node_modules/prop-types/index.js");
+/* harmony import */ var prop_types__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(prop_types__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _styles_scss__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./styles.scss */ "./dev_zaplane/components/OptionMenu/styles.scss");
+/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! react-dom */ "react-dom");
+/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(react_dom__WEBPACK_IMPORTED_MODULE_3__);
+Object(function webpackMissingModule() { var e = new Error("Cannot find module '@ZAPComponents/Button'"); e.code = 'MODULE_NOT_FOUND'; throw e; }());
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__);
+
+
+
+
+
+
+const propTypes = {
+  icon: (prop_types__WEBPACK_IMPORTED_MODULE_1___default().string),
+  suffix: (prop_types__WEBPACK_IMPORTED_MODULE_1___default().string),
+  options: (prop_types__WEBPACK_IMPORTED_MODULE_1___default().array),
+  iconClass: (prop_types__WEBPACK_IMPORTED_MODULE_1___default().node),
+  alwaysShowOptions: (prop_types__WEBPACK_IMPORTED_MODULE_1___default().bool)
+};
+const OptionMenu = props => {
+  const {
+    icon = 'menu',
+    options = [],
+    iconClass,
+    suffix = '',
+    alwaysShowOptions = false
+  } = props;
+  const [itemSelected, setItemSelected] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
+  const menuItemRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
+  const relativeTo = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
+  const handleClick = e => {
+    if (menuItemRef?.current && !menuItemRef?.current?.contains(e.target) && !relativeTo.current.contains(e.target)) {
+      setItemSelected(false);
+    }
+  };
+  const handleMenuToggle = () => {
+    setItemSelected(!itemSelected);
+  };
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    if (!alwaysShowOptions) {
+      document.addEventListener('mousedown', handleClick);
+      return () => document.removeEventListener('mousedown', handleClick);
+    }
+  }, [alwaysShowOptions]);
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    if (alwaysShowOptions) {
+      return;
+    }
+    if (itemSelected && relativeTo.current) {
+      const rect = relativeTo.current.getBoundingClientRect();
+      const x = rect.left + window.pageXOffset;
+      const y = rect.top + window.pageYOffset;
+      const buttonHeight = relativeTo.current.offsetHeight;
+      menuItemRef.current.style.position = 'absolute';
+      menuItemRef.current.style.left = `${x - 155}px`;
+      menuItemRef.current.style.top = `${y + buttonHeight - 25}px`;
+      document.body.appendChild(menuItemRef.current);
+    } else if (menuItemRef.current && menuItemRef.current.parentNode === document.body) {
+      document.body.removeChild(menuItemRef.current);
+    }
+  }, [itemSelected, alwaysShowOptions]);
+  const renderOptions = () => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("div", {
+    className: `zaplane-dropdown-menu__lists  ${alwaysShowOptions ? 'zaplane-dropdown-menu--inline' : ''} ${suffix && `zaplane-dropdown-menu--list-${suffix}`}`,
+    ref: menuItemRef,
+    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("ul", {
+      className: `${alwaysShowOptions ? 'zaplane-dropdown-menu__inline' : 'zaplane-more-options'}`,
+      children: options.map((item, itemIndex) => {
+        const handleItemClick = () => {
+          setItemSelected(false);
+          if ('button' === item.type) {
+            return item?.onClick();
+          }
+          return null;
+        };
+        return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)((react__WEBPACK_IMPORTED_MODULE_0___default().Fragment), {
+          children: item.action ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsxs)("form", {
+            className: `${alwaysShowOptions ? 'zaplane-dropdown-menu__inline-form' : 'zaplane-more-options__item'}`,
+            action: item.action,
+            method: item.method,
+            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(Object(function webpackMissingModule() { var e = new Error("Cannot find module '@ZAPComponents/Button'"); e.code = 'MODULE_NOT_FOUND'; throw e; }()), {
+              preset: "transparent",
+              iconPosition: "left",
+              ...item,
+              suffix: `${alwaysShowOptions ? 'inline' : 'block'}`
+            }), item.hasBorder && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("hr", {
+              className: "zaplane-option-separator"
+            })]
+          }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsxs)("li", {
+            className: `${alwaysShowOptions ? 'zaplane-dropdown-menu__inline-form' : 'zaplane-more-options__item'}`,
+            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(Object(function webpackMissingModule() { var e = new Error("Cannot find module '@ZAPComponents/Button'"); e.code = 'MODULE_NOT_FOUND'; throw e; }()), {
+              preset: "transparent",
+              iconPosition: "left",
+              ...item,
+              onClick: handleItemClick
+              // suffix={`${alwaysShowOptions ? 'inline' : 'block'}`}
+            }), item.hasBorder && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("hr", {
+              className: "zaplane-option-separator"
+            })]
+          })
+        }, itemIndex);
+      })
+    })
+  });
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.Fragment, {
+    children: [!alwaysShowOptions && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("button", {
+      className: `zaplane-dropdown-menu ${suffix && `zaplane-dropdown-menu--${suffix}`}`,
+      type: "button",
+      ref: relativeTo,
+      onClick: handleMenuToggle,
+      children: iconClass ? iconClass : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("span", {
+        className: `zaplane-icon zaplane-icon--${icon}`
+      })
+    }), alwaysShowOptions ? renderOptions() : itemSelected && (0,react_dom__WEBPACK_IMPORTED_MODULE_3__.createPortal)(renderOptions(), document.body)]
+  });
+};
+OptionMenu.propTypes = propTypes;
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (OptionMenu);
+
+/***/ },
+
+/***/ "./dev_zaplane/components/OptionMenu/styles.scss"
+/*!*******************************************************!*\
+  !*** ./dev_zaplane/components/OptionMenu/styles.scss ***!
+  \*******************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+// extracted by mini-css-extract-plugin
+
 
 /***/ },
 

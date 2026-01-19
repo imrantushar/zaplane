@@ -1,0 +1,123 @@
+.zaplane-dropdown-menu {
+    position: relative;
+    border-radius: 4px;
+    border: 1px solid var(--zaplane-border-color) !important;
+    cursor: pointer;
+    background: transparent;
+    padding: 5px 12px !important;
+    &:focus, &:hover {
+        background: var(--zaplane-body-background);
+        color: none;
+    }
+
+    svg {
+        height: 16px;
+        pointer-events: none;
+    }
+
+    &__lists {
+        .zaplane-more-options {
+            position: relative;
+            min-width: 175px;
+            z-index: 99999;
+            border-radius: 4px;
+            border: 1px solid var(--zaplane-border-color);
+            background: var(--zaplane-background);
+            margin: 0;
+            padding: 8px 8px 4px 8px;
+            box-shadow: 0px 12px 24px -4px rgba(16, 24, 40, 0.08);
+            &__item {
+                cursor: pointer;
+                margin-bottom: 0;
+                border-radius: 6px;
+                list-style: none;
+                a, button {
+                    cursor: pointer;
+                    border: none;
+                    width: 100%;
+                    color: var(--zaplane-font-color);
+                    border-radius: 6px;
+                    padding: 8px 10px 8px 10px;
+                    display: flex;
+                    margin-bottom: 4px;
+                    &:hover {
+                        background: var(--zaplane-body-background);
+                        color: var(--zaplane-font-color);
+                        border-radius: 4px;
+                    }
+                    .zaplane-icon-slash {
+                        width: 18px;
+                        margin-right: 10px;
+                    }
+
+                    .zaplane-icon {
+                        margin-right: 10px;
+                        font-size: 20px;
+                        &--reset {
+                            font-size: 14px;
+                            font-weight: 500;
+                        }
+                        &--edit {
+                            font-size: 20px;
+                        }
+
+                        &--delete {
+                            &::before {
+                                color: #fff;
+                            }
+                        }
+                    }
+
+                    .zaplane-btn--label {
+                        pointer-events: none;
+                        font-size: 12px;
+                    }
+
+                    .dashicons {
+                        font-size: 16px; 
+                        height: auto;
+                        width: auto;
+                    }
+                }
+                .zaplane-btn--trash {
+                    color: #FF4D4D;
+                    .zaplane-icon {
+                        &::before {
+                            color: #FF4D4D;
+                        }
+                    }
+
+                    &:hover {
+                        color: #FF4D4D;
+                    }
+                }
+                
+                .zaplane-option-separator {
+                    margin: 4px 0;
+                }
+            }
+        }
+    }
+
+    &__inline {
+        display: flex;
+    }
+
+    &__inline-form {
+        &:not(&:last-child) {
+            border-right: 1px solid var(--zaplane-border-color);
+            padding-right: 2px;
+            margin-right: 2px;
+        }
+        .zaplane-btn {
+            &--inline {
+                padding: 0;
+                color: var(--zaplane-placing);
+            }
+            &--trash {
+                padding: 0;
+                color: var(--zaplane-placing);
+            }
+        }
+    }
+}
