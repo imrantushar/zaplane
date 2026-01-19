@@ -13,10 +13,10 @@ trait RoleActionsTrait
         $role = add_role(
             $role_key,
             $config['display_name'] ?? '',
-            WordpressHelpers::normalize_caps($config['capabilities'] ?? [])
+            Helper::normalize_caps($config['capabilities'] ?? [])
         );
 
-        return static::success(['role' => WordpressHelpers::format_role_payload($role_key, $role)]);
+        return static::success(['role' => Helper::format_role_payload($role_key, $role)]);
     }
 
     protected static function action_delete_role(array $config): array
@@ -74,7 +74,7 @@ trait RoleActionsTrait
     protected static function action_add_role_caps(array $config): array
     {
         $role = get_role($config['role'] ?? '');
-        foreach (WordpressHelpers::normalize_list($config['caps'] ?? []) as $cap) {
+        foreach (Helper::normalize_list($config['caps'] ?? []) as $cap) {
             $role->add_cap($cap);
         }
         return static::success();
@@ -83,7 +83,7 @@ trait RoleActionsTrait
     protected static function action_remove_role_caps(array $config): array
     {
         $role = get_role($config['role'] ?? '');
-        foreach (WordpressHelpers::normalize_list($config['caps'] ?? []) as $cap) {
+        foreach (Helper::normalize_list($config['caps'] ?? []) as $cap) {
             $role->remove_cap($cap);
         }
         return static::success();
@@ -98,7 +98,7 @@ trait RoleActionsTrait
     protected static function action_add_user_caps(array $config): array
     {
         $user = get_userdata($config['user_id'] ?? 0);
-        foreach (WordpressHelpers::normalize_list($config['caps'] ?? []) as $cap) {
+        foreach (Helper::normalize_list($config['caps'] ?? []) as $cap) {
             $user->add_cap($cap);
         }
         return static::success();
@@ -107,7 +107,7 @@ trait RoleActionsTrait
     protected static function action_remove_user_caps(array $config): array
     {
         $user = get_userdata($config['user_id'] ?? 0);
-        foreach (WordpressHelpers::normalize_list($config['caps'] ?? []) as $cap) {
+        foreach (Helper::normalize_list($config['caps'] ?? []) as $cap) {
             $user->remove_cap($cap);
         }
         return static::success();
