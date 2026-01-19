@@ -223,7 +223,6 @@ class Wordpress extends IntegrationBase {
                     'required' => true,
                 ],
             ];
-            return[];
         }
 
         if ( $trigger === 'switch_theme' ) {
@@ -240,7 +239,6 @@ class Wordpress extends IntegrationBase {
                     'required' => true,
                 ],
             ];
-            return [];
         }
 
         if ( $trigger === 'add_action' ) {
@@ -674,94 +672,160 @@ class Wordpress extends IntegrationBase {
 
     public static function get_actions(): array {
         return [
-            'create_post'   => ['label'=>'Create Post'],
-            'update_option' => ['label'=>'Update Option'],
-            'create_user' => ['label'=>'Create User'],
-            'update_user' => ['label'=>'Update User'],
-            'delete_user' => ['label'=>'Delete User'],
-            'get_users' => ['label'=>'Get All Users'],
-            'get_users_by_role' => ['label'=>'Get All Users by Role'],
-            'get_user_by_id' => ['label'=>'Get User by ID'],
-            'get_user_by_email' => ['label'=>'Get User by Email'],
-            'get_user_by_field' => ['label'=>'Get User by Field'],
-            'get_user_meta_all' => ['label'=>'Get User Metadata (All)'],
-            'get_user_meta_single' => ['label'=>'Get User Metadata (Single)'],
-            'update_user_meta' => ['label'=>'Update User Metadata'],
-            'send_password_reset_email' => ['label'=>'Send Password Reset Email'],
-            'authenticate_user' => ['label'=>'Authenticate User'],
-            'logout_user' => ['label'=>'Logout User'],
-            'activate_user' => ['label'=>'Activate User'],
-            'deactivate_user' => ['label'=>'Deactivate User'],
-            'create_role' => ['label'=>'Create Role'],
-            'delete_role' => ['label'=>'Delete Role'],
-            'add_user_role' => ['label'=>'Add User Role'],
-            'remove_user_role' => ['label'=>'Remove User Role'],
-            'update_user_role' => ['label'=>'Update User Role'],
-            'get_roles' => ['label'=>'Get All Roles'],
-            'get_caps' => ['label'=>'Get All Capabilities'],
-            'get_role_caps' => ['label'=>'Get Role Capabilities'],
-            'add_role_caps' => ['label'=>'Add Role Capabilities'],
-            'remove_role_caps' => ['label'=>'Remove Role Capabilities'],
-            'get_user_caps' => ['label'=>'Get User Capabilities'],
-            'add_user_caps' => ['label'=>'Add User Capabilities'],
-            'remove_user_caps' => ['label'=>'Remove User Capabilities'],
-            'get_term' => ['label'=>'Get Term (Single)'],
-            'get_terms_by_taxonomy' => ['label'=>'Get Term by Taxonomy'],
-            'get_term_by_field' => ['label'=>'Get Term by Field'],
-            'create_term' => ['label'=>'Create New Term'],
-            'update_term' => ['label'=>'Update Term'],
-            'delete_term' => ['label'=>'Delete Term'],
-            'register_taxonomy' => ['label'=>'Register Taxonomy'],
-            'unregister_taxonomy' => ['label'=>'Unregister Taxonomy'],
-            'get_taxonomies' => ['label'=>'Get Taxonomy (All)'],
-            'get_taxonomy' => ['label'=>'Get Taxonomy (Single)'],
-            'add_taxonomy_to_post' => ['label'=>'Add Taxonomy to Post'],
-            'remove_taxonomy_from_post' => ['label'=>'Remove Taxonomy from Post'],
-            'bulk_assign_terms_to_posts' => ['label'=>'Bulk Assign Terms to Posts'],
-            'bulk_remove_terms_from_posts' => ['label'=>'Bulk Remove Terms from Posts'],
-            'create_category' => ['label'=>'Create Category'],
-            'update_category' => ['label'=>'Update Category'],
-            'delete_category' => ['label'=>'Delete Category'],
-            'add_category_to_post' => ['label'=>'Add Category to Post'],
-            'get_categories' => ['label'=>'Get Category (All)'],
-            'get_category' => ['label'=>'Get Category (Single)'],
-            'create_post_tag' => ['label'=>'Create Post Tag'],
-            'update_post_tag' => ['label'=>'Update Post Tag'],
-            'delete_post_tag' => ['label'=>'Delete Post Tag'],
-            'add_tags_to_post' => ['label'=>'Add Tags to Post'],
-            'remove_tags_from_post' => ['label'=>'Remove Tags from Post'],
-            'get_post_tags' => ['label'=>'Get Post Tag (All)'],
-            'get_post_tag' => ['label'=>'Get Post Tag (Single)'],
-            'create_site' => ['label'=>'Create New Site'],
-            'delete_site' => ['label'=>'Delete Site'],
-            'add_user_to_site' => ['label'=>'Add User to Site'],
-            'remove_user_from_site' => ['label'=>'Remove User from Site'],
-            'create_post'               => ['label'=>'Create Post'],
-            'update_option'             => ['label'=>'Update Option'],
-            'untrash_post'              => ['label'=>'Untrash Post'],
-            'untrash_comment'           => ['label'=>'Untrash Comment'],
-            'update_comment_count'      => ['label'=>'Update Comment Count'],
-            'set_comment_status'        => ['label'=>'Set Comment Status'],
-            'get_post_comments_all'     => ['label'=>'Get Post Comments (All)'],
-            'get_post_comments_single'  => ['label'=>'Get Post Comments (Single Post)'],
-            'get_user_comments'         => ['label'=>'Get User Comments'],
-            'get_user_comments_email'   => ['label'=>'Get User Comments (By Email)'],
-            'get_comment_metadata_all'  => ['label'=>'Get Comment Metadata (All)'],
-            'get_comment_metadata_single' => ['label'=>'Get Comment Metadata (Single)'],
-            'create_comment'            => ['label'=>'Create New Comment'],
-            'reply_comment'             => ['label'=>'Reply To Comment'],
-            'delete_comment'            => ['label'=>'Delete Comment'],
-            'add_plugin_theme_option'   => ['label'=>'Add Option'],
-            'update_option_advanced'         => ['label' => 'Update Option'],
-            'delete_option'             => ['label'=>'Delete Option'],
-            'generate_attachment_metadata' => ['label'=>'Generate Attachment Metadata'],
-            'regenerate_image_sizes'    => ['label'=>'Resize / Regenerate Image Sizes'],
-            'set_featured_image'        => ['label'=>'Set Media Featured Image'],
+            'create_post'                   => ['label'=>'Create Post'],
+            'update_option'                 => ['label'=>'Update Option'],
+            'create_user'                   => ['label'=>'Create User'],
+            'update_user'                   => ['label'=>'Update User'],
+            'delete_user'                   => ['label'=>'Delete User'],
+            'get_users'                     => ['label'=>'Get All Users'],
+            'get_users_by_role'             => ['label'=>'Get All Users by Role'],
+            'get_user_by_id'                => ['label'=>'Get User by ID'],
+            'get_user_by_email'             => ['label'=>'Get User by Email'],
+            'get_user_by_field'             => ['label'=>'Get User by Field'],
+            'get_user_meta_all'             => ['label'=>'Get User Metadata (All)'],
+            'get_user_meta_single'          => ['label'=>'Get User Metadata (Single)'],
+            'update_user_meta'              => ['label'=>'Update User Metadata'],
+            'send_password_reset_email'     => ['label'=>'Send Password Reset Email'],
+            'authenticate_user'             => ['label'=>'Authenticate User'],
+            'logout_user'                   => ['label'=>'Logout User'],
+            'activate_user'                 => ['label'=>'Activate User'],
+            'deactivate_user'               => ['label'=>'Deactivate User'],
+            'create_role'                   => ['label'=>'Create Role'],
+            'delete_role'                   => ['label'=>'Delete Role'],
+            'add_user_role'                 => ['label'=>'Add User Role'],
+            'remove_user_role'              => ['label'=>'Remove User Role'],
+            'update_user_role'              => ['label'=>'Update User Role'],
+            'get_roles'                     => ['label'=>'Get All Roles'],
+            'get_caps'                      => ['label'=>'Get All Capabilities'],
+            'get_role_caps'                 => ['label'=>'Get Role Capabilities'],
+            'add_role_caps'                 => ['label'=>'Add Role Capabilities'],
+            'remove_role_caps'              => ['label'=>'Remove Role Capabilities'],
+            'get_user_caps'                 => ['label'=>'Get User Capabilities'],
+            'add_user_caps'                 => ['label'=>'Add User Capabilities'],
+            'remove_user_caps'              => ['label'=>'Remove User Capabilities'],
+            'get_term'                      => ['label'=>'Get Term (Single)'],
+            'get_terms_by_taxonomy'         => ['label'=>'Get Term by Taxonomy'],
+            'get_term_by_field'             => ['label'=>'Get Term by Field'],
+            'create_term'                   => ['label'=>'Create New Term'],
+            'update_term'                   => ['label'=>'Update Term'],
+            'delete_term'                   => ['label'=>'Delete Term'],
+            'register_taxonomy'             => ['label'=>'Register Taxonomy'],
+            'unregister_taxonomy'           => ['label'=>'Unregister Taxonomy'],
+            'get_taxonomies'                => ['label'=>'Get Taxonomy (All)'],
+            'get_taxonomy'                  => ['label'=>'Get Taxonomy (Single)'],
+            'add_taxonomy_to_post'          => ['label'=>'Add Taxonomy to Post'],
+            'remove_taxonomy_from_post'     => ['label'=>'Remove Taxonomy from Post'],
+            'bulk_assign_terms_to_posts'    => ['label'=>'Bulk Assign Terms to Posts'],
+            'bulk_remove_terms_from_posts'  => ['label'=>'Bulk Remove Terms from Posts'],
+            'create_category'               => ['label'=>'Create Category'],
+            'update_category'               => ['label'=>'Update Category'],
+            'delete_category'               => ['label'=>'Delete Category'],
+            'add_category_to_post'          => ['label'=>'Add Category to Post'],
+            'get_categories'                => ['label'=>'Get Category (All)'],
+            'get_category'                  => ['label'=>'Get Category (Single)'],
+            'create_post_tag'               => ['label'=>'Create Post Tag'],
+            'update_post_tag'               => ['label'=>'Update Post Tag'],
+            'delete_post_tag'               => ['label'=>'Delete Post Tag'],
+            'add_tags_to_post'              => ['label'=>'Add Tags to Post'],
+            'remove_tags_from_post'         => ['label'=>'Remove Tags from Post'],
+            'get_post_tags'                 => ['label'=>'Get Post Tag (All)'],
+            'get_post_tag'                  => ['label'=>'Get Post Tag (Single)'],
+            'create_site'                   => ['label'=>'Create New Site'],
+            'delete_site'                   => ['label'=>'Delete Site'],
+            'add_user_to_site'              => ['label'=>'Add User to Site'],
+            'remove_user_from_site'         => ['label'=>'Remove User from Site'],
+            'untrash_post'                  => ['label'=>'Untrash Post'],// ///
+            'untrash_comment'               => ['label'=>'Untrash Comment'],
+            'update_comment_count'          => ['label'=>'Update Comment Count'],
+            'set_comment_status'            => ['label'=>'Set Comment Status'],
+            'get_post_comments_all'         => ['label'=>'Get Post Comments (All)'],
+            'get_post_comments_single'      => ['label'=>'Get Post Comments (Single Post)'],
+            'get_user_comments'             => ['label'=>'Get User Comments'],
+            'get_user_comments_email'       => ['label'=>'Get User Comments (By Email)'],
+            'get_comment_metadata_all'      => ['label'=>'Get Comment Metadata (All)'],
+            'get_comment_metadata_single'   => ['label'=>'Get Comment Metadata (Single)'],
+            'create_comment'                => ['label'=>'Create New Comment'],
+            'reply_comment'                 => ['label'=>'Reply To Comment'],
+            'delete_comment'                => ['label'=>'Delete Comment'],
+            'add_plugin_theme_option'       => ['label'=>'Add Option'],
+            'update_option_advanced'        => ['label' => 'Update Option'],
+            'delete_option'                 => ['label'=>'Delete Option'],
+            'generate_attachment_metadata'  => ['label'=>'Generate Attachment Metadata'],
+            'regenerate_image_sizes'        => ['label'=>'Resize / Regenerate Image Sizes'],
+            'set_featured_image'            => ['label'=>'Set Media Featured Image'],
+            'update_title'                  => ['label' => 'Update Title'],
+            'update_post'                   => ['label' => 'Update Post'],
+            'update_status'                 => ['label' => 'Update Status'],
+            'duplicate_post'                => ['label' => 'Duplicate Post'],
+            'schedule_post'                 => ['label' => 'Schedule Post'],
+            'unschedule_post'               => ['label' => 'Unschedule Post'],
+            'update_post_feature_image'     => ['label' => 'Update Post Featured Image'],
+            'change_post_author'            => ['label' => 'Change Post Author'],
+            'trash_post'                    => ['label' => 'Trash Post'],
+            'restore_post'                  => ['label' => 'Restore Post from Trash'],
+            'delete_trash_post'             => ['label' => 'Delete Trash Post'],
+            'delete_post'                   => ['label' => 'Delete Post'],
+            'trash_page'                    => ['label' => 'Trash Page'],
+            'restore_page'                  => ['label' => 'Restore Page from Trash'],
+            'delete_trash_page'             => ['label' => 'Delete Trash Page'],
+            'delete_page'                   => ['label' => 'Delete Page'],
+            'get_posts_all'                 => ['label' => 'Get Post (All)'],
+            'get_post_single'               => ['label' => 'Get Post (Single)'],
+            'get_posts_by_post_type'        => ['label' => 'Get Posts by Post Type'],
+            'get_posts_by_metadata'         => ['label' => 'Get Posts by Metadata'],
+            'get_posts_metadata_all'        => ['label' => 'Get Post Metadata (All)'],
+            'get_post_metadata_single'      => ['label' => 'Get Post Metadata (Single)'],
+            'get_post_permalink'            => ['label' => 'Get Post Permalink'],
+            'get_post_content'              => ['label' => 'Get Post Content'],
+            'get_post_excerpt'              => ['label' => 'Get Post Excerpt'],
+            'get_post_status'               => ['label' => 'Get Post Status'],
+            'get_post_type_all'             => ['label' => 'Get Post Type (All)'],
+            'get_post_type_single'          => ['label' => 'Get Post Type (Single Post)'],
+            'register_post_type'            => ['label' => 'Register Post Type'],
+            'unregister_post_type'          => ['label' => 'Unregister Post Type'],
+            'add_post_type_support'         => ['label' => 'Add Post Type Features'],
+            'approve_comment'               => ['label' => 'Approve Comment'],
+            'unapproved_comment'            => ['label' => 'Unapproved Comment'],
+            'mark_comment_spam'             => ['label' => 'Mark Comment as Spam'],
+            'unmark_comment_spam'           => ['label' => 'Unmark Comment as Spam'],
+            'trash_comment'                 => ['label' => 'Trash Comment'],
+            'restore_comment'               => ['label' => 'Restore Comment from Trash'],
+            'delete_trash_comment'          => ['label' => 'Delete Trash Comment'],
+            'activate_plugin'               => ['label' => 'Activate Plugin'],
+            'deactivate_plugin'             => ['label' => 'Deactivate Plugin'],
+            'switch_theme'                  => ['label' => 'Theme Switch'],
+            'add_media_image'               => ['label' => 'Add New Image'],
+            'delete_media'                  => ['label' => 'Delete Media'],
+            'rename_media'                  => ['label' => 'Rename Media'],
+            'get_media_all'                 => ['label' => 'Get Media (All)'],
+            'get_media_by_title'            => ['label' => 'Get Media (By Title)'],
+            'get_media_by_id'               => ['label' => 'Get Media (By ID)'],
         ];
     }
 
     private static function field_post_id(): array {
-        return [['key'=>'post_id','label'=>'Post ID','type'=>'expression','required'=>true]];
+        return [['key'=>'post_id','label'=>'ID','type'=>'expression','required'=>true]];
+    }
+
+    private static function field_post_title(): array {
+        return [['key'=>'post_title','label'=>'New Title','type'=>'expression','required'=>true,],];
+    }
+
+    private static function field_post_type(): array {
+        return [['key'=>'post_type','label'=>'Post Type','type'=>'select','dynamic'=>[
+                        'integration' => 'wordpress',
+                        'query'       => 'post_types',
+                        'select'      => [ 'name', 'label' ],
+                    ],'required'=>true],];
+    }
+
+    private static function field_post_status(): array {
+        return [['key'=>'post_status','label'=>'Status','type'=>'select','options'=>[
+                        ['label' => 'Publish', 'value' => 'publish' ],
+                        ['label' => 'Pending', 'value' => 'pending' ],
+                        ['label' => 'Private', 'value' => 'private' ],
+                        ['label' => 'Draft',   'value' => 'draft' ],
+                    ],],];
     }
 
     private static function field_comment_id(): array {
@@ -775,6 +839,12 @@ class Wordpress extends IntegrationBase {
     private static function field_attachment_id(): array {
         return [['key'=>'attachment_id','label'=>'Attachment ID','type'=>'expression','required'=>true]];
     }
+    private static function field_media_id(): array {
+        return [['key'=>'media_id','label'=>'Media ID','type'=>'expression','required'=>true]];
+    }
+    private static function field_media_title(): array {
+        return [['key'=>'title','label'=>'Media Title','type'=>'text','required'=>true]];
+    }
 
 
     /**
@@ -785,6 +855,45 @@ class Wordpress extends IntegrationBase {
         $schemas = [
 
             /* ---------- POSTS ---------- */
+
+            'untrash_post'           => self::field_post_id(),
+            'update_comment_count'   => self::field_post_id(),
+            'unschedule_post'        => self::field_post_id(),
+            'trash_post'             => self::field_post_id(),
+            'restore_post'           => self::field_post_id(),
+            'delete_trash_post'      => self::field_post_id(),
+            'delete_post'            => self::field_post_id(),
+            'trash_page'             => self::field_post_id(),
+            'restore_page'           => self::field_post_id(),
+            'delete_trash_page'      => self::field_post_id(),
+            'delete_page'            => self::field_post_id(),
+            'get_post_single'        => self::field_post_id(),
+            'get_posts_metadata_all' => self::field_post_id(),
+            'get_post_permalink'     => self::field_post_id(),
+            'get_post_content'       => self::field_post_id(),
+            'get_post_excerpt'       => self::field_post_id(),
+            'get_post_status'        => self::field_post_id(),
+            'get_post_type_single'   => self::field_post_id(),
+            'get_posts_by_post_type' => self::field_post_type(),
+            'get_posts_by_metadata'  => self::field_post_type(),
+            'unregister_post_type'   => self::field_post_type(),
+            'update_status'          => [
+                ...self::field_post_id(),
+                ...self::field_post_type(),
+                ...self::field_post_status(),
+            ],
+            
+            'update_title'           => [
+                ...self::field_post_id(),
+                ...self::field_post_title(),
+                ...self::field_post_type(),
+            ],
+
+            'duplicate_post' => [
+                ...self::field_post_id(),
+                ...self::field_post_title(),
+                ...self::field_post_type(),
+            ],
 
             'create_post' => [
                 ['key'=>'post_title','label'=>'Title','type'=>'expression','required'=>true],
@@ -802,13 +911,105 @@ class Wordpress extends IntegrationBase {
                 ]],
             ],
 
-            'untrash_post'           => self::field_post_id(),
-            'update_comment_count'   => self::field_post_id(),
+            'update_post' => [
+                ...self::field_post_id(),
+                ['key'=>'post_title','label'=>'New Post Title','type'=>'expression','required'=>true,],
+                ['key'=>'post_content','label'=>'New Post Content','type'=>'expression','required'=>true,],
+                ['key'=>'post_type','label'=>'Post Type','type'=>'select',
+                    'dynamic' => [
+                        'integration' => 'wordpress',
+                        'query'       => 'post_types',
+                        'select'      => [ 'name', 'label' ],
+                    ],
+                    'required' => true,
+                ],
+                ['key'=>'post_status','label'=>'Status','type'=>'select','options'=>[
+                        ['label' => 'Draft',   'value' => 'draft' ],
+                        ['label' => 'Publish', 'value' => 'publish' ],
+                    ],],
+            ],
+
+            'schedule_post' => [
+                ...self::field_post_id(),
+                ['key'=>'schedule_date','label'=>'Schedule Date & Time','type'=>'datetime','required'=>true,],
+                ['key'=>'post_status','label'=>'Status','type'=>'select','options'=>[
+                        ['label' => 'Future', 'value' => 'future' ],
+                        ['label' => 'Draft',   'value' => 'draft' ],
+                    ],
+                    'default' => 'future',],
+            ],
+
+            'update_post_feature_image' => [
+                ...self::field_post_id(),
+                ['key'=>'image_id','label'=>'Featured Image ID','type'=>'expression','required'=>true,],
+            ],
+
+            'change_post_author' => [
+                ...self::field_post_id(),
+                ['key'=>'author_id','label'=>'Author ID','type'=>'expression','required'=>true,],
+            ],
+
+            'get_post_metadata_single' => [
+                ...self::field_post_id(),
+                ['key'=>'meta_kry','label'=>'Post Meta Key','type'=>'expression','required'=>true,],
+            ],
+
+            'register_post_type' => [
+                ['key'=>'slug','label'=>'Post Type Slug','type'=>'text','required'=>true,],
+                ['key'=>'label','label'=>'Label','type'=>'text','required'=>false,'default'=>'',],
+                ['key'=>'hierarchical','label'=>'Hierarchy (Category Style)','type'=>'boolean','required'=>false,],
+                ['key'=>'public','label'=>'Public','type'=>'boolean','required'=>false,'default'=>true,],
+                ['key'=>'show_in_rest','label'=>'Show in REST API','type'=>'boolean','required'=>false,'default'=>true,],
+                ['key'=>'show_ui','label'=>'Show UI','type'=>'boolean','required'=>false,'default'=>true,],
+                ['key'=>'show_in_menu','label'=>'Show In Menu','type'=>'boolean','required'=>false,'default'=>true,],
+                ['key'=>'show_in_nav_menus','label'=>'Show In Nav Menus','type'=>'boolean','required'=> false,'default'=> true,],
+                ['key'=>'show_in_admin_bar','label'=>'Show In Admin Bar','type'=>'boolean','required'=>false,'default'=>true,],
+                ['key'=> 'menu_icon','label'=>'Menu Icon','type'=>'text','required'=>false,],
+                ['key'=>'menu_position','label'=>'Menu Position','type'=>'number','required'=>false,],
+                ['key'=>'supports','label'=>'Supports','type'=>'multiselect','options'=>[
+                        ['label' => 'Title', 'value' => 'title' ],
+                        ['label' => 'Editor', 'value' => 'editor' ],
+                        ['label' => 'Thumbnail', 'value' => 'thumbnail' ],
+                        ['label' => 'Excerpt',   'value' => 'excerpt' ],
+                        ['label' => 'Comments',   'value' => 'comments' ],
+                        ['label' => 'Revisions',   'value' => 'revisions' ],
+                        ['label' => 'Author',   'value' => 'author' ],
+                        ['label' => 'Custom-Fields',   'value' => 'custom-fields' ],],
+                        'default'=> ['title', 'editor' ],'required' => false,],
+                ['key'=>'capability_type','label'=>'Capability Type','type'=>'text','required'=>false,'default'=>'post',],
+                ['key'=>'description','label'=>'Description','type'=>'textarea','required'=>false,'default'=>'',],
+                ['key'=>'rewrite_slug','label'=>'Custom URL Slug','type'=>'textarea','required'=>false,'default'=>'',],
+            ],
+
+            'add_post_type_support' => [
+                ['key'=>'post_type','label'=>'Post Type','type'=>'select','dynamic'=>[
+                        'integration' => 'wordpress',
+                        'query'       => 'post_types',
+                        'select'      => [ 'name', 'label' ],],
+                    'required' => true,],
+                ['key'=>'features','label'=>'Features (Supports)','type'=>'multiselect','options'=>[
+                        ['label' => 'Title', 'value' => 'title' ],
+                        ['label' => 'Editor', 'value' => 'editor' ],
+                        ['label' => 'Thumbnail', 'value' => 'thumbnail' ],
+                        ['label' => 'Excerpt',   'value' => 'excerpt' ],
+                        ['label' => 'Comments',   'value' => 'comments' ],
+                        ['label' => 'Revisions',   'value' => 'revisions' ],
+                        ['label' => 'Author',   'value' => 'author' ],
+                        ['label' => 'Custom-Fields',   'value' => 'custom-fields' ],],
+                    'required' => false,],
+            ],
 
             /* ---------- COMMENTS ---------- */
 
-            'untrash_comment'        => self::field_comment_id(),
-            'delete_comment'         => self::field_comment_id(),
+            'untrash_comment'             => self::field_comment_id(),
+            'delete_comment'              => self::field_comment_id(),
+            'approve_comment'             => self::field_comment_id(),
+            'unapproved_comment'          => self::field_comment_id(),
+            'mark_comment_spam'           => self::field_comment_id(),
+            'unmark_comment_spam'         => self::field_comment_id(),
+            'trash_comment'               => self::field_comment_id(),
+            'restore_comment'             => self::field_comment_id(),
+            'delete_trash_comment'        => self::field_comment_id(),
             'get_comment_metadata_single' => self::field_comment_id(),
 
             'set_comment_status' => [
@@ -885,10 +1086,55 @@ class Wordpress extends IntegrationBase {
 
             'generate_attachment_metadata' => self::field_attachment_id(),
             'regenerate_image_sizes'       => self::field_attachment_id(),
-
+            'get_media_by_title'           => self::field_media_title(),
+            'get_media_by_id'              => self::field_media_id(),
             'set_featured_image' => [
                 ...self::field_post_id(),
                 ...self::field_attachment_id(),
+            ],
+
+            'add_media_image' => [
+                ['key'=>'image_url','label'=>'Image URL','type'=>'text','required'=>true,],
+                ['key'=>'image_title','label'=>'Image Title','type'=>'text','required'=>false,],
+                ['key'=>'alternative_text','label'=>'Alternative Text','type'=>'text','required'=>false,],
+                ['key'=>'caption','label'=>'Caption','type'=>'textarea','required'=>false,],
+                ['key'=>'description','label'=>'Description','type'=>'textarea','required'=>false,],
+            ],
+
+            'delete_media' => [
+                ...self::field_media_id(),
+                ['key'=>'force_delete','label'=>'Force Delete','type'=>'boolean','default'=>false,'required'=>false,],
+            ],
+
+            'rename_media' => [
+                ...self::field_media_id(),
+                ['key'=>'new_title','label'=>'New Title','type'=>'expression','required'=>false,],
+            ],
+
+            /* ---------- PLUGIN / THEME ---------- */
+
+            'activate_plugin' => [
+                ['key'=>'plugin','label'=>'Inactive Plugin','type'=>'select','dynamic'=>[
+                        'integration' => 'wordpress',
+                        'query'       => 'inactive_plugins',
+                        'select'      => [ 'file', 'name' ],
+                    ],'required'=>true,],
+            ],
+
+            'deactivate_plugin' => [
+                ['key'=>'plugin','label'=>'Active Plugin','type'=>'select','dynamic'=>[
+                        'integration' => 'wordpress',
+                        'query'       => 'active_plugins',
+                        'select'      => [ 'file', 'name' ],
+                    ],'required'=>true,],
+            ],
+
+            'switch_theme' => [
+                ['key'=>'theme','label'=>'Theme Switch','type'=>'select','dynamic'=>[
+                        'integration' => 'wordpress',
+                        'query'       => 'deactivate_theme',
+                        'select'      => [ 'file', 'name' ],
+                    ],'required' => true,],
             ],
 
             /* ---------- AUTH ---------- */
@@ -939,7 +1185,9 @@ class Wordpress extends IntegrationBase {
             'categories' => [ self::class, 'query_categories' ],
             'roles'      => [ self::class, 'query_roles' ],
             'caps'       => [ self::class, 'query_caps' ],
-            'active_plugins' => [ self::class, 'query_active_plugins' ],
+            'active_plugins'    => [ self::class, 'query_active_plugins' ],
+            'inactive_plugins'  => [ self::class, 'query_deactivate_plugins' ],
+            'deactivate_theme'  => [ self::class, 'query_deactivate_theme' ],
         ];
     }
 

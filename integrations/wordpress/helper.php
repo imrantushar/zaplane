@@ -117,4 +117,33 @@ Trait Helper {
 
         return $require_existing ? '' : $key;
     }
+
+    public static function copy_taxonomies(int $from_post, int $to_post): void {
+        $taxonomies = get_object_taxonomies(get_post_type($from_post));
+
+        foreach ($taxonomies as $taxonomy) {
+            $terms = wp_get_object_terms(
+                $from_post,
+                $taxonomy,
+                ['fields' => 'slug']
+            );
+            if (!is_wp_error($terms) && !empty($terms)) {
+                wp_set_object_terms($to_post, $terms, $taxonomy);
+            }
+        }
+    }
+
+     public static function copy_meta(int $from_post, int $to_post): void {
+        $meta = get_post_meta($from_post);
+
+        foreach ($meta as $key => $values) {
+            foreach ($values as $value) {
+                add_post_meta(
+                    $to_post,
+                    $key,
+                    maybe_unserialize($value)
+                );
+            }
+        }
+    }
 }
