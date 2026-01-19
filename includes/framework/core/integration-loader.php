@@ -10,7 +10,7 @@ class IntegrationLoader {
 
     public static function init(): self {
         if (!empty(self::$registry)) return new self();
-        self::$registry = require ZAPLANE_INCLUDES_DIR_PATH . 'core/integration-registry.php';
+        self::$registry = require ZAPLANE_INCLUDES_DIR_PATH . 'framework/core/integration-registry.php';
         do_action('zaplane_register_integrations_registry', self::$registry);
 
         return new self();
@@ -32,7 +32,19 @@ class IntegrationLoader {
         return $instance;
     }
 
-    // Only Used for WP Cli JSON Generator
+    // Get all registered integration slugs (without loading instances)
+    public static function getAllSlugs(): array {
+        self::init();
+        return array_keys(self::$registry);
+    }
+
+    // Get registry metadata without loading instances
+    public static function getRegistry(): array {
+        self::init();
+        return self::$registry;
+    }
+
+    // Only Used for WP Cli JSON Generator - loads ALL integrations
     public static function all(): array {
         self::init();
 

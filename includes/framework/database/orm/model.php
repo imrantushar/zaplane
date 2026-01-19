@@ -38,6 +38,16 @@ abstract class Model implements JsonSerializable
         return Schema::getTable(static::$table);
     }
 
+    public static function getCreatedAtColumn(): string
+    {
+        return static::$createdAt;
+    }
+
+    public static function getUpdatedAtColumn(): string
+    {
+        return static::$updatedAt;
+    }
+
     public static function query(): QueryBuilder
     {
         $query = new QueryBuilder(static::getTable());

@@ -30,6 +30,8 @@ class Run extends Model
     ];
 
     protected static bool $timestamps = false;
+    protected static string $createdAt = 'started_at';
+    protected static string $updatedAt = 'finished_at';
 
     public function nodeRuns(): array
     {

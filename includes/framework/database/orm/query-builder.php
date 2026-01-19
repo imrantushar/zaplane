@@ -19,6 +19,8 @@ class QueryBuilder
     protected array $groups = [];
     protected array $havings = [];
     protected ?string $modelClass = null;
+    protected static array $queryCache = [];
+    protected static int $maxCacheSize = 100;
 
     public function __construct(string $table)
     {
@@ -213,13 +215,21 @@ class QueryBuilder
         return $this->orderBy($column, 'desc');
     }
 
-    public function latest(string $column = 'created_at'): self
+    public function latest(?string $column = null): self
     {
+        if ($column === null && $this->modelClass) {
+            $column = call_user_func([$this->modelClass, 'getCreatedAtColumn']);
+        }
+        $column = $column ?? 'created_at';
         return $this->orderByDesc($column);
     }
 
-    public function oldest(string $column = 'created_at'): self
+    public function oldest(?string $column = null): self
     {
+        if ($column === null && $this->modelClass) {
+            $column = call_user_func([$this->modelClass, 'getCreatedAtColumn']);
+        }
+        $column = $column ?? 'created_at';
         return $this->orderBy($column, 'asc');
     }
 
@@ -300,6 +310,14 @@ class QueryBuilder
         $sql = $this->toSql();
         $bindings = $this->getBindings();
 
+        // Create cache key
+        $cacheKey = md5($sql . serialize($bindings));
+
+        // Check cache
+        if (isset(self::$queryCache[$cacheKey])) {
+            return clone self::$queryCache[$cacheKey];
+        }
+
         if (!empty($bindings)) {
             $sql = $wpdb->prepare($sql, ...$bindings);
         }
@@ -307,10 +325,19 @@ class QueryBuilder
         $results = $wpdb->get_results($sql, ARRAY_A);
 
         if ($this->modelClass && $results) {
-            return new Collection(array_map(fn($row) => $this->modelClass::hydrate($row), $results));
+            $collection = new Collection(array_map(fn($row) => $this->modelClass::hydrate($row), $results));
+        } else {
+            $collection = new Collection($results ?: []);
         }
 
-        return new Collection($results ?: []);
+        // Store in cache (with size limit)
+        if (count(self::$queryCache) >= self::$maxCacheSize) {
+            // Remove oldest entry (first element)
+            array_shift(self::$queryCache);
+        }
+        self::$queryCache[$cacheKey] = clone $collection;
+
+        return $collection;
     }
 
     /**
