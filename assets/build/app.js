@@ -4067,18 +4067,6 @@ const VersionHistoryTable = ({
   const {
     isLoading
   } = (0,react_redux__WEBPACK_IMPORTED_MODULE_9__.useSelector)(state => state.workflows);
-  const statusStyle = isActive => {
-    if (isActive === "1") {
-      return {
-        color: "green.600",
-        bg: "green.50"
-      };
-    }
-    return {
-      color: "gray.600",
-      bg: "gray.100"
-    };
-  };
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_ZAPComponents_Table__WEBPACK_IMPORTED_MODULE_5__["default"], {
     data: versions,
     rowKey: "id",
@@ -4109,7 +4097,8 @@ const VersionHistoryTable = ({
         py: "0.5",
         rounded: "md",
         fontSize: "xs",
-        ...statusStyle(row.is_active),
+        color: row.is_active === "1" ? "green.600" : "gray.600",
+        bg: row.is_active === "1" ? "green.50" : "gray.100",
         children: row.is_active === "1" ? "Active" : "Inactive"
       })
     }, {
