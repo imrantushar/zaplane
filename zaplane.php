@@ -36,8 +36,8 @@ final class Zaplane {
 
         $this->container = $this->boot_container();
 
-        register_activation_hook(ZAPLANE_PLUGIN_FILE,[ __FILE__, 'activate_plugin'] );
-        register_deactivation_hook(ZAPLANE_PLUGIN_FILE,[ __FILE__, 'deactivate_plugin'] );
+        register_activation_hook( __FILE__, [ $this, 'activate_plugin' ] );
+        register_deactivation_hook( __FILE__, [ $this, 'deactivate_plugin' ] );
 
         add_action('plugins_loaded', [$this, 'on_plugins_loaded']);
         add_action('zaplane_loaded', [$this, 'init_plugin']);
@@ -64,8 +64,8 @@ final class Zaplane {
         define('ZAPLANE_INCLUDES_DIR_PATH', ZAPLANE_ROOT_DIR_PATH . 'includes/');
         define('ZAPLANE_FRAMEWORK_DIR_PATH', ZAPLANE_ROOT_DIR_PATH . 'includes/framework/');
         define('ZAPLANE_INTEGRATION_DIR_PATH', ZAPLANE_ROOT_DIR_PATH . 'integration/');
-        define( 'ZAPLANE_ASSETS_DIR_PATH', ZAPLANE_ROOT_DIR_PATH . 'assets/' );
-        define( 'ZAPLANE_ASSETS_URI', ZAPLANE_PLUGIN_ROOT_URI . 'assets/' );
+        define('ZAPLANE_ASSETS_DIR_PATH', ZAPLANE_ROOT_DIR_PATH . 'assets/');
+        define('ZAPLANE_ASSETS_URI', ZAPLANE_PLUGIN_ROOT_URI . 'assets/');
     }
 
     private function load_dependencies(): void {
