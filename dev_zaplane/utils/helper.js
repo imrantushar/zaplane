@@ -94,3 +94,13 @@ export const makeRequest = async (
 
     return data;
 };
+ export const parseJSON = (value) => {
+  if (!value) return {};
+  if (typeof value === "object") return value;
+  try {
+	return JSON.parse(value);
+  } catch (e) {
+	console.error("Invalid JSON:", value);
+	return {};
+  }
+};
