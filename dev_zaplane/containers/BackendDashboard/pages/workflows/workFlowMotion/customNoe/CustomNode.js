@@ -5,14 +5,11 @@ import {
   NodeToolbar,
   useReactFlow,
 } from "@xyflow/react";
-import { Box, Text, HStack, Icon, Badge, Button } from "@chakra-ui/react";
-import { RiDeleteBin7Line } from "react-icons/ri";
+import { Box, HStack, Icon } from "@chakra-ui/react";
+import { RiDeleteBin5Line } from "react-icons/ri";
 import { FaRegCopy } from "react-icons/fa";
 import FloatingEdge from "../floatingEdge/FloatingEdge";
 import ZAPText from "@ZAPComponents/Text";
-
-// import FloatingEdge from "./FloatingEdge";
-
 export default function CustomNode({ id, data, xPos, yPos }) {
   const [hovered, setHovered] = useState(false);
 
@@ -26,7 +23,7 @@ export default function CustomNode({ id, data, xPos, yPos }) {
 
   const sourceX = xPos + NODE_WIDTH;
   const sourceY = yPos + NODE_HEIGHT / 2;
-  
+
 
   return (
     <Box
@@ -52,29 +49,38 @@ export default function CustomNode({ id, data, xPos, yPos }) {
           </ZAPText>
         </HStack>
       </NodeToolbar>
-       {
-            data.action !== 'trigger' &&  <NodeToolbar
-        isVisible={hovered}
-        position={Position.Bottom}
-        align="end"
-        offset={-3}
-      >
-        <HStack
-          bg="gray.800"
-          color="white"
-          px={3}
-          py={1}
-          borderRadius="md"
-          boxShadow="md"
-          cursor="pointer"
-          pointerEvents="auto"
+      {
+        data.action !== 'trigger' && <NodeToolbar
+          isVisible={hovered}
+          position={Position.Bottom}
+          align="center"
+          offset={-3}
         >
-          <Icon as={RiDeleteBin7Line} boxSize={4} onClick={() => data?.deleteNode(id)} />
-          {!data?.action && <Icon as={FaRegCopy} boxSize={4} />}
-        </HStack>
-      </NodeToolbar>
-          }
-     
+          <HStack
+            bg="var(--zaplane-border-color)"
+            color="black"
+            p="6px"
+            marginTop="4px"
+            borderRadius="full"
+            boxShadow="lg"
+            cursor="pointer"
+            pointerEvents="auto"
+             _hover={{ bg: "red.300" }}
+          >
+            <Icon
+              as={RiDeleteBin5Line}
+              boxSize={4}
+              cursor="pointer"
+              onClick={(e) => {
+                e.stopPropagation();
+                data?.deleteNode(id);
+              }}
+            />
+            {!data?.action && <Icon as={FaRegCopy} boxSize={4} />}
+          </HStack>
+        </NodeToolbar>
+      }
+
       <Box
         bg="white"
         border="1px solid"

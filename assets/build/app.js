@@ -3256,8 +3256,6 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-// import FloatingEdge from "./FloatingEdge";
-
 function CustomNode({
   id,
   data,
@@ -3296,21 +3294,28 @@ function CustomNode({
     }), data.action !== 'trigger' && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.NodeToolbar, {
       isVisible: hovered,
       position: _xyflow_react__WEBPACK_IMPORTED_MODULE_2__.Position.Bottom,
-      align: "end",
+      align: "center",
       offset: -3,
       children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.HStack, {
-        bg: "gray.800",
-        color: "white",
-        px: 3,
-        py: 1,
-        borderRadius: "md",
-        boxShadow: "md",
+        bg: "var(--zaplane-border-color)",
+        color: "black",
+        p: "6px",
+        marginTop: "4px",
+        borderRadius: "full",
+        boxShadow: "lg",
         cursor: "pointer",
         pointerEvents: "auto",
+        _hover: {
+          bg: "red.300"
+        },
         children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Icon, {
-          as: react_icons_ri__WEBPACK_IMPORTED_MODULE_6__.RiDeleteBin7Line,
+          as: react_icons_ri__WEBPACK_IMPORTED_MODULE_6__.RiDeleteBin5Line,
           boxSize: 4,
-          onClick: () => data?.deleteNode(id)
+          cursor: "pointer",
+          onClick: e => {
+            e.stopPropagation();
+            data?.deleteNode(id);
+          }
         }), !data?.action && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Icon, {
           as: react_icons_fa__WEBPACK_IMPORTED_MODULE_7__.FaRegCopy,
           boxSize: 4
