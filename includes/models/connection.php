@@ -2,8 +2,9 @@
 
 namespace Zaplane\Models;
 
+use Zaplane\Framework\Classes\Encryption;
 use Zaplane\Framework\Database\ORM\Model;
-use Zaplane\Encryption;
+use Zaplane\Framework\Database\ORM\Collection;
 
 if (!defined('ABSPATH')) exit;
 
@@ -109,7 +110,7 @@ class Connection extends Model
         return $this->user_id === $userId;
     }
 
-    public static function forUser(int $userId, ?string $app = null): array
+    public static function forUser(int $userId, ?string $app = null): Collection
     {
         $query = static::where('user_id', $userId);
 
@@ -120,12 +121,12 @@ class Connection extends Model
         return $query->orderBy('name', 'asc')->get();
     }
 
-    public static function forApp(string $app): array
+    public static function forApp(string $app): Collection
     {
         return static::where('app', $app)->get();
     }
 
-    public static function active(): array
+    public static function active(): Collection
     {
         return static::where('status', 'active')->get();
     }

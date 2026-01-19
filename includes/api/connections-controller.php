@@ -14,9 +14,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-/**
- * REST API Controller for Connection Management
- */
 class ConnectionsController extends WP_REST_Controller {
 
 	protected Container $container;
@@ -27,9 +24,6 @@ class ConnectionsController extends WP_REST_Controller {
 		$this->rest_base = 'connections';
 	}
 
-	/**
-	 * Register REST API routes
-	 */
 	public function register_routes() {
 		// List user's connections
 		register_rest_route(
@@ -162,16 +156,10 @@ class ConnectionsController extends WP_REST_Controller {
 		);
 	}
 
-	/**
-	 * Permission check for general endpoints
-	 */
 	public function permissions_check( $request ) {
 		return is_user_logged_in();
 	}
 
-	/**
-	 * Permission check for item-specific endpoints
-	 */
 	public function item_permissions_check( $request ) {
 		if ( ! is_user_logged_in() ) {
 			return new WP_Error(
@@ -197,9 +185,6 @@ class ConnectionsController extends WP_REST_Controller {
 		return true;
 	}
 
-	/**
-	 * Get all connections for current user
-	 */
 	public function get_items( $request ) {
 		$user_id = get_current_user_id();
 		$app = $request->get_param( 'app' );
@@ -214,9 +199,6 @@ class ConnectionsController extends WP_REST_Controller {
 		);
 	}
 
-	/**
-	 * Create a new connection (API Key flow)
-	 */
 	public function create_item( $request ) {
 		$user_id = get_current_user_id();
 		$app = $request->get_param( 'app' );
@@ -255,9 +237,6 @@ class ConnectionsController extends WP_REST_Controller {
 		);
 	}
 
-	/**
-	 * Get a single connection
-	 */
 	public function get_item( $request ) {
 		$connection_id = (int) $request->get_param( 'id' );
 
@@ -275,9 +254,6 @@ class ConnectionsController extends WP_REST_Controller {
 		return rest_ensure_response( $connection );
 	}
 
-	/**
-	 * Update a connection
-	 */
 	public function update_item( $request ) {
 		$connection_id = (int) $request->get_param( 'id' );
 		$manager = $this->get_connection_manager();
@@ -310,9 +286,6 @@ class ConnectionsController extends WP_REST_Controller {
 		return rest_ensure_response( $connection );
 	}
 
-	/**
-	 * Delete a connection
-	 */
 	public function delete_item( $request ) {
 		$connection_id = (int) $request->get_param( 'id' );
 
@@ -335,9 +308,6 @@ class ConnectionsController extends WP_REST_Controller {
 		);
 	}
 
-	/**
-	 * Test a connection
-	 */
 	public function test_connection( $request ) {
 		$connection_id = (int) $request->get_param( 'id' );
 
@@ -347,9 +317,6 @@ class ConnectionsController extends WP_REST_Controller {
 		return rest_ensure_response( $result );
 	}
 
-	/**
-	 * Initialize OAuth flow
-	 */
 	public function init_oauth( $request ) {
 		$user_id = get_current_user_id();
 		$app = $request->get_param( 'app' );
@@ -370,9 +337,6 @@ class ConnectionsController extends WP_REST_Controller {
 		}
 	}
 
-	/**
-	 * Handle OAuth callback from provider
-	 */
 	public function oauth_callback( $request ) {
 		// Check for OAuth error from provider
 		$error = $request->get_param( 'error' );
@@ -398,14 +362,10 @@ class ConnectionsController extends WP_REST_Controller {
 		return $this->oauth_redirect_response( true, 'Connection created successfully', $result );
 	}
 
-	/**
-	 * Get auth fields for an integration
-	 */
 	public function get_auth_fields( $request ) {
 		$app = $request->get_param( 'app' );
 		$auth_type = $request->get_param( 'auth_type' );
 
-		IntegrationLoader::init();
 		$integration = IntegrationLoader::get( $app );
 
 		if ( ! $integration ) {
@@ -434,9 +394,6 @@ class ConnectionsController extends WP_REST_Controller {
 		return rest_ensure_response( $response );
 	}
 
-	/**
-	 * Generate OAuth redirect response (HTML page that posts message to opener)
-	 */
 	private function oauth_redirect_response( bool $success, string $message, ?int $connection_id = null ): WP_REST_Response {
 		$data = array(
 			'success'       => $success,
@@ -483,23 +440,14 @@ HTML;
 		return $response;
 	}
 
-	/**
-	 * Get ConnectionManager instance
-	 */
 	private function get_connection_manager(): ConnectionManager {
 		return $this->container->get( 'connections' );
 	}
 
-	/**
-	 * Get OAuthHandler instance
-	 */
 	private function get_oauth_handler(): OAuthHandler {
 		return $this->container->get( 'oauth' );
 	}
 
-	/**
-	 * Arguments for create endpoint
-	 */
 	private function get_create_args(): array {
 		return array(
 			'app'         => array(
@@ -525,9 +473,6 @@ HTML;
 		);
 	}
 
-	/**
-	 * Arguments for update endpoint
-	 */
 	private function get_update_args(): array {
 		return array(
 			'name'        => array(

@@ -14,6 +14,10 @@ use Zaplane\Models\Connection;
 
 class ConnectionManager
 {
+    /**
+     * @throws ConnectionException
+     * @throws IntegrationException
+     */
     public function create(int $user_id, string $app, string $name, string $auth_type, array $credentials)
     {
         $integration = IntegrationLoader::get($app);
@@ -36,10 +40,6 @@ class ConnectionManager
             'status' => 'active',
         ]);
 
-        if (!$connection) {
-            throw ConnectionException::createFailed($app, 'Database insert failed');
-        }
-
         return $connection->id;
     }
 
@@ -59,6 +59,7 @@ class ConnectionManager
             } catch (EncryptionException $e) {
                 $data['credentials'] = [];
                 $data['decrypt_error'] = $e->getMessage();
+            } catch (\Exception $e) {
             }
         }
 
@@ -69,18 +70,7 @@ class ConnectionManager
     {
         $connections = Connection::forUser($user_id, $app);
 
-        return array_map(fn($c) => [
-            'id' => $c->id,
-            'user_id' => $c->user_id,
-            'app' => $c->app,
-            'name' => $c->name,
-            'auth_type' => $c->auth_type,
-            'status' => $c->status,
-            'last_used_at' => $c->last_used_at,
-            'last_tested_at' => $c->last_tested_at,
-            'last_test_status' => $c->last_test_status,
-            'created_at' => $c->created_at,
-        ], $connections);
+        return $connections->toArray();
     }
 
     public function update(int $id, array $data): bool
@@ -159,14 +149,14 @@ class ConnectionManager
             throw ConnectionException::testFailed($id, 'Failed to decrypt credentials');
         }
 
-        IntegrationLoader::init();
-        $integration = IntegrationLoader::get($connection->app);
-
-        if (!$integration) {
+        if (!IntegrationLoader::has($connection->app)) {
             throw IntegrationException::notFound($connection->app);
         }
 
-        $result = $integration::test_connection($credentials);
+        $integration = IntegrationLoader::get($connection->app);
+        $class = get_class($integration);
+
+        $result = $class::test_connection($credentials);
 
         $connection->markAsTested($result['success'] ?? false);
 
@@ -213,15 +203,15 @@ class ConnectionManager
             return $credentials;
         }
 
-        IntegrationLoader::init();
-        $integration = IntegrationLoader::get($connection->app);
-
-        if (!$integration) {
+        if (!IntegrationLoader::has($connection->app)) {
             return $credentials;
         }
 
+        $integration = IntegrationLoader::get($connection->app);
+        $class = get_class($integration);
+
         try {
-            $new_tokens = $integration::refresh_oauth_token($refresh_token);
+            $new_tokens = $class::refresh_oauth_token($refresh_token);
             $credentials = array_merge($credentials, $new_tokens);
 
             $connection->setCredentials($credentials);

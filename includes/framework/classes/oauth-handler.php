@@ -6,6 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use Zaplane\Framework\Core\IntegrationLoader;
+use Zaplane\Framework\Exceptions\ConnectionException;
 use Zaplane\Framework\Exceptions\IntegrationException;
 use Zaplane\Framework\Exceptions\OAuthException;
 
@@ -19,14 +20,22 @@ class OAuthHandler {
 		$this->connections = $connections;
 	}
 
-	public function init_flow( string $app, int $user_id, string $connection_name ): array {
-		$integration = IntegrationLoader::get( $app );
-
-		if ( ! $integration ) {
+    /**
+     * @throws OAuthException
+     * @throws IntegrationException
+     */
+    public function init_flow(string $app, int $user_id, string $connection_name, array $credentials ): array {
+		// Check if integration exists
+		if ( ! IntegrationLoader::has( $app ) ) {
 			throw IntegrationException::notFound( $app );
 		}
 
-		if ( $integration::get_auth_type() !== 'oauth2' ) {
+		// Get integration class
+		$integration = IntegrationLoader::get( $app );
+		$class = get_class( $integration );
+
+		// Check if integration supports OAuth2
+		if ( $class::get_auth_type() !== 'oauth2' && $class::get_auth_type() !== 'both' ) {
 			throw OAuthException::notSupported( $app );
 		}
 
@@ -37,11 +46,12 @@ class OAuthHandler {
 				'app'         => $app,
 				'user_id'     => $user_id,
 				'name'        => $connection_name,
-				'credentials' => $credentials, // Store for token exchange
+				'credentials' => $credentials,
 			)
 		);
 
-		$auth_url = $integration::get_oauth_auth_url( $redirect_uri, $state );
+		// Get OAuth authorization URL
+		$auth_url = $class::get_oauth_auth_url( $redirect_uri, $state, $credentials );
 
 		if ( ! $auth_url ) {
 			throw OAuthException::authUrlFailed( $app );
@@ -53,7 +63,12 @@ class OAuthHandler {
 		);
 	}
 
-	public function handle_callback( string $state, string $code ): int {
+    /**
+     * @throws OAuthException
+     * @throws IntegrationException
+     * @throws ConnectionException
+     */
+    public function handle_callback(string $state, string $code ): int {
 		$state_data = $this->validate_state( $state );
 
 		if ( ! $state_data ) {
@@ -65,18 +80,18 @@ class OAuthHandler {
 		$name = $state_data['name'];
 		$credentials = $state_data['credentials'] ?? array();
 
-		// Ensure registry is loaded
-		IntegrationLoader::init();
-		$integration = IntegrationLoader::get( $app );
-
-		if ( ! $integration ) {
+		// Get integration class
+		if ( ! IntegrationLoader::has( $app ) ) {
 			throw IntegrationException::notFound( $app );
 		}
+
+		$integration = IntegrationLoader::get( $app );
+		$class = get_class( $integration );
 
 		$redirect_uri = self::get_callback_url();
 
 		try {
-			$tokens = $integration::exchange_oauth_code( $code, $redirect_uri );
+			$tokens = $class::exchange_oauth_code( $code, $redirect_uri, $credentials );
 		} catch ( \Throwable $e ) {
 			throw OAuthException::tokenExchangeFailed( $app, $e->getMessage() );
 		}
@@ -85,12 +100,12 @@ class OAuthHandler {
 			throw OAuthException::noAccessToken( $app );
 		}
 
-		$connection_id = $this->connections->create(
+        $connection_id = $this->connections->create(
 			$user_id,
 			$app,
 			$name,
 			'oauth2',
-			$final_credentials
+            $credentials
 		);
 
 		if ( isset( $tokens['expires_in'] ) ) {

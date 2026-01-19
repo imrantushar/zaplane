@@ -25,6 +25,7 @@ class CreateConnectionsTable extends Migration
             $table->datetime('last_tested_at')->nullable();
             $table->string('last_test_status', 20)->nullable();
             $table->datetime('created_at')->nullable()->useCurrent();
+            $table->datetime('updated_at')->nullable()->useCurrent()->useCurrentOnUpdate();
 
             $table->index('user_id');
             $table->index('app');
