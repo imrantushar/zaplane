@@ -2919,6 +2919,8 @@ const CreateWorkflows = () => {
             render: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_20__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.Text, {
               fontWeight: "500",
               m: 0,
+              onClick: () => navigate(`${_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_10__.route_path}admin.php?page=zaplane-workflows&action=edit&id=${row.id}`),
+              cursor: "pointer",
               children: row.title
             })
           }, {
