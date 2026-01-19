@@ -1,5 +1,228 @@
-.zaplane-wp-modal{
-       width: 600px;
+body.ReactModal__Body--open {
+    overflow: hidden;
+}
 
+.quizleap-react-modal {
+    position: relative;
+    background: var(--quizleap-background);
+    border-radius: 6px;
+    transition: all ease 0.8s;
+    * {
+        font-family: var(--quizleap-font);
+    }
+    &--small {
+        width: 600px;
+    }
+    &--medium {
+        width: 1020px;
+    }
+    &--large {
+        width: calc(100vw - 17px);
+        min-height: 100vh;
+    }
 
+    &__head {
+        display: flex;
+        gap: 10px;
+        justify-content: space-between;
+        flex-direction: row;
+        align-items: center;
+        margin: 0 24px;
+        padding: 20px 0;
+        border-bottom: 1px solid var(--quizleap-border-color);
+        &-title {
+            font-size: 18px;
+            font-weight: 500;
+            color: var(--quizleap-font-color);
+            margin: 0;
+        }
+        p {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-right: auto;
+            font-size: 14px;
+            font-weight: 500;
+            line-height: 20px;
+            .quizleap-icon--angle-right {
+                position: relative;
+                right: 0;
+                rotate: none;
+                &::before {
+                    font-size: 12px;
+                    color: #0F0E16;
+                }
+            }
+        }
+        .quizleap-react-modal-buttons {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            button {
+                padding: 8px;
+                width: 24px;
+                height: 24px;
+                background: var(--quizleap-background);
+                color: var(--quizleap-font-color);
+                border: 1px solid var(--quizleap-border-color) !important;
+                border-radius: 4px;
+                display: flex;
+                transition: all .3s ease;
+                justify-content: center;
+                align-items: center;
+                font-size: 16px;
+                cursor: pointer;
+                &:hover {
+                    border-color: var(--quizleap-primary) !important;
+                    .quizleap-icon {
+                        &--close {
+                            transition: all .3s ease;
+                            &::before {
+                                color: var(--quizleap-primary);
+                            }
+                        }
+                    }
+                }
+                .quizleap-icon {
+                    &--close {
+                        &::before {
+                            transition: all .3s ease;
+                        }
+                    }
+                }
+            }
+            
+            .quizleap-course-submit-btn {
+                display: flex;
+                gap: 12px;
+                align-items: center;
+                .quizleap-custom-select {
+                    &--submit-box {
+                        .quizleap-custom-select {
+                            &--container {
+                                width: 100px;
+                                min-height: 40px;
+                            }
+                            &--single-value {
+                                padding: 0;
+                            }
+                            .quizleap-select-single-label {
+                                margin: 0;
+                                padding: 0 12px;
+                            }
+                        }
+                    }
+                }
+
+                .quizleap-btn {
+                    &--preset-gray {
+                        border: 1px solid var(--quizleap-border-color);
+                    }
+                    &--submit-box {
+                        min-width: 105px;
+                        height: 40px;
+                        padding: 4px 8px;
+                    }
+                }
+            }
+        }
+    }
+
+    &__content {
+        background: var(--quizleap-background);
+        padding: 24px;
+        .quizleap-btn-close-modal {
+            position: absolute;
+            right: -12px;
+            top: -12px;
+            background: #fff;
+            border: none;
+            padding: 8px;
+            border-radius: 50%;
+            cursor: pointer;
+            &:hover {
+                .quizleap-icon--close {
+                    &::before {
+                        color: var(--quizleap-primary);
+                    }
+                }
+            }
+        }
+
+        .quizleap-editor {
+            padding: unset;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            margin-bottom: 10px;
+            &__title {
+                margin-bottom: 0;
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+                &-input {
+                    font-weight: 400;
+                    font-size: 14px;
+                    height: 40px;
+                    background: #FFFFFF;
+                    border: 1px solid var(--quizleap-border-color) !important;
+                    border-radius: 4px;
+                    margin: 0;
+                }
+            }
+            &-title {
+                font-weight: 500;
+                font-size: 16px;
+                line-height: 19px;
+                display: flex;
+                align-items: center;
+                letter-spacing: 0.02em;
+                color: #1C1F22;
+            }
+            .mce-tinymce {
+                .mce-toolbar-grp {
+                    border-bottom: unset !important;
+                    background: transparent !important;
+                }
+            }
+            &-tinymce-wrapper {
+                // border-radius: 10px;
+                // border: 1px solid var(--quizleap-border-color);
+                // box-sizing: border-box;
+                // overflow: hidden;
+            }
+        }
+
+        .quizleap-table__table {
+            overflow-x: scroll;
+        }
+    }
+
+    &__footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        margin: 0 24px;
+        padding: 20px 0;
+        border-top: 1px solid var(--quizleap-border-color);
+        background: var(--quizleap-background);
+        .quizleap-btn {
+            &--cancel {
+                background: transparent;
+            }
+        }
+    }
+}
+
+// modal scrollbar hide
+.quizleap-react-modal {
+    &__content {
+        -ms-overflow-style: none; /* for Internet Explorer, Edge */
+        scrollbar-width: none; /* for Firefox */
+        overflow-y: scroll;
+    }
+
+    &__content::-webkit-scrollbar {
+        display: none; /* for Chrome, Safari, and Opera */
+    }
 }

@@ -482,8 +482,227 @@
 /*!*************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/@wordpress/scripts/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./dev_zaplane/components/Modal/styles.scss ***!
   \*************************************************************************************************************************************************************************************************************************************************************************************************/
-.zaplane-wp-modal {
+body.ReactModal__Body--open {
+  overflow: hidden;
+}
+
+.quizleap-react-modal {
+  position: relative;
+  background: var(--quizleap-background);
+  border-radius: 6px;
+  transition: all ease 0.8s;
+}
+
+.quizleap-react-modal * {
+  font-family: var(--quizleap-font);
+}
+
+.quizleap-react-modal--small {
   width: 600px;
+}
+
+.quizleap-react-modal--medium {
+  width: 1020px;
+}
+
+.quizleap-react-modal--large {
+  width: calc(100vw - 17px);
+  min-height: 100vh;
+}
+
+.quizleap-react-modal__head {
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+  flex-direction: row;
+  align-items: center;
+  margin: 0 24px;
+  padding: 20px 0;
+  border-bottom: 1px solid var(--quizleap-border-color);
+}
+
+.quizleap-react-modal__head-title {
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--quizleap-font-color);
+  margin: 0;
+}
+
+.quizleap-react-modal__head p {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+}
+
+.quizleap-react-modal__head p .quizleap-icon--angle-right {
+  position: relative;
+  left: 0;
+  rotate: none;
+}
+
+.quizleap-react-modal__head p .quizleap-icon--angle-right::before {
+  font-size: 12px;
+  color: #0F0E16;
+}
+
+.quizleap-react-modal__head .quizleap-react-modal-buttons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.quizleap-react-modal__head .quizleap-react-modal-buttons button {
+  padding: 8px;
+  width: 24px;
+  height: 24px;
+  background: var(--quizleap-background);
+  color: var(--quizleap-font-color);
+  border: 1px solid var(--quizleap-border-color) !important;
+  border-radius: 4px;
+  display: flex;
+  transition: all 0.3s ease;
+  justify-content: center;
+  align-items: center;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.quizleap-react-modal__head .quizleap-react-modal-buttons button:hover {
+  border-color: var(--quizleap-primary) !important;
+}
+
+.quizleap-react-modal__head .quizleap-react-modal-buttons button:hover .quizleap-icon--close {
+  transition: all 0.3s ease;
+}
+
+.quizleap-react-modal__head .quizleap-react-modal-buttons button:hover .quizleap-icon--close::before {
+  color: var(--quizleap-primary);
+}
+
+.quizleap-react-modal__head .quizleap-react-modal-buttons button .quizleap-icon--close::before {
+  transition: all 0.3s ease;
+}
+
+.quizleap-react-modal__head .quizleap-react-modal-buttons .quizleap-course-submit-btn {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.quizleap-react-modal__head .quizleap-react-modal-buttons .quizleap-course-submit-btn .quizleap-custom-select--submit-box .quizleap-custom-select--container {
+  width: 100px;
+  min-height: 40px;
+}
+
+.quizleap-react-modal__head .quizleap-react-modal-buttons .quizleap-course-submit-btn .quizleap-custom-select--submit-box .quizleap-custom-select--single-value {
+  padding: 0;
+}
+
+.quizleap-react-modal__head .quizleap-react-modal-buttons .quizleap-course-submit-btn .quizleap-custom-select--submit-box .quizleap-custom-select .quizleap-select-single-label {
+  margin: 0;
+  padding: 0 12px;
+}
+
+.quizleap-react-modal__head .quizleap-react-modal-buttons .quizleap-course-submit-btn .quizleap-btn--preset-gray {
+  border: 1px solid var(--quizleap-border-color);
+}
+
+.quizleap-react-modal__head .quizleap-react-modal-buttons .quizleap-course-submit-btn .quizleap-btn--submit-box {
+  min-width: 105px;
+  height: 40px;
+  padding: 4px 8px;
+}
+
+.quizleap-react-modal__content {
+  background: var(--quizleap-background);
+  padding: 24px;
+}
+
+.quizleap-react-modal__content .quizleap-btn-close-modal {
+  position: absolute;
+  left: -12px;
+  top: -12px;
+  background: #fff;
+  border: none;
+  padding: 8px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.quizleap-react-modal__content .quizleap-btn-close-modal:hover .quizleap-icon--close::before {
+  color: var(--quizleap-primary);
+}
+
+.quizleap-react-modal__content .quizleap-editor {
+  padding: unset;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  margin-bottom: 10px;
+}
+
+.quizleap-react-modal__content .quizleap-editor__title {
+  margin-bottom: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.quizleap-react-modal__content .quizleap-editor__title-input {
+  font-weight: 400;
+  font-size: 14px;
+  height: 40px;
+  background: #FFFFFF;
+  border: 1px solid var(--quizleap-border-color) !important;
+  border-radius: 4px;
+  margin: 0;
+}
+
+.quizleap-react-modal__content .quizleap-editor-title {
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 19px;
+  display: flex;
+  align-items: center;
+  letter-spacing: 0.02em;
+  color: #1C1F22;
+}
+
+.quizleap-react-modal__content .quizleap-editor .mce-tinymce .mce-toolbar-grp {
+  border-bottom: unset !important;
+  background: transparent !important;
+}
+
+.quizleap-react-modal__content .quizleap-table__table {
+  overflow-x: scroll;
+}
+
+.quizleap-react-modal__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin: 0 24px;
+  padding: 20px 0;
+  border-top: 1px solid var(--quizleap-border-color);
+  background: var(--quizleap-background);
+}
+
+.quizleap-react-modal__footer .quizleap-btn--cancel {
+  background: transparent;
+}
+
+.quizleap-react-modal__content {
+  -ms-overflow-style: none; /* for Internet Explorer, Edge */
+  scrollbar-width: none; /* for Firefox */
+  overflow-y: scroll;
+}
+
+.quizleap-react-modal__content::-webkit-scrollbar {
+  display: none; /* for Chrome, Safari, and Opera */
 }
 /*!**********************************************************************************************************************************************************************************************!*\
   !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[2].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[2].use[2]!./node_modules/@xyflow/react/dist/base.css ***!

@@ -5,7 +5,6 @@
         "@ZAPContainers/*": ["containers/*"],
         "@ZAPComponents/*": ["components/*"],
         "@ZAPCustomizer/*": ["customizer/*"],
-        //@ZAPages/*": ["containers/pages/*"],
         "@ZAPGlobal/*": ["global/*"],
         "@ZAPRedux/*": ["redux/*"],
         "@ZAPUtils/*": ["utils/*"],

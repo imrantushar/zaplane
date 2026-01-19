@@ -8,9 +8,7 @@ export default function Workflows({ id }) {
     <ReactFlowProvider>
       <div style={{ display: "flex", height: "100vh" }}>
         <Formik
-          initialValues={
-            {
-            }}
+          initialValues={{ }}
 
           onSubmit={(values) => {
             console.log("Final Values", values);

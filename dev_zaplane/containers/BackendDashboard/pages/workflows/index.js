@@ -186,7 +186,7 @@ const CreateWorkflows = () => {
                   </Text>
                 ),
               },
-                {
+              {
                 label: __("Status", "zaplane"),
                 key: "status",
                 textAlign: "center",
