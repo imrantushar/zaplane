@@ -18,6 +18,10 @@
   --zaplane-gray: #F6F7F8;
 }
 
+body {
+  overflow: hidden;
+}
+
 #wpbody-content {
   padding: 0;
 }

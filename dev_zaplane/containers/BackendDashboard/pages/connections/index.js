@@ -193,7 +193,7 @@ const Connections = () => {
                                 render: (row) => (
                                     <HStack>
                                         {row.app === "slack" && <FaSlack />}
-                                        <Text>{row.name}</Text>
+                                        <Text>{__(row.name, 'zaplane')}</Text>
                                     </HStack>
                                 ),
                             },
@@ -232,14 +232,14 @@ const Connections = () => {
                                 onClick={() => dispatch(testConnection(row.id))}
                                 leftIcon={<FiRefreshCw />}
                             >
-                                Test
+                                {__('Test', 'zaplane')}
                             </Button>
                                 <Button
                                     size="xs"
                                     onClick={() => openDetails(row)}
                                     leftIcon={<FiEye />}
                                 >
-                                    Details
+                                    {__('Details', 'zaplane')}
                                 </Button>
                                 <Button
                                     size="xs"
@@ -249,7 +249,7 @@ const Connections = () => {
                                         dispatch(deleteConnection(row.id))
                                     }
                                 >
-                                    Delete
+                                      {__('Delete', 'zaplane')}
                                 </Button>
                             </>
                         )}
@@ -257,90 +257,90 @@ const Connections = () => {
                 </Box>
             </Box>
             <ConnectionDetails
-                    isOpen={detailsOpen}
-                    onClose={() => setDetailsOpen(false)}
-                    singleData={singleData}
-                />          
-                <WPModal
-                    title={__("Create credential", "zaplane")}
-                    isOpen={isModalOpen}
-                    onRequestClose={() => setIsModalOpen(false)}
-                    size="medium"
-                >
-                    <Box px={4}>
-                        <VStack spacing={4} align="stretch">
-                            <Text>{__("Select an app or service to connect", "zaplane")}</Text>
+                isOpen={detailsOpen}
+                onClose={() => setDetailsOpen(false)}
+                singleData={singleData}
+            />
+            <WPModal
+                title={__("Create credential", "zaplane")}
+                isOpen={isModalOpen}
+                onRequestClose={() => setIsModalOpen(false)}
+                size="medium"
+            >
+                <Box px={4}>
+                    <VStack spacing={4} align="stretch">
+                        <Text>{__("Select an app or service to connect", "zaplane")}</Text>
 
-                            <Select
-                                value={selectedApp}
-                                onChange={(val) => {
-                                    setSelectedApp(val);
-                                    setSelectedAuthType(null);
+                        <Select
+                            value={selectedApp}
+                            onChange={(val) => {
+                                setSelectedApp(val);
+                                setSelectedAuthType(null);
+                                setCredentials({});
+                            }}
+                            options={[{ value: "slack", label: "Slack" }]}
+                        />
+                        {Object.keys(authTypes).map((key) => (
+                            <Button
+                                key={key}
+                                variant={selectedAuthType === key ? "solid" : "outline"}
+                                colorScheme="blue"
+                                onClick={() => {
+                                    setSelectedAuthType(key);
                                     setCredentials({});
                                 }}
-                                options={[{ value: "slack", label: "Slack" }]}
-                            />
-                            {Object.keys(authTypes).map((key) => (
-                                <Button
-                                    key={key}
-                                    variant={selectedAuthType === key ? "solid" : "outline"}
-                                    colorScheme="blue"
-                                    onClick={() => {
-                                        setSelectedAuthType(key);
-                                        setCredentials({});
-                                    }}
-                                >
-                                    {key}
-                                </Button>
-                            ))}
-                            {authFields?.auth_fields && selectedAuthType && (
-                                <VStack spacing={3} align="stretch" pt={3}>
-                                    {Object.entries(authFields.auth_fields).map(
-                                        ([fieldKey, field]) => {
-                                            const value = credentials[fieldKey] || "";
-
-                                            return (
-                                                <Box key={fieldKey}>
-                                                    <ZAPText fontWeight="bold">{field.label}</ZAPText>
-                                                    <Input
-                                                        type={field.type === "password" ? "password" : "text"}
-                                                        placeholder={field.placeholder || ""}
-                                                        value={value}
-                                                        onChange={(e) =>
-                                                            setCredentials((prev) => ({
-                                                                ...prev,
-                                                                [fieldKey]: e.target.value,
-                                                            }))
-                                                        }
-                                                    />
-                                                    {field.help && (
-                                                        <ZAPText fontSize="sm" color="gray.500">
-                                                            {field.help}
-                                                        </ZAPText>
-                                                    )}
-                                                </Box>
-                                            );
-                                        }
-                                    )}
-                                </VStack>
-                            )}
-
-
-
-                            <Button
-                                width="220px"
-                                colorScheme="blue"
-                                onClick={handleConnect}
-                                isLoading={loadingOAuth}
-                                isDisabled={!selectedApp || !selectedAuthType}
                             >
-                                {selectedAuthType === "oauth2"
-                                    ? __("Connect with OAuth", "zaplane")
-                                    : __("Save Connection", "zaplane")}
+                                {key}
                             </Button>
-                        </VStack>
-                    </Box>
-                </WPModal>
+                        ))}
+                        {authFields?.auth_fields && selectedAuthType && (
+                            <VStack spacing={3} align="stretch" pt={3}>
+                                {Object.entries(authFields.auth_fields).map(
+                                    ([fieldKey, field]) => {
+                                        const value = credentials[fieldKey] || "";
+
+                                        return (
+                                            <Box key={fieldKey}>
+                                                <ZAPText fontWeight="bold">{field.label}</ZAPText>
+                                                <Input
+                                                    type={field.type === "password" ? "password" : "text"}
+                                                    placeholder={field.placeholder || ""}
+                                                    value={value}
+                                                    onChange={(e) =>
+                                                        setCredentials((prev) => ({
+                                                            ...prev,
+                                                            [fieldKey]: e.target.value,
+                                                        }))
+                                                    }
+                                                />
+                                                {field.help && (
+                                                    <ZAPText fontSize="sm" color="gray.500">
+                                                        {field.help}
+                                                    </ZAPText>
+                                                )}
+                                            </Box>
+                                        );
+                                    }
+                                )}
+                            </VStack>
+                        )}
+
+
+
+                        <Button
+                            width="220px"
+                            colorScheme="blue"
+                            onClick={handleConnect}
+                            isLoading={loadingOAuth}
+                            isDisabled={!selectedApp || !selectedAuthType}
+                        >
+                            {selectedAuthType === "oauth2"
+                                ? __("Connect with OAuth", "zaplane")
+                                : __("Save Connection", "zaplane")}
+                        </Button>
+                    </VStack>
+                </Box>
+            </WPModal>
         </>
     );
 };

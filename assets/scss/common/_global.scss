@@ -14,6 +14,9 @@
     --zaplane-shadow-2: 0px 0px 1px 0px rgba(16, 24, 40, 0.15), 0px 8px 16px 0px rgba(20, 26, 36, 0.1);
     --zaplane-gray: #F6F7F8;
 }
+body{
+    overflow: hidden;
+}
 #wpbody-content{
     padding: 0
 }

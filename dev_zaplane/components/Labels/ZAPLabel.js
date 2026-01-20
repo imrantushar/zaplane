@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { Text, Button, Flex } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
 

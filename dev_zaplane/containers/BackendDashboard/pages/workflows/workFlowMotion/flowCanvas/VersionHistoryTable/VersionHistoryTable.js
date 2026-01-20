@@ -19,19 +19,6 @@ const VersionHistoryTable = ({
 }) => {
   const dispatch = useDispatch()
   const { isLoading } = useSelector((state) => state.workflows);
-  const statusStyle = (isActive) => {
-    if (isActive === "1") {
-      return {
-        color: "green.600",
-        bg: "green.50",
-      };
-    }
-    return {
-      color: "gray.600",
-      bg: "gray.100",
-    };
-  };
-
   return (
     <ZAPTable
       data={versions}         
@@ -63,7 +50,8 @@ const VersionHistoryTable = ({
               py="0.5"
               rounded="md"
               fontSize="xs"
-              {...statusStyle(row.is_active)}
+              color={row.is_active === "1" ? "green.600" : "gray.600"}
+              bg={row.is_active === "1"? "green.50" : "gray.100"}
             >
               {row.is_active === "1" ? "Active" : "Inactive"}
             </Badge>

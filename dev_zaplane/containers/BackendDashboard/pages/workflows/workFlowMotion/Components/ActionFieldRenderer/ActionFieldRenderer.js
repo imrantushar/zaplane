@@ -91,9 +91,6 @@ const ActionFieldRenderer = ({
           value={
             value
           }
-          onChange={(val) =>
-            setFieldValue(field.key, val)
-          }
           field={field}
         />
       );

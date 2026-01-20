@@ -25,6 +25,7 @@ import Select from "react-select";
 import ActionFieldRenderer from "../Components/ActionFieldRenderer/ActionFieldRenderer";
 import ZAPTab from "@ZAPComponents/Tab";
 import { IoIosArrowForward } from "react-icons/io";
+import { __ } from "@wordpress/i18n";
 
 const APPS = Object.entries(integrations.apps || {}).map(([key, value]) => ({
     id: value.slug || key,
@@ -219,6 +220,7 @@ export default function ActionDrawer({
         <ZAPDrawer
             open={open}
             onClose={resetAll}
+            closeOnOverlayClick={true}
             title={
                 !mode
                     ? "Add Action"
@@ -232,7 +234,7 @@ export default function ActionDrawer({
             footer={
                 <HStack justify="space-between">
                     <Button variant="ghost" onClick={resetAll}>
-                        Cancel
+                        {__("Cancel", "zaplane")}
                     </Button>
                     <Button onClick={handleContinue}>
                         {step === "test" ? "Submit" : "Continue"}
@@ -284,7 +286,7 @@ export default function ActionDrawer({
                             "& svg": { transform: "translateX(4px)" },
                         }}
                         onClick={() => setMode("app")}>
-                        <span>Apps</span>
+                        <span>{__("Apps", "zaplane")}</span>
                         <IoIosArrowForward />
                     </Button>
 
@@ -328,7 +330,7 @@ export default function ActionDrawer({
                         </Button>
                     ))}
                     <Button size="sm" variant="ghost" onClick={() => setMode(null)}>
-                        ← Back
+                        {__(' Back', 'zaplane')}
                     </Button>
                 </VStack>
             )}
@@ -374,7 +376,7 @@ export default function ActionDrawer({
                         {
                             value: "configure",
                             label: "Configure",
-                            content: <Text fontSize="sm">Configure step</Text>,
+                            content: <Text fontSize="sm">{__("Configure step", "zaplane")}</Text>,
                         },
                         {
                             value: "test",
@@ -393,9 +395,9 @@ export default function ActionDrawer({
                                             )
                                         }
                                     >
-                                        Run test
+                                        {__("Run test", "zaplane")}
                                     </Button>
-                                    <Code w="100%">Output</Code>
+                                    <Code w="100%">{__("Output", "zaplane")}</Code>
                                 </>
                             ),
                         },

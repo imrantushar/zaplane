@@ -86,3 +86,15 @@ export const mapNodesForBackend = (nodes) => {
 export const mapEdgesForBackend = (edges) => {
   return edges.map(({ type, ...edge }) => edge);
 };
+export const statusStyle = (status) => {
+  switch (status) {
+    case "completed":
+      return { color: "green.600", bg: "green.50" };
+    case "running":
+      return { color: "blue.600", bg: "blue.50" };
+    case "failed":
+      return { color: "red.600", bg: "red.50" };
+    default:
+      return { color: "gray.600", bg: "gray.50" };
+  }
+};
