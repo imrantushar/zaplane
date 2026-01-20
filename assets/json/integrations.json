@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-01-19 12:52:48",
+    "generated_at": "2026-01-20 08:32:36",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -2041,12 +2041,26 @@
                 },
                 "trash_post": {
                     "key": "trash_post",
-                    "label": "Trash Post",
+                    "label": "Trash Post / Page",
                     "schema": [
                         {
                             "key": "post_id",
                             "label": "ID",
                             "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "post_type",
+                            "label": "Post Type",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "post_types",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -2056,12 +2070,26 @@
                 },
                 "restore_post": {
                     "key": "restore_post",
-                    "label": "Restore Post from Trash",
+                    "label": "Restore Post / Page from Trash",
                     "schema": [
                         {
                             "key": "post_id",
                             "label": "ID",
                             "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "post_type",
+                            "label": "Post Type",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "post_types",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -2071,12 +2099,26 @@
                 },
                 "delete_trash_post": {
                     "key": "delete_trash_post",
-                    "label": "Delete Trash Post",
+                    "label": "Delete Trash Post / Page",
                     "schema": [
                         {
                             "key": "post_id",
                             "label": "ID",
                             "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "post_type",
+                            "label": "Post Type",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "post_types",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -2086,72 +2128,26 @@
                 },
                 "delete_post": {
                     "key": "delete_post",
-                    "label": "Delete Post",
+                    "label": "Delete Post / Page",
                     "schema": [
                         {
                             "key": "post_id",
                             "label": "ID",
                             "type": "expression",
                             "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "trash_page": {
-                    "key": "trash_page",
-                    "label": "Trash Page",
-                    "schema": [
+                        },
                         {
-                            "key": "post_id",
-                            "label": "ID",
-                            "type": "expression",
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "restore_page": {
-                    "key": "restore_page",
-                    "label": "Restore Page from Trash",
-                    "schema": [
-                        {
-                            "key": "post_id",
-                            "label": "ID",
-                            "type": "expression",
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "delete_trash_page": {
-                    "key": "delete_trash_page",
-                    "label": "Delete Trash Page",
-                    "schema": [
-                        {
-                            "key": "post_id",
-                            "label": "ID",
-                            "type": "expression",
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "delete_page": {
-                    "key": "delete_page",
-                    "label": "Delete Page",
-                    "schema": [
-                        {
-                            "key": "post_id",
-                            "label": "ID",
-                            "type": "expression",
+                            "key": "post_type",
+                            "label": "Post Type",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "post_types",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],

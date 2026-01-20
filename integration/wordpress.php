@@ -1852,13 +1852,13 @@ class Wordpress extends IntegrationBase {
                     'description'      => $description,
                     ]];
 
-                case 'delete_media':
+            case 'delete_media':
                     $attachment_id = $config['attachment_id'] ?? 0;
                     $force_delete  = $config['force_delete'] ?? false;
                     $result        = wp_delete_attachment( $attachment_id, $force_delete );
                     return ['port'=>'main', 'data'=>[ 'success' => $result ? true : false,  'attachment_id' => $attachment_id,  'force_delete'  => (bool) $force_delete,  ]];
                     
-                case 'rename_media':
+            case 'rename_media':
                     $media_id  = $config['media_id'] ?? 0;
                     $new_title = $config['new_title'] ?? '';
                     $result    = wp_update_post([
@@ -1867,7 +1867,7 @@ class Wordpress extends IntegrationBase {
                     ]);
                     return ['port'=>'main', 'data'=>[ 'success' => $result ? true : false,  'media_id' => $media_id,  'new_title'  => $new_title,  ]];
 
-                case 'get_media_all':
+            case 'get_media_all':
                     $media_posts = get_posts([
                         'post_type'      => 'attachment',
                         'post_status'    => 'inherit',
@@ -1890,7 +1890,7 @@ class Wordpress extends IntegrationBase {
                     }
                     return ['port' => 'main', 'data' => $media_items];
                     
-                case 'get_media_by_title':
+            case 'get_media_by_title':
                     $title       = $config['title'] ?? '';
                     $media_posts = get_posts([
                         'post_type'      => 'attachment',
@@ -1915,7 +1915,7 @@ class Wordpress extends IntegrationBase {
                     }
                     return ['port' => 'main', 'data' => $media_items];
 
-                case 'get_media_by_id':
+            case 'get_media_by_id':
                     $media_id   = $config['media_id'] ?? 0;
                     $media      = get_post( $media_id );
                     $media_item = [

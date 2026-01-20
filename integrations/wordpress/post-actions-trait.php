@@ -134,7 +134,14 @@ trait PostActionsTrait
     protected static function action_trash_post(array $config): array
     {
         $result = wp_trash_post($config['post_id'] ?? 0);
-        if (!$result) return static::error("Failed to untrash post");
+        if (!$result) return static::error("Failed to trash post");
+        return static::success(['post_id' => $config['post_id']]);
+    }
+
+    protected static function action_restore_post(array $config): array
+    {
+        $result = wp_untrash_post($config['post_id'] ?? 0);
+        if (!$result) return static::error("Failed to restore post");
         return static::success(['post_id' => $config['post_id']]);
     }
 
@@ -143,6 +150,166 @@ trait PostActionsTrait
         $result = wp_untrash_post($config['post_id'] ?? 0);
         if (!$result) return static::error("Failed to untrash post");
         return static::success(['post_id' => $config['post_id']]);
+    }
+
+    protected static function action_delete_trash_post(array $config): array
+    {
+        $result = wp_delete_post($config['post_id'] ?? 0);
+        if (!$result) return static::error("Failed to delete trash post");
+        return static::success(['post_id' => $config['post_id']]);
+    }
+
+    protected static function action_delete_post(array $config): array
+    {
+        $result = wp_delete_post($config['post_id'] ?? 0);
+        if (!$result) return static::error("Failed to delete trash post");
+        return static::success(['post_id' => $config['post_id']]);
+    }
+
+    protected static function action_get_posts_all(array $config): array
+    {
+        return static::success(
+            WordpressHelpers::get_posts()
+        );
+    }
+
+    protected static function action_get_post_single(array $config): array
+    {
+        return static::success(
+            WordpressHelpers::get_posts([
+                'post_id' => $config['post_id'] ?? 0
+            ])
+        );
+    }
+
+    protected static function action_get_posts_by_post_type(array $config): array
+    {
+        return static::success(
+            WordpressHelpers::get_posts([
+                'post_type' => $config['post_type'] ?? 'post'
+            ])
+        );
+    }
+
+    protected static function action_get_posts_by_metadata(array $config): array
+    {
+        return static::success(
+            WordpressHelpers::get_posts([
+                'post_type' => $config['post_type'] ?? 'post',
+                'meta_query' => [
+                        [
+                            'key'     => $config['meta_key'] ?? '',
+                            'value'   => $config['meta_value'] ?? '',
+                            'compare' => '=',
+                        ],
+                    ],
+            ])
+        );
+    }
+
+    protected static function action_get_post_metadata_single(array $config): array
+    {
+        $post_id = $config['post_id'] ?? 0;
+        $meta_key = $config['meta_key'] ?? '';
+        $meta_value = maybe_unserialize( get_post_meta( $post_id, $meta_key, true ) );
+        if (!$meta_value) return static::error("No meta value found for this key");
+        return static::success([
+            'post_id'    => $post_id,
+            'meta_key'   => $meta_key,
+            'meta_value' => $meta_value,
+        ]);
+    }
+
+    protected static function action_get_post_permalink(array $config): array
+    {
+        $post_id = $config['post_id'] ?? 0;
+        $permalink = get_permalink( $post_id );
+        if (!$permalink) return static::error("No permalink found for this key");
+        return static::success([
+            'post_id'   => $post_id,
+            'permalink' => $permalink,
+        ]);
+    }
+
+    protected static function action_get_post_content(array $config): array
+    {
+        $post_id = $config['post_id'] ?? 0;
+        $post = get_post( $post_id );
+        if (!$post) return static::error("No post found for this ID");
+        return static::success([
+            'post_id'      => $post_id,
+            'post_content' => $post->post_content,
+        ]);
+    }
+
+    protected static function action_get_post_excerpt(array $config): array
+    {
+        $post_id = $config['post_id'] ?? 0;
+        $post = get_post( $post_id );
+        if (!$post) return static::error("No post found for this ID");
+        return static::success([
+            'post_id'      => $post_id,
+            'post_excerpt' => $post->post_excerpt,
+        ]);
+    }
+
+    protected static function action_get_post_status(array $config): array
+    {
+        $post_id = $config['post_id'] ?? 0;
+        $post = get_post( $post_id );
+        if (!$post) return static::error("No post found for this ID");
+        return static::success([
+            'post_id'      => $post_id,
+            'post_status' => $post->post_status,
+        ]);
+    }
+    protected static function action_get_post_type_all(array $config): array
+    {
+        $post_types = WordpressHelpers::get_post_types();
+        return static::success($post_types);
+    }
+    protected static function action_get_post_type_single(array $config): array
+    {
+        $post_id = absint($config['post_id'] ?? 0);
+        $post_type_info = WordpressHelpers::get_post_type_by_post_id($post_id);
+        if (empty($post_type_info)) return static::error("Post type not found for this post");
+        return static::success($post_type_info);
+    }
+
+    protected static function action_register_post_type(array $config): array
+    {
+        $result = WordpressHelpers::register_post_type($config);
+        if (isset($result['error'])) {
+            return static::error($result['error']);
+        }
+        return static::success([
+            'post_type' => $result['post_type'],
+            'args'      => $result['args'],
+        ]);
+    }
+
+    protected static function action_unregister_post_type(array $config): array
+    {
+        $post_type = $config['post_type'] ?? '';
+        $result = unregister_post_type( $post_type );
+        if (!$result) return static::error("Failed to unregister post type : {$post_type}");
+        return static::success([
+            'post_type'=>$post_type,
+            'result'   =>$result,
+        ]);
+    }
+
+    protected static function action_add_post_type_support(array $config): array
+    {
+        $post_type = $config['post_type'] ?? '';
+        $features = $config['features'] ?? [];
+        foreach ( $features as $feature ) {
+            add_post_type_support( $post_type, $feature );
+        }
+        return static::success([
+            'post_type' =>$post_type,
+            'added'     =>$features,
+        ]);
     }
 
     protected static function action_set_featured_image(array $config): array

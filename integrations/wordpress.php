@@ -244,9 +244,9 @@ class Wordpress extends IntegrationBase {
         if ( $trigger === 'add_action' ) {
             return [
                 [
-                    'key' => 'hook_name',
-                    'label' => 'Hook Name',
-                    'type' => 'text',
+                    'key'      => 'hook_name',
+                    'label'    => 'Hook Name',
+                    'type'     => 'text',
                     'required' => true,
                 ],
             ];
@@ -529,7 +529,7 @@ class Wordpress extends IntegrationBase {
                     'username' => $user->user_login,
                 ];
 
-             case 'create_application_password' :
+            case 'create_application_password' :
                 $user_id      = $args[0] ?? 0;
                 $new_password = $args[1] ?? '';
                 if ( ! $user_id || empty( $new_password ) ) return false;
@@ -734,7 +734,7 @@ class Wordpress extends IntegrationBase {
             'delete_site'                   => ['label'=>'Delete Site'],
             'add_user_to_site'              => ['label'=>'Add User to Site'],
             'remove_user_from_site'         => ['label'=>'Remove User from Site'],
-            'untrash_post'                  => ['label'=>'Untrash Post'],// ///
+            'untrash_post'                  => ['label'=>'Untrash Post'],
             'untrash_comment'               => ['label'=>'Untrash Comment'],
             'update_comment_count'          => ['label'=>'Update Comment Count'],
             'set_comment_status'            => ['label'=>'Set Comment Status'],
@@ -761,14 +761,10 @@ class Wordpress extends IntegrationBase {
             'unschedule_post'               => ['label' => 'Unschedule Post'],
             'update_post_feature_image'     => ['label' => 'Update Post Featured Image'],
             'change_post_author'            => ['label' => 'Change Post Author'],
-            'trash_post'                    => ['label' => 'Trash Post'],
-            'restore_post'                  => ['label' => 'Restore Post from Trash'],
-            'delete_trash_post'             => ['label' => 'Delete Trash Post'],
-            'delete_post'                   => ['label' => 'Delete Post'],
-            'trash_page'                    => ['label' => 'Trash Page'],
-            'restore_page'                  => ['label' => 'Restore Page from Trash'],
-            'delete_trash_page'             => ['label' => 'Delete Trash Page'],
-            'delete_page'                   => ['label' => 'Delete Page'],
+            'trash_post'                    => ['label' => 'Trash Post / Page'],
+            'restore_post'                  => ['label' => 'Restore Post / Page from Trash'],
+            'delete_trash_post'             => ['label' => 'Delete Trash Post / Page'],
+            'delete_post'                   => ['label' => 'Delete Post / Page'],
             'get_posts_all'                 => ['label' => 'Get Post (All)'],
             'get_post_single'               => ['label' => 'Get Post (Single)'],
             'get_posts_by_post_type'        => ['label' => 'Get Posts by Post Type'],
@@ -839,9 +835,11 @@ class Wordpress extends IntegrationBase {
     private static function field_attachment_id(): array {
         return [['key'=>'attachment_id','label'=>'Attachment ID','type'=>'expression','required'=>true]];
     }
+
     private static function field_media_id(): array {
         return [['key'=>'media_id','label'=>'Media ID','type'=>'expression','required'=>true]];
     }
+    
     private static function field_media_title(): array {
         return [['key'=>'title','label'=>'Media Title','type'=>'text','required'=>true]];
     }
@@ -859,14 +857,6 @@ class Wordpress extends IntegrationBase {
             'untrash_post'           => self::field_post_id(),
             'update_comment_count'   => self::field_post_id(),
             'unschedule_post'        => self::field_post_id(),
-            'trash_post'             => self::field_post_id(),
-            'restore_post'           => self::field_post_id(),
-            'delete_trash_post'      => self::field_post_id(),
-            'delete_post'            => self::field_post_id(),
-            'trash_page'             => self::field_post_id(),
-            'restore_page'           => self::field_post_id(),
-            'delete_trash_page'      => self::field_post_id(),
-            'delete_page'            => self::field_post_id(),
             'get_post_single'        => self::field_post_id(),
             'get_posts_metadata_all' => self::field_post_id(),
             'get_post_permalink'     => self::field_post_id(),
@@ -892,6 +882,23 @@ class Wordpress extends IntegrationBase {
             'duplicate_post' => [
                 ...self::field_post_id(),
                 ...self::field_post_title(),
+                ...self::field_post_type(),
+            ],
+
+            'trash_post'             => [
+                ...self::field_post_id(),
+                ...self::field_post_type(),
+            ],
+            'restore_post'           => [
+                ...self::field_post_id(),
+                ...self::field_post_type(),
+            ],
+            'delete_trash_post'      => [
+                ...self::field_post_id(),
+                ...self::field_post_type(),
+            ],
+            'delete_post'            => [
+                ...self::field_post_id(),
                 ...self::field_post_type(),
             ],
 
