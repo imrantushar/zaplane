@@ -66,7 +66,7 @@ trait CommentActionsTrait
 
     protected static function action_unapproved_comment(array $config): array
     {
-       $comment_id = $config['comment_id'] ?? 0;
+        $comment_id = $config['comment_id'] ?? 0;
         $result = wp_set_comment_status( $comment_id, 'hold' );
         if (is_wp_error( $result ) || !$result) {
             return static::error("Failed to unapproved comment ID {$config['comment_id']}");
@@ -79,7 +79,7 @@ trait CommentActionsTrait
 
     protected static function action_mark_comment_spam(array $config): array
     {
-       $comment_id = $config['comment_id'] ?? 0;
+        $comment_id = $config['comment_id'] ?? 0;
         $result = wp_spam_comment( $comment_id );
         if (is_wp_error( $result ) || !$result) {
             return static::error("Failed to mark comment ID {$comment_id}");
@@ -92,7 +92,7 @@ trait CommentActionsTrait
 
     protected static function action_unmark_comment_spam(array $config): array
     {
-       $comment_id = $config['comment_id'] ?? 0;
+        $comment_id = $config['comment_id'] ?? 0;
         $result = wp_unspam_comment( $comment_id );
         if (is_wp_error( $result ) || !$result) {
             return static::error("Failed to unmark comment ID {$comment_id}");

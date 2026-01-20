@@ -209,8 +209,8 @@ trait PostActionsTrait
 
     protected static function action_get_post_metadata_single(array $config): array
     {
-        $post_id = $config['post_id'] ?? 0;
-        $meta_key = $config['meta_key'] ?? '';
+        $post_id    = $config['post_id'] ?? 0;
+        $meta_key   = $config['meta_key'] ?? '';
         $meta_value = maybe_unserialize( get_post_meta( $post_id, $meta_key, true ) );
         if (!$meta_value) return static::error("No meta value found for this key");
         return static::success([
@@ -222,7 +222,7 @@ trait PostActionsTrait
 
     protected static function action_get_post_permalink(array $config): array
     {
-        $post_id = $config['post_id'] ?? 0;
+        $post_id   = $config['post_id'] ?? 0;
         $permalink = get_permalink( $post_id );
         if (!$permalink) return static::error("No permalink found for this key");
         return static::success([
@@ -234,7 +234,7 @@ trait PostActionsTrait
     protected static function action_get_post_content(array $config): array
     {
         $post_id = $config['post_id'] ?? 0;
-        $post = get_post( $post_id );
+        $post    = get_post( $post_id );
         if (!$post) return static::error("No post found for this ID");
         return static::success([
             'post_id'      => $post_id,
@@ -245,7 +245,7 @@ trait PostActionsTrait
     protected static function action_get_post_excerpt(array $config): array
     {
         $post_id = $config['post_id'] ?? 0;
-        $post = get_post( $post_id );
+        $post    = get_post( $post_id );
         if (!$post) return static::error("No post found for this ID");
         return static::success([
             'post_id'      => $post_id,
@@ -256,7 +256,7 @@ trait PostActionsTrait
     protected static function action_get_post_status(array $config): array
     {
         $post_id = $config['post_id'] ?? 0;
-        $post = get_post( $post_id );
+        $post    = get_post( $post_id );
         if (!$post) return static::error("No post found for this ID");
         return static::success([
             'post_id'      => $post_id,
@@ -291,7 +291,7 @@ trait PostActionsTrait
     protected static function action_unregister_post_type(array $config): array
     {
         $post_type = $config['post_type'] ?? '';
-        $result = unregister_post_type( $post_type );
+        $result    = unregister_post_type( $post_type );
         if (!$result) return static::error("Failed to unregister post type : {$post_type}");
         return static::success([
             'post_type'=>$post_type,
@@ -302,7 +302,7 @@ trait PostActionsTrait
     protected static function action_add_post_type_support(array $config): array
     {
         $post_type = $config['post_type'] ?? '';
-        $features = $config['features'] ?? [];
+        $features  = $config['features'] ?? [];
         foreach ( $features as $feature ) {
             add_post_type_support( $post_type, $feature );
         }
@@ -345,11 +345,11 @@ trait PostActionsTrait
 
     protected static function action_bulk_assign_terms_to_posts(array $config): array
     {
-        $results = [];
+        $results  = [];
         $post_ids = WordpressHelpers::normalize_list($config['post_ids'] ?? []);
-        $terms = WordpressHelpers::normalize_list($config['terms'] ?? []);
+        $terms    = WordpressHelpers::normalize_list($config['terms'] ?? []);
         $taxonomy = $config['taxonomy'] ?? '';
-        $append = $config['append'] ?? false;
+        $append   = $config['append'] ?? false;
 
         foreach ($post_ids as $post_id) {
             $results[$post_id] = wp_set_object_terms($post_id, $terms, $taxonomy, $append);
@@ -360,9 +360,9 @@ trait PostActionsTrait
 
     protected static function action_bulk_remove_terms_from_posts(array $config): array
     {
-        $results = [];
+        $results  = [];
         $post_ids = WordpressHelpers::normalize_list($config['post_ids'] ?? []);
-        $terms = WordpressHelpers::normalize_list($config['terms'] ?? []);
+        $terms    = WordpressHelpers::normalize_list($config['terms'] ?? []);
         $taxonomy = $config['taxonomy'] ?? '';
 
         foreach ($post_ids as $post_id) {
