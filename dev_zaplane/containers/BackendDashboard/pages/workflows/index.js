@@ -32,6 +32,7 @@ import { showNotification } from "@ZAPRedux/Slices/notificationSlice/notificatio
 import ZAPLoading from "@ZAPComponents/Loading";
 import ZAPTable from "@ZAPComponents/Table";
 import ZAPText from "@ZAPComponents/Text";
+import ZAPMenu from "@ZAPComponents/ZapMenu";
 
 
 const CreateWorkflows = () => {
@@ -116,25 +117,20 @@ const CreateWorkflows = () => {
           </Text>
         </Box>
 
-        <Menu.Root>
-          <Menu.Trigger asChild>
-            <Button colorScheme="blue">
-              {__("Create Workflow", "zaplane")}
-            </Button>
-          </Menu.Trigger>
-          <Portal>
-            <Menu.Positioner>
-              <Menu.Content>
-                <Menu.Item onClick={() => setIsModalOpen(true)}>
-                  {__("Create from Scratch", "zaplane")}
-                </Menu.Item>
-                {/* <Menu.Item>
-                  {__("Create with AI", "zaplane")}
-                </Menu.Item> */}
-              </Menu.Content>
-            </Menu.Positioner>
-          </Portal>
-        </Menu.Root>
+        <ZAPMenu
+          triggerLabel="Create Workflow"
+          items={[
+            {
+              label: "Create from Scratch",
+              onClick: () => setIsModalOpen(true),
+            },
+            // {
+            //   label: "Create with AI",
+            //   onClick: () => console.log("AI workflow clicked"),
+            // },
+          ]}
+        />
+
       </Flex>
       <Box p={6} bg="gray.50" minH="calc(100vh - 80px)">
         <Box
@@ -187,7 +183,7 @@ const CreateWorkflows = () => {
                   </ZAPText>
                 ),
               },
-                {
+              {
                 label: __("Status", "zaplane"),
                 key: "status",
                 textAlign: "center",
