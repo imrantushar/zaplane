@@ -175,8 +175,9 @@ const Connections = () => {
                         {
                             label: "APP / NAME",
                             key: "name",
+                            textAlign: "center",
                             render: (row) => (
-                                <HStack>
+                                <HStack justifyContent="center">
                                     {row.app === "slack" && <FaSlack />}
                                     <Text>{__(row.name, 'zaplane')}</Text>
                                 </HStack>
@@ -186,11 +187,13 @@ const Connections = () => {
                             label: "AUTH TYPE",
                             key: "auth_type",
                             render: (row) => row.auth_type,
+                            textAlign: "center",
                         },
                         {
                             label: "CREATED AT",
                             key: "created_at",
                             render: (row) => row.created_at || "--",
+                            textAlign: "center",
                         },
                         {
                             label: "STATUS",

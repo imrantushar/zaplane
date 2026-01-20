@@ -10,6 +10,7 @@ import {
 import ZAPLoading from "@ZAPComponents/Loading";
 import ZAPText from "@ZAPComponents/Text";
 import { __ } from "@wordpress/i18n";
+import CustomTableMessage from "@ZAPComponents/Oops/CustomTableMessage";
 
 const ZAPTable = ({
   data = [],
@@ -20,7 +21,10 @@ const ZAPTable = ({
   variant = "line",
   size = "sm",
   isLoading = false,
-  noDataText = "No data have"
+  noDataText = __(
+    'Please, create data to see the available list here.',
+    'easy-content-manager'
+  )
 }) => {
   const colSpan = columns.length + (actionsRenderer ? 1 : 0);
 
@@ -36,7 +40,6 @@ const ZAPTable = ({
     >
       <Table.Root size={size} variant={variant}>
         {caption && <Table.Caption>{caption}</Table.Caption>}
-
         <Table.Header>
           <Table.Row>
             {columns.map((col, i) => (
@@ -44,8 +47,9 @@ const ZAPTable = ({
                 key={i}
                 textAlign={col.textAlign || "left"}
                 w={col.width}
+                py="20px"
               >
-                {col.label}
+                {__(col.label, 'zaplane')}
               </Table.ColumnHeader>
             ))}
             {actionsRenderer && (
@@ -89,7 +93,14 @@ const ZAPTable = ({
             <Table.Row>
               <Table.Cell colSpan={colSpan} textAlign="center">
                 <ZAPText fontSize="sm" color="gray.500">
-                  {noDataText}
+
+                  <CustomTableMessage
+                    title={__(
+                      'No Data Available!!!',
+                      'easy-content-manager'
+                    )}
+                    subText={noDataText}
+                  />
                 </ZAPText>
               </Table.Cell>
             </Table.Row>

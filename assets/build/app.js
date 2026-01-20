@@ -750,6 +750,79 @@ const Notification = () => {
 
 /***/ },
 
+/***/ "./dev_zaplane/components/Oops/CustomTableMessage.js"
+/*!***********************************************************!*\
+  !*** ./dev_zaplane/components/Oops/CustomTableMessage.js ***!
+  \***********************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _styles_scss__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./styles.scss */ "./dev_zaplane/components/Oops/styles.scss");
+/* harmony import */ var _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @ZAPUtils/helper */ "./dev_zaplane/utils/helper.js");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__);
+
+
+
+
+
+const CustomTableMessage = ({
+  title,
+  subText,
+  button
+}) => {
+  const [isImageLoaded, setIsImageLoaded] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
+  const handleImageLoad = () => {
+    setIsImageLoaded(true);
+  };
+  const imageSrc = _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.plugin_root_url + 'assets/images/noDataAvailable.svg';
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("div", {
+    className: `zaplane-oops zaplane-oops__message`,
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
+      className: "zaplane-oops__icon",
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("img", {
+        src: imageSrc,
+        alt: "",
+        onLoad: handleImageLoad
+      })
+    }), isImageLoaded && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("div", {
+      className: "zaplane-oops__content",
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("h3", {
+        className: "zaplane-oops__heading",
+        children: title
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("h3", {
+        className: "zaplane-oops__text",
+        children: subText
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
+        className: "zaplane-oops__button",
+        children: button
+      })]
+    })]
+  });
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (CustomTableMessage);
+
+/***/ },
+
+/***/ "./dev_zaplane/components/Oops/styles.scss"
+/*!*************************************************!*\
+  !*** ./dev_zaplane/components/Oops/styles.scss ***!
+  \*************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+// extracted by mini-css-extract-plugin
+
+
+/***/ },
+
 /***/ "./dev_zaplane/components/Tab/index.js"
 /*!*********************************************!*\
   !*** ./dev_zaplane/components/Tab/index.js ***!
@@ -809,8 +882,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _ZAPComponents_Text__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @ZAPComponents/Text */ "./dev_zaplane/components/Text/index.js");
 /* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
 /* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_6__);
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__);
+/* harmony import */ var _ZAPComponents_Oops_CustomTableMessage__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @ZAPComponents/Oops/CustomTableMessage */ "./dev_zaplane/components/Oops/CustomTableMessage.js");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__);
+
 
 
 
@@ -826,10 +901,10 @@ const ZAPTable = ({
   variant = "line",
   size = "sm",
   isLoading = false,
-  noDataText = "No data have"
+  noDataText = (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_6__.__)('Please, create data to see the available list here.', 'easy-content-manager')
 }) => {
   const colSpan = columns.length + (actionsRenderer ? 1 : 0);
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Flex, {
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Flex, {
     direction: "column",
     bg: "white",
     border: "1px solid",
@@ -837,52 +912,56 @@ const ZAPTable = ({
     borderRadius: "lg",
     boxShadow: "sm",
     overflow: "hidden",
-    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.TableRoot, {
+    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.TableRoot, {
       size: size,
       variant: variant,
-      children: [caption && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.TableCaption, {
+      children: [caption && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.TableCaption, {
         children: caption
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.TableHeader, {
-        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.TableRow, {
-          children: [columns.map((col, i) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.TableColumnHeader, {
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.TableHeader, {
+        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.TableRow, {
+          children: [columns.map((col, i) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.TableColumnHeader, {
             textAlign: col.textAlign || "left",
             w: col.width,
-            children: col.label
-          }, i)), actionsRenderer && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.TableColumnHeader, {
+            py: "20px",
+            children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_6__.__)(col.label, 'zaplane')
+          }, i)), actionsRenderer && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.TableColumnHeader, {
             textAlign: "center",
             children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_6__.__)('Actions', 'zaplane')
           })]
         })
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.TableBody, {
-        children: [isLoading && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.TableRow, {
-          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.TableCell, {
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.TableBody, {
+        children: [isLoading && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.TableRow, {
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.TableCell, {
             colSpan: colSpan,
-            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Flex, {
+            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Flex, {
               justify: "center",
               py: 6,
-              children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_ZAPComponents_Loading__WEBPACK_IMPORTED_MODULE_4__["default"], {})
+              children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_ZAPComponents_Loading__WEBPACK_IMPORTED_MODULE_4__["default"], {})
             })
           })
-        }), !isLoading && Array.isArray(data) && data.map(row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.TableRow, {
-          children: [columns.map((col, i) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.TableCell, {
+        }), !isLoading && Array.isArray(data) && data.map(row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.TableRow, {
+          children: [columns.map((col, i) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.TableCell, {
             textAlign: col.textAlign || "left",
             children: col.render ? col.render(row) : row[col.key] || "--"
-          }, i)), actionsRenderer && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.TableCell, {
+          }, i)), actionsRenderer && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.TableCell, {
             textAlign: "center",
-            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.HStack, {
+            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.HStack, {
               justify: "center",
               spacing: "1",
               children: actionsRenderer(row)
             })
           })]
-        }, row[rowKey])), !isLoading && Array.isArray(data) && data.length === 0 && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.TableRow, {
-          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.TableCell, {
+        }, row[rowKey])), !isLoading && Array.isArray(data) && data.length === 0 && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.TableRow, {
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.TableCell, {
             colSpan: colSpan,
             textAlign: "center",
-            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_ZAPComponents_Text__WEBPACK_IMPORTED_MODULE_5__["default"], {
+            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_ZAPComponents_Text__WEBPACK_IMPORTED_MODULE_5__["default"], {
               fontSize: "sm",
               color: "gray.500",
-              children: noDataText
+              children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_ZAPComponents_Oops_CustomTableMessage__WEBPACK_IMPORTED_MODULE_7__["default"], {
+                title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_6__.__)('No Data Available!!!', 'easy-content-manager'),
+                subText: noDataText
+              })
             })
           })
         })]
@@ -1775,7 +1854,9 @@ const Connections = () => {
         columns: [{
           label: "APP / NAME",
           key: "name",
+          textAlign: "center",
           render: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_7__.HStack, {
+            justifyContent: "center",
             children: [row.app === "slack" && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(react_icons_fa__WEBPACK_IMPORTED_MODULE_10__.FaSlack, {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Text, {
               children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_9__.__)(row.name, 'zaplane')
             })]
@@ -1783,11 +1864,13 @@ const Connections = () => {
         }, {
           label: "AUTH TYPE",
           key: "auth_type",
-          render: row => row.auth_type
+          render: row => row.auth_type,
+          textAlign: "center"
         }, {
           label: "CREATED AT",
           key: "created_at",
-          render: row => row.created_at || "--"
+          render: row => row.created_at || "--",
+          textAlign: "center"
         }, {
           label: "STATUS",
           key: "status",
@@ -1997,7 +2080,8 @@ const Logs = () => {
           render: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
             fontSize: "sm",
             children: row.started_at || "--"
-          })
+          }),
+          textAlign: "center"
         }, {
           label: "STATUS",
           key: "status",
@@ -2019,7 +2103,8 @@ const Logs = () => {
           render: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
             fontSize: "sm",
             children: (0,_workflows_workFlowMotion_helper__WEBPACK_IMPORTED_MODULE_10__.getDuration)(row.started_at, row.finished_at)
-          })
+          }),
+          textAlign: "center"
         }],
         actionsRenderer: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.Fragment, {
           children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Button, {
@@ -2430,7 +2515,7 @@ const CreateWorkflows = () => {
         data: data,
         rowKey: "id",
         size: "sm",
-        variant: "line",
+        variant: "inline",
         columns: [{
           label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)("Title", "zaplane"),
           key: "title",
@@ -5327,6 +5412,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   menu: () => (/* binding */ menu),
 /* harmony export */   namespace: () => (/* binding */ namespace),
 /* harmony export */   nonce: () => (/* binding */ nonce),
+/* harmony export */   plugin_root_url: () => (/* binding */ plugin_root_url),
 /* harmony export */   reactDebounce: () => (/* binding */ reactDebounce),
 /* harmony export */   rest_url: () => (/* binding */ rest_url),
 /* harmony export */   route_path: () => (/* binding */ route_path),
@@ -5344,7 +5430,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const {
-  // plugin_root_url,
+  plugin_root_url,
   nonce,
   ajaxurl,
   menu,

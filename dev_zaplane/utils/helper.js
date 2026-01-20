@@ -4,7 +4,7 @@ import axios from 'axios';
 import { showNotification } from '@ZAPRedux/Slices/notificationSlice/notificationSlice';
 
 export const {
-	// plugin_root_url,
+	plugin_root_url,
 	nonce,
 	ajaxurl,
 	menu,

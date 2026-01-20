@@ -85,6 +85,7 @@ const Logs = () => {
                             label: "CREATED AT",
                             key: "started_at",
                             render: (row) => <Text fontSize="sm">{row.started_at || "--"}</Text>,
+                            textAlign: "center",
                         },
                         {
                             label: "STATUS",
@@ -109,6 +110,7 @@ const Logs = () => {
                             render: (row) => (
                                 <Text fontSize="sm">{getDuration(row.started_at, row.finished_at)}</Text>
                             ),
+                            textAlign: "center",
                         },
                     ]}
                     actionsRenderer={(row) => (
