@@ -21,6 +21,7 @@ import { getDuration } from "../workflows/workFlowMotion/helper";
 import ZAPLoading from "@ZAPComponents/Loading";
 import ZAPTable from "@ZAPComponents/Table";
 import { __ } from "@wordpress/i18n";
+import TopBar from "@ZAPComponents/TopBar";
 
 const Logs = () => {
     const dispatch = useDispatch();
@@ -63,79 +64,80 @@ const Logs = () => {
     }
 
     return (
-        <Box
-            bg="white"
-            border="1px solid"
-            borderColor="gray.200"
-            borderRadius="lg"
-            p={6}
-            minHeight="100vh"
-        >
-            <Text fontSize="lg" fontWeight="600" mb={4}>
-                {__('Workflow Logs', 'zaplane')}
-            </Text>
-            <ZAPTable
-                data={data}
-                rowKey="id"
-                variant="outline"
-                size="sm"
-                columns={[
-                    {
-                        label: "CREATED AT",
-                        key: "started_at",
-                        render: (row) => <Text fontSize="sm">{row.started_at || "--"}</Text>,
-                    },
-                    {
-                        label: "STATUS",
-                        key: "status",
-                        render: (row) => (
-                            <HStack spacing={2}>
-                                <Box
-                                    w="8px"
-                                    h="8px"
-                                    borderRadius="full"
-                                    bg={isSuccess(row.status) ? "green.500" : "red.500"}
-                                />
-                                <Text fontSize="sm">
-                                    {isSuccess(row.status) ? "Success" : "Failed"}
-                                </Text>
-                            </HStack>
-                        ),
-                    },
-                    {
-                        label: "DURATION / SIZE",
-                        key: "duration",
-                        render: (row) => (
-                            <Text fontSize="sm">{getDuration(row.started_at, row.finished_at)}</Text>
-                        ),
-                    },
-                ]}
-                actionsRenderer={(row) => (
-                    <>
-                        <Button
-                            size="xs"
-                            variant="outline"
-                            onClick={() => {
-                                setActiveRunId(row.id);
-                                setShowDetails(true);
-                                dispatch(nodeLogsRunDetails(row.id));
-                            }}
-                        >
-                            {__('Details', 'zaplane')}
-                        </Button>
-
-                        <Button
-                            size="xs"
-                            variant="outline"
-                            onClick={() => dispatch(retryNodeRun(row.id))}
-                        >
-                            {__('Re-execute', 'zaplane')}
-                        </Button>
-                    </>
+        <>
+            <TopBar
+                render={() => (
+                    <Box>
+                        <Text fontSize="lg" fontWeight="600" margin="0">
+                            {__('Workflow Logs', 'zaplane')}
+                        </Text>
+                    </Box>
                 )}
             />
+            <div className="zaplane-page-content">
+                <ZAPTable
+                    data={data}
+                    rowKey="id"
+                    variant="outline"
+                    size="sm"
+                    columns={[
+                        {
+                            label: "CREATED AT",
+                            key: "started_at",
+                            render: (row) => <Text fontSize="sm">{row.started_at || "--"}</Text>,
+                        },
+                        {
+                            label: "STATUS",
+                            key: "status",
+                            render: (row) => (
+                                <HStack spacing={2}>
+                                    <Box
+                                        w="8px"
+                                        h="8px"
+                                        borderRadius="full"
+                                        bg={isSuccess(row.status) ? "green.500" : "red.500"}
+                                    />
+                                    <Text fontSize="sm">
+                                        {isSuccess(row.status) ? "Success" : "Failed"}
+                                    </Text>
+                                </HStack>
+                            ),
+                        },
+                        {
+                            label: "DURATION / SIZE",
+                            key: "duration",
+                            render: (row) => (
+                                <Text fontSize="sm">{getDuration(row.started_at, row.finished_at)}</Text>
+                            ),
+                        },
+                    ]}
+                    actionsRenderer={(row) => (
+                        <>
+                            <Button
+                                size="xs"
+                                variant="outline"
+                                onClick={() => {
+                                    setActiveRunId(row.id);
+                                    setShowDetails(true);
+                                    dispatch(nodeLogsRunDetails(row.id));
+                                }}
+                            >
+                                {__('Details', 'zaplane')}
+                            </Button>
 
-        </Box>
+                            <Button
+                                size="xs"
+                                variant="outline"
+                                onClick={() => dispatch(retryNodeRun(row.id))}
+                            >
+                                {__('Re-execute', 'zaplane')}
+                            </Button>
+                        </>
+                    )}
+                />
+            </div>
+        </>
+
     );
 };
 
