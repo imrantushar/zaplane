@@ -5,7 +5,6 @@ import { testAPI } from '@ZAPRedux/Slices/settingSlice/settingSlice';
 const Setting = () => {
 	const dispatch = useDispatch();
 	const { data, loading } = useSelector((state) => state.setting);
-    console.log(data);
 
 	const [method, setMethod] = useState('GET');
 	const [path, setPath] = useState('');

@@ -215,7 +215,6 @@ export default function ActionDrawer({
 
         resetAll();
     };
-    console.log(mode, 'modeeee')
     return (
         <ZAPDrawer
             open={open}
