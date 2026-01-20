@@ -6,6 +6,7 @@ import {
   Text,
   VStack,
 } from "@chakra-ui/react";
+import { parseJSON } from "@ZAPUtils/helper";
 import { useSelector } from "react-redux";
 
 const LogDetails = ({ runId, onBack }) => {
@@ -30,8 +31,8 @@ const LogDetails = ({ runId, onBack }) => {
 
       <Accordion.Root collapsible>
         {nodeDetails?.nodes?.map((log) => {
-          const input = JSON.parse(log.input_json || "{}");
-          const output = JSON.parse(log.output_json || "{}");
+          const input = parseJSON(log.input_json);
+          const output = parseJSON(log.output_json);
 
           return (
             <Accordion.Item key={log.id} value={log.id}>

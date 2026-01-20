@@ -380,7 +380,7 @@ export default function FlowCanvas({ id }) {
                                         const paylod = {
                                             workflow_hash: singleData?.version?.hash,
                                         }
-                                        console.log(paylod, "pp");
+                                        
                                         dispatch(workFLowExction(paylod))
                                     }}>
                                     {__("🔄 Replay ", "zaplane")}
