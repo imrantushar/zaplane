@@ -2537,64 +2537,40 @@ const ActionFieldRenderer = ({
   loadingFields,
   fetchDynamicOptions
 }) => {
+  const handleChange = val => setFieldValue(field.key, val);
+  const commonProps = {
+    label: field.label,
+    placeholder: field.placeholder || "",
+    value: value || "",
+    onChange: e => handleChange(e.target.value)
+  };
   switch (field.type) {
     case "text":
     case "expression":
-      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_ZAPComponents_ZAPInput__WEBPACK_IMPORTED_MODULE_0__["default"], {
-        label: field.label,
-        placeholder: field.placeholder || "",
-        value: value || "",
-        type: "text",
-        onChange: e => setFieldValue(field.key, e.target.value)
-      });
     case "number":
-      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_ZAPComponents_ZAPInput__WEBPACK_IMPORTED_MODULE_0__["default"], {
-        label: field.label,
-        placeholder: field.placeholder || "",
-        value: value || "",
-        type: "number",
-        onChange: e => setFieldValue(field.key, e.target.value)
-      });
     case "textarea":
       return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_ZAPComponents_ZAPInput__WEBPACK_IMPORTED_MODULE_0__["default"], {
-        label: field.label,
-        placeholder: field.placeholder || "",
-        value: value || "",
-        type: "textarea",
-        onChange: e => setFieldValue(field.key, e.target.value)
+        ...commonProps,
+        type: field.type === "expression" ? "text" : field.type
       });
     case "select":
-      // static options
-      if (field.options) {
-        const options = field.options.map(opt => ({
+      {
+        const key = getKey?.(field);
+        const options = field.options ? field.options.map(opt => ({
           label: opt.label,
           value: opt.value
-        }));
+        })) : dynamicOptions[key] || [];
         return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_ZAPComponents_ZAPSelect__WEBPACK_IMPORTED_MODULE_1__["default"], {
           label: field.label,
           options: options,
           value: value,
-          onChange: val => setFieldValue(field.key, val),
+          onChange: handleChange,
           placeholder: field.placeholder || `Select ${field.label}`,
-          isClearable: true
+          isClearable: true,
+          isLoading: field.dynamic ? loadingFields[key] : false,
+          onMenuOpen: field.dynamic ? () => fetchDynamicOptions(field) : undefined
         });
       }
-
-      // dynamic options
-      if (field.dynamic) {
-        const key = getKey(field);
-        return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_ZAPComponents_ZAPSelect__WEBPACK_IMPORTED_MODULE_1__["default"], {
-          label: field.label,
-          options: dynamicOptions[key] || [],
-          value: value,
-          isLoading: loadingFields[key],
-          onMenuOpen: () => fetchDynamicOptions(field),
-          onChange: val => setFieldValue(field.key, val),
-          placeholder: `Select ${field.label}`,
-          isClearable: true
-        });
-      }
-      return null;
     case "condition_group":
       return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_ConditionGroupField_ConditionGroupField__WEBPACK_IMPORTED_MODULE_2__["default"], {
         value: value,
