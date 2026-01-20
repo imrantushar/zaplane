@@ -2629,8 +2629,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _ZAPComponents_Text__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @ZAPComponents/Text */ "./dev_zaplane/components/Text/index.js");
 /* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
 /* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_8___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_8__);
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__);
+/* harmony import */ var _helper__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../../helper */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/helper.js");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__);
 
 
 
@@ -2639,105 +2640,102 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-const EMPTY_RULE = {
-  left: "",
-  operator: "==",
-  right: ""
-};
+
 function ConditionGroupField({
-  value = [[{
-    ...EMPTY_RULE
-  }]],
+  value,
   onChange,
   field
 }) {
-  const operatorField = field.fields.find(f => f.key === "operator");
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(formik__WEBPACK_IMPORTED_MODULE_3__.FieldArray, {
+  const ruleFields = field?.fields;
+  const EMPTY_RULE = (0,_helper__WEBPACK_IMPORTED_MODULE_9__.buildEmptyRule)(ruleFields);
+  const groups = value && value.length ? value : [[{
+    ...EMPTY_RULE
+  }]];
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(formik__WEBPACK_IMPORTED_MODULE_3__.FieldArray, {
     name: field.key,
-    children: groupHelpers => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Flex, {
+    children: groupHelpers => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Flex, {
       direction: "column",
       gap: 4,
-      children: [value.map((group, gIndex) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
-        children: [gIndex > 0 && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Flex, {
+      children: [groups.map((group, gIndex) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
+        children: [groups.length > 1 && gIndex !== 0 && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Flex, {
           align: "center",
-          my: 3,
-          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
+          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
             flex: "1",
             h: "1px",
             bg: "gray.300"
-          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_ZAPComponents_Text__WEBPACK_IMPORTED_MODULE_7__["default"], {
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_ZAPComponents_Text__WEBPACK_IMPORTED_MODULE_7__["default"], {
             mx: 3,
             fontSize: "sm",
             children: "OR"
-          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
             flex: "1",
             h: "1px",
             bg: "gray.300"
           })]
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(formik__WEBPACK_IMPORTED_MODULE_3__.FieldArray, {
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(formik__WEBPACK_IMPORTED_MODULE_3__.FieldArray, {
           name: `${field.key}.${gIndex}`,
-          children: ruleHelpers => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.Fragment, {
-            children: group.map((rule, rIndex) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Flex, {
-              gap: 4,
-              align: "flex-end",
-              children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_ZAPComponents_ZAPInput__WEBPACK_IMPORTED_MODULE_5__["default"], {
-                label: "Condition",
-                value: rule.left,
-                onChange: e => ruleHelpers.replace(rIndex, {
-                  ...rule,
-                  left: e.target.value
-                }),
-                style: {
-                  width: "30%"
-                }
-              }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_ZAPComponents_ZAPSelect__WEBPACK_IMPORTED_MODULE_6__["default"], {
-                label: operatorField.label,
-                options: operatorField.options,
-                value: rule.operator,
-                onChange: val => ruleHelpers.replace(rIndex, {
-                  ...rule,
-                  operator: val
-                }),
-                style: {
-                  width: "30%"
-                }
-              }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_ZAPComponents_ZAPInput__WEBPACK_IMPORTED_MODULE_5__["default"], {
-                label: "Value",
-                value: rule.right,
-                onChange: e => ruleHelpers.replace(rIndex, {
-                  ...rule,
-                  right: e.target.value
-                }),
-                style: {
-                  width: "30%"
-                }
-              }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Flex, {
-                gap: 2,
-                mt: "25px",
-                children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Button, {
-                  type: "button",
-                  onClick: () => ruleHelpers.push({
-                    ...EMPTY_RULE
-                  }),
-                  children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_8__.__)("Add", "zaplane")
-                }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Button, {
-                  type: "button",
-                  colorScheme: "red",
-                  variant: "ghost",
-                  size: "sm",
-                  onClick: () => {
-                    ruleHelpers.remove(rIndex);
-                    if (group.length === 1 && gIndex > 0) {
-                      groupHelpers.remove(gIndex);
+          children: ruleHelpers => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.Fragment, {
+            children: group.map((rule, rIndex) => {
+              return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Flex, {
+                gap: 4,
+                align: "flex-end",
+                mb: "15px",
+                children: [ruleFields.map(f => {
+                  if (f.type === "select") {
+                    return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_ZAPComponents_ZAPSelect__WEBPACK_IMPORTED_MODULE_6__["default"], {
+                      label: f.label,
+                      options: f.options,
+                      value: rule[f.key],
+                      onChange: val => ruleHelpers.replace(rIndex, {
+                        ...rule,
+                        [f.key]: val
+                      }),
+                      style: {
+                        width: "30%"
+                      }
+                    }, f.key);
+                  }
+                  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_ZAPComponents_ZAPInput__WEBPACK_IMPORTED_MODULE_5__["default"], {
+                    label: f.label,
+                    value: rule[f.key],
+                    onChange: e => ruleHelpers.replace(rIndex, {
+                      ...rule,
+                      [f.key]: e.target.value
+                    }),
+                    style: {
+                      width: "30%"
                     }
-                  },
-                  children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(react_icons_fi__WEBPACK_IMPORTED_MODULE_4__.FiTrash2, {})
+                  }, f.key);
+                }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Flex, {
+                  gap: 2,
+                  mt: "25px",
+                  children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Button, {
+                    type: "button",
+                    onClick: () => ruleHelpers.push({
+                      ...EMPTY_RULE
+                    }),
+                    children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_8__.__)("Add", "zaplane")
+                  }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Button, {
+                    type: "button",
+                    colorScheme: "red",
+                    variant: "ghost",
+                    size: "sm",
+                    disabled: group.length === 1 && groups.length === 1 && !gIndex,
+                    onClick: () => {
+                      if (group.length === 1) {
+                        groupHelpers.remove(gIndex);
+                      } else {
+                        ruleHelpers.remove(rIndex);
+                      }
+                    },
+                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(react_icons_fi__WEBPACK_IMPORTED_MODULE_4__.FiTrash2, {})
+                  })]
                 })]
-              })]
-            }, rIndex))
+              }, rIndex);
+            })
           })
         })]
-      }, gIndex)), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Button, {
+      }, gIndex)), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Button, {
         size: "sm",
         width: "140px",
         onClick: () => groupHelpers.push([{
@@ -4148,6 +4146,7 @@ const VersionHistoryTable = ({
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   buildEmptyRule: () => (/* binding */ buildEmptyRule),
 /* harmony export */   getDuration: () => (/* binding */ getDuration),
 /* harmony export */   mapEdgesForBackend: () => (/* binding */ mapEdgesForBackend),
 /* harmony export */   mapNodesForBackend: () => (/* binding */ mapNodesForBackend),
@@ -4257,6 +4256,14 @@ const statusStyle = status => {
         bg: "gray.50"
       };
   }
+};
+const buildEmptyRule = fields => {
+  const rule = {};
+  fields.forEach(f => {
+    var _f$options$0$value;
+    rule[f.key] = f.type === "select" ? (_f$options$0$value = f.options?.[0]?.value) !== null && _f$options$0$value !== void 0 ? _f$options$0$value : "" : "";
+  });
+  return rule;
 };
 
 /***/ },
