@@ -1,25 +1,17 @@
 <?php
 namespace Zaplane\Integrations;
 
-use Zaplane\Classes\IntegrationBase;
+use Zaplane\Framework\Classes\IntegrationBase;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-/**
- * Slack Integration
- * Supports both OAuth 2.0 and Bot Token authentication
- */
 class Slack extends IntegrationBase {
 
 	private const API_BASE_URL = 'https://slack.com/api';
 	private const OAUTH_AUTHORIZE_URL = 'https://slack.com/oauth/v2/authorize';
 	private const OAUTH_TOKEN_URL = 'https://slack.com/api/oauth.v2.access';
-
-	/* ---------------------------------------------------------
-	 * Core Identity
-	 * --------------------------------------------------------- */
 
 	public static function get_slug(): string {
 		return 'slack';
@@ -32,10 +24,6 @@ class Slack extends IntegrationBase {
 	public static function get_icon(): string {
 		return 'slack';
 	}
-
-	/* ---------------------------------------------------------
-	 * Triggers & Actions
-	 * --------------------------------------------------------- */
 
 	public static function get_triggers(): array {
 		return array(
@@ -91,10 +79,6 @@ class Slack extends IntegrationBase {
 		return array();
 	}
 
-	/* ---------------------------------------------------------
-	 * Execution
-	 * --------------------------------------------------------- */
-
 	public static function resolve_trigger( array $node, array $args ) {
 		return array( 'message' => $args[0] ?? '' );
 	}
@@ -128,9 +112,6 @@ class Slack extends IntegrationBase {
 		);
 	}
 
-	/**
-	 * Send message to a channel
-	 */
 	private static function action_send_message( array $node, array $input, string $token ): array {
 		$channel = $node['config']['data']['channel'] ?? '';
 		$text = $node['config']['data']['text'] ?? '';
@@ -176,9 +157,6 @@ class Slack extends IntegrationBase {
 		);
 	}
 
-	/**
-	 * Send direct message to a user
-	 */
 	private static function action_send_dm( array $node, array $input, string $token ): array {
 		$user_id = $node['config']['data']['user_id'] ?? '';
 		$text = $node['config']['data']['text'] ?? '';
@@ -248,27 +226,14 @@ class Slack extends IntegrationBase {
 		);
 	}
 
-	/* ---------------------------------------------------------
-	 * Connection & Authentication
-	 * --------------------------------------------------------- */
-
 	public static function requires_connection(): bool {
 		return true;
 	}
 
-	/**
-	 * Slack supports both OAuth 2.0 and token-based authentication
-	 * Return 'both' to indicate multiple auth types are available
-	 */
 	public static function get_auth_type(): string {
 		return 'both';
 	}
 
-	/**
-	 * Get available authentication methods for this integration
-	 *
-	 * @return array List of auth methods with labels
-	 */
 	public static function get_available_auth_types(): array {
 		return array(
 			'oauth2'  => array(
@@ -282,13 +247,6 @@ class Slack extends IntegrationBase {
 		);
 	}
 
-	/**
-	 * Define the authentication fields for the connection form
-	 * Returns fields based on the selected auth type
-	 *
-	 * @param string|null $auth_type The selected auth type (oauth2 or api_key)
-	 * @return array Field definitions
-	 */
 	public static function get_auth_fields( ?string $auth_type = null ): array {
 		// OAuth 2.0 fields - shown when user selects OAuth
 		$oauth_fields = array(
@@ -335,10 +293,6 @@ class Slack extends IntegrationBase {
 		);
 	}
 
-	/**
-	 * Test connection with provided credentials
-	 * Works with both OAuth tokens and Bot tokens
-	 */
 	public static function test_connection( array $credentials ): array {
 		// Get the token - could be from OAuth (access_token) or direct bot token
 		$token = $credentials['access_token'] ?? $credentials['bot_token'] ?? '';
@@ -400,13 +354,6 @@ class Slack extends IntegrationBase {
 		);
 	}
 
-	/* ---------------------------------------------------------
-	 * OAuth 2.0 Methods
-	 * --------------------------------------------------------- */
-
-	/**
-	 * Get OAuth 2.0 scopes required for Slack
-	 */
 	public static function get_oauth_scopes(): array {
 		return array(
 			'chat:write',
@@ -416,14 +363,6 @@ class Slack extends IntegrationBase {
 		);
 	}
 
-	/**
-	 * Get OAuth authorization URL
-	 *
-	 * @param string $redirect_uri Callback URL
-	 * @param string $state        CSRF state token
-	 * @param array  $credentials  Contains client_id and client_secret
-	 * @return string|null Authorization URL
-	 */
 	public static function get_oauth_auth_url( string $redirect_uri, string $state, array $credentials = array() ): ?string {
 		$client_id = $credentials['client_id'] ?? '';
 
@@ -441,15 +380,6 @@ class Slack extends IntegrationBase {
 		return self::OAUTH_AUTHORIZE_URL . '?' . http_build_query( $params );
 	}
 
-	/**
-	 * Exchange authorization code for tokens
-	 *
-	 * @param string $code         Authorization code
-	 * @param string $redirect_uri Callback URL
-	 * @param array  $credentials  Contains client_id and client_secret
-	 * @return array Token data
-	 * @throws \Exception on failure
-	 */
 	public static function exchange_oauth_code( string $code, string $redirect_uri, array $credentials = array() ): array {
 		$client_id = $credentials['client_id'] ?? '';
 		$client_secret = $credentials['client_secret'] ?? '';
@@ -493,14 +423,6 @@ class Slack extends IntegrationBase {
 		);
 	}
 
-	/* ---------------------------------------------------------
-	 * Helper Methods
-	 * --------------------------------------------------------- */
-
-	/**
-	 * Substitute variables in text from input data
-	 * Replaces {{variable}} patterns with values from input
-	 */
 	private static function substitute_variables( string $text, array $data ): string {
 		return preg_replace_callback(
 			'/\{\{([^}]+)\}\}/',

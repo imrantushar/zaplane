@@ -54,7 +54,6 @@ export const getDuration = (start, end) => {
     if (mins > 0) {
         return `${mins}m ${secs}s`;
     }
-    console.log(secs,'k');
     return `${secs}s`;
 };
 export const mapNodesForBackend = (nodes) => {

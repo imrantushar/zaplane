@@ -256,7 +256,7 @@ export const getAllVersion = createAsyncThunk(
 export const getPreviewOldVersion = createAsyncThunk(
 	'zaplane/getPreviewOldVersion',
 	async ({ id, versionID }, thunkAPI) => {
-		console.log(id, versionID, 'boom');
+	
 		try {
 			const res = await API.get(
 				namespace + `workflows/${id}/versions/${parseInt(versionID)}`

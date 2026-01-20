@@ -5,7 +5,7 @@ namespace Zaplane\Integrations;
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-use Zaplane\Classes\IntegrationBase;
+use Zaplane\Framework\Classes\IntegrationBase;
 use Zaplane\Integrations\Wordpress\PostActionsTrait;
 use Zaplane\Integrations\Wordpress\TaxonomyActionsTrait;
 use Zaplane\Integrations\Wordpress\UserActionsTrait;
