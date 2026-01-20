@@ -2072,7 +2072,7 @@ const Logs = () => {
       children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_ZAPComponents_Table__WEBPACK_IMPORTED_MODULE_12__["default"], {
         data: data,
         rowKey: "id",
-        variant: "outline",
+        variant: "line",
         size: "sm",
         columns: [{
           label: "CREATED AT",
@@ -2515,7 +2515,7 @@ const CreateWorkflows = () => {
         data: data,
         rowKey: "id",
         size: "sm",
-        variant: "inline",
+        variant: "line",
         columns: [{
           label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)("Title", "zaplane"),
           key: "title",

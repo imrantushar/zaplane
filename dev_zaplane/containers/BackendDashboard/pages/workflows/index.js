@@ -134,7 +134,7 @@ const CreateWorkflows = () => {
           data={data}
           rowKey="id"
           size="sm"
-          variant="inline"
+          variant="line"
           columns={[
             {
               label: __("Title", "zaplane"),

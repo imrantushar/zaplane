@@ -78,7 +78,7 @@ const Logs = () => {
                 <ZAPTable
                     data={data}
                     rowKey="id"
-                    variant="outline"
+                    variant="line"
                     size="sm"
                     columns={[
                         {
