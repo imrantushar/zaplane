@@ -12,6 +12,7 @@ return [
     'trello'    => ['file' => 'trello.php', 'class' => \Zaplane\Integrations\Trello::class],
     'stripe'    => ['file' => 'stripe.php', 'class' => \Zaplane\Integrations\Stripe::class],
     'Http' => ['file' => 'http.php', 'class' => \Zaplane\Integrations\Http::class],
-    'variable' => ['file' => 'variable.php', 'class' => \Zaplane\Integrations\variable::class],
-    'webhook' => ['file' => 'webhook.php', 'class' => \Zaplane\Integrations\webhook::class],
+    'variable' => ['file' => 'variable.php', 'class' => \Zaplane\Integrations\Variable::class],
+    'webhook' => ['file' => 'webhook.php', 'class' => \Zaplane\Integrations\Webhook::class],
+    'storeengine' => ['file' => 'storeengine.php', 'class' => \Zaplane\Integrations\Storeengine::class],
 ];

@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-01-20 08:32:36",
+    "generated_at": "2026-01-21 06:55:23",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -3036,26 +3036,35 @@
             "name": "Webhook",
             "icon": "",
             "category": "app",
+            "triggers": [],
+            "actions": []
+        },
+        "storeengine": {
+            "slug": "storeengine",
+            "name": "Storeengine",
+            "icon": "",
+            "category": "app",
             "triggers": {
-                "incoming": {
-                    "key": "incoming",
-                    "label": "Incoming Webhook",
-                    "hook": null,
-                    "schema": [
-                        {
-                            "key": "path",
-                            "label": "Webhook Path",
-                            "type": "text",
-                            "required": true,
-                            "help": "Example: order-created"
-                        }
-                    ],
+                "publish_post": {
+                    "key": "publish_post",
+                    "label": "Post Published",
+                    "hook": "publish_post",
+                    "schema": [],
                     "outputs": [
                         "main"
                     ]
                 }
             },
-            "actions": []
+            "actions": {
+                "create_post": {
+                    "key": "create_post",
+                    "label": "Create Post",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
         }
     },
     "tools": {
