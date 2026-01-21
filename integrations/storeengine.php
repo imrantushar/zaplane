@@ -6,117 +6,59 @@ namespace Zaplane\Integrations;
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 use Zaplane\Classes\IntegrationBase;
-// use Zaplane\Integrations\Wordpress\PostActionsTrait;
-// use Zaplane\Integrations\Wordpress\TaxonomyActionsTrait;
-// use Zaplane\Integrations\Wordpress\UserActionsTrait;
-// use Zaplane\Integrations\Wordpress\RoleActionsTrait;
-// use Zaplane\Integrations\Wordpress\OptionActionsTrait;
-// use Zaplane\Integrations\Wordpress\MediaActionsTrait;
-// use Zaplane\Integrations\Wordpress\CommentActionsTrait;
-use Zaplane\Integrations\Storeengine\QueryTrait;
-use Zaplane\Integrations\Storeengine\Helper;
 
 
 class Storeengine extends IntegrationBase {
-    // use PostActionsTrait;
-    // use TaxonomyActionsTrait;
-    // use UserActionsTrait;
-    // use RoleActionsTrait;
-    // use OptionActionsTrait;
-    // use MediaActionsTrait;
-    // use CommentActionsTrait;
-    use QueryTrait;
-    use Helper;
-
     public static function get_slug(): string {
         return 'storeengine';
     }
 
-    /* =====================================================
-     * TRIGGERS
-     * ===================================================== */
-
     public static function get_triggers(): array {
         return [
             // Posts
-            //Media
-            // Users
-            // Auth
-            // Comments
-            // Terms / Taxonomy
-            //Plugin // Theme
-            // Options / System
+            'publish_post'           => ['label' => 'Post Published', 'hook' => 'publish_post'], // example code
         ];
     }
 
-
-    /**
-     * Trigger UI Schema
-     */
     public static function get_trigger_config_schema( string $trigger ): array {
+        if ( $trigger === 'add_action' ) {
+            return [
+                [
+                    'key'      => 'hook_name',
+                    'label'    => 'Hook Name',
+                    'type'     => 'text',
+                    'required' => true,
+                ],
+            ];
+        }
         return [];
     }
-
-    private static function resolve_comment_payload( int $comment_id ) {
-    }
-
-
-    /* =====================================================
-     * TRIGGER PAYLOAD
-     * ===================================================== */
 
     public static function resolve_trigger( array $node, array $args ) {
 
         switch ( $node['event'] ) {
-
-            /* ---------------- POSTS ---------------- */
-            /* ---------------- MEDIA ---------------- */
-            /* ---------------- COMMENTS ---------------- */
-            /* ---------------- Plugin / Theme  ---------------- */
-            /* ---------------- USERS ---------------- */
-            /* ---------------- TERMS ---------------- */
-            /* ---------------- SYSTEM ---------------- */
+            case 'publish_post':
+                // return self::resolve_post_payload( $args[0] ?? 0 ); // example code remove before proceed
         }
 
         return false;
     }
 
-
-    /* =====================================================
-     * ACTIONS
-     * ===================================================== */
-
     public static function get_actions(): array {
         return [
+            'create_post'                   => ['label'=>'Create Post'], // example code
         ];
     }
 
-    private static function field_comment_id(): array {
-        return [];
-    }
-
-    /**
-     * Action UI Schema
-     */
     public static function get_action_config_schema( string $action ): array {
 
         $schemas = [
-
-            /* ---------- POSTS ---------- */
-            /* ---------- COMMENTS ---------- */
-            /* ---------- USERS ---------- */
-            /* ---------- OPTIONS ---------- */
-            /* ---------- MEDIA ---------- */
-            /* ---------- PLUGIN / THEME ---------- */
-            /* ---------- AUTH ---------- */
+            'action' => ['schema_key' => 'schema_value' ] // example code
         ];
 
         return $schemas[$action] ?? [];
     }
 
-    /* =====================================================
-     * ACTION EXECUTION
-     * ===================================================== */
 
     public static function execute_node( array $node, array $input ): array {
 
@@ -131,11 +73,4 @@ class Storeengine extends IntegrationBase {
 
         return ['port' => 'main', 'data' => $input];
     }
-
-    /* =====================================================
-     * DYNAMIC DATA QUERIES (API)
-     * ===================================================== */
-
-    // public static function get_dynamic_queries(): array {
-    // }
 }
