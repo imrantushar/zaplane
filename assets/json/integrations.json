@@ -3056,6 +3056,15 @@
                 }
             },
             "actions": []
+        },
+        "storeengine": {
+            "slug": "storeengine",
+            "name": "Storeengine",
+            "icon": "",
+            "category": "app",
+            "triggers": {
+                
+            }
         }
     },
     "tools": {
