@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-01-21 06:55:23",
+    "generated_at": "2026-01-21 12:56:32",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -3045,10 +3045,109 @@
             "icon": "",
             "category": "app",
             "triggers": {
-                "publish_post": {
-                    "key": "publish_post",
-                    "label": "Post Published",
-                    "hook": "publish_post",
+                "product_purchased": {
+                    "key": "product_purchased",
+                    "label": "Product Purchased",
+                    "hook": "product_purchased",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "order_status_update": {
+                    "key": "order_status_update",
+                    "label": "Order Status Updated",
+                    "hook": "order_status_update",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "order_status_on_hold": {
+                    "key": "order_status_on_hold",
+                    "label": "Order Status Set To On Hold",
+                    "hook": "order_status_on_hold",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "order_status_pending_payment": {
+                    "key": "order_status_pending_payment",
+                    "label": "Order Status Set To Pending Payment",
+                    "hook": "order_status_pending_payment",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "order_status_processing": {
+                    "key": "order_status_processing",
+                    "label": "Order Status Set To Processing",
+                    "hook": "order_status_processing",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "order_status_completed": {
+                    "key": "order_status_completed",
+                    "label": "Order Status Set To Completed",
+                    "hook": "order_status_completed",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "order_status_cancelled": {
+                    "key": "order_status_cancelled",
+                    "label": "Order Status Set To Cancelled",
+                    "hook": "order_status_cancelled",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "order_status_draft": {
+                    "key": "order_status_draft",
+                    "label": "Order Status Set To Draft",
+                    "hook": "order_status_draft",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "order_status_trash": {
+                    "key": "order_status_trash",
+                    "label": "Order Status Set To Trash",
+                    "hook": "order_status_trash",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "order_customer_note_added": {
+                    "key": "order_customer_note_added",
+                    "label": "Customer Note Added to Order",
+                    "hook": "order_customer_note_added",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "order_customer_note_deleted": {
+                    "key": "order_customer_note_deleted",
+                    "label": "Customer Note Deleted From Order",
+                    "hook": "order_customer_note_deleted",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "order_restored": {
+                    "key": "order_restored",
+                    "label": "Order Restored",
+                    "hook": "order_restored",
                     "schema": [],
                     "outputs": [
                         "main"
