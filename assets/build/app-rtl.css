@@ -734,6 +734,288 @@
     padding: 0 15px;
   }
 }
+
+.zaplane-btn-group {
+  display: flex;
+  -moz-column-gap: 15px;
+       column-gap: 15px;
+}
+
+.zaplane-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
+  text-decoration: none;
+  background: #fff;
+  color: #444;
+  cursor: pointer;
+  text-align: center;
+  padding: 15px;
+  height: auto;
+  border-radius: 4px;
+  box-sizing: border-box;
+  margin: 0;
+  border: 0;
+  overflow: hidden !important;
+  transition: all 0.3 ease;
+  white-space: nowrap;
+}
+
+.zaplane-btn::after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  right: -100%;
+  top: 0;
+  background: rgba(0, 0, 0, 0.1);
+  transition: all 0.25s cubic-bezier(0.66, 0.36, 0.17, 0.91);
+}
+
+.zaplane-btn:hover::after {
+  right: 0;
+}
+
+.zaplane-btn:hover, .zaplane-btn:focus {
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.zaplane-btn--label {
+  padding: 0 4px;
+}
+
+.zaplane-btn--circle {
+  border-radius: 50%;
+}
+
+.zaplane-btn--inline-block {
+  display: inline-block;
+  width: auto;
+  padding-right: 30px;
+  padding-left: 30px;
+}
+
+.zaplane-btn--inline-flex {
+  display: inline-flex;
+  width: auto;
+  padding-right: 30px;
+  padding-left: 30px;
+  -moz-column-gap: 10px;
+       column-gap: 10px;
+}
+
+.zaplane-btn--bg-red, .zaplane-btn--preset-red {
+  background: #f94d4d;
+  color: #fff;
+}
+
+.zaplane-btn--bg-red:hover, .zaplane-btn--bg-red:focus, .zaplane-btn--preset-red:hover, .zaplane-btn--preset-red:focus {
+  background: #f94d4d;
+  color: #fff;
+}
+
+.zaplane-btn--preset-error {
+  background: #f94d4d !important;
+  color: #fff !important;
+}
+
+.zaplane-btn--bg-light-red, .zaplane-btn--preset-light-red {
+  background: rgba(249, 77, 77, 0.2);
+  color: #f94d4d;
+}
+
+.zaplane-btn--bg-light-red .zaplane-icon:before, .zaplane-btn--preset-light-red .zaplane-icon:before {
+  color: #f94d4d;
+}
+
+.zaplane-btn--bg-light-red:hover, .zaplane-btn--bg-light-red:focus, .zaplane-btn--preset-light-red:hover, .zaplane-btn--preset-light-red:focus {
+  background: rgba(249, 77, 77, 0.2);
+  color: #f94d4d;
+}
+
+.zaplane-btn--bg-purple, .zaplane-btn--preset-purple {
+  background: var(--zaplane-primary-color);
+  color: #fff;
+}
+
+.zaplane-btn--bg-purple:hover, .zaplane-btn--bg-purple:focus, .zaplane-btn--preset-purple:hover, .zaplane-btn--preset-purple:focus {
+  background: var(--zaplane-primary-color);
+  color: #fff;
+}
+
+.zaplane-btn--bg-light-purple, .zaplane-btn--preset-light-purple {
+  background: var(--zaplane-secondary-color);
+  color: var(--zaplane-primary-color);
+}
+
+.zaplane-btn--bg-light-purple .zaplane-icon:before, .zaplane-btn--preset-light-purple .zaplane-icon:before {
+  color: var(--zaplane-primary-color);
+}
+
+.zaplane-btn--bg-light-purple:hover, .zaplane-btn--bg-light-purple:focus, .zaplane-btn--preset-light-purple:hover, .zaplane-btn--preset-light-purple:focus {
+  background: var(--zaplane-secondary-color);
+  color: var(--zaplane-primary-color);
+}
+
+.zaplane-btn--bg-white-border, .zaplane-btn--preset-white-border {
+  border: 2px solid var(--zaplane-border-color);
+}
+
+.zaplane-btn--bg-white-border:hover, .zaplane-btn--bg-white-border:focus, .zaplane-btn--preset-white-border:hover, .zaplane-btn--preset-white-border:focus {
+  border: 2px solid var(--zaplane-border-color);
+}
+
+.zaplane-btn--bg-gray, .zaplane-btn--preset-gray {
+  background: var(--zaplane-border-color);
+}
+
+.zaplane-btn--bg-gray:hover, .zaplane-btn--bg-gray:focus, .zaplane-btn--preset-gray:hover, .zaplane-btn--preset-gray:focus {
+  background: var(--zaplane-gray-color);
+}
+
+.zaplane-btn--preset-white {
+  background: #fff;
+  color: #000000;
+}
+
+.zaplane-btn--preset-white:hover, .zaplane-btn--preset-white:focus {
+  background: #fff;
+  color: #000000;
+}
+
+.zaplane-btn--preset-transparent {
+  background: transparent;
+}
+
+.zaplane-btn--preset-transparent::after {
+  background: transparent;
+}
+
+.zaplane-btn--preset-transparent:hover, .zaplane-btn--preset-transparent:focus {
+  background-color: transparent;
+}
+
+.zaplane-btn--border-rounded {
+  border-radius: 4px;
+}
+
+.zaplane-btn--preset-border-purple, .zaplane-btn--border-purple {
+  background: transparent;
+  border: 1px solid var(--zaplane-primary-color);
+  color: var(--zaplane-primary-color);
+}
+
+.zaplane-btn--preset-border-purple:hover, .zaplane-btn--preset-border-purple:focus, .zaplane-btn--border-purple:hover, .zaplane-btn--border-purple:focus {
+  background: #F5F5F5;
+  color: var(--zaplane-primary-color);
+}
+
+.zaplane-btn--border-gray {
+  border: 1px solid var(--zaplane-border-color);
+}
+
+.zaplane-btn--border-gray:hover, .zaplane-btn--border-gray:focus {
+  border: 1px solid var(--zaplane-border-color);
+}
+
+.zaplane-btn--border-red {
+  border: 1px solid #f94d4d;
+}
+
+.zaplane-btn--border-red:hover, .zaplane-btn--border-red:focus {
+  border: 1px solid #f94d4d;
+}
+
+.zaplane-btn--border-black {
+  border: 1px solid var(--zaplane-primary-color);
+}
+
+.zaplane-btn--border-black:hover, .zaplane-btn--border-black:focus {
+  border: 1px solid var(--zaplane-primary-color);
+}
+
+.zaplane-btn--mini {
+  padding: 4px 6px;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 18px;
+}
+
+.zaplane-btn--xs {
+  padding: 8px;
+  font-size: 12px;
+}
+
+.zaplane-btn--sm {
+  padding: 8px 16px;
+  font-size: 12px;
+}
+
+.zaplane-btn--md {
+  padding: 10px 20px;
+  font-size: 14px;
+}
+
+.zaplane-btn--lg {
+  padding: 12px 24px;
+  font-size: 14px;
+}
+
+.zaplane-btn--disabled {
+  background: #E5E5E6 !important;
+  color: var(--zaplane-text-disable) !important;
+  cursor: not-allowed !important;
+}
+
+.zaplane-btn--disabled .zaplane-icon::before {
+  color: var(--zaplane-secondary-gray-color) !important;
+}
+
+.zaplane-btn--add-rule-group {
+  width: -moz-fit-content;
+  width: fit-content;
+}
+
+.zaplane-btn .zaplane-icon {
+  font-size: 14px;
+}
+
+.zaplane-btn--icon-left {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.zaplane-btn--icon-top {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.zaplane-btn--icon-bottom {
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+}
+
+.zaplane-btn--icon-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.zaplane-btn--icon-center .zaplane-icon {
+  font-size: 14px;
+}
+
+.zaplane-btn svg {
+  overflow: visible;
+}
 /*!*************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/@wordpress/scripts/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./dev_zaplane/components/Modal/styles.scss ***!
   \*************************************************************************************************************************************************************************************************************************************************************************************************/
@@ -792,6 +1074,108 @@
   background: #E2E0FF;
   padding: 6px;
   border-radius: 50%;
+}
+/*!******************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/@wordpress/scripts/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./dev_zaplane/components/OptionMenu/styles.scss ***!
+  \******************************************************************************************************************************************************************************************************************************************************************************************************/
+.zaplane-dropdown-menu {
+  position: relative;
+  border-radius: 4px;
+  border: 1px solid var(--zaplane-border-color) !important;
+  cursor: pointer;
+  background: transparent;
+  padding: 4px 8px !important;
+}
+.zaplane-dropdown-menu:focus, .zaplane-dropdown-menu:hover {
+  background: var(--zaplane-body-background);
+  color: none;
+}
+.zaplane-dropdown-menu__lists .zaplane-more-options {
+  position: relative;
+  min-width: 175px;
+  z-index: 99999;
+  border-radius: 4px;
+  border: 1px solid var(--zaplane-border-color);
+  background: var(--zaplane-background);
+  margin: 0;
+  padding: 8px 8px 4px 8px;
+  box-shadow: 0px 12px 24px -4px rgba(16, 24, 40, 0.08);
+}
+.zaplane-dropdown-menu__lists .zaplane-more-options__item {
+  cursor: pointer;
+  margin-bottom: 0;
+  border-radius: 6px;
+  list-style: none;
+}
+.zaplane-dropdown-menu__lists .zaplane-more-options__item a, .zaplane-dropdown-menu__lists .zaplane-more-options__item button {
+  cursor: pointer;
+  border: none;
+  width: 100%;
+  color: var(--zaplane-font-color);
+  border-radius: 6px;
+  padding: 8px 10px 8px 10px;
+  display: flex;
+  margin-bottom: 4px;
+}
+.zaplane-dropdown-menu__lists .zaplane-more-options__item a:hover, .zaplane-dropdown-menu__lists .zaplane-more-options__item button:hover {
+  background: var(--zaplane-body-background);
+  color: var(--zaplane-font-color);
+  border-radius: 4px;
+}
+.zaplane-dropdown-menu__lists .zaplane-more-options__item a .zaplane-icon-slash, .zaplane-dropdown-menu__lists .zaplane-more-options__item button .zaplane-icon-slash {
+  width: 18px;
+  margin-left: 10px;
+}
+.zaplane-dropdown-menu__lists .zaplane-more-options__item a .zaplane-icon, .zaplane-dropdown-menu__lists .zaplane-more-options__item button .zaplane-icon {
+  margin-left: 10px;
+  font-size: 20px;
+}
+.zaplane-dropdown-menu__lists .zaplane-more-options__item a .zaplane-icon--reset, .zaplane-dropdown-menu__lists .zaplane-more-options__item button .zaplane-icon--reset {
+  font-size: 14px;
+  font-weight: 500;
+}
+.zaplane-dropdown-menu__lists .zaplane-more-options__item a .zaplane-icon--edit, .zaplane-dropdown-menu__lists .zaplane-more-options__item button .zaplane-icon--edit {
+  font-size: 20px;
+}
+.zaplane-dropdown-menu__lists .zaplane-more-options__item a .zaplane-icon--delete::before, .zaplane-dropdown-menu__lists .zaplane-more-options__item button .zaplane-icon--delete::before {
+  color: #fff;
+}
+.zaplane-dropdown-menu__lists .zaplane-more-options__item a .zaplane-btn--label, .zaplane-dropdown-menu__lists .zaplane-more-options__item button .zaplane-btn--label {
+  pointer-events: none;
+  font-size: 12px;
+}
+.zaplane-dropdown-menu__lists .zaplane-more-options__item a .dashicons, .zaplane-dropdown-menu__lists .zaplane-more-options__item button .dashicons {
+  font-size: 16px;
+  height: auto;
+  width: auto;
+}
+.zaplane-dropdown-menu__lists .zaplane-more-options__item .zaplane-btn--trash {
+  color: #FF4D4D;
+}
+.zaplane-dropdown-menu__lists .zaplane-more-options__item .zaplane-btn--trash .zaplane-icon::before {
+  color: #FF4D4D;
+}
+.zaplane-dropdown-menu__lists .zaplane-more-options__item .zaplane-btn--trash:hover {
+  color: #FF4D4D;
+}
+.zaplane-dropdown-menu__lists .zaplane-more-options__item .zaplane-option-separator {
+  margin: 4px 0;
+}
+.zaplane-dropdown-menu__inline {
+  display: flex;
+}
+.zaplane-dropdown-menu__inline-form:not(.zaplane-dropdown-menu__inline-form:last-child) {
+  border-left: 1px solid var(--zaplane-border-color);
+  padding-left: 2px;
+  margin-left: 2px;
+}
+.zaplane-dropdown-menu__inline-form .zaplane-btn--inline {
+  padding: 0;
+  color: var(--zaplane-warn-muted);
+}
+.zaplane-dropdown-menu__inline-form .zaplane-btn--trash {
+  padding: 0;
+  color: var(--zaplane-placing);
 }
 /*!**********************************************************************************************************************************************************************************************!*\
   !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[2].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[2].use[2]!./node_modules/@xyflow/react/dist/base.css ***!

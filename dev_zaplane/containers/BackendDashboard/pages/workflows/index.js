@@ -6,6 +6,7 @@ import {
   Heading,
   Text,
   Button,
+  Icon,
 
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
@@ -23,6 +24,8 @@ import {
 import ZAPTable from "@ZAPComponents/Table";
 import ZAPMenu from "@ZAPComponents/ZapMenu";
 import TopBar from "@ZAPComponents/TopBar";
+import OptionMenu from "@ZAPComponents/OptionMenu";
+import { FiEdit, FiTrash2 } from "react-icons/fi";
 
 
 const CreateWorkflows = () => {
@@ -128,7 +131,7 @@ const CreateWorkflows = () => {
               textAlign: "center",
               render: (row) => (
                 <Text fontWeight="500" className="zaplane-label">
-                     {__(row.title, "zaplane")}
+                  {__(row.title, "zaplane")}
                 </Text>
               ),
             },
@@ -149,7 +152,7 @@ const CreateWorkflows = () => {
               textAlign: "center",
               render: (row) => (
                 <Text fontSize="sm" className="zaplane-label">
-                     {__(row.updated_at, "zaplane")}
+                  {__(row.updated_at, "zaplane")}
                 </Text>
               ),
             },
@@ -182,28 +185,28 @@ const CreateWorkflows = () => {
             },
           ]}
           actionsRenderer={(row) => (
-            <Box>
-              <Button
-                size="xs"
-                variant="outline"
-                onClick={() =>
-                  navigate(
-                    `${route_path}admin.php?page=zaplane-workflows&action=edit&id=${row.id}`
-                  )
-                }
-              >
-                {__('Edit', 'zaplane')}
-              </Button>
-
-              <Button
-                size="xs"
-                colorScheme="red"
-                variant="ghost"
-                onClick={() => workflowDeleteHandler(row.id)}
-              >
-                {__('Delete', 'zaplane')}
-              </Button>
-            </Box>
+            <OptionMenu
+              options={[
+                {
+                  label: __('Edit', 'zaplane'),
+                  icon: <Icon as={FiEdit} />,
+                  type: 'button',
+                  onClick: () =>
+                    navigate(
+                      `${route_path}admin.php?page=zaplane-workflows&action=edit&id=${row.id}`
+                    ),
+                },
+                {
+                  label: __('Delete', 'zaplane'),
+                  suffix: 'trash',
+                  icon: <Icon as={FiTrash2} />,
+                  type: 'button',
+                  onClick: () => workflowDeleteHandler(row.id),
+                  hasBorder: false,
+                },
+              ]}
+    
+            />
           )}
           isLoading={isLoading}
         />
