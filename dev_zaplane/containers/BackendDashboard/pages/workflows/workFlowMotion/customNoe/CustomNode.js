@@ -5,11 +5,11 @@ import {
   NodeToolbar,
   useReactFlow,
 } from "@xyflow/react";
-import { Box, HStack, Icon } from "@chakra-ui/react";
+import { Box, HStack, Icon, Text } from "@chakra-ui/react";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import { FaRegCopy } from "react-icons/fa";
 import FloatingEdge from "../floatingEdge/FloatingEdge";
-import ZAPText from "@ZAPComponents/Text";
+import { __ } from "@wordpress/i18n";
 export default function CustomNode({ id, data, xPos, yPos }) {
   const [hovered, setHovered] = useState(false);
 
@@ -38,15 +38,15 @@ export default function CustomNode({ id, data, xPos, yPos }) {
         offset={10}
       >
         <HStack>
-          <ZAPText
+          <Text
             borderRadius="full"
             p="4px 8px"
             fontWeight="medium"
-            background="#E6F4FF"
+            className="zaplane-label"
             margin={0}
           >
             {data.action || "Action"}
-          </ZAPText>
+          </Text>
         </HStack>
       </NodeToolbar>
       {
@@ -58,14 +58,14 @@ export default function CustomNode({ id, data, xPos, yPos }) {
         >
           <HStack
             bg="var(--zaplane-border-color)"
-            color="black"
+            color="var(--zaplane-font-color)"
             p="6px"
             marginTop="4px"
             borderRadius="full"
             boxShadow="lg"
             cursor="pointer"
             pointerEvents="auto"
-             _hover={{ bg: "red.300" }}
+            _hover={{ bg: "red.300" }}
           >
             <Icon
               as={RiDeleteBin5Line}
@@ -82,9 +82,9 @@ export default function CustomNode({ id, data, xPos, yPos }) {
       }
 
       <Box
-        bg="white"
+        bg="var(--zaplane-body-background)"
         border="1px solid"
-        borderColor="gray.300"
+        borderColor="var(--zaplane-border-color)"
         borderRadius="md"
         px={4}
         py={2}
@@ -107,9 +107,9 @@ export default function CustomNode({ id, data, xPos, yPos }) {
           />
         )}
 
-        <ZAPText m={0} fontSize="sm" fontWeight="medium">
-          {data.app}
-        </ZAPText>
+        <Text className="zaplane-label" fontSize="sm" fontWeight="medium">
+          {__(data.app, "zaplane")}
+        </Text>
         {!data.conditions && (
           <Handle
             type="source"

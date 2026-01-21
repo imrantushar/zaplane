@@ -4,7 +4,6 @@ import {
     Text,
     HStack,
     Box,
-    Button,
 } from "@chakra-ui/react";
 import { useDispatch, useSelector } from "react-redux";
 import { getQueueList } from "@ZAPRedux/Slices/queueSlice/queueSlice";

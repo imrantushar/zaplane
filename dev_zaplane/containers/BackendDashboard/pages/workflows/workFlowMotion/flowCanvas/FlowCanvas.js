@@ -16,22 +16,14 @@ import CustomEdge from "../customEdge/CustomEdge";
 import ActionDrawer from "../actionDrawer/ActionDrawer";
 import { useFormikContext } from "formik";
 import TopBar from "@ZAPComponents/TopBar";
-import { FaChevronRight } from "react-icons/fa";
 import {
     Box,
     Flex,
     Button,
-    Checkbox,
-    Table,
-    Badge,
-    HStack,
     Text,
-    Tabs
 } from "@chakra-ui/react";
 import {
-    FiArrowLeft,
-    FiRefreshCw,
-    FiHelpCircle,
+    FiArrowLeft
 } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import { getAllVersion, getRunWorkFlow, getSingleWorkFlow, liveMonitor, updateWorkFlow, updateWorkFlowStatus, workFLowExction, workflowNodeListiner } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
@@ -429,8 +421,8 @@ export default function FlowCanvas({ id }) {
                         <Button
                             size="sm"
                             bg="black"
-                            color="white"
-                            _hover={{ bg: "gray.800" }}
+                            color="var(--zaplane-background)"
+                            _hover={{ bg: "" }}
                             onClick={() => onSubmitHandler()}
                         >
                             {__("Update", "zaplane")}

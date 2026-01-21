@@ -503,6 +503,71 @@
   font-weight: 500;
 }
 
+.zaplane-heading {
+  color: var(--zaplane-font-color);
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 28px;
+  margin: 0;
+}
+
+.zaplane-label {
+  color: var(--zaplane-font-color);
+  font-weight: 500;
+  line-height: 28px;
+  margin: 0;
+}
+
+.zaplane-border {
+  width: 100%;
+  margin: 0 0 24px 0;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--zaplane-border-color);
+}
+
+.zaplane-title-subtitle {
+  color: var(--zaplane-font-color);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+  margin: 0;
+}
+
+.zaplane-title {
+  color: var(--zaplane-font-color);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 24px;
+  margin: 0;
+}
+
+.zaplane-sub-title {
+  color: var(--zaplane-font-color);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 18px;
+  margin: 0;
+}
+
+.zaplane-sub-title-muted {
+  color: var(--zaplane-warn-muted);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 18px;
+  margin: 0;
+}
+
+.zaplane-title-required {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.zaplane-title-required--sign {
+  color: var(--zaplane-placing);
+}
+
 .zaplane-input {
   border: 1px solid var(--zaplane-border-color) !important;
   height: 36px;

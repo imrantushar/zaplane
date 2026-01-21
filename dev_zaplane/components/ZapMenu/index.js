@@ -7,7 +7,7 @@ const ZAPMenu = ({ triggerLabel, items = [] }) => {
   return (
     <Menu.Root>
       <Menu.Trigger asChild>
-        <Button colorScheme="blue">{__(triggerLabel, "zaplane")}</Button>
+        <Button colorScheme="var(--zaplane-primary)">{__(triggerLabel, "zaplane")}</Button>
       </Menu.Trigger>
 
       <Portal>

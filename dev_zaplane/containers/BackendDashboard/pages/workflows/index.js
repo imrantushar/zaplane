@@ -6,12 +6,6 @@ import {
   Heading,
   Text,
   Button,
-  Badge,
-  Table,
-  Stack,
-  Menu,
-  Portal,
-  Spinner,
 
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
@@ -24,14 +18,9 @@ import {
   createWorkflows,
   deleteWorkFlow,
   getWorkFlow,
-  updateWorkFlow,
   updateWorkFlowStatus,
 } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
-import { FiMoreVertical } from "react-icons/fi";
-import { showNotification } from "@ZAPRedux/Slices/notificationSlice/notificationSlice";
-import ZAPLoading from "@ZAPComponents/Loading";
 import ZAPTable from "@ZAPComponents/Table";
-import ZAPText from "@ZAPComponents/Text";
 import ZAPMenu from "@ZAPComponents/ZapMenu";
 import TopBar from "@ZAPComponents/TopBar";
 
@@ -105,12 +94,9 @@ const CreateWorkflows = () => {
       <TopBar
         render={() => (
           <Box>
-            <Heading margin="0" size="md">
-              {__("Workflows", "zaplane")}
+            <Heading className="zaplane-heading">
+              {__("Flows", "zaplane")}
             </Heading>
-            <Text fontSize="sm" margin="0" color="gray.500">
-              {__("Automate actions between your apps", "zaplane")}
-            </Text>
           </Box>
         )}
         rightContent={() => (
@@ -134,16 +120,16 @@ const CreateWorkflows = () => {
           data={data}
           rowKey="id"
           size="sm"
-          variant="line"
+          variant="outline"
           columns={[
             {
               label: __("Title", "zaplane"),
               key: "title",
               textAlign: "center",
               render: (row) => (
-                <ZAPText fontWeight="500" >
-                  {row.title}
-                </ZAPText>
+                <Text fontWeight="500" className="zaplane-label">
+                     {__(row.title, "zaplane")}
+                </Text>
               ),
             },
             {
@@ -151,9 +137,9 @@ const CreateWorkflows = () => {
               key: "created_at",
               textAlign: "center",
               render: (row) => (
-                <ZAPText fontSize="sm">
+                <Text fontSize="sm" className="zaplane-label">
                   {row.created_at}
-                </ZAPText>
+                </Text>
               ),
             },
 
@@ -162,9 +148,9 @@ const CreateWorkflows = () => {
               key: "updated_at",
               textAlign: "center",
               render: (row) => (
-                <ZAPText fontSize="sm">
-                  {row.updated_at}
-                </ZAPText>
+                <Text fontSize="sm" className="zaplane-label">
+                     {__(row.updated_at, "zaplane")}
+                </Text>
               ),
             },
             {

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button, Flex, Box, Span, Text } from '@chakra-ui/react';
+import { Button, Flex, Text } from '@chakra-ui/react';
 import { __ } from '@wordpress/i18n';
 // import { isPlainPermalink } from '@Utils/helper';
 import './styles.scss';

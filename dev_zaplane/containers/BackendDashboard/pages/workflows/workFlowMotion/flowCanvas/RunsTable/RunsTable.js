@@ -1,22 +1,18 @@
 import {
-  Table,
   Badge,
   HStack,
   Button,
   Text,
-  Spinner,
-  Flex,
+  
 } from "@chakra-ui/react";
 import { useDispatch, useSelector } from "react-redux";
 import { useState } from "react";
 import {
-  getNodeLogDetails,
   getSingleRun,
   nodeLogsRunDetails,
 } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
 import LogDetails from "@ZAPComponents/LogDetails";
 import { getDuration, statusStyle } from "../../helper";
-import ZAPLoading from "@ZAPComponents/Loading";
 import ZAPTable from "@ZAPComponents/Table";
 import { __ } from "@wordpress/i18n";
 
@@ -29,7 +25,7 @@ const RunsTable = ({ runs = [] }) => {
   const [activeRunId, setActiveRunId] = useState(null);
   const { isLoading } = useSelector((state) => state.workflows);
 
-  
+
   if (showDetails) {
     return (
       <LogDetails
@@ -42,7 +38,7 @@ const RunsTable = ({ runs = [] }) => {
     );
   }
 
-  
+
 
   return (
     <ZAPTable
@@ -52,12 +48,12 @@ const RunsTable = ({ runs = [] }) => {
       isLoading={isLoading}
       noDataText='Have no History Yet'
       size="sm"
-      caption="Workflow Execution History"
       columns={[
         {
           label: "Run ID",
           key: "id",
-          render: (row) => <Text fontWeight="medium">#{row.id}</Text>,
+          textAlign: "center",
+          render: (row) => <Text fontWeight="medium">{__(row.id, "zaplane")}</Text>,
         },
         {
           label: "Status",
@@ -71,7 +67,7 @@ const RunsTable = ({ runs = [] }) => {
               textTransform="capitalize"
               {...statusStyle(row.status)}
             >
-              {row.status}
+              {__(row.status, "zaplane")}
             </Badge>
           ),
         },

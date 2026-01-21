@@ -1,10 +1,9 @@
-import { Box, Button, Flex } from "@chakra-ui/react";
+import { Box, Button, Flex,Text } from "@chakra-ui/react";
 import { FieldArray } from "formik";
 import { FiTrash2 } from "react-icons/fi";
 
 import ZAPInput from "@ZAPComponents/ZAPInput";
 import ZAPSelect from "@ZAPComponents/ZAPSelect";
-import ZAPText from "@ZAPComponents/Text";
 import { __ } from "@wordpress/i18n";
 import { buildEmptyRule } from "../../helper";
 
@@ -26,8 +25,8 @@ export default function ConditionGroupField({
                             {groups.length > 1 && gIndex !== 0 && (
                                 <Flex align="center">
                                     <Box flex="1" h="1px" bg="gray.300" />
-                                    <ZAPText mx={3} fontSize="sm">OR</ZAPText>
-                                    <Box flex="1" h="1px" bg="gray.300" />
+                                    <Text className="zaplane-label" mx={3} fontSize="sm"> {__("OR", "zaplane")}</Text>
+                                    <Box flex="1" h="1px" bg="var(--zaplane-border-color)" />
                                 </Flex>
                             )}
 
@@ -84,7 +83,7 @@ export default function ConditionGroupField({
 
                                                         <Button
                                                             type="button"
-                                                            colorScheme="red"
+                                                            colorScheme="#FF0000"
                                                             variant="ghost"
                                                             size="sm"
                                                             disabled={group.length === 1 && groups.length === 1 && !gIndex} 

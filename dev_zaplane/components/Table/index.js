@@ -3,12 +3,9 @@ import {
   Table,
   Text,
   HStack,
-  Button,
-  Badge,
   Flex,
 } from "@chakra-ui/react";
 import ZAPLoading from "@ZAPComponents/Loading";
-import ZAPText from "@ZAPComponents/Text";
 import { __ } from "@wordpress/i18n";
 import CustomTableMessage from "@ZAPComponents/Oops/CustomTableMessage";
 
@@ -32,8 +29,7 @@ const ZAPTable = ({
     <Flex
       direction="column"
       bg="white"
-      border="1px solid"
-      borderColor="gray.200"
+      borderColor="var(--zaplane-border-color)"
       borderRadius="lg"
       boxShadow="sm"
       overflow="hidden"
@@ -92,7 +88,7 @@ const ZAPTable = ({
           {!isLoading && Array.isArray(data) && data.length === 0 && (
             <Table.Row>
               <Table.Cell colSpan={colSpan} textAlign="center">
-                <ZAPText fontSize="sm" color="gray.500">
+                <Text className="zaplane-label">
 
                   <CustomTableMessage
                     title={__(
@@ -101,7 +97,7 @@ const ZAPTable = ({
                     )}
                     subText={noDataText}
                   />
-                </ZAPText>
+                </Text>
               </Table.Cell>
             </Table.Row>
           )}

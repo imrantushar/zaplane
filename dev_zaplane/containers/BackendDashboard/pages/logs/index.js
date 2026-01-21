@@ -1,13 +1,10 @@
 import React, { useEffect, useState } from "react";
 import {
-    Table,
     Text,
     HStack,
     Box,
     Button,
     Flex,
-    Spinner,
-    VStack,
 } from "@chakra-ui/react";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -68,7 +65,7 @@ const Logs = () => {
             <TopBar
                 render={() => (
                     <Box>
-                        <Text fontSize="lg" fontWeight="600" margin="0">
+                        <Text fontSize="lg" fontWeight="600" className="zaplane-label">
                             {__('Workflow Logs', 'zaplane')}
                         </Text>
                     </Box>
@@ -78,7 +75,7 @@ const Logs = () => {
                 <ZAPTable
                     data={data}
                     rowKey="id"
-                    variant="line"
+                    variant="outline"
                     size="sm"
                     columns={[
                         {

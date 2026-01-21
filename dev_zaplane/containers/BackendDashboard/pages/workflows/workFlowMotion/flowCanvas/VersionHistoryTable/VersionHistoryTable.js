@@ -7,6 +7,7 @@ import {
   Flex,
   Spinner,
 } from "@chakra-ui/react";
+import { __ } from "@wordpress/i18n";
 import ZAPLoading from "@ZAPComponents/Loading";
 import ZAPTable from "@ZAPComponents/Table";
 import { getPreviewOldVersion, versionActive } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
@@ -21,24 +22,24 @@ const VersionHistoryTable = ({
   const { isLoading } = useSelector((state) => state.workflows);
   return (
     <ZAPTable
-      data={versions}         
-      rowKey="id"             
+      data={versions}
+      rowKey="id"
       variant="line"
       isLoading={isLoading}
-      noDataText={"Right now Have no Version"}        
-      size="sm"                
-      caption="Version History" 
+      noDataText={"Right now Have no Version"}
+      size="sm"
       columns={[
         {
           label: "ID",
           key: "id",
-          render: (row) => <Text fontWeight="medium">#{row.id}</Text>,
+          textAlign: "center",
+          render: (row) => <Text className="zaplane-label" fontWeight="medium">{__(row.id, "zaplane")}</Text>,
         },
         {
           label: "Graph Hash",
           key: "graph_hash",
           render: (row) => (
-            <Text fontSize="sm">{row.graph_hash.slice(0, 12)}…</Text>
+            <Text fontSize="sm" >{row.graph_hash.slice(0, 12)}</Text>
           ),
         },
         {
@@ -50,8 +51,9 @@ const VersionHistoryTable = ({
               py="0.5"
               rounded="md"
               fontSize="xs"
-              color={row.is_active === "1" ? "green.600" : "gray.600"}
-              bg={row.is_active === "1"? "green.50" : "gray.100"}
+              color={row.is_active === "1" ? "#16A34A" : "#4B5563"}
+              bg={row.is_active === "1" ? "#DCFCE7" : "#F3F4F6"}
+
             >
               {row.is_active === "1" ? "Active" : "Inactive"}
             </Badge>
@@ -60,7 +62,7 @@ const VersionHistoryTable = ({
         {
           label: "Created At",
           key: "created_at",
-          render: (row) => <Text>{row.created_at}</Text>,
+          render: (row) => <Text>{__(row.created_at, "zaplane")}</Text>,
         },
       ]}
       actionsRenderer={(row) => (

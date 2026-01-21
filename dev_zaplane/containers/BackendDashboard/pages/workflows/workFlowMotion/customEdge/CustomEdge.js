@@ -61,7 +61,7 @@ const CustomEdge = ({
           onClick={() => onEdgeDelete(id)}
           title="Delete edge"
         >
-          <FaTimes color="red" />
+          <FaTimes color="#FF0000" />
         </div>
       </foreignObject>
 
@@ -85,7 +85,7 @@ const CustomEdge = ({
           onClick={() => onAddNode(id)}
           title="Add node"
         >
-          <FaPlus color="green" />
+          <FaPlus color="#4CAF50" />
         </div>
       </foreignObject>
     </>

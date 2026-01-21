@@ -19,13 +19,14 @@ const LogDetails = ({ runId, onBack }) => {
       <Text
         mb="4"
         cursor="pointer"
-        color="blue.500"
+        className="zaplane-label"
         onClick={onBack}
       >
         {__('← Back to Runs', 'zaplane')}
       </Text>
 
-      <Text mb="4" fontWeight="bold">
+      <Text mb="4" fontWeight="bold"
+      className="zaplane-label">
         
         {__(`Run ID: ${runId}`, 'zaplane')}
       </Text>
@@ -40,7 +41,7 @@ const LogDetails = ({ runId, onBack }) => {
               <Accordion.ItemTrigger>
                 <HStack flex="1" justify="space-between">
                   <HStack>
-                    <Text fontWeight="medium">
+                    <Text fontWeight="medium" className="zaplane-label">
                       {__(`Node ${log.node_key}`, 'zaplane')}
                     </Text>
                     <Badge>
@@ -51,10 +52,10 @@ const LogDetails = ({ runId, onBack }) => {
                   <Badge
                     colorScheme={
                       log.status === "completed"
-                        ? "green"
+                        ? "#4CAF50"
                         : log.status === "failed"
-                        ? "red"
-                        : "blue"
+                        ? "#F44336"
+                        : "var(--zaplane-primary)"
                     }
                   >
                     {log.status}
@@ -69,11 +70,11 @@ const LogDetails = ({ runId, onBack }) => {
                     <Box
                       p="3"
                       border="1px solid"
-                      borderColor="gray.200"
+                      borderColor="var(--zaplane-secondary)"
                       borderRadius="md"
-                      bg="gray.50"
+                      bg="var(--zaplane-secondary)"
                     >
-                      <Text fontWeight="bold" mb="2">
+                      <Text className="zaplane-label" fontWeight="bold" mb="2">
                         {__('Input', 'zaplane')}
                       </Text>
                       <pre>{JSON.stringify(input, null, 2)}</pre>
@@ -82,9 +83,9 @@ const LogDetails = ({ runId, onBack }) => {
                     <Box
                       p="3"
                       border="1px solid"
-                      borderColor="gray.200"
+                      borderColor="var(--zaplane-secondary)"
                       borderRadius="md"
-                      bg="gray.50"
+                      bg="var(--zaplane-secondary)"
                     >
                       <Text fontWeight="bold" mb="2">
                           {__('Output', 'zaplane')}

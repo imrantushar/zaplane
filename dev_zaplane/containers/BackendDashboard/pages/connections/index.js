@@ -16,12 +16,6 @@ import { __ } from "@wordpress/i18n";
 import { FaSlack } from "react-icons/fa";
 import {
     FiTrash2, FiRefreshCw, FiEye, FiLink,
-    FiLock,
-    FiCalendar,
-    FiClock,
-    FiCheckCircle,
-    FiEdit,
-    FiPlay
 } from "react-icons/fi";
 import Select from "react-select";
 
@@ -37,7 +31,6 @@ import {
 } from "@ZAPRedux/Slices/connectionsSlice/connectionsSlice";
 
 import WPModal from "@ZAPComponents/Modal/WPModal";
-import ZAPText from "@ZAPComponents/Text";
 import ZAPTable from "@ZAPComponents/Table";
 import ConnectionDetails from "./ConnectionDetails/ConnectionDetails";
 import TopBar from "@ZAPComponents/TopBar";
@@ -148,10 +141,10 @@ const Connections = () => {
             <TopBar
                 render={() => (
                     <Box>
-                        <Heading margin="0" size="md">
+                        <Heading className="zaplane-title">
                             {__("Connections", "zaplane")}
                         </Heading>
-                        <Text fontSize="sm" margin="0" color="gray.500">
+                        <Text className="zaplane-title-subtitle">
                             {__("Connections between your apps", "zaplane")}
                         </Text>
                     </Box>
@@ -209,7 +202,16 @@ const Connections = () => {
                                             handleStatusChange(row, s)
                                         }
                                         isSearchable={false}
+                                        menuPortalTarget={document.body}
+                                        menuPosition="fixed"
+                                        styles={{
+                                            menuPortal: (base) => ({
+                                                ...base,
+                                                zIndex: 9999,
+                                            }),
+                                        }}
                                     />
+
                                 </Box>
                             ),
                         },
@@ -231,7 +233,7 @@ const Connections = () => {
                             </Button>
                             <Button
                                 size="xs"
-                                colorScheme="red"
+                                colorScheme="#FF0000"
                                 leftIcon={<FiTrash2 />}
                                 onClick={() =>
                                     dispatch(deleteConnection(row.id))
@@ -256,7 +258,7 @@ const Connections = () => {
             >
                 <Box px={4}>
                     <VStack spacing={4} align="stretch">
-                        <Text>{__("Select an app or service to connect", "zaplane")}</Text>
+                        <Text className="zaplane-label">{__("Select an app or service to connect", "zaplane")}</Text>
 
                         <Select
                             value={selectedApp}
@@ -271,7 +273,7 @@ const Connections = () => {
                             <Button
                                 key={key}
                                 variant={selectedAuthType === key ? "solid" : "outline"}
-                                colorScheme="blue"
+                                colorScheme="var(--zaplane-primary)"
                                 onClick={() => {
                                     setSelectedAuthType(key);
                                     setCredentials({});
@@ -288,7 +290,7 @@ const Connections = () => {
 
                                         return (
                                             <Box key={fieldKey}>
-                                                <ZAPText fontWeight="bold">{field.label}</ZAPText>
+                                                <Text className="zaplane-label" fontWeight="bold">   {__(field.label, "zaplane")}</Text>
                                                 <Input
                                                     type={field.type === "password" ? "password" : "text"}
                                                     placeholder={field.placeholder || ""}
@@ -301,9 +303,10 @@ const Connections = () => {
                                                     }
                                                 />
                                                 {field.help && (
-                                                    <ZAPText fontSize="sm" color="gray.500">
-                                                        {field.help}
-                                                    </ZAPText>
+                                                    <Text fontSize="sm" className="zaplane-label">
+
+                                                        {__(field.help, "zaplane")}
+                                                    </Text>
                                                 )}
                                             </Box>
                                         );
@@ -316,7 +319,7 @@ const Connections = () => {
 
                         <Button
                             width="220px"
-                            colorScheme="blue"
+                            colorScheme="var(--zaplane-primary)"
                             onClick={handleConnect}
                             isLoading={loadingOAuth}
                             isDisabled={!selectedApp || !selectedAuthType}

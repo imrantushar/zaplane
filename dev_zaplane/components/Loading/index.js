@@ -20,7 +20,7 @@ const ZAPLoading = ({
       <Spinner size={size} />
 
       {label && (
-        <Text fontSize="sm" color="gray.500">
+        <Text fontSize="sm" color="var(--zaplane-body-background)">
          { __(label, 'zaplane')}
         </Text>
       )}
