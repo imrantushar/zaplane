@@ -38,7 +38,7 @@ const ZAPTable = ({
       boxShadow="sm"
       overflow="hidden"
     >
-      <Table.Root size={size} variant={variant}>
+      <Table.Root size={size} variant={variant} marginBottom={data.length > 0 ? "25px" : "0"}>
         {caption && <Table.Caption>{caption}</Table.Caption>}
         <Table.Header>
           <Table.Row>
