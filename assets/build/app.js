@@ -2551,7 +2551,15 @@ const CreateWorkflows = () => {
               options: statusOptions,
               value: statusOptions.find(opt => opt.value === row.status),
               onChange: selected => onSubmitHandler(row, selected.value),
-              isClearable: false
+              isClearable: false,
+              menuPortalTarget: document.body,
+              menuPosition: "fixed",
+              styles: {
+                menuPortal: base => ({
+                  ...base,
+                  zIndex: 9999
+                })
+              }
             })
           })
         }],

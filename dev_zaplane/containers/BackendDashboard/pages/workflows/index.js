@@ -182,6 +182,14 @@ const CreateWorkflows = () => {
                       onSubmitHandler(row, selected.value)
                     }
                     isClearable={false}
+                    menuPortalTarget={document.body}
+                    menuPosition="fixed"
+                    styles={{
+                      menuPortal: (base) => ({
+                        ...base,
+                        zIndex: 9999,
+                      }),
+                    }}
                   />
                 </Box>
               ),
