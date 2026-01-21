@@ -1170,7 +1170,7 @@ const ZAPInput = ({
   value,
   onChange,
   type = 'text',
-  style,
+  containerStyle,
   inputStyle,
   textAreaSize
 }) => {
@@ -1180,7 +1180,7 @@ const ZAPInput = ({
     direction: "column",
     gap: 2,
     style: {
-      ...style
+      ...containerStyle
     },
     children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_ZAPComponents_Text__WEBPACK_IMPORTED_MODULE_5__["default"], {
       fontWeight: "600",
@@ -1232,17 +1232,19 @@ const ZAPSelect = ({
   mb = 0,
   placeholder,
   isClearable = false,
-  style
+  containerStyle
 }) => {
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
     mb: mb,
-    style: style,
+    style: containerStyle,
     children: [label && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_ZAPComponents_Text__WEBPACK_IMPORTED_MODULE_2__["default"], {
       fontWeight: "600",
       fontSize: "0.875rem",
       mb: "4px",
       children: label
     }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(react_select__WEBPACK_IMPORTED_MODULE_1__["default"], {
+      className: "zaplane-select",
+      classNamePrefix: "zaplane-select",
       options: options,
       isLoading: isLoading,
       placeholder: placeholder,
@@ -2773,7 +2775,7 @@ function ConditionGroupField({
                         ...rule,
                         [f.key]: val
                       }),
-                      style: {
+                      containerStyle: {
                         width: "30%"
                       }
                     }, f.key);
@@ -2785,7 +2787,7 @@ function ConditionGroupField({
                       ...rule,
                       [f.key]: e.target.value
                     }),
-                    style: {
+                    containerStyle: {
                       width: "30%"
                     }
                   }, f.key);

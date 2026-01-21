@@ -13,13 +13,15 @@ const ZAPSelect = ({
   mb = 0,
   placeholder,
   isClearable = false,
-  style,
+  containerStyle,
 }) => {
   return (
-    <Box mb={mb} style={style}>
+    <Box mb={mb} style={containerStyle}>
       {label && <ZAPText fontWeight="600" fontSize="0.875rem" mb="4px">{label}</ZAPText>}
 
       <Select
+        className="zaplane-select"
+        classNamePrefix="zaplane-select"
         options={options}
         isLoading={isLoading}
         placeholder={placeholder}

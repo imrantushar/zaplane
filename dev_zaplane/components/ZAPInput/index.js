@@ -9,7 +9,7 @@ const ZAPInput = ({
   value,
   onChange,
   type = 'text',
-  style,
+  containerStyle,
   inputStyle,
   textAreaSize,
 
@@ -18,7 +18,7 @@ const ZAPInput = ({
   const InputComponent = type === 'textarea' ? Textarea : Input;
 
   return (
-    <Flex as="label" direction="column"  gap={2} style={{ ...style }}>
+    <Flex as="label" direction="column"  gap={2} style={{...containerStyle }}>
       <ZAPText fontWeight="600" fontSize="0.875rem" >
         {__(label, 'zaplane')}
       </ZAPText>

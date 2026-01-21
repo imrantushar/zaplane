@@ -51,7 +51,7 @@ export default function ConditionGroupField({
                                                                             [f.key]: val,
                                                                         })
                                                                     }
-                                                                    style={{ width: "30%" }}
+                                                                    containerStyle={{ width: "30%" }}
                                                                 />
                                                             );
                                                         }
@@ -67,7 +67,7 @@ export default function ConditionGroupField({
                                                                         [f.key]: e.target.value,
                                                                     })
                                                                 }
-                                                                style={{ width: "30%" }}
+                                                                containerStyle={{ width: "30%" }}
                                                             />
                                                         );
                                                     })}
