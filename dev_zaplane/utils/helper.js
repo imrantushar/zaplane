@@ -94,3 +94,22 @@ export const makeRequest = async (
 
     return data;
 };
+export const getDuration = (start, end) => {
+  if (!start || !end) return "--";
+
+  const startTime = new Date(start.replace(" ", "T"));
+  const endTime = new Date(end.replace(" ", "T"));
+
+  if (isNaN(startTime) || isNaN(endTime)) return "--";
+
+  const diffMs = endTime - startTime;
+  const seconds = Math.floor(diffMs / 1000);
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+
+  if (mins > 0) {
+    return `${mins}m ${secs}s`;
+  }
+
+  return `${secs}s`;
+};

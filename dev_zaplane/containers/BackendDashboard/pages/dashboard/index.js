@@ -1,12 +1,22 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { __ } from '@wordpress/i18n';
 import TopBar from '@ZAPComponents/TopBar';
 import ZAPLabel from '@ZAPComponents/Labels/ZAPLabel';
-import { Button, Flex } from '@chakra-ui/react';
+import { Box, Button, Flex, Text } from '@chakra-ui/react';
 import { outlineBtn } from '../../../../../assets/scss/chakra/recipe';
 import { FiHelpCircle } from 'react-icons/fi';
+import { useDispatch, useSelector } from 'react-redux';
+import RecentLogs from './RecentLogs';
+import ExecutedFlows from './ExecutedFlows';
+import { getRunsList } from '@ZAPRedux/Slices/logsSlice/logsSlice';
+import TotalExecutions from './TotalExecutions';
 
 export default function Dashboard() {
+      const dispatch = useDispatch();
+     const { data } = useSelector((state) => state.logs || {});
+      useEffect(() => {
+             dispatch(getRunsList());
+         }, [dispatch]);
     return (
         <React.Fragment>
             <TopBar
@@ -36,6 +46,17 @@ export default function Dashboard() {
                     </Flex>
                 )}
             />
+            <Box className="zaplane-page-content">
+                <Flex>
+                    <Box width="40%">
+                        <ExecutedFlows />
+                    </Box>
+                    <Box width="60%">
+                       <TotalExecutions />
+                    </Box>
+                </Flex>
+                <RecentLogs data={data} />
+            </Box>
 
         </React.Fragment>
     );
