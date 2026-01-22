@@ -52,7 +52,7 @@ export default function Dashboard() {
                         <ExecutedFlows />
                     </Box>
                     <Box width="60%">
-                       <TotalExecutions />
+                       <TotalExecutions data={data} />
                     </Box>
                 </Flex>
                 <RecentLogs data={data} />

@@ -4,7 +4,7 @@ import { __ } from '@wordpress/i18n';
 const ExecutedFlows = () => {
     return (
          <Box
-      bg="white"
+      bg="var(--zaplane-background)"
       borderRadius="lg"
       boxShadow="md"
       p={4}
