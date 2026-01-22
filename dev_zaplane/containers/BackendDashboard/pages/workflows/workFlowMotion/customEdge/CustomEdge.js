@@ -1,6 +1,10 @@
 import React from "react";
 import { getBezierPath, getEdgeCenter } from "@xyflow/react";
 import { FaTimes, FaPlus } from "react-icons/fa";
+import { HStack, Icon } from "@chakra-ui/react";
+import { RiDeleteBin5Line } from "react-icons/ri";
+import { IoAddSharp } from "react-icons/io5";
+
 
 const CustomEdge = ({
   id,
@@ -13,7 +17,7 @@ const CustomEdge = ({
   style = {},
   markerEnd,
   onEdgeDelete,
-  onAddNode, 
+  onAddNode,
 }) => {
   const [edgePath] = getBezierPath({
     sourceX,
@@ -49,20 +53,28 @@ const CustomEdge = ({
         y={centerY - 20}
         style={{ overflow: "visible" }}
       >
-        <div
-          style={{
-            width: "24px",
-            height: "24px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            cursor: "pointer",
-          }}
+        <HStack
+          bg="var(--zaplane-background)"
+          color="var(--zaplane-font-color)"
+          p='7px'
+          marginLeft="-20px"
+          marginTop="4px"
+          borderRadius="full"
+          boxShadow="lg"
+          cursor="pointer"
+          pointerEvents="auto"
+          height="30px"
+          width="30px"
           onClick={() => onEdgeDelete(id)}
-          title="Delete edge"
         >
-          <FaTimes color="#FF0000" />
-        </div>
+          <Icon
+            height='7px'
+            as={RiDeleteBin5Line}
+            boxSize={4}
+            cursor="pointer"
+            
+          />
+        </HStack>
       </foreignObject>
 
       {/* Add node icon */}
@@ -73,20 +85,27 @@ const CustomEdge = ({
         y={centerY + 4}
         style={{ overflow: "visible" }}
       >
-        <div
-          style={{
-            width: "24px",
-            height: "24px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            cursor: "pointer",
-          }}
+       <HStack
+          bg="var(--zaplane-background)"
+          color="var(--zaplane-font-color)"
+          p='7px'
+          m='-20px 0 0 13px'
+          borderRadius="full"
+          boxShadow="lg"
+          cursor="pointer"
+          pointerEvents="auto"
+          height="30px"
+          width="30px"
           onClick={() => onAddNode(id)}
-          title="Add node"
         >
-          <FaPlus color="#4CAF50" />
-        </div>
+          <Icon
+            height='7px'
+            as={IoAddSharp}
+            boxSize={4}
+            cursor="pointer"
+            
+          />
+        </HStack>
       </foreignObject>
     </>
   );

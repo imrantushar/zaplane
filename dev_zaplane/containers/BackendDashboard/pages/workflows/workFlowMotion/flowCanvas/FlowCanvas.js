@@ -28,8 +28,6 @@ import {
 import { useNavigate } from "react-router-dom";
 import { getAllVersion, getRunWorkFlow, getSingleWorkFlow, liveMonitor, updateWorkFlow, updateWorkFlowStatus, workFLowExction, workflowNodeListiner, workflowNodeListinerStop } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { use } from "react";
-import { showNotification } from "@ZAPRedux/Slices/notificationSlice/notificationSlice";
 import CustomNode from "../customNoe/CustomNode";
 import ZAPDrawer from "@ZAPComponents/Drawer";
 import { LucideHistory } from "lucide-react";
@@ -70,7 +68,7 @@ export default function FlowCanvas({ id }) {
     const { data, runs, versions } = useSelector((state) => state.workflows);
     const singleData = data[0]
     const isFlowLoaded = useRef(false);
-    const GAP = 220;
+    const GAP = 250;
     const containerRef = useRef(null);
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [activeDrawer, setActiveDrawer] = useState(null);
