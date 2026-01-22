@@ -8,12 +8,16 @@ import {
 
 } from "@chakra-ui/react";
 import { __ } from "@wordpress/i18n";
+import ZAPLoading from "@ZAPComponents/Loading";
 
 import { useSelector } from "react-redux";
 const LogDetails = ({ runId, onBack }) => {
-  const { nodeDetails = [] } = useSelector(
+  const { nodeDetails = [], isloading } = useSelector(
     (state) => state.workflows
   );
+  if (isloading) {
+    return <ZAPLoading />;
+  }
 
   return (
     <Box>

@@ -366,6 +366,7 @@ const workflowsSlice = createSlice({
 			})
 			.addCase(nodeLogsRunDetails.fulfilled, (state, action) => {
 				state.nodeDetails = action.payload;
+				state.isLoading=false
 			})
 
 
