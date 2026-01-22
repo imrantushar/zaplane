@@ -41,7 +41,7 @@ const ZAPDrawer = ({
             </Drawer.Trigger>
 
             <Portal>
-                <Drawer.Positioner marginTop='32px' height='calc(100vh - 32px)' zIndex={"99999999"}
+                <Drawer.Positioner marginTop='32px' height='calc(100vh - 32px)' zIndex={"9999"}
                     pointerEvents="none">
                     <Drawer.Content pointerEvents="auto">
                         {title && (
