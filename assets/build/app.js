@@ -3733,9 +3733,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony import */ var _xyflow_react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @xyflow/react */ "./node_modules/@xyflow/system/dist/esm/index.js");
-/* harmony import */ var react_icons_fa__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-icons/fa */ "./node_modules/react-icons/fa/index.mjs");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/box/index.js");
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/center/center.js");
+/* harmony import */ var react_icons_fa__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! react-icons/fa */ "./node_modules/react-icons/fa/index.mjs");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__);
+
 
 
 
@@ -3754,35 +3757,45 @@ const FloatingEdge = ({
     sourcePosition: "right",
     targetPosition: "left"
   });
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.Fragment, {
-    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("path", {
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.Fragment, {
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("path", {
       d: edgePath,
       fill: "none",
       stroke: "#bdbdbd",
       strokeWidth: 2,
       strokeDasharray: "6 6"
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("foreignObject", {
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("foreignObject", {
       width: 32,
       height: 32,
       x: targetX - 16,
       y: targetY - 16,
-      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("div", {
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Center, {
+        as: "button",
         onClick: openDrawerFromAdd,
-        style: {
-          width: 32,
-          height: 32,
-          borderRadius: "50%",
-          border: "2px dashed #bdbdbd",
-          background: "#fff",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          cursor: "pointer",
-          position: "absolute",
-          top: 0,
-          right: -80
+        w: "32px",
+        h: "32px",
+        borderRadius: "full",
+        border: "2px dashed var(--zaplane-border-color)",
+        cursor: "pointer",
+        position: "absolute",
+        top: "6px",
+        right: "-80px",
+        _hover: {
+          borderColor: "var(--zaplane-primary-color)",
+          bg: "var(--zaplane-background)"
         },
-        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)(react_icons_fa__WEBPACK_IMPORTED_MODULE_1__.FaPlus, {})
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Box, {
+          as: react_icons_fa__WEBPACK_IMPORTED_MODULE_3__.FaPlus,
+          fontSize: "12px",
+          color: "var(--zaplane-primary-color)"
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Box, {
+          as: "span",
+          left: "-45px",
+          border: "2px dashed var(--zaplane-border-color)",
+          top: "13px",
+          width: "42px",
+          position: "absolute"
+        })]
       })
     })]
   });
@@ -10482,6 +10495,43 @@ const IconButton = (0,react__WEBPACK_IMPORTED_MODULE_1__.forwardRef)(
   }
 );
 IconButton.displayName = "IconButton";
+
+
+
+
+/***/ },
+
+/***/ "./node_modules/@chakra-ui/react/dist/esm/components/center/center.js"
+/*!****************************************************************************!*\
+  !*** ./node_modules/@chakra-ui/react/dist/esm/components/center/center.js ***!
+  \****************************************************************************/
+(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   Center: () => (/* binding */ Center)
+/* harmony export */ });
+/* harmony import */ var _styled_system_factory_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../styled-system/factory.js */ "./node_modules/@chakra-ui/react/dist/esm/styled-system/factory.js");
+
+"use client";
+
+
+const Center = (0,_styled_system_factory_js__WEBPACK_IMPORTED_MODULE_0__.chakra)("div", {
+  base: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center"
+  },
+  variants: {
+    inline: {
+      true: {
+        display: "inline-flex"
+      }
+    }
+  }
+});
+Center.displayName = "Center";
 
 
 

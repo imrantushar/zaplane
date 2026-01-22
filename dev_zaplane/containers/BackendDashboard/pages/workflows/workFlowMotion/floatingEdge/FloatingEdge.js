@@ -1,4 +1,5 @@
 import { getBezierPath } from "@xyflow/react";
+import { Box, Center } from "@chakra-ui/react";
 import { FaPlus } from "react-icons/fa";
 
 const FloatingEdge = ({ sourceX, sourceY, openDrawerFromAdd }) => {
@@ -13,8 +14,10 @@ const FloatingEdge = ({ sourceX, sourceY, openDrawerFromAdd }) => {
     sourcePosition: "right",
     targetPosition: "left",
   });
+
   return (
     <>
+      {/* Dashed Edge */}
       <path
         d={edgePath}
         fill="none"
@@ -29,25 +32,30 @@ const FloatingEdge = ({ sourceX, sourceY, openDrawerFromAdd }) => {
         x={targetX - 16}
         y={targetY - 16}
       >
-        <div
+        <Center
+          as="button"
           onClick={openDrawerFromAdd}
-          style={{
-            width: 32,
-            height: 32,
-            borderRadius: "50%",
-            border: "2px dashed #bdbdbd",
-            background: "#fff",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            cursor: "pointer",
-            position: "absolute",
-            top: 0,          
-            right: -80,
+          w="32px"
+          h="32px"
+          borderRadius="full"
+          border="2px dashed var(--zaplane-border-color)"
+          cursor="pointer"
+          position="absolute"
+          top="6px"
+          right="-80px"
+          _hover={{
+            borderColor: "var(--zaplane-primary-color)",
+            bg: "var(--zaplane-background)",
           }}
         >
-          <FaPlus />
-        </div>
+          <Box as={FaPlus} fontSize="12px" color="var(--zaplane-primary-color)" />
+          <Box as="span" 
+          left="-45px"
+          border="2px dashed var(--zaplane-border-color)" 
+          top="13px"
+          width="42px"
+          position="absolute"/>
+        </Center>
       </foreignObject>
     </>
   );
