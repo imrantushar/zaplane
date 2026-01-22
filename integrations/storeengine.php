@@ -13,26 +13,54 @@ class Storeengine extends IntegrationBase {
 
     public static function get_triggers(): array {
         return [
-            'product_purchased'            => ['label' => 'Product Purchased',                   'hook' => 'storeengine/checkout/after_place_order'],
-            'created_product'            => ['label' => 'Created Product',                   'hook' => 'storeengine/product/created'],
-            'updated_product'            => ['label' => 'Updated Product',                   'hook' => 'storeengine/product/updated'],
-            'order_status_update'          => ['label' => 'Order Status Updated',                'hook' => 'storeengine/order/status_changed'],
-            'order_status_on_hold'         => ['label' => 'Order Status Set To On Hold',         'hook' => 'storeengine/order_status_on_hold'],
-            'order_status_pending_payment' => ['label' => 'Order Status Set To Pending Payment', 'hook' => 'storeengine/order_status_pending_payment'],
-            'order_status_processing'      => ['label' => 'Order Status Set To Processing',      'hook' => 'storeengine/order_status_processing'],
-            'order_status_completed'       => ['label' => 'Order Status Set To Completed',       'hook' => 'storeengine/order_status_completed'],
-            'order_status_cancelled'       => ['label' => 'Order Status Set To Cancelled',       'hook' => 'storeengine/order_status_cancelled'],
-            'order_status_draft'           => ['label' => 'Order Status Set To Draft',           'hook' => 'storeengine/order_status_auto-draft'],
-            'order_status_trash'           => ['label' => 'Order Status Set To Trash',           'hook' => 'storeengine/order_status_trash'],
-            'order_customer_note_added'    => ['label' => 'Customer Note Added to Order',        'hook' => 'storeengine/order/new_customer_note'],
-            'order_customer_note_deleted'  => ['label' => 'Customer Note Deleted From Order',    'hook' => 'storeengine/order/note_deleted'],
-            'order_restored'               => ['label' => 'Order Restored',                      'hook' => 'storeengine/order/status_changed'],
-            // 'payment_initiated'            => ['label' => 'Payment Initiated',                   'hook' => 'payment_initiated'],
-            // 'payment_successful'           => ['label' => 'Payment Successful',                  'hook' => 'payment_successful'],
-            // 'payment_failed'               => ['label' => 'Payment Failed',                      'hook' => 'payment_failed'],
-            // 'payment_refunded'             => ['label' => 'Payment Refunded',                    'hook' => 'payment_refunded'],
-            // 'customer_created'             => ['label' => 'Customer Created',                    'hook' => 'customer_created'],
-            // 'customer_updated'             => ['label' => 'Customer Updated',                    'hook' => 'customer_updated'],
+            'product_purchased' => [
+                'label' => 'Product Purchased', 
+                'hook' => 'storeengine/checkout/after_place_order'
+            ],
+            'order_status_update' => [
+                'label' => 'Order Status Updated',
+                'hook' => 'storeengine/order/status_changed'
+            ],
+            'order_status_on_hold' => [
+                'label' => 'Order Status Set To On Hold',
+                'hook' => 'storeengine/order_status_on_hold'
+            ],
+            'order_status_pending_payment' => [
+                'label' => 'Order Status Set To Pending Payment', 
+                'hook' => 'storeengine/order_status_pending_payment'
+            ],
+            'order_status_processing' => [
+                'label' => 'Order Status Set To Processing',      
+                'hook' => 'storeengine/order_status_processing'
+            ],
+            'order_status_completed' => [
+                'label' => 'Order Status Set To Completed',       
+                'hook' => 'storeengine/order_status_completed'
+            ],
+            'order_status_cancelled' => [
+                'label' => 'Order Status Set To Cancelled',       
+                'hook' => 'storeengine/order_status_cancelled'
+            ],
+            'order_status_draft' => [
+                'label' => 'Order Status Set To Draft',           
+                'hook' => 'storeengine/order_status_auto-draft'
+            ],
+            'order_status_trash' => [
+                'label' => 'Order Status Set To Trash',           
+                'hook' => 'storeengine/order_status_trash'
+            ],
+            'order_customer_note_added' => [
+                'label' => 'Customer Note Added to Order',        
+                'hook' => 'storeengine/order/new_customer_note'
+            ],
+            'order_customer_note_deleted' => [
+                'label' => 'Customer Note Deleted From Order',    
+                'hook' => 'storeengine/order/note_deleted'
+            ],
+            'order_restored' => [
+                'label' => 'Order Restored',                      
+                'hook' => 'storeengine/order/status_changed'
+            ],
         ]; 
     }
 
@@ -75,17 +103,17 @@ class Storeengine extends IntegrationBase {
                 if ( ! $order_id ) return false;
                 return self::resolve_order_payload( $order_id);
 
-            case 'created_product':
-                $product_id = $args[0] ?? 0;
-                if ( ! $product_id ) return false;
-                $product = storeengine_get_product( $product_id );
-                return [
-                    'product_id'   => $product_id,
-                    'product_name' => $product->get_name(),
-                    'price'        => $product->get_price(),
-                    'description'  => $product->get_description(),
-                    'status'       => $product->get_status(),
-                ];
+            // case 'created_product':
+            //     $product_id = $args[0] ?? 0;
+            //     if ( ! $product_id ) return false;
+            //     $product = storeengine_get_product( $product_id );
+            //     return [
+            //         'product_id'   => $product_id,
+            //         'product_name' => $product->get_name(),
+            //         'price'        => $product->get_price(),
+            //         'description'  => $product->get_description(),
+            //         'status'       => $product->get_status(),
+            //     ];
 
             case 'order_status_update':
             case 'order_status_on_hold':
@@ -134,54 +162,54 @@ class Storeengine extends IntegrationBase {
                     'deleted_by'     => $admin,
                 ]);
 
-            case 'payment_initiated':
-                $order_id = $args[0] ?? 0;
-                $payment_method = $args[1] ?? '';
-                if ( ! $order_id ) return false;
-                return self::resolve_order_payload( $order_id, [
-                    'payment_method'   => $payment_method,
-                ]);
+            // case 'payment_initiated':
+            //     $order_id = $args[0] ?? 0;
+            //     $payment_method = $args[1] ?? '';
+            //     if ( ! $order_id ) return false;
+            //     return self::resolve_order_payload( $order_id, [
+            //         'payment_method'   => $payment_method,
+            //     ]);
               
-            case 'payment_successful':
-            case 'payment_failed':
-                $order_id = $args[0] ?? 0;
-                $payment_method = $args[1] ?? '';
-                $transaction_id = $args[2] ?? '';
-                if ( ! $order_id ) return false;
-                return self::resolve_order_payload( $order_id, [
-                    'payment_method' => $payment_method,
-                    'transaction_id' => $transaction_id,
-                ]);
+            // case 'payment_successful':
+            // case 'payment_failed':
+            //     $order_id = $args[0] ?? 0;
+            //     $payment_method = $args[1] ?? '';
+            //     $transaction_id = $args[2] ?? '';
+            //     if ( ! $order_id ) return false;
+            //     return self::resolve_order_payload( $order_id, [
+            //         'payment_method' => $payment_method,
+            //         'transaction_id' => $transaction_id,
+            //     ]);
         
-            case 'payment_refunded':
-                $order_id = $args[0] ?? 0;
-                $refunded_amount = $args[1] ?? 0;
-                $refunded_reason = $args[2] ?? '';
-                if ( ! $order_id ) return false;
-                return self::resolve_order_payload( $order_id, [
-                    'refunded_amount' => $refunded_amount,
-                    'refunded_reason' => $refunded_reason,
-                ]);
+            // case 'payment_refunded':
+            //     $order_id = $args[0] ?? 0;
+            //     $refunded_amount = $args[1] ?? 0;
+            //     $refunded_reason = $args[2] ?? '';
+            //     if ( ! $order_id ) return false;
+            //     return self::resolve_order_payload( $order_id, [
+            //         'refunded_amount' => $refunded_amount,
+            //         'refunded_reason' => $refunded_reason,
+            //     ]);
 
-            case 'customer_created':
-                $customer_id = $args[0] ?? 0;
-                $customer_name = $args[1] ?? '';
-                $customer_email = $args[2] ?? '';
-                if ( ! $customer_id ) return false;
-                return [
-                    'customer_id'    => $customer_id,
-                    'customer_name'  => $customer_name,
-                    'customer_email' => $customer_email,
-                ];
+            // case 'customer_created':
+            //     $customer_id = $args[0] ?? 0;
+            //     $customer_name = $args[1] ?? '';
+            //     $customer_email = $args[2] ?? '';
+            //     if ( ! $customer_id ) return false;
+            //     return [
+            //         'customer_id'    => $customer_id,
+            //         'customer_name'  => $customer_name,
+            //         'customer_email' => $customer_email,
+            //     ];
 
-            case 'customer_updated':
-                $customer_id = $args[0] ?? 0;
-                $change = $args[1] ?? [];
-                if ( ! $customer_id ) return false;
-                return [
-                    'customer_id'    => $customer_id,
-                    'change'  => $change,
-                ];
+            // case 'customer_updated':
+            //     $customer_id = $args[0] ?? 0;
+            //     $change = $args[1] ?? [];
+            //     if ( ! $customer_id ) return false;
+            //     return [
+            //         'customer_id'    => $customer_id,
+            //         'change'  => $change,
+            //     ];
 
         }
         return false;
@@ -189,24 +217,25 @@ class Storeengine extends IntegrationBase {
 
     public static function get_actions(): array {
         return [
-            'create_product'   => ['label'=>'Create Product'],
-            'update_product'   => ['label'=>'Update Product'],
-            'create_order'   => ['label'=>'Create Order'],
+            //example
+           // 'create_product'   => ['label'=>'Create Product'],
         ];
     }
 
     public static function get_action_config_schema( string $action ): array {
 
         $schemas = [
-            'create_product' => [
-                ['key'=>'product_name','label'=>'Product Name','type'=>'text','required'=>true],
-                ['key'=>'price','label'=>'Price','type'=>'number','required'=>true],
-                ['key'=>'description','label'=>'Description','type'=>'textarea',],
-                ['key'=>'status','label'=>'Status','type'=>'select','options'=>[
-                    ['label'=>'Draft','value'=>'draft'],
-                    ['label'=>'Publish','value'=>'publish'],
-                ]],
-            ],
+
+        //example
+            // 'create_product' => [
+            //     ['key'=>'product_name','label'=>'Product Name','type'=>'text','required'=>true],
+            //     ['key'=>'price','label'=>'Price','type'=>'number','required'=>true],
+            //     ['key'=>'description','label'=>'Description','type'=>'textarea',],
+            //     ['key'=>'status','label'=>'Status','type'=>'select','options'=>[
+            //         ['label'=>'Draft','value'=>'draft'],
+            //         ['label'=>'Publish','value'=>'publish'],
+            //     ]],
+            //],
         ];
 
         return $schemas[$action] ?? [];
@@ -218,35 +247,36 @@ class Storeengine extends IntegrationBase {
 
         switch ( $node['data']['event'] ?? '' ) {
 
-            case 'create_product':
+        //example
+            // case 'create_product':
 
-                $name        = $config['product_name'] ?? '';
-                $price       = $config['price'] ?? '';
-                $description = $config['description'] ?? '';
-                $status      = $config['status'] ?? 'publish';
+            //     $name        = $config['product_name'] ?? '';
+            //     $price       = $config['price'] ?? '';
+            //     $description = $config['description'] ?? '';
+            //     $status      = $config['status'] ?? 'publish';
 
-                if ( ! $name || $price === '' ) {
-                    return ['success' => false, 'message' => 'Product name and price required'];
-                }
+            //     if ( ! $name || $price === '' ) {
+            //         return ['success' => false, 'message' => 'Product name and price required'];
+            //     }
 
-                $product_id = storeengine_create_product([
-                    'name'        => $name,
-                    'price'       => $price,
-                    'description' => $description,
-                    'status'      => $status,
-                ]);
+            //     $product_id = storeengine_create_product([
+            //         'name'        => $name,
+            //         'price'       => $price,
+            //         'description' => $description,
+            //         'status'      => $status,
+            //     ]);
 
-                if ( ! $product_id ) {
-                    return ['success' => false];
-                }
+            //     if ( ! $product_id ) {
+            //         return ['success' => false];
+            //     }
 
-                return [
-                    'success'    => true,
-                    'product_id' => $product_id,
-                    'product_name' =>$name,
-                    'price'      => $price,
-                    'status'     => $status,
-                ];
+            //     return [
+            //         'success'    => true,
+            //         'product_id' => $product_id,
+            //         'product_name' =>$name,
+            //         'price'      => $price,
+            //         'status'     => $status,
+            //     ];
 
         }
         return ['port'=>'main','data'=>$input];

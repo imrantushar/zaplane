@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-01-22 12:06:39",
+    "generated_at": "2026-01-22 13:17:28",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -769,8 +769,8 @@
                         "main"
                     ]
                 },
-                "new_blog": {
-                    "key": "new_blog",
+                "wpmu_new_blog": {
+                    "key": "wpmu_new_blog",
                     "label": "New Blog",
                     "hook": "wpmu_new_blog",
                     "schema": [],
@@ -3054,31 +3054,6 @@
                         "main"
                     ]
                 },
-                "created_product": {
-                    "key": "created_product",
-                    "label": "Created Product",
-                    "hook": "storeengine/product/created",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "updated_product": {
-                    "key": "updated_product",
-                    "label": "Updated Product",
-                    "hook": "storeengine/product/updated",
-                    "schema": [
-                        {
-                            "key": "product_id",
-                            "label": "ID",
-                            "type": "expression",
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
                 "order_status_update": {
                     "key": "order_status_update",
                     "label": "Order Status Updated",
@@ -3179,65 +3154,7 @@
                     ]
                 }
             },
-            "actions": {
-                "create_product": {
-                    "key": "create_product",
-                    "label": "Create Product",
-                    "schema": [
-                        {
-                            "key": "product_name",
-                            "label": "Product Name",
-                            "type": "text",
-                            "required": true
-                        },
-                        {
-                            "key": "price",
-                            "label": "Price",
-                            "type": "number",
-                            "required": true
-                        },
-                        {
-                            "key": "description",
-                            "label": "Description",
-                            "type": "textarea"
-                        },
-                        {
-                            "key": "status",
-                            "label": "Status",
-                            "type": "select",
-                            "options": [
-                                {
-                                    "label": "Draft",
-                                    "value": "draft"
-                                },
-                                {
-                                    "label": "Publish",
-                                    "value": "publish"
-                                }
-                            ]
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "update_product": {
-                    "key": "update_product",
-                    "label": "Update Product",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "create_order": {
-                    "key": "create_order",
-                    "label": "Create Order",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                }
-            }
+            "actions": []
         }
     },
     "tools": {
