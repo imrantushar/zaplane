@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-01-21 12:56:32",
+    "generated_at": "2026-01-22 11:03:46",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -3048,8 +3048,33 @@
                 "product_purchased": {
                     "key": "product_purchased",
                     "label": "Product Purchased",
-                    "hook": "product_purchased",
+                    "hook": "storeengine/checkout/after_place_order",
                     "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "created_product": {
+                    "key": "created_product",
+                    "label": "Created Product",
+                    "hook": "storeengine/product/created",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "updated_product": {
+                    "key": "updated_product",
+                    "label": "Updated Product",
+                    "hook": "storeengine/product/updated",
+                    "schema": [
+                        {
+                            "key": "product_id",
+                            "label": "ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -3057,7 +3082,7 @@
                 "order_status_update": {
                     "key": "order_status_update",
                     "label": "Order Status Updated",
-                    "hook": "order_status_update",
+                    "hook": "storeengine/order/status_changed",
                     "schema": [],
                     "outputs": [
                         "main"
@@ -3066,7 +3091,7 @@
                 "order_status_on_hold": {
                     "key": "order_status_on_hold",
                     "label": "Order Status Set To On Hold",
-                    "hook": "order_status_on_hold",
+                    "hook": "storeengine/order_status_on_hold",
                     "schema": [],
                     "outputs": [
                         "main"
@@ -3075,7 +3100,7 @@
                 "order_status_pending_payment": {
                     "key": "order_status_pending_payment",
                     "label": "Order Status Set To Pending Payment",
-                    "hook": "order_status_pending_payment",
+                    "hook": "storeengine/order_status_pending_payment",
                     "schema": [],
                     "outputs": [
                         "main"
@@ -3084,7 +3109,7 @@
                 "order_status_processing": {
                     "key": "order_status_processing",
                     "label": "Order Status Set To Processing",
-                    "hook": "order_status_processing",
+                    "hook": "storeengine/order_status_processing",
                     "schema": [],
                     "outputs": [
                         "main"
@@ -3093,7 +3118,7 @@
                 "order_status_completed": {
                     "key": "order_status_completed",
                     "label": "Order Status Set To Completed",
-                    "hook": "order_status_completed",
+                    "hook": "storeengine/order_status_completed",
                     "schema": [],
                     "outputs": [
                         "main"
@@ -3102,7 +3127,7 @@
                 "order_status_cancelled": {
                     "key": "order_status_cancelled",
                     "label": "Order Status Set To Cancelled",
-                    "hook": "order_status_cancelled",
+                    "hook": "storeengine/order_status_cancelled",
                     "schema": [],
                     "outputs": [
                         "main"
@@ -3111,7 +3136,7 @@
                 "order_status_draft": {
                     "key": "order_status_draft",
                     "label": "Order Status Set To Draft",
-                    "hook": "order_status_draft",
+                    "hook": "storeengine/order_status_auto-draft",
                     "schema": [],
                     "outputs": [
                         "main"
@@ -3120,7 +3145,7 @@
                 "order_status_trash": {
                     "key": "order_status_trash",
                     "label": "Order Status Set To Trash",
-                    "hook": "order_status_trash",
+                    "hook": "storeengine/order_status_trash",
                     "schema": [],
                     "outputs": [
                         "main"
@@ -3129,7 +3154,7 @@
                 "order_customer_note_added": {
                     "key": "order_customer_note_added",
                     "label": "Customer Note Added to Order",
-                    "hook": "order_customer_note_added",
+                    "hook": "storeengine/order/new_customer_note",
                     "schema": [],
                     "outputs": [
                         "main"
@@ -3138,7 +3163,7 @@
                 "order_customer_note_deleted": {
                     "key": "order_customer_note_deleted",
                     "label": "Customer Note Deleted From Order",
-                    "hook": "order_customer_note_deleted",
+                    "hook": "storeengine/order/note_deleted",
                     "schema": [],
                     "outputs": [
                         "main"
@@ -3147,7 +3172,7 @@
                 "order_restored": {
                     "key": "order_restored",
                     "label": "Order Restored",
-                    "hook": "order_restored",
+                    "hook": "storeengine/order/status_changed",
                     "schema": [],
                     "outputs": [
                         "main"
@@ -3155,9 +3180,58 @@
                 }
             },
             "actions": {
-                "create_post": {
-                    "key": "create_post",
-                    "label": "Create Post",
+                "create_product": {
+                    "key": "create_product",
+                    "label": "Create Product",
+                    "schema": [
+                        {
+                            "key": "product_name",
+                            "label": "Product Name",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "price",
+                            "label": "Price",
+                            "type": "number",
+                            "required": true
+                        },
+                        {
+                            "key": "description",
+                            "label": "Description",
+                            "type": "textarea"
+                        },
+                        {
+                            "key": "status",
+                            "label": "Status",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Draft",
+                                    "value": "draft"
+                                },
+                                {
+                                    "label": "Publish",
+                                    "value": "publish"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_product": {
+                    "key": "update_product",
+                    "label": "Update Product",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_order": {
+                    "key": "create_order",
+                    "label": "Create Order",
                     "schema": [],
                     "outputs": [
                         "main"
