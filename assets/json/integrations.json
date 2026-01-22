@@ -2887,10 +2887,190 @@
                         "main"
                     ]
                 },
+                "restore_order": {
+                    "key": "restore_order",
+                    "label": "Restore Order",
+                    "hook": "woocommerce_untrash_order",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "order_status_pending": {
+                    "key": "order_status_pending",
+                    "label": "Order Status Set to Pending",
+                    "hook": "woocommerce_order_status_pending",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "order_status_failed": {
+                    "key": "order_status_failed",
+                    "label": "Order Status Set to Failed",
+                    "hook": "woocommerce_order_status_failed",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "order_status_on_hold": {
+                    "key": "order_status_on_hold",
+                    "label": "Order Status Set to On-hold",
+                    "hook": "woocommerce_order_status_on-hold",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "order_status_processing": {
+                    "key": "order_status_processing",
+                    "label": "Order Status Set to Processing",
+                    "hook": "woocommerce_order_status_processing",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "order_status_completed": {
+                    "key": "order_status_completed",
+                    "label": "Order Status Set to Completed",
+                    "hook": "woocommerce_order_status_completed",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "order_status_refunded": {
+                    "key": "order_status_refunded",
+                    "label": "Order Status Set to Refunded",
+                    "hook": "woocommerce_order_status_refunded",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "order_status_cancelled": {
+                    "key": "order_status_cancelled",
+                    "label": "Order Status Set to Cancelled",
+                    "hook": "woocommerce_order_status_cancelled",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
                 "order_status_changed": {
                     "key": "order_status_changed",
                     "label": "Order Status Changed",
                     "hook": "woocommerce_order_status_changed",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "new_coupon": {
+                    "key": "new_coupon",
+                    "label": "New Coupon Created",
+                    "hook": "woocommerce_new_coupon",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_customer": {
+                    "key": "create_customer",
+                    "label": "Create Customer",
+                    "hook": "woocommerce_created_customer",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_customer": {
+                    "key": "update_customer",
+                    "label": "Update Customer",
+                    "hook": "woocommerce_update_customer",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_customer": {
+                    "key": "delete_customer",
+                    "label": "Delete Customer",
+                    "hook": "woocommerce_delete_customer",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_product": {
+                    "key": "create_product",
+                    "label": "Create Product",
+                    "hook": "woocommerce_new_product",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_product": {
+                    "key": "update_product",
+                    "label": "Update Product",
+                    "hook": "woocommerce_update_product",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_product": {
+                    "key": "delete_product",
+                    "label": "Delete Product",
+                    "hook": "before_delete_post",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "restore_product": {
+                    "key": "restore_product",
+                    "label": "Restore Product",
+                    "hook": "untrashed_post",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "product_status_updated": {
+                    "key": "product_status_updated",
+                    "label": "Product Status Updated",
+                    "hook": "woocommerce_product_set_stock_status",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "product_status_changed": {
+                    "key": "product_status_changed",
+                    "label": "Product Status Changed",
+                    "hook": "transition_post_status",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "product_added_to_cart": {
+                    "key": "product_added_to_cart",
+                    "label": "Product Added to Cart",
+                    "hook": "woocommerce_add_to_cart",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "product_removed_from_cart": {
+                    "key": "product_removed_from_cart",
+                    "label": "Product Removed from Cart",
+                    "hook": "woocommerce_cart_item_removed",
                     "schema": [],
                     "outputs": [
                         "main"
