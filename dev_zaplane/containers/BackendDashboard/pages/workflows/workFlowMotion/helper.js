@@ -1,3 +1,10 @@
+export function applyStyles(el, styles = {}) {
+  if (!el) return;
+  Object.entries(styles).forEach(([key, value]) => {
+    el.style[key] = value;
+  });
+};
+
 export const toggleFullscreenMode = (containerRef, isFullscreen, setIsFullscreen) => {
   if (!containerRef.current) return;
   const elem = containerRef.current;
@@ -7,12 +14,12 @@ export const toggleFullscreenMode = (containerRef, isFullscreen, setIsFullscreen
   const wpAdminBar = document.getElementById("wpadminbar");
   const adminMenuBack = document.getElementById("adminmenuback");
   const adminMenuWrap = document.getElementById("adminmenuwrap");
-  const applyStyles = (el, styles = {}) => {
-    if (!el) return;
-    Object.entries(styles).forEach(([key, value]) => {
-      el.style[key] = value;
-    });
-  };
+
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen();
+  } else {
+    document.exitFullscreen();
+  }
 
   const isEnter = !isFullscreen;
   applyStyles(elem, {
@@ -34,10 +41,11 @@ export const toggleFullscreenMode = (containerRef, isFullscreen, setIsFullscreen
   });
 
   applyStyles(wpWrap, { marginLeft: isEnter ? "0" : "" });
-  applyStyles(wpAdminBar, { top: isEnter ? "0" : "" });
+  applyStyles(wpAdminBar, { display: isEnter ? "none" : "" });
 
   setIsFullscreen(isEnter);
 };
+
 export const getDuration = (start, end) => {
   if (!start || !end) return "--";
 
