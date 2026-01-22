@@ -4,6 +4,7 @@ import { FaTimes, FaPlus } from "react-icons/fa";
 import { HStack, Icon } from "@chakra-ui/react";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import { IoAddSharp } from "react-icons/io5";
+import "./style.scss";
 
 
 const CustomEdge = ({
@@ -36,7 +37,7 @@ const CustomEdge = ({
   });
 
   return (
-    <>
+    <g className="zaplane-custom-edge">
       <path
         id={id}
         style={{ ...style, pointerEvents: "none" }}
@@ -47,6 +48,7 @@ const CustomEdge = ({
 
       {/* Delete icon */}
       <foreignObject
+        className="zaplane-edge-actions"
         width={24}
         height={24}
         x={centerX - 12}
@@ -83,6 +85,7 @@ const CustomEdge = ({
         height={24}
         x={centerX - 12}
         y={centerY + 4}
+        className="zaplane-edge-actions"
         style={{ overflow: "visible" }}
       >
        <HStack
@@ -107,7 +110,7 @@ const CustomEdge = ({
           />
         </HStack>
       </foreignObject>
-    </>
+    </g>
   );
 };
 
