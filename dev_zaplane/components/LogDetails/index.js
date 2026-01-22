@@ -5,10 +5,11 @@ import {
   HStack,
   Text,
   VStack,
+
 } from "@chakra-ui/react";
 import { __ } from "@wordpress/i18n";
-import { useSelector } from "react-redux";
 
+import { useSelector } from "react-redux";
 const LogDetails = ({ runId, onBack }) => {
   const { nodeDetails = [] } = useSelector(
     (state) => state.workflows
@@ -16,26 +17,15 @@ const LogDetails = ({ runId, onBack }) => {
 
   return (
     <Box>
-      <Text
-        mb="4"
-        cursor="pointer"
-        className="zaplane-label"
-        onClick={onBack}
-      >
-        {__('← Back to Runs', 'zaplane')}
-      </Text>
-
       <Text mb="4" fontWeight="bold"
-      className="zaplane-label">
-        
+        className="zaplane-label">
+
         {__(`Run ID: ${runId}`, 'zaplane')}
       </Text>
-
       <Accordion.Root collapsible>
         {nodeDetails?.nodes?.map((log) => {
           const input = JSON.parse(log.input_json || "{}");
           const output = JSON.parse(log.output_json || "{}");
-
           return (
             <Accordion.Item key={log.id} value={log.id}>
               <Accordion.ItemTrigger>
@@ -54,11 +44,11 @@ const LogDetails = ({ runId, onBack }) => {
                       log.status === "completed"
                         ? "#4CAF50"
                         : log.status === "failed"
-                        ? "#F44336"
-                        : "var(--zaplane-primary)"
+                          ? "#F44336"
+                          : "var(--zaplane-primary)"
                     }
                   >
-                    {log.status}
+                  {__(log.status, 'zaplane')}
                   </Badge>
                 </HStack>
                 <Accordion.ItemIndicator />
@@ -88,7 +78,7 @@ const LogDetails = ({ runId, onBack }) => {
                       bg="var(--zaplane-secondary)"
                     >
                       <Text fontWeight="bold" mb="2">
-                          {__('Output', 'zaplane')}
+                        {__('Output', 'zaplane')}
                       </Text>
                       <pre>{JSON.stringify(output, null, 2)}</pre>
                     </Box>

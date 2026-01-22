@@ -26,13 +26,12 @@ import {
     FiArrowLeft
 } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
-import { getAllVersion, getRunWorkFlow, getSingleWorkFlow, liveMonitor, updateWorkFlow, updateWorkFlowStatus, workFLowExction, workflowNodeListiner } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
+import { getAllVersion, getRunWorkFlow, getSingleWorkFlow, liveMonitor, updateWorkFlow, updateWorkFlowStatus, workFLowExction, workflowNodeListiner, workflowNodeListinerStop } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { use } from "react";
 import { showNotification } from "@ZAPRedux/Slices/notificationSlice/notificationSlice";
 import CustomNode from "../customNoe/CustomNode";
 import ZAPDrawer from "@ZAPComponents/Drawer";
-import { getRunLive, getRunTimeline, replayWorkflowRun, stopRun } from "@ZAPRedux/Slices/executionSlice/executionSlice";
 import { LucideHistory } from "lucide-react";
 import RunsTable from "./RunsTable/RunsTable";
 import VersionHistoryTable from "./VersionHistoryTable/VersionHistoryTable";
@@ -332,7 +331,7 @@ export default function FlowCanvas({ id }) {
                             {__("Runs ", "zaplane")}
                         </Button>
                         <Button size="sm" variant="outline"
-                            onClick={() => dispatch(workflowNodeListiner(id))}>
+                            onClick={() => dispatch(workflowNodeListinerStop(id))}>
                             {__("Stop", "zaplane")}
                         </Button>
                     </>

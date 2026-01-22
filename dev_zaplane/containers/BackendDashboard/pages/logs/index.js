@@ -19,12 +19,13 @@ import ZAPLoading from "@ZAPComponents/Loading";
 import ZAPTable from "@ZAPComponents/Table";
 import { __ } from "@wordpress/i18n";
 import TopBar from "@ZAPComponents/TopBar";
+import ZAPDrawer from "@ZAPComponents/Drawer";
 
 const Logs = () => {
     const dispatch = useDispatch();
 
-    const [showDetails, setShowDetails] = useState(false);
     const [activeRunId, setActiveRunId] = useState(null);
+    const [drawerOpen, setDrawerOpen] = useState(false);
 
     const { data, isLoading } = useSelector((state) => state.logs || {});
 
@@ -34,22 +35,8 @@ const Logs = () => {
 
     const isSuccess = (status) => status === "completed";
 
-    if (showDetails) {
-        return (
-            <LogDetails
-                runId={activeRunId}
-                onBack={() => {
-                    setShowDetails(false);
-                    setActiveRunId(null);
-                }}
-            />
-        );
-    }
-
     if (isLoading) {
-        return (
-            <ZAPLoading />
-        );
+        return <ZAPLoading />;
     }
 
     if (!data?.length) {
@@ -65,12 +52,17 @@ const Logs = () => {
             <TopBar
                 render={() => (
                     <Box>
-                        <Text fontSize="lg" fontWeight="600" className="zaplane-label">
-                            {__('Workflow Logs', 'zaplane')}
+                        <Text
+                            fontSize="lg"
+                            fontWeight="600"
+                            className="zaplane-label"
+                        >
+                            {__("Workflow Logs", "zaplane")}
                         </Text>
                     </Box>
                 )}
             />
+
             <div className="zaplane-page-content">
                 <ZAPTable
                     data={data}
@@ -81,7 +73,11 @@ const Logs = () => {
                         {
                             label: "CREATED AT",
                             key: "started_at",
-                            render: (row) => <Text fontSize="sm">{row.started_at || "--"}</Text>,
+                            render: (row) => (
+                                <Text fontSize="sm">
+                                    {row.started_at || "--"}
+                                </Text>
+                            ),
                             textAlign: "center",
                         },
                         {
@@ -93,10 +89,16 @@ const Logs = () => {
                                         w="8px"
                                         h="8px"
                                         borderRadius="full"
-                                        bg={isSuccess(row.status) ? "green.500" : "red.500"}
+                                        bg={
+                                            isSuccess(row.status)
+                                                ? "green.500"
+                                                : "red.500"
+                                        }
                                     />
                                     <Text fontSize="sm">
-                                        {isSuccess(row.status) ? "Success" : "Failed"}
+                                        {isSuccess(row.status)
+                                            ? "Success"
+                                            : "Failed"}
                                     </Text>
                                 </HStack>
                             ),
@@ -105,7 +107,12 @@ const Logs = () => {
                             label: "DURATION / SIZE",
                             key: "duration",
                             render: (row) => (
-                                <Text fontSize="sm">{getDuration(row.started_at, row.finished_at)}</Text>
+                                <Text fontSize="sm">
+                                    {getDuration(
+                                        row.started_at,
+                                        row.finished_at
+                                    )}
+                                </Text>
                             ),
                             textAlign: "center",
                         },
@@ -117,26 +124,48 @@ const Logs = () => {
                                 variant="outline"
                                 onClick={() => {
                                     setActiveRunId(row.id);
-                                    setShowDetails(true);
+                                    setDrawerOpen(true);
                                     dispatch(nodeLogsRunDetails(row.id));
                                 }}
                             >
-                                {__('Details', 'zaplane')}
+                                {__("Details", "zaplane")}
                             </Button>
 
                             <Button
                                 size="xs"
                                 variant="outline"
-                                onClick={() => dispatch(retryNodeRun(row.id))}
+                                onClick={() =>
+                                    dispatch(retryNodeRun(row.id))
+                                }
                             >
-                                {__('Re-execute', 'zaplane')}
+                                {__("Re-execute", "zaplane")}
                             </Button>
                         </>
                     )}
                 />
             </div>
+            <ZAPDrawer
+                open={drawerOpen}
+                onClose={() => {
+                    setDrawerOpen(false);
+                    setActiveRunId(null);
+                }}
+                closeOnOverlayClick
+                title={__("Run Details", "zaplane")}
+                placement="end"
+                size="md"
+            >
+                {activeRunId ? (
+                    <LogDetails
+                        runId={activeRunId}
+                        onBack={() => {
+                            setDrawerOpen(false);
+                            setActiveRunId(null);
+                        }}
+                    />
+                ) : null}
+            </ZAPDrawer>
         </>
-
     );
 };
 
