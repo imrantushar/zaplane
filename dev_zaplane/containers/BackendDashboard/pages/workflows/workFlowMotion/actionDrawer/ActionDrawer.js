@@ -157,6 +157,15 @@ export default function ActionDrawer({
         }));
     }, [selectedItem, mode, node]);
 
+    const actionHook = (val) => {
+         const integration = getIntegration();
+        if (!integration) return [];
+
+        const currentTrigger = Object.values(integration.triggers || {}).find(item => item.key === val);
+        if (currentTrigger) return currentTrigger.hook;
+        else return '';
+    }
+
     const selectedActionFields = useMemo(() => {
         const integration = getIntegration();
         if (!integration || !values?.actionType) return [];
@@ -201,6 +210,7 @@ export default function ActionDrawer({
             app: selectedItem.name,
             name: selectedItem.name,
             event: values.actionType,
+            hook: values.hook,
             config: selectedActionFields.reduce((acc, f) => {
                 acc[f.key] = values[f.key];
                 return acc;
@@ -260,8 +270,8 @@ export default function ActionDrawer({
                             }}
                             background="white"
                             _hover={{
-                                    bg: "var(--zaplane-body-background)",
-                                }}
+                                bg: "var(--zaplane-body-background)",
+                            }}
                         >
                             <ZAPText color='black'>{item.name}</ZAPText>
                             <ZAPText fontSize="xs" color="black">
@@ -346,9 +356,10 @@ export default function ActionDrawer({
                                         label={isTrigger ? "Trigger Type" : "Action Type"}
                                         options={actionOptions}
                                         value={values.actionType}
-                                        onChange={(val) =>
+                                        onChange={(val) => {
                                             setFieldValue("actionType", val)
-                                        }
+                                            setFieldValue("hook", actionHook(val))
+                                        }}
                                         placeholder="Select Action Type"
                                         isClearable
                                         mb={4}

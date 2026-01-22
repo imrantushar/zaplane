@@ -2736,6 +2736,12 @@ function ActionDrawer({
       value: a.key
     }));
   }, [selectedItem, mode, node]);
+  const actionHook = val => {
+    const integration = getIntegration();
+    if (!integration) return [];
+    const currentTrigger = Object.values(integration.triggers || {}).find(item => item.key === val);
+    if (currentTrigger) return currentTrigger.hook;else return '';
+  };
   const selectedActionFields = (0,react__WEBPACK_IMPORTED_MODULE_14__.useMemo)(() => {
     const integration = getIntegration();
     if (!integration || !values?.actionType) return [];
@@ -2776,6 +2782,7 @@ function ActionDrawer({
       app: selectedItem.name,
       name: selectedItem.name,
       event: values.actionType,
+      hook: values.hook,
       config: selectedActionFields.reduce((acc, f) => {
         acc[f.key] = values[f.key];
         return acc;
@@ -2891,7 +2898,10 @@ function ActionDrawer({
             label: isTrigger ? "Trigger Type" : "Action Type",
             options: actionOptions,
             value: values.actionType,
-            onChange: val => setFieldValue("actionType", val),
+            onChange: val => {
+              setFieldValue("actionType", val);
+              setFieldValue("hook", actionHook(val));
+            },
             placeholder: "Select Action Type",
             isClearable: true,
             mb: 4
@@ -3542,8 +3552,10 @@ function FlowCanvas({
     setNodes(nds => nds.filter(n => n.id !== nodeId));
     setEdges(eds => eds.filter(e => e.source !== nodeId && e.target !== nodeId));
   }, []);
-  console.log(nodes, 'all nodes');
-  console.log(edges, 'all edges');
+
+  // console.log(nodes, 'all nodes');
+  // console.log(edges, 'all edges');
+
   const nodeTypes = {
     custom: props => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_27__.jsx)(_customNoe_CustomNode__WEBPACK_IMPORTED_MODULE_18__["default"], {
       ...props,
@@ -9524,7 +9536,10 @@ const comboboxAnatomy = _ark_ui_react__WEBPACK_IMPORTED_MODULE_0__.comboboxAnato
   "indicatorGroup",
   "empty"
 );
-const sliderAnatomy = _ark_ui_react_slider__WEBPACK_IMPORTED_MODULE_16__.anatomy.extendWith("markerIndicator");
+const sliderAnatomy = _ark_ui_react_slider__WEBPACK_IMPORTED_MODULE_16__.anatomy.extendWith(
+  "markerIndicator",
+  "markerLabel"
+);
 const statAnatomy = (0,_ark_ui_react_anatomy__WEBPACK_IMPORTED_MODULE_2__.createAnatomy)("stat").parts(
   "root",
   "label",
@@ -13234,9 +13249,9 @@ function createCssFn(context) {
     const normalized = normalize(styles);
     const result = (0,_singleton_js__WEBPACK_IMPORTED_MODULE_5__.createEmptyObject)();
     (0,_utils_walk_object_js__WEBPACK_IMPORTED_MODULE_4__.walkObject)(normalized, (value, paths) => {
-      const important = isImportant(value);
       if (value == null) return;
       const [prop, ...selectors] = conditions.sort(paths).map(conditions.resolve);
+      const important = isImportant(value);
       if (important) {
         value = withoutImportant(value);
       }
@@ -13343,7 +13358,7 @@ function createRecipeFn(options) {
         ...defaultVariants,
         ...(0,_utils_compact_js__WEBPACK_IMPORTED_MODULE_0__.compact)(props)
       });
-      let variantCss = { ...base };
+      let variantCss = { ...normalize(base) };
       (0,_utils_merge_js__WEBPACK_IMPORTED_MODULE_3__.mergeWith)(variantCss, getVariantCss(variantSelections));
       const compoundVariantCss = getCompoundVariantCss(
         compoundVariants,
@@ -16247,46 +16262,47 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   layerStyles: () => (/* reexport safe */ _layer_styles_js__WEBPACK_IMPORTED_MODULE_3__.layerStyles),
 /* harmony export */   linkRecipe: () => (/* reexport safe */ _recipes_link_js__WEBPACK_IMPORTED_MODULE_40__.linkRecipe),
 /* harmony export */   listSlotRecipe: () => (/* reexport safe */ _recipes_list_js__WEBPACK_IMPORTED_MODULE_71__.listSlotRecipe),
+/* harmony export */   listboxSlotRecipe: () => (/* reexport safe */ _recipes_listbox_js__WEBPACK_IMPORTED_MODULE_72__.listboxSlotRecipe),
 /* harmony export */   markRecipe: () => (/* reexport safe */ _recipes_mark_js__WEBPACK_IMPORTED_MODULE_41__.markRecipe),
-/* harmony export */   menuSlotRecipe: () => (/* reexport safe */ _recipes_menu_js__WEBPACK_IMPORTED_MODULE_72__.menuSlotRecipe),
-/* harmony export */   nativeSelectSlotRecipe: () => (/* reexport safe */ _recipes_native_select_js__WEBPACK_IMPORTED_MODULE_73__.nativeSelectSlotRecipe),
-/* harmony export */   numberInputSlotRecipe: () => (/* reexport safe */ _recipes_number_input_js__WEBPACK_IMPORTED_MODULE_74__.numberInputSlotRecipe),
-/* harmony export */   pinInputSlotRecipe: () => (/* reexport safe */ _recipes_pin_input_js__WEBPACK_IMPORTED_MODULE_75__.pinInputSlotRecipe),
-/* harmony export */   popoverSlotRecipe: () => (/* reexport safe */ _recipes_popover_js__WEBPACK_IMPORTED_MODULE_76__.popoverSlotRecipe),
-/* harmony export */   progressCircleSlotRecipe: () => (/* reexport safe */ _recipes_progress_circle_js__WEBPACK_IMPORTED_MODULE_78__.progressCircleSlotRecipe),
-/* harmony export */   progressSlotRecipe: () => (/* reexport safe */ _recipes_progress_js__WEBPACK_IMPORTED_MODULE_77__.progressSlotRecipe),
-/* harmony export */   qrCodeSlotRecipe: () => (/* reexport safe */ _recipes_qr_code_js__WEBPACK_IMPORTED_MODULE_79__.qrCodeSlotRecipe),
-/* harmony export */   radioCardSlotRecipe: () => (/* reexport safe */ _recipes_radio_card_js__WEBPACK_IMPORTED_MODULE_80__.radioCardSlotRecipe),
-/* harmony export */   radioGroupSlotRecipe: () => (/* reexport safe */ _recipes_radio_group_js__WEBPACK_IMPORTED_MODULE_81__.radioGroupSlotRecipe),
+/* harmony export */   menuSlotRecipe: () => (/* reexport safe */ _recipes_menu_js__WEBPACK_IMPORTED_MODULE_73__.menuSlotRecipe),
+/* harmony export */   nativeSelectSlotRecipe: () => (/* reexport safe */ _recipes_native_select_js__WEBPACK_IMPORTED_MODULE_74__.nativeSelectSlotRecipe),
+/* harmony export */   numberInputSlotRecipe: () => (/* reexport safe */ _recipes_number_input_js__WEBPACK_IMPORTED_MODULE_75__.numberInputSlotRecipe),
+/* harmony export */   pinInputSlotRecipe: () => (/* reexport safe */ _recipes_pin_input_js__WEBPACK_IMPORTED_MODULE_76__.pinInputSlotRecipe),
+/* harmony export */   popoverSlotRecipe: () => (/* reexport safe */ _recipes_popover_js__WEBPACK_IMPORTED_MODULE_77__.popoverSlotRecipe),
+/* harmony export */   progressCircleSlotRecipe: () => (/* reexport safe */ _recipes_progress_circle_js__WEBPACK_IMPORTED_MODULE_79__.progressCircleSlotRecipe),
+/* harmony export */   progressSlotRecipe: () => (/* reexport safe */ _recipes_progress_js__WEBPACK_IMPORTED_MODULE_78__.progressSlotRecipe),
+/* harmony export */   qrCodeSlotRecipe: () => (/* reexport safe */ _recipes_qr_code_js__WEBPACK_IMPORTED_MODULE_80__.qrCodeSlotRecipe),
+/* harmony export */   radioCardSlotRecipe: () => (/* reexport safe */ _recipes_radio_card_js__WEBPACK_IMPORTED_MODULE_81__.radioCardSlotRecipe),
+/* harmony export */   radioGroupSlotRecipe: () => (/* reexport safe */ _recipes_radio_group_js__WEBPACK_IMPORTED_MODULE_82__.radioGroupSlotRecipe),
 /* harmony export */   radiomarkRecipe: () => (/* reexport safe */ _recipes_radiomark_js__WEBPACK_IMPORTED_MODULE_42__.radiomarkRecipe),
-/* harmony export */   ratingGroupSlotRecipe: () => (/* reexport safe */ _recipes_rating_group_js__WEBPACK_IMPORTED_MODULE_82__.ratingGroupSlotRecipe),
+/* harmony export */   ratingGroupSlotRecipe: () => (/* reexport safe */ _recipes_rating_group_js__WEBPACK_IMPORTED_MODULE_83__.ratingGroupSlotRecipe),
 /* harmony export */   recipes: () => (/* reexport safe */ _recipes_js__WEBPACK_IMPORTED_MODULE_5__.recipes),
-/* harmony export */   scrollAreaSlotRecipe: () => (/* reexport safe */ _recipes_scroll_area_js__WEBPACK_IMPORTED_MODULE_83__.scrollAreaSlotRecipe),
-/* harmony export */   segmentGroupSlotRecipe: () => (/* reexport safe */ _recipes_segment_group_js__WEBPACK_IMPORTED_MODULE_84__.segmentGroupSlotRecipe),
-/* harmony export */   selectSlotRecipe: () => (/* reexport safe */ _recipes_select_js__WEBPACK_IMPORTED_MODULE_85__.selectSlotRecipe),
+/* harmony export */   scrollAreaSlotRecipe: () => (/* reexport safe */ _recipes_scroll_area_js__WEBPACK_IMPORTED_MODULE_84__.scrollAreaSlotRecipe),
+/* harmony export */   segmentGroupSlotRecipe: () => (/* reexport safe */ _recipes_segment_group_js__WEBPACK_IMPORTED_MODULE_85__.segmentGroupSlotRecipe),
+/* harmony export */   selectSlotRecipe: () => (/* reexport safe */ _recipes_select_js__WEBPACK_IMPORTED_MODULE_86__.selectSlotRecipe),
 /* harmony export */   semanticTokens: () => (/* binding */ semanticTokens),
 /* harmony export */   separatorRecipe: () => (/* reexport safe */ _recipes_separator_js__WEBPACK_IMPORTED_MODULE_43__.separatorRecipe),
 /* harmony export */   skeletonRecipe: () => (/* reexport safe */ _recipes_skeleton_js__WEBPACK_IMPORTED_MODULE_44__.skeletonRecipe),
 /* harmony export */   skipNavLinkRecipe: () => (/* reexport safe */ _recipes_skip_nav_link_js__WEBPACK_IMPORTED_MODULE_45__.skipNavLinkRecipe),
-/* harmony export */   sliderSlotRecipe: () => (/* reexport safe */ _recipes_slider_js__WEBPACK_IMPORTED_MODULE_86__.sliderSlotRecipe),
+/* harmony export */   sliderSlotRecipe: () => (/* reexport safe */ _recipes_slider_js__WEBPACK_IMPORTED_MODULE_87__.sliderSlotRecipe),
 /* harmony export */   slotRecipes: () => (/* reexport safe */ _slot_recipes_js__WEBPACK_IMPORTED_MODULE_9__.slotRecipes),
 /* harmony export */   spinnerRecipe: () => (/* reexport safe */ _recipes_spinner_js__WEBPACK_IMPORTED_MODULE_46__.spinnerRecipe),
-/* harmony export */   splitterSlotRecipe: () => (/* reexport safe */ _recipes_splitter_js__WEBPACK_IMPORTED_MODULE_87__.splitterSlotRecipe),
-/* harmony export */   statSlotRecipe: () => (/* reexport safe */ _recipes_stat_js__WEBPACK_IMPORTED_MODULE_88__.statSlotRecipe),
-/* harmony export */   statusSlotRecipe: () => (/* reexport safe */ _recipes_status_js__WEBPACK_IMPORTED_MODULE_89__.statusSlotRecipe),
-/* harmony export */   stepsSlotRecipe: () => (/* reexport safe */ _recipes_steps_js__WEBPACK_IMPORTED_MODULE_90__.stepsSlotRecipe),
-/* harmony export */   switchSlotRecipe: () => (/* reexport safe */ _recipes_switch_js__WEBPACK_IMPORTED_MODULE_91__.switchSlotRecipe),
-/* harmony export */   tableSlotRecipe: () => (/* reexport safe */ _recipes_table_js__WEBPACK_IMPORTED_MODULE_92__.tableSlotRecipe),
-/* harmony export */   tabsSlotRecipe: () => (/* reexport safe */ _recipes_tabs_js__WEBPACK_IMPORTED_MODULE_93__.tabsSlotRecipe),
-/* harmony export */   tagSlotRecipe: () => (/* reexport safe */ _recipes_tag_js__WEBPACK_IMPORTED_MODULE_94__.tagSlotRecipe),
-/* harmony export */   tagsInputSlotRecipe: () => (/* reexport safe */ _recipes_tags_input_js__WEBPACK_IMPORTED_MODULE_95__.tagsInputSlotRecipe),
+/* harmony export */   splitterSlotRecipe: () => (/* reexport safe */ _recipes_splitter_js__WEBPACK_IMPORTED_MODULE_88__.splitterSlotRecipe),
+/* harmony export */   statSlotRecipe: () => (/* reexport safe */ _recipes_stat_js__WEBPACK_IMPORTED_MODULE_89__.statSlotRecipe),
+/* harmony export */   statusSlotRecipe: () => (/* reexport safe */ _recipes_status_js__WEBPACK_IMPORTED_MODULE_90__.statusSlotRecipe),
+/* harmony export */   stepsSlotRecipe: () => (/* reexport safe */ _recipes_steps_js__WEBPACK_IMPORTED_MODULE_91__.stepsSlotRecipe),
+/* harmony export */   switchSlotRecipe: () => (/* reexport safe */ _recipes_switch_js__WEBPACK_IMPORTED_MODULE_92__.switchSlotRecipe),
+/* harmony export */   tableSlotRecipe: () => (/* reexport safe */ _recipes_table_js__WEBPACK_IMPORTED_MODULE_93__.tableSlotRecipe),
+/* harmony export */   tabsSlotRecipe: () => (/* reexport safe */ _recipes_tabs_js__WEBPACK_IMPORTED_MODULE_94__.tabsSlotRecipe),
+/* harmony export */   tagSlotRecipe: () => (/* reexport safe */ _recipes_tag_js__WEBPACK_IMPORTED_MODULE_95__.tagSlotRecipe),
+/* harmony export */   tagsInputSlotRecipe: () => (/* reexport safe */ _recipes_tags_input_js__WEBPACK_IMPORTED_MODULE_96__.tagsInputSlotRecipe),
 /* harmony export */   textStyles: () => (/* reexport safe */ _text_styles_js__WEBPACK_IMPORTED_MODULE_10__.textStyles),
 /* harmony export */   textareaRecipe: () => (/* reexport safe */ _recipes_textarea_js__WEBPACK_IMPORTED_MODULE_47__.textareaRecipe),
-/* harmony export */   timelineSlotRecipe: () => (/* reexport safe */ _recipes_timeline_js__WEBPACK_IMPORTED_MODULE_96__.timelineSlotRecipe),
-/* harmony export */   toastSlotRecipe: () => (/* reexport safe */ _recipes_toast_js__WEBPACK_IMPORTED_MODULE_97__.toastSlotRecipe),
+/* harmony export */   timelineSlotRecipe: () => (/* reexport safe */ _recipes_timeline_js__WEBPACK_IMPORTED_MODULE_97__.timelineSlotRecipe),
+/* harmony export */   toastSlotRecipe: () => (/* reexport safe */ _recipes_toast_js__WEBPACK_IMPORTED_MODULE_98__.toastSlotRecipe),
 /* harmony export */   tokens: () => (/* binding */ tokens),
-/* harmony export */   tooltipSlotRecipe: () => (/* reexport safe */ _recipes_tooltip_js__WEBPACK_IMPORTED_MODULE_98__.tooltipSlotRecipe),
-/* harmony export */   treeViewSlotRecipe: () => (/* reexport safe */ _recipes_tree_view_js__WEBPACK_IMPORTED_MODULE_99__.treeViewSlotRecipe)
+/* harmony export */   tooltipSlotRecipe: () => (/* reexport safe */ _recipes_tooltip_js__WEBPACK_IMPORTED_MODULE_99__.tooltipSlotRecipe),
+/* harmony export */   treeViewSlotRecipe: () => (/* reexport safe */ _recipes_tree_view_js__WEBPACK_IMPORTED_MODULE_100__.treeViewSlotRecipe)
 /* harmony export */ });
 /* harmony import */ var _styled_system_config_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../styled-system/config.js */ "./node_modules/@chakra-ui/react/dist/esm/styled-system/config.js");
 /* harmony import */ var _breakpoints_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./breakpoints.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/breakpoints.js");
@@ -16360,34 +16376,36 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _recipes_file_upload_js__WEBPACK_IMPORTED_MODULE_69__ = __webpack_require__(/*! ./recipes/file-upload.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/file-upload.js");
 /* harmony import */ var _recipes_hover_card_js__WEBPACK_IMPORTED_MODULE_70__ = __webpack_require__(/*! ./recipes/hover-card.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/hover-card.js");
 /* harmony import */ var _recipes_list_js__WEBPACK_IMPORTED_MODULE_71__ = __webpack_require__(/*! ./recipes/list.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/list.js");
-/* harmony import */ var _recipes_menu_js__WEBPACK_IMPORTED_MODULE_72__ = __webpack_require__(/*! ./recipes/menu.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/menu.js");
-/* harmony import */ var _recipes_native_select_js__WEBPACK_IMPORTED_MODULE_73__ = __webpack_require__(/*! ./recipes/native-select.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/native-select.js");
-/* harmony import */ var _recipes_number_input_js__WEBPACK_IMPORTED_MODULE_74__ = __webpack_require__(/*! ./recipes/number-input.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/number-input.js");
-/* harmony import */ var _recipes_pin_input_js__WEBPACK_IMPORTED_MODULE_75__ = __webpack_require__(/*! ./recipes/pin-input.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/pin-input.js");
-/* harmony import */ var _recipes_popover_js__WEBPACK_IMPORTED_MODULE_76__ = __webpack_require__(/*! ./recipes/popover.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/popover.js");
-/* harmony import */ var _recipes_progress_js__WEBPACK_IMPORTED_MODULE_77__ = __webpack_require__(/*! ./recipes/progress.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/progress.js");
-/* harmony import */ var _recipes_progress_circle_js__WEBPACK_IMPORTED_MODULE_78__ = __webpack_require__(/*! ./recipes/progress-circle.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/progress-circle.js");
-/* harmony import */ var _recipes_qr_code_js__WEBPACK_IMPORTED_MODULE_79__ = __webpack_require__(/*! ./recipes/qr-code.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/qr-code.js");
-/* harmony import */ var _recipes_radio_card_js__WEBPACK_IMPORTED_MODULE_80__ = __webpack_require__(/*! ./recipes/radio-card.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/radio-card.js");
-/* harmony import */ var _recipes_radio_group_js__WEBPACK_IMPORTED_MODULE_81__ = __webpack_require__(/*! ./recipes/radio-group.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/radio-group.js");
-/* harmony import */ var _recipes_rating_group_js__WEBPACK_IMPORTED_MODULE_82__ = __webpack_require__(/*! ./recipes/rating-group.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/rating-group.js");
-/* harmony import */ var _recipes_scroll_area_js__WEBPACK_IMPORTED_MODULE_83__ = __webpack_require__(/*! ./recipes/scroll-area.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/scroll-area.js");
-/* harmony import */ var _recipes_segment_group_js__WEBPACK_IMPORTED_MODULE_84__ = __webpack_require__(/*! ./recipes/segment-group.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/segment-group.js");
-/* harmony import */ var _recipes_select_js__WEBPACK_IMPORTED_MODULE_85__ = __webpack_require__(/*! ./recipes/select.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/select.js");
-/* harmony import */ var _recipes_slider_js__WEBPACK_IMPORTED_MODULE_86__ = __webpack_require__(/*! ./recipes/slider.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/slider.js");
-/* harmony import */ var _recipes_splitter_js__WEBPACK_IMPORTED_MODULE_87__ = __webpack_require__(/*! ./recipes/splitter.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/splitter.js");
-/* harmony import */ var _recipes_stat_js__WEBPACK_IMPORTED_MODULE_88__ = __webpack_require__(/*! ./recipes/stat.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/stat.js");
-/* harmony import */ var _recipes_status_js__WEBPACK_IMPORTED_MODULE_89__ = __webpack_require__(/*! ./recipes/status.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/status.js");
-/* harmony import */ var _recipes_steps_js__WEBPACK_IMPORTED_MODULE_90__ = __webpack_require__(/*! ./recipes/steps.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/steps.js");
-/* harmony import */ var _recipes_switch_js__WEBPACK_IMPORTED_MODULE_91__ = __webpack_require__(/*! ./recipes/switch.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/switch.js");
-/* harmony import */ var _recipes_table_js__WEBPACK_IMPORTED_MODULE_92__ = __webpack_require__(/*! ./recipes/table.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/table.js");
-/* harmony import */ var _recipes_tabs_js__WEBPACK_IMPORTED_MODULE_93__ = __webpack_require__(/*! ./recipes/tabs.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/tabs.js");
-/* harmony import */ var _recipes_tag_js__WEBPACK_IMPORTED_MODULE_94__ = __webpack_require__(/*! ./recipes/tag.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/tag.js");
-/* harmony import */ var _recipes_tags_input_js__WEBPACK_IMPORTED_MODULE_95__ = __webpack_require__(/*! ./recipes/tags-input.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/tags-input.js");
-/* harmony import */ var _recipes_timeline_js__WEBPACK_IMPORTED_MODULE_96__ = __webpack_require__(/*! ./recipes/timeline.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/timeline.js");
-/* harmony import */ var _recipes_toast_js__WEBPACK_IMPORTED_MODULE_97__ = __webpack_require__(/*! ./recipes/toast.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/toast.js");
-/* harmony import */ var _recipes_tooltip_js__WEBPACK_IMPORTED_MODULE_98__ = __webpack_require__(/*! ./recipes/tooltip.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/tooltip.js");
-/* harmony import */ var _recipes_tree_view_js__WEBPACK_IMPORTED_MODULE_99__ = __webpack_require__(/*! ./recipes/tree-view.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/tree-view.js");
+/* harmony import */ var _recipes_listbox_js__WEBPACK_IMPORTED_MODULE_72__ = __webpack_require__(/*! ./recipes/listbox.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/listbox.js");
+/* harmony import */ var _recipes_menu_js__WEBPACK_IMPORTED_MODULE_73__ = __webpack_require__(/*! ./recipes/menu.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/menu.js");
+/* harmony import */ var _recipes_native_select_js__WEBPACK_IMPORTED_MODULE_74__ = __webpack_require__(/*! ./recipes/native-select.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/native-select.js");
+/* harmony import */ var _recipes_number_input_js__WEBPACK_IMPORTED_MODULE_75__ = __webpack_require__(/*! ./recipes/number-input.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/number-input.js");
+/* harmony import */ var _recipes_pin_input_js__WEBPACK_IMPORTED_MODULE_76__ = __webpack_require__(/*! ./recipes/pin-input.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/pin-input.js");
+/* harmony import */ var _recipes_popover_js__WEBPACK_IMPORTED_MODULE_77__ = __webpack_require__(/*! ./recipes/popover.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/popover.js");
+/* harmony import */ var _recipes_progress_js__WEBPACK_IMPORTED_MODULE_78__ = __webpack_require__(/*! ./recipes/progress.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/progress.js");
+/* harmony import */ var _recipes_progress_circle_js__WEBPACK_IMPORTED_MODULE_79__ = __webpack_require__(/*! ./recipes/progress-circle.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/progress-circle.js");
+/* harmony import */ var _recipes_qr_code_js__WEBPACK_IMPORTED_MODULE_80__ = __webpack_require__(/*! ./recipes/qr-code.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/qr-code.js");
+/* harmony import */ var _recipes_radio_card_js__WEBPACK_IMPORTED_MODULE_81__ = __webpack_require__(/*! ./recipes/radio-card.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/radio-card.js");
+/* harmony import */ var _recipes_radio_group_js__WEBPACK_IMPORTED_MODULE_82__ = __webpack_require__(/*! ./recipes/radio-group.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/radio-group.js");
+/* harmony import */ var _recipes_rating_group_js__WEBPACK_IMPORTED_MODULE_83__ = __webpack_require__(/*! ./recipes/rating-group.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/rating-group.js");
+/* harmony import */ var _recipes_scroll_area_js__WEBPACK_IMPORTED_MODULE_84__ = __webpack_require__(/*! ./recipes/scroll-area.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/scroll-area.js");
+/* harmony import */ var _recipes_segment_group_js__WEBPACK_IMPORTED_MODULE_85__ = __webpack_require__(/*! ./recipes/segment-group.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/segment-group.js");
+/* harmony import */ var _recipes_select_js__WEBPACK_IMPORTED_MODULE_86__ = __webpack_require__(/*! ./recipes/select.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/select.js");
+/* harmony import */ var _recipes_slider_js__WEBPACK_IMPORTED_MODULE_87__ = __webpack_require__(/*! ./recipes/slider.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/slider.js");
+/* harmony import */ var _recipes_splitter_js__WEBPACK_IMPORTED_MODULE_88__ = __webpack_require__(/*! ./recipes/splitter.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/splitter.js");
+/* harmony import */ var _recipes_stat_js__WEBPACK_IMPORTED_MODULE_89__ = __webpack_require__(/*! ./recipes/stat.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/stat.js");
+/* harmony import */ var _recipes_status_js__WEBPACK_IMPORTED_MODULE_90__ = __webpack_require__(/*! ./recipes/status.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/status.js");
+/* harmony import */ var _recipes_steps_js__WEBPACK_IMPORTED_MODULE_91__ = __webpack_require__(/*! ./recipes/steps.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/steps.js");
+/* harmony import */ var _recipes_switch_js__WEBPACK_IMPORTED_MODULE_92__ = __webpack_require__(/*! ./recipes/switch.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/switch.js");
+/* harmony import */ var _recipes_table_js__WEBPACK_IMPORTED_MODULE_93__ = __webpack_require__(/*! ./recipes/table.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/table.js");
+/* harmony import */ var _recipes_tabs_js__WEBPACK_IMPORTED_MODULE_94__ = __webpack_require__(/*! ./recipes/tabs.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/tabs.js");
+/* harmony import */ var _recipes_tag_js__WEBPACK_IMPORTED_MODULE_95__ = __webpack_require__(/*! ./recipes/tag.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/tag.js");
+/* harmony import */ var _recipes_tags_input_js__WEBPACK_IMPORTED_MODULE_96__ = __webpack_require__(/*! ./recipes/tags-input.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/tags-input.js");
+/* harmony import */ var _recipes_timeline_js__WEBPACK_IMPORTED_MODULE_97__ = __webpack_require__(/*! ./recipes/timeline.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/timeline.js");
+/* harmony import */ var _recipes_toast_js__WEBPACK_IMPORTED_MODULE_98__ = __webpack_require__(/*! ./recipes/toast.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/toast.js");
+/* harmony import */ var _recipes_tooltip_js__WEBPACK_IMPORTED_MODULE_99__ = __webpack_require__(/*! ./recipes/tooltip.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/tooltip.js");
+/* harmony import */ var _recipes_tree_view_js__WEBPACK_IMPORTED_MODULE_100__ = __webpack_require__(/*! ./recipes/tree-view.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/tree-view.js");
+
 
 
 
@@ -17001,11 +17019,9 @@ const actionBarSlotRecipe = (0,_styled_system_config_js__WEBPACK_IMPORTED_MODULE
     positioner: {
       position: "fixed",
       display: "flex",
-      justifyContent: "center",
       pointerEvents: "none",
       insetInline: "0",
-      top: "unset",
-      bottom: "calc(env(safe-area-inset-bottom) + 20px)"
+      "--action-bar-offset": "spacing.4"
     },
     content: {
       bg: "bg.panel",
@@ -17046,6 +17062,33 @@ const actionBarSlotRecipe = (0,_styled_system_config_js__WEBPACK_IMPORTED_MODULE
       borderWidth: "1px",
       borderStyle: "dashed"
     }
+  },
+  variants: {
+    placement: {
+      bottom: {
+        positioner: {
+          bottom: "calc(env(safe-area-inset-bottom) + var(--action-bar-offset))",
+          justifyContent: "center"
+        }
+      },
+      "bottom-start": {
+        positioner: {
+          bottom: "calc(env(safe-area-inset-bottom) + var(--action-bar-offset))",
+          justifyContent: "flex-start",
+          ps: "var(--action-bar-offset)"
+        }
+      },
+      "bottom-end": {
+        positioner: {
+          bottom: "calc(env(safe-area-inset-bottom) + var(--action-bar-offset))",
+          justifyContent: "flex-end",
+          pe: "var(--action-bar-offset)"
+        }
+      }
+    }
+  },
+  defaultVariants: {
+    placement: "bottom"
   }
 });
 
@@ -18914,7 +18957,8 @@ const colorPickerSlotRecipe = (0,_styled_system_config_js__WEBPACK_IMPORTED_MODU
       width: "64",
       p: "4",
       gap: "3",
-      zIndex: "dropdown",
+      "--color-picker-z-index": "zIndex.popover",
+      zIndex: "calc(var(--color-picker-z-index) + var(--layer-index, 0))",
       _open: {
         animationStyle: "slide-fade-in",
         animationDuration: "fast"
@@ -19272,7 +19316,8 @@ const comboboxSlotRecipe = (0,_styled_system_config_js__WEBPACK_IMPORTED_MODULE_
       background: "bg.panel",
       display: "flex",
       flexDirection: "column",
-      zIndex: "dropdown",
+      "--combobox-z-index": "zIndex.popover",
+      zIndex: "calc(var(--combobox-z-index) + var(--layer-index, 0))",
       borderRadius: "l2",
       outline: 0,
       maxH: "96",
@@ -21392,7 +21437,8 @@ const menuSlotRecipe = (0,_styled_system_config_js__WEBPACK_IMPORTED_MODULE_1__.
   base: {
     content: {
       outline: 0,
-      bg: "bg.panel",
+      "--menu-bg": "colors.bg.panel",
+      bg: "var(--menu-bg)",
       boxShadow: "lg",
       color: "fg",
       maxHeight: "var(--available-height)",
@@ -21464,6 +21510,14 @@ const menuSlotRecipe = (0,_styled_system_config_js__WEBPACK_IMPORTED_MODULE_1__.
       bg: "bg.muted",
       my: "1",
       mx: "-1"
+    },
+    arrow: {
+      "--arrow-size": "sizes.3",
+      "--arrow-background": "var(--menu-bg)"
+    },
+    arrowTip: {
+      borderTopWidth: "1px",
+      borderLeftWidth: "1px"
     }
   },
   variants: {
@@ -21611,6 +21665,9 @@ const nativeSelectSlotRecipe = (0,_styled_system_config_js__WEBPACK_IMPORTED_MOD
           color: "fg",
           focusRingWidth: "2px"
         }
+      },
+      ghost: {
+        field: _select_js__WEBPACK_IMPORTED_MODULE_2__.selectSlotRecipe.variants?.variant.ghost.trigger
       }
     },
     size: {
@@ -23248,7 +23305,8 @@ const selectSlotRecipe = (0,_styled_system_config_js__WEBPACK_IMPORTED_MODULE_1_
       background: "bg.panel",
       display: "flex",
       flexDirection: "column",
-      zIndex: "dropdown",
+      "--select-z-index": "zIndex.popover",
+      zIndex: "calc(var(--select-z-index) + var(--layer-index, 0))",
       borderRadius: "l2",
       outline: 0,
       maxH: "96",
@@ -23336,6 +23394,14 @@ const selectSlotRecipe = (0,_styled_system_config_js__WEBPACK_IMPORTED_MODULE_1_
           borderWidth: "1px",
           borderColor: "transparent",
           bg: "bg.muted"
+        }
+      },
+      ghost: {
+        trigger: {
+          bg: "transparent",
+          _expanded: {
+            bg: "bg.muted"
+          }
         }
       }
     },
@@ -23745,11 +23811,10 @@ const sliderSlotRecipe = (0,_styled_system_config_js__WEBPACK_IMPORTED_MODULE_1_
       outline: 0,
       zIndex: "2",
       borderRadius: "full",
+      transition: "shadow",
       _focusVisible: {
-        ring: "2px",
-        ringColor: "colorPalette.focusRing",
-        ringOffset: "2px",
-        ringOffsetColor: "bg"
+        ring: "3px",
+        ringColor: "colorPalette.focusRing/50"
       }
     }
   },
@@ -23829,7 +23894,7 @@ const sliderSlotRecipe = (0,_styled_system_config_js__WEBPACK_IMPORTED_MODULE_1_
           flexDirection: "column",
           height: "100%",
           minWidth: "var(--slider-thumb-size)",
-          "&[data-has-mark-label], &:has(.chakra-slider__marker-label)": {
+          "&:has(.chakra-slider__markerLabel)": {
             marginEnd: "4"
           }
         },
@@ -23853,7 +23918,7 @@ const sliderSlotRecipe = (0,_styled_system_config_js__WEBPACK_IMPORTED_MODULE_1_
           flexDirection: "row",
           width: "100%",
           minHeight: "var(--slider-thumb-size)",
-          "&[data-has-mark-label], &:has(.chakra-slider__marker-label)": {
+          "&:has(.chakra-slider__markerLabel)": {
             marginBottom: "4"
           }
         },
@@ -35842,7 +35907,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   stripBasename: () => (/* binding */ stripBasename)
 /* harmony export */ });
 /**
- * @remix-run/router v1.23.1
+ * @remix-run/router v1.23.2
  *
  * Copyright (c) Remix Software Inc.
  *
@@ -37965,7 +38030,7 @@ function createRouter(init) {
         // If the user didn't explicity indicate replace behavior, replace if
         // we redirected to the exact same location we're currently at to avoid
         // double back-buttons
-        let location = normalizeRedirectLocation(result.response.headers.get("Location"), new URL(request.url), basename);
+        let location = normalizeRedirectLocation(result.response.headers.get("Location"), new URL(request.url), basename, init.history);
         replace = location === state.location.pathname + state.location.search;
       }
       await startRedirectNavigation(request, result, true, {
@@ -38571,7 +38636,7 @@ function createRouter(init) {
     }
     let location = redirect.response.headers.get("Location");
     invariant(location, "Expected a Location header on the redirect Response");
-    location = normalizeRedirectLocation(location, new URL(request.url), basename);
+    location = normalizeRedirectLocation(location, new URL(request.url), basename, init.history);
     let redirectLocation = createLocation(state.location, location, {
       _isRedirect: true
     });
@@ -40277,16 +40342,30 @@ function normalizeRelativeRoutingRedirectResponse(response, request, routeId, ma
   }
   return response;
 }
-function normalizeRedirectLocation(location, currentUrl, basename) {
+function normalizeRedirectLocation(location, currentUrl, basename, historyInstance) {
+  // Match Chrome's behavior:
+  // https://github.com/chromium/chromium/blob/216dbeb61db0c667e62082e5f5400a32d6983df3/content/public/common/url_utils.cc#L82
+  let invalidProtocols = ["about:", "blob:", "chrome:", "chrome-untrusted:", "content:", "data:", "devtools:", "file:", "filesystem:",
+  // eslint-disable-next-line no-script-url
+  "javascript:"];
   if (ABSOLUTE_URL_REGEX.test(location)) {
     // Strip off the protocol+origin for same-origin + same-basename absolute redirects
     let normalizedLocation = location;
     let url = normalizedLocation.startsWith("//") ? new URL(currentUrl.protocol + normalizedLocation) : new URL(normalizedLocation);
+    if (invalidProtocols.includes(url.protocol)) {
+      throw new Error("Invalid redirect location");
+    }
     let isSameBasename = stripBasename(url.pathname, basename) != null;
     if (url.origin === currentUrl.origin && isSameBasename) {
       return url.pathname + url.search + url.hash;
     }
   }
+  try {
+    let url = historyInstance.createURL(location);
+    if (invalidProtocols.includes(url.protocol)) {
+      throw new Error("Invalid redirect location");
+    }
+  } catch (e) {}
   return location;
 }
 // Utility method for creating the Request instances for loaders/actions during
@@ -92664,6 +92743,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   castImmutable: () => (/* binding */ castImmutable),
 /* harmony export */   createDraft: () => (/* binding */ createDraft),
 /* harmony export */   current: () => (/* binding */ current),
+/* harmony export */   enableArrayMethods: () => (/* binding */ enableArrayMethods),
 /* harmony export */   enableMapSet: () => (/* binding */ enableMapSet),
 /* harmony export */   enablePatches: () => (/* binding */ enablePatches),
 /* harmony export */   finishDraft: () => (/* binding */ finishDraft),
@@ -92806,6 +92886,10 @@ var isSet = (target) => target instanceof Set;
 var isObjectish = (target) => typeof target === "object";
 var isFunction = (target) => typeof target === "function";
 var isBoolean = (target) => typeof target === "boolean";
+function isArrayIndex(value) {
+  const n = +value;
+  return Number.isInteger(n) && String(n) === value;
+}
 var getProxyDraft = (value) => {
   if (!isObjectish(value))
     return null;
@@ -92894,6 +92978,7 @@ function isFrozen(obj) {
 // src/utils/plugins.ts
 var PluginMapSet = "MapSet";
 var PluginPatches = "Patches";
+var PluginArrayMethods = "ArrayMethods";
 var plugins = {};
 function getPlugin(pluginKey) {
   const plugin = plugins[pluginKey];
@@ -92921,7 +93006,8 @@ var createScope = (parent_, immer_) => ({
   unfinalizedDrafts_: 0,
   handledSet_: /* @__PURE__ */ new Set(),
   processedForPatches_: /* @__PURE__ */ new Set(),
-  mapSetPlugin_: isPluginLoaded(PluginMapSet) ? getPlugin(PluginMapSet) : void 0
+  mapSetPlugin_: isPluginLoaded(PluginMapSet) ? getPlugin(PluginMapSet) : void 0,
+  arrayMethodsPlugin_: isPluginLoaded(PluginArrayMethods) ? getPlugin(PluginArrayMethods) : void 0
 });
 function usePatchesInScope(scope, patchListener) {
   if (patchListener) {
@@ -93056,7 +93142,7 @@ function registerChildFinalizationCallback(parent, child, key) {
   });
 }
 function generatePatchesAndFinalize(state, rootScope) {
-  const shouldFinalize = state.modified_ && !state.finalized_ && (state.type_ === 3 /* Set */ || (state.assigned_?.size ?? 0) > 0);
+  const shouldFinalize = state.modified_ && !state.finalized_ && (state.type_ === 3 /* Set */ || state.type_ === 1 /* Array */ && state.allIndicesReassigned_ || (state.assigned_?.size ?? 0) > 0);
   if (shouldFinalize) {
     const { patchPlugin_ } = rootScope;
     if (patchPlugin_) {
@@ -93082,13 +93168,19 @@ function handleCrossReference(target, key, value) {
   } else if (isDraftable(value)) {
     target.callbacks_.push(function nestedDraftCleanup() {
       const targetCopy = latest(target);
-      if (get(targetCopy, key, target.type_) === value) {
-        if (scope_.drafts_.length > 1 && (target.assigned_.get(key) ?? false) === true && target.copy_) {
-          handleValue(
-            get(target.copy_, key, target.type_),
-            scope_.handledSet_,
-            scope_
-          );
+      if (target.type_ === 3 /* Set */) {
+        if (targetCopy.has(value)) {
+          handleValue(value, scope_.handledSet_, scope_);
+        }
+      } else {
+        if (get(targetCopy, key, target.type_) === value) {
+          if (scope_.drafts_.length > 1 && (target.assigned_.get(key) ?? false) === true && target.copy_) {
+            handleValue(
+              get(target.copy_, key, target.type_),
+              scope_.handledSet_,
+              scope_
+            );
+          }
         }
       }
     });
@@ -93161,12 +93253,24 @@ var objectTraps = {
   get(state, prop) {
     if (prop === DRAFT_STATE)
       return state;
+    let arrayPlugin = state.scope_.arrayMethodsPlugin_;
+    const isArrayWithStringProp = state.type_ === 1 /* Array */ && typeof prop === "string";
+    if (isArrayWithStringProp) {
+      if (arrayPlugin?.isArrayOperationMethod(prop)) {
+        return arrayPlugin.createMethodInterceptor(state, prop);
+      }
+    }
     const source = latest(state);
     if (!has(source, prop, state.type_)) {
       return readPropFromProto(state, source, prop);
     }
     const value = source[prop];
     if (state.finalized_ || !isDraftable(value)) {
+      return value;
+    }
+    if (isArrayWithStringProp && state.operationMethod && arrayPlugin?.isMutatingArrayMethod(
+      state.operationMethod
+    ) && isArrayIndex(prop)) {
       return value;
     }
     if (value === peek(state.base_, prop)) {
@@ -93249,13 +93353,14 @@ var objectTraps = {
   }
 };
 var arrayTraps = {};
-each(objectTraps, (key, fn) => {
+for (let key in objectTraps) {
+  let fn = objectTraps[key];
   arrayTraps[key] = function() {
     const args = arguments;
     args[0] = args[0][0];
     return fn.apply(this, args);
   };
-});
+}
 arrayTraps.deleteProperty = function(state, prop) {
   if ( true && isNaN(parseInt(prop)))
     die(13);
@@ -93541,7 +93646,7 @@ function enablePatches() {
     );
   }
   function getPath(state, path = []) {
-    if ("key_" in state && state.key_ !== void 0) {
+    if (state.key_ !== void 0) {
       const parentCopy = state.parent_.copy_ ?? state.parent_.base_;
       const proxyDraft = getProxyDraft(get(parentCopy, state.key_));
       const valueAtKey = get(parentCopy, state.key_);
@@ -93631,10 +93736,12 @@ function enablePatches() {
       [base_, copy_] = [copy_, base_];
       [patches, inversePatches] = [inversePatches, patches];
     }
+    const allReassigned = state.allIndicesReassigned_ === true;
     for (let i = 0; i < base_.length; i++) {
       const copiedItem = copy_[i];
       const baseItem = base_[i];
-      if (assigned_?.get(i.toString()) && copiedItem !== baseItem) {
+      const isAssigned = allReassigned || assigned_?.get(i.toString());
+      if (isAssigned && copiedItem !== baseItem) {
         const childState = copiedItem?.[DRAFT_STATE];
         if (childState && childState.modified_) {
           continue;
@@ -93865,6 +93972,7 @@ function enableMapSet() {
         state.assigned_.set(key, true);
         state.copy_.set(key, value);
         state.assigned_.set(key, true);
+        handleCrossReference(state, key, value);
       }
       return this;
     }
@@ -94008,6 +94116,7 @@ function enableMapSet() {
         prepareSetCopy(state);
         markChanged(state);
         state.copy_.add(value);
+        handleCrossReference(state, value, value);
       }
       return this;
     }
@@ -94092,6 +94201,163 @@ function enableMapSet() {
     }
   }
   loadPlugin(PluginMapSet, { proxyMap_, proxySet_, fixSetContents });
+}
+
+// src/plugins/arrayMethods.ts
+function enableArrayMethods() {
+  const SHIFTING_METHODS = /* @__PURE__ */ new Set(["shift", "unshift"]);
+  const QUEUE_METHODS = /* @__PURE__ */ new Set(["push", "pop"]);
+  const RESULT_RETURNING_METHODS = /* @__PURE__ */ new Set([
+    ...QUEUE_METHODS,
+    ...SHIFTING_METHODS
+  ]);
+  const REORDERING_METHODS = /* @__PURE__ */ new Set(["reverse", "sort"]);
+  const MUTATING_METHODS = /* @__PURE__ */ new Set([
+    ...RESULT_RETURNING_METHODS,
+    ...REORDERING_METHODS,
+    "splice"
+  ]);
+  const FIND_METHODS = /* @__PURE__ */ new Set(["find", "findLast"]);
+  const NON_MUTATING_METHODS = /* @__PURE__ */ new Set([
+    "filter",
+    "slice",
+    "concat",
+    "flat",
+    ...FIND_METHODS,
+    "findIndex",
+    "findLastIndex",
+    "some",
+    "every",
+    "indexOf",
+    "lastIndexOf",
+    "includes",
+    "join",
+    "toString",
+    "toLocaleString"
+  ]);
+  function isMutatingArrayMethod(method) {
+    return MUTATING_METHODS.has(method);
+  }
+  function isNonMutatingArrayMethod(method) {
+    return NON_MUTATING_METHODS.has(method);
+  }
+  function isArrayOperationMethod(method) {
+    return isMutatingArrayMethod(method) || isNonMutatingArrayMethod(method);
+  }
+  function enterOperation(state, method) {
+    state.operationMethod = method;
+  }
+  function exitOperation(state) {
+    state.operationMethod = void 0;
+  }
+  function executeArrayMethod(state, operation, markLength = true) {
+    prepareCopy(state);
+    const result = operation();
+    markChanged(state);
+    if (markLength)
+      state.assigned_.set("length", true);
+    return result;
+  }
+  function markAllIndicesReassigned(state) {
+    state.allIndicesReassigned_ = true;
+  }
+  function normalizeSliceIndex(index, length) {
+    if (index < 0) {
+      return Math.max(length + index, 0);
+    }
+    return Math.min(index, length);
+  }
+  function handleSimpleOperation(state, method, args) {
+    return executeArrayMethod(state, () => {
+      const result = state.copy_[method](...args);
+      if (SHIFTING_METHODS.has(method)) {
+        markAllIndicesReassigned(state);
+      }
+      return RESULT_RETURNING_METHODS.has(method) ? result : state.draft_;
+    });
+  }
+  function handleReorderingOperation(state, method, args) {
+    return executeArrayMethod(
+      state,
+      () => {
+        ;
+        state.copy_[method](...args);
+        markAllIndicesReassigned(state);
+        return state.draft_;
+      },
+      false
+    );
+  }
+  function createMethodInterceptor(state, originalMethod) {
+    return function interceptedMethod(...args) {
+      const method = originalMethod;
+      enterOperation(state, method);
+      try {
+        if (isMutatingArrayMethod(method)) {
+          if (RESULT_RETURNING_METHODS.has(method)) {
+            return handleSimpleOperation(state, method, args);
+          }
+          if (REORDERING_METHODS.has(method)) {
+            return handleReorderingOperation(state, method, args);
+          }
+          if (method === "splice") {
+            const res = executeArrayMethod(
+              state,
+              () => state.copy_.splice(...args)
+            );
+            markAllIndicesReassigned(state);
+            return res;
+          }
+        } else {
+          return handleNonMutatingOperation(state, method, args);
+        }
+      } finally {
+        exitOperation(state);
+      }
+    };
+  }
+  function handleNonMutatingOperation(state, method, args) {
+    const source = latest(state);
+    if (method === "filter") {
+      const predicate = args[0];
+      const result = [];
+      for (let i = 0; i < source.length; i++) {
+        if (predicate(source[i], i, source)) {
+          result.push(state.draft_[i]);
+        }
+      }
+      return result;
+    }
+    if (FIND_METHODS.has(method)) {
+      const predicate = args[0];
+      const isForward = method === "find";
+      const step = isForward ? 1 : -1;
+      const start = isForward ? 0 : source.length - 1;
+      for (let i = start; i >= 0 && i < source.length; i += step) {
+        if (predicate(source[i], i, source)) {
+          return state.draft_[i];
+        }
+      }
+      return void 0;
+    }
+    if (method === "slice") {
+      const rawStart = args[0] ?? 0;
+      const rawEnd = args[1] ?? source.length;
+      const start = normalizeSliceIndex(rawStart, source.length);
+      const end = normalizeSliceIndex(rawEnd, source.length);
+      const result = [];
+      for (let i = start; i < end; i++) {
+        result.push(state.draft_[i]);
+      }
+      return result;
+    }
+    return source[method](...args);
+  }
+  loadPlugin(PluginArrayMethods, {
+    createMethodInterceptor,
+    isArrayOperationMethod,
+    isMutatingArrayMethod
+  });
 }
 
 // src/immer.ts
@@ -130178,7 +130444,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react_router__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react-router */ "./node_modules/react-router/dist/index.js");
 /* harmony import */ var react_router__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @remix-run/router */ "./node_modules/@remix-run/router/dist/router.js");
 /**
- * React Router DOM v6.30.2
+ * React Router DOM v6.30.3
  *
  * Copyright (c) Remix Software Inc.
  *
@@ -131709,7 +131975,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _remix_run_router__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @remix-run/router */ "./node_modules/@remix-run/router/dist/router.js");
 /**
- * React Router v6.30.2
+ * React Router v6.30.3
  *
  * Copyright (c) Remix Software Inc.
  *

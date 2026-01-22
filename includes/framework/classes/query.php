@@ -30,8 +30,8 @@ class Query
 
             $graph = $version->getGraph();
             foreach ($graph['nodes'] ?? [] as $node) {
-                if (($node['type'] ?? '') === 'trigger' && !empty($node['data']['event'])) {
-                    $events[] = $node['data']['event'];
+                if (($node['type'] ?? '') === 'trigger' && !empty($node['data']['hook'])) {
+                    $events[] = $node['data']['hook'];
                 }
             }
         }
