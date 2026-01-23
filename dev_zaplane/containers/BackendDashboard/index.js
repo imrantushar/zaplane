@@ -5,7 +5,6 @@ import CreateWorkflows from './pages/workflows';
 import Workflows from './pages/workflows/workFlowMotion';
 import Notification from '@ZAPComponents/Notification';
 import Logs from './pages/logs';
-import Queue from './pages/queue';
 import Setting from './pages/setting';
 import Connections from './pages/connections';
 

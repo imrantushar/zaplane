@@ -11,7 +11,7 @@ import notificationReducer from './Slices/notificationSlice/notificationSlice';
 
 import logger from 'redux-logger'
 /**
- * The main Redux store for the Gamify application.
+ * The main Redux store for the Zaplane application.
  *
  * We use configureStore from Redux Toolkit, which simplifies store setup,
  * automatically combines slice reducers, adds necessary middleware like redux-thunk,
