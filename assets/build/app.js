@@ -1390,9 +1390,8 @@ const TopBar = ({
       height: "80px",
       px: 6,
       py: 4,
-      mb: 6
-      // top="32px"
-      ,
+      mb: 6,
+      top: "32px",
       borderBottomWidth: "1px",
       borderColor: "var(--zaplane-border-color)",
       boxShadowColor: 'var(--zaplane-shadow)',
