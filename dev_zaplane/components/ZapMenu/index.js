@@ -2,12 +2,13 @@ import React from "react";
 import { Menu } from "@chakra-ui/react"
 import { Button, Portal } from "@chakra-ui/react";
 import { __ } from "@wordpress/i18n";
+import { primaryBtn } from "../../../assets/scss/chakra/recipe";
 
 const ZAPMenu = ({ triggerLabel, items = [] }) => {
   return (
     <Menu.Root>
       <Menu.Trigger asChild>
-        <Button colorScheme="var(--zaplane-primary)">{__(triggerLabel, "zaplane")}</Button>
+        <Button {...primaryBtn}>{__(triggerLabel, "zaplane")}</Button>
       </Menu.Trigger>
 
       <Portal>
@@ -17,7 +18,7 @@ const ZAPMenu = ({ triggerLabel, items = [] }) => {
               <Menu.Item
                 key={index}
                 onClick={item.onClick}
-                style={{ cursor: "pointer" }}
+                cursor="pointer"
               >
                 {__(item.label, "zaplane")}
               </Menu.Item>

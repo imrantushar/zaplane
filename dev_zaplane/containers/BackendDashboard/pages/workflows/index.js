@@ -26,6 +26,7 @@ import ZAPMenu from "@ZAPComponents/ZapMenu";
 import TopBar from "@ZAPComponents/TopBar";
 import OptionMenu from "@ZAPComponents/OptionMenu";
 import { FiEdit, FiTrash2 } from "react-icons/fi";
+import {primaryBtn, removeBtn } from "../../../../../assets/scss/chakra/recipe";
 
 
 const CreateWorkflows = () => {
@@ -226,11 +227,13 @@ const CreateWorkflows = () => {
           />
 
           <Flex justify="flex-end" mt={5}>
-            <Button variant="ghost" mr={3} onClick={() => setIsModalOpen(false)}>
+            <Button 
+            {...removeBtn}
+             mr={3} onClick={() => setIsModalOpen(false)}>
               {__("Cancel", "zaplane")}
             </Button>
             <Button
-              colorScheme="blue"
+              {...primaryBtn}
               onClick={handleCreate}
               isDisabled={!workflowName.trim()}
             >

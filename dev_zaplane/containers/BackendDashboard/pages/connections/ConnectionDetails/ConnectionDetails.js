@@ -15,11 +15,10 @@ const ConnectionDetails = ({ isOpen, onClose, singleData }) => {
         </Flex>
       ) : (
         <Box>
-          {/* Top Card */}
           <Box
             p={5}
             borderRadius="lg"
-            bg="white"
+            bg="var(--zaplane-background)"
             borderWidth="1px"
             mb={5}
             boxShadow="sm"
@@ -33,13 +32,12 @@ const ConnectionDetails = ({ isOpen, onClose, singleData }) => {
                   {__(singleData.app, "zaplane")}
                 </Text>
               </Box>
-
               <Badge
                 px={4}
                 py={1.5}
                 fontSize="sm"
                 borderRadius="full"
-                colorScheme={singleData.status === "active" ? "green" : "gray"}
+                colorPalette={singleData.status === "active" ? "green" : "gray"}
                 textTransform="capitalize"
               >
                 {__(singleData.status, "zaplane")}
@@ -48,16 +46,16 @@ const ConnectionDetails = ({ isOpen, onClose, singleData }) => {
           </Box>
           <Flex gap={4} wrap="wrap">
             <Box flex="1 1 45%" p={4} borderRadius="lg" borderWidth="1px" bg="gray.50">
-              <Text fontSize="xs" className="zaplane-label">
+              <Text className="zaplane-label">
                 {__('AUTH TYPE', 'zaplane')}
               </Text>
-              <Text fontSize="md" fontWeight="medium">
+              <Text className="zaplane-label" fontSize="md" fontWeight="medium">
                 {__(singleData.auth_type, 'zaplane')}
               </Text>
             </Box>
 
             <Box flex="1 1 45%" p={4} borderRadius="lg" borderWidth="1px" bg="gray.50">
-              <Text fontSize="xs" className="zaplane-label">
+              <Text  className="zaplane-label">
                 {__('CREATED AT', 'zaplane')}
               </Text>
               <Text fontSize="md" fontWeight="medium" className="zaplane-label" >
@@ -66,16 +64,16 @@ const ConnectionDetails = ({ isOpen, onClose, singleData }) => {
             </Box>
 
             <Box flex="1 1 45%" p={4} borderRadius="lg" borderWidth="1px" bg="gray.50">
-              <Text fontSize="xs" className="zaplane-label">
+              <Text className="zaplane-label">
                 {__('LAST USED', 'zaplane')}
               </Text>
-              <Text fontSize="md" fontWeight="medium">
+              <Text className="zaplane-label" fontSize="md" fontWeight="medium">
                 {__(singleData.last_used_at || "--", "zaplane")}
               </Text>
             </Box>
 
             <Box flex="1 1 45%" p={4} borderRadius="lg" borderWidth="1px" bg="gray.50">
-              <Text fontSize="xs" className="zaplane-label">
+              <Text  className="zaplane-label">
                 {__('LAST TESTED', 'zaplane')}
               </Text>
               <Text fontSize="md" fontWeight="medium" className="zaplane-label">

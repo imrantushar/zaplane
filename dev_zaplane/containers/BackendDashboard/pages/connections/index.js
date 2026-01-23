@@ -34,6 +34,7 @@ import WPModal from "@ZAPComponents/Modal/WPModal";
 import ZAPTable from "@ZAPComponents/Table";
 import ConnectionDetails from "./ConnectionDetails/ConnectionDetails";
 import TopBar from "@ZAPComponents/TopBar";
+import { primaryBtn, removeBtn } from "../../../../../assets/scss/chakra/recipe";
 
 const statusOptions = [
     { value: "active", label: "Active" },
@@ -151,8 +152,8 @@ const Connections = () => {
                 )}
                 rightContent={() => (
                     <Button
+                        {...primaryBtn}
                         leftIcon={<FaSlack />}
-                        variant="outline"
                         onClick={() => setIsModalOpen(true)}
                     >
                         {__("Create credential", "zaplane")}
@@ -194,6 +195,7 @@ const Connections = () => {
                             render: (row) => (
                                 <Box w="140px">
                                     <Select
+                                        className="zaplane-select"
                                         options={statusOptions}
                                         value={statusOptions.find(
                                             (o) => o.value === row.status
@@ -232,8 +234,7 @@ const Connections = () => {
                                 {__('Details', 'zaplane')}
                             </Button>
                             <Button
-                                size="xs"
-                                colorScheme="#FF0000"
+                                {...removeBtn}
                                 leftIcon={<FiTrash2 />}
                                 onClick={() =>
                                     dispatch(deleteConnection(row.id))
@@ -268,12 +269,12 @@ const Connections = () => {
                                 setCredentials({});
                             }}
                             options={[{ value: "slack", label: "Slack" }]}
+                            
                         />
                         {Object.keys(authTypes).map((key) => (
                             <Button
                                 key={key}
                                 variant={selectedAuthType === key ? "solid" : "outline"}
-                                colorScheme="var(--zaplane-primary)"
                                 onClick={() => {
                                     setSelectedAuthType(key);
                                     setCredentials({});
@@ -315,19 +316,20 @@ const Connections = () => {
                             </VStack>
                         )}
 
+                        {selectedAuthType &&
+                            <Button
+                                {...primaryBtn}
+                                width="220px"
+                                onClick={handleConnect}
+                                isLoading={loadingOAuth}
+                                isDisabled={!selectedApp || !selectedAuthType}
+                            >
+                                {selectedAuthType === "oauth2"
+                                    ? __("Connect with OAuth", "zaplane")
+                                    : __("Save Connection", "zaplane")}
+                            </Button>
+                        }
 
-
-                        <Button
-                            width="220px"
-                            colorScheme="var(--zaplane-primary)"
-                            onClick={handleConnect}
-                            isLoading={loadingOAuth}
-                            isDisabled={!selectedApp || !selectedAuthType}
-                        >
-                            {selectedAuthType === "oauth2"
-                                ? __("Connect with OAuth", "zaplane")
-                                : __("Save Connection", "zaplane")}
-                        </Button>
                     </VStack>
                 </Box>
             </WPModal>
