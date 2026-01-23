@@ -22,6 +22,7 @@ import ActionFieldRenderer from "../Components/ActionFieldRenderer/ActionFieldRe
 import ZAPTab from "@ZAPComponents/Tab";
 import { IoIosArrowForward } from "react-icons/io";
 import { __ } from "@wordpress/i18n";
+import { primaryBtn } from "../../../../../../../assets/scss/chakra/recipe";
 
 const APPS = Object.entries(integrations.apps || {}).map(([key, value]) => ({
     id: value.slug || key,
@@ -232,7 +233,7 @@ export default function ActionDrawer({
                     <Button variant="ghost" onClick={resetAll}>
                         {__("Cancel", "zaplane")}
                     </Button>
-                    <Button onClick={handleContinue}>
+                    <Button {...primaryBtn} onClick={handleContinue}>
                         {step === "test" ? "Submit" : "Continue"}
                     </Button>
                 </HStack>
@@ -256,7 +257,7 @@ export default function ActionDrawer({
                                 setSelectedItem(item);
                                 setSearch("");
                             }}
-                            background="white"
+                            background="var(--zaplane-background)"
                             _hover={{
                                     bg: "var(--zaplane-body-background)",
                                 }}
@@ -273,7 +274,7 @@ export default function ActionDrawer({
                 <VStack spacing={4}>
                     <Button
                         w="100%"
-                        background="white"
+                        background="var(--zaplane-background)"
                         color="var(--zaplane-font-color)"
                         justifyContent="space-between"
                         transition="all 0.2s ease"
@@ -289,7 +290,7 @@ export default function ActionDrawer({
                     {(node?.data?.action !== "trigger" || source === "add") &&
                         TOOLS.map(tool => (
                             <Button
-                                background="white"
+                                background="var(--zaplane-background)"
                                 color="var(--zaplane-font-color)"
                                 key={tool.id}
                                 justifyContent="left"

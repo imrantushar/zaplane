@@ -232,7 +232,7 @@ const CreateWorkflows = () => {
 
           <Flex justify="flex-end" mt={5}>
             <Button 
-            {...removeBtn}
+            variant="ghost"
              mr={3} onClick={() => setIsModalOpen(false)}>
               {__("Cancel", "zaplane")}
             </Button>
