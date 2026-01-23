@@ -3551,10 +3551,10 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ },
 
-/***/ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/customNoe/CustomNode.js"
-/*!********************************************************************************************************!*\
-  !*** ./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/customNoe/CustomNode.js ***!
-  \********************************************************************************************************/
+/***/ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/customNode/CustomNode.js"
+/*!*********************************************************************************************************!*\
+  !*** ./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/customNode/CustomNode.js ***!
+  \*********************************************************************************************************/
 (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3668,8 +3668,8 @@ function CustomNode({
           width: 10,
           height: 10,
           borderRadius: "50%",
-          background: "#3182ce",
-          border: "2px solid white"
+          background: "var(--zaplane-secondary)",
+          border: "2px solid var(--zaplane-body-background)"
         }
       }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Text, {
         className: "zaplane-label",
@@ -3683,8 +3683,8 @@ function CustomNode({
           width: 10,
           height: 10,
           borderRadius: "50%",
-          background: "#3182ce",
-          border: "2px solid white"
+          background: "var(--zaplane-secondary)",
+          border: "2px solid var(--zaplane-body-background)"
         }
       })]
     }), !hasOutgoingEdge && !data.conditions && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_floatingEdge_FloatingEdge__WEBPACK_IMPORTED_MODULE_9__["default"], {
@@ -3810,7 +3810,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react_router_dom__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! react-router-dom */ "./node_modules/react-router/dist/index.js");
 /* harmony import */ var _ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! @ZAPRedux/Slices/workFlowSlice/workFlowSlice */ "./dev_zaplane/redux/Slices/workFlowSlice/workFlowSlice.js");
 /* harmony import */ var react_redux__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/dist/react-redux.mjs");
-/* harmony import */ var _customNoe_CustomNode__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ../customNoe/CustomNode */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/customNoe/CustomNode.js");
+/* harmony import */ var _customNode_CustomNode__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ../customNode/CustomNode */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/customNode/CustomNode.js");
 /* harmony import */ var _ZAPComponents_Drawer__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! @ZAPComponents/Drawer */ "./dev_zaplane/components/Drawer/index.js");
 /* harmony import */ var lucide_react__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! lucide-react */ "./node_modules/lucide-react/dist/esm/icons/history.js");
 /* harmony import */ var _RunsTable_RunsTable__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! ./RunsTable/RunsTable */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js");
@@ -4065,7 +4065,7 @@ function FlowCanvas({
     return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_26__.jsx)(_ZAPComponents_Loading__WEBPACK_IMPORTED_MODULE_25__["default"], {});
   }
   const nodeTypes = {
-    custom: props => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_26__.jsx)(_customNoe_CustomNode__WEBPACK_IMPORTED_MODULE_17__["default"], {
+    custom: props => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_26__.jsx)(_customNode_CustomNode__WEBPACK_IMPORTED_MODULE_17__["default"], {
       ...props,
       data: {
         ...props.data,

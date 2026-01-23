@@ -28,7 +28,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { getAllVersion, getRunWorkFlow, getSingleWorkFlow, liveMonitor, updateWorkFlow, updateWorkFlowStatus, workFLowExction, workflowNodeListiner, workflowNodeListinerStop } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
 import { useDispatch, useSelector } from "react-redux";
-import CustomNode from "../customNoe/CustomNode";
+import CustomNode from "../customNode/CustomNode";
 import ZAPDrawer from "@ZAPComponents/Drawer";
 import { LucideHistory } from "lucide-react";
 import RunsTable from "./RunsTable/RunsTable";

@@ -101,8 +101,8 @@ export default function CustomNode({ id, data, xPos, yPos }) {
               width: 10,
               height: 10,
               borderRadius: "50%",
-              background: "#3182ce",
-              border: "2px solid white",
+              background: "var(--zaplane-secondary)",
+              border: "2px solid var(--zaplane-body-background)",
             }}
           />
         )}
@@ -118,8 +118,8 @@ export default function CustomNode({ id, data, xPos, yPos }) {
               width: 10,
               height: 10,
               borderRadius: "50%",
-              background: "#3182ce",
-              border: "2px solid white",
+              background: "var(--zaplane-secondary)",
+              border: "2px solid var(--zaplane-body-background)",
             }}
           />
         )}
