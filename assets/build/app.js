@@ -1485,7 +1485,7 @@ const ZAPInput = ({
       fontSize: "0.875rem",
       children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_5__.__)(label, 'zaplane')
     }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(InputComponent, {
-      className: `zaplane-${type}`,
+      className: `zaplane-${type === 'textarea' ? 'textarea' : 'input'}`,
       type: type !== "textarea" ? type : undefined,
       placeholder: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_5__.__)(placeholder, 'zaplane'),
       value: value,
