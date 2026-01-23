@@ -131,7 +131,11 @@ const CreateWorkflows = () => {
               key: "title",
               textAlign: "center",
               render: (row) => (
-                <Text fontWeight="500" className="zaplane-label">
+                <Text
+                onClick={()=>navigate(
+                      `${route_path}admin.php?page=zaplane-workflows&action=edit&id=${row.id}`
+                    )} fontWeight="500" className="zaplane-label"
+                >
                   {__(row.title, "zaplane")}
                 </Text>
               ),

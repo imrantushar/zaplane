@@ -2731,6 +2731,7 @@ const CreateWorkflows = () => {
           key: "title",
           textAlign: "center",
           render: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Text, {
+            onClick: () => navigate(`${_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_9__.route_path}admin.php?page=zaplane-workflows&action=edit&id=${row.id}`),
             fontWeight: "500",
             className: "zaplane-label",
             children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)(row.title, "zaplane")
