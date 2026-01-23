@@ -36,6 +36,7 @@ import VersionHistoryTable from "./VersionHistoryTable/VersionHistoryTable";
 import { LuFullscreen, LuMinimize } from "react-icons/lu";
 import { mapEdgesForBackend, mapNodesForBackend, toggleFullscreenMode } from "../helper";
 import Select from "react-select";
+import ZAPLoading from "@ZAPComponents/Loading";
 ;
 export default function FlowCanvas({ id }) {
     const nodeIdRef = useRef(0);
@@ -266,6 +267,9 @@ export default function FlowCanvas({ id }) {
 
     console.log(nodes, 'all nodes');
     console.log(edges, 'all edges');
+    if (loading) {
+        return <ZAPLoading/>
+    }
 
     const nodeTypes = {
         custom: (props) => (
@@ -369,7 +373,7 @@ export default function FlowCanvas({ id }) {
                                         const paylod = {
                                             workflow_hash: singleData?.version?.hash,
                                         }
-                                      
+
                                         dispatch(workFLowExction(paylod))
                                     }}>
                                     {__("🔄 Replay ", "zaplane")}
