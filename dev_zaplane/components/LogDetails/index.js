@@ -44,15 +44,16 @@ const LogDetails = ({ runId, onBack }) => {
                   </HStack>
 
                   <Badge
-                    colorScheme={
+                    colorPalette={
                       log.status === "completed"
-                        ? "#4CAF50"
+                        ? "green"
                         : log.status === "failed"
-                          ? "#F44336"
-                          : "var(--zaplane-primary)"
+                          ? "red"
+                          : "blue"
+
                     }
                   >
-                  {__(log.status, 'zaplane')}
+                    {__(log.status, 'zaplane')}
                   </Badge>
                 </HStack>
                 <Accordion.ItemIndicator />
@@ -63,10 +64,9 @@ const LogDetails = ({ runId, onBack }) => {
                   <VStack spacing="4" align="stretch">
                     <Box
                       p="3"
-                      border="1px solid"
-                      borderColor="var(--zaplane-secondary)"
+                      border="1px solid var(--zaplane-border-color)"
                       borderRadius="md"
-                      bg="var(--zaplane-secondary)"
+                      bg="var(--zaplane-gray)"
                     >
                       <Text className="zaplane-label" fontWeight="bold" mb="2">
                         {__('Input', 'zaplane')}
@@ -76,10 +76,9 @@ const LogDetails = ({ runId, onBack }) => {
 
                     <Box
                       p="3"
-                      border="1px solid"
-                      borderColor="var(--zaplane-secondary)"
+                      border="1px solid var(--zaplane-border-color)"
                       borderRadius="md"
-                      bg="var(--zaplane-secondary)"
+                      bg="var(--zaplane-gray)"
                     >
                       <Text fontWeight="bold" mb="2">
                         {__('Output', 'zaplane')}

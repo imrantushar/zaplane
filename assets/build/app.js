@@ -735,7 +735,7 @@ const LogDetails = ({
                   children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_6__.__)(`Log ${log.id}`, 'zaplane')
                 })]
               }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Badge, {
-                colorScheme: log.status === "completed" ? "#4CAF50" : log.status === "failed" ? "#F44336" : "var(--zaplane-primary)",
+                colorPalette: log.status === "completed" ? "green" : log.status === "failed" ? "red" : "blue",
                 children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_6__.__)(log.status, 'zaplane')
               })]
             }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.AccordionItemIndicator, {})]
@@ -746,10 +746,9 @@ const LogDetails = ({
                 align: "stretch",
                 children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
                   p: "3",
-                  border: "1px solid",
-                  borderColor: "var(--zaplane-secondary)",
+                  border: "1px solid var(--zaplane-border-color)",
                   borderRadius: "md",
-                  bg: "var(--zaplane-secondary)",
+                  bg: "var(--zaplane-gray)",
                   children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
                     className: "zaplane-label",
                     fontWeight: "bold",
@@ -760,10 +759,9 @@ const LogDetails = ({
                   })]
                 }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
                   p: "3",
-                  border: "1px solid",
-                  borderColor: "var(--zaplane-secondary)",
+                  border: "1px solid var(--zaplane-border-color)",
                   borderRadius: "md",
-                  bg: "var(--zaplane-secondary)",
+                  bg: "var(--zaplane-gray)",
                   children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
                     fontWeight: "bold",
                     mb: "2",
