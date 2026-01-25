@@ -3281,7 +3281,7 @@ function ActionDrawer({
     open: open,
     onClose: resetAll,
     closeOnOverlayClick: true,
-    title: !mode ? "Add Action" : selectedItem?.name || "App",
+    title: !mode ? "Add Action" : selectedItem?.name || (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_17__.__)('App', 'zaplane'),
     placement: "end",
     size: "xl",
     footer: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.HStack, {
@@ -3293,7 +3293,7 @@ function ActionDrawer({
       }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Button, {
         ..._assets_scss_chakra_recipe__WEBPACK_IMPORTED_MODULE_18__.primaryBtn,
         onClick: handleContinue,
-        children: step === "test" ? "Submit" : "Continue"
+        children: step === 'test' ? (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_17__.__)('Submit', 'zaplane') : (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_17__.__)('Continue', 'zaplane')
       })]
     }),
     children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Input, {
@@ -3316,10 +3316,10 @@ function ActionDrawer({
         },
         children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Text, {
           className: "zaplane-label",
-          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_17__.__)(item.name, "zaplane")
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Text, {
+          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_17__.sprintf)((0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_17__.__)(" Tool", "zaplane"), item.name)
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Text, {
           fontSize: "xs",
-          children: item.type === "tools" ? "Tool" : "App"
+          children: [" ", item.type === 'tools' ? (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_17__.__)('Tool', 'zaplane') : (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_17__.__)('App', 'zaplane')]
         })]
       }, `${item.type}-${item.id}`))
     }), !mode && !search && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_6__.VStack, {
@@ -3351,7 +3351,7 @@ function ActionDrawer({
           setMode("tools");
           setSelectedItem(tool);
         },
-        children: tool.name
+        children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_17__.sprintf)((0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_17__.__)(" Tool", "zaplane"), tool.name)
       }, tool.id))]
     }), mode && !selectedItem && !search && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_6__.VStack, {
       children: [list.map(item => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Button, {
@@ -3363,7 +3363,7 @@ function ActionDrawer({
           bg: "var(--zaplane-body-background)"
         },
         onClick: () => setSelectedItem(item),
-        children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_17__.__)(item.name, "zaplane")
+        children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_17__.sprintf)((0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_17__.__)("%s", "zaplane"), item.name)
       }, item.id)), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Button, {
         size: "sm",
         variant: "ghost",
@@ -3377,7 +3377,7 @@ function ActionDrawer({
         label: "Select",
         content: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.Fragment, {
           children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(_ZAPComponents_ZAPSelect__WEBPACK_IMPORTED_MODULE_8__["default"], {
-            label: isTrigger ? "Trigger Type" : "Action Type",
+            label: isTrigger ? (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_17__.__)('Trigger Type', 'gemboards') : (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_17__.__)('Action Type', 'gemboards'),
             options: actionOptions,
             value: values.actionType,
             onChange: val => setFieldValue("actionType", val),

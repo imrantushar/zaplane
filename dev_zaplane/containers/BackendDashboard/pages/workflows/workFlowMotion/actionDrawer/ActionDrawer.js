@@ -17,7 +17,7 @@ import { useDispatch } from "react-redux";
 import ActionFieldRenderer from "../Components/ActionFieldRenderer/ActionFieldRenderer";
 import ZAPTab from "@ZAPComponents/Tab";
 import { IoIosArrowForward } from "react-icons/io";
-import { __ } from "@wordpress/i18n";
+import { __, sprintf } from "@wordpress/i18n";
 import { primaryBtn } from "../../../../../../../assets/scss/chakra/recipe";
 import { useActionDrawer } from "../../../../../../hooks/useActionDrawer/useActionDrawer";
 import { TOOLS } from "../../../../../../hooks/useActionDrawer/helper";
@@ -114,13 +114,14 @@ export default function ActionDrawer({ open, context, onClose, updateNodeData, c
       open={open}
       onClose={resetAll}
       closeOnOverlayClick
-      title={!mode ? "Add Action" : selectedItem?.name || "App"}
+      title={!mode ? "Add Action" : selectedItem?.name || __('App', 'zaplane')}
       placement="end"
       size="xl"
       footer={
         <HStack justify="space-between">
           <Button variant="ghost" onClick={resetAll}>{__("Cancel", "zaplane")}</Button>
-          <Button {...primaryBtn} onClick={handleContinue}>{step === "test" ? "Submit" : "Continue"}</Button>
+          <Button {...primaryBtn} onClick={handleContinue}>{step === 'test' ? __('Submit', 'zaplane') : __('Continue', 'zaplane')}
+          </Button>
         </HStack>
       }
     >
@@ -132,14 +133,16 @@ export default function ActionDrawer({ open, context, onClose, updateNodeData, c
             <Button
               key={`${item.type}-${item.id}`}
               justifyContent="space-between"
-              onClick={() => { setMode(item.type);
-              setSelectedItem(item); 
-              setSearch(""); }}
+              onClick={() => {
+                setMode(item.type);
+                setSelectedItem(item);
+                setSearch("");
+              }}
               background="var(--zaplane-background)"
               _hover={{ bg: "var(--zaplane-body-background)" }}
             >
-              <Text className="zaplane-label">{__(item.name, "zaplane")}</Text>
-              <Text fontSize="xs">{item.type === "tools" ? "Tool" : "App"}</Text>
+              <Text className="zaplane-label">{sprintf(__(" Tool", "zaplane"), item.name)}</Text>
+              <Text fontSize="xs"> {item.type === 'tools'? __('Tool', 'zaplane'): __('App', 'zaplane')}</Text>
             </Button>
           ))}
         </VStack>
@@ -157,11 +160,12 @@ export default function ActionDrawer({ open, context, onClose, updateNodeData, c
           {(node?.data?.action !== "trigger" || source === "add") && TOOLS.map(tool => (
             <Button key={tool.id} background="var(--zaplane-background)" color="var(--zaplane-font-color)"
               justifyContent="left" w="100%" _hover={{ bg: "var(--zaplane-body-background)" }}
-              onClick={() => { 
+              onClick={() => {
                 setMode("tools");
-                setSelectedItem(tool); }}
+                setSelectedItem(tool);
+              }}
             >
-              {tool.name}
+              {sprintf(__(" Tool", "zaplane"), tool.name)}
             </Button>
           ))}
         </VStack>
@@ -174,7 +178,7 @@ export default function ActionDrawer({ open, context, onClose, updateNodeData, c
               justifyContent="left" _hover={{ bg: "var(--zaplane-body-background)" }}
               onClick={() => setSelectedItem(item)}
             >
-              {__(item.name, "zaplane")}
+              {sprintf(__("%s", "zaplane"), item.name)}
             </Button>
           ))}
           <Button size="sm" variant="ghost" onClick={() => setMode(null)}>{__('Back', 'zaplane')}</Button>
@@ -191,7 +195,11 @@ export default function ActionDrawer({ open, context, onClose, updateNodeData, c
               content: (
                 <>
                   <ZAPSelect
-                    label={isTrigger ? "Trigger Type" : "Action Type"}
+                    label={
+                      isTrigger
+                        ? __('Trigger Type', 'gemboards')
+                        : __('Action Type', 'gemboards')
+                    }
                     options={actionOptions}
                     value={values.actionType}
                     onChange={val => setFieldValue("actionType", val)}
