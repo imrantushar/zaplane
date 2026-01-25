@@ -34,7 +34,7 @@ export default function ActionDrawer({ open, context, onClose, updateNodeData, c
   const isTrigger = node?.data?.action === "trigger" && source === "node";
 
   const { mode, setMode, selectedItem, setSelectedItem, search, setSearch, list, searchList } =
-    useActionDrawer(open, node, source, setFieldValue);
+    useActionDrawer(open, node, source, setFieldValue,isTrigger);
 
   // Auto-set actionType if only one tool action
   useEffect(() => {
@@ -108,7 +108,7 @@ export default function ActionDrawer({ open, context, onClose, updateNodeData, c
     context?.source === "node" ? updateNodeData(payload) : createActionNode(payload);
     resetAll();
   };
-
+  console.log(searchList,'searchList',list,TOOLS);
   return (
     <ZAPDrawer
       open={open}
@@ -125,7 +125,7 @@ export default function ActionDrawer({ open, context, onClose, updateNodeData, c
         </HStack>
       }
     >
-      <Input placeholder="Search apps or tools..." value={search} onChange={e => setSearch(e.target.value)} />
+      <Input placeholder={__("Search apps or tools...","zaplane")} value={search} onChange={e => setSearch(e.target.value)} />
 
       {search && (
         <VStack spacing={2} align="stretch">
@@ -142,7 +142,7 @@ export default function ActionDrawer({ open, context, onClose, updateNodeData, c
               _hover={{ bg: "var(--zaplane-body-background)" }}
             >
               <Text className="zaplane-label">{sprintf(__("%s", "zaplane"), item.name)}</Text>
-              <Text fontSize="xs"> {item.type === 'tools'? __('Tool', 'zaplane'): __('App', 'zaplane')}</Text>
+              <Text fontSize="xs" className="zaplane-label"> {item.type === 'tools'? __('Tool', 'zaplane'): __('App', 'zaplane')}</Text>
             </Button>
           ))}
         </VStack>
@@ -157,7 +157,7 @@ export default function ActionDrawer({ open, context, onClose, updateNodeData, c
             <span>{__("Apps", "zaplane")}</span>
             <IoIosArrowForward />
           </Button>
-          {(node?.data?.action !== "trigger" || source === "add") && TOOLS.map(tool => (
+          {(!isTrigger || source === "add") && TOOLS.map(tool => (
             <Button key={tool.id} background="var(--zaplane-background)" color="var(--zaplane-font-color)"
               justifyContent="left" w="100%" _hover={{ bg: "var(--zaplane-body-background)" }}
               onClick={() => {

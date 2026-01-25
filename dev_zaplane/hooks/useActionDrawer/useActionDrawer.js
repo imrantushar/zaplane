@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { APPS, TOOLS } from "./helper";
 
-export const useActionDrawer = (open, node, source, setFieldValue) => {
+export const useActionDrawer = (open, node, source, setFieldValue, isTrigger) => {
   const [mode, setMode] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
   const [search, setSearch] = useState("");
@@ -29,9 +29,13 @@ export const useActionDrawer = (open, node, source, setFieldValue) => {
   const searchList = useMemo(() => {
     if (!search) return [];
     const q = search.toLowerCase();
-    const combined = APPS.concat(TOOLS.map(t => ({ ...t, type: "tools" })));
+    const combined = isTrigger
+      ? APPS
+      : APPS.concat(TOOLS.map(t => ({ ...t, type: "tools" })));
+
     return combined.filter(item => item.name.toLowerCase().includes(q));
-  }, [search]);
+  }, [search, isTrigger]);
+
 
   return { mode, setMode, selectedItem, setSelectedItem, search, setSearch, list, searchList };
 };

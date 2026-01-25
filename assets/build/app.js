@@ -3206,7 +3206,7 @@ function ActionDrawer({
     setSearch,
     list,
     searchList
-  } = (0,_hooks_useActionDrawer_useActionDrawer__WEBPACK_IMPORTED_MODULE_19__.useActionDrawer)(open, node, source, setFieldValue);
+  } = (0,_hooks_useActionDrawer_useActionDrawer__WEBPACK_IMPORTED_MODULE_19__.useActionDrawer)(open, node, source, setFieldValue, isTrigger);
 
   // Auto-set actionType if only one tool action
   (0,react__WEBPACK_IMPORTED_MODULE_12__.useEffect)(() => {
@@ -3276,6 +3276,7 @@ function ActionDrawer({
     context?.source === "node" ? updateNodeData(payload) : createActionNode(payload);
     resetAll();
   };
+  console.log(searchList, 'searchList', list, _hooks_useActionDrawer_helper__WEBPACK_IMPORTED_MODULE_20__.TOOLS);
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsxs)(_ZAPComponents_Drawer__WEBPACK_IMPORTED_MODULE_7__["default"], {
     open: open,
     onClose: resetAll,
@@ -3296,7 +3297,7 @@ function ActionDrawer({
       })]
     }),
     children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Input, {
-      placeholder: "Search apps or tools...",
+      placeholder: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_17__.__)("Search apps or tools...", "zaplane"),
       value: search,
       onChange: e => setSearch(e.target.value)
     }), search && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_6__.VStack, {
@@ -3318,6 +3319,7 @@ function ActionDrawer({
           children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_17__.sprintf)((0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_17__.__)("%s", "zaplane"), item.name)
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Text, {
           fontSize: "xs",
+          className: "zaplane-label",
           children: [" ", item.type === 'tools' ? (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_17__.__)('Tool', 'zaplane') : (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_17__.__)('App', 'zaplane')]
         })]
       }, `${item.type}-${item.id}`))
@@ -3338,7 +3340,7 @@ function ActionDrawer({
         children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)("span", {
           children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_17__.__)("Apps", "zaplane")
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(react_icons_io__WEBPACK_IMPORTED_MODULE_16__.IoIosArrowForward, {})]
-      }), (node?.data?.action !== "trigger" || source === "add") && _hooks_useActionDrawer_helper__WEBPACK_IMPORTED_MODULE_20__.TOOLS.map(tool => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Button, {
+      }), (!isTrigger || source === "add") && _hooks_useActionDrawer_helper__WEBPACK_IMPORTED_MODULE_20__.TOOLS.map(tool => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Button, {
         background: "var(--zaplane-background)",
         color: "var(--zaplane-font-color)",
         justifyContent: "left",
@@ -4924,7 +4926,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _helper__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./helper */ "./dev_zaplane/hooks/useActionDrawer/helper.js");
 
 
-const useActionDrawer = (open, node, source, setFieldValue) => {
+const useActionDrawer = (open, node, source, setFieldValue, isTrigger) => {
   const [mode, setMode] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(null);
   const [selectedItem, setSelectedItem] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(null);
   const [search, setSearch] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)("");
@@ -4944,12 +4946,12 @@ const useActionDrawer = (open, node, source, setFieldValue) => {
   const searchList = (0,react__WEBPACK_IMPORTED_MODULE_0__.useMemo)(() => {
     if (!search) return [];
     const q = search.toLowerCase();
-    const combined = _helper__WEBPACK_IMPORTED_MODULE_1__.APPS.concat(_helper__WEBPACK_IMPORTED_MODULE_1__.TOOLS.map(t => ({
+    const combined = isTrigger ? _helper__WEBPACK_IMPORTED_MODULE_1__.APPS : _helper__WEBPACK_IMPORTED_MODULE_1__.APPS.concat(_helper__WEBPACK_IMPORTED_MODULE_1__.TOOLS.map(t => ({
       ...t,
       type: "tools"
     })));
     return combined.filter(item => item.name.toLowerCase().includes(q));
-  }, [search]);
+  }, [search, isTrigger]);
   return {
     mode,
     setMode,
