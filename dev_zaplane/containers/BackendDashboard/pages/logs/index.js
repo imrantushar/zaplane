@@ -14,10 +14,10 @@ import {
 } from "@ZAPRedux/Slices/logsSlice/logsSlice";
 import { nodeLogsRunDetails } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
 import LogDetails from "@ZAPComponents/LogDetails";
-import { getDuration } from "../workflows/workFlowMotion/helper";
 import ZAPLoading from "@ZAPComponents/Loading";
 import ZAPTable from "@ZAPComponents/Table";
 import { __ } from "@wordpress/i18n";
+import { getDuration } from "@ZAPUtils/helper";
 import TopBar from "@ZAPComponents/TopBar";
 import ZAPDrawer from "@ZAPComponents/Drawer";
 
