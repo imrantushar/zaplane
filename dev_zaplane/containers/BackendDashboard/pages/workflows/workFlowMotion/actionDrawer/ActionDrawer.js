@@ -141,7 +141,7 @@ export default function ActionDrawer({ open, context, onClose, updateNodeData, c
               background="var(--zaplane-background)"
               _hover={{ bg: "var(--zaplane-body-background)" }}
             >
-              <Text className="zaplane-label">{sprintf(__(" Tool", "zaplane"), item.name)}</Text>
+              <Text className="zaplane-label">{sprintf(__("%s", "zaplane"), item.name)}</Text>
               <Text fontSize="xs"> {item.type === 'tools'? __('Tool', 'zaplane'): __('App', 'zaplane')}</Text>
             </Button>
           ))}
@@ -165,7 +165,7 @@ export default function ActionDrawer({ open, context, onClose, updateNodeData, c
                 setSelectedItem(tool);
               }}
             >
-              {sprintf(__(" Tool", "zaplane"), tool.name)}
+              {sprintf(__("%s", "zaplane"), tool.name)}
             </Button>
           ))}
         </VStack>

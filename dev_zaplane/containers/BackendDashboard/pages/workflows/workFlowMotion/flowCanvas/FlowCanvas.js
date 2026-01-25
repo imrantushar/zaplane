@@ -26,7 +26,7 @@ import {
     FiArrowLeft
 } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
-import { getAllVersion, getRunWorkFlow, getSingleWorkFlow, updateWorkFlow, updateWorkFlowStatus, workFLowExction, workflowNodeListiner, workflowNodeListinerStop } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
+import { getAllVersion, getRunWorkFlow, getSingleWorkFlow, workFLowExction, workflowNodeListiner, workflowNodeListinerStop } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
 import { useDispatch, useSelector } from "react-redux";
 import CustomNode from "../CustomNode/CustomNode";
 import ZAPDrawer from "@ZAPComponents/Drawer";
@@ -34,25 +34,25 @@ import { LucideHistory } from "lucide-react";
 import RunsTable from "./RunsTable/RunsTable";
 import VersionHistoryTable from "./VersionHistoryTable/VersionHistoryTable";
 import { LuFullscreen, LuMinimize } from "react-icons/lu";
-import { mapEdgesForBackend, mapNodesForBackend, toggleFullscreenMode } from "../helper";
+import { toggleFullscreenMode } from "../helper";
 import Select from "react-select";
 import ZAPLoading from "@ZAPComponents/Loading";
 import { statusOptions } from "../../helper";
-import { createNodeIdGenerator, mapGraphFromBackend } from "./helper";
+import { mapGraphFromBackend } from "./helper";
 import { useFlowActions } from "../../../../../../hooks/useFlowActions";
 
-export default function FlowCanvas({ id,nodes,setNodes,edges,setEdges,onEdgesChange,onNodesChange,getNewNodeId }) {
+export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdgesChange, onNodesChange, getNewNodeId }) {
     const dispatch = useDispatch();
     const navigate = useNavigate()
     const [drawerOpen, setDrawerOpen] = useState(false);
-    const { values, setFieldValue,handleSubmit } = useFormikContext()
+    const { values, setFieldValue, handleSubmit } = useFormikContext()
     const [loading, setLoading] = useState(false);
     const { data, runs, versions } = useSelector((state) => state.workflows);
     const singleData = data[0]
     const containerRef = useRef(null);
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [activeDrawer, setActiveDrawer] = useState(null);
-    
+
     useEffect(() => {
         if (!singleData?.graph) return;
         const { nodes, edges } = mapGraphFromBackend(singleData.graph);
@@ -77,7 +77,7 @@ export default function FlowCanvas({ id,nodes,setNodes,edges,setEdges,onEdgesCha
         createActionNode,
         openDrawerForNode,
         openDrawerFromAdd,
-    } = useFlowActions({ nodes, setNodes, edges, setEdges, drawerContext, getNewNodeId,setDrawerContext,setDrawerOpen });
+    } = useFlowActions({ nodes, setNodes, edges, setEdges, drawerContext, getNewNodeId, setDrawerContext, setDrawerOpen });
 
     const onAddNode = (edgeId) => {
         const edge = edges.find((e) => e.id === edgeId);
@@ -140,15 +140,13 @@ export default function FlowCanvas({ id,nodes,setNodes,edges,setEdges,onEdgesCha
     //     return () => clearInterval(interval);
     // }, []);
     return (
-        <div
+        <Box
             ref={containerRef}
             className="zaplane_flowcanvas"
-            style={{
-                flex: 1, height: "100vh",
-                marginRight: activeDrawer ? "497px" : "0px",
-                transition: "margin-right 0.4s ease",
-
-            }}
+            flex="1"
+            height="100vh"
+            marginRight={activeDrawer ? "497px" : "0px"}
+            transition="margin-right 0.4s ease"
         >
 
             <TopBar
@@ -179,8 +177,8 @@ export default function FlowCanvas({ id,nodes,setNodes,edges,setEdges,onEdgesCha
                         >
                             {isFullscreen ? <LuMinimize /> : <LuFullscreen />}
                         </Button>
-                        <ZAPDrawer
-                            title="Log History"
+                         <ZAPDrawer
+                            title={__("Log History", "Zaplane")}
                             size="md"
                             open={activeDrawer === "logs"}
                             onClose={() => setActiveDrawer(null)}
@@ -218,7 +216,7 @@ export default function FlowCanvas({ id,nodes,setNodes,edges,setEdges,onEdgesCha
 
                         </ZAPDrawer>
                         <ZAPDrawer
-                            title="Version History "
+                            title={__("Version History", 'zaplane')}
                             open={activeDrawer === "history"}
                             onClose={() => setActiveDrawer(null)}
                             trigger={
@@ -246,7 +244,7 @@ export default function FlowCanvas({ id,nodes,setNodes,edges,setEdges,onEdgesCha
                             }
 
                             onChange={(selected) =>
-                            setFieldValue('status', selected.value)}
+                                setFieldValue('status', selected.value)}
                             isClearable={false}
                             isSearchable={false}
                             placeholder="Select status"
@@ -259,6 +257,7 @@ export default function FlowCanvas({ id,nodes,setNodes,edges,setEdges,onEdgesCha
                         >
                             {__("Update", "zaplane")}
                         </Button>
+                       
                     </>
                 )}
             />
@@ -296,6 +295,7 @@ export default function FlowCanvas({ id,nodes,setNodes,edges,setEdges,onEdgesCha
                 singleData={singleData}
 
             />
-        </div>
+
+        </Box>
     );
 }

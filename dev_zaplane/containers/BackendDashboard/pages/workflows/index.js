@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { __ } from "@wordpress/i18n";
+import { __, sprintf } from "@wordpress/i18n";
 import {
   Box,
   Flex,
@@ -140,7 +140,10 @@ const CreateWorkflows = () => {
               textAlign: "center",
               render: (row) => (
                 <Text fontSize="sm" className="zaplane-label">
-                  {row.created_at}
+                  {sprintf(
+                    __('%s', 'zaplane'),
+                    row.created_at
+                  )}
                 </Text>
               ),
             },
@@ -151,7 +154,11 @@ const CreateWorkflows = () => {
               textAlign: "center",
               render: (row) => (
                 <Text fontSize="sm" className="zaplane-label">
-                  {__(row.updated_at, "zaplane")}
+                  {sprintf(
+                    __('%s', 'zaplane'),
+                    row.updated_at
+                  )}
+
                 </Text>
               ),
             },

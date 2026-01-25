@@ -16,7 +16,7 @@ import { nodeLogsRunDetails } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice
 import LogDetails from "@ZAPComponents/LogDetails";
 import ZAPLoading from "@ZAPComponents/Loading";
 import ZAPTable from "@ZAPComponents/Table";
-import { __ } from "@wordpress/i18n";
+import { __, sprintf } from "@wordpress/i18n";
 import { getDuration } from "@ZAPUtils/helper";
 import TopBar from "@ZAPComponents/TopBar";
 import ZAPDrawer from "@ZAPComponents/Drawer";
@@ -75,7 +75,7 @@ const Logs = () => {
                             key: "started_at",
                             render: (row) => (
                                 <Text fontSize="sm">
-                                    {row.started_at || "--"}
+                                    {sprintf(__("%s", "zaplane"), row.started_at) || "--"}
                                 </Text>
                             ),
                             textAlign: "center",
@@ -96,9 +96,12 @@ const Logs = () => {
                                         }
                                     />
                                     <Text fontSize="sm">
-                                        {isSuccess(row.status)
-                                            ? "Success"
-                                            : "Failed"}
+                                        {sprintf(
+                                            __('Status: %s', 'zapplane'),
+                                            isSuccess(row.status)
+                                                ? __('Success', 'zaplane')
+                                                : __('Failed', 'zapplane')
+                                        )}
                                     </Text>
                                 </HStack>
                             ),
@@ -108,9 +111,9 @@ const Logs = () => {
                             key: "duration",
                             render: (row) => (
                                 <Text fontSize="sm">
-                                    {getDuration(
-                                        row.started_at,
-                                        row.finished_at
+                                    {sprintf(
+                                        __('%s', 'zapplane'),
+                                        getDuration(row.started_at, row.finished_at)
                                     )}
                                 </Text>
                             ),

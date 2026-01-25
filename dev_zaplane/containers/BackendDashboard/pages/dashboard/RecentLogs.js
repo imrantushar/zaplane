@@ -1,16 +1,16 @@
 import { Box, HStack, Text } from '@chakra-ui/react';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import ZAPTable from '@ZAPComponents/Table';
 import { getDuration } from '@ZAPUtils/helper';
 
 
 const RecentLogs = ({ data }) => {
-  
-         const isSuccess = (status) => status === "completed";
+
+    const isSuccess = (status) => status === "completed";
     return (
-      <Box width='100%'>
-        <Text className="zaplane-heading" marginBottom="16px">{__('Recent Logs', 'zaplane')}</Text>
-          <ZAPTable
+        <Box width='100%'>
+            <Text className="zaplane-heading" marginBottom="16px">{__('Recent Logs', 'zaplane')}</Text>
+            <ZAPTable
                 data={data.slice(0, 5)}
                 rowKey="id"
                 variant="outline"
@@ -19,14 +19,22 @@ const RecentLogs = ({ data }) => {
                     {
                         label: "CREATED AT",
                         key: "started_at",
-                        render: (row) => <Text fontSize="sm">{row.started_at || "--"}</Text>,
+                        render: (row) => {
+                            sprintf(
+                                __('Start: %s', 'zapplane'),
+                                row.started_at || __('--', 'zapplane')
+                            )
+                        },
                     },
                     {
                         label: "DURATION / SIZE",
                         key: "duration",
-                        
+
                         render: (row) => (
-                            <Text fontSize="sm">{getDuration(row.started_at, row.finished_at)}</Text>
+                            <Text fontSize="sm"> {sprintf(
+                                __('%s', 'zaplane'),
+                                getDuration(row.started_at, row.finished_at)
+                            )}</Text>
                         ),
                     },
                     {
@@ -41,14 +49,20 @@ const RecentLogs = ({ data }) => {
                                     bg={isSuccess(row.status) ? "green.500" : "red.500"}
                                 />
                                 <Text fontSize="sm">
-                                    {isSuccess(row.status) ? "Success" : "Failed"}
+                                    {sprintf(
+                                        __('Status: %s', 'zapplane'),
+                                        isSuccess(row.status)
+                                            ? __('Success', 'zapplane')
+                                            : __('Failed', 'zapplane')
+                                    )}
+
                                 </Text>
                             </HStack>
                         ),
                     },
                 ]}
             />
-        </Box>  
+        </Box>
     );
 };
 
