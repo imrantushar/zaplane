@@ -1,4 +1,4 @@
-import { Box, Button, Flex,Text } from "@chakra-ui/react";
+import { Box, Button, Flex, Text } from "@chakra-ui/react";
 import { FieldArray } from "formik";
 import { FiTrash2 } from "react-icons/fi";
 
@@ -7,35 +7,38 @@ import ZAPSelect from "@ZAPComponents/ZAPSelect";
 import { __ } from "@wordpress/i18n";
 import { buildEmptyRule } from "../../helper";
 
-export default function ConditionGroupField({
-    value,
-    onChange,
-    field,
-}) {
+export default function ConditionGroupField({ value, onChange, field }) {
     const ruleFields = field?.fields;
     const EMPTY_RULE = buildEmptyRule(ruleFields);
-    const groups = value && value.length ? value : [[{ ...EMPTY_RULE }]];
+
     return (
         <FieldArray name={field.key}>
-            {(groupHelpers) => (
-                <Flex direction="column" gap={4}>
-                    {groups.map((group, gIndex) => (
+            {(groupHelpers) => {
+                if (!value || !value.length) {
+                    groupHelpers.push([{ ...EMPTY_RULE }]);
+                }
 
-                        <Box key={gIndex}>
-                            {groups.length > 1 && gIndex !== 0 && (
-                                <Flex align="center">
-                                    <Box flex="1" h="1px" bg="gray.300" />
-                                    <Text className="zaplane-label" mx={3} fontSize="sm"> {__("OR", "zaplane")}</Text>
-                                    <Box flex="1" h="1px" bg="var(--zaplane-border-color)" />
-                                </Flex>
-                            )}
+                const groups = value && value.length ? value : [];
 
-                            <FieldArray name={`${field.key}.${gIndex}`}>
-                                {(ruleHelpers) => (
-                                    <>
-                                        {group.map((rule, rIndex) => {
-                                            return (
-                                                <Flex key={rIndex} gap={4} align="flex-end" mb='15px'>
+                return (
+                    <Flex direction="column" gap={4}>
+                        {groups.map((group, gIndex) => (
+                            <Box key={gIndex}>
+                                {groups.length > 1 && gIndex !== 0 && (
+                                    <Flex align="center">
+                                        <Box flex="1" h="1px" bg="gray.300" />
+                                        <Text className="zaplane-label" mx={3} fontSize="sm">
+                                            {__("OR", "zaplane")}
+                                        </Text>
+                                        <Box flex="1" h="1px" bg="var(--zaplane-border-color)" />
+                                    </Flex>
+                                )}
+
+                                <FieldArray name={`${field.key}.${gIndex}`}>
+                                    {(ruleHelpers) => (
+                                        <>
+                                            {group.map((rule, rIndex) => (
+                                                <Flex key={rIndex} gap={4} align="flex-end" mb="15px">
                                                     {ruleFields.map((f) => {
                                                         if (f.type === "select") {
                                                             return (
@@ -74,9 +77,7 @@ export default function ConditionGroupField({
                                                     <Flex gap={2} mt="25px">
                                                         <Button
                                                             type="button"
-                                                            onClick={() =>
-                                                                ruleHelpers.push({ ...EMPTY_RULE })
-                                                            }
+                                                            onClick={() => ruleHelpers.push({ ...EMPTY_RULE })}
                                                         >
                                                             {__("Add", "zaplane")}
                                                         </Button>
@@ -86,7 +87,7 @@ export default function ConditionGroupField({
                                                             colorScheme="#FF0000"
                                                             variant="ghost"
                                                             size="sm"
-                                                            disabled={group.length === 1 && groups.length === 1 && !gIndex} 
+                                                            disabled={group.length === 1 && groups.length === 1 && !gIndex}
                                                             onClick={() => {
                                                                 if (group.length === 1) {
                                                                     groupHelpers.remove(gIndex);
@@ -97,27 +98,25 @@ export default function ConditionGroupField({
                                                         >
                                                             <FiTrash2 />
                                                         </Button>
-
                                                     </Flex>
                                                 </Flex>
-                                            );
-                                        })}
-                                    </>
-                                )}
+                                            ))}
+                                        </>
+                                    )}
+                                </FieldArray>
+                            </Box>
+                        ))}
 
-                            </FieldArray>
-                        </Box>
-                    ))}
-
-                    <Button
-                        size="sm"
-                        width="140px"
-                        onClick={() => groupHelpers.push([{ ...EMPTY_RULE }])}
-                    >
-                        {__("OR Group", "zaplane")}
-                    </Button>
-                </Flex>
-            )}
+                        <Button
+                            size="sm"
+                            width="140px"
+                            onClick={() => groupHelpers.push([{ ...EMPTY_RULE }])}
+                        >
+                            {__("OR Group", "zaplane")}
+                        </Button>
+                    </Flex>
+                );
+            }}
         </FieldArray>
     );
 }

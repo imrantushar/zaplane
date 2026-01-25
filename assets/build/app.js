@@ -3567,36 +3567,39 @@ function ConditionGroupField({
 }) {
   const ruleFields = field?.fields;
   const EMPTY_RULE = (0,_helper__WEBPACK_IMPORTED_MODULE_9__.buildEmptyRule)(ruleFields);
-  const groups = value && value.length ? value : [[{
-    ...EMPTY_RULE
-  }]];
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(formik__WEBPACK_IMPORTED_MODULE_4__.FieldArray, {
     name: field.key,
-    children: groupHelpers => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Flex, {
-      direction: "column",
-      gap: 4,
-      children: [groups.map((group, gIndex) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
-        children: [groups.length > 1 && gIndex !== 0 && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Flex, {
-          align: "center",
-          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
-            flex: "1",
-            h: "1px",
-            bg: "gray.300"
-          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
-            className: "zaplane-label",
-            mx: 3,
-            fontSize: "sm",
-            children: [" ", (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_8__.__)("OR", "zaplane")]
-          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
-            flex: "1",
-            h: "1px",
-            bg: "var(--zaplane-border-color)"
-          })]
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(formik__WEBPACK_IMPORTED_MODULE_4__.FieldArray, {
-          name: `${field.key}.${gIndex}`,
-          children: ruleHelpers => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.Fragment, {
-            children: group.map((rule, rIndex) => {
-              return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Flex, {
+    children: groupHelpers => {
+      if (!value || !value.length) {
+        groupHelpers.push([{
+          ...EMPTY_RULE
+        }]);
+      }
+      const groups = value && value.length ? value : [];
+      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Flex, {
+        direction: "column",
+        gap: 4,
+        children: [groups.map((group, gIndex) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
+          children: [groups.length > 1 && gIndex !== 0 && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Flex, {
+            align: "center",
+            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
+              flex: "1",
+              h: "1px",
+              bg: "gray.300"
+            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
+              className: "zaplane-label",
+              mx: 3,
+              fontSize: "sm",
+              children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_8__.__)("OR", "zaplane")
+            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
+              flex: "1",
+              h: "1px",
+              bg: "var(--zaplane-border-color)"
+            })]
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(formik__WEBPACK_IMPORTED_MODULE_4__.FieldArray, {
+            name: `${field.key}.${gIndex}`,
+            children: ruleHelpers => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.Fragment, {
+              children: group.map((rule, rIndex) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Flex, {
                 gap: 4,
                 align: "flex-end",
                 mb: "15px",
@@ -3651,19 +3654,19 @@ function ConditionGroupField({
                     children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(react_icons_fi__WEBPACK_IMPORTED_MODULE_5__.FiTrash2, {})
                   })]
                 })]
-              }, rIndex);
+              }, rIndex))
             })
-          })
+          })]
+        }, gIndex)), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Button, {
+          size: "sm",
+          width: "140px",
+          onClick: () => groupHelpers.push([{
+            ...EMPTY_RULE
+          }]),
+          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_8__.__)("OR Group", "zaplane")
         })]
-      }, gIndex)), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Button, {
-        size: "sm",
-        width: "140px",
-        onClick: () => groupHelpers.push([{
-          ...EMPTY_RULE
-        }]),
-        children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_8__.__)("OR Group", "zaplane")
-      })]
-    })
+      });
+    }
   });
 }
 
@@ -4926,6 +4929,30 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _helper__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./helper */ "./dev_zaplane/hooks/useActionDrawer/helper.js");
+/**
+ * useActionDrawer
+ * ----------------
+ * A custom React hook for managing the state and behavior of an Action Drawer in a flow canvas .
+ * 
+ * Features:
+ * - Tracks the drawer mode ("app" or "tools") and selected item.
+ * - Manages search input and generates filtered search results.
+ * - Pre-populates form values based on the selected node (app, event, config).
+ * - Provides convenient setters for mode, selected item, and search.
+ * 
+ * 
+ * Parameters:
+ * @param {boolean} open         - Whether the drawer is open.
+ * @param {object} node           - Current node data (app, event, config).
+ * @param {string} source         - Drawer context ("add" or "node").
+ * @param {function} setFieldValue- Function to update form field values (e.g., Formik).
+ * @param {boolean} isTrigger     - Whether this drawer is for a trigger action.
+ * 
+ * Returns:
+ * @returns {object} - {
+ *   mode, setMode, selectedItem, setSelectedItem, search, setSearch, list, searchList
+ * }
+ */
 
 
 const useActionDrawer = (open, node, source, setFieldValue, isTrigger) => {
@@ -4979,6 +5006,38 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   useFlowActions: () => (/* binding */ useFlowActions)
 /* harmony export */ });
+/**
+ * useFlowActions
+ * A custom React hook for managing nodes, edges, and drawer actions in a workflow React Flow canvas.
+ * 
+ * Features:
+ * - Updates selected node’s data.
+ * - Deletes a node along with its connected edges.
+ * - Creates a new action node, shifts other nodes if needed, and manages edges.
+ * - Opens drawer for a node or for adding a new node.
+ * - Provides helper for getting an edge by ID.
+ * 
+ * Usage:
+ * const { updateNodeData, deleteNode, createActionNode, onAddNode, openDrawerForNode, openDrawerFromAdd } =
+ *    useFlowActions({ nodes, setNodes, edges, setEdges, drawerContext, setDrawerContext, setDrawerOpen, getNewNodeId, GAP });
+ * 
+ * Parameters:
+ * @param {array} nodes                  - Current array of nodes.
+ * @param {function} setNodes            - Setter for nodes state.
+ * @param {array} edges                  - Current array of edges.
+ * @param {function} setEdges            - Setter for edges state.
+ * @param {object} drawerContext         - Current drawer context (selected node/edge).
+ * @param {function} setDrawerContext    - Setter for drawer context.
+ * @param {function} setDrawerOpen       - Function to open/close drawer.
+ * @param {function} getNewNodeId        - Function to generate unique node IDs.
+ * @param {number} GAP                   - Optional spacing between nodes (default 250).
+ * 
+ * Returns:
+ * @returns {object} - {
+ *   updateNodeData, deleteNode, createActionNode, onAddNode, openDrawerForNode, openDrawerFromAdd
+ * }
+ */
+
 const useFlowActions = ({
   nodes,
   setNodes,
