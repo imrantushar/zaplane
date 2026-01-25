@@ -12,8 +12,8 @@ import "@xyflow/react/dist/base.css";
 import { __ } from '@wordpress/i18n';
 
 
-import CustomEdge from "../customEdge/CustomEdge";
-import ActionDrawer from "../actionDrawer/ActionDrawer";
+import CustomEdge from "../CustomEdge/CustomEdge";
+import ActionDrawer from "../ActionDrawer/ActionDrawer";
 import { useFormikContext } from "formik";
 import TopBar from "@ZAPComponents/TopBar";
 import {
@@ -28,7 +28,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { getAllVersion, getRunWorkFlow, getSingleWorkFlow, updateWorkFlow, updateWorkFlowStatus, workFLowExction, workflowNodeListiner, workflowNodeListinerStop } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
 import { useDispatch, useSelector } from "react-redux";
-import CustomNode from "../customNode/CustomNode";
+import CustomNode from "../CustomNode/CustomNode";
 import ZAPDrawer from "@ZAPComponents/Drawer";
 import { LucideHistory } from "lucide-react";
 import RunsTable from "./RunsTable/RunsTable";
@@ -40,32 +40,19 @@ import ZAPLoading from "@ZAPComponents/Loading";
 import { statusOptions } from "../../helper";
 import { createNodeIdGenerator, mapGraphFromBackend } from "./helper";
 import { useFlowActions } from "../../../../../../hooks/useFlowActions";
-export default function FlowCanvas({ id }) {
-    const nodeIdRef = useRef(createNodeIdGenerator());
-    const getNewNodeId = nodeIdRef.current;
-    const [nodes, setNodes, onNodesChange] = useNodesState([
-        {
-            id: getNewNodeId(),
-            type: 'custom',
-            data: {
-                app: "Select an app",
-                action: 'trigger',
-                config: {}
-            },
-            position: { x: 125, y: 300 },
-        }
-    ]);
+
+export default function FlowCanvas({ id,nodes,setNodes,edges,setEdges,onEdgesChange,onNodesChange,getNewNodeId }) {
     const dispatch = useDispatch();
     const navigate = useNavigate()
-    const [edges, setEdges, onEdgesChange] = useEdgesState([]);
     const [drawerOpen, setDrawerOpen] = useState(false);
-    const { values, setFieldValue } = useFormikContext()
+    const { values, setFieldValue,handleSubmit } = useFormikContext()
     const [loading, setLoading] = useState(false);
     const { data, runs, versions } = useSelector((state) => state.workflows);
     const singleData = data[0]
     const containerRef = useRef(null);
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [activeDrawer, setActiveDrawer] = useState(null);
+    
     useEffect(() => {
         if (!singleData?.graph) return;
         const { nodes, edges } = mapGraphFromBackend(singleData.graph);
@@ -91,25 +78,7 @@ export default function FlowCanvas({ id }) {
         openDrawerForNode,
         openDrawerFromAdd,
     } = useFlowActions({ nodes, setNodes, edges, setEdges, drawerContext, getNewNodeId,setDrawerContext,setDrawerOpen });
-    const onSubmitHandler = async () => {
-        const payload = {
-            nodes: mapNodesForBackend(nodes)
-            , edges: mapEdgesForBackend(edges),
-        }
-        const statusPaylod = {
-            status: values?.status,
-            id: id,
-        }
-        if (values.status && values.status !== singleData?.workflow.status) {
-            await dispatch(updateWorkFlowStatus(statusPaylod));
-        }
-        await dispatch(
-            updateWorkFlow({ id, payload })
-        );
 
-
-
-    };
     const onAddNode = (edgeId) => {
         const edge = edges.find((e) => e.id === edgeId);
         setDrawerContext({
@@ -277,7 +246,7 @@ export default function FlowCanvas({ id }) {
                             }
 
                             onChange={(selected) =>
-                                setFieldValue('status', selected.value)}
+                            setFieldValue('status', selected.value)}
                             isClearable={false}
                             isSearchable={false}
                             placeholder="Select status"
@@ -286,17 +255,13 @@ export default function FlowCanvas({ id }) {
                             size="sm"
                             bg="black"
                             color="var(--zaplane-background)"
-                            _hover={{ bg: "" }}
-                            onClick={() => onSubmitHandler()}
+                            onClick={handleSubmit}
                         >
                             {__("Update", "zaplane")}
                         </Button>
                     </>
                 )}
             />
-            <Box>
-
-            </Box>
             <ReactFlow
                 nodes={nodes}
                 edges={edges}

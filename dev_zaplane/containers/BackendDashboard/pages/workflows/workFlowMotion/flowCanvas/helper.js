@@ -6,8 +6,7 @@ export const createNodeIdGenerator = () => {
   };
 };
 export const mapGraphFromBackend = (graph) => {
-  if (!graph) return { nodes: [], edges: [] };
-
+  // if (!graph) return { nodes: [], edges: [] };
   return {
     nodes: (graph.nodes || []).map((node) => ({
       ...node,
