@@ -25,7 +25,8 @@ import ZAPMenu from "@ZAPComponents/ZapMenu";
 import TopBar from "@ZAPComponents/TopBar";
 import OptionMenu from "@ZAPComponents/OptionMenu";
 import { FiEdit, FiTrash2 } from "react-icons/fi";
-import {primaryBtn, removeBtn } from "../../../../../assets/scss/chakra/recipe";
+import {primaryBtn } from "../../../../../assets/scss/chakra/recipe";
+import { statusOptions } from "./helper";
 
 
 const CreateWorkflows = () => {
@@ -41,15 +42,13 @@ const CreateWorkflows = () => {
     dispatch(getWorkFlow());
   }, [dispatch]);
 
-  const handleCreate = () => {
+  const handleCreate = async () => {
     if (!workflowName.trim()) return;
-
-    dispatch(
+    await dispatch(
       createWorkflows({
         title: workflowName
       })
     )
-      .unwrap()
       .then((res) => {
         navigate(
           `${route_path}admin.php?page=zaplane-workflows&action=edit&id=${res.id}`
@@ -71,11 +70,7 @@ const CreateWorkflows = () => {
       dispatch(deleteWorkFlow(id));
     }
   };
-  const statusOptions = [
-    { value: "active", label: "Active" },
-    { value: "paused", label: "Paused" },
-    { value: "draft", label: "draft" },
-  ];
+
   const onSubmitHandler = async (item, status) => {
     if (!item?.id || !status) return;
 

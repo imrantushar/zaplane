@@ -2869,6 +2869,30 @@ const Setting = () => {
 
 /***/ },
 
+/***/ "./dev_zaplane/containers/BackendDashboard/pages/workflows/helper.js"
+/*!***************************************************************************!*\
+  !*** ./dev_zaplane/containers/BackendDashboard/pages/workflows/helper.js ***!
+  \***************************************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   statusOptions: () => (/* binding */ statusOptions)
+/* harmony export */ });
+const statusOptions = [{
+  value: "active",
+  label: "Active"
+}, {
+  value: "paused",
+  label: "Paused"
+}, {
+  value: "draft",
+  label: "draft"
+}];
+
+/***/ },
+
 /***/ "./dev_zaplane/containers/BackendDashboard/pages/workflows/index.js"
 /*!**************************************************************************!*\
   !*** ./dev_zaplane/containers/BackendDashboard/pages/workflows/index.js ***!
@@ -2903,8 +2927,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _ZAPComponents_OptionMenu__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! @ZAPComponents/OptionMenu */ "./dev_zaplane/components/OptionMenu/index.js");
 /* harmony import */ var react_icons_fi__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! react-icons/fi */ "./node_modules/react-icons/fi/index.mjs");
 /* harmony import */ var _assets_scss_chakra_recipe__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! ../../../../../assets/scss/chakra/recipe */ "./assets/scss/chakra/recipe.js");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__);
+/* harmony import */ var _helper__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! ./helper */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/helper.js");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__);
+
 
 
 
@@ -2934,11 +2960,11 @@ const CreateWorkflows = () => {
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
     dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_14__.getWorkFlow)());
   }, [dispatch]);
-  const handleCreate = () => {
+  const handleCreate = async () => {
     if (!workflowName.trim()) return;
-    dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_14__.createWorkflows)({
+    await dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_14__.createWorkflows)({
       title: workflowName
-    })).unwrap().then(res => {
+    })).then(res => {
       navigate(`${_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_9__.route_path}admin.php?page=zaplane-workflows&action=edit&id=${res.id}`);
     });
     setWorkflowName("");
@@ -2949,16 +2975,6 @@ const CreateWorkflows = () => {
       dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_14__.deleteWorkFlow)(id));
     }
   };
-  const statusOptions = [{
-    value: "active",
-    label: "Active"
-  }, {
-    value: "paused",
-    label: "Paused"
-  }, {
-    value: "draft",
-    label: "draft"
-  }];
   const onSubmitHandler = async (item, status) => {
     if (!item?.id || !status) return;
     const payload = {
@@ -2971,15 +2987,15 @@ const CreateWorkflows = () => {
       console.log(error);
     }
   };
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.Fragment, {
-    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)(_ZAPComponents_TopBar__WEBPACK_IMPORTED_MODULE_17__["default"], {
-      render: () => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Box, {
-        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Heading, {
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.Fragment, {
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(_ZAPComponents_TopBar__WEBPACK_IMPORTED_MODULE_17__["default"], {
+      render: () => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Box, {
+        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Heading, {
           className: "zaplane-heading",
           children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)("Flows", "zaplane")
         })
       }),
-      rightContent: () => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)(_ZAPComponents_ZapMenu__WEBPACK_IMPORTED_MODULE_16__["default"], {
+      rightContent: () => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(_ZAPComponents_ZapMenu__WEBPACK_IMPORTED_MODULE_16__["default"], {
         triggerLabel: "Create Workflow",
         items: [{
           label: "Create from Scratch",
@@ -2991,9 +3007,9 @@ const CreateWorkflows = () => {
         // },
         ]
       })
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)("div", {
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)("div", {
       className: "zaplane-page-content",
-      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)(_ZAPComponents_Table__WEBPACK_IMPORTED_MODULE_15__["default"], {
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(_ZAPComponents_Table__WEBPACK_IMPORTED_MODULE_15__["default"], {
         data: data,
         rowKey: "id",
         size: "sm",
@@ -3002,7 +3018,7 @@ const CreateWorkflows = () => {
           label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)("Title", "zaplane"),
           key: "title",
           textAlign: "center",
-          render: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Text, {
+          render: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Text, {
             onClick: () => navigate(`${_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_9__.route_path}admin.php?page=zaplane-workflows&action=edit&id=${row.id}`),
             fontWeight: "500",
             className: "zaplane-label",
@@ -3012,7 +3028,7 @@ const CreateWorkflows = () => {
           label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)("Created At", "zaplane"),
           key: "created_at",
           textAlign: "center",
-          render: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Text, {
+          render: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Text, {
             fontSize: "sm",
             className: "zaplane-label",
             children: row.created_at
@@ -3021,7 +3037,7 @@ const CreateWorkflows = () => {
           label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)("Updated At", "zaplane"),
           key: "updated_at",
           textAlign: "center",
-          render: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Text, {
+          render: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Text, {
             fontSize: "sm",
             className: "zaplane-label",
             children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)(row.updated_at, "zaplane")
@@ -3030,12 +3046,12 @@ const CreateWorkflows = () => {
           label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)("Status", "zaplane"),
           key: "status",
           textAlign: "center",
-          render: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Box, {
+          render: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Box, {
             w: "120px",
             mx: "auto",
-            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)(react_select__WEBPACK_IMPORTED_MODULE_13__["default"], {
-              options: statusOptions,
-              value: statusOptions.find(opt => opt.value === row.status),
+            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(react_select__WEBPACK_IMPORTED_MODULE_13__["default"], {
+              options: _helper__WEBPACK_IMPORTED_MODULE_21__.statusOptions,
+              value: _helper__WEBPACK_IMPORTED_MODULE_21__.statusOptions.find(opt => opt.value === row.status),
               onChange: selected => onSubmitHandler(row, selected.value),
               isClearable: false,
               menuPortalTarget: document.body,
@@ -3049,10 +3065,10 @@ const CreateWorkflows = () => {
             })
           })
         }],
-        actionsRenderer: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)(_ZAPComponents_OptionMenu__WEBPACK_IMPORTED_MODULE_18__["default"], {
+        actionsRenderer: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(_ZAPComponents_OptionMenu__WEBPACK_IMPORTED_MODULE_18__["default"], {
           options: [{
             label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Edit', 'zaplane'),
-            icon: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_7__.Icon, {
+            icon: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_7__.Icon, {
               as: react_icons_fi__WEBPACK_IMPORTED_MODULE_19__.FiEdit
             }),
             type: 'button',
@@ -3060,7 +3076,7 @@ const CreateWorkflows = () => {
           }, {
             label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Delete', 'zaplane'),
             suffix: 'trash',
-            icon: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_7__.Icon, {
+            icon: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_7__.Icon, {
               as: react_icons_fi__WEBPACK_IMPORTED_MODULE_19__.FiTrash2
             }),
             type: 'button',
@@ -3070,27 +3086,27 @@ const CreateWorkflows = () => {
         }),
         isLoading: isLoading
       })
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)(_ZAPComponents_Modal_WPModal__WEBPACK_IMPORTED_MODULE_12__["default"], {
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(_ZAPComponents_Modal_WPModal__WEBPACK_IMPORTED_MODULE_12__["default"], {
       title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)("Create Workflow", "zaplane"),
       isOpen: isModalOpen,
       onRequestClose: () => setIsModalOpen(false),
       size: "medium",
-      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Box, {
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Box, {
         px: 4,
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)(_ZAPComponents_ZAPInput__WEBPACK_IMPORTED_MODULE_11__["default"], {
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(_ZAPComponents_ZAPInput__WEBPACK_IMPORTED_MODULE_11__["default"], {
           label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)("Workflow Name", "zaplane"),
           placeholder: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)("Enter workflow name", "zaplane"),
           value: workflowName,
           onChange: e => setWorkflowName(e.target.value)
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_6__.Flex, {
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_6__.Flex, {
           justify: "flex-end",
           mt: 5,
-          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.Button, {
+          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.Button, {
             variant: "ghost",
             mr: 3,
             onClick: () => setIsModalOpen(false),
             children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)("Cancel", "zaplane")
-          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.Button, {
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.Button, {
             ..._assets_scss_chakra_recipe__WEBPACK_IMPORTED_MODULE_20__.primaryBtn,
             onClick: handleCreate,
             isDisabled: !workflowName.trim(),
@@ -4094,8 +4110,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _helper__WEBPACK_IMPORTED_MODULE_23__ = __webpack_require__(/*! ../helper */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/helper.js");
 /* harmony import */ var react_select__WEBPACK_IMPORTED_MODULE_24__ = __webpack_require__(/*! react-select */ "./node_modules/react-select/dist/react-select.esm.js");
 /* harmony import */ var _ZAPComponents_Loading__WEBPACK_IMPORTED_MODULE_25__ = __webpack_require__(/*! @ZAPComponents/Loading */ "./dev_zaplane/components/Loading/index.js");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_26__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_26___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_26__);
+/* harmony import */ var _helper__WEBPACK_IMPORTED_MODULE_26__ = __webpack_require__(/*! ../../helper */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/helper.js");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_27__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_27___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_27__);
+
 
 
 
@@ -4145,10 +4163,6 @@ function FlowCanvas({
   const navigate = (0,react_router_dom__WEBPACK_IMPORTED_MODULE_14__.useNavigate)();
   const [edges, setEdges, onEdgesChange] = (0,_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.useEdgesState)([]);
   const [drawerOpen, setDrawerOpen] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
-  const [selectedNode, setSelectedNode] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(null);
-  const [activeEdgeId, setActiveEdgeId] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(null);
-  const [selectedApp, setSelectedApp] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(null);
-  const [selectedEvent, setSelectedEvent] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(null);
   const {
     values,
     setFieldValue
@@ -4160,7 +4174,6 @@ function FlowCanvas({
     versions
   } = (0,react_redux__WEBPACK_IMPORTED_MODULE_16__.useSelector)(state => state.workflows);
   const singleData = data[0];
-  const isFlowLoaded = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(false);
   const GAP = 250;
   const containerRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
   const [isFullscreen, setIsFullscreen] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
@@ -4208,9 +4221,6 @@ function FlowCanvas({
       payload
     }));
   };
-  const {
-    screenToFlowPosition
-  } = (0,_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.useReactFlow)();
   const openDrawerForNode = node => {
     setDrawerContext({
       source: "node",
@@ -4275,7 +4285,6 @@ function FlowCanvas({
       },
       data: {
         action: "action",
-        // order: nodes.length + 1,
         ...actionData
       }
     };
@@ -4336,10 +4345,10 @@ function FlowCanvas({
   console.log(nodes, 'all nodes');
   console.log(edges, 'all edges');
   if (loading) {
-    return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_26__.jsx)(_ZAPComponents_Loading__WEBPACK_IMPORTED_MODULE_25__["default"], {});
+    return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_27__.jsx)(_ZAPComponents_Loading__WEBPACK_IMPORTED_MODULE_25__["default"], {});
   }
   const nodeTypes = {
-    custom: props => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_26__.jsx)(_customNode_CustomNode__WEBPACK_IMPORTED_MODULE_17__["default"], {
+    custom: props => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_27__.jsx)(_customNode_CustomNode__WEBPACK_IMPORTED_MODULE_17__["default"], {
       ...props,
       data: {
         ...props.data,
@@ -4350,7 +4359,7 @@ function FlowCanvas({
     })
   };
   const edgeTypes = {
-    custom: props => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_26__.jsx)(_customEdge_CustomEdge__WEBPACK_IMPORTED_MODULE_5__["default"], {
+    custom: props => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_27__.jsx)(_customEdge_CustomEdge__WEBPACK_IMPORTED_MODULE_5__["default"], {
       ...props,
       onEdgeDelete: onEdgeDelete,
       onAddNode: onAddNode
@@ -4364,17 +4373,7 @@ function FlowCanvas({
 
   //     return () => clearInterval(interval);
   // }, []);
-  const statusOptions = [{
-    value: "active",
-    label: "Active"
-  }, {
-    value: "paused",
-    label: "Paused"
-  }, {
-    value: "draft",
-    label: "draft"
-  }];
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_26__.jsxs)("div", {
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_27__.jsxs)("div", {
     ref: containerRef,
     className: "zaplane_flowcanvas",
     style: {
@@ -4383,40 +4382,40 @@ function FlowCanvas({
       marginRight: activeDrawer ? "497px" : "0px",
       transition: "margin-right 0.4s ease"
     },
-    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_26__.jsx)(_ZAPComponents_TopBar__WEBPACK_IMPORTED_MODULE_8__["default"], {
-      leftContent: () => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_26__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_26__.Fragment, {
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_26__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_27__.jsx)(_ZAPComponents_TopBar__WEBPACK_IMPORTED_MODULE_8__["default"], {
+      leftContent: () => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_27__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_27__.Fragment, {
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_27__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {
           variant: "outline",
           onClick: () => navigate(-1),
-          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_26__.jsx)(react_icons_fi__WEBPACK_IMPORTED_MODULE_13__.FiArrowLeft, {})
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_26__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_10__.Text, {
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_27__.jsx)(react_icons_fi__WEBPACK_IMPORTED_MODULE_13__.FiArrowLeft, {})
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_27__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_10__.Text, {
           fontSize: "md",
           fontWeight: "medium",
           children: singleData?.workflow?.title || (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("Untitled Workflow", "zaplane")
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_26__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_27__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {
           size: "sm",
           variant: "outline",
           onClick: () => dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_15__.workflowNodeListiner)(id)),
           children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("Runs ", "zaplane")
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_26__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_27__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {
           size: "sm",
           variant: "outline",
           onClick: () => dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_15__.workflowNodeListinerStop)(id)),
           children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("Stop", "zaplane")
         })]
       }),
-      rightContent: () => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_26__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_26__.Fragment, {
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_26__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {
+      rightContent: () => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_27__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_27__.Fragment, {
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_27__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {
           size: "sm",
           variant: "outline",
           onClick: () => (0,_helper__WEBPACK_IMPORTED_MODULE_23__.toggleFullscreenMode)(containerRef, isFullscreen, setIsFullscreen),
-          children: isFullscreen ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_26__.jsx)(react_icons_lu__WEBPACK_IMPORTED_MODULE_22__.LuMinimize, {}) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_26__.jsx)(react_icons_lu__WEBPACK_IMPORTED_MODULE_22__.LuFullscreen, {})
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_26__.jsxs)(_ZAPComponents_Drawer__WEBPACK_IMPORTED_MODULE_18__["default"], {
+          children: isFullscreen ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_27__.jsx)(react_icons_lu__WEBPACK_IMPORTED_MODULE_22__.LuMinimize, {}) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_27__.jsx)(react_icons_lu__WEBPACK_IMPORTED_MODULE_22__.LuFullscreen, {})
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_27__.jsxs)(_ZAPComponents_Drawer__WEBPACK_IMPORTED_MODULE_18__["default"], {
           title: "Log History",
           size: "md",
           open: activeDrawer === "logs",
           onClose: () => setActiveDrawer(null),
-          trigger: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_26__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {
+          trigger: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_27__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {
             size: "sm",
             variant: "outline",
             onClick: () => {
@@ -4425,14 +4424,14 @@ function FlowCanvas({
             },
             children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("Logs ", "zaplane")
           }),
-          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_26__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_12__.Flex, {
+          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_27__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_12__.Flex, {
             gap: "5px",
-            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_26__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {
+            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_27__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {
               size: "sm",
               variant: "outline",
               onClick: () => dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_15__.getRunWorkFlow)(id)),
               children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("🔄 Refresh ", "zaplane")
-            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_26__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {
+            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_27__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {
               size: "sm",
               variant: "outline",
               onClick: () => {
@@ -4443,34 +4442,34 @@ function FlowCanvas({
               },
               children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("🔄 Replay ", "zaplane")
             })]
-          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_26__.jsx)(_RunsTable_RunsTable__WEBPACK_IMPORTED_MODULE_20__["default"], {
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_27__.jsx)(_RunsTable_RunsTable__WEBPACK_IMPORTED_MODULE_20__["default"], {
             runs: runs
           })]
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_26__.jsx)(_ZAPComponents_Drawer__WEBPACK_IMPORTED_MODULE_18__["default"], {
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_27__.jsx)(_ZAPComponents_Drawer__WEBPACK_IMPORTED_MODULE_18__["default"], {
           title: "Version History ",
           open: activeDrawer === "history",
           onClose: () => setActiveDrawer(null),
-          trigger: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_26__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_10__.Text, {
+          trigger: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_27__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_10__.Text, {
             margin: "0",
             cursor: "pointer",
             onClick: () => {
               setActiveDrawer("history");
               dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_15__.getAllVersion)(id));
             },
-            children: [" ", /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_26__.jsx)(lucide_react__WEBPACK_IMPORTED_MODULE_19__["default"], {})]
+            children: [" ", /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_27__.jsx)(lucide_react__WEBPACK_IMPORTED_MODULE_19__["default"], {})]
           }),
-          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_26__.jsx)(_VersionHistoryTable_VersionHistoryTable__WEBPACK_IMPORTED_MODULE_21__["default"], {
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_27__.jsx)(_VersionHistoryTable_VersionHistoryTable__WEBPACK_IMPORTED_MODULE_21__["default"], {
             versions: versions,
             id: id
           })
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_26__.jsx)(react_select__WEBPACK_IMPORTED_MODULE_24__["default"], {
-          options: statusOptions,
-          value: values?.status ? statusOptions.find(opt => opt.value === values.status) : statusOptions.find(opt => opt.value === singleData?.workflow?.status),
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_27__.jsx)(react_select__WEBPACK_IMPORTED_MODULE_24__["default"], {
+          options: _helper__WEBPACK_IMPORTED_MODULE_26__.statusOptions,
+          value: values?.status ? _helper__WEBPACK_IMPORTED_MODULE_26__.statusOptions.find(opt => opt.value === values.status) : _helper__WEBPACK_IMPORTED_MODULE_26__.statusOptions.find(opt => opt.value === singleData?.workflow?.status),
           onChange: selected => setFieldValue('status', selected.value),
           isClearable: false,
           isSearchable: false,
           placeholder: "Select status"
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_26__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_27__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {
           size: "sm",
           bg: "black",
           color: "var(--zaplane-background)",
@@ -4481,7 +4480,7 @@ function FlowCanvas({
           children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("Update", "zaplane")
         })]
       })
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_26__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_9__.Box, {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_26__.jsxs)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.ReactFlow, {
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_27__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_9__.Box, {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_27__.jsxs)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.ReactFlow, {
       nodes: nodes,
       edges: edges,
       nodeTypes: nodeTypes,
@@ -4500,8 +4499,8 @@ function FlowCanvas({
       nodesConnectable: true,
       elementsSelectable: true,
       minZoom: 0.5,
-      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_26__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.Background, {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_26__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.Controls, {})]
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_26__.jsx)(_actionDrawer_ActionDrawer__WEBPACK_IMPORTED_MODULE_6__["default"], {
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_27__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.Background, {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_27__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.Controls, {})]
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_27__.jsx)(_actionDrawer_ActionDrawer__WEBPACK_IMPORTED_MODULE_6__["default"], {
       open: drawerOpen,
       onClose: () => {
         setDrawerOpen(false);
@@ -10203,10 +10202,7 @@ const comboboxAnatomy = _ark_ui_react__WEBPACK_IMPORTED_MODULE_0__.comboboxAnato
   "indicatorGroup",
   "empty"
 );
-const sliderAnatomy = _ark_ui_react_slider__WEBPACK_IMPORTED_MODULE_16__.anatomy.extendWith(
-  "markerIndicator",
-  "markerLabel"
-);
+const sliderAnatomy = _ark_ui_react_slider__WEBPACK_IMPORTED_MODULE_16__.anatomy.extendWith("markerIndicator");
 const statAnatomy = (0,_ark_ui_react_anatomy__WEBPACK_IMPORTED_MODULE_2__.createAnatomy)("stat").parts(
   "root",
   "label",
@@ -13953,9 +13949,9 @@ function createCssFn(context) {
     const normalized = normalize(styles);
     const result = (0,_singleton_js__WEBPACK_IMPORTED_MODULE_5__.createEmptyObject)();
     (0,_utils_walk_object_js__WEBPACK_IMPORTED_MODULE_4__.walkObject)(normalized, (value, paths) => {
+      const important = isImportant(value);
       if (value == null) return;
       const [prop, ...selectors] = conditions.sort(paths).map(conditions.resolve);
-      const important = isImportant(value);
       if (important) {
         value = withoutImportant(value);
       }
@@ -14062,7 +14058,7 @@ function createRecipeFn(options) {
         ...defaultVariants,
         ...(0,_utils_compact_js__WEBPACK_IMPORTED_MODULE_0__.compact)(props)
       });
-      let variantCss = { ...normalize(base) };
+      let variantCss = { ...base };
       (0,_utils_merge_js__WEBPACK_IMPORTED_MODULE_3__.mergeWith)(variantCss, getVariantCss(variantSelections));
       const compoundVariantCss = getCompoundVariantCss(
         compoundVariants,
@@ -16966,47 +16962,46 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   layerStyles: () => (/* reexport safe */ _layer_styles_js__WEBPACK_IMPORTED_MODULE_3__.layerStyles),
 /* harmony export */   linkRecipe: () => (/* reexport safe */ _recipes_link_js__WEBPACK_IMPORTED_MODULE_40__.linkRecipe),
 /* harmony export */   listSlotRecipe: () => (/* reexport safe */ _recipes_list_js__WEBPACK_IMPORTED_MODULE_71__.listSlotRecipe),
-/* harmony export */   listboxSlotRecipe: () => (/* reexport safe */ _recipes_listbox_js__WEBPACK_IMPORTED_MODULE_72__.listboxSlotRecipe),
 /* harmony export */   markRecipe: () => (/* reexport safe */ _recipes_mark_js__WEBPACK_IMPORTED_MODULE_41__.markRecipe),
-/* harmony export */   menuSlotRecipe: () => (/* reexport safe */ _recipes_menu_js__WEBPACK_IMPORTED_MODULE_73__.menuSlotRecipe),
-/* harmony export */   nativeSelectSlotRecipe: () => (/* reexport safe */ _recipes_native_select_js__WEBPACK_IMPORTED_MODULE_74__.nativeSelectSlotRecipe),
-/* harmony export */   numberInputSlotRecipe: () => (/* reexport safe */ _recipes_number_input_js__WEBPACK_IMPORTED_MODULE_75__.numberInputSlotRecipe),
-/* harmony export */   pinInputSlotRecipe: () => (/* reexport safe */ _recipes_pin_input_js__WEBPACK_IMPORTED_MODULE_76__.pinInputSlotRecipe),
-/* harmony export */   popoverSlotRecipe: () => (/* reexport safe */ _recipes_popover_js__WEBPACK_IMPORTED_MODULE_77__.popoverSlotRecipe),
-/* harmony export */   progressCircleSlotRecipe: () => (/* reexport safe */ _recipes_progress_circle_js__WEBPACK_IMPORTED_MODULE_79__.progressCircleSlotRecipe),
-/* harmony export */   progressSlotRecipe: () => (/* reexport safe */ _recipes_progress_js__WEBPACK_IMPORTED_MODULE_78__.progressSlotRecipe),
-/* harmony export */   qrCodeSlotRecipe: () => (/* reexport safe */ _recipes_qr_code_js__WEBPACK_IMPORTED_MODULE_80__.qrCodeSlotRecipe),
-/* harmony export */   radioCardSlotRecipe: () => (/* reexport safe */ _recipes_radio_card_js__WEBPACK_IMPORTED_MODULE_81__.radioCardSlotRecipe),
-/* harmony export */   radioGroupSlotRecipe: () => (/* reexport safe */ _recipes_radio_group_js__WEBPACK_IMPORTED_MODULE_82__.radioGroupSlotRecipe),
+/* harmony export */   menuSlotRecipe: () => (/* reexport safe */ _recipes_menu_js__WEBPACK_IMPORTED_MODULE_72__.menuSlotRecipe),
+/* harmony export */   nativeSelectSlotRecipe: () => (/* reexport safe */ _recipes_native_select_js__WEBPACK_IMPORTED_MODULE_73__.nativeSelectSlotRecipe),
+/* harmony export */   numberInputSlotRecipe: () => (/* reexport safe */ _recipes_number_input_js__WEBPACK_IMPORTED_MODULE_74__.numberInputSlotRecipe),
+/* harmony export */   pinInputSlotRecipe: () => (/* reexport safe */ _recipes_pin_input_js__WEBPACK_IMPORTED_MODULE_75__.pinInputSlotRecipe),
+/* harmony export */   popoverSlotRecipe: () => (/* reexport safe */ _recipes_popover_js__WEBPACK_IMPORTED_MODULE_76__.popoverSlotRecipe),
+/* harmony export */   progressCircleSlotRecipe: () => (/* reexport safe */ _recipes_progress_circle_js__WEBPACK_IMPORTED_MODULE_78__.progressCircleSlotRecipe),
+/* harmony export */   progressSlotRecipe: () => (/* reexport safe */ _recipes_progress_js__WEBPACK_IMPORTED_MODULE_77__.progressSlotRecipe),
+/* harmony export */   qrCodeSlotRecipe: () => (/* reexport safe */ _recipes_qr_code_js__WEBPACK_IMPORTED_MODULE_79__.qrCodeSlotRecipe),
+/* harmony export */   radioCardSlotRecipe: () => (/* reexport safe */ _recipes_radio_card_js__WEBPACK_IMPORTED_MODULE_80__.radioCardSlotRecipe),
+/* harmony export */   radioGroupSlotRecipe: () => (/* reexport safe */ _recipes_radio_group_js__WEBPACK_IMPORTED_MODULE_81__.radioGroupSlotRecipe),
 /* harmony export */   radiomarkRecipe: () => (/* reexport safe */ _recipes_radiomark_js__WEBPACK_IMPORTED_MODULE_42__.radiomarkRecipe),
-/* harmony export */   ratingGroupSlotRecipe: () => (/* reexport safe */ _recipes_rating_group_js__WEBPACK_IMPORTED_MODULE_83__.ratingGroupSlotRecipe),
+/* harmony export */   ratingGroupSlotRecipe: () => (/* reexport safe */ _recipes_rating_group_js__WEBPACK_IMPORTED_MODULE_82__.ratingGroupSlotRecipe),
 /* harmony export */   recipes: () => (/* reexport safe */ _recipes_js__WEBPACK_IMPORTED_MODULE_5__.recipes),
-/* harmony export */   scrollAreaSlotRecipe: () => (/* reexport safe */ _recipes_scroll_area_js__WEBPACK_IMPORTED_MODULE_84__.scrollAreaSlotRecipe),
-/* harmony export */   segmentGroupSlotRecipe: () => (/* reexport safe */ _recipes_segment_group_js__WEBPACK_IMPORTED_MODULE_85__.segmentGroupSlotRecipe),
-/* harmony export */   selectSlotRecipe: () => (/* reexport safe */ _recipes_select_js__WEBPACK_IMPORTED_MODULE_86__.selectSlotRecipe),
+/* harmony export */   scrollAreaSlotRecipe: () => (/* reexport safe */ _recipes_scroll_area_js__WEBPACK_IMPORTED_MODULE_83__.scrollAreaSlotRecipe),
+/* harmony export */   segmentGroupSlotRecipe: () => (/* reexport safe */ _recipes_segment_group_js__WEBPACK_IMPORTED_MODULE_84__.segmentGroupSlotRecipe),
+/* harmony export */   selectSlotRecipe: () => (/* reexport safe */ _recipes_select_js__WEBPACK_IMPORTED_MODULE_85__.selectSlotRecipe),
 /* harmony export */   semanticTokens: () => (/* binding */ semanticTokens),
 /* harmony export */   separatorRecipe: () => (/* reexport safe */ _recipes_separator_js__WEBPACK_IMPORTED_MODULE_43__.separatorRecipe),
 /* harmony export */   skeletonRecipe: () => (/* reexport safe */ _recipes_skeleton_js__WEBPACK_IMPORTED_MODULE_44__.skeletonRecipe),
 /* harmony export */   skipNavLinkRecipe: () => (/* reexport safe */ _recipes_skip_nav_link_js__WEBPACK_IMPORTED_MODULE_45__.skipNavLinkRecipe),
-/* harmony export */   sliderSlotRecipe: () => (/* reexport safe */ _recipes_slider_js__WEBPACK_IMPORTED_MODULE_87__.sliderSlotRecipe),
+/* harmony export */   sliderSlotRecipe: () => (/* reexport safe */ _recipes_slider_js__WEBPACK_IMPORTED_MODULE_86__.sliderSlotRecipe),
 /* harmony export */   slotRecipes: () => (/* reexport safe */ _slot_recipes_js__WEBPACK_IMPORTED_MODULE_9__.slotRecipes),
 /* harmony export */   spinnerRecipe: () => (/* reexport safe */ _recipes_spinner_js__WEBPACK_IMPORTED_MODULE_46__.spinnerRecipe),
-/* harmony export */   splitterSlotRecipe: () => (/* reexport safe */ _recipes_splitter_js__WEBPACK_IMPORTED_MODULE_88__.splitterSlotRecipe),
-/* harmony export */   statSlotRecipe: () => (/* reexport safe */ _recipes_stat_js__WEBPACK_IMPORTED_MODULE_89__.statSlotRecipe),
-/* harmony export */   statusSlotRecipe: () => (/* reexport safe */ _recipes_status_js__WEBPACK_IMPORTED_MODULE_90__.statusSlotRecipe),
-/* harmony export */   stepsSlotRecipe: () => (/* reexport safe */ _recipes_steps_js__WEBPACK_IMPORTED_MODULE_91__.stepsSlotRecipe),
-/* harmony export */   switchSlotRecipe: () => (/* reexport safe */ _recipes_switch_js__WEBPACK_IMPORTED_MODULE_92__.switchSlotRecipe),
-/* harmony export */   tableSlotRecipe: () => (/* reexport safe */ _recipes_table_js__WEBPACK_IMPORTED_MODULE_93__.tableSlotRecipe),
-/* harmony export */   tabsSlotRecipe: () => (/* reexport safe */ _recipes_tabs_js__WEBPACK_IMPORTED_MODULE_94__.tabsSlotRecipe),
-/* harmony export */   tagSlotRecipe: () => (/* reexport safe */ _recipes_tag_js__WEBPACK_IMPORTED_MODULE_95__.tagSlotRecipe),
-/* harmony export */   tagsInputSlotRecipe: () => (/* reexport safe */ _recipes_tags_input_js__WEBPACK_IMPORTED_MODULE_96__.tagsInputSlotRecipe),
+/* harmony export */   splitterSlotRecipe: () => (/* reexport safe */ _recipes_splitter_js__WEBPACK_IMPORTED_MODULE_87__.splitterSlotRecipe),
+/* harmony export */   statSlotRecipe: () => (/* reexport safe */ _recipes_stat_js__WEBPACK_IMPORTED_MODULE_88__.statSlotRecipe),
+/* harmony export */   statusSlotRecipe: () => (/* reexport safe */ _recipes_status_js__WEBPACK_IMPORTED_MODULE_89__.statusSlotRecipe),
+/* harmony export */   stepsSlotRecipe: () => (/* reexport safe */ _recipes_steps_js__WEBPACK_IMPORTED_MODULE_90__.stepsSlotRecipe),
+/* harmony export */   switchSlotRecipe: () => (/* reexport safe */ _recipes_switch_js__WEBPACK_IMPORTED_MODULE_91__.switchSlotRecipe),
+/* harmony export */   tableSlotRecipe: () => (/* reexport safe */ _recipes_table_js__WEBPACK_IMPORTED_MODULE_92__.tableSlotRecipe),
+/* harmony export */   tabsSlotRecipe: () => (/* reexport safe */ _recipes_tabs_js__WEBPACK_IMPORTED_MODULE_93__.tabsSlotRecipe),
+/* harmony export */   tagSlotRecipe: () => (/* reexport safe */ _recipes_tag_js__WEBPACK_IMPORTED_MODULE_94__.tagSlotRecipe),
+/* harmony export */   tagsInputSlotRecipe: () => (/* reexport safe */ _recipes_tags_input_js__WEBPACK_IMPORTED_MODULE_95__.tagsInputSlotRecipe),
 /* harmony export */   textStyles: () => (/* reexport safe */ _text_styles_js__WEBPACK_IMPORTED_MODULE_10__.textStyles),
 /* harmony export */   textareaRecipe: () => (/* reexport safe */ _recipes_textarea_js__WEBPACK_IMPORTED_MODULE_47__.textareaRecipe),
-/* harmony export */   timelineSlotRecipe: () => (/* reexport safe */ _recipes_timeline_js__WEBPACK_IMPORTED_MODULE_97__.timelineSlotRecipe),
-/* harmony export */   toastSlotRecipe: () => (/* reexport safe */ _recipes_toast_js__WEBPACK_IMPORTED_MODULE_98__.toastSlotRecipe),
+/* harmony export */   timelineSlotRecipe: () => (/* reexport safe */ _recipes_timeline_js__WEBPACK_IMPORTED_MODULE_96__.timelineSlotRecipe),
+/* harmony export */   toastSlotRecipe: () => (/* reexport safe */ _recipes_toast_js__WEBPACK_IMPORTED_MODULE_97__.toastSlotRecipe),
 /* harmony export */   tokens: () => (/* binding */ tokens),
-/* harmony export */   tooltipSlotRecipe: () => (/* reexport safe */ _recipes_tooltip_js__WEBPACK_IMPORTED_MODULE_99__.tooltipSlotRecipe),
-/* harmony export */   treeViewSlotRecipe: () => (/* reexport safe */ _recipes_tree_view_js__WEBPACK_IMPORTED_MODULE_100__.treeViewSlotRecipe)
+/* harmony export */   tooltipSlotRecipe: () => (/* reexport safe */ _recipes_tooltip_js__WEBPACK_IMPORTED_MODULE_98__.tooltipSlotRecipe),
+/* harmony export */   treeViewSlotRecipe: () => (/* reexport safe */ _recipes_tree_view_js__WEBPACK_IMPORTED_MODULE_99__.treeViewSlotRecipe)
 /* harmony export */ });
 /* harmony import */ var _styled_system_config_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../styled-system/config.js */ "./node_modules/@chakra-ui/react/dist/esm/styled-system/config.js");
 /* harmony import */ var _breakpoints_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./breakpoints.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/breakpoints.js");
@@ -17080,36 +17075,34 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _recipes_file_upload_js__WEBPACK_IMPORTED_MODULE_69__ = __webpack_require__(/*! ./recipes/file-upload.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/file-upload.js");
 /* harmony import */ var _recipes_hover_card_js__WEBPACK_IMPORTED_MODULE_70__ = __webpack_require__(/*! ./recipes/hover-card.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/hover-card.js");
 /* harmony import */ var _recipes_list_js__WEBPACK_IMPORTED_MODULE_71__ = __webpack_require__(/*! ./recipes/list.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/list.js");
-/* harmony import */ var _recipes_listbox_js__WEBPACK_IMPORTED_MODULE_72__ = __webpack_require__(/*! ./recipes/listbox.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/listbox.js");
-/* harmony import */ var _recipes_menu_js__WEBPACK_IMPORTED_MODULE_73__ = __webpack_require__(/*! ./recipes/menu.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/menu.js");
-/* harmony import */ var _recipes_native_select_js__WEBPACK_IMPORTED_MODULE_74__ = __webpack_require__(/*! ./recipes/native-select.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/native-select.js");
-/* harmony import */ var _recipes_number_input_js__WEBPACK_IMPORTED_MODULE_75__ = __webpack_require__(/*! ./recipes/number-input.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/number-input.js");
-/* harmony import */ var _recipes_pin_input_js__WEBPACK_IMPORTED_MODULE_76__ = __webpack_require__(/*! ./recipes/pin-input.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/pin-input.js");
-/* harmony import */ var _recipes_popover_js__WEBPACK_IMPORTED_MODULE_77__ = __webpack_require__(/*! ./recipes/popover.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/popover.js");
-/* harmony import */ var _recipes_progress_js__WEBPACK_IMPORTED_MODULE_78__ = __webpack_require__(/*! ./recipes/progress.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/progress.js");
-/* harmony import */ var _recipes_progress_circle_js__WEBPACK_IMPORTED_MODULE_79__ = __webpack_require__(/*! ./recipes/progress-circle.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/progress-circle.js");
-/* harmony import */ var _recipes_qr_code_js__WEBPACK_IMPORTED_MODULE_80__ = __webpack_require__(/*! ./recipes/qr-code.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/qr-code.js");
-/* harmony import */ var _recipes_radio_card_js__WEBPACK_IMPORTED_MODULE_81__ = __webpack_require__(/*! ./recipes/radio-card.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/radio-card.js");
-/* harmony import */ var _recipes_radio_group_js__WEBPACK_IMPORTED_MODULE_82__ = __webpack_require__(/*! ./recipes/radio-group.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/radio-group.js");
-/* harmony import */ var _recipes_rating_group_js__WEBPACK_IMPORTED_MODULE_83__ = __webpack_require__(/*! ./recipes/rating-group.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/rating-group.js");
-/* harmony import */ var _recipes_scroll_area_js__WEBPACK_IMPORTED_MODULE_84__ = __webpack_require__(/*! ./recipes/scroll-area.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/scroll-area.js");
-/* harmony import */ var _recipes_segment_group_js__WEBPACK_IMPORTED_MODULE_85__ = __webpack_require__(/*! ./recipes/segment-group.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/segment-group.js");
-/* harmony import */ var _recipes_select_js__WEBPACK_IMPORTED_MODULE_86__ = __webpack_require__(/*! ./recipes/select.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/select.js");
-/* harmony import */ var _recipes_slider_js__WEBPACK_IMPORTED_MODULE_87__ = __webpack_require__(/*! ./recipes/slider.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/slider.js");
-/* harmony import */ var _recipes_splitter_js__WEBPACK_IMPORTED_MODULE_88__ = __webpack_require__(/*! ./recipes/splitter.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/splitter.js");
-/* harmony import */ var _recipes_stat_js__WEBPACK_IMPORTED_MODULE_89__ = __webpack_require__(/*! ./recipes/stat.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/stat.js");
-/* harmony import */ var _recipes_status_js__WEBPACK_IMPORTED_MODULE_90__ = __webpack_require__(/*! ./recipes/status.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/status.js");
-/* harmony import */ var _recipes_steps_js__WEBPACK_IMPORTED_MODULE_91__ = __webpack_require__(/*! ./recipes/steps.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/steps.js");
-/* harmony import */ var _recipes_switch_js__WEBPACK_IMPORTED_MODULE_92__ = __webpack_require__(/*! ./recipes/switch.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/switch.js");
-/* harmony import */ var _recipes_table_js__WEBPACK_IMPORTED_MODULE_93__ = __webpack_require__(/*! ./recipes/table.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/table.js");
-/* harmony import */ var _recipes_tabs_js__WEBPACK_IMPORTED_MODULE_94__ = __webpack_require__(/*! ./recipes/tabs.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/tabs.js");
-/* harmony import */ var _recipes_tag_js__WEBPACK_IMPORTED_MODULE_95__ = __webpack_require__(/*! ./recipes/tag.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/tag.js");
-/* harmony import */ var _recipes_tags_input_js__WEBPACK_IMPORTED_MODULE_96__ = __webpack_require__(/*! ./recipes/tags-input.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/tags-input.js");
-/* harmony import */ var _recipes_timeline_js__WEBPACK_IMPORTED_MODULE_97__ = __webpack_require__(/*! ./recipes/timeline.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/timeline.js");
-/* harmony import */ var _recipes_toast_js__WEBPACK_IMPORTED_MODULE_98__ = __webpack_require__(/*! ./recipes/toast.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/toast.js");
-/* harmony import */ var _recipes_tooltip_js__WEBPACK_IMPORTED_MODULE_99__ = __webpack_require__(/*! ./recipes/tooltip.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/tooltip.js");
-/* harmony import */ var _recipes_tree_view_js__WEBPACK_IMPORTED_MODULE_100__ = __webpack_require__(/*! ./recipes/tree-view.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/tree-view.js");
-
+/* harmony import */ var _recipes_menu_js__WEBPACK_IMPORTED_MODULE_72__ = __webpack_require__(/*! ./recipes/menu.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/menu.js");
+/* harmony import */ var _recipes_native_select_js__WEBPACK_IMPORTED_MODULE_73__ = __webpack_require__(/*! ./recipes/native-select.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/native-select.js");
+/* harmony import */ var _recipes_number_input_js__WEBPACK_IMPORTED_MODULE_74__ = __webpack_require__(/*! ./recipes/number-input.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/number-input.js");
+/* harmony import */ var _recipes_pin_input_js__WEBPACK_IMPORTED_MODULE_75__ = __webpack_require__(/*! ./recipes/pin-input.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/pin-input.js");
+/* harmony import */ var _recipes_popover_js__WEBPACK_IMPORTED_MODULE_76__ = __webpack_require__(/*! ./recipes/popover.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/popover.js");
+/* harmony import */ var _recipes_progress_js__WEBPACK_IMPORTED_MODULE_77__ = __webpack_require__(/*! ./recipes/progress.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/progress.js");
+/* harmony import */ var _recipes_progress_circle_js__WEBPACK_IMPORTED_MODULE_78__ = __webpack_require__(/*! ./recipes/progress-circle.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/progress-circle.js");
+/* harmony import */ var _recipes_qr_code_js__WEBPACK_IMPORTED_MODULE_79__ = __webpack_require__(/*! ./recipes/qr-code.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/qr-code.js");
+/* harmony import */ var _recipes_radio_card_js__WEBPACK_IMPORTED_MODULE_80__ = __webpack_require__(/*! ./recipes/radio-card.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/radio-card.js");
+/* harmony import */ var _recipes_radio_group_js__WEBPACK_IMPORTED_MODULE_81__ = __webpack_require__(/*! ./recipes/radio-group.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/radio-group.js");
+/* harmony import */ var _recipes_rating_group_js__WEBPACK_IMPORTED_MODULE_82__ = __webpack_require__(/*! ./recipes/rating-group.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/rating-group.js");
+/* harmony import */ var _recipes_scroll_area_js__WEBPACK_IMPORTED_MODULE_83__ = __webpack_require__(/*! ./recipes/scroll-area.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/scroll-area.js");
+/* harmony import */ var _recipes_segment_group_js__WEBPACK_IMPORTED_MODULE_84__ = __webpack_require__(/*! ./recipes/segment-group.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/segment-group.js");
+/* harmony import */ var _recipes_select_js__WEBPACK_IMPORTED_MODULE_85__ = __webpack_require__(/*! ./recipes/select.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/select.js");
+/* harmony import */ var _recipes_slider_js__WEBPACK_IMPORTED_MODULE_86__ = __webpack_require__(/*! ./recipes/slider.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/slider.js");
+/* harmony import */ var _recipes_splitter_js__WEBPACK_IMPORTED_MODULE_87__ = __webpack_require__(/*! ./recipes/splitter.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/splitter.js");
+/* harmony import */ var _recipes_stat_js__WEBPACK_IMPORTED_MODULE_88__ = __webpack_require__(/*! ./recipes/stat.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/stat.js");
+/* harmony import */ var _recipes_status_js__WEBPACK_IMPORTED_MODULE_89__ = __webpack_require__(/*! ./recipes/status.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/status.js");
+/* harmony import */ var _recipes_steps_js__WEBPACK_IMPORTED_MODULE_90__ = __webpack_require__(/*! ./recipes/steps.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/steps.js");
+/* harmony import */ var _recipes_switch_js__WEBPACK_IMPORTED_MODULE_91__ = __webpack_require__(/*! ./recipes/switch.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/switch.js");
+/* harmony import */ var _recipes_table_js__WEBPACK_IMPORTED_MODULE_92__ = __webpack_require__(/*! ./recipes/table.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/table.js");
+/* harmony import */ var _recipes_tabs_js__WEBPACK_IMPORTED_MODULE_93__ = __webpack_require__(/*! ./recipes/tabs.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/tabs.js");
+/* harmony import */ var _recipes_tag_js__WEBPACK_IMPORTED_MODULE_94__ = __webpack_require__(/*! ./recipes/tag.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/tag.js");
+/* harmony import */ var _recipes_tags_input_js__WEBPACK_IMPORTED_MODULE_95__ = __webpack_require__(/*! ./recipes/tags-input.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/tags-input.js");
+/* harmony import */ var _recipes_timeline_js__WEBPACK_IMPORTED_MODULE_96__ = __webpack_require__(/*! ./recipes/timeline.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/timeline.js");
+/* harmony import */ var _recipes_toast_js__WEBPACK_IMPORTED_MODULE_97__ = __webpack_require__(/*! ./recipes/toast.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/toast.js");
+/* harmony import */ var _recipes_tooltip_js__WEBPACK_IMPORTED_MODULE_98__ = __webpack_require__(/*! ./recipes/tooltip.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/tooltip.js");
+/* harmony import */ var _recipes_tree_view_js__WEBPACK_IMPORTED_MODULE_99__ = __webpack_require__(/*! ./recipes/tree-view.js */ "./node_modules/@chakra-ui/react/dist/esm/theme/recipes/tree-view.js");
 
 
 
@@ -17723,9 +17716,11 @@ const actionBarSlotRecipe = (0,_styled_system_config_js__WEBPACK_IMPORTED_MODULE
     positioner: {
       position: "fixed",
       display: "flex",
+      justifyContent: "center",
       pointerEvents: "none",
       insetInline: "0",
-      "--action-bar-offset": "spacing.4"
+      top: "unset",
+      bottom: "calc(env(safe-area-inset-bottom) + 20px)"
     },
     content: {
       bg: "bg.panel",
@@ -17766,33 +17761,6 @@ const actionBarSlotRecipe = (0,_styled_system_config_js__WEBPACK_IMPORTED_MODULE
       borderWidth: "1px",
       borderStyle: "dashed"
     }
-  },
-  variants: {
-    placement: {
-      bottom: {
-        positioner: {
-          bottom: "calc(env(safe-area-inset-bottom) + var(--action-bar-offset))",
-          justifyContent: "center"
-        }
-      },
-      "bottom-start": {
-        positioner: {
-          bottom: "calc(env(safe-area-inset-bottom) + var(--action-bar-offset))",
-          justifyContent: "flex-start",
-          ps: "var(--action-bar-offset)"
-        }
-      },
-      "bottom-end": {
-        positioner: {
-          bottom: "calc(env(safe-area-inset-bottom) + var(--action-bar-offset))",
-          justifyContent: "flex-end",
-          pe: "var(--action-bar-offset)"
-        }
-      }
-    }
-  },
-  defaultVariants: {
-    placement: "bottom"
   }
 });
 
@@ -19661,8 +19629,7 @@ const colorPickerSlotRecipe = (0,_styled_system_config_js__WEBPACK_IMPORTED_MODU
       width: "64",
       p: "4",
       gap: "3",
-      "--color-picker-z-index": "zIndex.popover",
-      zIndex: "calc(var(--color-picker-z-index) + var(--layer-index, 0))",
+      zIndex: "dropdown",
       _open: {
         animationStyle: "slide-fade-in",
         animationDuration: "fast"
@@ -20020,8 +19987,7 @@ const comboboxSlotRecipe = (0,_styled_system_config_js__WEBPACK_IMPORTED_MODULE_
       background: "bg.panel",
       display: "flex",
       flexDirection: "column",
-      "--combobox-z-index": "zIndex.popover",
-      zIndex: "calc(var(--combobox-z-index) + var(--layer-index, 0))",
+      zIndex: "dropdown",
       borderRadius: "l2",
       outline: 0,
       maxH: "96",
@@ -22141,8 +22107,7 @@ const menuSlotRecipe = (0,_styled_system_config_js__WEBPACK_IMPORTED_MODULE_1__.
   base: {
     content: {
       outline: 0,
-      "--menu-bg": "colors.bg.panel",
-      bg: "var(--menu-bg)",
+      bg: "bg.panel",
       boxShadow: "lg",
       color: "fg",
       maxHeight: "var(--available-height)",
@@ -22214,14 +22179,6 @@ const menuSlotRecipe = (0,_styled_system_config_js__WEBPACK_IMPORTED_MODULE_1__.
       bg: "bg.muted",
       my: "1",
       mx: "-1"
-    },
-    arrow: {
-      "--arrow-size": "sizes.3",
-      "--arrow-background": "var(--menu-bg)"
-    },
-    arrowTip: {
-      borderTopWidth: "1px",
-      borderLeftWidth: "1px"
     }
   },
   variants: {
@@ -22369,9 +22326,6 @@ const nativeSelectSlotRecipe = (0,_styled_system_config_js__WEBPACK_IMPORTED_MOD
           color: "fg",
           focusRingWidth: "2px"
         }
-      },
-      ghost: {
-        field: _select_js__WEBPACK_IMPORTED_MODULE_2__.selectSlotRecipe.variants?.variant.ghost.trigger
       }
     },
     size: {
@@ -24009,8 +23963,7 @@ const selectSlotRecipe = (0,_styled_system_config_js__WEBPACK_IMPORTED_MODULE_1_
       background: "bg.panel",
       display: "flex",
       flexDirection: "column",
-      "--select-z-index": "zIndex.popover",
-      zIndex: "calc(var(--select-z-index) + var(--layer-index, 0))",
+      zIndex: "dropdown",
       borderRadius: "l2",
       outline: 0,
       maxH: "96",
@@ -24098,14 +24051,6 @@ const selectSlotRecipe = (0,_styled_system_config_js__WEBPACK_IMPORTED_MODULE_1_
           borderWidth: "1px",
           borderColor: "transparent",
           bg: "bg.muted"
-        }
-      },
-      ghost: {
-        trigger: {
-          bg: "transparent",
-          _expanded: {
-            bg: "bg.muted"
-          }
         }
       }
     },
@@ -24515,10 +24460,11 @@ const sliderSlotRecipe = (0,_styled_system_config_js__WEBPACK_IMPORTED_MODULE_1_
       outline: 0,
       zIndex: "2",
       borderRadius: "full",
-      transition: "shadow",
       _focusVisible: {
-        ring: "3px",
-        ringColor: "colorPalette.focusRing/50"
+        ring: "2px",
+        ringColor: "colorPalette.focusRing",
+        ringOffset: "2px",
+        ringOffsetColor: "bg"
       }
     }
   },
@@ -24598,7 +24544,7 @@ const sliderSlotRecipe = (0,_styled_system_config_js__WEBPACK_IMPORTED_MODULE_1_
           flexDirection: "column",
           height: "100%",
           minWidth: "var(--slider-thumb-size)",
-          "&:has(.chakra-slider__markerLabel)": {
+          "&[data-has-mark-label], &:has(.chakra-slider__marker-label)": {
             marginEnd: "4"
           }
         },
@@ -24622,7 +24568,7 @@ const sliderSlotRecipe = (0,_styled_system_config_js__WEBPACK_IMPORTED_MODULE_1_
           flexDirection: "row",
           width: "100%",
           minHeight: "var(--slider-thumb-size)",
-          "&:has(.chakra-slider__markerLabel)": {
+          "&[data-has-mark-label], &:has(.chakra-slider__marker-label)": {
             marginBottom: "4"
           }
         },
@@ -36611,7 +36557,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   stripBasename: () => (/* binding */ stripBasename)
 /* harmony export */ });
 /**
- * @remix-run/router v1.23.2
+ * @remix-run/router v1.23.1
  *
  * Copyright (c) Remix Software Inc.
  *
@@ -38734,7 +38680,7 @@ function createRouter(init) {
         // If the user didn't explicity indicate replace behavior, replace if
         // we redirected to the exact same location we're currently at to avoid
         // double back-buttons
-        let location = normalizeRedirectLocation(result.response.headers.get("Location"), new URL(request.url), basename, init.history);
+        let location = normalizeRedirectLocation(result.response.headers.get("Location"), new URL(request.url), basename);
         replace = location === state.location.pathname + state.location.search;
       }
       await startRedirectNavigation(request, result, true, {
@@ -39340,7 +39286,7 @@ function createRouter(init) {
     }
     let location = redirect.response.headers.get("Location");
     invariant(location, "Expected a Location header on the redirect Response");
-    location = normalizeRedirectLocation(location, new URL(request.url), basename, init.history);
+    location = normalizeRedirectLocation(location, new URL(request.url), basename);
     let redirectLocation = createLocation(state.location, location, {
       _isRedirect: true
     });
@@ -41046,30 +40992,16 @@ function normalizeRelativeRoutingRedirectResponse(response, request, routeId, ma
   }
   return response;
 }
-function normalizeRedirectLocation(location, currentUrl, basename, historyInstance) {
-  // Match Chrome's behavior:
-  // https://github.com/chromium/chromium/blob/216dbeb61db0c667e62082e5f5400a32d6983df3/content/public/common/url_utils.cc#L82
-  let invalidProtocols = ["about:", "blob:", "chrome:", "chrome-untrusted:", "content:", "data:", "devtools:", "file:", "filesystem:",
-  // eslint-disable-next-line no-script-url
-  "javascript:"];
+function normalizeRedirectLocation(location, currentUrl, basename) {
   if (ABSOLUTE_URL_REGEX.test(location)) {
     // Strip off the protocol+origin for same-origin + same-basename absolute redirects
     let normalizedLocation = location;
     let url = normalizedLocation.startsWith("//") ? new URL(currentUrl.protocol + normalizedLocation) : new URL(normalizedLocation);
-    if (invalidProtocols.includes(url.protocol)) {
-      throw new Error("Invalid redirect location");
-    }
     let isSameBasename = stripBasename(url.pathname, basename) != null;
     if (url.origin === currentUrl.origin && isSameBasename) {
       return url.pathname + url.search + url.hash;
     }
   }
-  try {
-    let url = historyInstance.createURL(location);
-    if (invalidProtocols.includes(url.protocol)) {
-      throw new Error("Invalid redirect location");
-    }
-  } catch (e) {}
   return location;
 }
 // Utility method for creating the Request instances for loaders/actions during
@@ -87166,8 +87098,8 @@ __webpack_require__.r(__webpack_exports__);
 // significant digits p, where x is positive and p is in [1, 21] or undefined.
 // For example, formatDecimalParts(1.23) returns ["123", 0].
 function formatDecimalParts(x, p) {
-  if (!isFinite(x) || x === 0) return null; // NaN, ±Infinity, ±0
-  var i = (x = p ? x.toExponential(p - 1) : x.toExponential()).indexOf("e"), coefficient = x.slice(0, i);
+  if ((i = (x = p ? x.toExponential(p - 1) : x.toExponential()).indexOf("e")) < 0) return null; // NaN, ±Infinity
+  var i, coefficient = x.slice(0, i);
 
   // The string returned by toExponential either has the form \d\.\d+e[-+]\d+
   // (e.g., 1.2e+3) or the form \de[-+]\d+ (e.g., 1e+3).
@@ -87254,7 +87186,7 @@ var prefixExponent;
 
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(x, p) {
   var d = (0,_formatDecimal_js__WEBPACK_IMPORTED_MODULE_0__.formatDecimalParts)(x, p);
-  if (!d) return prefixExponent = undefined, x.toPrecision(p);
+  if (!d) return x + "";
   var coefficient = d[0],
       exponent = d[1],
       i = exponent - (prefixExponent = Math.max(-8, Math.min(8, Math.floor(exponent / 3))) * 3) + 1,
@@ -87480,7 +87412,7 @@ var map = Array.prototype.map,
       minus = locale.minus === undefined ? "−" : locale.minus + "",
       nan = locale.nan === undefined ? "NaN" : locale.nan + "";
 
-  function newFormat(specifier, options) {
+  function newFormat(specifier) {
     specifier = (0,_formatSpecifier_js__WEBPACK_IMPORTED_MODULE_3__["default"])(specifier);
 
     var fill = specifier.fill,
@@ -87505,8 +87437,8 @@ var map = Array.prototype.map,
 
     // Compute the prefix and suffix.
     // For SI-prefix, the suffix is lazily computed.
-    var prefix = (options && options.prefix !== undefined ? options.prefix : "") + (symbol === "$" ? currencyPrefix : symbol === "#" && /[boxX]/.test(type) ? "0" + type.toLowerCase() : ""),
-        suffix = (symbol === "$" ? currencySuffix : /[%p]/.test(type) ? percent : "") + (options && options.suffix !== undefined ? options.suffix : "");
+    var prefix = symbol === "$" ? currencyPrefix : symbol === "#" && /[boxX]/.test(type) ? "0" + type.toLowerCase() : "",
+        suffix = symbol === "$" ? currencySuffix : /[%p]/.test(type) ? percent : "";
 
     // What format function should we use?
     // Is this an integer type?
@@ -87547,7 +87479,7 @@ var map = Array.prototype.map,
 
         // Compute the prefix and suffix.
         valuePrefix = (valueNegative ? (sign === "(" ? sign : minus) : sign === "-" || sign === "(" ? "" : sign) + valuePrefix;
-        valueSuffix = (type === "s" && !isNaN(value) && _formatPrefixAuto_js__WEBPACK_IMPORTED_MODULE_6__.prefixExponent !== undefined ? prefixes[8 + _formatPrefixAuto_js__WEBPACK_IMPORTED_MODULE_6__.prefixExponent / 3] : "") + valueSuffix + (valueNegative && sign === "(" ? ")" : "");
+        valueSuffix = (type === "s" ? prefixes[8 + _formatPrefixAuto_js__WEBPACK_IMPORTED_MODULE_6__.prefixExponent / 3] : "") + valueSuffix + (valueNegative && sign === "(" ? ")" : "");
 
         // Break the formatted value into the integer “value” part that can be
         // grouped, and fractional or exponential “suffix” part that is not.
@@ -87592,11 +87524,12 @@ var map = Array.prototype.map,
   }
 
   function formatPrefix(specifier, value) {
-    var e = Math.max(-8, Math.min(8, Math.floor((0,_exponent_js__WEBPACK_IMPORTED_MODULE_0__["default"])(value) / 3))) * 3,
+    var f = newFormat((specifier = (0,_formatSpecifier_js__WEBPACK_IMPORTED_MODULE_3__["default"])(specifier), specifier.type = "f", specifier)),
+        e = Math.max(-8, Math.min(8, Math.floor((0,_exponent_js__WEBPACK_IMPORTED_MODULE_0__["default"])(value) / 3))) * 3,
         k = Math.pow(10, -e),
-        f = newFormat((specifier = (0,_formatSpecifier_js__WEBPACK_IMPORTED_MODULE_3__["default"])(specifier), specifier.type = "f", specifier), {suffix: prefixes[8 + e / 3]});
+        prefix = prefixes[8 + e / 3];
     return function(value) {
-      return f(k * value);
+      return f(k * value) + prefix;
     };
   }
 
@@ -101213,26 +101146,6 @@ module.exports = __webpack_require__(/*! ../dist/compat/array/uniqBy.js */ "./no
 
 /***/ },
 
-/***/ "./node_modules/es-toolkit/dist/_internal/isEqualsSameValueZero.js"
-/*!*************************************************************************!*\
-  !*** ./node_modules/es-toolkit/dist/_internal/isEqualsSameValueZero.js ***!
-  \*************************************************************************/
-(__unused_webpack_module, exports) {
-
-"use strict";
-
-
-Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-
-function isEqualsSameValueZero(value, other) {
-    return value === other || (Number.isNaN(value) && Number.isNaN(other));
-}
-
-exports.isEqualsSameValueZero = isEqualsSameValueZero;
-
-
-/***/ },
-
 /***/ "./node_modules/es-toolkit/dist/_internal/isUnsafeProperty.js"
 /*!********************************************************************!*\
   !*** ./node_modules/es-toolkit/dist/_internal/isUnsafeProperty.js ***!
@@ -101322,7 +101235,7 @@ function uniqBy(arr, mapper) {
     const map = new Map();
     for (let i = 0; i < arr.length; i++) {
         const item = arr[i];
-        const key = mapper(item, i, arr);
+        const key = mapper(item);
         if (!map.has(key)) {
             map.set(key, item);
         }
@@ -101499,7 +101412,7 @@ Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 const isIndex = __webpack_require__(/*! ./isIndex.js */ "./node_modules/es-toolkit/dist/compat/_internal/isIndex.js");
 const isArrayLike = __webpack_require__(/*! ../predicate/isArrayLike.js */ "./node_modules/es-toolkit/dist/compat/predicate/isArrayLike.js");
 const isObject = __webpack_require__(/*! ../predicate/isObject.js */ "./node_modules/es-toolkit/dist/compat/predicate/isObject.js");
-const isEqualsSameValueZero = __webpack_require__(/*! ../../_internal/isEqualsSameValueZero.js */ "./node_modules/es-toolkit/dist/_internal/isEqualsSameValueZero.js");
+const eq = __webpack_require__(/*! ../util/eq.js */ "./node_modules/es-toolkit/dist/compat/util/eq.js");
 
 function isIterateeCall(value, index, object) {
     if (!isObject.isObject(object)) {
@@ -101507,7 +101420,7 @@ function isIterateeCall(value, index, object) {
     }
     if ((typeof index === 'number' && isArrayLike.isArrayLike(object) && isIndex.isIndex(index) && index < object.length) ||
         (typeof index === 'string' && index in object)) {
-        return isEqualsSameValueZero.isEqualsSameValueZero(object[index], value);
+        return eq.eq(object[index], value);
     }
     return false;
 }
@@ -101825,7 +101738,6 @@ exports.sortBy = sortBy;
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
 const uniqBy$1 = __webpack_require__(/*! ../../array/uniqBy.js */ "./node_modules/es-toolkit/dist/array/uniqBy.js");
-const ary = __webpack_require__(/*! ../../function/ary.js */ "./node_modules/es-toolkit/dist/function/ary.js");
 const identity = __webpack_require__(/*! ../../function/identity.js */ "./node_modules/es-toolkit/dist/function/identity.js");
 const isArrayLikeObject = __webpack_require__(/*! ../predicate/isArrayLikeObject.js */ "./node_modules/es-toolkit/dist/compat/predicate/isArrayLikeObject.js");
 const iteratee = __webpack_require__(/*! ../util/iteratee.js */ "./node_modules/es-toolkit/dist/compat/util/iteratee.js");
@@ -101834,7 +101746,7 @@ function uniqBy(array, iteratee$1 = identity.identity) {
     if (!isArrayLikeObject.isArrayLikeObject(array)) {
         return [];
     }
-    return uniqBy$1.uniqBy(Array.from(array), ary.ary(iteratee.iteratee(iteratee$1), 1));
+    return uniqBy$1.uniqBy(Array.from(array), iteratee.iteratee(iteratee$1));
 }
 
 exports.uniqBy = uniqBy;
@@ -102005,7 +101917,6 @@ exports.cloneDeep = cloneDeep;
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
 const cloneDeepWith$1 = __webpack_require__(/*! ../../object/cloneDeepWith.js */ "./node_modules/es-toolkit/dist/object/cloneDeepWith.js");
-const getTag = __webpack_require__(/*! ../_internal/getTag.js */ "./node_modules/es-toolkit/dist/compat/_internal/getTag.js");
 const tags = __webpack_require__(/*! ../_internal/tags.js */ "./node_modules/es-toolkit/dist/compat/_internal/tags.js");
 
 function cloneDeepWith(obj, customizer) {
@@ -102016,12 +101927,6 @@ function cloneDeepWith(obj, customizer) {
         }
         if (typeof obj !== 'object') {
             return undefined;
-        }
-        if (getTag.getTag(obj) === tags.objectTag && typeof obj.constructor !== 'function') {
-            const result = {};
-            stack.set(obj, result);
-            cloneDeepWith$1.copyProperties(result, obj, object, stack);
-            return result;
         }
         switch (Object.prototype.toString.call(obj)) {
             case tags.numberTag:
@@ -102318,7 +102223,7 @@ Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
 const isObject = __webpack_require__(/*! ./isObject.js */ "./node_modules/es-toolkit/dist/compat/predicate/isObject.js");
 const isPrimitive = __webpack_require__(/*! ../../predicate/isPrimitive.js */ "./node_modules/es-toolkit/dist/predicate/isPrimitive.js");
-const isEqualsSameValueZero = __webpack_require__(/*! ../../_internal/isEqualsSameValueZero.js */ "./node_modules/es-toolkit/dist/_internal/isEqualsSameValueZero.js");
+const eq = __webpack_require__(/*! ../util/eq.js */ "./node_modules/es-toolkit/dist/compat/util/eq.js");
 
 function isMatchWith(target, source, compare) {
     if (typeof compare !== 'function') {
@@ -102345,11 +102250,11 @@ function isMatchWithInternal(target, source, compare, stack) {
             if (sourceKeys.length > 0) {
                 return isMatchWithInternal(target, { ...source }, compare, stack);
             }
-            return isEqualsSameValueZero.isEqualsSameValueZero(target, source);
+            return eq.eq(target, source);
         }
         default: {
             if (!isObject.isObject(target)) {
-                return isEqualsSameValueZero.isEqualsSameValueZero(target, source);
+                return eq.eq(target, source);
             }
             if (typeof source === 'string') {
                 return source === '';
@@ -102648,6 +102553,26 @@ exports.matchesProperty = matchesProperty;
 
 /***/ },
 
+/***/ "./node_modules/es-toolkit/dist/compat/util/eq.js"
+/*!********************************************************!*\
+  !*** ./node_modules/es-toolkit/dist/compat/util/eq.js ***!
+  \********************************************************/
+(__unused_webpack_module, exports) {
+
+"use strict";
+
+
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+
+function eq(value, other) {
+    return value === other || (Number.isNaN(value) && Number.isNaN(other));
+}
+
+exports.eq = eq;
+
+
+/***/ },
+
 /***/ "./node_modules/es-toolkit/dist/compat/util/iteratee.js"
 /*!**************************************************************!*\
   !*** ./node_modules/es-toolkit/dist/compat/util/iteratee.js ***!
@@ -102868,28 +102793,6 @@ function toString(value) {
 }
 
 exports.toString = toString;
-
-
-/***/ },
-
-/***/ "./node_modules/es-toolkit/dist/function/ary.js"
-/*!******************************************************!*\
-  !*** ./node_modules/es-toolkit/dist/function/ary.js ***!
-  \******************************************************/
-(__unused_webpack_module, exports) {
-
-"use strict";
-
-
-Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-
-function ary(func, n) {
-    return function (...args) {
-        return func.apply(this, args.slice(0, n));
-    };
-}
-
-exports.ary = ary;
 
 
 /***/ },
@@ -105933,7 +105836,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   castImmutable: () => (/* binding */ castImmutable),
 /* harmony export */   createDraft: () => (/* binding */ createDraft),
 /* harmony export */   current: () => (/* binding */ current),
-/* harmony export */   enableArrayMethods: () => (/* binding */ enableArrayMethods),
 /* harmony export */   enableMapSet: () => (/* binding */ enableMapSet),
 /* harmony export */   enablePatches: () => (/* binding */ enablePatches),
 /* harmony export */   finishDraft: () => (/* binding */ finishDraft),
@@ -106076,10 +105978,6 @@ var isSet = (target) => target instanceof Set;
 var isObjectish = (target) => typeof target === "object";
 var isFunction = (target) => typeof target === "function";
 var isBoolean = (target) => typeof target === "boolean";
-function isArrayIndex(value) {
-  const n = +value;
-  return Number.isInteger(n) && String(n) === value;
-}
 var getProxyDraft = (value) => {
   if (!isObjectish(value))
     return null;
@@ -106168,7 +106066,6 @@ function isFrozen(obj) {
 // src/utils/plugins.ts
 var PluginMapSet = "MapSet";
 var PluginPatches = "Patches";
-var PluginArrayMethods = "ArrayMethods";
 var plugins = {};
 function getPlugin(pluginKey) {
   const plugin = plugins[pluginKey];
@@ -106196,8 +106093,7 @@ var createScope = (parent_, immer_) => ({
   unfinalizedDrafts_: 0,
   handledSet_: /* @__PURE__ */ new Set(),
   processedForPatches_: /* @__PURE__ */ new Set(),
-  mapSetPlugin_: isPluginLoaded(PluginMapSet) ? getPlugin(PluginMapSet) : void 0,
-  arrayMethodsPlugin_: isPluginLoaded(PluginArrayMethods) ? getPlugin(PluginArrayMethods) : void 0
+  mapSetPlugin_: isPluginLoaded(PluginMapSet) ? getPlugin(PluginMapSet) : void 0
 });
 function usePatchesInScope(scope, patchListener) {
   if (patchListener) {
@@ -106332,7 +106228,7 @@ function registerChildFinalizationCallback(parent, child, key) {
   });
 }
 function generatePatchesAndFinalize(state, rootScope) {
-  const shouldFinalize = state.modified_ && !state.finalized_ && (state.type_ === 3 /* Set */ || state.type_ === 1 /* Array */ && state.allIndicesReassigned_ || (state.assigned_?.size ?? 0) > 0);
+  const shouldFinalize = state.modified_ && !state.finalized_ && (state.type_ === 3 /* Set */ || (state.assigned_?.size ?? 0) > 0);
   if (shouldFinalize) {
     const { patchPlugin_ } = rootScope;
     if (patchPlugin_) {
@@ -106358,19 +106254,13 @@ function handleCrossReference(target, key, value) {
   } else if (isDraftable(value)) {
     target.callbacks_.push(function nestedDraftCleanup() {
       const targetCopy = latest(target);
-      if (target.type_ === 3 /* Set */) {
-        if (targetCopy.has(value)) {
-          handleValue(value, scope_.handledSet_, scope_);
-        }
-      } else {
-        if (get(targetCopy, key, target.type_) === value) {
-          if (scope_.drafts_.length > 1 && (target.assigned_.get(key) ?? false) === true && target.copy_) {
-            handleValue(
-              get(target.copy_, key, target.type_),
-              scope_.handledSet_,
-              scope_
-            );
-          }
+      if (get(targetCopy, key, target.type_) === value) {
+        if (scope_.drafts_.length > 1 && (target.assigned_.get(key) ?? false) === true && target.copy_) {
+          handleValue(
+            get(target.copy_, key, target.type_),
+            scope_.handledSet_,
+            scope_
+          );
         }
       }
     });
@@ -106443,24 +106333,12 @@ var objectTraps = {
   get(state, prop) {
     if (prop === DRAFT_STATE)
       return state;
-    let arrayPlugin = state.scope_.arrayMethodsPlugin_;
-    const isArrayWithStringProp = state.type_ === 1 /* Array */ && typeof prop === "string";
-    if (isArrayWithStringProp) {
-      if (arrayPlugin?.isArrayOperationMethod(prop)) {
-        return arrayPlugin.createMethodInterceptor(state, prop);
-      }
-    }
     const source = latest(state);
     if (!has(source, prop, state.type_)) {
       return readPropFromProto(state, source, prop);
     }
     const value = source[prop];
     if (state.finalized_ || !isDraftable(value)) {
-      return value;
-    }
-    if (isArrayWithStringProp && state.operationMethod && arrayPlugin?.isMutatingArrayMethod(
-      state.operationMethod
-    ) && isArrayIndex(prop)) {
       return value;
     }
     if (value === peek(state.base_, prop)) {
@@ -106543,14 +106421,13 @@ var objectTraps = {
   }
 };
 var arrayTraps = {};
-for (let key in objectTraps) {
-  let fn = objectTraps[key];
+each(objectTraps, (key, fn) => {
   arrayTraps[key] = function() {
     const args = arguments;
     args[0] = args[0][0];
     return fn.apply(this, args);
   };
-}
+});
 arrayTraps.deleteProperty = function(state, prop) {
   if ( true && isNaN(parseInt(prop)))
     die(13);
@@ -106836,7 +106713,7 @@ function enablePatches() {
     );
   }
   function getPath(state, path = []) {
-    if (state.key_ !== void 0) {
+    if ("key_" in state && state.key_ !== void 0) {
       const parentCopy = state.parent_.copy_ ?? state.parent_.base_;
       const proxyDraft = getProxyDraft(get(parentCopy, state.key_));
       const valueAtKey = get(parentCopy, state.key_);
@@ -106926,12 +106803,10 @@ function enablePatches() {
       [base_, copy_] = [copy_, base_];
       [patches, inversePatches] = [inversePatches, patches];
     }
-    const allReassigned = state.allIndicesReassigned_ === true;
     for (let i = 0; i < base_.length; i++) {
       const copiedItem = copy_[i];
       const baseItem = base_[i];
-      const isAssigned = allReassigned || assigned_?.get(i.toString());
-      if (isAssigned && copiedItem !== baseItem) {
+      if (assigned_?.get(i.toString()) && copiedItem !== baseItem) {
         const childState = copiedItem?.[DRAFT_STATE];
         if (childState && childState.modified_) {
           continue;
@@ -107162,7 +107037,6 @@ function enableMapSet() {
         state.assigned_.set(key, true);
         state.copy_.set(key, value);
         state.assigned_.set(key, true);
-        handleCrossReference(state, key, value);
       }
       return this;
     }
@@ -107306,7 +107180,6 @@ function enableMapSet() {
         prepareSetCopy(state);
         markChanged(state);
         state.copy_.add(value);
-        handleCrossReference(state, value, value);
       }
       return this;
     }
@@ -107391,163 +107264,6 @@ function enableMapSet() {
     }
   }
   loadPlugin(PluginMapSet, { proxyMap_, proxySet_, fixSetContents });
-}
-
-// src/plugins/arrayMethods.ts
-function enableArrayMethods() {
-  const SHIFTING_METHODS = /* @__PURE__ */ new Set(["shift", "unshift"]);
-  const QUEUE_METHODS = /* @__PURE__ */ new Set(["push", "pop"]);
-  const RESULT_RETURNING_METHODS = /* @__PURE__ */ new Set([
-    ...QUEUE_METHODS,
-    ...SHIFTING_METHODS
-  ]);
-  const REORDERING_METHODS = /* @__PURE__ */ new Set(["reverse", "sort"]);
-  const MUTATING_METHODS = /* @__PURE__ */ new Set([
-    ...RESULT_RETURNING_METHODS,
-    ...REORDERING_METHODS,
-    "splice"
-  ]);
-  const FIND_METHODS = /* @__PURE__ */ new Set(["find", "findLast"]);
-  const NON_MUTATING_METHODS = /* @__PURE__ */ new Set([
-    "filter",
-    "slice",
-    "concat",
-    "flat",
-    ...FIND_METHODS,
-    "findIndex",
-    "findLastIndex",
-    "some",
-    "every",
-    "indexOf",
-    "lastIndexOf",
-    "includes",
-    "join",
-    "toString",
-    "toLocaleString"
-  ]);
-  function isMutatingArrayMethod(method) {
-    return MUTATING_METHODS.has(method);
-  }
-  function isNonMutatingArrayMethod(method) {
-    return NON_MUTATING_METHODS.has(method);
-  }
-  function isArrayOperationMethod(method) {
-    return isMutatingArrayMethod(method) || isNonMutatingArrayMethod(method);
-  }
-  function enterOperation(state, method) {
-    state.operationMethod = method;
-  }
-  function exitOperation(state) {
-    state.operationMethod = void 0;
-  }
-  function executeArrayMethod(state, operation, markLength = true) {
-    prepareCopy(state);
-    const result = operation();
-    markChanged(state);
-    if (markLength)
-      state.assigned_.set("length", true);
-    return result;
-  }
-  function markAllIndicesReassigned(state) {
-    state.allIndicesReassigned_ = true;
-  }
-  function normalizeSliceIndex(index, length) {
-    if (index < 0) {
-      return Math.max(length + index, 0);
-    }
-    return Math.min(index, length);
-  }
-  function handleSimpleOperation(state, method, args) {
-    return executeArrayMethod(state, () => {
-      const result = state.copy_[method](...args);
-      if (SHIFTING_METHODS.has(method)) {
-        markAllIndicesReassigned(state);
-      }
-      return RESULT_RETURNING_METHODS.has(method) ? result : state.draft_;
-    });
-  }
-  function handleReorderingOperation(state, method, args) {
-    return executeArrayMethod(
-      state,
-      () => {
-        ;
-        state.copy_[method](...args);
-        markAllIndicesReassigned(state);
-        return state.draft_;
-      },
-      false
-    );
-  }
-  function createMethodInterceptor(state, originalMethod) {
-    return function interceptedMethod(...args) {
-      const method = originalMethod;
-      enterOperation(state, method);
-      try {
-        if (isMutatingArrayMethod(method)) {
-          if (RESULT_RETURNING_METHODS.has(method)) {
-            return handleSimpleOperation(state, method, args);
-          }
-          if (REORDERING_METHODS.has(method)) {
-            return handleReorderingOperation(state, method, args);
-          }
-          if (method === "splice") {
-            const res = executeArrayMethod(
-              state,
-              () => state.copy_.splice(...args)
-            );
-            markAllIndicesReassigned(state);
-            return res;
-          }
-        } else {
-          return handleNonMutatingOperation(state, method, args);
-        }
-      } finally {
-        exitOperation(state);
-      }
-    };
-  }
-  function handleNonMutatingOperation(state, method, args) {
-    const source = latest(state);
-    if (method === "filter") {
-      const predicate = args[0];
-      const result = [];
-      for (let i = 0; i < source.length; i++) {
-        if (predicate(source[i], i, source)) {
-          result.push(state.draft_[i]);
-        }
-      }
-      return result;
-    }
-    if (FIND_METHODS.has(method)) {
-      const predicate = args[0];
-      const isForward = method === "find";
-      const step = isForward ? 1 : -1;
-      const start = isForward ? 0 : source.length - 1;
-      for (let i = start; i >= 0 && i < source.length; i += step) {
-        if (predicate(source[i], i, source)) {
-          return state.draft_[i];
-        }
-      }
-      return void 0;
-    }
-    if (method === "slice") {
-      const rawStart = args[0] ?? 0;
-      const rawEnd = args[1] ?? source.length;
-      const start = normalizeSliceIndex(rawStart, source.length);
-      const end = normalizeSliceIndex(rawEnd, source.length);
-      const result = [];
-      for (let i = start; i < end; i++) {
-        result.push(state.draft_[i]);
-      }
-      return result;
-    }
-    return source[method](...args);
-  }
-  loadPlugin(PluginArrayMethods, {
-    createMethodInterceptor,
-    isArrayOperationMethod,
-    isMutatingArrayMethod
-  });
 }
 
 // src/immer.ts
@@ -150913,7 +150629,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react_router__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react-router */ "./node_modules/react-router/dist/index.js");
 /* harmony import */ var react_router__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @remix-run/router */ "./node_modules/@remix-run/router/dist/router.js");
 /**
- * React Router DOM v6.30.3
+ * React Router DOM v6.30.2
  *
  * Copyright (c) Remix Software Inc.
  *
@@ -152444,7 +152160,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _remix_run_router__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @remix-run/router */ "./node_modules/@remix-run/router/dist/router.js");
 /**
- * React Router v6.30.3
+ * React Router v6.30.2
  *
  * Copyright (c) Remix Software Inc.
  *

@@ -26,7 +26,7 @@ import {
     FiArrowLeft
 } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
-import { getAllVersion, getRunWorkFlow, getSingleWorkFlow, liveMonitor, updateWorkFlow, updateWorkFlowStatus, workFLowExction, workflowNodeListiner, workflowNodeListinerStop } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
+import { getAllVersion, getRunWorkFlow, getSingleWorkFlow, updateWorkFlow, updateWorkFlowStatus, workFLowExction, workflowNodeListiner, workflowNodeListinerStop } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
 import { useDispatch, useSelector } from "react-redux";
 import CustomNode from "../customNode/CustomNode";
 import ZAPDrawer from "@ZAPComponents/Drawer";
@@ -37,6 +37,7 @@ import { LuFullscreen, LuMinimize } from "react-icons/lu";
 import { mapEdgesForBackend, mapNodesForBackend, toggleFullscreenMode } from "../helper";
 import Select from "react-select";
 import ZAPLoading from "@ZAPComponents/Loading";
+import { statusOptions } from "../../helper";
 ;
 export default function FlowCanvas({ id }) {
     const nodeIdRef = useRef(0);
@@ -60,15 +61,10 @@ export default function FlowCanvas({ id }) {
     const navigate = useNavigate()
     const [edges, setEdges, onEdgesChange] = useEdgesState([]);
     const [drawerOpen, setDrawerOpen] = useState(false);
-    const [selectedNode, setSelectedNode] = useState(null);
-    const [activeEdgeId, setActiveEdgeId] = useState(null);
-    const [selectedApp, setSelectedApp] = useState(null);
-    const [selectedEvent, setSelectedEvent] = useState(null);
     const { values, setFieldValue } = useFormikContext()
     const [loading, setLoading] = useState(false);
     const { data, runs, versions } = useSelector((state) => state.workflows);
     const singleData = data[0]
-    const isFlowLoaded = useRef(false);
     const GAP = 250;
     const containerRef = useRef(null);
     const [isFullscreen, setIsFullscreen] = useState(false);
@@ -121,7 +117,6 @@ export default function FlowCanvas({ id }) {
 
 
     };
-    const { screenToFlowPosition } = useReactFlow();
     const openDrawerForNode = (node) => {
         setDrawerContext({
             source: "node",
@@ -187,7 +182,6 @@ export default function FlowCanvas({ id }) {
             position: { x: newX, y: newY },
             data: {
                 action: "action",
-                // order: nodes.length + 1,
                 ...actionData,
             },
         };
@@ -301,11 +295,6 @@ export default function FlowCanvas({ id }) {
 
     //     return () => clearInterval(interval);
     // }, []);
-    const statusOptions = [
-        { value: "active", label: "Active" },
-        { value: "paused", label: "Paused" },
-        { value: "draft", label: "draft" },
-    ];
     return (
         <div
             ref={containerRef}
