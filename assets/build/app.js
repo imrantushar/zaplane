@@ -3215,6 +3215,7 @@ function ActionDrawer({
     const actions = Object.values(tool?.actions || {});
     if (actions.length === 1) setFieldValue("actionType", actions[0].key);
   }, [mode, selectedItem, setFieldValue]);
+  //Generate action options for the selected item
   const actionOptions = (0,react__WEBPACK_IMPORTED_MODULE_12__.useMemo)(() => {
     const integration = (0,_helper__WEBPACK_IMPORTED_MODULE_21__.getIntegration)(mode, selectedItem);
     if (!integration) return [];
@@ -3224,6 +3225,7 @@ function ActionDrawer({
       value: i.key
     }));
   }, [mode, selectedItem, isTrigger]);
+  //Get schema fields for the selected action
   const selectedActionFields = (0,react__WEBPACK_IMPORTED_MODULE_12__.useMemo)(() => {
     const integration = (0,_helper__WEBPACK_IMPORTED_MODULE_21__.getIntegration)(mode, selectedItem);
     if (!integration || !values?.actionType) return [];
@@ -3232,6 +3234,7 @@ function ActionDrawer({
     return integration.actions?.[values.actionType]?.schema || [];
   }, [mode, selectedItem, values?.actionType, isTrigger]);
   const getKey = field => `${mode}:${selectedItem?.id}:${field.key}`;
+  //Generate dynamic keys and fetch dynamic options
   const fetchDynamicOptions = async field => {
     if (!field.dynamic) return;
     const key = getKey(field);

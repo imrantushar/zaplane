@@ -34,7 +34,7 @@ export default function ActionDrawer({ open, context, onClose, updateNodeData, c
   const isTrigger = node?.data?.action === "trigger" && source === "node";
 
   const { mode, setMode, selectedItem, setSelectedItem, search, setSearch, list, searchList } =
-    useActionDrawer(open, node, source, setFieldValue,isTrigger);
+    useActionDrawer(open, node, source, setFieldValue, isTrigger);
 
   // Auto-set actionType if only one tool action
   useEffect(() => {
@@ -43,7 +43,7 @@ export default function ActionDrawer({ open, context, onClose, updateNodeData, c
     const actions = Object.values(tool?.actions || {});
     if (actions.length === 1) setFieldValue("actionType", actions[0].key);
   }, [mode, selectedItem, setFieldValue]);
-
+  //Generate action options for the selected item
   const actionOptions = useMemo(() => {
     const integration = getIntegration(mode, selectedItem);
     if (!integration) return [];
@@ -54,7 +54,7 @@ export default function ActionDrawer({ open, context, onClose, updateNodeData, c
         : Object.values(integration.actions || {});
     return list.map(i => ({ label: i.label, value: i.key }));
   }, [mode, selectedItem, isTrigger]);
-
+  //Get schema fields for the selected action
   const selectedActionFields = useMemo(() => {
     const integration = getIntegration(mode, selectedItem);
     if (!integration || !values?.actionType) return [];
@@ -64,7 +64,7 @@ export default function ActionDrawer({ open, context, onClose, updateNodeData, c
   }, [mode, selectedItem, values?.actionType, isTrigger]);
 
   const getKey = (field) => `${mode}:${selectedItem?.id}:${field.key}`;
-
+//Generate dynamic keys and fetch dynamic options
   const fetchDynamicOptions = async (field) => {
     if (!field.dynamic) return;
     const key = getKey(field);
@@ -124,7 +124,7 @@ export default function ActionDrawer({ open, context, onClose, updateNodeData, c
         </HStack>
       }
     >
-      <Input placeholder={__("Search apps or tools...","zaplane")} value={search} onChange={e => setSearch(e.target.value)} />
+      <Input placeholder={__("Search apps or tools...", "zaplane")} value={search} onChange={e => setSearch(e.target.value)} />
 
       {search && (
         <VStack spacing={2} align="stretch">
@@ -141,7 +141,7 @@ export default function ActionDrawer({ open, context, onClose, updateNodeData, c
               _hover={{ bg: "var(--zaplane-body-background)" }}
             >
               <Text className="zaplane-label">{sprintf(__("%s", "zaplane"), item.name)}</Text>
-              <Text fontSize="xs" className="zaplane-label"> {item.type === 'tools'? __('Tool', 'zaplane'): __('App', 'zaplane')}</Text>
+              <Text fontSize="xs" className="zaplane-label"> {item.type === 'tools' ? __('Tool', 'zaplane') : __('App', 'zaplane')}</Text>
             </Button>
           ))}
         </VStack>

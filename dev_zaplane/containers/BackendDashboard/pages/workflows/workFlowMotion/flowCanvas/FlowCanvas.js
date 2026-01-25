@@ -2,11 +2,8 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
     ReactFlow,
     addEdge,
-    useNodesState,
-    useEdgesState,
     Controls,
     Background,
-    useReactFlow,
 } from "@xyflow/react";
 import "@xyflow/react/dist/base.css";
 import { __ } from '@wordpress/i18n';
