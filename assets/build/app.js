@@ -3276,7 +3276,6 @@ function ActionDrawer({
     context?.source === "node" ? updateNodeData(payload) : createActionNode(payload);
     resetAll();
   };
-  console.log(searchList, 'searchList', list, _hooks_useActionDrawer_helper__WEBPACK_IMPORTED_MODULE_20__.TOOLS);
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsxs)(_ZAPComponents_Drawer__WEBPACK_IMPORTED_MODULE_7__["default"], {
     open: open,
     onClose: resetAll,
@@ -3323,7 +3322,7 @@ function ActionDrawer({
           children: [" ", item.type === 'tools' ? (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_17__.__)('Tool', 'zaplane') : (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_17__.__)('App', 'zaplane')]
         })]
       }, `${item.type}-${item.id}`))
-    }), !mode && !search && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_6__.VStack, {
+    }), !mode && !search && !selectedItem && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_6__.VStack, {
       spacing: 4,
       children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Button, {
         w: "100%",

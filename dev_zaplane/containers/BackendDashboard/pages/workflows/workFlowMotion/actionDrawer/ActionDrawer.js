@@ -108,7 +108,6 @@ export default function ActionDrawer({ open, context, onClose, updateNodeData, c
     context?.source === "node" ? updateNodeData(payload) : createActionNode(payload);
     resetAll();
   };
-  console.log(searchList,'searchList',list,TOOLS);
   return (
     <ZAPDrawer
       open={open}
@@ -148,7 +147,7 @@ export default function ActionDrawer({ open, context, onClose, updateNodeData, c
         </VStack>
       )}
 
-      {!mode && !search && (
+      {!mode && !search && !selectedItem && (
         <VStack spacing={4}>
           <Button w="100%" background="var(--zaplane-background)" color="var(--zaplane-font-color)"
             justifyContent="space-between" _hover={{ bg: "var(--zaplane-body-background)", "& svg": { transform: "translateX(4px)" } }}
