@@ -38,13 +38,12 @@ import { mapEdgesForBackend, mapNodesForBackend, toggleFullscreenMode } from "..
 import Select from "react-select";
 import ZAPLoading from "@ZAPComponents/Loading";
 import { statusOptions } from "../../helper";
+import { createNodeIdGenerator, mapGraphFromBackend } from "./helper";
 ;
 export default function FlowCanvas({ id }) {
-    const nodeIdRef = useRef(0);
-    const getNewNodeId = () => {
-        nodeIdRef.current += 1;
-        return `${nodeIdRef.current}`;
-    };
+    const nodeIdRef = useRef(createNodeIdGenerator());
+    const getNewNodeId = nodeIdRef.current;
+
     const [nodes, setNodes, onNodesChange] = useNodesState([
         {
             id: getNewNodeId(),
@@ -70,23 +69,13 @@ export default function FlowCanvas({ id }) {
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [activeDrawer, setActiveDrawer] = useState(null);
     useEffect(() => {
-        if (!singleData?.graph?.nodes?.length) return;
-        const mappedNodes = (singleData.graph.nodes || []).map((node) => ({
-            ...node,
-            type: "custom",
-            data: {
-                ...node.data,
-                action: node.type,
-            },
-        }));
+        if (!singleData?.graph) return;
 
-        const mappedEdges = (singleData.graph.edges || []).map((edge) => ({
-            ...edge,
-            type: "custom",
-        }));
-        setNodes(mappedNodes);
-        setEdges(mappedEdges);
+        const { nodes, edges } = mapGraphFromBackend(singleData.graph);
+        setNodes(nodes);
+        setEdges(edges);
     }, [singleData?.graph]);
+
     const [drawerContext, setDrawerContext] = useState({
         source: null,
         node: null,
@@ -126,7 +115,6 @@ export default function FlowCanvas({ id }) {
         setDrawerOpen(true);
     };
     const onAddNode = (edgeId) => {
-        setActiveEdgeId(edgeId);
         const edge = edges.find((e) => e.id === edgeId);
         setDrawerContext({
             source: "edge",
@@ -261,7 +249,7 @@ export default function FlowCanvas({ id }) {
     console.log(nodes, 'all nodes');
     console.log(edges, 'all edges');
     if (loading) {
-        return <ZAPLoading/>
+        return <ZAPLoading />
     }
 
     const nodeTypes = {
@@ -448,10 +436,8 @@ export default function FlowCanvas({ id }) {
                 open={drawerOpen}
                 onClose={() => {
                     setDrawerOpen(false)
-                    setActiveEdgeId(null);
                     setDrawerContext({ source: null, node: null, edge: null });
                 }}
-                setSelectedNode={setSelectedNode}
                 context={drawerContext}
                 createActionNode={createActionNode}
                 updateNodeData={updateNodeData}
