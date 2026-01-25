@@ -1699,5 +1699,12 @@ svg.react-flow__connectionline {
   opacity: 1;
   pointer-events: auto;
 }
+/*!****************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/@wordpress/scripts/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./dev_zaplane/containers/BackendDashboard/pages/dashboard/styles.scss ***!
+  \****************************************************************************************************************************************************************************************************************************************************************************************************************************/
+.recharts-wrapper {
+  height: 250px !important;
+  width: 648px !important;
+}
 
 /*# sourceMappingURL=app.css.map*/
