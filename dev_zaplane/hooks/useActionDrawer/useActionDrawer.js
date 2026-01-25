@@ -1,3 +1,27 @@
+/**
+ * useActionDrawer
+ * ----------------
+ * A custom React hook for managing the state and behavior of an Action Drawer in a flow canvas .
+ * 
+ * Features:
+ * - Tracks the drawer mode ("app" or "tools") and selected item.
+ * - Manages search input and generates filtered search results.
+ * - Pre-populates form values based on the selected node (app, event, config).
+ * - Provides convenient setters for mode, selected item, and search.
+ * 
+ * 
+ * Parameters:
+ * @param {boolean} open         - Whether the drawer is open.
+ * @param {object} node           - Current node data (app, event, config).
+ * @param {string} source         - Drawer context ("add" or "node").
+ * @param {function} setFieldValue- Function to update form field values (e.g., Formik).
+ * @param {boolean} isTrigger     - Whether this drawer is for a trigger action.
+ * 
+ * Returns:
+ * @returns {object} - {
+ *   mode, setMode, selectedItem, setSelectedItem, search, setSearch, list, searchList
+ * }
+ */
 import { useState, useMemo, useEffect } from "react";
 import { APPS, TOOLS } from "./helper";
 

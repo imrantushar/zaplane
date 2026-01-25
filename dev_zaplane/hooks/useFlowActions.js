@@ -1,3 +1,35 @@
+/**
+ * useFlowActions
+ * A custom React hook for managing nodes, edges, and drawer actions in a workflow React Flow canvas.
+ * 
+ * Features:
+ * - Updates selected node’s data.
+ * - Deletes a node along with its connected edges.
+ * - Creates a new action node, shifts other nodes if needed, and manages edges.
+ * - Opens drawer for a node or for adding a new node.
+ * - Provides helper for getting an edge by ID.
+ * 
+ * Usage:
+ * const { updateNodeData, deleteNode, createActionNode, onAddNode, openDrawerForNode, openDrawerFromAdd } =
+ *    useFlowActions({ nodes, setNodes, edges, setEdges, drawerContext, setDrawerContext, setDrawerOpen, getNewNodeId, GAP });
+ * 
+ * Parameters:
+ * @param {array} nodes                  - Current array of nodes.
+ * @param {function} setNodes            - Setter for nodes state.
+ * @param {array} edges                  - Current array of edges.
+ * @param {function} setEdges            - Setter for edges state.
+ * @param {object} drawerContext         - Current drawer context (selected node/edge).
+ * @param {function} setDrawerContext    - Setter for drawer context.
+ * @param {function} setDrawerOpen       - Function to open/close drawer.
+ * @param {function} getNewNodeId        - Function to generate unique node IDs.
+ * @param {number} GAP                   - Optional spacing between nodes (default 250).
+ * 
+ * Returns:
+ * @returns {object} - {
+ *   updateNodeData, deleteNode, createActionNode, onAddNode, openDrawerForNode, openDrawerFromAdd
+ * }
+ */
+
 export const useFlowActions = ({
     nodes,
     setNodes,
