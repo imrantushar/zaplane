@@ -89,22 +89,22 @@ const AdminMenu = () => {
 					{ is_pro ? (
 						<li
 							className={
-								page === 'gamify-license' ? 'current' : ''
+								page === 'Zaplane-license' ? 'current' : ''
 							}
 						>
-							<a href="admin.php?page=gamify-license">
-								{ __( 'License', 'gamify' ) }
+							<a href="admin.php?page=Zaplane-license">
+								{ __( 'License', 'Zaplane' ) }
 							</a>
 						</li>
 					) : (
 						<li
 							className={
-								page === 'gamify-get-pro' ? 'current' : ''
+								page === 'Zaplane-get-pro' ? 'current' : ''
 							}
 						>
-							<a href="admin.php?page=gamify-get-pro">
-								<span className="dashicons dashicons-awards gamify-blue-color"></span>{ ' ' }
-								{ __( 'Get Pro', 'gamify' ) }
+							<a href="admin.php?page=Zaplane-get-pro">
+								<span className="dashicons dashicons-awards Zaplane-blue-color"></span>{ ' ' }
+								{ __( 'Get Pro', 'Zaplane' ) }
 							</a>
 						</li>
 					) }

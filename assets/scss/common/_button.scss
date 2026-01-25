@@ -91,23 +91,23 @@
     }
     &--bg-purple,
     &--preset-purple {
-        background: var(--zaplane-primary);
+        background: var(--zaplane-primary-color);
         color: #fff;
         &:hover, &:focus {
-            background: var(--zaplane-primary);
+            background: var(--zaplane-primary-color);
             color: #fff;
         }
     }
     &--bg-light-purple,
     &--preset-light-purple {
-        background: var(--zaplane-secondary);
-        color: var(--zaplane-primary);
+        background: var(--zaplane-secondary-color);
+        color: var(--zaplane-primary-color);
         .zaplane-icon:before {
-            color: var(--zaplane-primary);
+            color: var(--zaplane-primary-color);
         }
         &:hover, &:focus {
-            background: var(--zaplane-secondary);
-            color: var(--zaplane-primary);
+            background: var(--zaplane-secondary-color);
+            color: var(--zaplane-primary-color);
         }
     }
     &--bg-white-border,    
@@ -121,7 +121,7 @@
     &--preset-gray {
         background: var(--zaplane-border-color);
         &:hover, &:focus {
-            background: var(--zaplane-gray);
+            background: var(--zaplane-gray-color);
         }
     }
     &--preset-white {
@@ -147,11 +147,11 @@
     &--preset-border-purple,
     &--border-purple {
         background: transparent;
-        border: 1px solid var(--zaplane-primary);
-        color: var(--zaplane-primary);
+        border: 1px solid var(--zaplane-primary-color);
+        color: var(--zaplane-primary-color);
         &:hover, &:focus {
             background: #F5F5F5;
-            color: var(--zaplane-primary);
+            color: var(--zaplane-primary-color);
         }
     }
     &--border-gray {
@@ -167,9 +167,9 @@
         }
     }
     &--border-black {
-        border: 1px solid var(--zaplane-primary);
+        border: 1px solid var(--zaplane-primary-color);
         &:hover, &:focus {
-            border: 1px solid var(--zaplane-primary);
+            border: 1px solid var(--zaplane-primary-color);
         }
     }
     &--mini {
@@ -200,7 +200,7 @@
         cursor: not-allowed !important;
         .zaplane-icon {
             &::before{
-              color:   var(--zaplane-secondary) !important;
+              color:   var(--zaplane-secondary-gray-color) !important;
             }
         }
     }

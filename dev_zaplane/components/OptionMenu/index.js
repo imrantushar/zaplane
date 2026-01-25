@@ -1,175 +1,161 @@
 import React, { useEffect, useRef, useState } from 'react';
-import PropTypes from 'prop-types';
-import './styles.scss';
 import { createPortal } from 'react-dom';
+import { FiMoreHorizontal } from "react-icons/fi";
+import { Icon } from '@chakra-ui/react';
+import { HiDotsHorizontal } from "react-icons/hi";
+
+import './styles.scss';
 import Button from '@ZAPComponents/Button';
 
-const propTypes = {
-	icon: PropTypes.string,
-	suffix: PropTypes.string,
-	options: PropTypes.array,
-	iconClass: PropTypes.node,
-	alwaysShowOptions: PropTypes.bool,
-};
-
-const OptionMenu = ( props ) => {
+const OptionMenu = (props) => {
 	const {
-		icon = 'menu',
+		icon = HiDotsHorizontal,
 		options = [],
 		iconClass,
 		suffix = '',
 		alwaysShowOptions = false,
 	} = props;
-	const [ itemSelected, setItemSelected ] = useState( false );
-	const menuItemRef = useRef( null );
-	const relativeTo = useRef( null );
+	const [itemSelected, setItemSelected] = useState(false);
+	const menuItemRef = useRef(null);
+	const relativeTo = useRef(null);
 
-	const handleClick = ( e ) => {
+	const handleClick = (e) => {
 		if (
 			menuItemRef?.current &&
-			! menuItemRef?.current?.contains( e.target ) &&
-			! relativeTo.current.contains( e.target )
+			!menuItemRef?.current?.contains(e.target) &&
+			!relativeTo.current.contains(e.target)
 		) {
-			setItemSelected( false );
+			setItemSelected(false);
 		}
 	};
 
 	const handleMenuToggle = () => {
-		setItemSelected( ! itemSelected );
+		setItemSelected(!itemSelected);
 	};
 
-	useEffect( () => {
-		if ( ! alwaysShowOptions ) {
-			document.addEventListener( 'mousedown', handleClick );
+	useEffect(() => {
+		if (!alwaysShowOptions) {
+			document.addEventListener('mousedown', handleClick);
 			return () =>
-				document.removeEventListener( 'mousedown', handleClick );
+				document.removeEventListener('mousedown', handleClick);
 		}
-	}, [ alwaysShowOptions ] );
+	}, [alwaysShowOptions]);
 
-	useEffect( () => {
-		if ( alwaysShowOptions ) {
+	useEffect(() => {
+		if (alwaysShowOptions) {
 			return;
 		}
 
-		if ( itemSelected && relativeTo.current ) {
+		if (itemSelected && relativeTo.current) {
 			const rect = relativeTo.current.getBoundingClientRect();
 			const x = rect.left + window.pageXOffset;
 			const y = rect.top + window.pageYOffset;
 			const buttonHeight = relativeTo.current.offsetHeight;
 			menuItemRef.current.style.position = 'absolute';
-			menuItemRef.current.style.left = `${ x - 155 }px`;
-			menuItemRef.current.style.top = `${ y + buttonHeight - 25 }px`;
-			document.body.appendChild( menuItemRef.current );
+			menuItemRef.current.style.left = `${x - 155}px`;
+			menuItemRef.current.style.top = `${y + buttonHeight - 25}px`;
+			document.body.appendChild(menuItemRef.current);
 		} else if (
 			menuItemRef.current &&
 			menuItemRef.current.parentNode === document.body
 		) {
-			document.body.removeChild( menuItemRef.current );
+			document.body.removeChild(menuItemRef.current);
 		}
-	}, [ itemSelected, alwaysShowOptions ] );
+	}, [itemSelected, alwaysShowOptions]);
 
 	const renderOptions = () => (
 		<div
-			className={ `zaplane-dropdown-menu__lists  ${
-				alwaysShowOptions ? 'zaplane-dropdown-menu--inline' : ''
-			} ${ suffix && `zaplane-dropdown-menu--list-${ suffix }` }` }
-			ref={ menuItemRef }
+			className={`zaplane-dropdown-menu__lists  ${alwaysShowOptions ? 'zaplane-dropdown-menu--inline' : ''
+				} ${suffix && `zaplane-dropdown-menu--list-${suffix}`}`}
+			ref={menuItemRef}
 		>
 			<ul
-				className={ `${
-					alwaysShowOptions
+				className={`${alwaysShowOptions
 						? 'zaplane-dropdown-menu__inline'
 						: 'zaplane-more-options'
-				}` }
+					}`}
 			>
-				{ options.map( ( item, itemIndex ) => {
+				{options.map((item, itemIndex) => {
 					const handleItemClick = () => {
-						setItemSelected( false );
-						if ( 'button' === item.type ) {
+						setItemSelected(false);
+						if ('button' === item.type) {
 							return item?.onClick();
 						}
 						return null;
 					};
+
 					return (
-						<React.Fragment key={ itemIndex }>
-							{ item.action ? (
+						<React.Fragment key={itemIndex}>
+							{item.action ? (
 								<form
-									className={ `${
-										alwaysShowOptions
+									className={`${alwaysShowOptions
 											? 'zaplane-dropdown-menu__inline-form'
 											: 'zaplane-more-options__item'
-									}` }
-									action={ item.action }
-									method={ item.method }
+										}`}
+									action={item.action}
+									method={item.method}
 								>
 									<Button
 										preset="transparent"
 										iconPosition="left"
-										{ ...item }
-										suffix={ `${
-											alwaysShowOptions
+										{...item}
+										suffix={`${alwaysShowOptions
 												? 'inline'
 												: 'block'
-										}` }
+											}`}
 									/>
-									{ item.hasBorder && (
+									{item.hasBorder && (
 										<hr className="zaplane-option-separator" />
-									) }
+									)}
 								</form>
 							) : (
 								<li
-									className={ `${
-										alwaysShowOptions
+									className={`${alwaysShowOptions
 											? 'zaplane-dropdown-menu__inline-form'
 											: 'zaplane-more-options__item'
-									}` }
+										}`}
 								>
 									<Button
 										preset="transparent"
 										iconPosition="left"
-										{ ...item }
-										onClick={ handleItemClick }
-										// suffix={`${alwaysShowOptions ? 'inline' : 'block'}`}
+										{...item}
+										onClick={handleItemClick}
 									/>
-									{ item.hasBorder && (
+									{item.hasBorder && (
 										<hr className="zaplane-option-separator" />
-									) }
+									)}
 								</li>
-							) }
+							)}
 						</React.Fragment>
 					);
-				} ) }
+				})}
 			</ul>
 		</div>
 	);
 
 	return (
 		<>
-			{ ! alwaysShowOptions && (
+			{!alwaysShowOptions && (
 				<button
-					className={ `zaplane-dropdown-menu ${
-						suffix && `zaplane-dropdown-menu--${ suffix }`
-					}` }
+					className={`zaplane-dropdown-menu ${suffix && `zaplane-dropdown-menu--${suffix}`
+						}`}
 					type="button"
-					ref={ relativeTo }
-					onClick={ handleMenuToggle }
+					ref={relativeTo}
+					onClick={handleMenuToggle}
 				>
-					{ iconClass ? (
+					{iconClass ? (
 						iconClass
 					) : (
-						<span
-							className={ `zaplane-icon zaplane-icon--${ icon }` }
-						></span>
-					) }
+						<Icon as={icon} />
+					)}
 				</button>
-			) }
-			{ alwaysShowOptions
+			)}
+			{alwaysShowOptions
 				? renderOptions()
 				: itemSelected &&
-				  createPortal( renderOptions(), document.body ) }
+				createPortal(renderOptions(), document.body)}
 		</>
 	);
 };
 
-OptionMenu.propTypes = propTypes;
 export default OptionMenu;

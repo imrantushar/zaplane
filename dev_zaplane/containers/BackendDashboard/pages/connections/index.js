@@ -16,12 +16,6 @@ import { __ } from "@wordpress/i18n";
 import { FaSlack } from "react-icons/fa";
 import {
     FiTrash2, FiRefreshCw, FiEye, FiLink,
-    FiLock,
-    FiCalendar,
-    FiClock,
-    FiCheckCircle,
-    FiEdit,
-    FiPlay
 } from "react-icons/fi";
 import Select from "react-select";
 
@@ -37,9 +31,10 @@ import {
 } from "@ZAPRedux/Slices/connectionsSlice/connectionsSlice";
 
 import WPModal from "@ZAPComponents/Modal/WPModal";
-import ZAPText from "@ZAPComponents/Text";
 import ZAPTable from "@ZAPComponents/Table";
 import ConnectionDetails from "./ConnectionDetails/ConnectionDetails";
+import TopBar from "@ZAPComponents/TopBar";
+import { primaryBtn, removeBtn } from "../../../../../assets/scss/chakra/recipe";
 
 const statusOptions = [
     { value: "active", label: "Active" },
@@ -144,118 +139,113 @@ const Connections = () => {
 
     return (
         <>
-            <Flex
-                px={6}
-                py={4}
-                align="center"
-                justify="space-between"
-                borderBottom="1px solid"
-                borderColor="gray.200"
-                bg="white"
-            >
-                <Box>
-                    <Heading margin='0' size="md">{__("Connections", "zaplane")}</Heading>
-                    <Text fontSize="sm" margin='0' color="gray.500">
-                        {__("Connections between your apps", "zaplane")}
-                    </Text>
-                </Box>
-                <Button
-                    leftIcon={<FaSlack />}
-                    variant="outline"
-                    onClick={() => setIsModalOpen(true)}
-                >
-                    {__("Create credential", "zaplane")}
-                </Button>
-
-            </Flex>
-            <Box p={6} bg="gray.50" minH="calc(100vh - 80px)">
-                <Box
-                    bg="white"
-                    border="1px solid"
-                    borderColor="gray.200"
-                    borderRadius="lg"
-                    boxShadow="sm"
-                >
-                    <Box px={5} py={4} borderBottom="1px solid" borderColor="gray.200">
-                        <Heading size="sm" margin='0'>
-                            {__("Connection List", "zaplane")}
+            <TopBar
+                render={() => (
+                    <Box>
+                        <Heading className="zaplane-title">
+                            {__("Connections", "zaplane")}
                         </Heading>
+                        <Text className="zaplane-title-subtitle">
+                            {__("Connections between your apps", "zaplane")}
+                        </Text>
                     </Box>
+                )}
+                rightContent={() => (
+                    <Button
+                        {...primaryBtn}
+                        leftIcon={<FaSlack />}
+                        onClick={() => setIsModalOpen(true)}
+                    >
+                        {__("Create credential", "zaplane")}
+                    </Button>
+                )}
+            />
+            <div className="zaplane-page-content">
+                <ZAPTable
+                    data={list}
+                    rowKey="id"
+                    size="sm"
+                    columns={[
+                        {
+                            label: "APP / NAME",
+                            key: "name",
+                            textAlign: "center",
+                            render: (row) => (
+                                <HStack justifyContent="center">
+                                    {row.app === "slack" && <FaSlack />}
+                                    <Text>{__(row.name, 'zaplane')}</Text>
+                                </HStack>
+                            ),
+                        },
+                        {
+                            label: "AUTH TYPE",
+                            key: "auth_type",
+                            render: (row) => row.auth_type,
+                            textAlign: "center",
+                        },
+                        {
+                            label: "CREATED AT",
+                            key: "created_at",
+                            render: (row) => row.created_at || "--",
+                            textAlign: "center",
+                        },
+                        {
+                            label: "STATUS",
+                            key: "status",
+                            render: (row) => (
+                                <Box w="140px">
+                                    <Select
+                                        className="zaplane-select"
+                                        options={statusOptions}
+                                        value={statusOptions.find(
+                                            (o) => o.value === row.status
+                                        )}
+                                        onChange={(s) =>
+                                            handleStatusChange(row, s)
+                                        }
+                                        isSearchable={false}
+                                        menuPortalTarget={document.body}
+                                        menuPosition="fixed"
+                                        styles={{
+                                            menuPortal: (base) => ({
+                                                ...base,
+                                                zIndex: 9999,
+                                            }),
+                                        }}
+                                    />
 
-                    <ZAPTable
-                        data={list}
-                        rowKey="id"
-                        size="sm"
-                        columns={[
-                            {
-                                label: "APP / NAME",
-                                key: "name",
-                                render: (row) => (
-                                    <HStack>
-                                        {row.app === "slack" && <FaSlack />}
-                                        <Text>{__(row.name, 'zaplane')}</Text>
-                                    </HStack>
-                                ),
-                            },
-                            {
-                                label: "AUTH TYPE",
-                                key: "auth_type",
-                                render: (row) => row.auth_type,
-                            },
-                            {
-                                label: "CREATED AT",
-                                key: "created_at",
-                                render: (row) => row.created_at || "--",
-                            },
-                            {
-                                label: "STATUS",
-                                key: "status",
-                                render: (row) => (
-                                    <Box w="140px">
-                                        <Select
-                                            options={statusOptions}
-                                            value={statusOptions.find(
-                                                (o) => o.value === row.status
-                                            )}
-                                            onChange={(s) =>
-                                                handleStatusChange(row, s)
-                                            }
-                                            isSearchable={false}
-                                        />
-                                    </Box>
-                                ),
-                            },
-                        ]}
-                        actionsRenderer={(row) => (
-                            <> <Button
+                                </Box>
+                            ),
+                        },
+                    ]}
+                    actionsRenderer={(row) => (
+                        <> <Button
+                            size="xs"
+                            onClick={() => dispatch(testConnection(row.id))}
+                            leftIcon={<FiRefreshCw />}
+                        >
+                            {__('Test', 'zaplane')}
+                        </Button>
+                            <Button
                                 size="xs"
-                                onClick={() => dispatch(testConnection(row.id))}
-                                leftIcon={<FiRefreshCw />}
+                                onClick={() => openDetails(row)}
+                                leftIcon={<FiEye />}
                             >
-                                {__('Test', 'zaplane')}
+                                {__('Details', 'zaplane')}
                             </Button>
-                                <Button
-                                    size="xs"
-                                    onClick={() => openDetails(row)}
-                                    leftIcon={<FiEye />}
-                                >
-                                    {__('Details', 'zaplane')}
-                                </Button>
-                                <Button
-                                    size="xs"
-                                    colorScheme="red"
-                                    leftIcon={<FiTrash2 />}
-                                    onClick={() =>
-                                        dispatch(deleteConnection(row.id))
-                                    }
-                                >
-                                      {__('Delete', 'zaplane')}
-                                </Button>
-                            </>
-                        )}
-                    />
-                </Box>
-            </Box>
+                            <Button
+                                {...removeBtn}
+                                leftIcon={<FiTrash2 />}
+                                onClick={() =>
+                                    dispatch(deleteConnection(row.id))
+                                }
+                            >
+                                {__('Delete', 'zaplane')}
+                            </Button>
+                        </>
+                    )}
+                />
+            </div>
             <ConnectionDetails
                 isOpen={detailsOpen}
                 onClose={() => setDetailsOpen(false)}
@@ -269,7 +259,7 @@ const Connections = () => {
             >
                 <Box px={4}>
                     <VStack spacing={4} align="stretch">
-                        <Text>{__("Select an app or service to connect", "zaplane")}</Text>
+                        <Text className="zaplane-label">{__("Select an app or service to connect", "zaplane")}</Text>
 
                         <Select
                             value={selectedApp}
@@ -279,12 +269,12 @@ const Connections = () => {
                                 setCredentials({});
                             }}
                             options={[{ value: "slack", label: "Slack" }]}
+                            
                         />
                         {Object.keys(authTypes).map((key) => (
                             <Button
                                 key={key}
                                 variant={selectedAuthType === key ? "solid" : "outline"}
-                                colorScheme="blue"
                                 onClick={() => {
                                     setSelectedAuthType(key);
                                     setCredentials({});
@@ -301,7 +291,7 @@ const Connections = () => {
 
                                         return (
                                             <Box key={fieldKey}>
-                                                <ZAPText fontWeight="bold">{field.label}</ZAPText>
+                                                <Text className="zaplane-label" fontWeight="bold">   {__(field.label, "zaplane")}</Text>
                                                 <Input
                                                     type={field.type === "password" ? "password" : "text"}
                                                     placeholder={field.placeholder || ""}
@@ -314,9 +304,10 @@ const Connections = () => {
                                                     }
                                                 />
                                                 {field.help && (
-                                                    <ZAPText fontSize="sm" color="gray.500">
-                                                        {field.help}
-                                                    </ZAPText>
+                                                    <Text fontSize="sm" className="zaplane-label">
+
+                                                        {__(field.help, "zaplane")}
+                                                    </Text>
                                                 )}
                                             </Box>
                                         );
@@ -325,19 +316,20 @@ const Connections = () => {
                             </VStack>
                         )}
 
+                        {selectedAuthType &&
+                            <Button
+                                {...primaryBtn}
+                                width="220px"
+                                onClick={handleConnect}
+                                isLoading={loadingOAuth}
+                                isDisabled={!selectedApp || !selectedAuthType}
+                            >
+                                {selectedAuthType === "oauth2"
+                                    ? __("Connect with OAuth", "zaplane")
+                                    : __("Save Connection", "zaplane")}
+                            </Button>
+                        }
 
-
-                        <Button
-                            width="220px"
-                            colorScheme="blue"
-                            onClick={handleConnect}
-                            isLoading={loadingOAuth}
-                            isDisabled={!selectedApp || !selectedAuthType}
-                        >
-                            {selectedAuthType === "oauth2"
-                                ? __("Connect with OAuth", "zaplane")
-                                : __("Save Connection", "zaplane")}
-                        </Button>
                     </VStack>
                 </Box>
             </WPModal>

@@ -70,12 +70,37 @@ export const mapEdgesForBackend = (edges) => {
 export const statusStyle = (status) => {
   switch (status) {
     case "completed":
-      return { color: "green.600", bg: "green.50" };
+      return {
+        color: "#16A34A",
+        bg: "#DCFCE7",
+      };
+
     case "running":
-      return { color: "blue.600", bg: "blue.50" };
+      return {
+        color: "#2563EB",
+        bg: "#DBEAFE",
+      };
+
     case "failed":
-      return { color: "red.600", bg: "red.50" };
+      return {
+        color: "#DC2626",
+        bg: "#FEE2E2",
+      };
+
     default:
-      return { color: "gray.600", bg: "gray.50" };
+      return {
+        color: "#4B5563", 
+        bg: "#F3F4F6",
+      };
   }
+};
+
+export const buildEmptyRule = (fields) => {
+  const rule = {};
+  fields.forEach(f => {
+    rule[f.key] = f.type === "select"
+      ? f.options?.[0]?.value ?? ""
+      : "";
+  });
+  return rule;
 };

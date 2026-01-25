@@ -4,15 +4,10 @@
     border: 1px solid var(--zaplane-border-color) !important;
     cursor: pointer;
     background: transparent;
-    padding: 5px 12px !important;
+    padding: 4px 8px !important;
     &:focus, &:hover {
         background: var(--zaplane-body-background);
         color: none;
-    }
-
-    svg {
-        height: 16px;
-        pointer-events: none;
     }
 
     &__lists {
@@ -112,7 +107,7 @@
         .zaplane-btn {
             &--inline {
                 padding: 0;
-                color: var(--zaplane-placing);
+                color: var(--zaplane-warn-muted);
             }
             &--trash {
                 padding: 0;

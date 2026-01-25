@@ -16,37 +16,27 @@ import CustomEdge from "../customEdge/CustomEdge";
 import ActionDrawer from "../actionDrawer/ActionDrawer";
 import { useFormikContext } from "formik";
 import TopBar from "@ZAPComponents/TopBar";
-import { FaChevronRight } from "react-icons/fa";
 import {
     Box,
     Flex,
     Button,
-    Checkbox,
-    Table,
-    Badge,
-    HStack,
     Text,
-    Tabs
 } from "@chakra-ui/react";
 import {
-    FiArrowLeft,
-    FiRefreshCw,
-    FiHelpCircle,
+    FiArrowLeft
 } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
-import { getAllVersion, getRunWorkFlow, getSingleWorkFlow, liveMonitor, updateWorkFlow, updateWorkFlowStatus, workFLowExction, workflowNodeListiner } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
+import { getAllVersion, getRunWorkFlow, getSingleWorkFlow, liveMonitor, updateWorkFlow, updateWorkFlowStatus, workFLowExction, workflowNodeListiner, workflowNodeListinerStop } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { use } from "react";
-import { showNotification } from "@ZAPRedux/Slices/notificationSlice/notificationSlice";
-import CustomNode from "../customNoe/CustomNode";
+import CustomNode from "../customNode/CustomNode";
 import ZAPDrawer from "@ZAPComponents/Drawer";
-import { getRunLive, getRunTimeline, replayWorkflowRun, stopRun } from "@ZAPRedux/Slices/executionSlice/executionSlice";
 import { LucideHistory } from "lucide-react";
 import RunsTable from "./RunsTable/RunsTable";
 import VersionHistoryTable from "./VersionHistoryTable/VersionHistoryTable";
 import { LuFullscreen, LuMinimize } from "react-icons/lu";
 import { mapEdgesForBackend, mapNodesForBackend, toggleFullscreenMode } from "../helper";
 import Select from "react-select";
+import ZAPLoading from "@ZAPComponents/Loading";
 ;
 export default function FlowCanvas({ id }) {
     const nodeIdRef = useRef(0);
@@ -79,7 +69,7 @@ export default function FlowCanvas({ id }) {
     const { data, runs, versions } = useSelector((state) => state.workflows);
     const singleData = data[0]
     const isFlowLoaded = useRef(false);
-    const GAP = 220;
+    const GAP = 250;
     const containerRef = useRef(null);
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [activeDrawer, setActiveDrawer] = useState(null);
@@ -277,6 +267,9 @@ export default function FlowCanvas({ id }) {
 
     console.log(nodes, 'all nodes');
     console.log(edges, 'all edges');
+    if (loading) {
+        return <ZAPLoading/>
+    }
 
     const nodeTypes = {
         custom: (props) => (
@@ -340,7 +333,7 @@ export default function FlowCanvas({ id }) {
                             {__("Runs ", "zaplane")}
                         </Button>
                         <Button size="sm" variant="outline"
-                            onClick={() => dispatch(workflowNodeListiner(id))}>
+                            onClick={() => dispatch(workflowNodeListinerStop(id))}>
                             {__("Stop", "zaplane")}
                         </Button>
                     </>
@@ -380,7 +373,7 @@ export default function FlowCanvas({ id }) {
                                         const paylod = {
                                             workflow_hash: singleData?.version?.hash,
                                         }
-                                      
+
                                         dispatch(workFLowExction(paylod))
                                     }}>
                                     {__("🔄 Replay ", "zaplane")}
@@ -429,8 +422,8 @@ export default function FlowCanvas({ id }) {
                         <Button
                             size="sm"
                             bg="black"
-                            color="white"
-                            _hover={{ bg: "gray.800" }}
+                            color="var(--zaplane-background)"
+                            _hover={{ bg: "" }}
                             onClick={() => onSubmitHandler()}
                         >
                             {__("Update", "zaplane")}

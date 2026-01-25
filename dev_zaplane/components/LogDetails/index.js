@@ -5,42 +5,37 @@ import {
   HStack,
   Text,
   VStack,
+
 } from "@chakra-ui/react";
 import { __ } from "@wordpress/i18n";
-import { useSelector } from "react-redux";
+import ZAPLoading from "@ZAPComponents/Loading";
 
+import { useSelector } from "react-redux";
 const LogDetails = ({ runId, onBack }) => {
-  const { nodeDetails = [] } = useSelector(
+  const { nodeDetails = [], isloading } = useSelector(
     (state) => state.workflows
   );
+  if (isloading) {
+    return <ZAPLoading />;
+  }
 
   return (
     <Box>
-      <Text
-        mb="4"
-        cursor="pointer"
-        color="blue.500"
-        onClick={onBack}
-      >
-        {__('← Back to Runs', 'zaplane')}
-      </Text>
+      <Text mb="4" fontWeight="bold"
+        className="zaplane-label">
 
-      <Text mb="4" fontWeight="bold">
-        
         {__(`Run ID: ${runId}`, 'zaplane')}
       </Text>
-
       <Accordion.Root collapsible>
         {nodeDetails?.nodes?.map((log) => {
           const input = JSON.parse(log.input_json || "{}");
           const output = JSON.parse(log.output_json || "{}");
-
           return (
             <Accordion.Item key={log.id} value={log.id}>
               <Accordion.ItemTrigger>
                 <HStack flex="1" justify="space-between">
                   <HStack>
-                    <Text fontWeight="medium">
+                    <Text fontWeight="medium" className="zaplane-label">
                       {__(`Node ${log.node_key}`, 'zaplane')}
                     </Text>
                     <Badge>
@@ -49,15 +44,16 @@ const LogDetails = ({ runId, onBack }) => {
                   </HStack>
 
                   <Badge
-                    colorScheme={
+                    colorPalette={
                       log.status === "completed"
                         ? "green"
                         : log.status === "failed"
-                        ? "red"
-                        : "blue"
+                          ? "red"
+                          : "blue"
+
                     }
                   >
-                    {log.status}
+                    {__(log.status, 'zaplane')}
                   </Badge>
                 </HStack>
                 <Accordion.ItemIndicator />
@@ -68,12 +64,11 @@ const LogDetails = ({ runId, onBack }) => {
                   <VStack spacing="4" align="stretch">
                     <Box
                       p="3"
-                      border="1px solid"
-                      borderColor="gray.200"
+                      border="1px solid var(--zaplane-border-color)"
                       borderRadius="md"
-                      bg="gray.50"
+                      bg="var(--zaplane-gray)"
                     >
-                      <Text fontWeight="bold" mb="2">
+                      <Text className="zaplane-label" fontWeight="bold" mb="2">
                         {__('Input', 'zaplane')}
                       </Text>
                       <pre>{JSON.stringify(input, null, 2)}</pre>
@@ -81,13 +76,12 @@ const LogDetails = ({ runId, onBack }) => {
 
                     <Box
                       p="3"
-                      border="1px solid"
-                      borderColor="gray.200"
+                      border="1px solid var(--zaplane-border-color)"
                       borderRadius="md"
-                      bg="gray.50"
+                      bg="var(--zaplane-gray)"
                     >
                       <Text fontWeight="bold" mb="2">
-                          {__('Output', 'zaplane')}
+                        {__('Output', 'zaplane')}
                       </Text>
                       <pre>{JSON.stringify(output, null, 2)}</pre>
                     </Box>

@@ -1,12 +1,17 @@
 import React from 'react';
-import { Button, Flex, Box, Span, Text, IconButton } from '@chakra-ui/react';
+import PropTypes from 'prop-types';
+import { Button, Flex, Text } from '@chakra-ui/react';
 import { __ } from '@wordpress/i18n';
 // import { isPlainPermalink } from '@Utils/helper';
-import ZAPLabel from '@ZAPComponents/Labels/ZAPLabel';
-import { useDispatch, useSelector } from 'react-redux';
 import './styles.scss';
-import { GoMoon } from "react-icons/go";
-import { IoSunnyOutline } from "react-icons/io5";
+import ZAPLabel from '@ZAPComponents/Labels/ZAPLabel';
+
+const propTypes = {
+	title: PropTypes.string,
+	render: PropTypes.func,
+	rightContent: PropTypes.func,
+	leftContent: PropTypes.func,
+};
 
 const TopBar = ({
 	title = '',
@@ -16,41 +21,9 @@ const TopBar = ({
 	leftContent = () => null,
 	topBarStyles = {},
 }) => {
-	// const { baseSettings } = useSelector((state) => state.settings);
-	// const { color_theme_mode } = useSelector((state) => state.localized_data);
-	// const dispatch = useDispatch();
-	// const isDark = color_theme_mode === 'dark';
-
-	// const inlineStyles =
-	// 	Object.keys(baseSettings).length > 0
-	// 		? `
-	// 	:root {
-	// 		--ecm-border-color: ${isDark ? baseSettings?.dark_border_color : baseSettings?.border_color};
-	// 		--ecm-body-background: ${isDark ? baseSettings?.dark_body_color : baseSettings?.body_color};
-	// 		--ecm-background: ${isDark ? baseSettings?.dark_background_color : baseSettings?.background_color};
-	// 		--ecm-primary: ${isDark ? baseSettings?.dark_primary_color : baseSettings?.primary_color};
-	// 		--ecm-font-color: ${isDark ? baseSettings?.dark_text_color : baseSettings?.text_color};
-	// 		--ecm-secondary: ${isDark ? baseSettings?.dark_secondary_color : baseSettings?.secondary_color};
-	// 	}
-	// `
-	// 		: '';
-
-	// const toggleTheme = () => {
-	// 	const newTheme = isDark ? 'light' : 'dark';
-	// 	dispatch(updateColorLocalize(newTheme));
-	// 	dispatch(
-	// 		updateBaseSettings({
-	// 			...baseSettings,
-	// 			color_theme_mode: newTheme,
-	// 			isShowNotification: false,
-	// 		})
-	// 	);
-	// };
-
-	const isDark = false;
+	// if (!is_admin) return null;
 	return (
 		<React.Fragment>
-			{/* <style>{inlineStyles}</style> */}
 			<Flex
 				style={topBarStyles}
 				direction={{ base: 'column', md: 'row' }}
@@ -90,36 +63,22 @@ const TopBar = ({
 
 				<Flex align="center" gap={2}>
 					{rightContent()}
-
-					{isDark ? (
-						<Button
-							as={IconButton}
-							bg="transparent"
-							borderWidth="1px"
-							borderColor="var(--zaplane-border-color)"
-							padding="5px"
-							color="var(--zaplane-font-color)"
-						// onClick={toggleTheme}
-						>
-							<IoSunnyOutline />
-						</Button>
-					) : (
-						<Button
-							as={IconButton}
-							bg="transparent"
-							borderWidth="1px"
-							borderColor="var(--zaplane-border-color)"
-							padding="5px"
-							color="var(--zaplane-font-color)"
-						// onClick={toggleTheme}
-						>
-							<GoMoon />
-						</Button>
-					)}
+					{ /* <Button
+					bg="transparent"
+					borderWidth="1px"
+					borderColor="var(--zaplane-border-color)"
+					padding="5px"
+					onClick={toggleTheme}
+				>
+					<span
+						className={`easy-content-manager-icon easy-content-manager-icon--${isDark ? 'moon' : 'sun'}`}
+					/>
+				</Button> */ }
 				</Flex>
 			</Flex>
 		</React.Fragment>
 	);
 };
 
+TopBar.propTypes = propTypes;
 export default TopBar;

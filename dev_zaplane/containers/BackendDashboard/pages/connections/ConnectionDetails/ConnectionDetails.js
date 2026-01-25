@@ -1,5 +1,4 @@
 import { Box, Flex, Badge, Spinner, Text } from "@chakra-ui/react";
-import ZAPText from "@ZAPComponents/Text";
 import WPModal from "@ZAPComponents/Modal/WPModal";
 import { __ } from "@wordpress/i18n";
 
@@ -16,72 +15,70 @@ const ConnectionDetails = ({ isOpen, onClose, singleData }) => {
         </Flex>
       ) : (
         <Box>
-          {/* Top Card */}
           <Box
             p={5}
             borderRadius="lg"
-            bg="white"
+            bg="var(--zaplane-background)"
             borderWidth="1px"
             mb={5}
             boxShadow="sm"
           >
             <Flex justify="space-between" align="center">
               <Box>
-                <ZAPText fontSize="xl" fontWeight="semibold">
-                  {singleData.name}
-                </ZAPText>
-                <ZAPText fontSize="sm" color="gray.500">
-                  {singleData.app} connection
-                </ZAPText>
+                <Text className="zaplane-label" fontSize="xl" fontWeight="semibold">
+                  {__(singleData.name, "zaplane")}
+                </Text>
+                <Text className="zaplane-label" fontSize="sm" color="gray.500">
+                  {__(singleData.app, "zaplane")}
+                </Text>
               </Box>
-
               <Badge
                 px={4}
                 py={1.5}
                 fontSize="sm"
                 borderRadius="full"
-                colorScheme={singleData.status === "active" ? "green" : "gray"}
+                colorPalette={singleData.status === "active" ? "green" : "gray"}
                 textTransform="capitalize"
               >
-                {singleData.status}
+                {__(singleData.status, "zaplane")}
               </Badge>
             </Flex>
           </Box>
           <Flex gap={4} wrap="wrap">
             <Box flex="1 1 45%" p={4} borderRadius="lg" borderWidth="1px" bg="gray.50">
-              <ZAPText fontSize="xs" color="gray.500">
-                  {__('AUTH TYPE', 'zaplane')}
-              </ZAPText>
-              <ZAPText fontSize="md" fontWeight="medium">
-                {singleData.auth_type}
-              </ZAPText>
+              <Text className="zaplane-label">
+                {__('AUTH TYPE', 'zaplane')}
+              </Text>
+              <Text className="zaplane-label" fontSize="md" fontWeight="medium">
+                {__(singleData.auth_type, 'zaplane')}
+              </Text>
             </Box>
 
             <Box flex="1 1 45%" p={4} borderRadius="lg" borderWidth="1px" bg="gray.50">
-              <ZAPText fontSize="xs" color="gray.500">
-                  {__('CREATED AT', 'zaplane')}
-              </ZAPText>
-              <ZAPText fontSize="md" fontWeight="medium">
+              <Text  className="zaplane-label">
+                {__('CREATED AT', 'zaplane')}
+              </Text>
+              <Text fontSize="md" fontWeight="medium" className="zaplane-label" >
                 {__(singleData.created_at, "zaplane")}
-              </ZAPText>
+              </Text>
             </Box>
 
             <Box flex="1 1 45%" p={4} borderRadius="lg" borderWidth="1px" bg="gray.50">
-              <ZAPText fontSize="xs" color="gray.500">
-                  {__('LAST USED', 'zaplane')}
-              </ZAPText>
-              <Text fontSize="md" fontWeight="medium">
+              <Text className="zaplane-label">
+                {__('LAST USED', 'zaplane')}
+              </Text>
+              <Text className="zaplane-label" fontSize="md" fontWeight="medium">
                 {__(singleData.last_used_at || "--", "zaplane")}
               </Text>
             </Box>
 
             <Box flex="1 1 45%" p={4} borderRadius="lg" borderWidth="1px" bg="gray.50">
-              <ZAPText fontSize="xs" color="gray.500">
+              <Text  className="zaplane-label">
                 {__('LAST TESTED', 'zaplane')}
-              </ZAPText>
-              <ZAPText fontSize="md" fontWeight="medium">
+              </Text>
+              <Text fontSize="md" fontWeight="medium" className="zaplane-label">
                 {singleData.last_tested_at || "--"}
-              </ZAPText>
+              </Text>
             </Box>
           </Flex>
         </Box>

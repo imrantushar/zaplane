@@ -1,7 +1,7 @@
 
-import { Box } from "@chakra-ui/react";
+import { Box ,Text} from "@chakra-ui/react";
+import { __ } from "@wordpress/i18n";
 import Select from "react-select";
-import ZAPText from "@ZAPComponents/Text";
 
 const ZAPSelect = ({
   label,
@@ -13,19 +13,18 @@ const ZAPSelect = ({
   mb = 0,
   placeholder,
   isClearable = false,
-  style,
+  containerStyle,
 }) => {
   return (
-    <Box mb={mb} style={style}>
-      {label && <ZAPText fontWeight="600" fontSize="0.875rem" mb="4px">{label}</ZAPText>}
-
+    <Box mb={mb} style={containerStyle}>
+      {label && <Text className="zaplane-label" fontWeight="600" fontSize="0.875rem" mb="4px">{__(label, 'zaplane')}</Text>}
       <Select
+        className="zaplane-select"
+        classNamePrefix="zaplane-select"
         options={options}
         isLoading={isLoading}
         placeholder={placeholder}
         isClearable={isClearable}
-        className="zaplane-select"
-        classNamePrefix="zaplane-select"
         value={options.find(o => o.value === value) || null}
         onMenuOpen={onMenuOpen}
         onChange={(opt) => onChange?.(opt?.value)}

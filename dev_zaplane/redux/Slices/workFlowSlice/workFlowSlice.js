@@ -18,7 +18,6 @@ export const createWorkflows = createAsyncThunk(
 	async (payload, thunkAPI) => {
 		return await API.post(namespace + 'workflows', payload)
 			.then((res) => {
-				handleSliceSuccess(thunkAPI, "data fetched successfully");
 				return res?.data;
 			})
 			.catch((err) => {
@@ -366,6 +365,7 @@ const workflowsSlice = createSlice({
 			})
 			.addCase(nodeLogsRunDetails.fulfilled, (state, action) => {
 				state.nodeDetails = action.payload;
+				state.isLoading=false
 			})
 
 

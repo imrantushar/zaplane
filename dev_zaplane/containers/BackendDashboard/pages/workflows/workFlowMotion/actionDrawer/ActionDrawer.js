@@ -5,14 +5,11 @@ import {
     Box,
     HStack,
     Input,
-    Tabs,
     Flex,
     Code
 } from "@chakra-ui/react";
 import ZAPDrawer from "@ZAPComponents/Drawer";
-import ZAPInput from "@ZAPComponents/ZAPInput";
 import ZAPSelect from "@ZAPComponents/ZAPSelect";
-import ZAPText from "@ZAPComponents/Text";
 import {
     fetchDynamic,
     workFLowSingeNodeExction
@@ -21,11 +18,11 @@ import { integrations } from "@ZAPUtils/helper";
 import { useFormikContext } from "formik";
 import { useEffect, useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
-import Select from "react-select";
 import ActionFieldRenderer from "../Components/ActionFieldRenderer/ActionFieldRenderer";
 import ZAPTab from "@ZAPComponents/Tab";
 import { IoIosArrowForward } from "react-icons/io";
 import { __ } from "@wordpress/i18n";
+import { primaryBtn } from "../../../../../../../assets/scss/chakra/recipe";
 
 const APPS = Object.entries(integrations.apps || {}).map(([key, value]) => ({
     id: value.slug || key,
@@ -236,7 +233,7 @@ export default function ActionDrawer({
                     <Button variant="ghost" onClick={resetAll}>
                         {__("Cancel", "zaplane")}
                     </Button>
-                    <Button onClick={handleContinue}>
+                    <Button {...primaryBtn} onClick={handleContinue}>
                         {step === "test" ? "Submit" : "Continue"}
                     </Button>
                 </HStack>
@@ -260,15 +257,15 @@ export default function ActionDrawer({
                                 setSelectedItem(item);
                                 setSearch("");
                             }}
-                            background="white"
+                            background="var(--zaplane-background)"
                             _hover={{
                                     bg: "var(--zaplane-body-background)",
                                 }}
                         >
-                            <ZAPText color='black'>{item.name}</ZAPText>
-                            <ZAPText fontSize="xs" color="black">
+                            <Text className="zaplane-label">   {__(item.name, "zaplane")}</Text>
+                            <Text fontSize="xs" className="zaplane-label">
                                 {item.type === "tools" ? "Tool" : "App"}
-                            </ZAPText>
+                            </Text>
                         </Button>
                     ))}
                 </VStack>
@@ -277,8 +274,8 @@ export default function ActionDrawer({
                 <VStack spacing={4}>
                     <Button
                         w="100%"
-                        background="white"
-                        color="black"
+                        background="var(--zaplane-background)"
+                        color="var(--zaplane-font-color)"
                         justifyContent="space-between"
                         transition="all 0.2s ease"
                         _hover={{
@@ -293,8 +290,8 @@ export default function ActionDrawer({
                     {(node?.data?.action !== "trigger" || source === "add") &&
                         TOOLS.map(tool => (
                             <Button
-                                background="white"
-                                color="black"
+                                background="var(--zaplane-background)"
+                                color="var(--zaplane-font-color)"
                                 key={tool.id}
                                 justifyContent="left"
                                 w="100%"
@@ -316,8 +313,8 @@ export default function ActionDrawer({
                 <VStack>
                     {LIST.map(item => (
                         <Button
-                            background="white"
-                            color="black"
+                            background="var(--zaplane-background)"
+                            color="var(--zaplane-font-color)"
                             key={item.id}
                             w="100%"
                             onClick={() => setSelectedItem(item)}
@@ -326,7 +323,7 @@ export default function ActionDrawer({
                                 bg: "var(--zaplane-body-background)",
                             }}
                         >
-                            {item.name}
+                            {__(item.name, 'zaplane')}
                         </Button>
                     ))}
                     <Button size="sm" variant="ghost" onClick={() => setMode(null)}>

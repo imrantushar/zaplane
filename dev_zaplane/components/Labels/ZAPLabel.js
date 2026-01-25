@@ -112,17 +112,17 @@ const ZAPLabel = ({
 
 	const needsSlicing = enableSlice && label && label.length > sliceLength;
 
-	const getDisplayText = () => {
-		if (!enableSlice || !needsSlicing) {
-			return label;
-		}
+	// const getDisplayText = () => {
+	// 	if (!enableSlice || !needsSlicing) {
+	// 		return label;
+	// 	}
 
-		if (isExpanded) {
-			return label;
-		}
+	// 	if (isExpanded) {
+	// 		return label;
+	// 	}
 
-		return sliceString(label, sliceLength, sliceMore);
-	};
+	// 	return sliceString(label, sliceLength, sliceMore);
+	// };
 
 	const displayText = getDisplayText();
 
