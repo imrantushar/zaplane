@@ -141,7 +141,6 @@ export default function FlowCanvas({ id }) {
         setDrawerOpen(true);
     };
     const openDrawerFromAdd = (node) => {
-        ;
         setDrawerContext({
             source: "add",
             node: node,

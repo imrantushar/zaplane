@@ -7,6 +7,7 @@ import Notification from '@ZAPComponents/Notification';
 import Logs from './pages/logs';
 import Setting from './pages/setting';
 import Connections from './pages/connections';
+import Dashboard from './pages/dashboard';
 
 
 
@@ -14,7 +15,7 @@ const renderSwitch = (page, id, action, path) => {
 
 	switch (page) {
 		case 'zaplane':
-			return <>Zaplane Dashboard</>;
+			return <Dashboard />;
 		case 'zaplane-workflows':
 			if ( action || id ) {
 				return <Workflows id={ id } />;

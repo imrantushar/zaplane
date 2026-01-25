@@ -7,7 +7,6 @@ import {
   Text,
   Button,
   Icon,
-
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import { route_path } from "@ZAPUtils/helper";

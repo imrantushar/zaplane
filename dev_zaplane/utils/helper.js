@@ -94,6 +94,15 @@ export const makeRequest = async (
 
     return data;
 };
+
+export const sliceString = ( text, length = 20, more = '...' ) => {
+	if ( ! text || text.length < length ) {
+		return text;
+	}
+
+	return text.slice( 0, length ).replace( /(^[\s]+|[\s]+$)/g, '' ) + more;
+};
+
 export const getDuration = (start, end) => {
   if (!start || !end) return "--";
 
