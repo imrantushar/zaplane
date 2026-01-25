@@ -25,7 +25,7 @@ import ZAPMenu from "@ZAPComponents/ZapMenu";
 import TopBar from "@ZAPComponents/TopBar";
 import OptionMenu from "@ZAPComponents/OptionMenu";
 import { FiEdit, FiTrash2 } from "react-icons/fi";
-import {primaryBtn } from "../../../../../assets/scss/chakra/recipe";
+import { primaryBtn } from "../../../../../assets/scss/chakra/recipe";
 import { statusOptions } from "./helper";
 
 
@@ -44,16 +44,16 @@ const CreateWorkflows = () => {
 
   const handleCreate = async () => {
     if (!workflowName.trim()) return;
-    await dispatch(
+    const res = await dispatch(
       createWorkflows({
         title: workflowName
       })
     )
-      .then((res) => {
-        navigate(
-          `${route_path}admin.php?page=zaplane-workflows&action=edit&id=${res.id}`
-        );
-      });
+    if (res?.payload.id) {
+      navigate(
+        `${route_path}admin.php?page=zaplane-workflows&action=edit&id=${res.payload.id}`
+      );
+    }
 
     setWorkflowName("");
     setIsModalOpen(false);
@@ -126,9 +126,9 @@ const CreateWorkflows = () => {
               textAlign: "center",
               render: (row) => (
                 <Text
-                onClick={()=>navigate(
-                      `${route_path}admin.php?page=zaplane-workflows&action=edit&id=${row.id}`
-                    )} fontWeight="500" className="zaplane-label"
+                  onClick={() => navigate(
+                    `${route_path}admin.php?page=zaplane-workflows&action=edit&id=${row.id}`
+                  )} fontWeight="500" className="zaplane-label"
                 >
                   {__(row.title, "zaplane")}
                 </Text>
@@ -204,7 +204,7 @@ const CreateWorkflows = () => {
                   hasBorder: false,
                 },
               ]}
-    
+
             />
           )}
           isLoading={isLoading}
@@ -225,9 +225,9 @@ const CreateWorkflows = () => {
           />
 
           <Flex justify="flex-end" mt={5}>
-            <Button 
-            variant="ghost"
-             mr={3} onClick={() => setIsModalOpen(false)}>
+            <Button
+              variant="ghost"
+              mr={3} onClick={() => setIsModalOpen(false)}>
               {__("Cancel", "zaplane")}
             </Button>
             <Button

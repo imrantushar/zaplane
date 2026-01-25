@@ -39,11 +39,10 @@ import Select from "react-select";
 import ZAPLoading from "@ZAPComponents/Loading";
 import { statusOptions } from "../../helper";
 import { createNodeIdGenerator, mapGraphFromBackend } from "./helper";
-;
+import { useFlowActions } from "../../../../../../hooks/useFlowActions";
 export default function FlowCanvas({ id }) {
     const nodeIdRef = useRef(createNodeIdGenerator());
     const getNewNodeId = nodeIdRef.current;
-
     const [nodes, setNodes, onNodesChange] = useNodesState([
         {
             id: getNewNodeId(),
@@ -64,14 +63,13 @@ export default function FlowCanvas({ id }) {
     const [loading, setLoading] = useState(false);
     const { data, runs, versions } = useSelector((state) => state.workflows);
     const singleData = data[0]
-    const GAP = 250;
     const containerRef = useRef(null);
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [activeDrawer, setActiveDrawer] = useState(null);
     useEffect(() => {
         if (!singleData?.graph) return;
-
         const { nodes, edges } = mapGraphFromBackend(singleData.graph);
+        if (nodes.length === 0) return;
         setNodes(nodes);
         setEdges(edges);
     }, [singleData?.graph]);
@@ -86,7 +84,13 @@ export default function FlowCanvas({ id }) {
         dispatch(getSingleWorkFlow(id)).finally(() => setLoading(false));
 
     }, [id]);
-
+    const {
+        updateNodeData,
+        deleteNode,
+        createActionNode,
+        openDrawerForNode,
+        openDrawerFromAdd,
+    } = useFlowActions({ nodes, setNodes, edges, setEdges, drawerContext, getNewNodeId,setDrawerContext,setDrawerOpen });
     const onSubmitHandler = async () => {
         const payload = {
             nodes: mapNodesForBackend(nodes)
@@ -106,14 +110,6 @@ export default function FlowCanvas({ id }) {
 
 
     };
-    const openDrawerForNode = (node) => {
-        setDrawerContext({
-            source: "node",
-            node,
-            edge: null,
-        });
-        setDrawerOpen(true);
-    };
     const onAddNode = (edgeId) => {
         const edge = edges.find((e) => e.id === edgeId);
         setDrawerContext({
@@ -121,14 +117,6 @@ export default function FlowCanvas({ id }) {
             node: null,
             edge,
         })
-        setDrawerOpen(true);
-    };
-    const openDrawerFromAdd = (node) => {
-        setDrawerContext({
-            source: "add",
-            node: node,
-            edge: null,
-        });
         setDrawerOpen(true);
     };
     const onConnect = useCallback(
@@ -145,107 +133,6 @@ export default function FlowCanvas({ id }) {
     const onEdgeDelete = (edgeId) => {
         setEdges((eds) => eds.filter((e) => e.id !== edgeId));
     };
-
-    const createActionNode = (actionData) => {
-        const { edge, node } = drawerContext;
-        let sourceNode = null;
-        let targetNode = null;
-        if (edge) {
-            sourceNode = nodes.find((n) => n.id === edge.source);
-            targetNode = nodes.find((n) => n.id === edge.target);
-            if (!sourceNode || !targetNode) return;
-        }
-
-        if (!edge && node) {
-            sourceNode = nodes.find((n) => n.id === node.id);
-            if (!sourceNode) return;
-        }
-        const newX = sourceNode.position.x + GAP;
-        const newY = sourceNode.position.y;
-
-        const newNodeId = getNewNodeId();
-        const newNode = {
-            id: newNodeId,
-            type: "custom",
-            position: { x: newX, y: newY },
-            data: {
-                action: "action",
-                ...actionData,
-            },
-        };
-        const updatedNodes = nodes.map((n) => {
-            if (n.position.x >= newX) {
-                return {
-                    ...n,
-                    position: {
-                        ...n.position,
-                        x: n.position.x + GAP,
-                    },
-                };
-            }
-            return n;
-        });
-
-        let newEdges = [...edges];
-
-        if (edge) {
-            newEdges = [
-                ...edges.filter((e) => e.id !== edge.id),
-                {
-                    id: `e${edge.source}-${newNodeId}`,
-                    source: edge.source,
-                    target: newNodeId,
-                    type: "custom",
-                },
-                {
-                    id: `e${newNodeId}-${edge.target}`,
-                    source: newNodeId,
-                    target: edge.target,
-                    type: "custom",
-                },
-            ];
-        } else {
-            newEdges = [
-                ...edges,
-                {
-                    id: `e${sourceNode.id}-${newNodeId}`,
-                    source: sourceNode.id,
-                    target: newNodeId,
-                    type: "custom",
-                },
-            ];
-        }
-
-        setNodes([...updatedNodes, newNode]);
-        setEdges(newEdges);
-    };
-
-    const updateNodeData = (updatedData) => {
-        setNodes((nds) =>
-            nds.map((n) => {
-                if (n.id === drawerContext.node?.id) {
-                    return {
-                        ...n,
-                        data: {
-                            ...n.data,
-                            ...updatedData,
-                        },
-                    };
-                }
-                return n;
-            })
-        );
-    };
-    const deleteNode = useCallback((nodeId) => {
-        setNodes((nds) => nds.filter((n) => n.id !== nodeId));
-
-        setEdges((eds) =>
-            eds.filter(
-                (e) => e.source !== nodeId && e.target !== nodeId
-            )
-        );
-    }, []);
-
     console.log(nodes, 'all nodes');
     console.log(edges, 'all edges');
     if (loading) {
