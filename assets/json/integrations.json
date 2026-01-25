@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-01-21 06:55:23",
+    "generated_at": "2026-01-22 11:26:35",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -2909,6 +2909,40 @@
                 "update_order": {
                     "key": "update_order",
                     "label": "Update Order",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
+        },
+        "academy": {
+            "slug": "academy",
+            "name": "Academy",
+            "icon": "",
+            "category": "app",
+            "triggers": {
+                "user_enroll_course": {
+                    "key": "user_enroll_course",
+                    "label": "User enrolled in a course",
+                    "hook": "academy/course/after_enroll",
+                    "schema": [
+                        {
+                            "key": "course_id",
+                            "label": "Course ID",
+                            "type": "number",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": {
+                "create_post": {
+                    "key": "create_post",
+                    "label": "Create Post",
                     "schema": [],
                     "outputs": [
                         "main"
