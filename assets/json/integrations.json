@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-01-22 13:17:28",
+    "generated_at": "2026-01-25 09:09:58",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -3063,6 +3063,15 @@
                         "main"
                     ]
                 },
+                "payment_refunded": {
+                    "key": "payment_refunded",
+                    "label": "Payment Refunded",
+                    "hook": "storeengine/subscription/payment_refunded",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
                 "order_status_on_hold": {
                     "key": "order_status_on_hold",
                     "label": "Order Status Set To On Hold",
@@ -3121,6 +3130,60 @@
                     "key": "order_status_trash",
                     "label": "Order Status Set To Trash",
                     "hook": "storeengine/order_status_trash",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "payment_complete": {
+                    "key": "payment_complete",
+                    "label": "Completed Payment",
+                    "hook": "storeengine/payment_complete",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "payment_processing": {
+                    "key": "payment_processing",
+                    "label": "Processing Payment",
+                    "hook": "storeengine/payment_processing",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "payment_pending": {
+                    "key": "payment_pending",
+                    "label": "Pending Payment",
+                    "hook": "storeengine/payment_pending",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "payment_confirmed": {
+                    "key": "payment_confirmed",
+                    "label": "Pending Payment",
+                    "hook": "storeengine/payment_confirmed",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "customer_created": {
+                    "key": "customer_created",
+                    "label": "Customer Created",
+                    "hook": "storeengine/checkout/customer_created",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_customer": {
+                    "key": "update_customer",
+                    "label": "Customer Updated",
+                    "hook": "storeengine/stripe/update_customer",
                     "schema": [],
                     "outputs": [
                         "main"
