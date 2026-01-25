@@ -19,12 +19,12 @@ const RecentLogs = ({ data }) => {
                     {
                         label: "CREATED AT",
                         key: "started_at",
-                        render: (row) => {
-                            sprintf(
-                                __('Start: %s', 'zapplane'),
-                                row.started_at || __('--', 'zapplane')
-                            )
-                        },
+                        render: (row) => (
+                            <Text fontSize="sm">{sprintf(
+                                __('%s', 'zapplane'),
+                                row.started_at
+                            )}</Text>
+                        ),
                     },
                     {
                         label: "DURATION / SIZE",

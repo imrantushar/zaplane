@@ -2325,9 +2325,10 @@ const RecentLogs = ({
       columns: [{
         label: "CREATED AT",
         key: "started_at",
-        render: row => {
-          (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.sprintf)((0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Start: %s', 'zapplane'), row.started_at || (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('--', 'zapplane'));
-        }
+        render: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
+          fontSize: "sm",
+          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.sprintf)((0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('%s', 'zapplane'), row.started_at)
+        })
       }, {
         label: "DURATION / SIZE",
         key: "duration",
