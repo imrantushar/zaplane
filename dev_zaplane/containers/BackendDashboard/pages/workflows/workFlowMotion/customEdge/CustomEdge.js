@@ -4,7 +4,7 @@ import { FaTimes, FaPlus } from "react-icons/fa";
 import { HStack, Icon } from "@chakra-ui/react";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import { IoAddSharp } from "react-icons/io5";
-import "./style.scss";
+import "./styles.scss";
 
 
 const CustomEdge = ({
