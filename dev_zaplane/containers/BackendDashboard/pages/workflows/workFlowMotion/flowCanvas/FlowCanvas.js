@@ -2,18 +2,16 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
     ReactFlow,
     addEdge,
-    useNodesState,
-    useEdgesState,
     Controls,
     Background,
-    useReactFlow,
+    Panel,
 } from "@xyflow/react";
 import "@xyflow/react/dist/base.css";
 import { __ } from '@wordpress/i18n';
 
 
-import CustomEdge from "../customEdge/CustomEdge";
-import ActionDrawer from "../actionDrawer/ActionDrawer";
+import CustomEdge from "../CustomEdge/CustomEdge";
+import ActionDrawer from "../ActionDrawer/ActionDrawer";
 import { useFormikContext } from "formik";
 import TopBar from "@ZAPComponents/TopBar";
 import {
@@ -26,71 +24,41 @@ import {
     FiArrowLeft
 } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
-import { getAllVersion, getRunWorkFlow, getSingleWorkFlow, liveMonitor, updateWorkFlow, updateWorkFlowStatus, workFLowExction, workflowNodeListiner, workflowNodeListinerStop } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
+import { getAllVersion, getRunWorkFlow, getSingleWorkFlow, workFLowExction, workflowNodeListiner, workflowNodeListinerStop } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
 import { useDispatch, useSelector } from "react-redux";
-import CustomNode from "../customNode/CustomNode";
 import ZAPDrawer from "@ZAPComponents/Drawer";
 import { LucideHistory } from "lucide-react";
 import RunsTable from "./RunsTable/RunsTable";
 import VersionHistoryTable from "./VersionHistoryTable/VersionHistoryTable";
 import { LuFullscreen, LuMinimize } from "react-icons/lu";
-import { mapEdgesForBackend, mapNodesForBackend, toggleFullscreenMode } from "../helper";
+import { toggleFullscreenMode } from "../helper";
 import Select from "react-select";
 import ZAPLoading from "@ZAPComponents/Loading";
-;
-export default function FlowCanvas({ id }) {
-    const nodeIdRef = useRef(0);
-    const getNewNodeId = () => {
-        nodeIdRef.current += 1;
-        return `${nodeIdRef.current}`;
-    };
-    const [nodes, setNodes, onNodesChange] = useNodesState([
-        {
-            id: getNewNodeId(),
-            type: 'custom',
-            data: {
-                app: "Select an app",
-                action: 'trigger',
-                config: {}
-            },
-            position: { x: 125, y: 300 },
-        }
-    ]);
+import { statusOptions } from "../../helper";
+import { mapGraphFromBackend } from "./helper";
+import { useFlowActions } from "../../../../../../hooks/useFlowActions";
+import CustomNode from "../customNode/CustomNode";
+import { primaryBtn } from "../../../../../../../assets/scss/chakra/recipe";
+
+export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdgesChange, onNodesChange, getNewNodeId, singleData }) {
     const dispatch = useDispatch();
     const navigate = useNavigate()
-    const [edges, setEdges, onEdgesChange] = useEdgesState([]);
     const [drawerOpen, setDrawerOpen] = useState(false);
-    const [selectedNode, setSelectedNode] = useState(null);
-    const [activeEdgeId, setActiveEdgeId] = useState(null);
-    const [selectedApp, setSelectedApp] = useState(null);
-    const [selectedEvent, setSelectedEvent] = useState(null);
-    const { values, setFieldValue } = useFormikContext()
+    const { values, setFieldValue, handleSubmit, dirty, isSubmitting } = useFormikContext()
     const [loading, setLoading] = useState(false);
-    const { data, runs, versions } = useSelector((state) => state.workflows);
-    const singleData = data[0]
-    const isFlowLoaded = useRef(false);
-    const GAP = 250;
+    const { runs, versions } = useSelector((state) => state.workflows);
     const containerRef = useRef(null);
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [activeDrawer, setActiveDrawer] = useState(null);
-    useEffect(() => {
-        if (!singleData?.graph?.nodes?.length) return;
-        const mappedNodes = (singleData.graph.nodes || []).map((node) => ({
-            ...node,
-            type: "custom",
-            data: {
-                ...node.data,
-                action: node.type,
-            },
-        }));
 
-        const mappedEdges = (singleData.graph.edges || []).map((edge) => ({
-            ...edge,
-            type: "custom",
-        }));
-        setNodes(mappedNodes);
-        setEdges(mappedEdges);
+    useEffect(() => {
+        if (!singleData?.graph) return;
+        const { nodes, edges } = mapGraphFromBackend(singleData.graph);
+        if (nodes.length === 0) return;
+        setNodes(nodes);
+        setEdges(edges);
     }, [singleData?.graph]);
+
     const [drawerContext, setDrawerContext] = useState({
         source: null,
         node: null,
@@ -101,51 +69,21 @@ export default function FlowCanvas({ id }) {
         dispatch(getSingleWorkFlow(id)).finally(() => setLoading(false));
 
     }, [id]);
+    const {
+        updateNodeData,
+        deleteNode,
+        createActionNode,
+        openDrawerForNode,
+        openDrawerFromAdd,
+    } = useFlowActions({ nodes, setNodes, edges, setEdges, drawerContext, getNewNodeId, setDrawerContext, setDrawerOpen });
 
-    const onSubmitHandler = async () => {
-        const payload = {
-            nodes: mapNodesForBackend(nodes)
-            , edges: mapEdgesForBackend(edges),
-        }
-        const statusPaylod = {
-            status: values?.status,
-            id: id,
-        }
-        if (values.status && values.status !== singleData?.workflow.status) {
-            await dispatch(updateWorkFlowStatus(statusPaylod));
-        }
-        await dispatch(
-            updateWorkFlow({ id, payload })
-        );
-
-
-
-    };
-    const { screenToFlowPosition } = useReactFlow();
-    const openDrawerForNode = (node) => {
-        setDrawerContext({
-            source: "node",
-            node,
-            edge: null,
-        });
-        setDrawerOpen(true);
-    };
     const onAddNode = (edgeId) => {
-        setActiveEdgeId(edgeId);
         const edge = edges.find((e) => e.id === edgeId);
         setDrawerContext({
             source: "edge",
             node: null,
             edge,
         })
-        setDrawerOpen(true);
-    };
-    const openDrawerFromAdd = (node) => {
-        setDrawerContext({
-            source: "add",
-            node: node,
-            edge: null,
-        });
         setDrawerOpen(true);
     };
     const onConnect = useCallback(
@@ -162,112 +100,10 @@ export default function FlowCanvas({ id }) {
     const onEdgeDelete = (edgeId) => {
         setEdges((eds) => eds.filter((e) => e.id !== edgeId));
     };
-
-    const createActionNode = (actionData) => {
-        const { edge, node } = drawerContext;
-        let sourceNode = null;
-        let targetNode = null;
-        if (edge) {
-            sourceNode = nodes.find((n) => n.id === edge.source);
-            targetNode = nodes.find((n) => n.id === edge.target);
-            if (!sourceNode || !targetNode) return;
-        }
-
-        if (!edge && node) {
-            sourceNode = nodes.find((n) => n.id === node.id);
-            if (!sourceNode) return;
-        }
-        const newX = sourceNode.position.x + GAP;
-        const newY = sourceNode.position.y;
-
-        const newNodeId = getNewNodeId();
-        const newNode = {
-            id: newNodeId,
-            type: "custom",
-            position: { x: newX, y: newY },
-            data: {
-                action: "action",
-                // order: nodes.length + 1,
-                ...actionData,
-            },
-        };
-        const updatedNodes = nodes.map((n) => {
-            if (n.position.x >= newX) {
-                return {
-                    ...n,
-                    position: {
-                        ...n.position,
-                        x: n.position.x + GAP,
-                    },
-                };
-            }
-            return n;
-        });
-
-        let newEdges = [...edges];
-
-        if (edge) {
-            newEdges = [
-                ...edges.filter((e) => e.id !== edge.id),
-                {
-                    id: `e${edge.source}-${newNodeId}`,
-                    source: edge.source,
-                    target: newNodeId,
-                    type: "custom",
-                },
-                {
-                    id: `e${newNodeId}-${edge.target}`,
-                    source: newNodeId,
-                    target: edge.target,
-                    type: "custom",
-                },
-            ];
-        } else {
-            newEdges = [
-                ...edges,
-                {
-                    id: `e${sourceNode.id}-${newNodeId}`,
-                    source: sourceNode.id,
-                    target: newNodeId,
-                    type: "custom",
-                },
-            ];
-        }
-
-        setNodes([...updatedNodes, newNode]);
-        setEdges(newEdges);
-    };
-
-    const updateNodeData = (updatedData) => {
-        setNodes((nds) =>
-            nds.map((n) => {
-                if (n.id === drawerContext.node?.id) {
-                    return {
-                        ...n,
-                        data: {
-                            ...n.data,
-                            ...updatedData,
-                        },
-                    };
-                }
-                return n;
-            })
-        );
-    };
-    const deleteNode = useCallback((nodeId) => {
-        setNodes((nds) => nds.filter((n) => n.id !== nodeId));
-
-        setEdges((eds) =>
-            eds.filter(
-                (e) => e.source !== nodeId && e.target !== nodeId
-            )
-        );
-    }, []);
-
     console.log(nodes, 'all nodes');
     console.log(edges, 'all edges');
     if (loading) {
-        return <ZAPLoading/>
+        return <ZAPLoading />
     }
 
     const nodeTypes = {
@@ -301,21 +137,14 @@ export default function FlowCanvas({ id }) {
 
     //     return () => clearInterval(interval);
     // }, []);
-    const statusOptions = [
-        { value: "active", label: "Active" },
-        { value: "paused", label: "Paused" },
-        { value: "draft", label: "draft" },
-    ];
     return (
-        <div
+        <Box
             ref={containerRef}
             className="zaplane_flowcanvas"
-            style={{
-                flex: 1, height: "100vh",
-                marginRight: activeDrawer ? "497px" : "0px",
-                transition: "margin-right 0.4s ease",
-
-            }}
+            flex="1"
+            height="100vh"
+            marginRight={activeDrawer ? "497px" : "0px"}
+            transition="margin-right 0.4s ease"
         >
 
             <TopBar
@@ -347,7 +176,7 @@ export default function FlowCanvas({ id }) {
                             {isFullscreen ? <LuMinimize /> : <LuFullscreen />}
                         </Button>
                         <ZAPDrawer
-                            title="Log History"
+                            title={__("Log History", "Zaplane")}
                             size="md"
                             open={activeDrawer === "logs"}
                             onClose={() => setActiveDrawer(null)}
@@ -385,7 +214,7 @@ export default function FlowCanvas({ id }) {
 
                         </ZAPDrawer>
                         <ZAPDrawer
-                            title="Version History "
+                            title={__("Version History", 'zaplane')}
                             open={activeDrawer === "history"}
                             onClose={() => setActiveDrawer(null)}
                             trigger={
@@ -419,20 +248,17 @@ export default function FlowCanvas({ id }) {
                             placeholder="Select status"
                         />
                         <Button
+                            {...primaryBtn}
                             size="sm"
-                            bg="black"
-                            color="var(--zaplane-background)"
-                            _hover={{ bg: "" }}
-                            onClick={() => onSubmitHandler()}
+                            onClick={handleSubmit}
+                            disabled={!dirty || isSubmitting}
                         >
                             {__("Update", "zaplane")}
                         </Button>
+
                     </>
                 )}
             />
-            <Box>
-
-            </Box>
             <ReactFlow
                 nodes={nodes}
                 edges={edges}
@@ -459,16 +285,15 @@ export default function FlowCanvas({ id }) {
                 open={drawerOpen}
                 onClose={() => {
                     setDrawerOpen(false)
-                    setActiveEdgeId(null);
                     setDrawerContext({ source: null, node: null, edge: null });
                 }}
-                setSelectedNode={setSelectedNode}
                 context={drawerContext}
                 createActionNode={createActionNode}
                 updateNodeData={updateNodeData}
                 singleData={singleData}
 
             />
-        </div>
+
+        </Box>
     );
 }

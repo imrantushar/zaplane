@@ -10,6 +10,7 @@ import {
     ResponsiveContainer,
 } from "recharts";
 import { __ } from "@wordpress/i18n";
+import './styles.scss'
 
 
 const TotalExecutions = ({ data = [] }) => {

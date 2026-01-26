@@ -8,7 +8,7 @@ import {
 import { Box, HStack, Icon, Text } from "@chakra-ui/react";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import { FaRegCopy } from "react-icons/fa";
-import FloatingEdge from "../floatingEdge/FloatingEdge";
+import FloatingEdge from "../FloatingEdge/FloatingEdge";
 import { __ } from "@wordpress/i18n";
 export default function CustomNode({ id, data, xPos, yPos }) {
   const [hovered, setHovered] = useState(false);

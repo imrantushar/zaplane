@@ -1,7 +1,7 @@
 import React from "react";
 import { Menu } from "@chakra-ui/react"
 import { Button, Portal } from "@chakra-ui/react";
-import { __ } from "@wordpress/i18n";
+import { __, sprintf } from "@wordpress/i18n";
 import { primaryBtn } from "../../../assets/scss/chakra/recipe";
 
 const ZAPMenu = ({ triggerLabel, items = [] }) => {
@@ -20,7 +20,7 @@ const ZAPMenu = ({ triggerLabel, items = [] }) => {
                 onClick={item.onClick}
                 cursor="pointer"
               >
-                {__(item.label, "zaplane")}
+                {sprintf(__('%s', 'zaplane'), item.label)}
               </Menu.Item>
             ))}
           </Menu.Content>
