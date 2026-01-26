@@ -1,7 +1,16 @@
 .zaplane-canvas-controls{
 gap: 5px;
+margin-top: 50px;
+}
 .react-flow__controls-button{
     background: var(--zaplane-background);
     border-radius: 5px;
 }
+.zaplane-canvas-layout-icon{
+    width: 60px;
+    margin: 10px 0 10px 15px;
+    gap: 5px;
+    cursor: pointer;
+    position: absolute;
+    z-index: 999;
 }

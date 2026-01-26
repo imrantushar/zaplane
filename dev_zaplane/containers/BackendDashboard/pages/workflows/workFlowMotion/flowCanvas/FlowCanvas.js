@@ -5,6 +5,7 @@ import {
     Controls,
     Background,
     Panel,
+    ControlButton,
 } from "@xyflow/react";
 import "@xyflow/react/dist/base.css";
 import { __ } from '@wordpress/i18n';
@@ -30,7 +31,7 @@ import ZAPDrawer from "@ZAPComponents/Drawer";
 import { LucideHistory } from "lucide-react";
 import RunsTable from "./RunsTable/RunsTable";
 import VersionHistoryTable from "./VersionHistoryTable/VersionHistoryTable";
-import { LuFullscreen, LuMinimize } from "react-icons/lu";
+import { LuArrowDownUp, LuArrowLeftRight, LuFullscreen, LuMinimize } from "react-icons/lu";
 import { toggleFullscreenMode } from "../helper";
 import Select from "react-select";
 import ZAPLoading from "@ZAPComponents/Loading";
@@ -39,7 +40,10 @@ import { mapGraphFromBackend } from "./helper";
 import { useFlowActions } from "../../../../../../hooks/useFlowActions";
 import CustomNode from "../customNode/CustomNode";
 import { primaryBtn } from "../../../../../../../assets/scss/chakra/recipe";
+import { getLayoutedElements } from "./dagreLayout";
+
 import './styles.scss'
+import { IoSwapHorizontal, IoSwapVerticalOutline } from "react-icons/io5";
 
 export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdgesChange, onNodesChange, getNewNodeId, singleData }) {
     const dispatch = useDispatch();
@@ -101,12 +105,19 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
     const onEdgeDelete = (edgeId) => {
         setEdges((eds) => eds.filter((e) => e.id !== edgeId));
     };
+    const onLayout = useCallback(
+        (direction) => {
+            const { nodes: layoutedNodes, edges: layoutedEdges } =
+                getLayoutedElements(nodes, edges, direction);
+
+            setNodes(layoutedNodes);
+            setEdges(layoutedEdges);
+        },
+        [nodes, edges]
+    );
+
     console.log(nodes, 'all nodes');
     console.log(edges, 'all edges');
-    if (loading) {
-        return <ZAPLoading />
-    }
-
     const nodeTypes = {
         custom: (props) => (
             <CustomNode
@@ -137,7 +148,7 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
     //     }, 5000);
 
     //     return () => clearInterval(interval);
-    // }, []);
+    // }, []);  
     return (
         <Box
             ref={containerRef}
@@ -263,30 +274,51 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
                     </>
                 )}
             />
-            <ReactFlow
-                nodes={nodes}
-                edges={edges}
-                nodeTypes={nodeTypes}
-                edgeTypes={edgeTypes}
-                isValidConnection={isValidConnection}
-                onNodesChange={onNodesChange}
-                onEdgesChange={onEdgesChange}
-                onConnect={onConnect}
-                // fitView
-                // fitViewOnInit
-                panOnDrag
-                zoomOnScroll
-                zoomOnDoubleClick
-                nodesDraggable
-                nodesConnectable
-                elementsSelectable
-                minZoom={0.5}
-            >
-                <Background />
-                <Controls position='top-cente'
-                    className="zaplane-canvas-controls"
-                />
-            </ReactFlow>
+            {
+                loading ? <ZAPLoading /> : <ReactFlow
+                    nodes={nodes}
+                    edges={edges}
+                    nodeTypes={nodeTypes}
+                    edgeTypes={edgeTypes}
+                    isValidConnection={isValidConnection}
+                    onNodesChange={onNodesChange}
+                    onEdgesChange={onEdgesChange}
+                    onConnect={onConnect}
+                    fitView
+                    // fitViewOnInit
+                    panOnDrag
+                    zoomOnScroll
+                    zoomOnDoubleClick
+                    nodesDraggable
+                    nodesConnectable
+                    elementsSelectable
+                    minZoom={0.5}
+                >
+
+                    <Background />
+                    <Flex className="zaplane-canvas-layout-icon">
+                         <ControlButton
+                            onClick={() => onLayout("TB")}
+                            title="Vertical layout"
+                            className="zaplane-control-btn"
+                        >
+                            <IoSwapVerticalOutline size={16} />
+                        </ControlButton>
+                        <ControlButton
+                            onClick={() => onLayout("LR")}
+                            title="Horizontal layout"
+                            className="zaplane-control-btn"
+                        >
+                            <IoSwapHorizontal size={16} />
+                        </ControlButton>
+                       </Flex>
+                   <Controls
+                        position="top-left"
+                        className="zaplane-canvas-controls"
+                    />
+                </ReactFlow>
+            }
+
             <ActionDrawer
                 open={drawerOpen}
                 onClose={() => {
