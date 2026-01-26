@@ -6,7 +6,7 @@ import { mapEdgesForBackend, mapNodesForBackend } from "./helper";
 import { useDispatch } from "react-redux";
 import { updateWorkFlow, updateWorkFlowStatus } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
 import { createNodeIdGenerator } from "./flowCanvas/helper";
-import { Box } from "@chakra-ui/react";
+import { Box, Flex } from "@chakra-ui/react";
 
 export default function Workflows({ id }) {
   const nodeIdRef = useRef(createNodeIdGenerator());
@@ -43,22 +43,23 @@ export default function Workflows({ id }) {
   };
   return (
     <ReactFlowProvider>
-      <div style={{ display: "flex", height: "100vh" }}>
+      <Flex hight='100vh'>
         <Formik
           initialValues={
             {
             }}
           onSubmit={onSubmitHandler}
         >
-          <Form style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+          {({}) => (
             <Box flex="1" >
               <FlowCanvas setNodes={setNodes} setEdges={setEdges} onEdgesChange={onEdgesChange}
                 onNodesChange={onNodesChange} nodes={nodes} edges={edges} getNewNodeId={getNewNodeId} id={id} />
             </Box>
-          </Form>
+          )}
+
         </Formik>
 
-      </div>
+      </Flex>
     </ReactFlowProvider>
   );
 }

@@ -3226,13 +3226,16 @@ function ActionDrawer({
   } = (0,_hooks_useActionDrawer_useActionDrawer__WEBPACK_IMPORTED_MODULE_19__.useActionDrawer)(open, node, source, setFieldValue, isTrigger);
 
   // Auto-set actionType if only one tool action
+
   (0,react__WEBPACK_IMPORTED_MODULE_12__.useEffect)(() => {
     if (mode !== "tools" || !selectedItem) return;
     const tool = _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_10__.integrations.tools?.[selectedItem.id];
     const actions = Object.values(tool?.actions || {});
     if (actions.length === 1) setFieldValue("actionType", actions[0].key);
   }, [mode, selectedItem, setFieldValue]);
+
   //Generate action options for the selected item
+
   const actionOptions = (0,react__WEBPACK_IMPORTED_MODULE_12__.useMemo)(() => {
     const integration = (0,_helper__WEBPACK_IMPORTED_MODULE_21__.getIntegration)(mode, selectedItem);
     if (!integration) return [];
@@ -3242,7 +3245,9 @@ function ActionDrawer({
       value: i.key
     }));
   }, [mode, selectedItem, isTrigger]);
+
   //Get schema fields for the selected action
+
   const selectedActionFields = (0,react__WEBPACK_IMPORTED_MODULE_12__.useMemo)(() => {
     const integration = (0,_helper__WEBPACK_IMPORTED_MODULE_21__.getIntegration)(mode, selectedItem);
     if (!integration || !values?.actionType) return [];
@@ -3251,7 +3256,9 @@ function ActionDrawer({
     return integration.actions?.[values.actionType]?.schema || [];
   }, [mode, selectedItem, values?.actionType, isTrigger]);
   const getKey = field => `${mode}:${selectedItem?.id}:${field.key}`;
+
   //Generate dynamic keys and fetch dynamic options
+
   const fetchDynamicOptions = async field => {
     if (!field.dynamic) return;
     const key = getKey(field);
@@ -3833,9 +3840,92 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ },
 
-/***/ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/CustomNode/CustomNode.js"
+/***/ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/FloatingEdge/FloatingEdge.js"
+/*!*************************************************************************************************************!*\
+  !*** ./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/FloatingEdge/FloatingEdge.js ***!
+  \*************************************************************************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _xyflow_react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @xyflow/react */ "./node_modules/@xyflow/system/dist/esm/index.js");
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/box/index.js");
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/center/center.js");
+/* harmony import */ var react_icons_fa__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! react-icons/fa */ "./node_modules/react-icons/fa/index.mjs");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__);
+
+
+
+
+const FloatingEdge = ({
+  sourceX,
+  sourceY,
+  openDrawerFromAdd
+}) => {
+  const targetX = sourceX + 140;
+  const targetY = sourceY;
+  const [edgePath] = (0,_xyflow_react__WEBPACK_IMPORTED_MODULE_0__.getBezierPath)({
+    sourceX,
+    sourceY,
+    targetX,
+    targetY,
+    sourcePosition: "right",
+    targetPosition: "left"
+  });
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.Fragment, {
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("path", {
+      d: edgePath,
+      fill: "none",
+      stroke: "#bdbdbd",
+      strokeWidth: 2,
+      strokeDasharray: "6 6"
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("foreignObject", {
+      width: 32,
+      height: 32,
+      x: targetX - 16,
+      y: targetY - 16,
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Center, {
+        as: "button",
+        onClick: openDrawerFromAdd,
+        w: "32px",
+        h: "32px",
+        borderRadius: "full",
+        border: "2px dashed var(--zaplane-border-color)",
+        cursor: "pointer",
+        position: "absolute",
+        top: "6px",
+        right: "-80px",
+        _hover: {
+          borderColor: "var(--zaplane-primary-color)",
+          bg: "var(--zaplane-background)"
+        },
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Box, {
+          as: react_icons_fa__WEBPACK_IMPORTED_MODULE_3__.FaPlus,
+          fontSize: "12px",
+          color: "var(--zaplane-primary-color)"
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Box, {
+          as: "span",
+          left: "-45px",
+          border: "2px dashed var(--zaplane-border-color)",
+          top: "13px",
+          width: "42px",
+          position: "absolute"
+        })]
+      })
+    })]
+  });
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (FloatingEdge);
+
+/***/ },
+
+/***/ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/customNode/CustomNode.js"
 /*!*********************************************************************************************************!*\
-  !*** ./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/CustomNode/CustomNode.js ***!
+  !*** ./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/customNode/CustomNode.js ***!
   \*********************************************************************************************************/
 (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
@@ -3979,89 +4069,6 @@ function CustomNode({
 
 /***/ },
 
-/***/ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/FloatingEdge/FloatingEdge.js"
-/*!*************************************************************************************************************!*\
-  !*** ./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/FloatingEdge/FloatingEdge.js ***!
-  \*************************************************************************************************************/
-(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony import */ var _xyflow_react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @xyflow/react */ "./node_modules/@xyflow/system/dist/esm/index.js");
-/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/box/index.js");
-/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/center/center.js");
-/* harmony import */ var react_icons_fa__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! react-icons/fa */ "./node_modules/react-icons/fa/index.mjs");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__);
-
-
-
-
-const FloatingEdge = ({
-  sourceX,
-  sourceY,
-  openDrawerFromAdd
-}) => {
-  const targetX = sourceX + 140;
-  const targetY = sourceY;
-  const [edgePath] = (0,_xyflow_react__WEBPACK_IMPORTED_MODULE_0__.getBezierPath)({
-    sourceX,
-    sourceY,
-    targetX,
-    targetY,
-    sourcePosition: "right",
-    targetPosition: "left"
-  });
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.Fragment, {
-    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("path", {
-      d: edgePath,
-      fill: "none",
-      stroke: "#bdbdbd",
-      strokeWidth: 2,
-      strokeDasharray: "6 6"
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("foreignObject", {
-      width: 32,
-      height: 32,
-      x: targetX - 16,
-      y: targetY - 16,
-      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Center, {
-        as: "button",
-        onClick: openDrawerFromAdd,
-        w: "32px",
-        h: "32px",
-        borderRadius: "full",
-        border: "2px dashed var(--zaplane-border-color)",
-        cursor: "pointer",
-        position: "absolute",
-        top: "6px",
-        right: "-80px",
-        _hover: {
-          borderColor: "var(--zaplane-primary-color)",
-          bg: "var(--zaplane-background)"
-        },
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Box, {
-          as: react_icons_fa__WEBPACK_IMPORTED_MODULE_3__.FaPlus,
-          fontSize: "12px",
-          color: "var(--zaplane-primary-color)"
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Box, {
-          as: "span",
-          left: "-45px",
-          border: "2px dashed var(--zaplane-border-color)",
-          top: "13px",
-          width: "42px",
-          position: "absolute"
-        })]
-      })
-    })]
-  });
-};
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (FloatingEdge);
-
-/***/ },
-
 /***/ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/FlowCanvas.js"
 /*!*********************************************************************************************************!*\
   !*** ./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/FlowCanvas.js ***!
@@ -4092,18 +4099,18 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react_router_dom__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! react-router-dom */ "./node_modules/react-router/dist/index.js");
 /* harmony import */ var _ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! @ZAPRedux/Slices/workFlowSlice/workFlowSlice */ "./dev_zaplane/redux/Slices/workFlowSlice/workFlowSlice.js");
 /* harmony import */ var react_redux__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/dist/react-redux.mjs");
-/* harmony import */ var _CustomNode_CustomNode__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ../CustomNode/CustomNode */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/CustomNode/CustomNode.js");
-/* harmony import */ var _ZAPComponents_Drawer__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! @ZAPComponents/Drawer */ "./dev_zaplane/components/Drawer/index.js");
-/* harmony import */ var lucide_react__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! lucide-react */ "./node_modules/lucide-react/dist/esm/icons/history.js");
-/* harmony import */ var _RunsTable_RunsTable__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! ./RunsTable/RunsTable */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js");
-/* harmony import */ var _VersionHistoryTable_VersionHistoryTable__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! ./VersionHistoryTable/VersionHistoryTable */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/VersionHistoryTable/VersionHistoryTable.js");
-/* harmony import */ var react_icons_lu__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(/*! react-icons/lu */ "./node_modules/react-icons/lu/index.mjs");
-/* harmony import */ var _helper__WEBPACK_IMPORTED_MODULE_23__ = __webpack_require__(/*! ../helper */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/helper.js");
-/* harmony import */ var react_select__WEBPACK_IMPORTED_MODULE_24__ = __webpack_require__(/*! react-select */ "./node_modules/react-select/dist/react-select.esm.js");
-/* harmony import */ var _ZAPComponents_Loading__WEBPACK_IMPORTED_MODULE_25__ = __webpack_require__(/*! @ZAPComponents/Loading */ "./dev_zaplane/components/Loading/index.js");
-/* harmony import */ var _helper__WEBPACK_IMPORTED_MODULE_26__ = __webpack_require__(/*! ../../helper */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/helper.js");
-/* harmony import */ var _helper__WEBPACK_IMPORTED_MODULE_27__ = __webpack_require__(/*! ./helper */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/helper.js");
-/* harmony import */ var _hooks_useFlowActions__WEBPACK_IMPORTED_MODULE_28__ = __webpack_require__(/*! ../../../../../../hooks/useFlowActions */ "./dev_zaplane/hooks/useFlowActions.js");
+/* harmony import */ var _ZAPComponents_Drawer__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! @ZAPComponents/Drawer */ "./dev_zaplane/components/Drawer/index.js");
+/* harmony import */ var lucide_react__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! lucide-react */ "./node_modules/lucide-react/dist/esm/icons/history.js");
+/* harmony import */ var _RunsTable_RunsTable__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ./RunsTable/RunsTable */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js");
+/* harmony import */ var _VersionHistoryTable_VersionHistoryTable__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! ./VersionHistoryTable/VersionHistoryTable */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/VersionHistoryTable/VersionHistoryTable.js");
+/* harmony import */ var react_icons_lu__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! react-icons/lu */ "./node_modules/react-icons/lu/index.mjs");
+/* harmony import */ var _helper__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(/*! ../helper */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/helper.js");
+/* harmony import */ var react_select__WEBPACK_IMPORTED_MODULE_23__ = __webpack_require__(/*! react-select */ "./node_modules/react-select/dist/react-select.esm.js");
+/* harmony import */ var _ZAPComponents_Loading__WEBPACK_IMPORTED_MODULE_24__ = __webpack_require__(/*! @ZAPComponents/Loading */ "./dev_zaplane/components/Loading/index.js");
+/* harmony import */ var _helper__WEBPACK_IMPORTED_MODULE_25__ = __webpack_require__(/*! ../../helper */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/helper.js");
+/* harmony import */ var _helper__WEBPACK_IMPORTED_MODULE_26__ = __webpack_require__(/*! ./helper */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/helper.js");
+/* harmony import */ var _hooks_useFlowActions__WEBPACK_IMPORTED_MODULE_27__ = __webpack_require__(/*! ../../../../../../hooks/useFlowActions */ "./dev_zaplane/hooks/useFlowActions.js");
+/* harmony import */ var _customNode_CustomNode__WEBPACK_IMPORTED_MODULE_28__ = __webpack_require__(/*! ../customNode/CustomNode */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/customNode/CustomNode.js");
 /* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_29__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
 /* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_29___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_29__);
 
@@ -4165,7 +4172,7 @@ function FlowCanvas({
     const {
       nodes,
       edges
-    } = (0,_helper__WEBPACK_IMPORTED_MODULE_27__.mapGraphFromBackend)(singleData.graph);
+    } = (0,_helper__WEBPACK_IMPORTED_MODULE_26__.mapGraphFromBackend)(singleData.graph);
     if (nodes.length === 0) return;
     setNodes(nodes);
     setEdges(edges);
@@ -4185,7 +4192,7 @@ function FlowCanvas({
     createActionNode,
     openDrawerForNode,
     openDrawerFromAdd
-  } = (0,_hooks_useFlowActions__WEBPACK_IMPORTED_MODULE_28__.useFlowActions)({
+  } = (0,_hooks_useFlowActions__WEBPACK_IMPORTED_MODULE_27__.useFlowActions)({
     nodes,
     setNodes,
     edges,
@@ -4217,10 +4224,10 @@ function FlowCanvas({
   console.log(nodes, 'all nodes');
   console.log(edges, 'all edges');
   if (loading) {
-    return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_29__.jsx)(_ZAPComponents_Loading__WEBPACK_IMPORTED_MODULE_25__["default"], {});
+    return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_29__.jsx)(_ZAPComponents_Loading__WEBPACK_IMPORTED_MODULE_24__["default"], {});
   }
   const nodeTypes = {
-    custom: props => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_29__.jsx)(_CustomNode_CustomNode__WEBPACK_IMPORTED_MODULE_17__["default"], {
+    custom: props => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_29__.jsx)(_customNode_CustomNode__WEBPACK_IMPORTED_MODULE_28__["default"], {
       ...props,
       data: {
         ...props.data,
@@ -4278,9 +4285,9 @@ function FlowCanvas({
         children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_29__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {
           size: "sm",
           variant: "outline",
-          onClick: () => (0,_helper__WEBPACK_IMPORTED_MODULE_23__.toggleFullscreenMode)(containerRef, isFullscreen, setIsFullscreen),
-          children: isFullscreen ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_29__.jsx)(react_icons_lu__WEBPACK_IMPORTED_MODULE_22__.LuMinimize, {}) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_29__.jsx)(react_icons_lu__WEBPACK_IMPORTED_MODULE_22__.LuFullscreen, {})
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_29__.jsxs)(_ZAPComponents_Drawer__WEBPACK_IMPORTED_MODULE_18__["default"], {
+          onClick: () => (0,_helper__WEBPACK_IMPORTED_MODULE_22__.toggleFullscreenMode)(containerRef, isFullscreen, setIsFullscreen),
+          children: isFullscreen ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_29__.jsx)(react_icons_lu__WEBPACK_IMPORTED_MODULE_21__.LuMinimize, {}) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_29__.jsx)(react_icons_lu__WEBPACK_IMPORTED_MODULE_21__.LuFullscreen, {})
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_29__.jsxs)(_ZAPComponents_Drawer__WEBPACK_IMPORTED_MODULE_17__["default"], {
           title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("Log History", "Zaplane"),
           size: "md",
           open: activeDrawer === "logs",
@@ -4312,10 +4319,10 @@ function FlowCanvas({
               },
               children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("🔄 Replay ", "zaplane")
             })]
-          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_29__.jsx)(_RunsTable_RunsTable__WEBPACK_IMPORTED_MODULE_20__["default"], {
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_29__.jsx)(_RunsTable_RunsTable__WEBPACK_IMPORTED_MODULE_19__["default"], {
             runs: runs
           })]
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_29__.jsx)(_ZAPComponents_Drawer__WEBPACK_IMPORTED_MODULE_18__["default"], {
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_29__.jsx)(_ZAPComponents_Drawer__WEBPACK_IMPORTED_MODULE_17__["default"], {
           title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("Version History", 'zaplane'),
           open: activeDrawer === "history",
           onClose: () => setActiveDrawer(null),
@@ -4326,15 +4333,15 @@ function FlowCanvas({
               setActiveDrawer("history");
               dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_15__.getAllVersion)(id));
             },
-            children: [" ", /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_29__.jsx)(lucide_react__WEBPACK_IMPORTED_MODULE_19__["default"], {})]
+            children: [" ", /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_29__.jsx)(lucide_react__WEBPACK_IMPORTED_MODULE_18__["default"], {})]
           }),
-          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_29__.jsx)(_VersionHistoryTable_VersionHistoryTable__WEBPACK_IMPORTED_MODULE_21__["default"], {
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_29__.jsx)(_VersionHistoryTable_VersionHistoryTable__WEBPACK_IMPORTED_MODULE_20__["default"], {
             versions: versions,
             id: id
           })
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_29__.jsx)(react_select__WEBPACK_IMPORTED_MODULE_24__["default"], {
-          options: _helper__WEBPACK_IMPORTED_MODULE_26__.statusOptions,
-          value: values?.status ? _helper__WEBPACK_IMPORTED_MODULE_26__.statusOptions.find(opt => opt.value === values.status) : _helper__WEBPACK_IMPORTED_MODULE_26__.statusOptions.find(opt => opt.value === singleData?.workflow?.status),
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_29__.jsx)(react_select__WEBPACK_IMPORTED_MODULE_23__["default"], {
+          options: _helper__WEBPACK_IMPORTED_MODULE_25__.statusOptions,
+          value: values?.status ? _helper__WEBPACK_IMPORTED_MODULE_25__.statusOptions.find(opt => opt.value === values.status) : _helper__WEBPACK_IMPORTED_MODULE_25__.statusOptions.find(opt => opt.value === singleData?.workflow?.status),
           onChange: selected => setFieldValue('status', selected.value),
           isClearable: false,
           isSearchable: false,
@@ -4818,8 +4825,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @ZAPRedux/Slices/workFlowSlice/workFlowSlice */ "./dev_zaplane/redux/Slices/workFlowSlice/workFlowSlice.js");
 /* harmony import */ var _flowCanvas_helper__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./flowCanvas/helper */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/helper.js");
 /* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/box/index.js");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__);
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/flex/flex.js");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__);
 
 
 
@@ -4867,33 +4875,23 @@ function Workflows({
       payload
     }));
   };
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.ReactFlowProvider, {
-    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)("div", {
-      style: {
-        display: "flex",
-        height: "100vh"
-      },
-      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(formik__WEBPACK_IMPORTED_MODULE_3__.Formik, {
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.ReactFlowProvider, {
+    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_9__.Flex, {
+      hight: "100vh",
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(formik__WEBPACK_IMPORTED_MODULE_3__.Formik, {
         initialValues: {},
         onSubmit: onSubmitHandler,
-        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(formik__WEBPACK_IMPORTED_MODULE_3__.Form, {
-          style: {
-            flex: 1,
-            display: 'flex',
-            flexDirection: 'column'
-          },
-          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_8__.Box, {
-            flex: "1",
-            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_flowCanvas_FlowCanvas__WEBPACK_IMPORTED_MODULE_2__["default"], {
-              setNodes: setNodes,
-              setEdges: setEdges,
-              onEdgesChange: onEdgesChange,
-              onNodesChange: onNodesChange,
-              nodes: nodes,
-              edges: edges,
-              getNewNodeId: getNewNodeId,
-              id: id
-            })
+        children: ({}) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_8__.Box, {
+          flex: "1",
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_flowCanvas_FlowCanvas__WEBPACK_IMPORTED_MODULE_2__["default"], {
+            setNodes: setNodes,
+            setEdges: setEdges,
+            onEdgesChange: onEdgesChange,
+            onNodesChange: onNodesChange,
+            nodes: nodes,
+            edges: edges,
+            getNewNodeId: getNewNodeId,
+            id: id
           })
         })
       })

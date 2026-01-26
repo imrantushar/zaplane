@@ -37,13 +37,16 @@ export default function ActionDrawer({ open, context, onClose, updateNodeData, c
     useActionDrawer(open, node, source, setFieldValue, isTrigger);
 
   // Auto-set actionType if only one tool action
+
   useEffect(() => {
     if (mode !== "tools" || !selectedItem) return;
     const tool = integrations.tools?.[selectedItem.id];
     const actions = Object.values(tool?.actions || {});
     if (actions.length === 1) setFieldValue("actionType", actions[0].key);
   }, [mode, selectedItem, setFieldValue]);
+
   //Generate action options for the selected item
+
   const actionOptions = useMemo(() => {
     const integration = getIntegration(mode, selectedItem);
     if (!integration) return [];
@@ -54,7 +57,9 @@ export default function ActionDrawer({ open, context, onClose, updateNodeData, c
         : Object.values(integration.actions || {});
     return list.map(i => ({ label: i.label, value: i.key }));
   }, [mode, selectedItem, isTrigger]);
+
   //Get schema fields for the selected action
+
   const selectedActionFields = useMemo(() => {
     const integration = getIntegration(mode, selectedItem);
     if (!integration || !values?.actionType) return [];
@@ -64,7 +69,9 @@ export default function ActionDrawer({ open, context, onClose, updateNodeData, c
   }, [mode, selectedItem, values?.actionType, isTrigger]);
 
   const getKey = (field) => `${mode}:${selectedItem?.id}:${field.key}`;
+
 //Generate dynamic keys and fetch dynamic options
+
   const fetchDynamicOptions = async (field) => {
     if (!field.dynamic) return;
     const key = getKey(field);

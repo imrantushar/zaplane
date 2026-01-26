@@ -4,6 +4,7 @@ import {
     addEdge,
     Controls,
     Background,
+    Panel,
 } from "@xyflow/react";
 import "@xyflow/react/dist/base.css";
 import { __ } from '@wordpress/i18n';
@@ -25,7 +26,6 @@ import {
 import { useNavigate } from "react-router-dom";
 import { getAllVersion, getRunWorkFlow, getSingleWorkFlow, workFLowExction, workflowNodeListiner, workflowNodeListinerStop } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
 import { useDispatch, useSelector } from "react-redux";
-import CustomNode from "../CustomNode/CustomNode";
 import ZAPDrawer from "@ZAPComponents/Drawer";
 import { LucideHistory } from "lucide-react";
 import RunsTable from "./RunsTable/RunsTable";
@@ -37,6 +37,7 @@ import ZAPLoading from "@ZAPComponents/Loading";
 import { statusOptions } from "../../helper";
 import { mapGraphFromBackend } from "./helper";
 import { useFlowActions } from "../../../../../../hooks/useFlowActions";
+import CustomNode from "../customNode/CustomNode";
 
 export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdgesChange, onNodesChange, getNewNodeId }) {
     const dispatch = useDispatch();
