@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-01-26 09:11:40",
+    "generated_at": "2026-01-26 12:43:47",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -3239,17 +3239,42 @@
                 }
             }
         },
-        "Contact From 7": {
-            "slug": "Contact From 7",
-            "name": "Contact From 7",
+        "wp-contact-form-7": {
+            "slug": "wp-contact-form-7",
+            "name": "Contact Form 7",
             "icon": "",
             "category": "app",
             "triggers": {
-                "from_submitted": {
-                    "key": "from_submitted",
-                    "label": "From Submitted",
+                "form_submitted": {
+                    "key": "form_submitted",
+                    "label": "Form Submitted",
                     "hook": "wpcf7_before_send_mail",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "form_id",
+                            "label": "Forms",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Any From",
+                                    "value": "any"
+                                },
+                                {
+                                    "label": "Contact form 1",
+                                    "value": 8
+                                },
+                                {
+                                    "label": "Contact form 1_copy",
+                                    "value": 12
+                                },
+                                {
+                                    "label": "Contact form 1_copy_copy",
+                                    "value": 14
+                                }
+                            ],
+                            "required": true
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]

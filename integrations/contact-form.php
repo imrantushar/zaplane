@@ -4,17 +4,19 @@ namespace Zaplane\Integrations;
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 use Zaplane\Framework\Classes\IntegrationBase;
+use WPCF7_ContactForm;
+use WPCF7_Submission;
 
 class ContactForm extends IntegrationBase {
 
     public static function get_slug(): string {
-        return 'Contact From 7';
+        return 'Contact Form 7';
     }
 
     public static function get_triggers(): array {
         return [
-            'from_submitted' => [
-                'label' => 'From Submitted', 
+            'form_submitted' => [
+                'label' => 'Form Submitted', 
                 'hook'  => 'wpcf7_before_send_mail'
             ],
         ]; 
@@ -22,35 +24,103 @@ class ContactForm extends IntegrationBase {
 
     public static function get_trigger_config_schema( string $trigger ): array {
 
+        if ($trigger === 'form_submitted') {
+            $options = [
+                ['label'=>'Any From','value'=>'any'],
+            ];
+            if ( class_exists( 'WPCF7_ContactForm' ) ) {
+                $forms = \WPCF7_ContactForm::find();
+                foreach ( $forms as $form ) {
+                    $options[]  = [
+                        'label' => $form->title(),
+                        'value' => $form->id(),
+                    ];
+                }
+            }
+            return [
+                [
+                    'key'      => 'form_id',
+                    'label'    => 'Forms',
+                    'type'     => 'select',
+                    'options'  => $options,
+                    'required' => true,
+                ],
+            ];
+        }
         return [];
     }
-    
-    // private static function resolve_order_payload( int $order_id , array $extra= [] ) {
-    //     $order = storeengine_get_order( $order_id );
-    //             if ( ! $order) return false;
-    //             return array_merge([
-    //                 'order_id'       => $order_id,
-    //                 'order_number'   => $order->get_order_number(),
-    //                 'order_status'   => $order->get_status(),
-    //                 'total'          => $order->get_total(),
-    //                 'currency'       => $order->get_currency(),
-    //                 'payment_method' => $order->get_payment_method(),
-    //                 'customer_email' => $order->get_customer_email(),
-    //                 'customer_name'  => $order->get_customer_name(),
-    //                 'items'          => $order->get_items(),
-    //             ], $extra);
-    // }
 
+    public static function handle_form_submitted($contact_form, &$abort = null, $submission_obj = null) {
+        if (!class_exists('WPCF7_Submission') || !$contact_form) return false;
+
+        $submission = WPCF7_Submission::get_instance();
+        if (!$submission) return false;
+
+        $form_id = $contact_form->id();
+        $form_data = $submission->get_posted_data();
+        $files = $submission->uploaded_files();
+        $form_data = array_merge($form_data, self::setFileRoot($files));
+
+        $post_id = (int) $submission->get_meta('container_post_id');
+        if ($post_id !== 0) $form_data['post_id'] = $post_id;
+
+        return [
+        'form_id' => $form_id,
+        'form_data' => $form_data,
+        ];
+    }
+
+    public static function setFileRoot( $files ) {
+        $all_files = [];
+        foreach ( $files as $key => $file ) {
+            $all_files[ $key ] = is_array( $file ) ? self::setFileRoot( $file ) : self::fileUrl( $file );
+        }
+        return $all_files;
+    }
+
+    public static function fileUrl( $file ) {
+        $upload_dir = wp_upload_dir();
+        $file_base_url = $upload_dir['baseurl'];
+        $file_base_path = $upload_dir['basedir'];
+        if ( is_array( $file ) ) {
+            $url = [];
+            foreach ( $file as $file_index => $file_url ) {
+                $url[ $file_index ] = str_replace( $file_base_path, $file_base_url, $file_url );
+            }
+        } else {
+            $url = str_replace( $file_base_path, $file_base_url, $file );
+        }
+        return $url;
+    }
+    
     public static function resolve_trigger( array $node, array $args ) {
 
         switch ( $node['event'] ) {
 
-            case 'from_submitted':
-                $order_id = $args[0] ?? 0;
-                if ( ! $order_id ) return false;
-                //return self::resolve_order_payload( $order_id);
+            case 'form_submitted':
+                $payload = self::handle_form_submitted($args[0] ?? null, $args[1] ?? null, $args[2] ?? null);
+                if (!$payload) return false;
 
-            
+                $flows = get_option('wp_contact_form_flows', []);
+
+
+                foreach ($flows as $flow) {
+                    if (empty($flow['nodes'])) continue;
+
+
+                    $trigger_node = $flow['nodes'][0] ?? null;
+                    if (!$trigger_node) continue;
+
+
+                    $config_form_id = $trigger_node['config']['form_id'] ?? 'any';
+                    if ($config_form_id !== 'any' && $config_form_id != $payload['form_id']) continue;
+
+
+                    if (is_callable($trigger_node['callback'] ?? null)) {
+                    $trigger_node['callback']($payload);
+                    }
+                }
+                return $payload;
         }
         return false;
     }
