@@ -38,14 +38,15 @@ import { statusOptions } from "../../helper";
 import { mapGraphFromBackend } from "./helper";
 import { useFlowActions } from "../../../../../../hooks/useFlowActions";
 import CustomNode from "../customNode/CustomNode";
+import { primaryBtn } from "../../../../../../../assets/scss/chakra/recipe";
 
-export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdgesChange, onNodesChange, getNewNodeId,singleData }) {
+export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdgesChange, onNodesChange, getNewNodeId, singleData }) {
     const dispatch = useDispatch();
     const navigate = useNavigate()
     const [drawerOpen, setDrawerOpen] = useState(false);
-    const { values, setFieldValue, handleSubmit } = useFormikContext()
+    const { values, setFieldValue, handleSubmit, dirty, isSubmitting } = useFormikContext()
     const [loading, setLoading] = useState(false);
-    const {runs, versions } = useSelector((state) => state.workflows);
+    const { runs, versions } = useSelector((state) => state.workflows);
     const containerRef = useRef(null);
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [activeDrawer, setActiveDrawer] = useState(null);
@@ -174,7 +175,7 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
                         >
                             {isFullscreen ? <LuMinimize /> : <LuFullscreen />}
                         </Button>
-                         <ZAPDrawer
+                        <ZAPDrawer
                             title={__("Log History", "Zaplane")}
                             size="md"
                             open={activeDrawer === "logs"}
@@ -247,14 +248,14 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
                             placeholder="Select status"
                         />
                         <Button
+                            {...primaryBtn}
                             size="sm"
-                            bg="black"
-                            color="var(--zaplane-background)"
                             onClick={handleSubmit}
+                            disabled={!dirty || isSubmitting}
                         >
                             {__("Update", "zaplane")}
                         </Button>
-                       
+
                     </>
                 )}
             />
