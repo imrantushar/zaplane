@@ -39,6 +39,7 @@ import { mapGraphFromBackend } from "./helper";
 import { useFlowActions } from "../../../../../../hooks/useFlowActions";
 import CustomNode from "../customNode/CustomNode";
 import { primaryBtn } from "../../../../../../../assets/scss/chakra/recipe";
+import './styles.scss'
 
 export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdgesChange, onNodesChange, getNewNodeId, singleData }) {
     const dispatch = useDispatch();
@@ -148,6 +149,9 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
         >
 
             <TopBar
+                topBarStyles={
+                    { top: 0, margin: 0 }
+                }
                 leftContent={() => (
                     <>
                         <Button variant="outline" onClick={() => navigate(-1)}>
@@ -279,7 +283,9 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
                 minZoom={0.5}
             >
                 <Background />
-                <Controls />
+                <Controls position='top-cente'
+                    className="zaplane-canvas-controls"
+                />
             </ReactFlow>
             <ActionDrawer
                 open={drawerOpen}
