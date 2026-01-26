@@ -648,6 +648,7 @@ const LogDetails = ({
   if (isloading) {
     return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_ZAPComponents_Loading__WEBPACK_IMPORTED_MODULE_7__["default"], {});
   }
+  //after the  response I’ll add translation support.
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
     children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
       mb: "4",
@@ -1478,7 +1479,7 @@ const ZAPSelect = ({
       fontWeight: "600",
       fontSize: "0.875rem",
       mb: "4px",
-      children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)(label, 'zaplane')
+      children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.sprintf)((0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('%s', 'zaplane'), label)
     }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(react_select__WEBPACK_IMPORTED_MODULE_3__["default"], {
       className: "zaplane-select",
       classNamePrefix: "zaplane-select",
@@ -1540,7 +1541,7 @@ const ZAPMenu = ({
           children: items.map((item, index) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.MenuItem, {
             onClick: item.onClick,
             cursor: "pointer",
-            children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)(item.label, "zaplane")
+            children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.sprintf)((0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)('%s', 'zaplane'), item.label)
           }, index))
         })
       })

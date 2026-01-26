@@ -18,7 +18,7 @@ const LogDetails = ({ runId, onBack }) => {
   if (isloading) {
     return <ZAPLoading />;
   }
-
+//after the  response I’ll add translation support.
   return (
     <Box>
       <Text mb="4" fontWeight="bold"

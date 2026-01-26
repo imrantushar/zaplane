@@ -1,6 +1,6 @@
 
 import { Box ,Text} from "@chakra-ui/react";
-import { __ } from "@wordpress/i18n";
+import { __, sprintf } from "@wordpress/i18n";
 import Select from "react-select";
 
 const ZAPSelect = ({
@@ -17,7 +17,9 @@ const ZAPSelect = ({
 }) => {
   return (
     <Box mb={mb} style={containerStyle}>
-      {label && <Text className="zaplane-label" fontWeight="600" fontSize="0.875rem" mb="4px">{__(label, 'zaplane')}</Text>}
+      {label && <Text className="zaplane-label" fontWeight="600" fontSize="0.875rem" mb="4px">
+         {sprintf(__('%s', 'zaplane'), label)}
+        </Text>}
       <Select
         className="zaplane-select"
         classNamePrefix="zaplane-select"
