@@ -275,8 +275,8 @@ export default function FlowCanvas({ id }) {
         );
     }, []);
 
-    console.log(nodes, 'all nodes');
-    console.log(edges, 'all edges');
+    // console.log(nodes, 'all nodes');
+    // console.log(edges, 'all edges');
 
     const nodeTypes = {
         custom: (props) => (
