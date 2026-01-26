@@ -1,9 +1,9 @@
 import React, { useRef } from "react";
 import { ReactFlowProvider, useEdgesState, useNodesState } from "@xyflow/react";
 import FlowCanvas from "./flowCanvas/FlowCanvas";
-import { Form, Formik } from "formik";
+import {Formik } from "formik";
 import { mapEdgesForBackend, mapNodesForBackend } from "./helper";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { updateWorkFlow, updateWorkFlowStatus } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
 import { createNodeIdGenerator } from "./flowCanvas/helper";
 import { Box, Flex } from "@chakra-ui/react";
@@ -11,6 +11,8 @@ import { Box, Flex } from "@chakra-ui/react";
 export default function Workflows({ id }) {
   const nodeIdRef = useRef(createNodeIdGenerator());
   const getNewNodeId = nodeIdRef.current;
+   const { data} = useSelector((state) => state.workflows);
+    const singleData = data[0]
   const [nodes, setNodes, onNodesChange] = useNodesState([
     {
       id: getNewNodeId(),
@@ -53,7 +55,8 @@ export default function Workflows({ id }) {
           {({}) => (
             <Box flex="1" >
               <FlowCanvas setNodes={setNodes} setEdges={setEdges} onEdgesChange={onEdgesChange}
-                onNodesChange={onNodesChange} nodes={nodes} edges={edges} getNewNodeId={getNewNodeId} id={id} />
+                onNodesChange={onNodesChange} nodes={nodes} edges={edges} getNewNodeId={getNewNodeId} 
+                singleData={singleData} id={id} />
             </Box>
           )}
 

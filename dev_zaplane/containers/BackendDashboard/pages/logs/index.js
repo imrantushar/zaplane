@@ -38,15 +38,6 @@ const Logs = () => {
     if (isLoading) {
         return <ZAPLoading />;
     }
-
-    if (!data?.length) {
-        return (
-            <Flex align="center" justify="center" h="300px">
-                <Text>{__("No data found", "zaplane")}</Text>
-            </Flex>
-        );
-    }
-
     return (
         <>
             <TopBar

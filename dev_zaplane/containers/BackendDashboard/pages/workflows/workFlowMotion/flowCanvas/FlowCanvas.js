@@ -39,14 +39,13 @@ import { mapGraphFromBackend } from "./helper";
 import { useFlowActions } from "../../../../../../hooks/useFlowActions";
 import CustomNode from "../customNode/CustomNode";
 
-export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdgesChange, onNodesChange, getNewNodeId }) {
+export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdgesChange, onNodesChange, getNewNodeId,singleData }) {
     const dispatch = useDispatch();
     const navigate = useNavigate()
     const [drawerOpen, setDrawerOpen] = useState(false);
     const { values, setFieldValue, handleSubmit } = useFormikContext()
     const [loading, setLoading] = useState(false);
-    const { data, runs, versions } = useSelector((state) => state.workflows);
-    const singleData = data[0]
+    const {runs, versions } = useSelector((state) => state.workflows);
     const containerRef = useRef(null);
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [activeDrawer, setActiveDrawer] = useState(null);
