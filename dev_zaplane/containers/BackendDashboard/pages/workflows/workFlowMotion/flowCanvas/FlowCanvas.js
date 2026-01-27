@@ -41,10 +41,11 @@ import { mapGraphFromBackend } from "./helper";
 import { useFlowActions } from "../../../../../../hooks/useFlowActions";
 import CustomNode from "../customNode/CustomNode";
 import { primaryBtn } from "../../../../../../../assets/scss/chakra/recipe";
-import { getLayoutedElements } from "./dagreLayout";
+
 
 import './styles.scss'
 import { IoSwapHorizontal, IoSwapVerticalOutline } from "react-icons/io5";
+import { getLayoutedElements } from "./dagreLayout";
 
 export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdgesChange, onNodesChange, getNewNodeId, singleData }) {
     const dispatch = useDispatch();
@@ -56,6 +57,7 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
     const containerRef = useRef(null);
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [activeDrawer, setActiveDrawer] = useState(null);
+    const [canvasLayout,setCanvasLayout] =useState("LR")
     const { fitView } = useReactFlow();
 
 
@@ -117,13 +119,14 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
             setEdges(layoutedEdges);
              requestAnimationFrame(() => {
             fitView({ padding: 0.2, duration: 300 });
+            setCanvasLayout(direction)
         });
         },
-        
+
         [nodes, edges,fitView]
     );
 
-    console.log(nodes, 'all nodes');
+    console.log(nodes, 'all nodes',);
     console.log(edges, 'all edges');
     const nodeTypes = {
         custom: (props) => (
@@ -136,6 +139,7 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
                     deleteNode: () => deleteNode(props.id),
 
                 }}
+                canvasLayout={canvasLayout}
             />
         ),
     };

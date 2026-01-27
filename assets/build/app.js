@@ -3853,17 +3853,19 @@ __webpack_require__.r(__webpack_exports__);
 const FloatingEdge = ({
   sourceX,
   sourceY,
-  openDrawerFromAdd
+  openDrawerFromAdd,
+  canvasLayout
 }) => {
   const targetX = sourceX + 140;
   const targetY = sourceY;
+  const isLR = canvasLayout === "LR";
   const [edgePath] = (0,_xyflow_react__WEBPACK_IMPORTED_MODULE_0__.getBezierPath)({
     sourceX,
     sourceY,
     targetX,
     targetY,
-    sourcePosition: "right",
-    targetPosition: "left"
+    sourcePosition: isLR ? "right" : "bottom",
+    targetPosition: isLR ? "left" : "top"
   });
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.Fragment, {
     children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("path", {
@@ -3886,8 +3888,8 @@ const FloatingEdge = ({
         border: "2px dashed var(--zaplane-border-color)",
         cursor: "pointer",
         position: "absolute",
-        top: "6px",
-        right: "-80px",
+        top: isLR ? "6px" : "98px",
+        right: isLR ? "-80px" : "64px",
         _hover: {
           borderColor: "var(--zaplane-primary-color)",
           bg: "var(--zaplane-background)"
@@ -3898,10 +3900,11 @@ const FloatingEdge = ({
           color: "var(--zaplane-primary-color)"
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Box, {
           as: "span",
-          left: "-45px",
+          top: isLR ? "13px" : "-49px",
+          left: isLR ? "-45px" : "12px",
           border: "2px dashed var(--zaplane-border-color)",
-          top: "13px",
-          width: "42px",
+          width: isLR ? "42px" : "1px",
+          height: isLR ? "0" : "49px",
           position: "absolute"
         })]
       })
@@ -3950,7 +3953,8 @@ function CustomNode({
   id,
   data,
   xPos,
-  yPos
+  yPos,
+  canvasLayout
 }) {
   const [hovered, setHovered] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
   const {
@@ -4024,7 +4028,7 @@ function CustomNode({
       onClick: data.onOpenDrawer,
       children: [data?.action !== "trigger" && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.Handle, {
         type: "target",
-        position: _xyflow_react__WEBPACK_IMPORTED_MODULE_2__.Position.Left,
+        position: canvasLayout === "LR" ? _xyflow_react__WEBPACK_IMPORTED_MODULE_2__.Position.Left : _xyflow_react__WEBPACK_IMPORTED_MODULE_2__.Position.Top,
         style: {
           width: 10,
           height: 10,
@@ -4039,7 +4043,7 @@ function CustomNode({
         children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_10__.__)(data.app, "zaplane")
       }), !data.conditions && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.Handle, {
         type: "source",
-        position: _xyflow_react__WEBPACK_IMPORTED_MODULE_2__.Position.Right,
+        position: canvasLayout === "LR" ? _xyflow_react__WEBPACK_IMPORTED_MODULE_2__.Position.Right : _xyflow_react__WEBPACK_IMPORTED_MODULE_2__.Position.Bottom,
         style: {
           width: 10,
           height: 10,
@@ -4051,7 +4055,8 @@ function CustomNode({
     }), !hasOutgoingEdge && !data.conditions && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_FloatingEdge_FloatingEdge__WEBPACK_IMPORTED_MODULE_9__["default"], {
       sourceX: sourceX,
       sourceY: sourceY,
-      openDrawerFromAdd: data.openDrawerFromAdd
+      openDrawerFromAdd: data.openDrawerFromAdd,
+      canvasLayout: canvasLayout
     })]
   });
 }
@@ -4101,9 +4106,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _hooks_useFlowActions__WEBPACK_IMPORTED_MODULE_27__ = __webpack_require__(/*! ../../../../../../hooks/useFlowActions */ "./dev_zaplane/hooks/useFlowActions.js");
 /* harmony import */ var _customNode_CustomNode__WEBPACK_IMPORTED_MODULE_28__ = __webpack_require__(/*! ../customNode/CustomNode */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/customNode/CustomNode.js");
 /* harmony import */ var _assets_scss_chakra_recipe__WEBPACK_IMPORTED_MODULE_29__ = __webpack_require__(/*! ../../../../../../../assets/scss/chakra/recipe */ "./assets/scss/chakra/recipe.js");
-/* harmony import */ var _dagreLayout__WEBPACK_IMPORTED_MODULE_30__ = __webpack_require__(/*! ./dagreLayout */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/dagreLayout.js");
-/* harmony import */ var _styles_scss__WEBPACK_IMPORTED_MODULE_31__ = __webpack_require__(/*! ./styles.scss */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/styles.scss");
-/* harmony import */ var react_icons_io5__WEBPACK_IMPORTED_MODULE_32__ = __webpack_require__(/*! react-icons/io5 */ "./node_modules/react-icons/io5/index.mjs");
+/* harmony import */ var _styles_scss__WEBPACK_IMPORTED_MODULE_30__ = __webpack_require__(/*! ./styles.scss */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/styles.scss");
+/* harmony import */ var react_icons_io5__WEBPACK_IMPORTED_MODULE_31__ = __webpack_require__(/*! react-icons/io5 */ "./node_modules/react-icons/io5/index.mjs");
+/* harmony import */ var _dagreLayout__WEBPACK_IMPORTED_MODULE_32__ = __webpack_require__(/*! ./dagreLayout */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/dagreLayout.js");
 /* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
 /* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__);
 
@@ -4165,6 +4170,7 @@ function FlowCanvas({
   const containerRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
   const [isFullscreen, setIsFullscreen] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
   const [activeDrawer, setActiveDrawer] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(null);
+  const [canvasLayout, setCanvasLayout] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)("LR");
   const {
     fitView
   } = (0,_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.useReactFlow)();
@@ -4226,7 +4232,7 @@ function FlowCanvas({
     const {
       nodes: layoutedNodes,
       edges: layoutedEdges
-    } = (0,_dagreLayout__WEBPACK_IMPORTED_MODULE_30__.getLayoutedElements)(nodes, edges, direction);
+    } = (0,_dagreLayout__WEBPACK_IMPORTED_MODULE_32__.getLayoutedElements)(nodes, edges, direction);
     setNodes(layoutedNodes);
     setEdges(layoutedEdges);
     requestAnimationFrame(() => {
@@ -4234,6 +4240,7 @@ function FlowCanvas({
         padding: 0.2,
         duration: 300
       });
+      setCanvasLayout(direction);
     });
   }, [nodes, edges, fitView]);
   console.log(nodes, 'all nodes');
@@ -4246,7 +4253,8 @@ function FlowCanvas({
         onOpenDrawer: () => openDrawerForNode(props),
         openDrawerFromAdd: () => openDrawerFromAdd(props),
         deleteNode: () => deleteNode(props.id)
-      }
+      },
+      canvasLayout: canvasLayout
     })
   };
   const edgeTypes = {
@@ -4394,14 +4402,14 @@ function FlowCanvas({
           onClick: () => onLayout("TB"),
           title: "Vertical layout",
           className: "zaplane-control-btn",
-          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsx)(react_icons_io5__WEBPACK_IMPORTED_MODULE_32__.IoSwapVerticalOutline, {
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsx)(react_icons_io5__WEBPACK_IMPORTED_MODULE_31__.IoSwapVerticalOutline, {
             size: 16
           })
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.ControlButton, {
           onClick: () => onLayout("LR"),
           title: "Horizontal layout",
           className: "zaplane-control-btn",
-          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsx)(react_icons_io5__WEBPACK_IMPORTED_MODULE_32__.IoSwapHorizontal, {
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsx)(react_icons_io5__WEBPACK_IMPORTED_MODULE_31__.IoSwapHorizontal, {
             size: 16
           })
         })]
@@ -4693,8 +4701,8 @@ __webpack_require__.r(__webpack_exports__);
 
 const dagreGraph = new (dagre__WEBPACK_IMPORTED_MODULE_0___default().graphlib).Graph();
 dagreGraph.setDefaultEdgeLabel(() => ({}));
-const NODE_WIDTH = 220;
-const NODE_HEIGHT = 80;
+const NODE_WIDTH = 160;
+const NODE_HEIGHT = 48;
 const getLayoutedElements = (nodes, edges, direction = "TB") => {
   const isHorizontal = direction === "LR";
   dagreGraph.setGraph({
@@ -36889,7 +36897,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   stripBasename: () => (/* binding */ stripBasename)
 /* harmony export */ });
 /**
- * @remix-run/router v1.23.2
+ * @remix-run/router v1.23.1
  *
  * Copyright (c) Remix Software Inc.
  *
@@ -39012,7 +39020,7 @@ function createRouter(init) {
         // If the user didn't explicity indicate replace behavior, replace if
         // we redirected to the exact same location we're currently at to avoid
         // double back-buttons
-        let location = normalizeRedirectLocation(result.response.headers.get("Location"), new URL(request.url), basename, init.history);
+        let location = normalizeRedirectLocation(result.response.headers.get("Location"), new URL(request.url), basename);
         replace = location === state.location.pathname + state.location.search;
       }
       await startRedirectNavigation(request, result, true, {
@@ -39618,7 +39626,7 @@ function createRouter(init) {
     }
     let location = redirect.response.headers.get("Location");
     invariant(location, "Expected a Location header on the redirect Response");
-    location = normalizeRedirectLocation(location, new URL(request.url), basename, init.history);
+    location = normalizeRedirectLocation(location, new URL(request.url), basename);
     let redirectLocation = createLocation(state.location, location, {
       _isRedirect: true
     });
@@ -41324,30 +41332,16 @@ function normalizeRelativeRoutingRedirectResponse(response, request, routeId, ma
   }
   return response;
 }
-function normalizeRedirectLocation(location, currentUrl, basename, historyInstance) {
-  // Match Chrome's behavior:
-  // https://github.com/chromium/chromium/blob/216dbeb61db0c667e62082e5f5400a32d6983df3/content/public/common/url_utils.cc#L82
-  let invalidProtocols = ["about:", "blob:", "chrome:", "chrome-untrusted:", "content:", "data:", "devtools:", "file:", "filesystem:",
-  // eslint-disable-next-line no-script-url
-  "javascript:"];
+function normalizeRedirectLocation(location, currentUrl, basename) {
   if (ABSOLUTE_URL_REGEX.test(location)) {
     // Strip off the protocol+origin for same-origin + same-basename absolute redirects
     let normalizedLocation = location;
     let url = normalizedLocation.startsWith("//") ? new URL(currentUrl.protocol + normalizedLocation) : new URL(normalizedLocation);
-    if (invalidProtocols.includes(url.protocol)) {
-      throw new Error("Invalid redirect location");
-    }
     let isSameBasename = stripBasename(url.pathname, basename) != null;
     if (url.origin === currentUrl.origin && isSameBasename) {
       return url.pathname + url.search + url.hash;
     }
   }
-  try {
-    let url = historyInstance.createURL(location);
-    if (invalidProtocols.includes(url.protocol)) {
-      throw new Error("Invalid redirect location");
-    }
-  } catch (e) {}
   return location;
 }
 // Utility method for creating the Request instances for loaders/actions during
@@ -110788,7 +110782,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   castImmutable: () => (/* binding */ castImmutable),
 /* harmony export */   createDraft: () => (/* binding */ createDraft),
 /* harmony export */   current: () => (/* binding */ current),
-/* harmony export */   enableArrayMethods: () => (/* binding */ enableArrayMethods),
 /* harmony export */   enableMapSet: () => (/* binding */ enableMapSet),
 /* harmony export */   enablePatches: () => (/* binding */ enablePatches),
 /* harmony export */   finishDraft: () => (/* binding */ finishDraft),
@@ -110931,10 +110924,6 @@ var isSet = (target) => target instanceof Set;
 var isObjectish = (target) => typeof target === "object";
 var isFunction = (target) => typeof target === "function";
 var isBoolean = (target) => typeof target === "boolean";
-function isArrayIndex(value) {
-  const n = +value;
-  return Number.isInteger(n) && String(n) === value;
-}
 var getProxyDraft = (value) => {
   if (!isObjectish(value))
     return null;
@@ -111023,7 +111012,6 @@ function isFrozen(obj) {
 // src/utils/plugins.ts
 var PluginMapSet = "MapSet";
 var PluginPatches = "Patches";
-var PluginArrayMethods = "ArrayMethods";
 var plugins = {};
 function getPlugin(pluginKey) {
   const plugin = plugins[pluginKey];
@@ -111051,8 +111039,7 @@ var createScope = (parent_, immer_) => ({
   unfinalizedDrafts_: 0,
   handledSet_: /* @__PURE__ */ new Set(),
   processedForPatches_: /* @__PURE__ */ new Set(),
-  mapSetPlugin_: isPluginLoaded(PluginMapSet) ? getPlugin(PluginMapSet) : void 0,
-  arrayMethodsPlugin_: isPluginLoaded(PluginArrayMethods) ? getPlugin(PluginArrayMethods) : void 0
+  mapSetPlugin_: isPluginLoaded(PluginMapSet) ? getPlugin(PluginMapSet) : void 0
 });
 function usePatchesInScope(scope, patchListener) {
   if (patchListener) {
@@ -111187,7 +111174,7 @@ function registerChildFinalizationCallback(parent, child, key) {
   });
 }
 function generatePatchesAndFinalize(state, rootScope) {
-  const shouldFinalize = state.modified_ && !state.finalized_ && (state.type_ === 3 /* Set */ || state.type_ === 1 /* Array */ && state.allIndicesReassigned_ || (state.assigned_?.size ?? 0) > 0);
+  const shouldFinalize = state.modified_ && !state.finalized_ && (state.type_ === 3 /* Set */ || (state.assigned_?.size ?? 0) > 0);
   if (shouldFinalize) {
     const { patchPlugin_ } = rootScope;
     if (patchPlugin_) {
@@ -111213,19 +111200,13 @@ function handleCrossReference(target, key, value) {
   } else if (isDraftable(value)) {
     target.callbacks_.push(function nestedDraftCleanup() {
       const targetCopy = latest(target);
-      if (target.type_ === 3 /* Set */) {
-        if (targetCopy.has(value)) {
-          handleValue(value, scope_.handledSet_, scope_);
-        }
-      } else {
-        if (get(targetCopy, key, target.type_) === value) {
-          if (scope_.drafts_.length > 1 && (target.assigned_.get(key) ?? false) === true && target.copy_) {
-            handleValue(
-              get(target.copy_, key, target.type_),
-              scope_.handledSet_,
-              scope_
-            );
-          }
+      if (get(targetCopy, key, target.type_) === value) {
+        if (scope_.drafts_.length > 1 && (target.assigned_.get(key) ?? false) === true && target.copy_) {
+          handleValue(
+            get(target.copy_, key, target.type_),
+            scope_.handledSet_,
+            scope_
+          );
         }
       }
     });
@@ -111298,24 +111279,12 @@ var objectTraps = {
   get(state, prop) {
     if (prop === DRAFT_STATE)
       return state;
-    let arrayPlugin = state.scope_.arrayMethodsPlugin_;
-    const isArrayWithStringProp = state.type_ === 1 /* Array */ && typeof prop === "string";
-    if (isArrayWithStringProp) {
-      if (arrayPlugin?.isArrayOperationMethod(prop)) {
-        return arrayPlugin.createMethodInterceptor(state, prop);
-      }
-    }
     const source = latest(state);
     if (!has(source, prop, state.type_)) {
       return readPropFromProto(state, source, prop);
     }
     const value = source[prop];
     if (state.finalized_ || !isDraftable(value)) {
-      return value;
-    }
-    if (isArrayWithStringProp && state.operationMethod && arrayPlugin?.isMutatingArrayMethod(
-      state.operationMethod
-    ) && isArrayIndex(prop)) {
       return value;
     }
     if (value === peek(state.base_, prop)) {
@@ -111398,14 +111367,13 @@ var objectTraps = {
   }
 };
 var arrayTraps = {};
-for (let key in objectTraps) {
-  let fn = objectTraps[key];
+each(objectTraps, (key, fn) => {
   arrayTraps[key] = function() {
     const args = arguments;
     args[0] = args[0][0];
     return fn.apply(this, args);
   };
-}
+});
 arrayTraps.deleteProperty = function(state, prop) {
   if ( true && isNaN(parseInt(prop)))
     die(13);
@@ -111691,7 +111659,7 @@ function enablePatches() {
     );
   }
   function getPath(state, path = []) {
-    if (state.key_ !== void 0) {
+    if ("key_" in state && state.key_ !== void 0) {
       const parentCopy = state.parent_.copy_ ?? state.parent_.base_;
       const proxyDraft = getProxyDraft(get(parentCopy, state.key_));
       const valueAtKey = get(parentCopy, state.key_);
@@ -111781,12 +111749,10 @@ function enablePatches() {
       [base_, copy_] = [copy_, base_];
       [patches, inversePatches] = [inversePatches, patches];
     }
-    const allReassigned = state.allIndicesReassigned_ === true;
     for (let i = 0; i < base_.length; i++) {
       const copiedItem = copy_[i];
       const baseItem = base_[i];
-      const isAssigned = allReassigned || assigned_?.get(i.toString());
-      if (isAssigned && copiedItem !== baseItem) {
+      if (assigned_?.get(i.toString()) && copiedItem !== baseItem) {
         const childState = copiedItem?.[DRAFT_STATE];
         if (childState && childState.modified_) {
           continue;
@@ -112017,7 +111983,6 @@ function enableMapSet() {
         state.assigned_.set(key, true);
         state.copy_.set(key, value);
         state.assigned_.set(key, true);
-        handleCrossReference(state, key, value);
       }
       return this;
     }
@@ -112161,7 +112126,6 @@ function enableMapSet() {
         prepareSetCopy(state);
         markChanged(state);
         state.copy_.add(value);
-        handleCrossReference(state, value, value);
       }
       return this;
     }
@@ -112246,163 +112210,6 @@ function enableMapSet() {
     }
   }
   loadPlugin(PluginMapSet, { proxyMap_, proxySet_, fixSetContents });
-}
-
-// src/plugins/arrayMethods.ts
-function enableArrayMethods() {
-  const SHIFTING_METHODS = /* @__PURE__ */ new Set(["shift", "unshift"]);
-  const QUEUE_METHODS = /* @__PURE__ */ new Set(["push", "pop"]);
-  const RESULT_RETURNING_METHODS = /* @__PURE__ */ new Set([
-    ...QUEUE_METHODS,
-    ...SHIFTING_METHODS
-  ]);
-  const REORDERING_METHODS = /* @__PURE__ */ new Set(["reverse", "sort"]);
-  const MUTATING_METHODS = /* @__PURE__ */ new Set([
-    ...RESULT_RETURNING_METHODS,
-    ...REORDERING_METHODS,
-    "splice"
-  ]);
-  const FIND_METHODS = /* @__PURE__ */ new Set(["find", "findLast"]);
-  const NON_MUTATING_METHODS = /* @__PURE__ */ new Set([
-    "filter",
-    "slice",
-    "concat",
-    "flat",
-    ...FIND_METHODS,
-    "findIndex",
-    "findLastIndex",
-    "some",
-    "every",
-    "indexOf",
-    "lastIndexOf",
-    "includes",
-    "join",
-    "toString",
-    "toLocaleString"
-  ]);
-  function isMutatingArrayMethod(method) {
-    return MUTATING_METHODS.has(method);
-  }
-  function isNonMutatingArrayMethod(method) {
-    return NON_MUTATING_METHODS.has(method);
-  }
-  function isArrayOperationMethod(method) {
-    return isMutatingArrayMethod(method) || isNonMutatingArrayMethod(method);
-  }
-  function enterOperation(state, method) {
-    state.operationMethod = method;
-  }
-  function exitOperation(state) {
-    state.operationMethod = void 0;
-  }
-  function executeArrayMethod(state, operation, markLength = true) {
-    prepareCopy(state);
-    const result = operation();
-    markChanged(state);
-    if (markLength)
-      state.assigned_.set("length", true);
-    return result;
-  }
-  function markAllIndicesReassigned(state) {
-    state.allIndicesReassigned_ = true;
-  }
-  function normalizeSliceIndex(index, length) {
-    if (index < 0) {
-      return Math.max(length + index, 0);
-    }
-    return Math.min(index, length);
-  }
-  function handleSimpleOperation(state, method, args) {
-    return executeArrayMethod(state, () => {
-      const result = state.copy_[method](...args);
-      if (SHIFTING_METHODS.has(method)) {
-        markAllIndicesReassigned(state);
-      }
-      return RESULT_RETURNING_METHODS.has(method) ? result : state.draft_;
-    });
-  }
-  function handleReorderingOperation(state, method, args) {
-    return executeArrayMethod(
-      state,
-      () => {
-        ;
-        state.copy_[method](...args);
-        markAllIndicesReassigned(state);
-        return state.draft_;
-      },
-      false
-    );
-  }
-  function createMethodInterceptor(state, originalMethod) {
-    return function interceptedMethod(...args) {
-      const method = originalMethod;
-      enterOperation(state, method);
-      try {
-        if (isMutatingArrayMethod(method)) {
-          if (RESULT_RETURNING_METHODS.has(method)) {
-            return handleSimpleOperation(state, method, args);
-          }
-          if (REORDERING_METHODS.has(method)) {
-            return handleReorderingOperation(state, method, args);
-          }
-          if (method === "splice") {
-            const res = executeArrayMethod(
-              state,
-              () => state.copy_.splice(...args)
-            );
-            markAllIndicesReassigned(state);
-            return res;
-          }
-        } else {
-          return handleNonMutatingOperation(state, method, args);
-        }
-      } finally {
-        exitOperation(state);
-      }
-    };
-  }
-  function handleNonMutatingOperation(state, method, args) {
-    const source = latest(state);
-    if (method === "filter") {
-      const predicate = args[0];
-      const result = [];
-      for (let i = 0; i < source.length; i++) {
-        if (predicate(source[i], i, source)) {
-          result.push(state.draft_[i]);
-        }
-      }
-      return result;
-    }
-    if (FIND_METHODS.has(method)) {
-      const predicate = args[0];
-      const isForward = method === "find";
-      const step = isForward ? 1 : -1;
-      const start = isForward ? 0 : source.length - 1;
-      for (let i = start; i >= 0 && i < source.length; i += step) {
-        if (predicate(source[i], i, source)) {
-          return state.draft_[i];
-        }
-      }
-      return void 0;
-    }
-    if (method === "slice") {
-      const rawStart = args[0] ?? 0;
-      const rawEnd = args[1] ?? source.length;
-      const start = normalizeSliceIndex(rawStart, source.length);
-      const end = normalizeSliceIndex(rawEnd, source.length);
-      const result = [];
-      for (let i = start; i < end; i++) {
-        result.push(state.draft_[i]);
-      }
-      return result;
-    }
-    return source[method](...args);
-  }
-  loadPlugin(PluginArrayMethods, {
-    createMethodInterceptor,
-    isArrayOperationMethod,
-    isMutatingArrayMethod
-  });
 }
 
 // src/immer.ts
@@ -160873,7 +160680,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react_router__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react-router */ "./node_modules/react-router/dist/index.js");
 /* harmony import */ var react_router__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @remix-run/router */ "./node_modules/@remix-run/router/dist/router.js");
 /**
- * React Router DOM v6.30.3
+ * React Router DOM v6.30.2
  *
  * Copyright (c) Remix Software Inc.
  *
@@ -162404,7 +162211,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _remix_run_router__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @remix-run/router */ "./node_modules/@remix-run/router/dist/router.js");
 /**
- * React Router v6.30.3
+ * React Router v6.30.2
  *
  * Copyright (c) Remix Software Inc.
  *

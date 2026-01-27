@@ -10,7 +10,7 @@ import { RiDeleteBin5Line } from "react-icons/ri";
 import { FaRegCopy } from "react-icons/fa";
 import FloatingEdge from "../FloatingEdge/FloatingEdge";
 import { __ } from "@wordpress/i18n";
-export default function CustomNode({ id, data, xPos, yPos }) {
+export default function CustomNode({ id, data, xPos, yPos ,canvasLayout}) {
   const [hovered, setHovered] = useState(false);
 
   const { getEdges } = useReactFlow();
@@ -23,7 +23,6 @@ export default function CustomNode({ id, data, xPos, yPos }) {
 
   const sourceX = xPos + NODE_WIDTH;
   const sourceY = yPos + NODE_HEIGHT / 2;
-
 
   return (
     <Box
@@ -96,7 +95,7 @@ export default function CustomNode({ id, data, xPos, yPos }) {
         {data?.action !== "trigger" && (
           <Handle
             type="target"
-            position={Position.Left}
+            position={canvasLayout === "LR"? Position.Left : Position.Top}
             style={{
               width: 10,
               height: 10,
@@ -113,7 +112,7 @@ export default function CustomNode({ id, data, xPos, yPos }) {
         {!data.conditions && (
           <Handle
             type="source"
-            position={Position.Right}
+            position={canvasLayout === "LR"? Position.Right : Position.Bottom}
             style={{
               width: 10,
               height: 10,
@@ -129,6 +128,7 @@ export default function CustomNode({ id, data, xPos, yPos }) {
           sourceX={sourceX}
           sourceY={sourceY}
           openDrawerFromAdd={data.openDrawerFromAdd}
+          canvasLayout={canvasLayout}
         />
       )}
     </Box>
