@@ -17,6 +17,7 @@ export default function CustomNode({ id, data,canvasLayout}) {
   const edges = getEdges();
 
   const hasOutgoingEdge = edges.some((e) => e.source === id);
+  const isLR = canvasLayout === "LR"
 
   return (
     <Box
@@ -53,7 +54,8 @@ export default function CustomNode({ id, data,canvasLayout}) {
             bg="var(--zaplane-border-color)"
             color="var(--zaplane-font-color)"
             p="6px"
-            marginTop="4px"
+            marginTop= "4px"
+            marginLeft={isLR ? "0" : "100px"}
             borderRadius="full"
             boxShadow="lg"
             cursor="pointer"

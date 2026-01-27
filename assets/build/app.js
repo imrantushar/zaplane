@@ -3945,6 +3945,7 @@ function CustomNode({
   } = (0,_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.useReactFlow)();
   const edges = getEdges();
   const hasOutgoingEdge = edges.some(e => e.source === id);
+  const isLR = canvasLayout === "LR";
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Box, {
     position: "relative",
     onMouseEnter: () => setHovered(true),
@@ -3974,6 +3975,7 @@ function CustomNode({
         color: "var(--zaplane-font-color)",
         p: "6px",
         marginTop: "4px",
+        marginLeft: isLR ? "0" : "100px",
         borderRadius: "full",
         boxShadow: "lg",
         cursor: "pointer",
