@@ -6,6 +6,7 @@ import {
     Background,
     Panel,
     ControlButton,
+    useReactFlow,
 } from "@xyflow/react";
 import "@xyflow/react/dist/base.css";
 import { __ } from '@wordpress/i18n';
@@ -55,6 +56,8 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
     const containerRef = useRef(null);
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [activeDrawer, setActiveDrawer] = useState(null);
+    const { fitView } = useReactFlow();
+
 
     useEffect(() => {
         if (!singleData?.graph) return;
@@ -112,8 +115,12 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
 
             setNodes(layoutedNodes);
             setEdges(layoutedEdges);
+             requestAnimationFrame(() => {
+            fitView({ padding: 0.2, duration: 300 });
+        });
         },
-        [nodes, edges]
+        
+        [nodes, edges,fitView]
     );
 
     console.log(nodes, 'all nodes');
@@ -285,7 +292,7 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
                     onEdgesChange={onEdgesChange}
                     onConnect={onConnect}
                     fitView
-                    // fitViewOnInit
+                    fitViewOnInit
                     panOnDrag
                     zoomOnScroll
                     zoomOnDoubleClick

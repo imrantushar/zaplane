@@ -4165,6 +4165,9 @@ function FlowCanvas({
   const containerRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
   const [isFullscreen, setIsFullscreen] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
   const [activeDrawer, setActiveDrawer] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(null);
+  const {
+    fitView
+  } = (0,_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.useReactFlow)();
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
     if (!singleData?.graph) return;
     const {
@@ -4226,7 +4229,13 @@ function FlowCanvas({
     } = (0,_dagreLayout__WEBPACK_IMPORTED_MODULE_30__.getLayoutedElements)(nodes, edges, direction);
     setNodes(layoutedNodes);
     setEdges(layoutedEdges);
-  }, [nodes, edges]);
+    requestAnimationFrame(() => {
+      fitView({
+        padding: 0.2,
+        duration: 300
+      });
+    });
+  }, [nodes, edges, fitView]);
   console.log(nodes, 'all nodes');
   console.log(edges, 'all edges');
   const nodeTypes = {
@@ -4370,9 +4379,8 @@ function FlowCanvas({
       onNodesChange: onNodesChange,
       onEdgesChange: onEdgesChange,
       onConnect: onConnect,
-      fitView: true
-      // fitViewOnInit
-      ,
+      fitView: true,
+      fitViewOnInit: true,
       panOnDrag: true,
       zoomOnScroll: true,
       zoomOnDoubleClick: true,
@@ -36881,7 +36889,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   stripBasename: () => (/* binding */ stripBasename)
 /* harmony export */ });
 /**
- * @remix-run/router v1.23.1
+ * @remix-run/router v1.23.2
  *
  * Copyright (c) Remix Software Inc.
  *
@@ -39004,7 +39012,7 @@ function createRouter(init) {
         // If the user didn't explicity indicate replace behavior, replace if
         // we redirected to the exact same location we're currently at to avoid
         // double back-buttons
-        let location = normalizeRedirectLocation(result.response.headers.get("Location"), new URL(request.url), basename);
+        let location = normalizeRedirectLocation(result.response.headers.get("Location"), new URL(request.url), basename, init.history);
         replace = location === state.location.pathname + state.location.search;
       }
       await startRedirectNavigation(request, result, true, {
@@ -39610,7 +39618,7 @@ function createRouter(init) {
     }
     let location = redirect.response.headers.get("Location");
     invariant(location, "Expected a Location header on the redirect Response");
-    location = normalizeRedirectLocation(location, new URL(request.url), basename);
+    location = normalizeRedirectLocation(location, new URL(request.url), basename, init.history);
     let redirectLocation = createLocation(state.location, location, {
       _isRedirect: true
     });
@@ -41316,16 +41324,30 @@ function normalizeRelativeRoutingRedirectResponse(response, request, routeId, ma
   }
   return response;
 }
-function normalizeRedirectLocation(location, currentUrl, basename) {
+function normalizeRedirectLocation(location, currentUrl, basename, historyInstance) {
+  // Match Chrome's behavior:
+  // https://github.com/chromium/chromium/blob/216dbeb61db0c667e62082e5f5400a32d6983df3/content/public/common/url_utils.cc#L82
+  let invalidProtocols = ["about:", "blob:", "chrome:", "chrome-untrusted:", "content:", "data:", "devtools:", "file:", "filesystem:",
+  // eslint-disable-next-line no-script-url
+  "javascript:"];
   if (ABSOLUTE_URL_REGEX.test(location)) {
     // Strip off the protocol+origin for same-origin + same-basename absolute redirects
     let normalizedLocation = location;
     let url = normalizedLocation.startsWith("//") ? new URL(currentUrl.protocol + normalizedLocation) : new URL(normalizedLocation);
+    if (invalidProtocols.includes(url.protocol)) {
+      throw new Error("Invalid redirect location");
+    }
     let isSameBasename = stripBasename(url.pathname, basename) != null;
     if (url.origin === currentUrl.origin && isSameBasename) {
       return url.pathname + url.search + url.hash;
     }
   }
+  try {
+    let url = historyInstance.createURL(location);
+    if (invalidProtocols.includes(url.protocol)) {
+      throw new Error("Invalid redirect location");
+    }
+  } catch (e) {}
   return location;
 }
 // Utility method for creating the Request instances for loaders/actions during
@@ -110766,6 +110788,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   castImmutable: () => (/* binding */ castImmutable),
 /* harmony export */   createDraft: () => (/* binding */ createDraft),
 /* harmony export */   current: () => (/* binding */ current),
+/* harmony export */   enableArrayMethods: () => (/* binding */ enableArrayMethods),
 /* harmony export */   enableMapSet: () => (/* binding */ enableMapSet),
 /* harmony export */   enablePatches: () => (/* binding */ enablePatches),
 /* harmony export */   finishDraft: () => (/* binding */ finishDraft),
@@ -110908,6 +110931,10 @@ var isSet = (target) => target instanceof Set;
 var isObjectish = (target) => typeof target === "object";
 var isFunction = (target) => typeof target === "function";
 var isBoolean = (target) => typeof target === "boolean";
+function isArrayIndex(value) {
+  const n = +value;
+  return Number.isInteger(n) && String(n) === value;
+}
 var getProxyDraft = (value) => {
   if (!isObjectish(value))
     return null;
@@ -110996,6 +111023,7 @@ function isFrozen(obj) {
 // src/utils/plugins.ts
 var PluginMapSet = "MapSet";
 var PluginPatches = "Patches";
+var PluginArrayMethods = "ArrayMethods";
 var plugins = {};
 function getPlugin(pluginKey) {
   const plugin = plugins[pluginKey];
@@ -111023,7 +111051,8 @@ var createScope = (parent_, immer_) => ({
   unfinalizedDrafts_: 0,
   handledSet_: /* @__PURE__ */ new Set(),
   processedForPatches_: /* @__PURE__ */ new Set(),
-  mapSetPlugin_: isPluginLoaded(PluginMapSet) ? getPlugin(PluginMapSet) : void 0
+  mapSetPlugin_: isPluginLoaded(PluginMapSet) ? getPlugin(PluginMapSet) : void 0,
+  arrayMethodsPlugin_: isPluginLoaded(PluginArrayMethods) ? getPlugin(PluginArrayMethods) : void 0
 });
 function usePatchesInScope(scope, patchListener) {
   if (patchListener) {
@@ -111158,7 +111187,7 @@ function registerChildFinalizationCallback(parent, child, key) {
   });
 }
 function generatePatchesAndFinalize(state, rootScope) {
-  const shouldFinalize = state.modified_ && !state.finalized_ && (state.type_ === 3 /* Set */ || (state.assigned_?.size ?? 0) > 0);
+  const shouldFinalize = state.modified_ && !state.finalized_ && (state.type_ === 3 /* Set */ || state.type_ === 1 /* Array */ && state.allIndicesReassigned_ || (state.assigned_?.size ?? 0) > 0);
   if (shouldFinalize) {
     const { patchPlugin_ } = rootScope;
     if (patchPlugin_) {
@@ -111184,13 +111213,19 @@ function handleCrossReference(target, key, value) {
   } else if (isDraftable(value)) {
     target.callbacks_.push(function nestedDraftCleanup() {
       const targetCopy = latest(target);
-      if (get(targetCopy, key, target.type_) === value) {
-        if (scope_.drafts_.length > 1 && (target.assigned_.get(key) ?? false) === true && target.copy_) {
-          handleValue(
-            get(target.copy_, key, target.type_),
-            scope_.handledSet_,
-            scope_
-          );
+      if (target.type_ === 3 /* Set */) {
+        if (targetCopy.has(value)) {
+          handleValue(value, scope_.handledSet_, scope_);
+        }
+      } else {
+        if (get(targetCopy, key, target.type_) === value) {
+          if (scope_.drafts_.length > 1 && (target.assigned_.get(key) ?? false) === true && target.copy_) {
+            handleValue(
+              get(target.copy_, key, target.type_),
+              scope_.handledSet_,
+              scope_
+            );
+          }
         }
       }
     });
@@ -111263,12 +111298,24 @@ var objectTraps = {
   get(state, prop) {
     if (prop === DRAFT_STATE)
       return state;
+    let arrayPlugin = state.scope_.arrayMethodsPlugin_;
+    const isArrayWithStringProp = state.type_ === 1 /* Array */ && typeof prop === "string";
+    if (isArrayWithStringProp) {
+      if (arrayPlugin?.isArrayOperationMethod(prop)) {
+        return arrayPlugin.createMethodInterceptor(state, prop);
+      }
+    }
     const source = latest(state);
     if (!has(source, prop, state.type_)) {
       return readPropFromProto(state, source, prop);
     }
     const value = source[prop];
     if (state.finalized_ || !isDraftable(value)) {
+      return value;
+    }
+    if (isArrayWithStringProp && state.operationMethod && arrayPlugin?.isMutatingArrayMethod(
+      state.operationMethod
+    ) && isArrayIndex(prop)) {
       return value;
     }
     if (value === peek(state.base_, prop)) {
@@ -111351,13 +111398,14 @@ var objectTraps = {
   }
 };
 var arrayTraps = {};
-each(objectTraps, (key, fn) => {
+for (let key in objectTraps) {
+  let fn = objectTraps[key];
   arrayTraps[key] = function() {
     const args = arguments;
     args[0] = args[0][0];
     return fn.apply(this, args);
   };
-});
+}
 arrayTraps.deleteProperty = function(state, prop) {
   if ( true && isNaN(parseInt(prop)))
     die(13);
@@ -111643,7 +111691,7 @@ function enablePatches() {
     );
   }
   function getPath(state, path = []) {
-    if ("key_" in state && state.key_ !== void 0) {
+    if (state.key_ !== void 0) {
       const parentCopy = state.parent_.copy_ ?? state.parent_.base_;
       const proxyDraft = getProxyDraft(get(parentCopy, state.key_));
       const valueAtKey = get(parentCopy, state.key_);
@@ -111733,10 +111781,12 @@ function enablePatches() {
       [base_, copy_] = [copy_, base_];
       [patches, inversePatches] = [inversePatches, patches];
     }
+    const allReassigned = state.allIndicesReassigned_ === true;
     for (let i = 0; i < base_.length; i++) {
       const copiedItem = copy_[i];
       const baseItem = base_[i];
-      if (assigned_?.get(i.toString()) && copiedItem !== baseItem) {
+      const isAssigned = allReassigned || assigned_?.get(i.toString());
+      if (isAssigned && copiedItem !== baseItem) {
         const childState = copiedItem?.[DRAFT_STATE];
         if (childState && childState.modified_) {
           continue;
@@ -111967,6 +112017,7 @@ function enableMapSet() {
         state.assigned_.set(key, true);
         state.copy_.set(key, value);
         state.assigned_.set(key, true);
+        handleCrossReference(state, key, value);
       }
       return this;
     }
@@ -112110,6 +112161,7 @@ function enableMapSet() {
         prepareSetCopy(state);
         markChanged(state);
         state.copy_.add(value);
+        handleCrossReference(state, value, value);
       }
       return this;
     }
@@ -112194,6 +112246,163 @@ function enableMapSet() {
     }
   }
   loadPlugin(PluginMapSet, { proxyMap_, proxySet_, fixSetContents });
+}
+
+// src/plugins/arrayMethods.ts
+function enableArrayMethods() {
+  const SHIFTING_METHODS = /* @__PURE__ */ new Set(["shift", "unshift"]);
+  const QUEUE_METHODS = /* @__PURE__ */ new Set(["push", "pop"]);
+  const RESULT_RETURNING_METHODS = /* @__PURE__ */ new Set([
+    ...QUEUE_METHODS,
+    ...SHIFTING_METHODS
+  ]);
+  const REORDERING_METHODS = /* @__PURE__ */ new Set(["reverse", "sort"]);
+  const MUTATING_METHODS = /* @__PURE__ */ new Set([
+    ...RESULT_RETURNING_METHODS,
+    ...REORDERING_METHODS,
+    "splice"
+  ]);
+  const FIND_METHODS = /* @__PURE__ */ new Set(["find", "findLast"]);
+  const NON_MUTATING_METHODS = /* @__PURE__ */ new Set([
+    "filter",
+    "slice",
+    "concat",
+    "flat",
+    ...FIND_METHODS,
+    "findIndex",
+    "findLastIndex",
+    "some",
+    "every",
+    "indexOf",
+    "lastIndexOf",
+    "includes",
+    "join",
+    "toString",
+    "toLocaleString"
+  ]);
+  function isMutatingArrayMethod(method) {
+    return MUTATING_METHODS.has(method);
+  }
+  function isNonMutatingArrayMethod(method) {
+    return NON_MUTATING_METHODS.has(method);
+  }
+  function isArrayOperationMethod(method) {
+    return isMutatingArrayMethod(method) || isNonMutatingArrayMethod(method);
+  }
+  function enterOperation(state, method) {
+    state.operationMethod = method;
+  }
+  function exitOperation(state) {
+    state.operationMethod = void 0;
+  }
+  function executeArrayMethod(state, operation, markLength = true) {
+    prepareCopy(state);
+    const result = operation();
+    markChanged(state);
+    if (markLength)
+      state.assigned_.set("length", true);
+    return result;
+  }
+  function markAllIndicesReassigned(state) {
+    state.allIndicesReassigned_ = true;
+  }
+  function normalizeSliceIndex(index, length) {
+    if (index < 0) {
+      return Math.max(length + index, 0);
+    }
+    return Math.min(index, length);
+  }
+  function handleSimpleOperation(state, method, args) {
+    return executeArrayMethod(state, () => {
+      const result = state.copy_[method](...args);
+      if (SHIFTING_METHODS.has(method)) {
+        markAllIndicesReassigned(state);
+      }
+      return RESULT_RETURNING_METHODS.has(method) ? result : state.draft_;
+    });
+  }
+  function handleReorderingOperation(state, method, args) {
+    return executeArrayMethod(
+      state,
+      () => {
+        ;
+        state.copy_[method](...args);
+        markAllIndicesReassigned(state);
+        return state.draft_;
+      },
+      false
+    );
+  }
+  function createMethodInterceptor(state, originalMethod) {
+    return function interceptedMethod(...args) {
+      const method = originalMethod;
+      enterOperation(state, method);
+      try {
+        if (isMutatingArrayMethod(method)) {
+          if (RESULT_RETURNING_METHODS.has(method)) {
+            return handleSimpleOperation(state, method, args);
+          }
+          if (REORDERING_METHODS.has(method)) {
+            return handleReorderingOperation(state, method, args);
+          }
+          if (method === "splice") {
+            const res = executeArrayMethod(
+              state,
+              () => state.copy_.splice(...args)
+            );
+            markAllIndicesReassigned(state);
+            return res;
+          }
+        } else {
+          return handleNonMutatingOperation(state, method, args);
+        }
+      } finally {
+        exitOperation(state);
+      }
+    };
+  }
+  function handleNonMutatingOperation(state, method, args) {
+    const source = latest(state);
+    if (method === "filter") {
+      const predicate = args[0];
+      const result = [];
+      for (let i = 0; i < source.length; i++) {
+        if (predicate(source[i], i, source)) {
+          result.push(state.draft_[i]);
+        }
+      }
+      return result;
+    }
+    if (FIND_METHODS.has(method)) {
+      const predicate = args[0];
+      const isForward = method === "find";
+      const step = isForward ? 1 : -1;
+      const start = isForward ? 0 : source.length - 1;
+      for (let i = start; i >= 0 && i < source.length; i += step) {
+        if (predicate(source[i], i, source)) {
+          return state.draft_[i];
+        }
+      }
+      return void 0;
+    }
+    if (method === "slice") {
+      const rawStart = args[0] ?? 0;
+      const rawEnd = args[1] ?? source.length;
+      const start = normalizeSliceIndex(rawStart, source.length);
+      const end = normalizeSliceIndex(rawEnd, source.length);
+      const result = [];
+      for (let i = start; i < end; i++) {
+        result.push(state.draft_[i]);
+      }
+      return result;
+    }
+    return source[method](...args);
+  }
+  loadPlugin(PluginArrayMethods, {
+    createMethodInterceptor,
+    isArrayOperationMethod,
+    isMutatingArrayMethod
+  });
 }
 
 // src/immer.ts
@@ -160664,7 +160873,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react_router__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react-router */ "./node_modules/react-router/dist/index.js");
 /* harmony import */ var react_router__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @remix-run/router */ "./node_modules/@remix-run/router/dist/router.js");
 /**
- * React Router DOM v6.30.2
+ * React Router DOM v6.30.3
  *
  * Copyright (c) Remix Software Inc.
  *
@@ -162195,7 +162404,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _remix_run_router__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @remix-run/router */ "./node_modules/@remix-run/router/dist/router.js");
 /**
- * React Router v6.30.2
+ * React Router v6.30.3
  *
  * Copyright (c) Remix Software Inc.
  *
