@@ -255,7 +255,6 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
                             {...primaryBtn}
                             size="sm"
                             onClick={handleSubmit}
-                            disabled={!dirty || isSubmitting}
                         >
                             {__("Update", "zaplane")}
                         </Button>

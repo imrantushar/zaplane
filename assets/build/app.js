@@ -4348,7 +4348,6 @@ function FlowCanvas({
           ..._assets_scss_chakra_recipe__WEBPACK_IMPORTED_MODULE_29__.primaryBtn,
           size: "sm",
           onClick: handleSubmit,
-          disabled: !dirty || isSubmitting,
           children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("Update", "zaplane")
         })]
       })
