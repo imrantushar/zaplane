@@ -10,7 +10,6 @@ const NODE_HEIGHT = 48;
 export const getLayoutedElements = (nodes, edges, direction = "TB") => {
   const isHorizontal = direction === "LR";
   dagreGraph.setGraph({ rankdir: direction });
-
   nodes.forEach((node) => {
     dagreGraph.setNode(node.id, {
       width: NODE_WIDTH,
@@ -23,20 +22,16 @@ export const getLayoutedElements = (nodes, edges, direction = "TB") => {
   });
 
   dagre.layout(dagreGraph);
-
+  
   const layoutedNodes = nodes.map((node) => {
     const { x, y } = dagreGraph.node(node.id);
-
     return {
       ...node,
       position: {
         x: x - NODE_WIDTH / 2,
         y: y - NODE_HEIGHT / 2,
       },
-      targetPosition: isHorizontal ? "left" : "top",
-      sourcePosition: isHorizontal ? "right" : "bottom",
     };
   });
-
   return { nodes: layoutedNodes, edges };
 };

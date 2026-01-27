@@ -3713,15 +3713,12 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-
 const CustomEdge = ({
   id,
   sourceX,
   sourceY,
   targetX,
   targetY,
-  sourcePosition,
-  targetPosition,
   style = {},
   markerEnd,
   onEdgeDelete,
@@ -3730,10 +3727,8 @@ const CustomEdge = ({
   const [edgePath] = (0,_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.getBezierPath)({
     sourceX,
     sourceY,
-    sourcePosition,
     targetX,
-    targetY,
-    targetPosition
+    targetY
   });
   const [centerX, centerY] = (0,_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.getEdgeCenter)({
     sourceX,
@@ -3851,19 +3846,11 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const FloatingEdge = ({
-  sourceX,
-  sourceY,
   openDrawerFromAdd,
   canvasLayout
 }) => {
-  const targetX = sourceX + 140;
-  const targetY = sourceY;
   const isLR = canvasLayout === "LR";
   const [edgePath] = (0,_xyflow_react__WEBPACK_IMPORTED_MODULE_0__.getBezierPath)({
-    sourceX,
-    sourceY,
-    targetX,
-    targetY,
     sourcePosition: isLR ? "right" : "bottom",
     targetPosition: isLR ? "left" : "top"
   });
@@ -3877,8 +3864,6 @@ const FloatingEdge = ({
     }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("foreignObject", {
       width: 32,
       height: 32,
-      x: targetX - 16,
-      y: targetY - 16,
       children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Center, {
         as: "button",
         onClick: openDrawerFromAdd,
@@ -3952,8 +3937,6 @@ __webpack_require__.r(__webpack_exports__);
 function CustomNode({
   id,
   data,
-  xPos,
-  yPos,
   canvasLayout
 }) {
   const [hovered, setHovered] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
@@ -3962,10 +3945,6 @@ function CustomNode({
   } = (0,_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.useReactFlow)();
   const edges = getEdges();
   const hasOutgoingEdge = edges.some(e => e.source === id);
-  const NODE_WIDTH = 160;
-  const NODE_HEIGHT = 48;
-  const sourceX = xPos + NODE_WIDTH;
-  const sourceY = yPos + NODE_HEIGHT / 2;
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Box, {
     position: "relative",
     onMouseEnter: () => setHovered(true),
@@ -4052,9 +4031,10 @@ function CustomNode({
           border: "2px solid var(--zaplane-body-background)"
         }
       })]
-    }), !hasOutgoingEdge && !data.conditions && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_FloatingEdge_FloatingEdge__WEBPACK_IMPORTED_MODULE_9__["default"], {
-      sourceX: sourceX,
-      sourceY: sourceY,
+    }), !hasOutgoingEdge && !data.conditions && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_FloatingEdge_FloatingEdge__WEBPACK_IMPORTED_MODULE_9__["default"]
+    // sourceX={sourceX}
+    // sourceY={sourceY}
+    , {
       openDrawerFromAdd: data.openDrawerFromAdd,
       canvasLayout: canvasLayout
     })]
@@ -4170,10 +4150,12 @@ function FlowCanvas({
   const containerRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
   const [isFullscreen, setIsFullscreen] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
   const [activeDrawer, setActiveDrawer] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(null);
+  //if we menage layout syestem then we need to save databse this value
   const [canvasLayout, setCanvasLayout] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)("LR");
   const {
     fitView
   } = (0,_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.useReactFlow)();
+  const updateNodeInternals = (0,_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.useUpdateNodeInternals)();
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
     if (!singleData?.graph) return;
     const {
@@ -4236,13 +4218,16 @@ function FlowCanvas({
     setNodes(layoutedNodes);
     setEdges(layoutedEdges);
     requestAnimationFrame(() => {
+      layoutedNodes.forEach(node => {
+        updateNodeInternals(node.id);
+      });
       fitView({
         padding: 0.2,
         duration: 300
       });
       setCanvasLayout(direction);
     });
-  }, [nodes, edges, fitView]);
+  }, [nodes, edges, fitView, updateNodeInternals]);
   console.log(nodes, 'all nodes');
   console.log(edges, 'all edges');
   const nodeTypes = {
@@ -4374,7 +4359,6 @@ function FlowCanvas({
           ..._assets_scss_chakra_recipe__WEBPACK_IMPORTED_MODULE_29__.primaryBtn,
           size: "sm",
           onClick: handleSubmit,
-          disabled: !dirty || isSubmitting,
           children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("Update", "zaplane")
         })]
       })
@@ -4728,9 +4712,7 @@ const getLayoutedElements = (nodes, edges, direction = "TB") => {
       position: {
         x: x - NODE_WIDTH / 2,
         y: y - NODE_HEIGHT / 2
-      },
-      targetPosition: isHorizontal ? "left" : "top",
-      sourcePosition: isHorizontal ? "right" : "bottom"
+      }
     };
   });
   return {

@@ -7,6 +7,7 @@ import {
     Panel,
     ControlButton,
     useReactFlow,
+    useUpdateNodeInternals,
 } from "@xyflow/react";
 import "@xyflow/react/dist/base.css";
 import { __ } from '@wordpress/i18n';
@@ -57,8 +58,10 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
     const containerRef = useRef(null);
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [activeDrawer, setActiveDrawer] = useState(null);
-    const [canvasLayout,setCanvasLayout] =useState("LR")
+    //if we menage layout syestem then we need to save databse this value
+    const [canvasLayout, setCanvasLayout] = useState("LR")
     const { fitView } = useReactFlow();
+    const updateNodeInternals = useUpdateNodeInternals();
 
 
     useEffect(() => {
@@ -117,14 +120,19 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
 
             setNodes(layoutedNodes);
             setEdges(layoutedEdges);
-             requestAnimationFrame(() => {
-            fitView({ padding: 0.2, duration: 300 });
-            setCanvasLayout(direction)
-        });
-        },
 
-        [nodes, edges,fitView]
+            requestAnimationFrame(() => {
+                layoutedNodes.forEach((node) => {
+                    updateNodeInternals(node.id);
+                });
+
+                fitView({ padding: 0.2, duration: 300 });
+                setCanvasLayout(direction);
+            });
+        },
+        [nodes, edges, fitView, updateNodeInternals]
     );
+
 
     console.log(nodes, 'all nodes',);
     console.log(edges, 'all edges');
@@ -277,7 +285,6 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
                             {...primaryBtn}
                             size="sm"
                             onClick={handleSubmit}
-                            disabled={!dirty || isSubmitting}
                         >
                             {__("Update", "zaplane")}
                         </Button>
@@ -308,7 +315,7 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
 
                     <Background />
                     <Flex className="zaplane-canvas-layout-icon">
-                         <ControlButton
+                        <ControlButton
                             onClick={() => onLayout("TB")}
                             title="Vertical layout"
                             className="zaplane-control-btn"
@@ -322,8 +329,8 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
                         >
                             <IoSwapHorizontal size={16} />
                         </ControlButton>
-                       </Flex>
-                   <Controls
+                    </Flex>
+                    <Controls
                         position="top-left"
                         className="zaplane-canvas-controls"
                     />

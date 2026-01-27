@@ -10,19 +10,13 @@ import { RiDeleteBin5Line } from "react-icons/ri";
 import { FaRegCopy } from "react-icons/fa";
 import FloatingEdge from "../FloatingEdge/FloatingEdge";
 import { __ } from "@wordpress/i18n";
-export default function CustomNode({ id, data, xPos, yPos ,canvasLayout}) {
+export default function CustomNode({ id, data,canvasLayout}) {
   const [hovered, setHovered] = useState(false);
 
   const { getEdges } = useReactFlow();
   const edges = getEdges();
 
   const hasOutgoingEdge = edges.some((e) => e.source === id);
-
-  const NODE_WIDTH = 160;
-  const NODE_HEIGHT = 48;
-
-  const sourceX = xPos + NODE_WIDTH;
-  const sourceY = yPos + NODE_HEIGHT / 2;
 
   return (
     <Box
@@ -125,8 +119,8 @@ export default function CustomNode({ id, data, xPos, yPos ,canvasLayout}) {
       </Box>
       {!hasOutgoingEdge && !data.conditions && (
         <FloatingEdge
-          sourceX={sourceX}
-          sourceY={sourceY}
+          // sourceX={sourceX}
+          // sourceY={sourceY}
           openDrawerFromAdd={data.openDrawerFromAdd}
           canvasLayout={canvasLayout}
         />
