@@ -30,6 +30,10 @@
  * }
  */
 
+import { useReactFlow, useUpdateNodeInternals } from "@xyflow/react";
+import { getLayoutedElements } from "@ZAPContainers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/dagreLayout";
+import { useCallback } from "react";
+
 export const useFlowActions = ({
     nodes,
     setNodes,
@@ -40,7 +44,9 @@ export const useFlowActions = ({
     setDrawerOpen,
     getNewNodeId,
     GAP = 250,
+    setCanvasLayout
 }) => {
+
     const updateNodeData = (updatedData) => {
         setNodes((nds) =>
             nds.map((n) =>
@@ -124,6 +130,28 @@ export const useFlowActions = ({
         setDrawerContext({ source: "add", node, edge: null });
         setDrawerOpen(true);
     };
+    //meanagin layout flow canvas 
+    const { fitView } = useReactFlow();
+    const updateNodeInternals = useUpdateNodeInternals();
+    const onLayout = useCallback(
+        (direction) => {
+            const { nodes: layoutedNodes, edges: layoutedEdges } =
+                getLayoutedElements(nodes, edges, direction);
+
+            setNodes(layoutedNodes);
+            setEdges(layoutedEdges);
+
+            requestAnimationFrame(() => {
+                layoutedNodes.forEach((node) => {
+                    updateNodeInternals(node.id);
+                });
+
+                fitView({ padding: 0.2, duration: 300 });
+                setCanvasLayout(direction);
+            });
+        },
+        [nodes, edges, fitView, updateNodeInternals]
+    );
 
     return {
         updateNodeData,
@@ -132,5 +160,6 @@ export const useFlowActions = ({
         onAddNode,
         openDrawerForNode,
         openDrawerFromAdd,
+        onLayout
     };
 };

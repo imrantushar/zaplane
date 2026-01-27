@@ -4083,15 +4083,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _ZAPComponents_Loading__WEBPACK_IMPORTED_MODULE_24__ = __webpack_require__(/*! @ZAPComponents/Loading */ "./dev_zaplane/components/Loading/index.js");
 /* harmony import */ var _helper__WEBPACK_IMPORTED_MODULE_25__ = __webpack_require__(/*! ../../helper */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/helper.js");
 /* harmony import */ var _helper__WEBPACK_IMPORTED_MODULE_26__ = __webpack_require__(/*! ./helper */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/helper.js");
-/* harmony import */ var _hooks_useFlowActions__WEBPACK_IMPORTED_MODULE_27__ = __webpack_require__(/*! ../../../../../../hooks/useFlowActions */ "./dev_zaplane/hooks/useFlowActions.js");
+/* harmony import */ var _hooks_useFlowActions_useFlowActions__WEBPACK_IMPORTED_MODULE_27__ = __webpack_require__(/*! ../../../../../../hooks/useFlowActions/useFlowActions */ "./dev_zaplane/hooks/useFlowActions/useFlowActions.js");
 /* harmony import */ var _customNode_CustomNode__WEBPACK_IMPORTED_MODULE_28__ = __webpack_require__(/*! ../customNode/CustomNode */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/customNode/CustomNode.js");
 /* harmony import */ var _assets_scss_chakra_recipe__WEBPACK_IMPORTED_MODULE_29__ = __webpack_require__(/*! ../../../../../../../assets/scss/chakra/recipe */ "./assets/scss/chakra/recipe.js");
 /* harmony import */ var _styles_scss__WEBPACK_IMPORTED_MODULE_30__ = __webpack_require__(/*! ./styles.scss */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/styles.scss");
 /* harmony import */ var react_icons_io5__WEBPACK_IMPORTED_MODULE_31__ = __webpack_require__(/*! react-icons/io5 */ "./node_modules/react-icons/io5/index.mjs");
-/* harmony import */ var _dagreLayout__WEBPACK_IMPORTED_MODULE_32__ = __webpack_require__(/*! ./dagreLayout */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/dagreLayout.js");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__);
-
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__);
 
 
 
@@ -4138,9 +4136,7 @@ function FlowCanvas({
   const {
     values,
     setFieldValue,
-    handleSubmit,
-    dirty,
-    isSubmitting
+    handleSubmit
   } = (0,formik__WEBPACK_IMPORTED_MODULE_7__.useFormikContext)();
   const [loading, setLoading] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
   const {
@@ -4152,10 +4148,6 @@ function FlowCanvas({
   const [activeDrawer, setActiveDrawer] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(null);
   //if we menage layout syestem then we need to save databse this value
   const [canvasLayout, setCanvasLayout] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)("LR");
-  const {
-    fitView
-  } = (0,_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.useReactFlow)();
-  const updateNodeInternals = (0,_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.useUpdateNodeInternals)();
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
     if (!singleData?.graph) return;
     const {
@@ -4180,8 +4172,9 @@ function FlowCanvas({
     deleteNode,
     createActionNode,
     openDrawerForNode,
-    openDrawerFromAdd
-  } = (0,_hooks_useFlowActions__WEBPACK_IMPORTED_MODULE_27__.useFlowActions)({
+    openDrawerFromAdd,
+    onLayout
+  } = (0,_hooks_useFlowActions_useFlowActions__WEBPACK_IMPORTED_MODULE_27__.useFlowActions)({
     nodes,
     setNodes,
     edges,
@@ -4189,7 +4182,8 @@ function FlowCanvas({
     drawerContext,
     getNewNodeId,
     setDrawerContext,
-    setDrawerOpen
+    setDrawerOpen,
+    setCanvasLayout
   });
   const onAddNode = edgeId => {
     const edge = edges.find(e => e.id === edgeId);
@@ -4210,28 +4204,10 @@ function FlowCanvas({
   const onEdgeDelete = edgeId => {
     setEdges(eds => eds.filter(e => e.id !== edgeId));
   };
-  const onLayout = (0,react__WEBPACK_IMPORTED_MODULE_0__.useCallback)(direction => {
-    const {
-      nodes: layoutedNodes,
-      edges: layoutedEdges
-    } = (0,_dagreLayout__WEBPACK_IMPORTED_MODULE_32__.getLayoutedElements)(nodes, edges, direction);
-    setNodes(layoutedNodes);
-    setEdges(layoutedEdges);
-    requestAnimationFrame(() => {
-      layoutedNodes.forEach(node => {
-        updateNodeInternals(node.id);
-      });
-      fitView({
-        padding: 0.2,
-        duration: 300
-      });
-      setCanvasLayout(direction);
-    });
-  }, [nodes, edges, fitView, updateNodeInternals]);
   console.log(nodes, 'all nodes');
   console.log(edges, 'all edges');
   const nodeTypes = {
-    custom: props => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsx)(_customNode_CustomNode__WEBPACK_IMPORTED_MODULE_28__["default"], {
+    custom: props => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsx)(_customNode_CustomNode__WEBPACK_IMPORTED_MODULE_28__["default"], {
       ...props,
       data: {
         ...props.data,
@@ -4243,7 +4219,7 @@ function FlowCanvas({
     })
   };
   const edgeTypes = {
-    custom: props => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsx)(_CustomEdge_CustomEdge__WEBPACK_IMPORTED_MODULE_5__["default"], {
+    custom: props => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsx)(_CustomEdge_CustomEdge__WEBPACK_IMPORTED_MODULE_5__["default"], {
       ...props,
       onEdgeDelete: onEdgeDelete,
       onAddNode: onAddNode
@@ -4257,51 +4233,51 @@ function FlowCanvas({
 
   //     return () => clearInterval(interval);
   // }, []);  
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_9__.Box, {
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_9__.Box, {
     ref: containerRef,
     className: "zaplane_flowcanvas",
     flex: "1",
     height: "100vh",
     marginRight: activeDrawer ? "497px" : "0px",
     transition: "margin-right 0.4s ease",
-    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsx)(_ZAPComponents_TopBar__WEBPACK_IMPORTED_MODULE_8__["default"], {
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsx)(_ZAPComponents_TopBar__WEBPACK_IMPORTED_MODULE_8__["default"], {
       topBarStyles: {
         top: 0,
         margin: 0
       },
-      leftContent: () => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.Fragment, {
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {
+      leftContent: () => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.Fragment, {
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {
           variant: "outline",
           onClick: () => navigate(-1),
-          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsx)(react_icons_fi__WEBPACK_IMPORTED_MODULE_13__.FiArrowLeft, {})
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_10__.Text, {
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsx)(react_icons_fi__WEBPACK_IMPORTED_MODULE_13__.FiArrowLeft, {})
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_10__.Text, {
           fontSize: "md",
           fontWeight: "medium",
           children: singleData?.workflow?.title || (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("Untitled Workflow", "zaplane")
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {
           size: "sm",
           variant: "outline",
           onClick: () => dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_15__.workflowNodeListiner)(id)),
           children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("Runs ", "zaplane")
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {
           size: "sm",
           variant: "outline",
           onClick: () => dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_15__.workflowNodeListinerStop)(id)),
           children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("Stop", "zaplane")
         })]
       }),
-      rightContent: () => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.Fragment, {
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {
+      rightContent: () => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.Fragment, {
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {
           size: "sm",
           variant: "outline",
           onClick: () => (0,_helper__WEBPACK_IMPORTED_MODULE_22__.toggleFullscreenMode)(containerRef, isFullscreen, setIsFullscreen),
-          children: isFullscreen ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsx)(react_icons_lu__WEBPACK_IMPORTED_MODULE_21__.LuMinimize, {}) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsx)(react_icons_lu__WEBPACK_IMPORTED_MODULE_21__.LuFullscreen, {})
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsxs)(_ZAPComponents_Drawer__WEBPACK_IMPORTED_MODULE_17__["default"], {
+          children: isFullscreen ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsx)(react_icons_lu__WEBPACK_IMPORTED_MODULE_21__.LuMinimize, {}) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsx)(react_icons_lu__WEBPACK_IMPORTED_MODULE_21__.LuFullscreen, {})
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsxs)(_ZAPComponents_Drawer__WEBPACK_IMPORTED_MODULE_17__["default"], {
           title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("Log History", "Zaplane"),
           size: "md",
           open: activeDrawer === "logs",
           onClose: () => setActiveDrawer(null),
-          trigger: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {
+          trigger: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {
             size: "sm",
             variant: "outline",
             onClick: () => {
@@ -4310,14 +4286,14 @@ function FlowCanvas({
             },
             children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("Logs ", "zaplane")
           }),
-          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_12__.Flex, {
+          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_12__.Flex, {
             gap: "5px",
-            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {
+            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {
               size: "sm",
               variant: "outline",
               onClick: () => dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_15__.getRunWorkFlow)(id)),
               children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("🔄 Refresh ", "zaplane")
-            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {
+            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {
               size: "sm",
               variant: "outline",
               onClick: () => {
@@ -4328,41 +4304,41 @@ function FlowCanvas({
               },
               children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("🔄 Replay ", "zaplane")
             })]
-          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsx)(_RunsTable_RunsTable__WEBPACK_IMPORTED_MODULE_19__["default"], {
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsx)(_RunsTable_RunsTable__WEBPACK_IMPORTED_MODULE_19__["default"], {
             runs: runs
           })]
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsx)(_ZAPComponents_Drawer__WEBPACK_IMPORTED_MODULE_17__["default"], {
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsx)(_ZAPComponents_Drawer__WEBPACK_IMPORTED_MODULE_17__["default"], {
           title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("Version History", 'zaplane'),
           open: activeDrawer === "history",
           onClose: () => setActiveDrawer(null),
-          trigger: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_10__.Text, {
+          trigger: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_10__.Text, {
             margin: "0",
             cursor: "pointer",
             onClick: () => {
               setActiveDrawer("history");
               dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_15__.getAllVersion)(id));
             },
-            children: [" ", /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsx)(lucide_react__WEBPACK_IMPORTED_MODULE_18__["default"], {})]
+            children: [" ", /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsx)(lucide_react__WEBPACK_IMPORTED_MODULE_18__["default"], {})]
           }),
-          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsx)(_VersionHistoryTable_VersionHistoryTable__WEBPACK_IMPORTED_MODULE_20__["default"], {
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsx)(_VersionHistoryTable_VersionHistoryTable__WEBPACK_IMPORTED_MODULE_20__["default"], {
             versions: versions,
             id: id
           })
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsx)(react_select__WEBPACK_IMPORTED_MODULE_23__["default"], {
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsx)(react_select__WEBPACK_IMPORTED_MODULE_23__["default"], {
           options: _helper__WEBPACK_IMPORTED_MODULE_25__.statusOptions,
           value: values?.status ? _helper__WEBPACK_IMPORTED_MODULE_25__.statusOptions.find(opt => opt.value === values.status) : _helper__WEBPACK_IMPORTED_MODULE_25__.statusOptions.find(opt => opt.value === singleData?.workflow?.status),
           onChange: selected => setFieldValue('status', selected.value),
           isClearable: false,
           isSearchable: false,
           placeholder: "Select status"
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {
           ..._assets_scss_chakra_recipe__WEBPACK_IMPORTED_MODULE_29__.primaryBtn,
           size: "sm",
           onClick: handleSubmit,
           children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("Update", "zaplane")
         })]
       })
-    }), loading ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsx)(_ZAPComponents_Loading__WEBPACK_IMPORTED_MODULE_24__["default"], {}) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsxs)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.ReactFlow, {
+    }), loading ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsx)(_ZAPComponents_Loading__WEBPACK_IMPORTED_MODULE_24__["default"], {}) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsxs)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.ReactFlow, {
       nodes: nodes,
       edges: edges,
       nodeTypes: nodeTypes,
@@ -4380,28 +4356,28 @@ function FlowCanvas({
       nodesConnectable: true,
       elementsSelectable: true,
       minZoom: 0.5,
-      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.Background, {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_12__.Flex, {
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.Background, {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_12__.Flex, {
         className: "zaplane-canvas-layout-icon",
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.ControlButton, {
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.ControlButton, {
           onClick: () => onLayout("TB"),
           title: "Vertical layout",
           className: "zaplane-control-btn",
-          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsx)(react_icons_io5__WEBPACK_IMPORTED_MODULE_31__.IoSwapVerticalOutline, {
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsx)(react_icons_io5__WEBPACK_IMPORTED_MODULE_31__.IoSwapVerticalOutline, {
             size: 16
           })
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.ControlButton, {
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.ControlButton, {
           onClick: () => onLayout("LR"),
           title: "Horizontal layout",
           className: "zaplane-control-btn",
-          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsx)(react_icons_io5__WEBPACK_IMPORTED_MODULE_31__.IoSwapHorizontal, {
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsx)(react_icons_io5__WEBPACK_IMPORTED_MODULE_31__.IoSwapHorizontal, {
             size: 16
           })
         })]
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.Controls, {
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.Controls, {
         position: "top-left",
         className: "zaplane-canvas-controls"
       })]
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsx)(_ActionDrawer_ActionDrawer__WEBPACK_IMPORTED_MODULE_6__["default"], {
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsx)(_ActionDrawer_ActionDrawer__WEBPACK_IMPORTED_MODULE_6__["default"], {
       open: drawerOpen,
       onClose: () => {
         setDrawerOpen(false);
@@ -4688,7 +4664,6 @@ dagreGraph.setDefaultEdgeLabel(() => ({}));
 const NODE_WIDTH = 160;
 const NODE_HEIGHT = 48;
 const getLayoutedElements = (nodes, edges, direction = "TB") => {
-  const isHorizontal = direction === "LR";
   dagreGraph.setGraph({
     rankdir: direction
   });
@@ -5109,10 +5084,10 @@ const useActionDrawer = (open, node, source, setFieldValue, isTrigger) => {
 
 /***/ },
 
-/***/ "./dev_zaplane/hooks/useFlowActions.js"
-/*!*********************************************!*\
-  !*** ./dev_zaplane/hooks/useFlowActions.js ***!
-  \*********************************************/
+/***/ "./dev_zaplane/hooks/useFlowActions/useFlowActions.js"
+/*!************************************************************!*\
+  !*** ./dev_zaplane/hooks/useFlowActions/useFlowActions.js ***!
+  \************************************************************/
 (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -5120,6 +5095,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   useFlowActions: () => (/* binding */ useFlowActions)
 /* harmony export */ });
+/* harmony import */ var _xyflow_react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @xyflow/react */ "./node_modules/@xyflow/react/dist/esm/index.js");
+/* harmony import */ var _ZAPContainers_BackendDashboard_pages_workflows_workFlowMotion_flowCanvas_dagreLayout__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @ZAPContainers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/dagreLayout */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/dagreLayout.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_2__);
 /**
  * useFlowActions
  * A custom React hook for managing nodes, edges, and drawer actions in a workflow React Flow canvas.
@@ -5152,6 +5131,9 @@ __webpack_require__.r(__webpack_exports__);
  * }
  */
 
+
+
+
 const useFlowActions = ({
   nodes,
   setNodes,
@@ -5161,7 +5143,8 @@ const useFlowActions = ({
   setDrawerContext,
   setDrawerOpen,
   getNewNodeId,
-  GAP = 250
+  GAP = 250,
+  setCanvasLayout
 }) => {
   const updateNodeData = updatedData => {
     setNodes(nds => nds.map(n => n.id === drawerContext.node?.id ? {
@@ -5264,13 +5247,37 @@ const useFlowActions = ({
     });
     setDrawerOpen(true);
   };
+  //meanagin layout flow canvas 
+  const {
+    fitView
+  } = (0,_xyflow_react__WEBPACK_IMPORTED_MODULE_0__.useReactFlow)();
+  const updateNodeInternals = (0,_xyflow_react__WEBPACK_IMPORTED_MODULE_0__.useUpdateNodeInternals)();
+  const onLayout = (0,react__WEBPACK_IMPORTED_MODULE_2__.useCallback)(direction => {
+    const {
+      nodes: layoutedNodes,
+      edges: layoutedEdges
+    } = (0,_ZAPContainers_BackendDashboard_pages_workflows_workFlowMotion_flowCanvas_dagreLayout__WEBPACK_IMPORTED_MODULE_1__.getLayoutedElements)(nodes, edges, direction);
+    setNodes(layoutedNodes);
+    setEdges(layoutedEdges);
+    requestAnimationFrame(() => {
+      layoutedNodes.forEach(node => {
+        updateNodeInternals(node.id);
+      });
+      fitView({
+        padding: 0.2,
+        duration: 300
+      });
+      setCanvasLayout(direction);
+    });
+  }, [nodes, edges, fitView, updateNodeInternals]);
   return {
     updateNodeData,
     deleteNode,
     createActionNode,
     onAddNode,
     openDrawerForNode,
-    openDrawerFromAdd
+    openDrawerFromAdd,
+    onLayout
   };
 };
 

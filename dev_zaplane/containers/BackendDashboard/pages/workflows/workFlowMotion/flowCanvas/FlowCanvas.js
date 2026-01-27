@@ -4,7 +4,6 @@ import {
     addEdge,
     Controls,
     Background,
-    Panel,
     ControlButton,
     useReactFlow,
     useUpdateNodeInternals,
@@ -33,26 +32,24 @@ import ZAPDrawer from "@ZAPComponents/Drawer";
 import { LucideHistory } from "lucide-react";
 import RunsTable from "./RunsTable/RunsTable";
 import VersionHistoryTable from "./VersionHistoryTable/VersionHistoryTable";
-import { LuArrowDownUp, LuArrowLeftRight, LuFullscreen, LuMinimize } from "react-icons/lu";
+import { LuFullscreen, LuMinimize } from "react-icons/lu";
 import { toggleFullscreenMode } from "../helper";
 import Select from "react-select";
 import ZAPLoading from "@ZAPComponents/Loading";
 import { statusOptions } from "../../helper";
 import { mapGraphFromBackend } from "./helper";
-import { useFlowActions } from "../../../../../../hooks/useFlowActions";
+import { useFlowActions } from "../../../../../../hooks/useFlowActions/useFlowActions";
 import CustomNode from "../customNode/CustomNode";
 import { primaryBtn } from "../../../../../../../assets/scss/chakra/recipe";
 
-
 import './styles.scss'
 import { IoSwapHorizontal, IoSwapVerticalOutline } from "react-icons/io5";
-import { getLayoutedElements } from "./dagreLayout";
 
 export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdgesChange, onNodesChange, getNewNodeId, singleData }) {
     const dispatch = useDispatch();
     const navigate = useNavigate()
     const [drawerOpen, setDrawerOpen] = useState(false);
-    const { values, setFieldValue, handleSubmit, dirty, isSubmitting } = useFormikContext()
+    const { values, setFieldValue, handleSubmit, } = useFormikContext()
     const [loading, setLoading] = useState(false);
     const { runs, versions } = useSelector((state) => state.workflows);
     const containerRef = useRef(null);
@@ -60,10 +57,7 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
     const [activeDrawer, setActiveDrawer] = useState(null);
     //if we menage layout syestem then we need to save databse this value
     const [canvasLayout, setCanvasLayout] = useState("LR")
-    const { fitView } = useReactFlow();
-    const updateNodeInternals = useUpdateNodeInternals();
-
-
+ 
     useEffect(() => {
         if (!singleData?.graph) return;
         const { nodes, edges } = mapGraphFromBackend(singleData.graph);
@@ -88,7 +82,8 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
         createActionNode,
         openDrawerForNode,
         openDrawerFromAdd,
-    } = useFlowActions({ nodes, setNodes, edges, setEdges, drawerContext, getNewNodeId, setDrawerContext, setDrawerOpen });
+        onLayout
+    } = useFlowActions({ nodes, setNodes, edges, setEdges, drawerContext, getNewNodeId, setDrawerContext, setDrawerOpen,setCanvasLayout });
 
     const onAddNode = (edgeId) => {
         const edge = edges.find((e) => e.id === edgeId);
@@ -113,26 +108,6 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
     const onEdgeDelete = (edgeId) => {
         setEdges((eds) => eds.filter((e) => e.id !== edgeId));
     };
-    const onLayout = useCallback(
-        (direction) => {
-            const { nodes: layoutedNodes, edges: layoutedEdges } =
-                getLayoutedElements(nodes, edges, direction);
-
-            setNodes(layoutedNodes);
-            setEdges(layoutedEdges);
-
-            requestAnimationFrame(() => {
-                layoutedNodes.forEach((node) => {
-                    updateNodeInternals(node.id);
-                });
-
-                fitView({ padding: 0.2, duration: 300 });
-                setCanvasLayout(direction);
-            });
-        },
-        [nodes, edges, fitView, updateNodeInternals]
-    );
-
 
     console.log(nodes, 'all nodes',);
     console.log(edges, 'all edges');

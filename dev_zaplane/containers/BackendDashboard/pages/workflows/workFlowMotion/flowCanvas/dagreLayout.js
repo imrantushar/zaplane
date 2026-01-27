@@ -8,7 +8,6 @@ const NODE_WIDTH = 160;
 const NODE_HEIGHT = 48;
 
 export const getLayoutedElements = (nodes, edges, direction = "TB") => {
-  const isHorizontal = direction === "LR";
   dagreGraph.setGraph({ rankdir: direction });
   nodes.forEach((node) => {
     dagreGraph.setNode(node.id, {
@@ -22,7 +21,7 @@ export const getLayoutedElements = (nodes, edges, direction = "TB") => {
   });
 
   dagre.layout(dagreGraph);
-  
+
   const layoutedNodes = nodes.map((node) => {
     const { x, y } = dagreGraph.node(node.id);
     return {
