@@ -8,6 +8,7 @@
  * - Creates a new action node, shifts other nodes if needed, and manages edges.
  * - Opens drawer for a node or for adding a new node.
  * - Provides helper for getting an edge by ID.
+ * -canvas flow layout maintai LR and TB
  * 
  * Usage:
  * const { updateNodeData, deleteNode, createActionNode, onAddNode, openDrawerForNode, openDrawerFromAdd } =
@@ -22,16 +23,17 @@
  * @param {function} setDrawerContext    - Setter for drawer context.
  * @param {function} setDrawerOpen       - Function to open/close drawer.
  * @param {function} getNewNodeId        - Function to generate unique node IDs.
- * @param {number} GAP                   - Optional spacing between nodes (default 250).
+ * @param {function} onLayout             - changing layout LR and LB
+ *
  * 
  * Returns:
  * @returns {object} - {
- *   updateNodeData, deleteNode, createActionNode, onAddNode, openDrawerForNode, openDrawerFromAdd
+ *   updateNodeData, deleteNode, createActionNode, onAddNode, openDrawerForNode, openDrawerFromAdd,onLayout
  * }
  */
 
 import { useReactFlow, useUpdateNodeInternals } from "@xyflow/react";
-import { getLayoutedElements } from "@ZAPContainers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/dagreLayout";
+import { getLayoutedElements } from "hooks/useFlowActions/Helper/dagreLayout";
 import { useCallback } from "react";
 
 export const useFlowActions = ({
@@ -66,8 +68,8 @@ export const useFlowActions = ({
 
     const createActionNode = (actionData) => {
         const layoutLR = canvasLayout === 'LR';
-        const LRGap=250
-        const TBGap=98
+        const LRGap = 250
+        const TBGap = 98
         console.log(layoutLR, 'layot');
         const { edge, node } = drawerContext;
         let sourceNode = null;
@@ -103,7 +105,6 @@ export const useFlowActions = ({
                 }
             } else {
                 // Only shift nodes below the new node
-                console.log('iam here');
                 if (n.position.y >= newY) {
                     return { ...n, position: { ...n.position, y: n.position.y + TBGap } };
                 }
