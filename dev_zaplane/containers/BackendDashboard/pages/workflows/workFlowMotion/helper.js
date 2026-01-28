@@ -1,29 +1,22 @@
-export const statusStyle = (status) => {
-  switch (status) {
-    case "completed":
-      return {
-        color: "#16A34A",
-        bg: "#DCFCE7",
-      };
+export const mapNodesForBackend = (nodes) => {
+  return nodes.map(({
+    dragging,
+    selected,
+    measured,
+    data,
+    ...node
+  }) => {
+    const backendType = data?.action?.toLowerCase();
+    const cleanedData = { ...data };
+    delete cleanedData.action;
 
-    case "running":
-      return {
-        color: "#2563EB",
-        bg: "#DBEAFE",
-      };
-
-    case "failed":
-      return {
-        color: "#DC2626",
-        bg: "#FEE2E2",
-      };
-
-    default:
-      return {
-        color: "#4B5563", 
-        bg: "#F3F4F6",
-      };
-  }
+    return {
+      ...node,
+      type: backendType,
+      data: cleanedData,
+    };
+  });
 };
-
-
+export const mapEdgesForBackend = (edges) => {
+  return edges.map(({ type, ...edge }) => edge);
+};

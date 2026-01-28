@@ -2976,7 +2976,8 @@ const Setting = () => {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   statusOptions: () => (/* binding */ statusOptions)
+/* harmony export */   statusOptions: () => (/* binding */ statusOptions),
+/* harmony export */   statusStyle: () => (/* binding */ statusStyle)
 /* harmony export */ });
 const statusOptions = [{
   value: "active",
@@ -2988,6 +2989,30 @@ const statusOptions = [{
   value: "draft",
   label: "draft"
 }];
+const statusStyle = status => {
+  switch (status) {
+    case "completed":
+      return {
+        color: "#16A34A",
+        bg: "#DCFCE7"
+      };
+    case "running":
+      return {
+        color: "#2563EB",
+        bg: "#DBEAFE"
+      };
+    case "failed":
+      return {
+        color: "#DC2626",
+        bg: "#FEE2E2"
+      };
+    default:
+      return {
+        color: "#4B5563",
+        bg: "#F3F4F6"
+      };
+  }
+};
 
 /***/ },
 
@@ -4541,11 +4566,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _ZAPComponents_LogDetails__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @ZAPComponents/LogDetails */ "./dev_zaplane/components/LogDetails/index.js");
 /* harmony import */ var _ZAPComponents_Loading__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @ZAPComponents/Loading */ "./dev_zaplane/components/Loading/index.js");
 /* harmony import */ var _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @ZAPUtils/helper */ "./dev_zaplane/utils/helper.js");
-/* harmony import */ var _helper__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../../helper */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/helper.js");
-/* harmony import */ var _ZAPComponents_Table__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @ZAPComponents/Table */ "./dev_zaplane/components/Table/index.js");
-/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
-/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_12___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_12__);
-/* harmony import */ var _ZAPComponents_Drawer__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! @ZAPComponents/Drawer */ "./dev_zaplane/components/Drawer/index.js");
+/* harmony import */ var _ZAPComponents_Table__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @ZAPComponents/Table */ "./dev_zaplane/components/Table/index.js");
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_11___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_11__);
+/* harmony import */ var _ZAPComponents_Drawer__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @ZAPComponents/Drawer */ "./dev_zaplane/components/Drawer/index.js");
+/* harmony import */ var _helper__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ../../../helper */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/helper.js");
 /* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
 /* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__);
 
@@ -4570,7 +4595,7 @@ const RunsTable = ({
   } = (0,react_redux__WEBPACK_IMPORTED_MODULE_4__.useSelector)(state => state.workflows);
   const [drawerOpen, setDrawerOpen] = (0,react__WEBPACK_IMPORTED_MODULE_5__.useState)(false);
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.Fragment, {
-    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsx)(_ZAPComponents_Table__WEBPACK_IMPORTED_MODULE_11__["default"], {
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsx)(_ZAPComponents_Table__WEBPACK_IMPORTED_MODULE_10__["default"], {
       data: runs,
       rowKey: "id",
       variant: "line",
@@ -4583,7 +4608,7 @@ const RunsTable = ({
         textAlign: "center",
         render: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Text, {
           fontWeight: "medium",
-          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_12__.__)(row.id, "zaplane")
+          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_11__.__)(row.id, "zaplane")
         })
       }, {
         label: "Status",
@@ -4594,8 +4619,8 @@ const RunsTable = ({
           rounded: "md",
           fontSize: "xs",
           textTransform: "capitalize",
-          ...(0,_helper__WEBPACK_IMPORTED_MODULE_10__.statusStyle)(row.status),
-          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_12__.__)(row.status, "zaplane")
+          ...(0,_helper__WEBPACK_IMPORTED_MODULE_13__.statusStyle)(row.status),
+          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_11__.__)(row.status, "zaplane")
         })
       }, {
         label: "Duration",
@@ -4617,12 +4642,12 @@ const RunsTable = ({
             setDrawerOpen(true);
             dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_6__.nodeLogsRunDetails)(row.id));
           },
-          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_12__.__)('Details', 'zaplane')
+          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_11__.__)('Details', 'zaplane')
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Button, {
           size: "xs",
           variant: "outline",
           onClick: () => dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_6__.getSingleRun)(row.id)),
-          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_12__.__)('Re-execute', 'zaplane')
+          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_11__.__)('Re-execute', 'zaplane')
         })]
       }),
       footerRenderer: () => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Text, {
@@ -4630,13 +4655,13 @@ const RunsTable = ({
         color: "gray.600",
         children: ["Total Runs: ", runs.length]
       })
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsx)(_ZAPComponents_Drawer__WEBPACK_IMPORTED_MODULE_13__["default"], {
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsx)(_ZAPComponents_Drawer__WEBPACK_IMPORTED_MODULE_12__["default"], {
       open: drawerOpen,
       onClose: () => {
         setDrawerOpen(false);
         setActiveRunId(null);
       },
-      title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_12__.__)("Log Details", "zaplane"),
+      title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_11__.__)("Log Details", "zaplane"),
       placement: "end",
       size: "md",
       children: activeRunId ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsx)(_ZAPComponents_LogDetails__WEBPACK_IMPORTED_MODULE_7__["default"], {
@@ -4778,9 +4803,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   applyStyles: () => (/* binding */ applyStyles),
 /* harmony export */   createNodeIdGenerator: () => (/* binding */ createNodeIdGenerator),
-/* harmony export */   mapEdgesForBackend: () => (/* binding */ mapEdgesForBackend),
 /* harmony export */   mapGraphFromBackend: () => (/* binding */ mapGraphFromBackend),
-/* harmony export */   mapNodesForBackend: () => (/* binding */ mapNodesForBackend),
 /* harmony export */   toggleFullscreenMode: () => (/* binding */ toggleFullscreenMode)
 /* harmony export */ });
 const createNodeIdGenerator = () => {
@@ -4853,32 +4876,6 @@ const toggleFullscreenMode = (containerRef, isFullscreen, setIsFullscreen) => {
   });
   setIsFullscreen(isEnter);
 };
-const mapNodesForBackend = nodes => {
-  return nodes.map(({
-    dragging,
-    selected,
-    measured,
-    data,
-    ...node
-  }) => {
-    const backendType = data?.action?.toLowerCase();
-    const cleanedData = {
-      ...data
-    };
-    delete cleanedData.action;
-    return {
-      ...node,
-      type: backendType,
-      data: cleanedData
-    };
-  });
-};
-const mapEdgesForBackend = edges => {
-  return edges.map(({
-    type,
-    ...edge
-  }) => edge);
-};
 
 /***/ },
 
@@ -4904,31 +4901,34 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   statusStyle: () => (/* binding */ statusStyle)
+/* harmony export */   mapEdgesForBackend: () => (/* binding */ mapEdgesForBackend),
+/* harmony export */   mapNodesForBackend: () => (/* binding */ mapNodesForBackend)
 /* harmony export */ });
-const statusStyle = status => {
-  switch (status) {
-    case "completed":
-      return {
-        color: "#16A34A",
-        bg: "#DCFCE7"
-      };
-    case "running":
-      return {
-        color: "#2563EB",
-        bg: "#DBEAFE"
-      };
-    case "failed":
-      return {
-        color: "#DC2626",
-        bg: "#FEE2E2"
-      };
-    default:
-      return {
-        color: "#4B5563",
-        bg: "#F3F4F6"
-      };
-  }
+const mapNodesForBackend = nodes => {
+  return nodes.map(({
+    dragging,
+    selected,
+    measured,
+    data,
+    ...node
+  }) => {
+    const backendType = data?.action?.toLowerCase();
+    const cleanedData = {
+      ...data
+    };
+    delete cleanedData.action;
+    return {
+      ...node,
+      type: backendType,
+      data: cleanedData
+    };
+  });
+};
+const mapEdgesForBackend = edges => {
+  return edges.map(({
+    type,
+    ...edge
+  }) => edge);
 };
 
 /***/ },
