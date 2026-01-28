@@ -5,7 +5,7 @@ namespace Zaplane\Integrations;
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-use Zaplane\Framework\Classes\IntegrationBase;
+use Zaplane\Framework\Classes\WordPressPluginIntegration;
 use Zaplane\Integrations\Wordpress\PostActionsTrait;
 use Zaplane\Integrations\Wordpress\TaxonomyActionsTrait;
 use Zaplane\Integrations\Wordpress\UserActionsTrait;
@@ -17,7 +17,7 @@ use Zaplane\Integrations\Wordpress\QueryTrait;
 use Zaplane\Integrations\Wordpress\Helper;
 
 
-class Wordpress extends IntegrationBase {
+class Wordpress extends WordPressPluginIntegration {
     use PostActionsTrait;
     use TaxonomyActionsTrait;
     use UserActionsTrait;
@@ -31,10 +31,6 @@ class Wordpress extends IntegrationBase {
     public static function get_slug(): string {
         return 'wordpress';
     }
-
-    /* =====================================================
-     * TRIGGERS
-     * ===================================================== */
 
     public static function get_triggers(): array {
         return [
@@ -958,7 +954,7 @@ class Wordpress extends IntegrationBase {
 
             'get_post_metadata_single' => [
                 ...self::field_post_id(),
-                ['key'=>'meta_kry','label'=>'Post Meta Key','type'=>'expression','required'=>true,],
+                ['key'=>'meta_key','label'=>'Post Meta Key','type'=>'expression','required'=>true,],
             ],
 
             'register_post_type' => [

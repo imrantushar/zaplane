@@ -21,58 +21,29 @@ class MakeMigrationCommand extends Command
 
         $name = $this->sanitizeName($args[0]);
         $table = $assoc_args['table'] ?? null;
-        $create = isset($assoc_args['create']) ? $assoc_args['create'] : $table;
+        $isCreate = isset($assoc_args['create']);
+
+        // If --create flag is used with a value, use it as the table name
+        if ($isCreate && !empty($assoc_args['create']) && $assoc_args['create'] !== '1') {
+            $table = $assoc_args['create'];
+        }
 
         $migrator = Migrator::getInstance();
-        $filename = $migrator->make($name);
-
-        if ($create || $table) {
-            $this->updateMigrationContent($filename, $create ?: $table, (bool) $create);
-        }
+        $filename = $migrator->make($name, $table, $isCreate);
 
         $this->success("Created migration: {$filename}");
         $this->info("Location: includes/database/migrations/{$filename}");
+
+        // Show helpful hint about the migration type
+        if ($isCreate || preg_match('/^create_/', $name)) {
+            $this->line("  Type: CREATE TABLE");
+        } else {
+            $this->line("  Type: ALTER TABLE");
+        }
     }
 
     protected function sanitizeName(string $name): string
     {
         return strtolower(preg_replace('/[^a-zA-Z0-9_]/', '_', $name));
-    }
-
-    protected function updateMigrationContent(string $filename, string $table, bool $isCreate): void
-    {
-        $path = ZAPLANE_ROOT_DIR_PATH . 'includes/database/migrations/' . $filename;
-
-        if (!file_exists($path)) {
-            return;
-        }
-
-        $content = file_get_contents($path);
-
-        if ($isCreate) {
-            $content = str_replace(
-                "Schema::create('table_name'",
-                "Schema::create('{$table}'",
-                $content
-            );
-            $content = str_replace(
-                "Schema::drop('table_name')",
-                "Schema::drop('{$table}')",
-                $content
-            );
-        } else {
-            $content = str_replace(
-                "Schema::create('table_name', function (Blueprint \$table) {\n            \$table->id();\n            \$table->timestamps();\n        });",
-                "Schema::table('{$table}', function (Blueprint \$table) {\n            //\n        });",
-                $content
-            );
-            $content = str_replace(
-                "Schema::drop('table_name');",
-                "Schema::table('{$table}', function (Blueprint \$table) {\n            //\n        });",
-                $content
-            );
-        }
-
-        file_put_contents($path, $content);
     }
 }

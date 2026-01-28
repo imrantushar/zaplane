@@ -213,6 +213,18 @@ class Blueprint
         return $this;
     }
 
+    public function dropForeign(string $name): self
+    {
+        $this->commands[] = ['type' => 'dropForeign', 'name' => $name];
+        return $this;
+    }
+
+    public function dropUnique(string $name): self
+    {
+        $this->commands[] = ['type' => 'dropUnique', 'name' => $name];
+        return $this;
+    }
+
     protected function addColumn(string $type, string $name, array $parameters = []): ColumnDefinition
     {
         $definition = new ColumnDefinition(array_merge([

@@ -90,6 +90,22 @@ class ColumnDefinition
         return $this;
     }
 
+    public function change(): self
+    {
+        $this->attributes['change'] = true;
+        return $this;
+    }
+
+    public function isChange(): bool
+    {
+        return $this->attributes['change'] ?? false;
+    }
+
+    public function getAfter(): ?string
+    {
+        return $this->attributes['after'] ?? null;
+    }
+
     public function isPrimary(): bool
     {
         return $this->attributes['primary'] ?? false;
@@ -143,6 +159,18 @@ class ColumnDefinition
 
         if ($this->attributes['unique']) {
             $sql .= ' UNIQUE';
+        }
+
+        return $sql;
+    }
+
+    public function toAlterSql(): string
+    {
+        $sql = $this->toSql();
+
+        $after = $this->attributes['after'] ?? null;
+        if ($after) {
+            $sql .= " AFTER {$after}";
         }
 
         return $sql;

@@ -262,7 +262,7 @@ class Migrator
         return 'Zaplane\\Database\\Migrations\\' . $className;
     }
 
-    public function make(string $name): string
+    public function make(string $name, ?string $table = null, bool $isCreate = false): string
     {
         $timestamp = date('Y_m_d_His');
         $filename = $timestamp . '_' . $name . '.php';
@@ -274,7 +274,60 @@ class Migrator
             $className .= ucfirst($part);
         }
 
-        $content = <<<PHP
+        // Auto-detect intent from migration name if not explicitly set
+        if ($table === null) {
+            $table = self::detectTableFromName($name);
+        }
+        if (!$isCreate) {
+            $isCreate = self::detectIsCreateFromName($name);
+        }
+
+        $tableName = $table ?: 'table_name';
+
+        if ($isCreate) {
+            $content = self::createTemplate($className, $tableName);
+        } else {
+            $content = self::alterTemplate($className, $tableName);
+        }
+
+        if (!is_dir($this->migrationsPath)) {
+            mkdir($this->migrationsPath, 0755, true);
+        }
+
+        file_put_contents($filepath, $content);
+
+        return $filename;
+    }
+
+    protected static function detectTableFromName(string $name): ?string
+    {
+        // "create_users_table" → "users"
+        if (preg_match('/^create_(.+)_table$/', $name, $m)) {
+            return $m[1];
+        }
+        // "add_email_to_users" or "add_email_to_users_table" → "users"
+        if (preg_match('/_to_(.+?)(?:_table)?$/', $name, $m)) {
+            return $m[1];
+        }
+        // "remove_email_from_users" → "users"
+        if (preg_match('/_from_(.+?)(?:_table)?$/', $name, $m)) {
+            return $m[1];
+        }
+        // "drop_users_table" → "users"
+        if (preg_match('/^drop_(.+)_table$/', $name, $m)) {
+            return $m[1];
+        }
+        return null;
+    }
+
+    protected static function detectIsCreateFromName(string $name): bool
+    {
+        return (bool) preg_match('/^create_/', $name);
+    }
+
+    protected static function createTemplate(string $className, string $tableName): string
+    {
+        return <<<PHP
 <?php
 
 namespace Zaplane\Database\Migrations;
@@ -289,7 +342,7 @@ class {$className} extends Migration
 {
     public function up(): void
     {
-        Schema::create('table_name', function (Blueprint \$table) {
+        Schema::create('{$tableName}', function (Blueprint \$table) {
             \$table->id();
             \$table->timestamps();
         });
@@ -297,17 +350,43 @@ class {$className} extends Migration
 
     public function down(): void
     {
-        Schema::drop('table_name');
+        Schema::drop('{$tableName}');
     }
 }
 PHP;
+    }
 
-        if (!is_dir($this->migrationsPath)) {
-            mkdir($this->migrationsPath, 0755, true);
-        }
+    protected static function alterTemplate(string $className, string $tableName): string
+    {
+        return <<<PHP
+<?php
 
-        file_put_contents($filepath, $content);
+namespace Zaplane\Database\Migrations;
 
-        return $filename;
+use Zaplane\Framework\Database\ORM\Migration;
+use Zaplane\Framework\Database\ORM\Schema;
+use Zaplane\Framework\Database\ORM\Blueprint;
+
+if (!defined('ABSPATH')) exit;
+
+class {$className} extends Migration
+{
+    public function up(): void
+    {
+        Schema::table('{$tableName}', function (Blueprint \$table) {
+            // \$table->string('new_column')->nullable()->after('existing_column');
+            // \$table->dropColumn('old_column');
+            // \$table->index('new_column');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::table('{$tableName}', function (Blueprint \$table) {
+            // \$table->dropColumn('new_column');
+        });
+    }
+}
+PHP;
     }
 }

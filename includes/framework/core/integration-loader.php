@@ -18,15 +18,81 @@ class IntegrationLoader {
     /**
      * Initialize the integration registry
      * Called automatically on first use - no need to call manually
+     *
+     * Loads from:
+     *  1. Manual registry file (integration-registry.php)
+     *  2. Auto-discovered integrations from the integrations/ directory
+     *  3. Third-party integrations via `zaplane_register_integrations_registry` hook
      */
     protected static function ensureInitialized(): void {
         if (self::$initialized) {
             return;
         }
 
+        // Load manual registry
         self::$registry = require ZAPLANE_INCLUDES_DIR_PATH . 'framework/core/integration-registry.php';
+
+        // Auto-discover integrations from the integrations/ directory
+        self::autoDiscover();
+
+        // Allow third-party plugins to register integrations
         do_action('zaplane_register_integrations_registry', self::$registry);
         self::$initialized = true;
+    }
+
+    /**
+     * Auto-discover integration classes from the integrations/ directory.
+     *
+     * Scans for PHP files, loads them to check if they contain a class
+     * extending IntegrationBase, and registers them if not already in the registry.
+     */
+    protected static function autoDiscover(): void {
+        $dir = ZAPLANE_ROOT_DIR_PATH . 'integrations/';
+        if ( ! is_dir( $dir ) ) {
+            return;
+        }
+
+        $files = glob( $dir . '*.php' );
+        if ( ! $files ) {
+            return;
+        }
+
+        foreach ( $files as $file ) {
+            $basename = basename( $file, '.php' );
+
+            // Convert kebab-case filename to PascalCase class name
+            $class_name = str_replace( ' ', '', ucwords( str_replace( '-', ' ', $basename ) ) );
+            $fqcn       = 'Zaplane\\Integrations\\' . $class_name;
+
+            // Skip if already registered by manual registry
+            foreach ( self::$registry as $slug => $meta ) {
+                if ( ( $meta['class'] ?? '' ) === $fqcn ) {
+                    continue 2;
+                }
+            }
+
+            // Try to load and validate the class
+            if ( ! class_exists( $fqcn ) && file_exists( $file ) ) {
+                require_once $file;
+            }
+
+            if ( ! class_exists( $fqcn ) ) {
+                continue;
+            }
+
+            // Verify it extends IntegrationBase
+            if ( ! is_subclass_of( $fqcn, \Zaplane\Framework\Classes\IntegrationBase::class ) ) {
+                continue;
+            }
+
+            $slug = $fqcn::get_slug();
+            if ( ! isset( self::$registry[ $slug ] ) ) {
+                self::$registry[ $slug ] = [
+                    'file'  => $basename . '.php',
+                    'class' => $fqcn,
+                ];
+            }
+        }
     }
 
     /**
@@ -49,8 +115,11 @@ class IntegrationLoader {
             return null;
         }
 
-        // Load integration file
-        $file = ZAPLANE_INTEGRATION_DIR_PATH . '/' . basename(self::$registry[$slug]['file']);
+        // Load integration file — check both integrations/ dirs
+        $file = ZAPLANE_ROOT_DIR_PATH . 'integrations/' . basename(self::$registry[$slug]['file']);
+        if ( ! file_exists( $file ) ) {
+            $file = ZAPLANE_INTEGRATION_DIR_PATH . '/' . basename(self::$registry[$slug]['file']);
+        }
         $class = self::$registry[$slug]['class'];
 
         if (!class_exists($class) && file_exists($file)) {
@@ -60,6 +129,9 @@ class IntegrationLoader {
         if (!class_exists($class)) {
             return null;
         }
+
+        // Validate integration on first load
+        self::validateIntegration($slug, $class);
 
         // Create and cache instance
         $instance = new $class();
@@ -132,5 +204,53 @@ class IntegrationLoader {
     public static function init(): self {
         self::ensureInitialized();
         return new self();
+    }
+
+    /**
+     * Validate an integration class on first load.
+     *
+     * Checks for common issues and logs warnings. Does NOT block loading —
+     * integration still works, but developers get feedback in the error log.
+     *
+     * @param string $slug  Integration slug.
+     * @param string $class Fully qualified class name.
+     */
+    protected static function validateIntegration(string $slug, string $class): void {
+        // Only validate in debug mode to avoid production overhead
+        if ( ! defined('WP_DEBUG') || ! WP_DEBUG ) {
+            return;
+        }
+
+        $warnings = [];
+
+        // Check slug consistency
+        if ( method_exists( $class, 'get_slug' ) && $class::get_slug() !== $slug ) {
+            $warnings[] = "get_slug() returns '{$class::get_slug()}' but registered as '{$slug}'";
+        }
+
+        // If requires_connection, verify auth setup
+        if ( $class::requires_connection() ) {
+            if ( $class::get_auth_type() === 'none' ) {
+                $warnings[] = "requires_connection() is true but get_auth_type() returns 'none'";
+            }
+            if ( empty( $class::get_auth_fields() ) ) {
+                $warnings[] = "requires_connection() is true but get_auth_fields() is empty";
+            }
+        }
+
+        // Check triggers have hooks
+        foreach ( $class::get_triggers() as $key => $trigger ) {
+            if ( empty( $trigger['hook'] ) ) {
+                $warnings[] = "Trigger '{$key}' is missing 'hook' field";
+            }
+        }
+
+        if ( ! empty( $warnings ) ) {
+            error_log( sprintf(
+                'Zaplane integration validation [%s]: %s',
+                $slug,
+                implode( '; ', $warnings )
+            ) );
+        }
     }
 }

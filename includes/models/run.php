@@ -12,6 +12,7 @@ class Run extends Model
     protected static string $table = 'runs';
 
     protected static array $fillable = [
+        'workflow_id',
         'workflow_version_hash',
         'target_node_key',
         'start_node_key',
@@ -25,6 +26,7 @@ class Run extends Model
 
     protected static array $casts = [
         'id' => 'integer',
+        'workflow_id' => 'integer',
         'attempts' => 'integer',
         'trigger_data' => 'json',
     ];

@@ -119,50 +119,102 @@ class Schema
     {
         global $wpdb;
 
+        // Process column additions and modifications
         foreach ($blueprint->getColumns() as $column) {
             $columnName = $column->getName();
-            if (self::columnExists($table, $columnName)) {
-                $sql = "ALTER TABLE {$table} MODIFY COLUMN " . $column->toSql();
+            $exists = self::columnExists($table, $columnName);
+
+            if ($column->isChange() || $exists) {
+                $sql = "ALTER TABLE {$table} MODIFY COLUMN " . $column->toAlterSql();
             } else {
-                $sql = "ALTER TABLE {$table} ADD COLUMN " . $column->toSql();
+                $sql = "ALTER TABLE {$table} ADD COLUMN " . $column->toAlterSql();
             }
-            $wpdb->query($sql);
+
+            $result = $wpdb->query($sql);
+            if ($result === false) {
+                error_log("[Zaplane Migration] Failed: {$sql} | Error: {$wpdb->last_error}");
+            }
         }
 
+        // Process index additions (skip if already exists)
         foreach ($blueprint->getIndexes() as $index) {
+            if (self::indexExists($table, $index['name'])) {
+                continue;
+            }
+
             $cols = implode(', ', $index['columns']);
-            switch ($index['type']) {
-                case 'unique':
-                    $wpdb->query("ALTER TABLE {$table} ADD UNIQUE KEY {$index['name']} ({$cols})");
-                    break;
-                case 'index':
-                    $wpdb->query("ALTER TABLE {$table} ADD KEY {$index['name']} ({$cols})");
-                    break;
+            $sql = match ($index['type']) {
+                'unique' => "ALTER TABLE {$table} ADD UNIQUE KEY {$index['name']} ({$cols})",
+                'index'  => "ALTER TABLE {$table} ADD KEY {$index['name']} ({$cols})",
+                default  => null,
+            };
+
+            if ($sql) {
+                $result = $wpdb->query($sql);
+                if ($result === false) {
+                    error_log("[Zaplane Migration] Failed: {$sql} | Error: {$wpdb->last_error}");
+                }
             }
         }
 
+        // Process commands (drops, renames, foreign keys)
         foreach ($blueprint->getCommands() as $command) {
+            $sql = null;
+
             switch ($command['type']) {
                 case 'dropColumn':
-                    $wpdb->query("ALTER TABLE {$table} DROP COLUMN {$command['column']}");
+                    if (self::columnExists($table, $command['column'])) {
+                        $sql = "ALTER TABLE {$table} DROP COLUMN {$command['column']}";
+                    }
                     break;
+
                 case 'renameColumn':
                     $colInfo = $wpdb->get_row("SHOW COLUMNS FROM {$table} LIKE '{$command['from']}'");
                     if ($colInfo) {
-                        $wpdb->query("ALTER TABLE {$table} CHANGE {$command['from']} {$command['to']} {$colInfo->Type}");
+                        $sql = "ALTER TABLE {$table} CHANGE {$command['from']} {$command['to']} {$colInfo->Type}";
                     }
                     break;
+
                 case 'dropIndex':
-                    $wpdb->query("ALTER TABLE {$table} DROP INDEX {$command['name']}");
+                    if (self::indexExists($table, $command['name'])) {
+                        $sql = "ALTER TABLE {$table} DROP INDEX {$command['name']}";
+                    }
                     break;
+
+                case 'dropForeign':
+                    $sql = "ALTER TABLE {$table} DROP FOREIGN KEY {$command['name']}";
+                    break;
+
+                case 'dropUnique':
+                    if (self::indexExists($table, $command['name'])) {
+                        $sql = "ALTER TABLE {$table} DROP INDEX {$command['name']}";
+                    }
+                    break;
+
                 case 'foreign':
                     $foreignSql = $command['definition']->toSql($table);
                     if ($foreignSql) {
-                        $wpdb->query("ALTER TABLE {$table} ADD {$foreignSql}");
+                        $sql = "ALTER TABLE {$table} ADD {$foreignSql}";
                     }
                     break;
             }
+
+            if ($sql) {
+                $result = $wpdb->query($sql);
+                if ($result === false) {
+                    error_log("[Zaplane Migration] Failed: {$sql} | Error: {$wpdb->last_error}");
+                }
+            }
         }
+    }
+
+    protected static function indexExists(string $table, string $indexName): bool
+    {
+        global $wpdb;
+        $result = $wpdb->get_results(
+            $wpdb->prepare("SHOW INDEX FROM {$table} WHERE Key_name = %s", $indexName)
+        );
+        return count($result) > 0;
     }
 
     protected static function columnExists(string $table, string $column): bool
