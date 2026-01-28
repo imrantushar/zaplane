@@ -44,6 +44,7 @@ import { primaryBtn } from "../../../../../../../assets/scss/chakra/recipe";
 
 import './styles.scss'
 import { IoSwapHorizontal, IoSwapVerticalOutline } from "react-icons/io5";
+import ZAPTooltip from "@ZAPComponents/ZAPTooltip";
 
 export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdgesChange, onNodesChange, getNewNodeId, singleData }) {
     const dispatch = useDispatch();
@@ -57,7 +58,7 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
     const [activeDrawer, setActiveDrawer] = useState(null);
     //if we menage layout syestem then we need to save databse this value
     const [canvasLayout, setCanvasLayout] = useState("LR")
- 
+
     useEffect(() => {
         if (!singleData?.graph) return;
         const { nodes, edges } = mapGraphFromBackend(singleData.graph);
@@ -83,7 +84,7 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
         openDrawerForNode,
         openDrawerFromAdd,
         onLayout
-    } = useFlowActions({ nodes, setNodes, edges, setEdges, drawerContext, getNewNodeId, setDrawerContext, setDrawerOpen,setCanvasLayout });
+    } = useFlowActions({ nodes, setNodes, edges, setEdges, drawerContext, getNewNodeId, setDrawerContext, setDrawerOpen, setCanvasLayout });
 
     const onAddNode = (edgeId) => {
         const edge = edges.find((e) => e.id === edgeId);
@@ -290,20 +291,23 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
 
                     <Background />
                     <Flex className="zaplane-canvas-layout-icon">
-                        <ControlButton
-                            onClick={() => onLayout("TB")}
-                            title="Vertical layout"
-                            className="zaplane-control-btn"
-                        >
-                            <IoSwapVerticalOutline size={16} />
-                        </ControlButton>
-                        <ControlButton
-                            onClick={() => onLayout("LR")}
-                            title="Horizontal layout"
-                            className="zaplane-control-btn"
-                        >
-                            <IoSwapHorizontal size={16} />
-                        </ControlButton>
+                        <ZAPTooltip content={__("Vertical layout", "zaplane")}>
+                            <ControlButton
+                                onClick={() => onLayout("TB")}
+                                className="zaplane-control-btn"
+                            >
+                                <IoSwapVerticalOutline size={16} />
+                            </ControlButton>
+                        </ZAPTooltip>
+                        <ZAPTooltip content={__("Horizontal layout", "zaplane")}>
+                            <ControlButton
+                                onClick={() => onLayout("LR")}
+                                className="zaplane-control-btn"
+                            >
+                                <IoSwapHorizontal size={16} />
+                            </ControlButton>
+                        </ZAPTooltip >
+
                     </Flex>
                     <Controls
                         position="top-left"

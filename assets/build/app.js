@@ -1497,6 +1497,43 @@ const ZAPSelect = ({
 
 /***/ },
 
+/***/ "./dev_zaplane/components/ZAPTooltip/index.js"
+/*!****************************************************!*\
+  !*** ./dev_zaplane/components/ZAPTooltip/index.js ***!
+  \****************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _ZAPComponents_chakra_Tooltip__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @ZAPComponents/chakra/Tooltip */ "./dev_zaplane/components/chakra/Tooltip.js");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__);
+
+
+const ZAPTooltip = ({
+  content,
+  children,
+  placement = "top"
+}) => {
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)(_ZAPComponents_chakra_Tooltip__WEBPACK_IMPORTED_MODULE_0__["default"], {
+    content: content,
+    positioning: {
+      placement,
+      offset: {
+        mainAxis: 8,
+        crossAxis: 25
+      }
+    },
+    children: children
+  });
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (ZAPTooltip);
+
+/***/ },
+
 /***/ "./dev_zaplane/components/ZapMenu/index.js"
 /*!*************************************************!*\
   !*** ./dev_zaplane/components/ZapMenu/index.js ***!
@@ -1549,6 +1586,62 @@ const ZAPMenu = ({
   });
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (ZAPMenu);
+
+/***/ },
+
+/***/ "./dev_zaplane/components/chakra/Tooltip.js"
+/*!**************************************************!*\
+  !*** ./dev_zaplane/components/chakra/Tooltip.js ***!
+  \**************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@ark-ui/react/dist/components/portal/portal.js");
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/tooltip/tooltip.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__);
+
+
+
+const Tooltip = (props, ref) => {
+  const {
+    showArrow,
+    children,
+    disabled,
+    portalled = true,
+    content,
+    contentProps,
+    portalRef,
+    ...rest
+  } = props;
+  if (disabled) return children;
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.TooltipRoot, {
+    ...rest,
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.TooltipTrigger, {
+      asChild: true,
+      children: children
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Portal, {
+      disabled: !portalled,
+      container: portalRef,
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.TooltipPositioner, {
+        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.TooltipContent, {
+          ref: ref,
+          ...contentProps,
+          children: [showArrow && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.TooltipArrow, {
+            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.TooltipArrowTip, {})
+          }), content]
+        })
+      })
+    })]
+  });
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Tooltip);
 
 /***/ },
 
@@ -4090,8 +4183,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _assets_scss_chakra_recipe__WEBPACK_IMPORTED_MODULE_29__ = __webpack_require__(/*! ../../../../../../../assets/scss/chakra/recipe */ "./assets/scss/chakra/recipe.js");
 /* harmony import */ var _styles_scss__WEBPACK_IMPORTED_MODULE_30__ = __webpack_require__(/*! ./styles.scss */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/styles.scss");
 /* harmony import */ var react_icons_io5__WEBPACK_IMPORTED_MODULE_31__ = __webpack_require__(/*! react-icons/io5 */ "./node_modules/react-icons/io5/index.mjs");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__);
+/* harmony import */ var _ZAPComponents_ZAPTooltip__WEBPACK_IMPORTED_MODULE_32__ = __webpack_require__(/*! @ZAPComponents/ZAPTooltip */ "./dev_zaplane/components/ZAPTooltip/index.js");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__);
+
 
 
 
@@ -4209,7 +4304,7 @@ function FlowCanvas({
   console.log(nodes, 'all nodes');
   console.log(edges, 'all edges');
   const nodeTypes = {
-    custom: props => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsx)(_customNode_CustomNode__WEBPACK_IMPORTED_MODULE_28__["default"], {
+    custom: props => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsx)(_customNode_CustomNode__WEBPACK_IMPORTED_MODULE_28__["default"], {
       ...props,
       data: {
         ...props.data,
@@ -4221,7 +4316,7 @@ function FlowCanvas({
     })
   };
   const edgeTypes = {
-    custom: props => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsx)(_CustomEdge_CustomEdge__WEBPACK_IMPORTED_MODULE_5__["default"], {
+    custom: props => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsx)(_CustomEdge_CustomEdge__WEBPACK_IMPORTED_MODULE_5__["default"], {
       ...props,
       onEdgeDelete: onEdgeDelete,
       onAddNode: onAddNode
@@ -4235,51 +4330,51 @@ function FlowCanvas({
 
   //     return () => clearInterval(interval);
   // }, []);  
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_9__.Box, {
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_9__.Box, {
     ref: containerRef,
     className: "zaplane_flowcanvas",
     flex: "1",
     height: "100vh",
     marginRight: activeDrawer ? "497px" : "0px",
     transition: "margin-right 0.4s ease",
-    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsx)(_ZAPComponents_TopBar__WEBPACK_IMPORTED_MODULE_8__["default"], {
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsx)(_ZAPComponents_TopBar__WEBPACK_IMPORTED_MODULE_8__["default"], {
       topBarStyles: {
         top: 0,
         margin: 0
       },
-      leftContent: () => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.Fragment, {
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {
+      leftContent: () => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.Fragment, {
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {
           variant: "outline",
           onClick: () => navigate(-1),
-          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsx)(react_icons_fi__WEBPACK_IMPORTED_MODULE_13__.FiArrowLeft, {})
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_10__.Text, {
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsx)(react_icons_fi__WEBPACK_IMPORTED_MODULE_13__.FiArrowLeft, {})
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_10__.Text, {
           fontSize: "md",
           fontWeight: "medium",
           children: singleData?.workflow?.title || (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("Untitled Workflow", "zaplane")
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {
           size: "sm",
           variant: "outline",
           onClick: () => dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_15__.workflowNodeListiner)(id)),
           children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("Runs ", "zaplane")
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {
           size: "sm",
           variant: "outline",
           onClick: () => dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_15__.workflowNodeListinerStop)(id)),
           children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("Stop", "zaplane")
         })]
       }),
-      rightContent: () => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.Fragment, {
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {
+      rightContent: () => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.Fragment, {
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {
           size: "sm",
           variant: "outline",
           onClick: () => (0,_helper__WEBPACK_IMPORTED_MODULE_22__.toggleFullscreenMode)(containerRef, isFullscreen, setIsFullscreen),
-          children: isFullscreen ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsx)(react_icons_lu__WEBPACK_IMPORTED_MODULE_21__.LuMinimize, {}) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsx)(react_icons_lu__WEBPACK_IMPORTED_MODULE_21__.LuFullscreen, {})
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsxs)(_ZAPComponents_Drawer__WEBPACK_IMPORTED_MODULE_17__["default"], {
+          children: isFullscreen ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsx)(react_icons_lu__WEBPACK_IMPORTED_MODULE_21__.LuMinimize, {}) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsx)(react_icons_lu__WEBPACK_IMPORTED_MODULE_21__.LuFullscreen, {})
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsxs)(_ZAPComponents_Drawer__WEBPACK_IMPORTED_MODULE_17__["default"], {
           title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("Log History", "Zaplane"),
           size: "md",
           open: activeDrawer === "logs",
           onClose: () => setActiveDrawer(null),
-          trigger: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {
+          trigger: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {
             size: "sm",
             variant: "outline",
             onClick: () => {
@@ -4288,14 +4383,14 @@ function FlowCanvas({
             },
             children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("Logs ", "zaplane")
           }),
-          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_12__.Flex, {
+          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_12__.Flex, {
             gap: "5px",
-            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {
+            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {
               size: "sm",
               variant: "outline",
               onClick: () => dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_15__.getRunWorkFlow)(id)),
               children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("🔄 Refresh ", "zaplane")
-            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {
+            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {
               size: "sm",
               variant: "outline",
               onClick: () => {
@@ -4306,41 +4401,41 @@ function FlowCanvas({
               },
               children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("🔄 Replay ", "zaplane")
             })]
-          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsx)(_RunsTable_RunsTable__WEBPACK_IMPORTED_MODULE_19__["default"], {
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsx)(_RunsTable_RunsTable__WEBPACK_IMPORTED_MODULE_19__["default"], {
             runs: runs
           })]
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsx)(_ZAPComponents_Drawer__WEBPACK_IMPORTED_MODULE_17__["default"], {
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsx)(_ZAPComponents_Drawer__WEBPACK_IMPORTED_MODULE_17__["default"], {
           title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("Version History", 'zaplane'),
           open: activeDrawer === "history",
           onClose: () => setActiveDrawer(null),
-          trigger: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_10__.Text, {
+          trigger: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_10__.Text, {
             margin: "0",
             cursor: "pointer",
             onClick: () => {
               setActiveDrawer("history");
               dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_15__.getAllVersion)(id));
             },
-            children: [" ", /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsx)(lucide_react__WEBPACK_IMPORTED_MODULE_18__["default"], {})]
+            children: [" ", /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsx)(lucide_react__WEBPACK_IMPORTED_MODULE_18__["default"], {})]
           }),
-          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsx)(_VersionHistoryTable_VersionHistoryTable__WEBPACK_IMPORTED_MODULE_20__["default"], {
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsx)(_VersionHistoryTable_VersionHistoryTable__WEBPACK_IMPORTED_MODULE_20__["default"], {
             versions: versions,
             id: id
           })
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsx)(react_select__WEBPACK_IMPORTED_MODULE_23__["default"], {
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsx)(react_select__WEBPACK_IMPORTED_MODULE_23__["default"], {
           options: _helper__WEBPACK_IMPORTED_MODULE_25__.statusOptions,
           value: values?.status ? _helper__WEBPACK_IMPORTED_MODULE_25__.statusOptions.find(opt => opt.value === values.status) : _helper__WEBPACK_IMPORTED_MODULE_25__.statusOptions.find(opt => opt.value === singleData?.workflow?.status),
           onChange: selected => setFieldValue('status', selected.value),
           isClearable: false,
           isSearchable: false,
           placeholder: "Select status"
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {
           ..._assets_scss_chakra_recipe__WEBPACK_IMPORTED_MODULE_29__.primaryBtn,
           size: "sm",
           onClick: handleSubmit,
           children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("Update", "zaplane")
         })]
       })
-    }), loading ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsx)(_ZAPComponents_Loading__WEBPACK_IMPORTED_MODULE_24__["default"], {}) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsxs)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.ReactFlow, {
+    }), loading ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsx)(_ZAPComponents_Loading__WEBPACK_IMPORTED_MODULE_24__["default"], {}) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsxs)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.ReactFlow, {
       nodes: nodes,
       edges: edges,
       nodeTypes: nodeTypes,
@@ -4358,28 +4453,32 @@ function FlowCanvas({
       nodesConnectable: true,
       elementsSelectable: true,
       minZoom: 0.5,
-      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.Background, {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_12__.Flex, {
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.Background, {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_12__.Flex, {
         className: "zaplane-canvas-layout-icon",
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.ControlButton, {
-          onClick: () => onLayout("TB"),
-          title: "Vertical layout",
-          className: "zaplane-control-btn",
-          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsx)(react_icons_io5__WEBPACK_IMPORTED_MODULE_31__.IoSwapVerticalOutline, {
-            size: 16
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsx)(_ZAPComponents_ZAPTooltip__WEBPACK_IMPORTED_MODULE_32__["default"], {
+          content: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("Vertical layout", "zaplane"),
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.ControlButton, {
+            onClick: () => onLayout("TB"),
+            className: "zaplane-control-btn",
+            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsx)(react_icons_io5__WEBPACK_IMPORTED_MODULE_31__.IoSwapVerticalOutline, {
+              size: 16
+            })
           })
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.ControlButton, {
-          onClick: () => onLayout("LR"),
-          title: "Horizontal layout",
-          className: "zaplane-control-btn",
-          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsx)(react_icons_io5__WEBPACK_IMPORTED_MODULE_31__.IoSwapHorizontal, {
-            size: 16
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsx)(_ZAPComponents_ZAPTooltip__WEBPACK_IMPORTED_MODULE_32__["default"], {
+          content: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("Horizontal layout", "zaplane"),
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.ControlButton, {
+            onClick: () => onLayout("LR"),
+            className: "zaplane-control-btn",
+            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsx)(react_icons_io5__WEBPACK_IMPORTED_MODULE_31__.IoSwapHorizontal, {
+              size: 16
+            })
           })
         })]
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.Controls, {
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.Controls, {
         position: "top-left",
         className: "zaplane-canvas-controls"
       })]
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_32__.jsx)(_ActionDrawer_ActionDrawer__WEBPACK_IMPORTED_MODULE_6__["default"], {
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsx)(_ActionDrawer_ActionDrawer__WEBPACK_IMPORTED_MODULE_6__["default"], {
       open: drawerOpen,
       onClose: () => {
         setDrawerOpen(false);
@@ -9329,6 +9428,361 @@ const useTabs = (props) => {
 
 /***/ },
 
+/***/ "./node_modules/@ark-ui/react/dist/components/tooltip/tooltip-arrow-tip.js"
+/*!*********************************************************************************!*\
+  !*** ./node_modules/@ark-ui/react/dist/components/tooltip/tooltip-arrow-tip.js ***!
+  \*********************************************************************************/
+(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   TooltipArrowTip: () => (/* binding */ TooltipArrowTip)
+/* harmony export */ });
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var _zag_js_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @zag-js/react */ "./node_modules/@zag-js/core/dist/index.mjs");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var _factory_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../factory.js */ "./node_modules/@ark-ui/react/dist/components/factory.js");
+/* harmony import */ var _use_tooltip_context_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./use-tooltip-context.js */ "./node_modules/@ark-ui/react/dist/components/tooltip/use-tooltip-context.js");
+'use client';
+
+
+
+
+
+
+const TooltipArrowTip = (0,react__WEBPACK_IMPORTED_MODULE_2__.forwardRef)((props, ref) => {
+  const tooltip = (0,_use_tooltip_context_js__WEBPACK_IMPORTED_MODULE_4__.useTooltipContext)();
+  const mergedProps = (0,_zag_js_react__WEBPACK_IMPORTED_MODULE_1__.mergeProps)(tooltip.getArrowTipProps(), props);
+  return /* @__PURE__ */ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_factory_js__WEBPACK_IMPORTED_MODULE_3__.ark.div, { ...mergedProps, ref });
+});
+TooltipArrowTip.displayName = "TooltipArrowTip";
+
+
+
+
+/***/ },
+
+/***/ "./node_modules/@ark-ui/react/dist/components/tooltip/tooltip-arrow.js"
+/*!*****************************************************************************!*\
+  !*** ./node_modules/@ark-ui/react/dist/components/tooltip/tooltip-arrow.js ***!
+  \*****************************************************************************/
+(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   TooltipArrow: () => (/* binding */ TooltipArrow)
+/* harmony export */ });
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var _zag_js_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @zag-js/react */ "./node_modules/@zag-js/core/dist/index.mjs");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var _factory_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../factory.js */ "./node_modules/@ark-ui/react/dist/components/factory.js");
+/* harmony import */ var _use_tooltip_context_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./use-tooltip-context.js */ "./node_modules/@ark-ui/react/dist/components/tooltip/use-tooltip-context.js");
+'use client';
+
+
+
+
+
+
+const TooltipArrow = (0,react__WEBPACK_IMPORTED_MODULE_2__.forwardRef)((props, ref) => {
+  const tooltip = (0,_use_tooltip_context_js__WEBPACK_IMPORTED_MODULE_4__.useTooltipContext)();
+  const mergedProps = (0,_zag_js_react__WEBPACK_IMPORTED_MODULE_1__.mergeProps)(tooltip.getArrowProps(), props);
+  return /* @__PURE__ */ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_factory_js__WEBPACK_IMPORTED_MODULE_3__.ark.div, { ...mergedProps, ref });
+});
+TooltipArrow.displayName = "TooltipArrow";
+
+
+
+
+/***/ },
+
+/***/ "./node_modules/@ark-ui/react/dist/components/tooltip/tooltip-content.js"
+/*!*******************************************************************************!*\
+  !*** ./node_modules/@ark-ui/react/dist/components/tooltip/tooltip-content.js ***!
+  \*******************************************************************************/
+(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   TooltipContent: () => (/* binding */ TooltipContent)
+/* harmony export */ });
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var _zag_js_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @zag-js/react */ "./node_modules/@zag-js/core/dist/index.mjs");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var _utils_compose_refs_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../utils/compose-refs.js */ "./node_modules/@ark-ui/react/dist/utils/compose-refs.js");
+/* harmony import */ var _factory_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../factory.js */ "./node_modules/@ark-ui/react/dist/components/factory.js");
+/* harmony import */ var _presence_use_presence_context_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../presence/use-presence-context.js */ "./node_modules/@ark-ui/react/dist/components/presence/use-presence-context.js");
+/* harmony import */ var _use_tooltip_context_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./use-tooltip-context.js */ "./node_modules/@ark-ui/react/dist/components/tooltip/use-tooltip-context.js");
+'use client';
+
+
+
+
+
+
+
+
+const TooltipContent = (0,react__WEBPACK_IMPORTED_MODULE_2__.forwardRef)((props, ref) => {
+  const tooltip = (0,_use_tooltip_context_js__WEBPACK_IMPORTED_MODULE_6__.useTooltipContext)();
+  const presence = (0,_presence_use_presence_context_js__WEBPACK_IMPORTED_MODULE_5__.usePresenceContext)();
+  const mergedProps = (0,_zag_js_react__WEBPACK_IMPORTED_MODULE_1__.mergeProps)(tooltip.getContentProps(), presence.getPresenceProps(), props);
+  if (presence.unmounted) {
+    return null;
+  }
+  return /* @__PURE__ */ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_factory_js__WEBPACK_IMPORTED_MODULE_4__.ark.div, { ...mergedProps, ref: (0,_utils_compose_refs_js__WEBPACK_IMPORTED_MODULE_3__.composeRefs)(presence.ref, ref) });
+});
+TooltipContent.displayName = "TooltipContent";
+
+
+
+
+/***/ },
+
+/***/ "./node_modules/@ark-ui/react/dist/components/tooltip/tooltip-context.js"
+/*!*******************************************************************************!*\
+  !*** ./node_modules/@ark-ui/react/dist/components/tooltip/tooltip-context.js ***!
+  \*******************************************************************************/
+(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   TooltipContext: () => (/* binding */ TooltipContext)
+/* harmony export */ });
+/* harmony import */ var _use_tooltip_context_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./use-tooltip-context.js */ "./node_modules/@ark-ui/react/dist/components/tooltip/use-tooltip-context.js");
+'use client';
+
+
+const TooltipContext = (props) => props.children((0,_use_tooltip_context_js__WEBPACK_IMPORTED_MODULE_0__.useTooltipContext)());
+
+
+
+
+/***/ },
+
+/***/ "./node_modules/@ark-ui/react/dist/components/tooltip/tooltip-positioner.js"
+/*!**********************************************************************************!*\
+  !*** ./node_modules/@ark-ui/react/dist/components/tooltip/tooltip-positioner.js ***!
+  \**********************************************************************************/
+(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   TooltipPositioner: () => (/* binding */ TooltipPositioner)
+/* harmony export */ });
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var _zag_js_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @zag-js/react */ "./node_modules/@zag-js/core/dist/index.mjs");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var _factory_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../factory.js */ "./node_modules/@ark-ui/react/dist/components/factory.js");
+/* harmony import */ var _presence_use_presence_context_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../presence/use-presence-context.js */ "./node_modules/@ark-ui/react/dist/components/presence/use-presence-context.js");
+/* harmony import */ var _use_tooltip_context_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./use-tooltip-context.js */ "./node_modules/@ark-ui/react/dist/components/tooltip/use-tooltip-context.js");
+'use client';
+
+
+
+
+
+
+
+const TooltipPositioner = (0,react__WEBPACK_IMPORTED_MODULE_2__.forwardRef)((props, ref) => {
+  const tooltip = (0,_use_tooltip_context_js__WEBPACK_IMPORTED_MODULE_5__.useTooltipContext)();
+  const mergedProps = (0,_zag_js_react__WEBPACK_IMPORTED_MODULE_1__.mergeProps)(tooltip.getPositionerProps(), props);
+  const presence = (0,_presence_use_presence_context_js__WEBPACK_IMPORTED_MODULE_4__.usePresenceContext)();
+  if (presence.unmounted) {
+    return null;
+  }
+  return /* @__PURE__ */ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_factory_js__WEBPACK_IMPORTED_MODULE_3__.ark.div, { ...mergedProps, ref });
+});
+TooltipPositioner.displayName = "TooltipPositioner";
+
+
+
+
+/***/ },
+
+/***/ "./node_modules/@ark-ui/react/dist/components/tooltip/tooltip-root-provider.js"
+/*!*************************************************************************************!*\
+  !*** ./node_modules/@ark-ui/react/dist/components/tooltip/tooltip-root-provider.js ***!
+  \*************************************************************************************/
+(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   TooltipRootProvider: () => (/* binding */ TooltipRootProvider)
+/* harmony export */ });
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var _zag_js_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @zag-js/react */ "./node_modules/@zag-js/core/dist/index.mjs");
+/* harmony import */ var _presence_split_presence_props_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../presence/split-presence-props.js */ "./node_modules/@ark-ui/react/dist/components/presence/split-presence-props.js");
+/* harmony import */ var _presence_use_presence_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../presence/use-presence.js */ "./node_modules/@ark-ui/react/dist/components/presence/use-presence.js");
+/* harmony import */ var _presence_use_presence_context_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../presence/use-presence-context.js */ "./node_modules/@ark-ui/react/dist/components/presence/use-presence-context.js");
+/* harmony import */ var _use_tooltip_context_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./use-tooltip-context.js */ "./node_modules/@ark-ui/react/dist/components/tooltip/use-tooltip-context.js");
+'use client';
+
+
+
+
+
+
+
+const TooltipRootProvider = (props) => {
+  const [presenceProps, { value: tooltip, children }] = (0,_presence_split_presence_props_js__WEBPACK_IMPORTED_MODULE_2__.splitPresenceProps)(props);
+  const presence = (0,_presence_use_presence_js__WEBPACK_IMPORTED_MODULE_3__.usePresence)((0,_zag_js_react__WEBPACK_IMPORTED_MODULE_1__.mergeProps)({ present: tooltip.open }, presenceProps));
+  return /* @__PURE__ */ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_use_tooltip_context_js__WEBPACK_IMPORTED_MODULE_5__.TooltipProvider, { value: tooltip, children: /* @__PURE__ */ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_presence_use_presence_context_js__WEBPACK_IMPORTED_MODULE_4__.PresenceProvider, { value: presence, children }) });
+};
+
+
+
+
+/***/ },
+
+/***/ "./node_modules/@ark-ui/react/dist/components/tooltip/tooltip-root.js"
+/*!****************************************************************************!*\
+  !*** ./node_modules/@ark-ui/react/dist/components/tooltip/tooltip-root.js ***!
+  \****************************************************************************/
+(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   TooltipRoot: () => (/* binding */ TooltipRoot)
+/* harmony export */ });
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var _zag_js_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @zag-js/react */ "./node_modules/@zag-js/core/dist/index.mjs");
+/* harmony import */ var _presence_split_presence_props_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../presence/split-presence-props.js */ "./node_modules/@ark-ui/react/dist/components/presence/split-presence-props.js");
+/* harmony import */ var _presence_use_presence_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../presence/use-presence.js */ "./node_modules/@ark-ui/react/dist/components/presence/use-presence.js");
+/* harmony import */ var _presence_use_presence_context_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../presence/use-presence-context.js */ "./node_modules/@ark-ui/react/dist/components/presence/use-presence-context.js");
+/* harmony import */ var _use_tooltip_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./use-tooltip.js */ "./node_modules/@ark-ui/react/dist/components/tooltip/use-tooltip.js");
+/* harmony import */ var _use_tooltip_context_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./use-tooltip-context.js */ "./node_modules/@ark-ui/react/dist/components/tooltip/use-tooltip-context.js");
+'use client';
+
+
+
+
+
+
+
+
+const TooltipRoot = (props) => {
+  const [presenceProps, { children, ...localProps }] = (0,_presence_split_presence_props_js__WEBPACK_IMPORTED_MODULE_2__.splitPresenceProps)(props);
+  const tooltip = (0,_use_tooltip_js__WEBPACK_IMPORTED_MODULE_5__.useTooltip)(localProps);
+  const presence = (0,_presence_use_presence_js__WEBPACK_IMPORTED_MODULE_3__.usePresence)((0,_zag_js_react__WEBPACK_IMPORTED_MODULE_1__.mergeProps)({ present: tooltip.open }, presenceProps));
+  return /* @__PURE__ */ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_use_tooltip_context_js__WEBPACK_IMPORTED_MODULE_6__.TooltipProvider, { value: tooltip, children: /* @__PURE__ */ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_presence_use_presence_context_js__WEBPACK_IMPORTED_MODULE_4__.PresenceProvider, { value: presence, children }) });
+};
+
+
+
+
+/***/ },
+
+/***/ "./node_modules/@ark-ui/react/dist/components/tooltip/tooltip-trigger.js"
+/*!*******************************************************************************!*\
+  !*** ./node_modules/@ark-ui/react/dist/components/tooltip/tooltip-trigger.js ***!
+  \*******************************************************************************/
+(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   TooltipTrigger: () => (/* binding */ TooltipTrigger)
+/* harmony export */ });
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var _zag_js_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @zag-js/react */ "./node_modules/@zag-js/core/dist/index.mjs");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var _factory_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../factory.js */ "./node_modules/@ark-ui/react/dist/components/factory.js");
+/* harmony import */ var _use_tooltip_context_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./use-tooltip-context.js */ "./node_modules/@ark-ui/react/dist/components/tooltip/use-tooltip-context.js");
+'use client';
+
+
+
+
+
+
+const TooltipTrigger = (0,react__WEBPACK_IMPORTED_MODULE_2__.forwardRef)((props, ref) => {
+  const tooltip = (0,_use_tooltip_context_js__WEBPACK_IMPORTED_MODULE_4__.useTooltipContext)();
+  const mergedProps = (0,_zag_js_react__WEBPACK_IMPORTED_MODULE_1__.mergeProps)(tooltip.getTriggerProps(), props);
+  return /* @__PURE__ */ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_factory_js__WEBPACK_IMPORTED_MODULE_3__.ark.button, { ...mergedProps, ref });
+});
+TooltipTrigger.displayName = "TooltipTrigger";
+
+
+
+
+/***/ },
+
+/***/ "./node_modules/@ark-ui/react/dist/components/tooltip/use-tooltip-context.js"
+/*!***********************************************************************************!*\
+  !*** ./node_modules/@ark-ui/react/dist/components/tooltip/use-tooltip-context.js ***!
+  \***********************************************************************************/
+(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   TooltipProvider: () => (/* binding */ TooltipProvider),
+/* harmony export */   useTooltipContext: () => (/* binding */ useTooltipContext)
+/* harmony export */ });
+/* harmony import */ var _utils_create_context_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../utils/create-context.js */ "./node_modules/@ark-ui/react/dist/utils/create-context.js");
+'use client';
+
+
+const [TooltipProvider, useTooltipContext] = (0,_utils_create_context_js__WEBPACK_IMPORTED_MODULE_0__.createContext)({
+  name: "TooltipContext",
+  hookName: "useTooltipContext",
+  providerName: "<TooltipProvider />"
+});
+
+
+
+
+/***/ },
+
+/***/ "./node_modules/@ark-ui/react/dist/components/tooltip/use-tooltip.js"
+/*!***************************************************************************!*\
+  !*** ./node_modules/@ark-ui/react/dist/components/tooltip/use-tooltip.js ***!
+  \***************************************************************************/
+(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   useTooltip: () => (/* binding */ useTooltip)
+/* harmony export */ });
+/* harmony import */ var _zag_js_react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @zag-js/react */ "./node_modules/@zag-js/react/dist/index.mjs");
+/* harmony import */ var _zag_js_tooltip__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @zag-js/tooltip */ "./node_modules/@zag-js/tooltip/dist/index.mjs");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var _providers_environment_use_environment_context_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../providers/environment/use-environment-context.js */ "./node_modules/@ark-ui/react/dist/providers/environment/use-environment-context.js");
+/* harmony import */ var _providers_locale_use_locale_context_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../providers/locale/use-locale-context.js */ "./node_modules/@ark-ui/react/dist/providers/locale/use-locale-context.js");
+'use client';
+
+
+
+
+
+
+const useTooltip = (props) => {
+  const id = (0,react__WEBPACK_IMPORTED_MODULE_2__.useId)();
+  const { getRootNode } = (0,_providers_environment_use_environment_context_js__WEBPACK_IMPORTED_MODULE_3__.useEnvironmentContext)();
+  const { dir } = (0,_providers_locale_use_locale_context_js__WEBPACK_IMPORTED_MODULE_4__.useLocaleContext)();
+  const machineProps = {
+    id,
+    dir,
+    getRootNode,
+    ...props
+  };
+  const service = (0,_zag_js_react__WEBPACK_IMPORTED_MODULE_0__.useMachine)(_zag_js_tooltip__WEBPACK_IMPORTED_MODULE_1__.machine, machineProps);
+  return _zag_js_tooltip__WEBPACK_IMPORTED_MODULE_1__.connect(service, _zag_js_react__WEBPACK_IMPORTED_MODULE_0__.normalizeProps);
+};
+
+
+
+
+/***/ },
+
 /***/ "./node_modules/@ark-ui/react/dist/providers/environment/use-environment-context.js"
 /*!******************************************************************************************!*\
   !*** ./node_modules/@ark-ui/react/dist/providers/environment/use-environment-context.js ***!
@@ -12292,6 +12746,75 @@ const Textarea = withContext(
 );
 Textarea.displayName = "Textarea";
 const TextareaPropsProvider = PropsProvider;
+
+
+
+
+/***/ },
+
+/***/ "./node_modules/@chakra-ui/react/dist/esm/components/tooltip/tooltip.js"
+/*!******************************************************************************!*\
+  !*** ./node_modules/@chakra-ui/react/dist/esm/components/tooltip/tooltip.js ***!
+  \******************************************************************************/
+(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   TooltipArrow: () => (/* binding */ TooltipArrow),
+/* harmony export */   TooltipArrowTip: () => (/* binding */ TooltipArrowTip),
+/* harmony export */   TooltipContent: () => (/* binding */ TooltipContent),
+/* harmony export */   TooltipContext: () => (/* binding */ TooltipContext),
+/* harmony export */   TooltipPositioner: () => (/* binding */ TooltipPositioner),
+/* harmony export */   TooltipPropsProvider: () => (/* binding */ TooltipPropsProvider),
+/* harmony export */   TooltipRoot: () => (/* binding */ TooltipRoot),
+/* harmony export */   TooltipRootProvider: () => (/* binding */ TooltipRootProvider),
+/* harmony export */   TooltipTrigger: () => (/* binding */ TooltipTrigger),
+/* harmony export */   useTooltipStyles: () => (/* binding */ useTooltipStyles)
+/* harmony export */ });
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var _ark_ui_react_tooltip__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @ark-ui/react/tooltip */ "./node_modules/@ark-ui/react/dist/components/tooltip/tooltip-root-provider.js");
+/* harmony import */ var _ark_ui_react_tooltip__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @ark-ui/react/tooltip */ "./node_modules/@ark-ui/react/dist/components/tooltip/tooltip-root.js");
+/* harmony import */ var _ark_ui_react_tooltip__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @ark-ui/react/tooltip */ "./node_modules/@ark-ui/react/dist/components/tooltip/tooltip-trigger.js");
+/* harmony import */ var _ark_ui_react_tooltip__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @ark-ui/react/tooltip */ "./node_modules/@ark-ui/react/dist/components/tooltip/tooltip-positioner.js");
+/* harmony import */ var _ark_ui_react_tooltip__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @ark-ui/react/tooltip */ "./node_modules/@ark-ui/react/dist/components/tooltip/tooltip-content.js");
+/* harmony import */ var _ark_ui_react_tooltip__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @ark-ui/react/tooltip */ "./node_modules/@ark-ui/react/dist/components/tooltip/tooltip-arrow-tip.js");
+/* harmony import */ var _ark_ui_react_tooltip__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @ark-ui/react/tooltip */ "./node_modules/@ark-ui/react/dist/components/tooltip/tooltip-arrow.js");
+/* harmony import */ var _ark_ui_react_tooltip__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @ark-ui/react/tooltip */ "./node_modules/@ark-ui/react/dist/components/tooltip/tooltip-context.js");
+/* harmony import */ var _styled_system_create_slot_recipe_context_js__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../../styled-system/create-slot-recipe-context.js */ "./node_modules/@chakra-ui/react/dist/esm/styled-system/create-slot-recipe-context.js");
+
+"use client";
+
+
+
+
+const {
+  withRootProvider,
+  withContext,
+  useStyles: useTooltipStyles,
+  PropsProvider
+} = (0,_styled_system_create_slot_recipe_context_js__WEBPACK_IMPORTED_MODULE_9__.createSlotRecipeContext)({ key: "tooltip" });
+const TooltipRootProvider = withRootProvider(
+  _ark_ui_react_tooltip__WEBPACK_IMPORTED_MODULE_1__.TooltipRootProvider
+);
+const TooltipRoot = withRootProvider(_ark_ui_react_tooltip__WEBPACK_IMPORTED_MODULE_2__.TooltipRoot, {
+  defaultProps: { lazyMount: true, unmountOnExit: true }
+});
+const TooltipPropsProvider = PropsProvider;
+const TooltipTrigger = withContext(_ark_ui_react_tooltip__WEBPACK_IMPORTED_MODULE_3__.TooltipTrigger, "trigger", { forwardAsChild: true });
+const TooltipPositioner = withContext(_ark_ui_react_tooltip__WEBPACK_IMPORTED_MODULE_4__.TooltipPositioner, "positioner", { forwardAsChild: true });
+const TooltipContent = withContext(
+  _ark_ui_react_tooltip__WEBPACK_IMPORTED_MODULE_5__.TooltipContent,
+  "content",
+  { forwardAsChild: true }
+);
+const TooltipArrowTip = withContext(_ark_ui_react_tooltip__WEBPACK_IMPORTED_MODULE_6__.TooltipArrowTip, "arrowTip", { forwardAsChild: true });
+const TooltipArrow = withContext(
+  _ark_ui_react_tooltip__WEBPACK_IMPORTED_MODULE_7__.TooltipArrow,
+  "arrow",
+  { forwardAsChild: true, defaultProps: { children: /* @__PURE__ */ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(TooltipArrowTip, {}) } }
+);
+const TooltipContext = _ark_ui_react_tooltip__WEBPACK_IMPORTED_MODULE_8__.TooltipContext;
 
 
 
