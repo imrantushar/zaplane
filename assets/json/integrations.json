@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-01-22 12:06:39",
+    "generated_at": "2026-01-28 13:24:10",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -3238,6 +3238,53 @@
                     ]
                 }
             }
+        },
+        "fluentCRM": {
+            "slug": "fluentCRM",
+            "name": "FluentCRM",
+            "icon": "",
+            "category": "app",
+            "triggers": {
+                "tag_added": {
+                    "key": "tag_added",
+                    "label": "Tag Added To Contact",
+                    "hook": "fluentcrm_contact_added_to_tags",
+                    "schema": [
+                        {
+                            "key": "tag_id",
+                            "label": "Tags",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Any Tag",
+                                    "value": "any"
+                                },
+                                {
+                                    "label": "grf",
+                                    "value": 1
+                                },
+                                {
+                                    "label": "tea",
+                                    "value": 2
+                                },
+                                {
+                                    "label": "coffe",
+                                    "value": 3
+                                },
+                                {
+                                    "label": "base",
+                                    "value": 4
+                                }
+                            ],
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": []
         }
     },
     "tools": {
