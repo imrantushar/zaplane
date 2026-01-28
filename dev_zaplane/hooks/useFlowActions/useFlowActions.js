@@ -8,6 +8,7 @@
  * - Creates a new action node, shifts other nodes if needed, and manages edges.
  * - Opens drawer for a node or for adding a new node.
  * - Provides helper for getting an edge by ID.
+ * -canvas flow layout maintai LR and TB
  * 
  * Usage:
  * const { updateNodeData, deleteNode, createActionNode, onAddNode, openDrawerForNode, openDrawerFromAdd } =
@@ -22,13 +23,18 @@
  * @param {function} setDrawerContext    - Setter for drawer context.
  * @param {function} setDrawerOpen       - Function to open/close drawer.
  * @param {function} getNewNodeId        - Function to generate unique node IDs.
- * @param {number} GAP                   - Optional spacing between nodes (default 250).
+ * @param {function} onLayout             - changing layout LR and LB
+ *
  * 
  * Returns:
  * @returns {object} - {
- *   updateNodeData, deleteNode, createActionNode, onAddNode, openDrawerForNode, openDrawerFromAdd
+ *   updateNodeData, deleteNode, createActionNode, onAddNode, openDrawerForNode, openDrawerFromAdd,onLayout
  * }
  */
+
+import { useReactFlow, useUpdateNodeInternals } from "@xyflow/react";
+import { getLayoutedElements } from "./Helper/dagreLayout";
+import { useCallback } from "react";
 
 export const useFlowActions = ({
     nodes,
@@ -39,8 +45,10 @@ export const useFlowActions = ({
     setDrawerContext,
     setDrawerOpen,
     getNewNodeId,
-    GAP = 250,
+    setCanvasLayout,
+    canvasLayout
 }) => {
+
     const updateNodeData = (updatedData) => {
         setNodes((nds) =>
             nds.map((n) =>
@@ -59,6 +67,10 @@ export const useFlowActions = ({
     };
 
     const createActionNode = (actionData) => {
+        const layoutLR = canvasLayout === 'LR';
+        const LRGap = 250
+        const TBGap = 98
+        console.log(layoutLR, 'layot');
         const { edge, node } = drawerContext;
         let sourceNode = null;
         let targetNode = null;
@@ -73,9 +85,8 @@ export const useFlowActions = ({
         }
 
         const newNodeId = getNewNodeId();
-        const newX = sourceNode.position.x + GAP;
-        const newY = sourceNode.position.y;
-
+        const newX = layoutLR ? sourceNode.position.x + LRGap : sourceNode.position.x;
+        const newY = layoutLR ? sourceNode.position.y : sourceNode.position.y + TBGap;
         const newNode = {
             id: newNodeId,
             type: "custom",
@@ -85,14 +96,22 @@ export const useFlowActions = ({
                 ...actionData,
             },
         };
-
         // Shift nodes if they are after newX
         const updatedNodes = nodes.map((n) => {
-            if (n.position.x >= newX) {
-                return { ...n, position: { ...n.position, x: n.position.x + GAP } };
+            if (layoutLR) {
+                // Only shift nodes to the right of new node
+                if (n.position.x >= newX) {
+                    return { ...n, position: { ...n.position, x: n.position.x + LRGap } };
+                }
+            } else {
+                // Only shift nodes below the new node
+                if (n.position.y >= newY) {
+                    return { ...n, position: { ...n.position, y: n.position.y + TBGap } };
+                }
             }
             return n;
         });
+
 
         let newEdges = [...edges];
 
@@ -124,6 +143,28 @@ export const useFlowActions = ({
         setDrawerContext({ source: "add", node, edge: null });
         setDrawerOpen(true);
     };
+    //meanagin layout flow canvas 
+    const { fitView } = useReactFlow();
+    const updateNodeInternals = useUpdateNodeInternals();
+    const onLayout = useCallback(
+        (direction) => {
+            const { nodes: layoutedNodes, edges: layoutedEdges } =
+                getLayoutedElements(nodes, edges, direction);
+
+            setNodes(layoutedNodes);
+            setEdges(layoutedEdges);
+
+            requestAnimationFrame(() => {
+                layoutedNodes.forEach((node) => {
+                    updateNodeInternals(node.id);
+                });
+
+                fitView({ padding: 0.2, duration: 300 });
+                setCanvasLayout(direction);
+            });
+        },
+        [nodes, edges, fitView, updateNodeInternals]
+    );
 
     return {
         updateNodeData,
@@ -132,5 +173,6 @@ export const useFlowActions = ({
         onAddNode,
         openDrawerForNode,
         openDrawerFromAdd,
+        onLayout
     };
 };

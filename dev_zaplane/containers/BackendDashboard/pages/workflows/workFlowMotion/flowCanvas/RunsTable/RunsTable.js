@@ -14,10 +14,10 @@ import {
 import LogDetails from "@ZAPComponents/LogDetails";
 import ZAPLoading from "@ZAPComponents/Loading";
 import { getDuration } from "@ZAPUtils/helper";
-import { statusStyle } from "../../helper";
 import ZAPTable from "@ZAPComponents/Table";
 import { __ } from "@wordpress/i18n";
 import ZAPDrawer from "@ZAPComponents/Drawer";
+import { statusStyle } from "../../../helper";
 
 
 
@@ -26,11 +26,6 @@ const RunsTable = ({ runs = [] }) => {
   const [activeRunId, setActiveRunId] = useState(null);
   const { isLoading } = useSelector((state) => state.workflows);
   const [drawerOpen, setDrawerOpen] = useState(false);
-
-
-
-
-
 
   return (
     <>

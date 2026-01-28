@@ -10,20 +10,14 @@ import { RiDeleteBin5Line } from "react-icons/ri";
 import { FaRegCopy } from "react-icons/fa";
 import FloatingEdge from "../FloatingEdge/FloatingEdge";
 import { __ } from "@wordpress/i18n";
-export default function CustomNode({ id, data, xPos, yPos }) {
+export default function CustomNode({ id, data,canvasLayout}) {
   const [hovered, setHovered] = useState(false);
 
   const { getEdges } = useReactFlow();
   const edges = getEdges();
 
   const hasOutgoingEdge = edges.some((e) => e.source === id);
-
-  const NODE_WIDTH = 160;
-  const NODE_HEIGHT = 48;
-
-  const sourceX = xPos + NODE_WIDTH;
-  const sourceY = yPos + NODE_HEIGHT / 2;
-
+  const isLR = canvasLayout === "LR"
 
   return (
     <Box
@@ -60,7 +54,8 @@ export default function CustomNode({ id, data, xPos, yPos }) {
             bg="var(--zaplane-border-color)"
             color="var(--zaplane-font-color)"
             p="6px"
-            marginTop="4px"
+            marginTop= "4px"
+            marginLeft={isLR ? "0" : "100px"}
             borderRadius="full"
             boxShadow="lg"
             cursor="pointer"
@@ -96,7 +91,7 @@ export default function CustomNode({ id, data, xPos, yPos }) {
         {data?.action !== "trigger" && (
           <Handle
             type="target"
-            position={Position.Left}
+            position={canvasLayout === "LR"? Position.Left : Position.Top}
             style={{
               width: 10,
               height: 10,
@@ -113,7 +108,7 @@ export default function CustomNode({ id, data, xPos, yPos }) {
         {!data.conditions && (
           <Handle
             type="source"
-            position={Position.Right}
+            position={canvasLayout === "LR"? Position.Right : Position.Bottom}
             style={{
               width: 10,
               height: 10,
@@ -126,9 +121,10 @@ export default function CustomNode({ id, data, xPos, yPos }) {
       </Box>
       {!hasOutgoingEdge && !data.conditions && (
         <FloatingEdge
-          sourceX={sourceX}
-          sourceY={sourceY}
+          // sourceX={sourceX}
+          // sourceY={sourceY}
           openDrawerFromAdd={data.openDrawerFromAdd}
+          canvasLayout={canvasLayout}
         />
       )}
     </Box>

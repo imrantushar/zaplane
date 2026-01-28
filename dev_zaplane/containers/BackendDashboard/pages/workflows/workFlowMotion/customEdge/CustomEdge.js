@@ -1,6 +1,5 @@
 import React from "react";
-import { getBezierPath, getEdgeCenter } from "@xyflow/react";
-import { FaTimes, FaPlus } from "react-icons/fa";
+import { getBezierPath, getEdgeCenter, Position } from "@xyflow/react";
 import { HStack, Icon } from "@chakra-ui/react";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import { IoAddSharp } from "react-icons/io5";
@@ -13,8 +12,6 @@ const CustomEdge = ({
   sourceY,
   targetX,
   targetY,
-  sourcePosition,
-  targetPosition,
   style = {},
   markerEnd,
   onEdgeDelete,
@@ -23,10 +20,8 @@ const CustomEdge = ({
   const [edgePath] = getBezierPath({
     sourceX,
     sourceY,
-    sourcePosition,
     targetX,
     targetY,
-    targetPosition,
   });
 
   const [centerX, centerY] = getEdgeCenter({
@@ -35,7 +30,7 @@ const CustomEdge = ({
     targetX,
     targetY,
   });
-
+ 
   return (
     <g className="zaplane-custom-edge">
       <path
@@ -74,7 +69,7 @@ const CustomEdge = ({
             as={RiDeleteBin5Line}
             boxSize={4}
             cursor="pointer"
-            
+
           />
         </HStack>
       </foreignObject>
@@ -88,7 +83,7 @@ const CustomEdge = ({
         className="zaplane-edge-actions"
         style={{ overflow: "visible" }}
       >
-       <HStack
+        <HStack
           bg="var(--zaplane-background)"
           color="var(--zaplane-font-color)"
           p='7px'
@@ -106,7 +101,7 @@ const CustomEdge = ({
             as={IoAddSharp}
             boxSize={4}
             cursor="pointer"
-            
+
           />
         </HStack>
       </foreignObject>

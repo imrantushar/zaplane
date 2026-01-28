@@ -5,7 +5,7 @@ import { FiTrash2 } from "react-icons/fi";
 import ZAPInput from "@ZAPComponents/ZAPInput";
 import ZAPSelect from "@ZAPComponents/ZAPSelect";
 import { __ } from "@wordpress/i18n";
-import { buildEmptyRule } from "../../helper";
+import { buildEmptyRule } from "./helper";
 
 export default function ConditionGroupField({ value, onChange, field }) {
     const ruleFields = field?.fields;
