@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-01-22 12:06:39",
+    "generated_at": "2026-01-28 09:33:00",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -3238,6 +3238,87 @@
                     ]
                 }
             }
+        },
+        "ablocks": {
+            "slug": "ablocks",
+            "name": "Ablocks",
+            "icon": "",
+            "category": "app",
+            "triggers": {
+                "form_before_submit": {
+                    "key": "form_before_submit",
+                    "label": "Form Before Submit",
+                    "hook": "ablocks/form/before_submit",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "form_submitted": {
+                    "key": "form_submitted",
+                    "label": "Form Submitted",
+                    "hook": "ablocks/form/submitted",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "multistep_completed": {
+                    "key": "multistep_completed",
+                    "label": "Multi-step Form",
+                    "hook": "ablocks/form/multistep_completed",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "login_form": {
+                    "key": "login_form",
+                    "label": "Login Form",
+                    "hook": "wp_login",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "register_form": {
+                    "key": "register_form",
+                    "label": "Register Form",
+                    "hook": "ablocks/form/user_registered",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "block_activated": {
+                    "key": "block_activated",
+                    "label": "Block Activated",
+                    "hook": "ablocks/block/activated",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "block_deactivated": {
+                    "key": "block_deactivated",
+                    "label": "Block Deactivated",
+                    "hook": "ablocks/block/deactivated",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "after_save_settings": {
+                    "key": "after_save_settings",
+                    "label": "Block Deactivated",
+                    "hook": "ablocks/after_save_settings",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": []
         }
     },
     "tools": {
