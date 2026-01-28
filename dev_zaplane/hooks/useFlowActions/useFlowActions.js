@@ -33,7 +33,7 @@
  */
 
 import { useReactFlow, useUpdateNodeInternals } from "@xyflow/react";
-import { getLayoutedElements } from "./Helper/dagreLayout";
+import { getLayoutedElements } from "./utils/dagreLayout";
 import { useCallback } from "react";
 
 export const useFlowActions = ({
