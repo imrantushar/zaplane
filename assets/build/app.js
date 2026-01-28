@@ -4280,7 +4280,8 @@ function FlowCanvas({
     getNewNodeId,
     setDrawerContext,
     setDrawerOpen,
-    setCanvasLayout
+    setCanvasLayout,
+    canvasLayout
   });
   const onAddNode = edgeId => {
     const edge = edges.find(e => e.id === edgeId);
@@ -5244,8 +5245,8 @@ const useFlowActions = ({
   setDrawerContext,
   setDrawerOpen,
   getNewNodeId,
-  GAP = 250,
-  setCanvasLayout
+  setCanvasLayout,
+  canvasLayout
 }) => {
   const updateNodeData = updatedData => {
     setNodes(nds => nds.map(n => n.id === drawerContext.node?.id ? {
@@ -5261,6 +5262,10 @@ const useFlowActions = ({
     setEdges(eds => eds.filter(e => e.source !== nodeId && e.target !== nodeId));
   };
   const createActionNode = actionData => {
+    const layoutLR = canvasLayout === 'LR';
+    const LRGap = 250;
+    const TBGap = 98;
+    console.log(layoutLR, 'layot');
     const {
       edge,
       node
@@ -5276,8 +5281,8 @@ const useFlowActions = ({
       if (!sourceNode) return;
     }
     const newNodeId = getNewNodeId();
-    const newX = sourceNode.position.x + GAP;
-    const newY = sourceNode.position.y;
+    const newX = layoutLR ? sourceNode.position.x + LRGap : sourceNode.position.x;
+    const newY = layoutLR ? sourceNode.position.y : sourceNode.position.y + TBGap;
     const newNode = {
       id: newNodeId,
       type: "custom",
@@ -5290,17 +5295,31 @@ const useFlowActions = ({
         ...actionData
       }
     };
-
     // Shift nodes if they are after newX
     const updatedNodes = nodes.map(n => {
-      if (n.position.x >= newX) {
-        return {
-          ...n,
-          position: {
-            ...n.position,
-            x: n.position.x + GAP
-          }
-        };
+      if (layoutLR) {
+        // Only shift nodes to the right of new node
+        if (n.position.x >= newX) {
+          return {
+            ...n,
+            position: {
+              ...n.position,
+              x: n.position.x + LRGap
+            }
+          };
+        }
+      } else {
+        // Only shift nodes below the new node
+        console.log('iam here');
+        if (n.position.y >= newY) {
+          return {
+            ...n,
+            position: {
+              ...n.position,
+              y: n.position.y + TBGap
+            }
+          };
+        }
       }
       return n;
     });

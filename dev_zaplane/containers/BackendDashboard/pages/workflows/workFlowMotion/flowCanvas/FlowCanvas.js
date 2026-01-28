@@ -5,8 +5,6 @@ import {
     Controls,
     Background,
     ControlButton,
-    useReactFlow,
-    useUpdateNodeInternals,
 } from "@xyflow/react";
 import "@xyflow/react/dist/base.css";
 import { __ } from '@wordpress/i18n';
@@ -84,7 +82,7 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
         openDrawerForNode,
         openDrawerFromAdd,
         onLayout
-    } = useFlowActions({ nodes, setNodes, edges, setEdges, drawerContext, getNewNodeId, setDrawerContext, setDrawerOpen, setCanvasLayout });
+    } = useFlowActions({ nodes, setNodes, edges, setEdges, drawerContext, getNewNodeId, setDrawerContext, setDrawerOpen, setCanvasLayout ,canvasLayout});
 
     const onAddNode = (edgeId) => {
         const edge = edges.find((e) => e.id === edgeId);
