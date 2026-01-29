@@ -56,7 +56,7 @@ class ContactForm extends IntegrationBase {
                 $forms = \WPCF7_ContactForm::find();
                 foreach ( $forms as $form ) {
                     $options[]  = [
-                        'label' => $form->title(),
+                        'label' => $form->title,
                         'value' => $form->id(),
                     ];
                 }
