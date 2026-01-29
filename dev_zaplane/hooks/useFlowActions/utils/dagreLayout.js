@@ -1,14 +1,19 @@
 import dagre from "dagre";
 
-
-const dagreGraph = new dagre.graphlib.Graph();
-dagreGraph.setDefaultEdgeLabel(() => ({}));
-
 const NODE_WIDTH = 160;
 const NODE_HEIGHT = 48;
 
 export const getLayoutedElements = (nodes, edges, direction = "TB") => {
-  dagreGraph.setGraph({ rankdir: direction });
+  const dagreGraph = new dagre.graphlib.Graph();
+  dagreGraph.setDefaultEdgeLabel(() => ({}));
+
+  dagreGraph.setGraph({
+    rankdir: direction,
+    ranker: "tight-tree",
+    ranksep: direction === "LR" ? 140 : 90,
+    nodesep: 60,
+  });
+
   nodes.forEach((node) => {
     dagreGraph.setNode(node.id, {
       width: NODE_WIDTH,
@@ -17,20 +22,25 @@ export const getLayoutedElements = (nodes, edges, direction = "TB") => {
   });
 
   edges.forEach((edge) => {
-    dagreGraph.setEdge(edge.source, edge.target);
+    dagreGraph.setEdge(edge.source, edge.target, {
+      weight: 5,
+      minlen: 1,
+    });
   });
 
   dagre.layout(dagreGraph);
 
   const layoutedNodes = nodes.map((node) => {
-    const { x, y } = dagreGraph.node(node.id);
+    const pos = dagreGraph.node(node.id);
+
     return {
       ...node,
       position: {
-        x: x - NODE_WIDTH / 2,
-        y: y - NODE_HEIGHT / 2,
+        x: pos.x - NODE_WIDTH / 2,
+        y: pos.y - NODE_HEIGHT / 2,
       },
     };
   });
+
   return { nodes: layoutedNodes, edges };
 };
