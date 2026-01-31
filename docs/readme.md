@@ -1,6 +1,6 @@
 # Zaplane Developer Documentation
 
-Complete documentation for building integrations, using the ORM, and configuring the framework.
+Complete documentation for building integrations, using the ORM, configuring the framework, and understanding the automation system.
 
 ## Table of Contents
 
@@ -13,12 +13,23 @@ Complete documentation for building integrations, using the ORM, and configuring
    - [Testing Integrations](#testing-integrations)
 2. [ORM (Object-Relational Mapper)](#orm)
    - [Models](#models)
+   - [Creating New Models](#creating-new-models)
+   - [WordPress Table Models](#wordpress-table-models)
    - [Query Builder](#query-builder)
    - [Collections](#collections)
    - [Migrations](#migrations)
-3. [Configuration System](#configuration-system)
+3. [Controllers and API](#controllers-and-api)
+   - [REST API Controllers](#rest-api-controllers)
+   - [Creating Controllers](#creating-controllers)
+   - [Ajax Handling](#ajax-handling)
+4. [WP-CLI Commands](#wp-cli-commands)
+   - [Available Commands](#available-commands)
+   - [Creating Commands](#creating-commands)
+5. [Configuration System](#configuration-system)
+   - [Config Helper](#config-helper)
    - [Config Manager](#config-manager)
    - [Configuration Repository](#configuration-repository)
+6. [Automation System](#automation-system) - [See detailed documentation](./automation-system.md)
 
 ---
 
@@ -1225,6 +1236,190 @@ protected static array $casts = [
 
 ---
 
+### Creating New Models
+
+Models are stored in `includes/models/`. Follow these steps to create a new model:
+
+#### 1. Create the Model File
+
+```php
+<?php
+// includes/models/my-entity.php
+
+namespace Zaplane\Models;
+
+use Zaplane\Framework\Database\ORM\Model;
+
+if (!defined('ABSPATH')) exit;
+
+class MyEntity extends Model
+{
+    // Table name without WordPress prefix (zaplane_ prefix auto-added)
+    protected static string $table = 'my_entities';
+
+    // Mass-assignable fields
+    protected static array $fillable = [
+        'name',
+        'type',
+        'data',
+        'user_id',
+    ];
+
+    // Type casting
+    protected static array $casts = [
+        'id'      => 'integer',
+        'user_id' => 'integer',
+        'data'    => 'array',
+        'active'  => 'boolean',
+    ];
+
+    // Custom methods
+    public function user()
+    {
+        return get_user_by('ID', $this->user_id);
+    }
+
+    public static function forUser(int $userId): Collection
+    {
+        return static::where('user_id', $userId)->get();
+    }
+}
+```
+
+#### 2. Create the Migration
+
+```php
+<?php
+// includes/database/migrations/2024_01_15_000001_create_my_entities_table.php
+
+namespace Zaplane\Database\Migrations;
+
+use Zaplane\Framework\Database\ORM\Migration;
+use Zaplane\Framework\Database\ORM\Schema;
+use Zaplane\Framework\Database\ORM\Blueprint;
+
+if (!defined('ABSPATH')) exit;
+
+class CreateMyEntitiesTable extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('my_entities', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('type', 50);
+            $table->json('data')->nullable();
+            $table->unsignedBigInteger('user_id');
+            $table->boolean('active')->default(true);
+            $table->timestamps();
+
+            $table->index('user_id');
+            $table->index('type');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::drop('my_entities');
+    }
+}
+```
+
+#### 3. Register in Autoloader
+
+Add to `includes/autoload.php`:
+
+```php
+'Zaplane\\Models\\MyEntity' => 'models/my-entity.php',
+```
+
+---
+
+### WordPress Table Models
+
+You can also create models for WordPress core tables. These models don't use the `zaplane_` prefix.
+
+#### Post Model Example
+
+```php
+<?php
+
+namespace Zaplane\Models;
+
+use Zaplane\Framework\Database\ORM\Model;
+
+class Post extends Model
+{
+    // Use WordPress posts table (no zaplane_ prefix)
+    protected static string $table = 'posts';
+    protected static bool $usePrefix = false;  // Skip zaplane_ prefix
+
+    protected static string $primaryKey = 'ID';
+
+    protected static array $fillable = [
+        'post_title',
+        'post_content',
+        'post_status',
+        'post_type',
+        'post_author',
+    ];
+
+    protected static array $casts = [
+        'ID'          => 'integer',
+        'post_author' => 'integer',
+    ];
+
+    // Timestamps use different column names
+    protected static string $createdAt = 'post_date';
+    protected static string $updatedAt = 'post_modified';
+}
+```
+
+#### User Model Example
+
+```php
+<?php
+
+namespace Zaplane\Models;
+
+use Zaplane\Framework\Database\ORM\Model;
+
+class User extends Model
+{
+    protected static string $table = 'users';
+    protected static bool $usePrefix = false;
+
+    protected static string $primaryKey = 'ID';
+
+    protected static array $fillable = [
+        'user_login',
+        'user_email',
+        'display_name',
+    ];
+
+    protected static bool $timestamps = false;  // WP users table has different timestamp handling
+}
+```
+
+---
+
+### Existing Zaplane Models
+
+The following models are available in `includes/models/`:
+
+| Model | Table | Description |
+|-------|-------|-------------|
+| `Workflow` | `zaplane_workflows` | Workflow definitions |
+| `WorkflowVersion` | `zaplane_workflow_versions` | Versioned workflow graphs |
+| `Run` | `zaplane_runs` | Workflow execution runs |
+| `NodeRun` | `zaplane_node_runs` | Individual node executions |
+| `NodeLog` | `zaplane_node_logs` | Execution logs |
+| `Connection` | `zaplane_connections` | Integration credentials |
+| `QueueJob` | `zaplane_queue` | Pending async jobs |
+| `ExecutionEdge` | `zaplane_execution_edges` | Node execution edges |
+
+---
+
 ### Query Builder
 
 The Query Builder provides a fluent interface for database queries.
@@ -1479,40 +1674,69 @@ $joined = $collection->join(', ', ' and ');
 
 ### Migrations
 
-Migrations manage database schema changes.
+Migrations manage database schema changes. They are stored in `includes/database/migrations/`.
 
-#### Creating a Migration
+#### Migration File Naming
+
+Migrations use timestamp-based naming for ordering:
+
+```
+YYYY_MM_DD_NNNNNN_description.php
+
+Examples:
+2024_01_01_000001_create_workflows_table.php
+2024_01_15_000001_add_priority_to_workflows.php
+2024_02_01_000001_create_analytics_table.php
+```
+
+#### Existing Migrations
+
+| Migration | Description |
+|-----------|-------------|
+| `2024_01_01_000001_create_workflows_table.php` | Workflow definitions |
+| `2024_01_01_000002_create_workflow_versions_table.php` | Versioned graphs |
+| `2024_01_01_000003_create_runs_table.php` | Execution runs |
+| `2024_01_01_000004_create_node_runs_table.php` | Node executions |
+| `2024_01_01_000005_create_execution_edges_table.php` | Edge tracking |
+| `2024_01_01_000006_create_queue_table.php` | Async queue |
+| `2024_01_01_000007_create_node_logs_table.php` | Execution logs |
+| `2024_01_01_000008_create_connections_table.php` | Credentials |
+
+#### Creating a New Table
 
 ```php
 <?php
+// includes/database/migrations/2024_01_15_000001_create_analytics_table.php
 
 namespace Zaplane\Database\Migrations;
 
 use Zaplane\Framework\Database\ORM\Migration;
 use Zaplane\Framework\Database\ORM\Schema;
+use Zaplane\Framework\Database\ORM\Blueprint;
 
-class CreateWorkflowsTable extends Migration
+if (!defined('ABSPATH')) exit;
+
+class CreateAnalyticsTable extends Migration
 {
     public function up(): void
     {
-        Schema::create('workflows', function ($table) {
+        Schema::create('analytics', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->text('description')->nullable();
-            $table->string('status', 50)->default('draft');
-            $table->json('nodes');
-            $table->json('edges');
-            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('workflow_id');
+            $table->string('event_type', 50);
+            $table->json('event_data')->nullable();
+            $table->unsignedInteger('count')->default(0);
             $table->timestamps();
 
-            $table->index('status');
-            $table->index('user_id');
+            $table->index('workflow_id');
+            $table->index('event_type');
+            $table->index(['workflow_id', 'event_type']);
         });
     }
 
     public function down(): void
     {
-        Schema::drop('workflows');
+        Schema::drop('analytics');
     }
 }
 ```
@@ -1580,21 +1804,73 @@ $table->timestamps();       // created_at and updated_at
 $table->softDeletes();      // deleted_at (nullable datetime)
 ```
 
-#### Modifying Tables
+#### Altering Tables (Add/Modify Columns)
+
+To alter an existing table, create a new migration:
 
 ```php
-Schema::table('workflows', function ($table) {
-    // Add column
-    $table->string('new_column')->nullable();
+<?php
+// includes/database/migrations/2024_02_01_000001_add_priority_to_workflows.php
 
-    // Modify existing column
+namespace Zaplane\Database\Migrations;
+
+use Zaplane\Framework\Database\ORM\Migration;
+use Zaplane\Framework\Database\ORM\Schema;
+use Zaplane\Framework\Database\ORM\Blueprint;
+
+if (!defined('ABSPATH')) exit;
+
+class AddPriorityToWorkflows extends Migration
+{
+    public function up(): void
+    {
+        Schema::table('workflows', function (Blueprint $table) {
+            // Add new columns
+            $table->unsignedInteger('priority')->default(0);
+            $table->string('category', 100)->nullable();
+            $table->json('settings')->nullable();
+
+            // Add index for new column
+            $table->index('priority');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::table('workflows', function (Blueprint $table) {
+            $table->dropColumn('priority');
+            $table->dropColumn('category');
+            $table->dropColumn('settings');
+            $table->dropIndex('zaplane_workflows_priority_index');
+        });
+    }
+}
+```
+
+#### Common Alter Operations
+
+```php
+Schema::table('my_table', function (Blueprint $table) {
+    // Add column after specific column
+    $table->string('new_column')->after('existing_column');
+
+    // Add column at beginning
+    $table->string('first_column')->first();
+
+    // Modify column type/size
     $table->string('name', 500)->change();
 
     // Rename column
     $table->renameColumn('old_name', 'new_name');
 
     // Drop column
-    $table->dropColumn('old_column');
+    $table->dropColumn('unused_column');
+
+    // Drop multiple columns
+    $table->dropColumn(['column1', 'column2']);
+
+    // Add composite index
+    $table->index(['column1', 'column2'], 'custom_index_name');
 
     // Drop index
     $table->dropIndex('index_name');
@@ -1629,9 +1905,494 @@ Schema::rename('old_name', 'new_name');
 
 ---
 
+## Controllers and API
+
+Zaplane uses WordPress REST API for frontend communication.
+
+### REST API Controllers
+
+Controllers are stored in `includes/api/` and extend `WP_REST_Controller`.
+
+#### Existing Controllers
+
+| Controller | Endpoint | Description |
+|------------|----------|-------------|
+| `WorkflowsController` | `/zaplane/v1/workflows` | Workflow CRUD |
+| `RunController` | `/zaplane/v1/runs` | Execution runs |
+| `ConnectionsController` | `/zaplane/v1/connections` | Integration credentials |
+| `IntegrationsController` | `/zaplane/v1/integrations` | Available integrations |
+
+### Creating Controllers
+
+```php
+<?php
+// includes/api/analytics-controller.php
+
+namespace Zaplane\API;
+
+use WP_REST_Controller;
+use WP_REST_Server;
+use WP_REST_Request;
+use WP_REST_Response;
+use WP_Error;
+use Zaplane\Models\Analytics;
+
+if (!defined('ABSPATH')) exit;
+
+class AnalyticsController extends WP_REST_Controller
+{
+    protected string $namespace = 'zaplane/v1';
+    protected string $rest_base = 'analytics';
+
+    /**
+     * Register routes
+     */
+    public function register_routes(): void
+    {
+        // GET /zaplane/v1/analytics
+        register_rest_route($this->namespace, '/' . $this->rest_base, [
+            [
+                'methods'             => WP_REST_Server::READABLE,
+                'callback'            => [$this, 'get_items'],
+                'permission_callback' => [$this, 'permissions_check'],
+            ],
+            [
+                'methods'             => WP_REST_Server::CREATABLE,
+                'callback'            => [$this, 'create_item'],
+                'permission_callback' => [$this, 'permissions_check'],
+            ],
+        ]);
+
+        // GET/PUT/DELETE /zaplane/v1/analytics/{id}
+        register_rest_route($this->namespace, '/' . $this->rest_base . '/(?P<id>\d+)', [
+            [
+                'methods'             => WP_REST_Server::READABLE,
+                'callback'            => [$this, 'get_item'],
+                'permission_callback' => [$this, 'permissions_check'],
+            ],
+            [
+                'methods'             => WP_REST_Server::EDITABLE,
+                'callback'            => [$this, 'update_item'],
+                'permission_callback' => [$this, 'permissions_check'],
+            ],
+            [
+                'methods'             => WP_REST_Server::DELETABLE,
+                'callback'            => [$this, 'delete_item'],
+                'permission_callback' => [$this, 'permissions_check'],
+            ],
+        ]);
+    }
+
+    /**
+     * Permission check - require admin capability
+     */
+    public function permissions_check(): bool
+    {
+        return current_user_can('manage_options');
+    }
+
+    /**
+     * Get all items
+     */
+    public function get_items($request): WP_REST_Response
+    {
+        $items = Analytics::orderBy('id', 'desc')->get();
+        return rest_ensure_response($items->toArray());
+    }
+
+    /**
+     * Get single item
+     */
+    public function get_item($request)
+    {
+        $item = Analytics::find((int) $request['id']);
+
+        if (!$item) {
+            return new WP_Error('not_found', 'Item not found', ['status' => 404]);
+        }
+
+        return rest_ensure_response($item->toArray());
+    }
+
+    /**
+     * Create item
+     */
+    public function create_item($request): WP_REST_Response
+    {
+        $item = Analytics::create([
+            'workflow_id' => (int) $request['workflow_id'],
+            'event_type'  => sanitize_text_field($request['event_type']),
+            'event_data'  => $request['event_data'] ?? [],
+        ]);
+
+        return rest_ensure_response(['id' => $item->id]);
+    }
+
+    /**
+     * Update item
+     */
+    public function update_item($request)
+    {
+        $item = Analytics::find((int) $request['id']);
+
+        if (!$item) {
+            return new WP_Error('not_found', 'Item not found', ['status' => 404]);
+        }
+
+        $item->event_type = sanitize_text_field($request['event_type']);
+        $item->event_data = $request['event_data'] ?? $item->event_data;
+        $item->save();
+
+        return rest_ensure_response($item->toArray());
+    }
+
+    /**
+     * Delete item
+     */
+    public function delete_item($request): WP_REST_Response
+    {
+        $item = Analytics::find((int) $request['id']);
+
+        if ($item) {
+            $item->delete();
+        }
+
+        return rest_ensure_response(['deleted' => true]);
+    }
+}
+```
+
+#### Register the Controller
+
+In your plugin bootstrap or `includes/api.php`:
+
+```php
+add_action('rest_api_init', function () {
+    $controller = new \Zaplane\API\AnalyticsController();
+    $controller->register_routes();
+});
+```
+
+### Ajax Handling
+
+For non-REST Ajax requests, use WordPress admin-ajax:
+
+```php
+<?php
+// includes/ajax/analytics-ajax.php
+
+namespace Zaplane\Ajax;
+
+if (!defined('ABSPATH')) exit;
+
+class AnalyticsAjax
+{
+    public function __construct()
+    {
+        add_action('wp_ajax_zaplane_get_analytics', [$this, 'get_analytics']);
+        add_action('wp_ajax_zaplane_save_analytics', [$this, 'save_analytics']);
+    }
+
+    /**
+     * Handle get analytics request
+     */
+    public function get_analytics(): void
+    {
+        // Verify nonce
+        check_ajax_referer('zaplane_nonce', 'nonce');
+
+        // Check permissions
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(['message' => 'Unauthorized'], 403);
+        }
+
+        $workflow_id = (int) ($_GET['workflow_id'] ?? 0);
+        $analytics = \Zaplane\Models\Analytics::where('workflow_id', $workflow_id)->get();
+
+        wp_send_json_success($analytics->toArray());
+    }
+
+    /**
+     * Handle save analytics request
+     */
+    public function save_analytics(): void
+    {
+        check_ajax_referer('zaplane_nonce', 'nonce');
+
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(['message' => 'Unauthorized'], 403);
+        }
+
+        $data = json_decode(file_get_contents('php://input'), true);
+
+        $item = \Zaplane\Models\Analytics::create([
+            'workflow_id' => (int) ($data['workflow_id'] ?? 0),
+            'event_type'  => sanitize_text_field($data['event_type'] ?? ''),
+            'event_data'  => $data['event_data'] ?? [],
+        ]);
+
+        wp_send_json_success(['id' => $item->id]);
+    }
+}
+
+// Initialize
+new AnalyticsAjax();
+```
+
+#### JavaScript Usage
+
+```javascript
+// Using REST API
+fetch('/wp-json/zaplane/v1/analytics', {
+    headers: {
+        'X-WP-Nonce': wpApiSettings.nonce
+    }
+})
+.then(response => response.json())
+.then(data => console.log(data));
+
+// Using Admin Ajax
+jQuery.post(ajaxurl, {
+    action: 'zaplane_save_analytics',
+    nonce: zaplane.nonce,
+    workflow_id: 123,
+    event_type: 'view'
+}, function(response) {
+    console.log(response);
+});
+```
+
+---
+
+## WP-CLI Commands
+
+Zaplane includes WP-CLI commands for development and maintenance tasks.
+
+### Available Commands
+
+| Command | Description |
+|---------|-------------|
+| `wp zaplane build:integration` | Generate `integrations.json` manifest from registered integrations |
+| `wp zaplane make:integration` | Scaffold a new integration with boilerplate code |
+| `wp zaplane test:integration <slug>` | Test an integration's triggers and actions |
+| `wp zaplane queue:status` | Show status of pending queue jobs |
+| `wp zaplane demo` | Run demo/test functionality |
+
+#### Build Integration Manifest
+
+```bash
+# Generate integrations.json for frontend
+wp zaplane build:integration
+
+# Output:
+# 🔨 Building integrations.json manifest...
+#   ✓ wordpress (app) - 67 triggers, 91 actions
+#   ✓ slack (app) - 1 triggers, 2 actions
+#   ✓ storeengine (app) - 14 triggers, 3 actions
+# ✅ Integrations manifest built successfully!
+```
+
+#### Scaffold New Integration
+
+```bash
+# Interactive mode
+wp zaplane make:integration
+
+# With options
+wp zaplane make:integration --slug=mailchimp --type=external --auth=api_key --name="Mailchimp"
+
+# Output creates: integrations/mailchimp.php
+```
+
+#### Test Integration
+
+```bash
+# Test all triggers and actions for an integration
+wp zaplane test:integration slack
+
+# Output shows validation results
+```
+
+### Creating Commands
+
+Commands are stored in `includes/commands/`. Create a new command:
+
+```php
+<?php
+// includes/commands/cleanup-command.php
+
+namespace Zaplane\Commands;
+
+use Zaplane\Framework\Console\Command;
+use Zaplane\Models\Run;
+use Zaplane\Models\NodeLog;
+
+if (!defined('ABSPATH')) exit;
+
+class CleanupCommand extends Command
+{
+    protected string $signature = 'cleanup';
+    protected string $description = 'Clean up old execution logs and runs';
+
+    public function handle(array $args, array $assoc_args): void
+    {
+        $this->info('Starting cleanup...');
+
+        // Get options
+        $days = (int) ($assoc_args['days'] ?? 30);
+        $dryRun = isset($assoc_args['dry-run']);
+
+        // Find old runs
+        $cutoff = date('Y-m-d H:i:s', strtotime("-{$days} days"));
+        $oldRuns = Run::where('created_at', '<', $cutoff)->get();
+
+        $this->line("Found {$oldRuns->count()} runs older than {$days} days");
+
+        if ($dryRun) {
+            $this->warning('Dry run - no changes made');
+            return;
+        }
+
+        // Confirm deletion
+        if (!$this->confirm("Delete {$oldRuns->count()} old runs?")) {
+            $this->line('Cancelled');
+            return;
+        }
+
+        // Delete with progress
+        $deleted = 0;
+        foreach ($oldRuns as $run) {
+            // Delete related logs
+            NodeLog::where('run_id', $run->id)->delete();
+            $run->delete();
+            $deleted++;
+        }
+
+        $this->success("Deleted {$deleted} runs and associated logs");
+
+        // Show summary table
+        $this->table(
+            ['Metric', 'Value'],
+            [
+                ['Runs Deleted', $deleted],
+                ['Cutoff Date', $cutoff],
+                ['Days', $days],
+            ]
+        );
+    }
+}
+```
+
+#### Register the Command
+
+In `includes/framework/core/console.php` or your bootstrap:
+
+```php
+use Zaplane\Commands\CleanupCommand;
+
+// Register command
+$commands = [
+    // ... existing commands
+    CleanupCommand::class,
+];
+```
+
+#### Command Helper Methods
+
+The `Command` base class provides:
+
+```php
+// Output methods
+$this->info('Informational message');     // Regular log
+$this->success('Success message');         // Green success
+$this->error('Error message');             // Red error
+$this->warning('Warning message');         // Yellow warning
+$this->line('Plain text');                 // Plain output
+$this->line('');                           // Empty line
+
+// Input methods
+$answer = $this->ask('Question?');         // Get text input
+$confirmed = $this->confirm('Continue?');  // Yes/no confirmation
+
+// Table output
+$this->table(
+    ['Column 1', 'Column 2'],
+    [
+        ['Row 1 Col 1', 'Row 1 Col 2'],
+        ['Row 2 Col 1', 'Row 2 Col 2'],
+    ]
+);
+```
+
+#### Running Commands
+
+```bash
+# Basic usage
+wp zaplane cleanup
+
+# With options
+wp zaplane cleanup --days=7
+
+# Dry run
+wp zaplane cleanup --days=7 --dry-run
+```
+
+---
+
 ## Configuration System
 
 The configuration system provides centralized settings management with dot notation support.
+
+### Config Helper
+
+Access configuration values anywhere in your code:
+
+```php
+use Zaplane\Framework\Config\Config;
+
+// Get the config instance
+$config = Config::getInstance();
+
+// Get values with dot notation
+$debug = $config->get('app.debug');
+$level = $config->get('logging.level', 'info');  // With default
+
+// Set values
+$config->set('app.name', 'My Automation');
+
+// Check existence
+if ($config->has('api.rate_limit')) {
+    // ...
+}
+
+// Array access (alternative syntax)
+$debug = $config['app.debug'];
+$config['app.name'] = 'My App';
+```
+
+#### Using in Integrations
+
+```php
+use Zaplane\Framework\Config\Config;
+
+class MyIntegration extends ExternalAppIntegration
+{
+    public static function execute_node(array $node, array $input): array
+    {
+        $config = Config::getInstance();
+
+        // Check if logging is enabled
+        if ($config->get('logging.enabled')) {
+            // Log action
+        }
+
+        // Get retry settings
+        $maxRetries = $config->get('queue.retry_attempts', 3);
+
+        // ...
+    }
+}
+```
 
 ### Config Manager
 
@@ -1791,6 +2552,21 @@ $path = $fileConfig->get('path');       // Gets logging.channels.file.path
 
 ---
 
+## Automation System
+
+The automation system is the core engine that executes workflows. For detailed documentation on how the automation system works, including:
+
+- Trigger event routing
+- Node execution flow
+- Credential injection
+- Rate limiting
+- Retry logic with exponential backoff
+- Complex workflow scenarios
+
+**See: [Automation System Documentation](./automation-system.md)**
+
+---
+
 ## Best Practices
 
 ### Integration Development
@@ -1810,9 +2586,16 @@ $path = $fileConfig->get('path');       // Gets logging.channels.file.path
 
 ### Configuration
 
-1. **Use dot notation**: `config('app.debug')` not `config('app')['debug']`
+1. **Use Config class**: `Config::getInstance()->get('app.debug')`
 2. **Provide defaults**: Always pass a default value when getting config
 3. **Group related settings**: Use nested configuration structure
 4. **Don't store secrets in config files**: Use WordPress options or environment variables
+
+### Commands
+
+1. **Use descriptive signatures**: `cleanup:logs` not `cl`
+2. **Provide dry-run options**: Allow testing without changes
+3. **Show progress**: Use `$this->line()` for updates
+4. **Confirm destructive actions**: Use `$this->confirm()`
 
 ---
