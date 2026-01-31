@@ -42,7 +42,8 @@ class BuildIntegrationCommand extends Command
                 'actions'  => [],
             ];
 
-            foreach ($class::get_triggers() as $key => $trigger) {
+            // Use IntegrationLoader to get triggers (combines modular + legacy)
+            foreach (IntegrationLoader::getTriggers($slug) as $key => $trigger) {
                 if ($category === 'tool') {
                     continue;
                 }
@@ -54,23 +55,20 @@ class BuildIntegrationCommand extends Command
 
                 $integration['triggers'][$key] = [
                     'key'     => $key,
-                    'label'   => $trigger['label'],
+                    'label'   => $trigger['label'] ?? $key,
                     'hook'    => $trigger['hook'],
-                    'schema'  => method_exists($class, 'get_trigger_config_schema')
-                        ? $class::get_trigger_config_schema($key)
-                        : [],
-                    'outputs' => $class::get_output_ports(),
+                    'schema'  => $trigger['config_schema'] ?? IntegrationLoader::getTriggerConfigSchema($slug, $key),
+                    'outputs' => $trigger['output_schema'] ?? [],
                 ];
             }
 
-            foreach ($class::get_actions() as $key => $action) {
+            // Use IntegrationLoader to get actions (combines modular + legacy)
+            foreach (IntegrationLoader::getActions($slug) as $key => $action) {
                 $integration['actions'][$key] = [
                     'key'     => $key,
-                    'label'   => $action['label'],
-                    'schema'  => method_exists($class, 'get_action_config_schema')
-                        ? $class::get_action_config_schema($key)
-                        : [],
-                    'outputs' => $class::get_output_ports(),
+                    'label'   => $action['label'] ?? $key,
+                    'schema'  => $action['config_schema'] ?? IntegrationLoader::getActionConfigSchema($slug, $key),
+                    'outputs' => $action['output_ports'] ?? ['main'],
                 ];
             }
 

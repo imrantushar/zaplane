@@ -5,7 +5,9 @@ namespace Zaplane\Framework\Core;
 use Zaplane\Framework\Classes\Container;
 use Zaplane\Framework\Classes\DataMapper;
 use Zaplane\Framework\Classes\ExecutionContext;
+use Zaplane\Framework\Classes\NodeConfig;
 use Zaplane\Framework\Classes\Query;
+use Zaplane\Framework\Core\IntegrationLoader;
 use Zaplane\Framework\Exceptions\WorkflowException;
 use Zaplane\Framework\Exceptions\IntegrationException;
 use Zaplane\Models\Run;
@@ -82,14 +84,33 @@ class Automation
         $args = func_get_args();
 
         foreach (Query::get_active_workflows_for_event($event) as $trigger) {
-            $integration = $this->container->get('integrations')->get(strtolower($trigger['app']));
-            if (!$integration) {
+            $slug        = strtolower( $trigger['app'] );
+            $trigger_key = $trigger['graph_node']['data']['event'] ?? '';
+            $node_data   = $trigger['graph_node']['data'];
+
+            // Try modular trigger first
+            $trigger_class = IntegrationLoader::getTriggerClass( $slug, $trigger_key );
+
+            if ( $trigger_class ) {
+                // Use modular trigger
+                if ( ! $trigger_class::matches( $node_data, $args ) ) {
+                    continue;
+                }
+                $payload = $trigger_class::resolve( $node_data, $args );
+            } else {
+                // Fall back to legacy integration
+                $integration = $this->container->get('integrations')->get( $slug );
+                if ( ! $integration ) {
+                    continue;
+                }
+                $payload = $integration::resolve_trigger( $node_data, $args );
+            }
+
+            if ( ! $payload ) {
                 continue;
             }
-            $payload = $integration::resolve_trigger($trigger['graph_node']['data'], $args);
-            if (!$payload) continue;
 
-            $this->start_trigger_run($trigger, $payload);
+            $this->start_trigger_run( $trigger, $payload );
         }
     }
 
@@ -158,34 +179,67 @@ class Automation
                 $output = $input;
                 $nodeRun->log('info', 'Trigger node passed through');
             } else {
-                $app_slug = strtolower($node['data']['app'] ?? '');
-                $integration = $this->container->get('integrations')->get($app_slug);
-                if (!$integration) {
-                    throw IntegrationException::notFound($node['data']['app']);
+                $app_slug   = strtolower($node['data']['app'] ?? '');
+                $nodeConfig = NodeConfig::from($node);
+                $action_key = $nodeConfig->event();
+
+                // Try modular action first
+                $action_class = IntegrationLoader::getActionClass($app_slug, $action_key);
+
+                if ($action_class) {
+                    // Use modular action
+                    $integration = $this->container->get('integrations')->get($app_slug);
+
+                    // Rate limiting (if integration exists and has rate limit)
+                    if ($integration) {
+                        $this->enforce_rate_limit($integration, $nodeRun);
+                    }
+
+                    // Inject credentials for external integrations
+                    if ($integration) {
+                        $node = $this->inject_credentials($node, $integration);
+                    }
+
+                    // Resolve variables in node config
+                    $node = DataMapper::resolve_node_config($node, $input);
+
+                    // Get resolved config and credentials
+                    $config      = NodeConfig::from($node)->config();
+                    $credentials = $node['_connection_credentials'] ?? [];
+
+                    // Execute modular action
+                    $output = $action_class::execute($config, $input, $credentials);
+                    $nodeRun->log('info', 'Node executed successfully (modular)');
+                } else {
+                    // Fall back to legacy integration
+                    $integration = $this->container->get('integrations')->get($app_slug);
+                    if (!$integration) {
+                        throw IntegrationException::notFound($node['data']['app']);
+                    }
+
+                    // --- Phase 5.2: Rate limiting ---
+                    $this->enforce_rate_limit($integration, $nodeRun);
+
+                    // --- Phase 1.1: Inject connection credentials automatically ---
+                    $node = $this->inject_credentials($node, $integration);
+
+                    // --- Phase 1.2: Resolve variables in node config ---
+                    $node = DataMapper::resolve_node_config($node, $input);
+
+                    // --- Phase 3.3: Attach ExecutionContext for structured access ---
+                    $node['_context'] = new ExecutionContext(
+                        $run->id,
+                        $nodeRun->node_key,
+                        $input,
+                        $node['_connection_credentials'] ?? [],
+                        $node['config']['data'] ?? $node['data']['config'] ?? [],
+                        $node,
+                        $nodeRun
+                    );
+
+                    $output = $integration::execute_node($node, $input);
+                    $nodeRun->log('info', 'Node executed successfully (legacy)');
                 }
-
-                // --- Phase 5.2: Rate limiting ---
-                $this->enforce_rate_limit($integration, $nodeRun);
-
-                // --- Phase 1.1: Inject connection credentials automatically ---
-                $node = $this->inject_credentials($node, $integration);
-
-                // --- Phase 1.2: Resolve variables in node config ---
-                $node = DataMapper::resolve_node_config($node, $input);
-
-                // --- Phase 3.3: Attach ExecutionContext for structured access ---
-                $node['_context'] = new ExecutionContext(
-                    $run->id,
-                    $nodeRun->node_key,
-                    $input,
-                    $node['_connection_credentials'] ?? [],
-                    $node['config']['data'] ?? $node['data']['config'] ?? [],
-                    $node,
-                    $nodeRun
-                );
-
-                $output = $integration::execute_node($node, $input);
-                $nodeRun->log('info', 'Node executed successfully');
             }
 
             $nodeRun->setOutput($output);

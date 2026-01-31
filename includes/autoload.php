@@ -76,8 +76,9 @@ class Autoload {
      * Constructor: register autoloader
      */
     private function __construct() {
-        // Register autoload callback
+        // Register autoload callbacks
         spl_autoload_register([$this, 'autoload']);
+        spl_autoload_register([$this, 'autoload_modular_integration']);
 
         // Default namespace mappings
         $this->add_namespace_directory('Zaplane', ZAPLANE_ROOT_DIR_PATH . 'includes/');
@@ -103,6 +104,71 @@ class Autoload {
         $this->add_namespace_directory('Zaplane\\Ajax', ZAPLANE_ROOT_DIR_PATH . 'includes/ajax/');
         $this->add_namespace_directory('Zaplane\\Admin', ZAPLANE_ROOT_DIR_PATH . 'includes/admin/');
         $this->add_namespace_directory('Zaplane\\Database\\Migrations', ZAPLANE_ROOT_DIR_PATH . 'includes/database/migrations/');
+
+        // Modular integrations namespace mappings
+        // Each integration subdirectory: integrations/{slug}/
+        // - SlackIntegration -> integrations/slack/SlackIntegration.php
+        // - Zaplane\Integrations\Slack\Actions\SendMessage -> integrations/slack/actions/SendMessage.php
+        $this->add_namespace_directory('Zaplane\\Integrations', ZAPLANE_ROOT_DIR_PATH . 'integrations/');
+    }
+
+    /**
+     * Custom autoload for modular integration classes.
+     *
+     * Handles namespaces like:
+     * - Zaplane\Integrations\Slack\SlackIntegration -> integrations/slack/slack-integration.php
+     * - Zaplane\Integrations\Slack\Actions\SendMessage -> integrations/slack/actions/send-message.php
+     * - Zaplane\Integrations\WordPress\Triggers\PublishPost -> integrations/wordpress/triggers/publish-post.php
+     *
+     * All files use kebab-case naming convention.
+     *
+     * @param string $class The fully-qualified class name
+     * @return void
+     */
+    public function autoload_modular_integration( string $class ): void {
+        // Check if this is a modular integration class
+        if ( 0 !== strpos( $class, 'Zaplane\\Integrations\\' ) ) {
+            return;
+        }
+
+        // Extract parts: Zaplane\Integrations\Slack\Actions\SendMessage
+        // -> ['Zaplane', 'Integrations', 'Slack', 'Actions', 'SendMessage']
+        $parts = explode( '\\', $class );
+
+        // Need at least 4 parts: Zaplane\Integrations\{Slug}\{Something}
+        if ( count( $parts ) < 4 ) {
+            return;
+        }
+
+        // Get the integration slug (lowercase)
+        $slug = strtolower( $parts[2] );
+
+        // Build the file path based on remaining parts
+        // Zaplane\Integrations\Slack\Actions\SendMessage
+        // -> integrations/slack/actions/send-message.php
+        $remaining = array_slice( $parts, 3 );
+
+        // Build path: all parts converted to kebab-case
+        $path_parts = [];
+        foreach ( $remaining as $part ) {
+            // Convert PascalCase to kebab-case
+            $kebab = strtolower( preg_replace( '/([a-z])([A-Z])/', '$1-$2', $part ) );
+            $path_parts[] = $kebab;
+        }
+
+        // Last part is the filename
+        $filename = array_pop( $path_parts ) . '.php';
+
+        // Build full path
+        if ( ! empty( $path_parts ) ) {
+            $file = ZAPLANE_ROOT_DIR_PATH . 'integrations/' . $slug . '/' . implode( '/', $path_parts ) . '/' . $filename;
+        } else {
+            $file = ZAPLANE_ROOT_DIR_PATH . 'integrations/' . $slug . '/' . $filename;
+        }
+
+        if ( is_readable( $file ) ) {
+            require_once $file;
+        }
     }
 }
 

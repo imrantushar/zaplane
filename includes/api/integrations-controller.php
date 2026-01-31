@@ -3,6 +3,7 @@ namespace Zaplane\API;
 
 use WP_REST_Controller;
 use Zaplane\Framework\Classes\Container;
+use Zaplane\Framework\Core\IntegrationLoader;
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
@@ -55,47 +56,85 @@ class IntegrationsController extends WP_REST_Controller {
         return rest_ensure_response( $out );
     }
 
+    /**
+     * Get triggers for an integration.
+     *
+     * Uses IntegrationLoader::getTriggers() which combines modular triggers
+     * (from /triggers/*.php) with legacy triggers (from get_triggers()).
+     */
     public function get_triggers( $request ) {
-        $integrationLoader = $this->container->get('integrations'); // loader instance
-        $integration = $integrationLoader->get($request['slug']);  // integration class
-        if ( ! $integration ) {
+        $slug = $request['slug'];
+
+        // Check if integration exists
+        if ( ! IntegrationLoader::has( $slug ) ) {
             return new \WP_Error( 'not_found', 'Integration not found', [ 'status' => 404 ] );
         }
 
-        return rest_ensure_response( $integration::get_triggers() );
+        // Get combined triggers (modular + legacy)
+        $triggers = IntegrationLoader::getTriggers( $slug );
+
+        return rest_ensure_response( $triggers );
     }
 
+    /**
+     * Get trigger config schema for an integration.
+     *
+     * Uses IntegrationLoader::getTriggerConfigSchema() which checks modular
+     * triggers first, then falls back to legacy get_trigger_config_schema().
+     */
     public function get_trigger_schema( $request ) {
-         $integrationLoader = $this->container->get('integrations'); // loader instance
-        $integration = $integrationLoader->get($request['slug']);  // integration class
-        if ( ! $integration || ! method_exists( $integration, 'get_trigger_config_schema' ) ) {
-            return [];
-        }
+        $slug    = $request['slug'];
+        $trigger = $request['trigger'];
 
-        return rest_ensure_response(
-            $integration::get_trigger_config_schema( $request['trigger'] )
-        );
-    }
-
-    public function get_actions( $request ) {
-        $integrationLoader = $this->container->get('integrations'); // loader instance
-        $integration = $integrationLoader->get($request['slug']);  // integration class
-        if ( ! $integration ) {
+        // Check if integration exists
+        if ( ! IntegrationLoader::has( $slug ) ) {
             return new \WP_Error( 'not_found', 'Integration not found', [ 'status' => 404 ] );
         }
 
-        return rest_ensure_response( $integration::get_actions() );
+        // Get config schema (modular or legacy)
+        $schema = IntegrationLoader::getTriggerConfigSchema( $slug, $trigger );
+
+        return rest_ensure_response( $schema );
     }
 
-    public function get_action_schema( $request ) {
-        $integrationLoader = $this->container->get('integrations'); // loader instance
-        $integration = $integrationLoader->get($request['slug']);  // integration class
-        if ( ! $integration || ! method_exists( $integration, 'get_action_config_schema' ) ) {
-            return [];
+    /**
+     * Get actions for an integration.
+     *
+     * Uses IntegrationLoader::getActions() which combines modular actions
+     * (from /actions/*.php) with legacy actions (from get_actions()).
+     */
+    public function get_actions( $request ) {
+        $slug = $request['slug'];
+
+        // Check if integration exists
+        if ( ! IntegrationLoader::has( $slug ) ) {
+            return new \WP_Error( 'not_found', 'Integration not found', [ 'status' => 404 ] );
         }
 
-        return rest_ensure_response(
-            $integration::get_action_config_schema( $request['action'] )
-        );
+        // Get combined actions (modular + legacy)
+        $actions = IntegrationLoader::getActions( $slug );
+
+        return rest_ensure_response( $actions );
+    }
+
+    /**
+     * Get action config schema for an integration.
+     *
+     * Uses IntegrationLoader::getActionConfigSchema() which checks modular
+     * actions first, then falls back to legacy get_action_config_schema().
+     */
+    public function get_action_schema( $request ) {
+        $slug   = $request['slug'];
+        $action = $request['action'];
+
+        // Check if integration exists
+        if ( ! IntegrationLoader::has( $slug ) ) {
+            return new \WP_Error( 'not_found', 'Integration not found', [ 'status' => 404 ] );
+        }
+
+        // Get config schema (modular or legacy)
+        $schema = IntegrationLoader::getActionConfigSchema( $slug, $action );
+
+        return rest_ensure_response( $schema );
     }
 }
