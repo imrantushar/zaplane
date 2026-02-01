@@ -5376,13 +5376,16 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var dagre__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! dagre */ "./node_modules/dagre/index.js");
 /* harmony import */ var dagre__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(dagre__WEBPACK_IMPORTED_MODULE_0__);
 
-const dagreGraph = new (dagre__WEBPACK_IMPORTED_MODULE_0___default().graphlib).Graph();
-dagreGraph.setDefaultEdgeLabel(() => ({}));
 const NODE_WIDTH = 160;
 const NODE_HEIGHT = 48;
 const getLayoutedElements = (nodes, edges, direction = "TB") => {
+  const dagreGraph = new (dagre__WEBPACK_IMPORTED_MODULE_0___default().graphlib).Graph();
+  dagreGraph.setDefaultEdgeLabel(() => ({}));
   dagreGraph.setGraph({
-    rankdir: direction
+    rankdir: direction,
+    ranker: "tight-tree",
+    ranksep: direction === "LR" ? 140 : 90,
+    nodesep: 60
   });
   nodes.forEach(node => {
     dagreGraph.setNode(node.id, {
@@ -5391,19 +5394,19 @@ const getLayoutedElements = (nodes, edges, direction = "TB") => {
     });
   });
   edges.forEach(edge => {
-    dagreGraph.setEdge(edge.source, edge.target);
+    dagreGraph.setEdge(edge.source, edge.target, {
+      weight: 5,
+      minlen: 1
+    });
   });
   dagre__WEBPACK_IMPORTED_MODULE_0___default().layout(dagreGraph);
   const layoutedNodes = nodes.map(node => {
-    const {
-      x,
-      y
-    } = dagreGraph.node(node.id);
+    const pos = dagreGraph.node(node.id);
     return {
       ...node,
       position: {
-        x: x - NODE_WIDTH / 2,
-        y: y - NODE_HEIGHT / 2
+        x: pos.x - NODE_WIDTH / 2,
+        y: pos.y - NODE_HEIGHT / 2
       }
     };
   });
