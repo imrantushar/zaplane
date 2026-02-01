@@ -139,11 +139,7 @@ class Academy extends IntegrationBase {
         return [];
     }
 
-    /**
-     * Resolve trigger (FULL WORKABLE)
-     * NOTE: Automation.php passes $trigger['graph_node']['data'] here
-     * so $node structure is: ['app'=>..., 'event'=>..., 'config'=>...]
-     */
+
     public static function resolve_trigger( array $node, array $args ) {
 
         $event  = $node['event'] ?? '';
@@ -162,7 +158,6 @@ class Academy extends IntegrationBase {
 
                 if ( ! $course_id ) return false;
 
-                // user_id hook থেকে না এলে fallback
                 $user_id = (int) get_current_user_id();
 
                 if ( ! empty( $config['course_id'] ) && $config['course_id'] !== 'any' ) {
@@ -203,7 +198,6 @@ class Academy extends IntegrationBase {
 
             case 'lesson_complete': {
 
-                // NOTE: hook accepted_args = 4, কিন্তু আমরা lesson_id/user_id শুধু নিই
                 $lesson_id = (int) ($args[0] ?? 0);
                 $user_id   = (int) ($args[1] ?? get_current_user_id());
 
