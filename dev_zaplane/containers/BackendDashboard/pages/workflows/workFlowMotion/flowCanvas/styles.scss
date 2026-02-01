@@ -1,12 +1,25 @@
-.zaplane-canvas-controls{
-gap: 5px;
-margin-top: 57px;
+
+.zaplane-canvas-controls {
+    gap: 5px;
+    margin-top: 57px;
 }
-.react-flow__controls-button{
+
+.react-flow__controls-button {
     background: var(--zaplane-background);
     border-radius: 5px;
+    transition: all 0.2s ease;
+
+    &.zaplane-layout-active {
+        background: var(--zaplane-primary);
+        color: var(--zaplane-background);
+    }
+
+    &:not(.zaplane-layout-active):hover {
+        background: var(--zaplane-background);
+    }
 }
-.zaplane-canvas-layout-icon{
+
+.zaplane-canvas-layout-icon {
     width: 60px;
     margin: 22px 0 10px 15px;
     gap: 5px;

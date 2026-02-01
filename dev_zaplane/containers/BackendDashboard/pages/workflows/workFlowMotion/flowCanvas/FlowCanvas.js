@@ -31,7 +31,7 @@ import { LucideHistory } from "lucide-react";
 import RunsTable from "./RunsTable/RunsTable";
 import VersionHistoryTable from "./VersionHistoryTable/VersionHistoryTable";
 import { LuFullscreen, LuMinimize } from "react-icons/lu";
-import { toggleFullscreenMode ,mapGraphFromBackend} from "./helper";
+import { toggleFullscreenMode, mapGraphFromBackend } from "./helper";
 import Select from "react-select";
 import ZAPLoading from "@ZAPComponents/Loading";
 import { statusOptions } from "../../helper";
@@ -81,7 +81,7 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
         openDrawerForNode,
         openDrawerFromAdd,
         onLayout
-    } = useFlowActions({ nodes, setNodes, edges, setEdges, drawerContext, getNewNodeId, setDrawerContext, setDrawerOpen, setCanvasLayout ,canvasLayout});
+    } = useFlowActions({ nodes, setNodes, edges, setEdges, drawerContext, getNewNodeId, setDrawerContext, setDrawerOpen, setCanvasLayout, canvasLayout });
 
     const onAddNode = (edgeId) => {
         const edge = edges.find((e) => e.id === edgeId);
@@ -291,7 +291,9 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
                         <ZAPTooltip content={__("Vertical layout", "zaplane")}>
                             <ControlButton
                                 onClick={() => onLayout("TB")}
-                                className="zaplane-control-btn"
+                                className={`react-flow__controls-button ${canvasLayout === "TB" ? "zaplane-layout-active" : ""
+                                    }`}
+
                             >
                                 <IoSwapVerticalOutline size={16} />
                             </ControlButton>
@@ -299,7 +301,8 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
                         <ZAPTooltip content={__("Horizontal layout", "zaplane")}>
                             <ControlButton
                                 onClick={() => onLayout("LR")}
-                                className="zaplane-control-btn"
+                                className={`react-flow__controls-button ${canvasLayout === "LR" ? "zaplane-layout-active" : ""
+                                    }`}
                             >
                                 <IoSwapHorizontal size={16} />
                             </ControlButton>
