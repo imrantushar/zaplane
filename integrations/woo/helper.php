@@ -160,4 +160,350 @@ trait Helper {
             'variation_id' => $cart_item['variation_id'] ?? 0,
         ];
     }
+
+    protected static function respond(array $data = [], string $port = 'main'): array {
+        return ['port' => $port, 'data' => $data];
+    }
+
+    protected static function error(string $message, array $data = []): array {
+        return self::respond(array_merge(['error' => $message], $data), 'error');
+    }
+
+    protected static function get_node_action(array $node): string {
+        return $node['data']['event'] ?? $node['config']['action'] ?? $node['data']['action'] ?? '';
+    }
+
+    protected static function get_node_config(array $node): array {
+        if (!empty($node['data']['config']) && is_array($node['data']['config'])) {
+            return $node['data']['config'];
+        }
+        if (!empty($node['config']['data']) && is_array($node['config']['data'])) {
+            return $node['config']['data'];
+        }
+        if (!empty($node['config']) && is_array($node['config'])) {
+            return $node['config'];
+        }
+        return [];
+    }
+
+    protected static function get_customer_id_by_email(string $email): int {
+        if ($email === '') {
+            return 0;
+        }
+        if (function_exists('wc_get_customer_id_by_email')) {
+            return (int) wc_get_customer_id_by_email($email);
+        }
+        $user = get_user_by('email', $email);
+        return $user ? (int) $user->ID : 0;
+    }
+
+    protected static function parse_bool($value, bool $default = false): bool {
+        if (is_bool($value)) {
+            return $value;
+        }
+        if ($value === null || $value === '') {
+            return $default;
+        }
+        $result = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+        return $result === null ? $default : $result;
+    }
+
+    protected static function parse_json_array($value): array {
+        if (is_array($value)) {
+            return $value;
+        }
+        if (!is_string($value) || trim($value) === '') {
+            return [];
+        }
+        $decoded = json_decode($value, true);
+        return is_array($decoded) ? $decoded : [];
+    }
+
+    protected static function parse_list($value): array {
+        if (is_array($value)) {
+            return $value;
+        }
+        if (!is_string($value)) {
+            return [];
+        }
+        $value = trim($value);
+        if ($value === '') {
+            return [];
+        }
+        $decoded = json_decode($value, true);
+        if (is_array($decoded)) {
+            return $decoded;
+        }
+        return array_values(array_filter(array_map('trim', explode(',', $value)), 'strlen'));
+    }
+
+    protected static function normalize_order_status(string $status): string {
+        $status = sanitize_key($status);
+        if (strpos($status, 'wc-') === 0) {
+            return substr($status, 3);
+        }
+        return $status;
+    }
+
+    protected static function get_pagination_args(array $config, int $default_limit = 20): array {
+        $limit = isset($config['limit']) ? (int) $config['limit'] : $default_limit;
+        if ($limit <= 0) {
+            $limit = $default_limit;
+        }
+        $page = isset($config['page']) ? max(1, (int) $config['page']) : 1;
+        return ['limit' => $limit, 'page' => $page];
+    }
+
+    protected static function query_orders(array $args): array {
+        $result = wc_get_orders($args);
+        if (is_wp_error($result)) {
+            return ['items' => [], 'total' => 0];
+        }
+        if (is_object($result) && isset($result->orders)) {
+            return [
+                'items' => $result->orders ?? [],
+                'total' => (int) ($result->total ?? count($result->orders ?? [])),
+            ];
+        }
+        if (is_array($result) && isset($result['orders'])) {
+            return [
+                'items' => $result['orders'] ?? [],
+                'total' => (int) ($result['total'] ?? count($result['orders'] ?? [])),
+            ];
+        }
+        $items = is_array($result) ? $result : [];
+        return [
+            'items' => $items,
+            'total' => count($items),
+        ];
+    }
+
+    protected static function query_products(array $args): array {
+        $result = wc_get_products($args);
+        if (is_wp_error($result)) {
+            return ['items' => [], 'total' => 0];
+        }
+        if (is_object($result) && isset($result->products)) {
+            return [
+                'items' => $result->products ?? [],
+                'total' => (int) ($result->total ?? count($result->products ?? [])),
+            ];
+        }
+        if (is_array($result) && isset($result['products'])) {
+            return [
+                'items' => $result['products'] ?? [],
+                'total' => (int) ($result['total'] ?? count($result['products'] ?? [])),
+            ];
+        }
+        $items = is_array($result) ? $result : [];
+        return [
+            'items' => $items,
+            'total' => count($items),
+        ];
+    }
+
+    protected static function query_customers(array $args): array {
+        if (function_exists('wc_get_customers')) {
+            $result = wc_get_customers($args);
+            return [
+                'items' => $result ?: [],
+                'total' => is_array($result) ? count($result) : 0,
+            ];
+        }
+        return ['items' => [], 'total' => 0];
+    }
+
+    protected static function query_coupons(array $args): array {
+        if (function_exists('wc_get_coupons')) {
+            $result = wc_get_coupons($args);
+            return [
+                'items' => $result ?: [],
+                'total' => is_array($result) ? count($result) : 0,
+            ];
+        }
+        return ['items' => [], 'total' => 0];
+    }
+
+    protected static function query_reviews(array $args): array {
+        $query = new \WP_Comment_Query($args);
+        $items = $query->comments ?: [];
+        $total = (int) ($query->found_comments ?? count($items));
+        return ['items' => $items, 'total' => $total];
+    }
+
+    protected static function build_term_payload($term): array {
+        if ($term instanceof \WP_Term) {
+            return [
+                'term_id' => $term->term_id,
+                'name' => $term->name,
+                'slug' => $term->slug,
+                'description' => $term->description,
+                'parent' => $term->parent,
+                'count' => $term->count,
+                'taxonomy' => $term->taxonomy,
+            ];
+        }
+        return [];
+    }
+
+    protected static function product_status_options(): array {
+        return [
+            ['label'=>'Publish','value'=>'publish'],
+            ['label'=>'Draft','value'=>'draft'],
+            ['label'=>'Pending','value'=>'pending'],
+            ['label'=>'Private','value'=>'private'],
+        ];
+    }
+
+    protected static function order_status_options(): array {
+        return [
+            ['label'=>'Pending','value'=>'pending'],
+            ['label'=>'Processing','value'=>'processing'],
+            ['label'=>'On-hold','value'=>'on-hold'],
+            ['label'=>'Completed','value'=>'completed'],
+            ['label'=>'Cancelled','value'=>'cancelled'],
+            ['label'=>'Refunded','value'=>'refunded'],
+            ['label'=>'Failed','value'=>'failed'],
+        ];
+    }
+
+    protected static function stock_status_options(): array {
+        return [
+            ['label'=>'In Stock','value'=>'instock'],
+            ['label'=>'Out of Stock','value'=>'outofstock'],
+            ['label'=>'On Backorder','value'=>'onbackorder'],
+        ];
+    }
+
+    protected static function coupon_type_options(): array {
+        return [
+            ['label'=>'Percentage','value'=>'percent'],
+            ['label'=>'Fixed Cart','value'=>'fixed_cart'],
+            ['label'=>'Fixed Product','value'=>'fixed_product'],
+        ];
+    }
+
+    protected static function field_order_id(bool $required = true): array {
+        return [[
+            'key' => 'order_id',
+            'label' => 'Order ID',
+            'type' => 'expression',
+            'required' => $required,
+        ]];
+    }
+
+    protected static function field_customer_id(bool $required = true): array {
+        return [[
+            'key' => 'customer_id',
+            'label' => 'Customer ID',
+            'type' => 'expression',
+            'required' => $required,
+        ]];
+    }
+
+    protected static function field_product_id(bool $required = true): array {
+        return [[
+            'key' => 'product_id',
+            'label' => 'Product ID',
+            'type' => 'expression',
+            'required' => $required,
+        ]];
+    }
+
+    protected static function field_coupon_identifier(): array {
+        return [
+            ['key'=>'coupon_id','label'=>'Coupon ID','type'=>'expression'],
+            ['key'=>'code','label'=>'Coupon Code','type'=>'text'],
+        ];
+    }
+
+    protected static function field_limit_page(): array {
+        return [
+            ['key'=>'limit','label'=>'Limit','type'=>'number','default'=>20],
+            ['key'=>'page','label'=>'Page','type'=>'number','default'=>1],
+        ];
+    }
+
+    protected static function field_term_id(): array {
+        return [[
+            'key'=>'term_id',
+            'label'=>'Term ID',
+            'type'=>'expression',
+            'required'=>true,
+        ]];
+    }
+
+    protected static function field_term_create(bool $with_parent = true): array {
+        $fields = [
+            ['key'=>'name','label'=>'Name','type'=>'text','required'=>true],
+            ['key'=>'slug','label'=>'Slug','type'=>'text'],
+            ['key'=>'description','label'=>'Description','type'=>'textarea'],
+        ];
+        if ($with_parent) {
+            $fields[] = ['key'=>'parent','label'=>'Parent Term ID','type'=>'expression'];
+        }
+        return $fields;
+    }
+
+    protected static function field_term_update(bool $with_parent = true): array {
+        $fields = array_merge(self::field_term_id(), [
+            ['key'=>'name','label'=>'Name','type'=>'text'],
+            ['key'=>'slug','label'=>'Slug','type'=>'text'],
+            ['key'=>'description','label'=>'Description','type'=>'textarea'],
+        ]);
+        if ($with_parent) {
+            $fields[] = ['key'=>'parent','label'=>'Parent Term ID','type'=>'expression'];
+        }
+        return $fields;
+    }
+
+    protected static function field_term_delete(): array {
+        return self::field_term_id();
+    }
+
+    protected static function field_attribute_id(): array {
+        return [[
+            'key'=>'attribute_id',
+            'label'=>'Attribute ID',
+            'type'=>'expression',
+            'required'=>true,
+        ]];
+    }
+
+    protected static function field_attribute_create(): array {
+        return [
+            ['key'=>'name','label'=>'Name','type'=>'text','required'=>true],
+            ['key'=>'slug','label'=>'Slug','type'=>'text'],
+            ['key'=>'type','label'=>'Type','type'=>'select','options'=>[
+                ['label'=>'Select','value'=>'select'],
+                ['label'=>'Text','value'=>'text'],
+            ]],
+            ['key'=>'order_by','label'=>'Order By','type'=>'select','options'=>[
+                ['label'=>'Name','value'=>'name'],
+                ['label'=>'Name (numeric)','value'=>'name_num'],
+                ['label'=>'ID','value'=>'id'],
+                ['label'=>'Menu Order','value'=>'menu_order'],
+            ]],
+            ['key'=>'has_archives','label'=>'Has Archives','type'=>'boolean'],
+        ];
+    }
+
+    protected static function field_attribute_update(): array {
+        return array_merge(self::field_attribute_id(), [
+            ['key'=>'name','label'=>'Name','type'=>'text'],
+            ['key'=>'slug','label'=>'Slug','type'=>'text'],
+            ['key'=>'type','label'=>'Type','type'=>'select','options'=>[
+                ['label'=>'Select','value'=>'select'],
+                ['label'=>'Text','value'=>'text'],
+            ]],
+            ['key'=>'order_by','label'=>'Order By','type'=>'select','options'=>[
+                ['label'=>'Name','value'=>'name'],
+                ['label'=>'Name (numeric)','value'=>'name_num'],
+                ['label'=>'ID','value'=>'id'],
+                ['label'=>'Menu Order','value'=>'menu_order'],
+            ]],
+            ['key'=>'has_archives','label'=>'Has Archives','type'=>'boolean'],
+        ]);
+    }
+
 }
