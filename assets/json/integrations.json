@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-01-29 12:50:37",
+    "generated_at": "2026-02-01 05:59:17",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -2935,7 +2935,8 @@
                             "key": "course_id",
                             "label": "Course ID",
                             "type": "number",
-                            "required": false
+                            "required": false,
+                            "help": "Leave empty for any course"
                         }
                     ],
                     "outputs": [
@@ -2959,6 +2960,22 @@
                                 {
                                     "label": "Any Course",
                                     "value": "any"
+                                },
+                                {
+                                    "label": "dfsgdfg",
+                                    "value": 25
+                                },
+                                {
+                                    "label": "dfgag",
+                                    "value": 21
+                                },
+                                {
+                                    "label": "asdfas",
+                                    "value": 18
+                                },
+                                {
+                                    "label": "testing",
+                                    "value": 14
                                 }
                             ],
                             "required": true
@@ -3011,6 +3028,22 @@
                                 {
                                     "label": "Any Course",
                                     "value": "any"
+                                },
+                                {
+                                    "label": "dfsgdfg",
+                                    "value": 25
+                                },
+                                {
+                                    "label": "dfgag",
+                                    "value": 21
+                                },
+                                {
+                                    "label": "asdfas",
+                                    "value": 18
+                                },
+                                {
+                                    "label": "testing",
+                                    "value": 14
                                 }
                             ],
                             "required": true
@@ -3037,6 +3070,22 @@
                                 {
                                     "label": "Any Course",
                                     "value": "any"
+                                },
+                                {
+                                    "label": "dfsgdfg",
+                                    "value": 25
+                                },
+                                {
+                                    "label": "dfgag",
+                                    "value": 21
+                                },
+                                {
+                                    "label": "asdfas",
+                                    "value": 18
+                                },
+                                {
+                                    "label": "testing",
+                                    "value": 14
                                 }
                             ],
                             "required": true
