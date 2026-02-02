@@ -15,4 +15,5 @@ return [
     'variable' => ['file' => 'variable.php', 'class' => \Zaplane\Integrations\Variable::class],
     'webhook' => ['file' => 'webhook.php', 'class' => \Zaplane\Integrations\Webhook::class],
     'storeengine' => ['file' => 'storeengine.php', 'class' => \Zaplane\Integrations\Storeengine::class],
+    'fluent-form' => ['file' => 'fluent-form.php', 'class' => \Zaplane\Integrations\FluentForm::class],
 ];

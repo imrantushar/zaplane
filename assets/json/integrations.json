@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-01-22 12:06:39",
+    "generated_at": "2026-02-02 10:45:31",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -3238,6 +3238,57 @@
                     ]
                 }
             }
+        },
+        "fluent-form": {
+            "slug": "fluent-form",
+            "name": "Fluent Forms",
+            "icon": "",
+            "category": "app",
+            "triggers": {
+                "submission_inserted": {
+                    "key": "submission_inserted",
+                    "label": "Form Submitted (submission_inserted)",
+                    "hook": "fluentform/submission_inserted",
+                    "schema": [
+                        {
+                            "key": "form_id",
+                            "label": "Forms",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Any Form",
+                                    "value": "any"
+                                },
+                                {
+                                    "label": "Fluent Forms",
+                                    "value": "5"
+                                },
+                                {
+                                    "label": "Contact Form Demo (#4)",
+                                    "value": "4"
+                                },
+                                {
+                                    "label": "Contact Form Demo (#3)",
+                                    "value": "3"
+                                },
+                                {
+                                    "label": "Subscription Form",
+                                    "value": "2"
+                                },
+                                {
+                                    "label": "Contact Form Demo",
+                                    "value": "1"
+                                }
+                            ],
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": []
         }
     },
     "tools": {
