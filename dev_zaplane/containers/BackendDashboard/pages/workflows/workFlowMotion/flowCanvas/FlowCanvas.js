@@ -12,8 +12,8 @@ import "@xyflow/react/dist/base.css";
 import { __ } from '@wordpress/i18n';
 
 
-import CustomEdge from "../customEdge/CustomEdge";
-import ActionDrawer from "../actionDrawer/ActionDrawer";
+
+
 import { useFormikContext } from "formik";
 import TopBar from "@ZAPComponents/TopBar";
 import { FaChevronRight } from "react-icons/fa";
@@ -34,7 +34,7 @@ import {
     FiHelpCircle,
 } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
-import { getAllVersion, getRunWorkFlow, getSingleWorkFlow, liveMonitor, updateWorkFlow, updateWorkFlowStatus, workFLowExction, workflowNodeListiner } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
+import { getAllVersion, getRunWorkFlow, getSingleWorkFlow, liveMonitor, updateWorkFlow, updateWorkFlowStatus, workFLowExction, workflowNodeListiner, workflowNodeListinerStop } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { use } from "react";
 import { showNotification } from "@ZAPRedux/Slices/notificationSlice/notificationSlice";
@@ -47,6 +47,8 @@ import VersionHistoryTable from "./VersionHistoryTable/VersionHistoryTable";
 import { LuFullscreen, LuMinimize } from "react-icons/lu";
 import { mapEdgesForBackend, mapNodesForBackend, toggleFullscreenMode } from "../helper";
 import Select from "react-select";
+import CustomEdge from "../CustomEdge/CustomEdge";
+import ActionDrawer from "../ActionDrawer/ActionDrawer";
 ;
 export default function FlowCanvas({ id }) {
     const nodeIdRef = useRef(0);
@@ -340,7 +342,7 @@ export default function FlowCanvas({ id }) {
                             {__("Runs ", "zaplane")}
                         </Button>
                         <Button size="sm" variant="outline"
-                            onClick={() => dispatch(workflowNodeListiner(id))}>
+                            onClick={() => dispatch(workflowNodeListinerStop(id))}>
                             {__("Stop", "zaplane")}
                         </Button>
                     </>
