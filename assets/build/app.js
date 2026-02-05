@@ -3402,14 +3402,6 @@ function ActionDrawer({
     resetForm();
     onClose();
   };
-  //haction hook 
-  const actionHook = val => {
-    console.log(mode);
-    const integration = (0,_helper__WEBPACK_IMPORTED_MODULE_21__.getIntegration)(mode, selectedItem);
-    if (!integration) return [];
-    const currentTrigger = Object.values(integration.triggers || {}).find(item => item.key === val);
-    if (currentTrigger) return currentTrigger.hook;else return '';
-  };
   const handleContinue = () => {
     if (step === "select") return setStep("configure");
     if (step === "configure") return setStep("test");
@@ -3532,7 +3524,11 @@ function ActionDrawer({
             value: values.actionType,
             onChange: val => {
               setFieldValue("actionType", val);
-              setFieldValue("hook", actionHook(values.actionType));
+              setFieldValue("hook", (0,_helper__WEBPACK_IMPORTED_MODULE_21__.getActionHook)({
+                mode,
+                selectedItem,
+                actionKey: val
+              }));
             },
             placeholder: "Select Action Type",
             isClearable: true,
@@ -3591,6 +3587,7 @@ function ActionDrawer({
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   getActionHook: () => (/* binding */ getActionHook),
 /* harmony export */   getIntegration: () => (/* binding */ getIntegration)
 /* harmony export */ });
 /* harmony import */ var _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @ZAPUtils/helper */ "./dev_zaplane/utils/helper.js");
@@ -3598,6 +3595,19 @@ __webpack_require__.r(__webpack_exports__);
 const getIntegration = (mode, selectedItem) => {
   if (!selectedItem?.id) return null;
   return mode === "tools" ? _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_0__.integrations.tools?.[selectedItem.id] : _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_0__.integrations.apps?.[selectedItem.id];
+};
+
+//get action hook 
+const getActionHook = ({
+  mode,
+  selectedItem,
+  actionKey
+}) => {
+  if (!mode || !selectedItem || !actionKey) return "";
+  const integration = getIntegration(mode, selectedItem);
+  if (!integration?.triggers) return "";
+  const trigger = Object.values(integration.triggers).find(item => item.key === actionKey);
+  return trigger?.hook || "";
 };
 
 /***/ },

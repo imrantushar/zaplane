@@ -21,7 +21,7 @@ import { __, sprintf } from "@wordpress/i18n";
 import { primaryBtn } from "../../../../../../../assets/scss/chakra/recipe";
 import { useActionDrawer } from "../../../../../../hooks/useActionDrawer/useActionDrawer";
 import { TOOLS } from "../../../../../../hooks/useActionDrawer/helper";
-import { getIntegration } from "./helper";
+import { getActionHook, getIntegration } from "./helper";
 
 
 export default function ActionDrawer({ open, context, onClose, updateNodeData, createActionNode, singleData }) {
@@ -98,14 +98,7 @@ export default function ActionDrawer({ open, context, onClose, updateNodeData, c
     resetForm();
     onClose();
   };
-  //haction hook 
-  const actionHook = (val) => {
-   const integration = getIntegration(mode, selectedItem);
-    if (!integration) return [];
-    const currentTrigger = Object.values(integration.triggers || {}).find(item => item.key === val);
-    if (currentTrigger) return currentTrigger.hook;
-    else return '';
-  }
+  
   const handleContinue = () => {
     if (step === "select") return setStep("configure");
     if (step === "configure") return setStep("test");
@@ -218,7 +211,14 @@ export default function ActionDrawer({ open, context, onClose, updateNodeData, c
                     value={values.actionType}
                     onChange={val => {
                       setFieldValue("actionType", val)
-                      setFieldValue("hook", actionHook(values.actionType))
+                      setFieldValue(
+                        "hook",
+                        getActionHook({
+                          mode,
+                          selectedItem,
+                          actionKey: val,
+                        })
+                      );
                     }}
                     placeholder="Select Action Type"
                     isClearable
