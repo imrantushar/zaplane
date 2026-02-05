@@ -208,7 +208,6 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
                                         const paylod = {
                                             workflow_hash: singleData?.version?.hash,
                                         }
-
                                         dispatch(workFLowExction(paylod))
                                     }}>
                                     {__("🔄 Replay ", "zaplane")}

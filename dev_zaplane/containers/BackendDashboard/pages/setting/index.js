@@ -6,7 +6,6 @@ const Setting = () => {
 	const dispatch = useDispatch();
 	const { data, loading } = useSelector((state) => state.setting);
 
-
 	const [method, setMethod] = useState('GET');
 	const [path, setPath] = useState('');
 	const [body, setBody] = useState('');

@@ -1,8 +1,8 @@
 <?php
 namespace Zaplane\Integrations;
 
-use Zaplane\Classes\IntegrationBase;
-use Zaplane\Classes\Expression;
+use Zaplane\Framework\Classes\IntegrationBase;
+use Zaplane\Framework\Classes\Expression;
 
 class Condition extends IntegrationBase {
 

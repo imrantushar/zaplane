@@ -18,20 +18,6 @@ class Database {
         $prefix = $wpdb->prefix;
         $charset_collate = $wpdb->get_charset_collate();
 
-        /**
-        *   workflow_version
-        *   ↓
-        *   run
-        *   ↓
-        *   node_runs   ← execution state
-        *   ↓
-        *   execution_edges   ← data flow
-        *   ↓
-        *   queue      ← scheduler
-        *   ↓
-        *   node_logs  ← debug
-         */
-
         Database\CreateWorkflowsTable::up($prefix, $charset_collate);
         Database\CreateWorkflowVersionsTable::up($prefix, $charset_collate);
 
