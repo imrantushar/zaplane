@@ -1,6 +1,6 @@
 <?php
 
-namespace Zaplane\Framework\Models\WordPress;
+namespace Zaplane\Framework\Models;
 
 use Zaplane\Framework\Database\ORM\Model;
 use Zaplane\Framework\Database\ORM\QueryBuilder;
