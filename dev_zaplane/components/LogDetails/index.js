@@ -18,7 +18,7 @@ const LogDetails = ({ runId, onBack }) => {
   if (isloading) {
     return <ZAPLoading />;
   }
-//after the  response I’ll add translation support.
+  //after the  response I’ll add translation support.
   return (
     <Box>
       <Text mb="4" fontWeight="bold"
@@ -28,8 +28,9 @@ const LogDetails = ({ runId, onBack }) => {
       </Text>
       <Accordion.Root collapsible>
         {nodeDetails?.nodes?.map((log) => {
-          const input = JSON.parse(log.input_json || "{}");
-          const output = JSON.parse(log.output_json || "{}");
+          const input = log?.input_json || {};
+          const output = log?.output_json || {};
+
           return (
             <Accordion.Item key={log.id} value={log.id}>
               <Accordion.ItemTrigger>

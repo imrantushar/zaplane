@@ -658,8 +658,8 @@ const LogDetails = ({
     }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.AccordionRoot, {
       collapsible: true,
       children: nodeDetails?.nodes?.map(log => {
-        const input = JSON.parse(log.input_json || "{}");
-        const output = JSON.parse(log.output_json || "{}");
+        const input = log?.input_json || {};
+        const output = log?.output_json || {};
         return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.AccordionItem, {
           value: log.id,
           children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.AccordionItemTrigger, {
