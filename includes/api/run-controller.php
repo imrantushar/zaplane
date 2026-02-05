@@ -78,8 +78,6 @@ class RunController extends WP_REST_Controller
         return current_user_can('manage_options');
     }
 
-    /* ================= RUN LIST ================= */
-
     public function list_runs()
     {
         return Run::recent(100)
@@ -110,8 +108,6 @@ class RunController extends WP_REST_Controller
             })
             ->toArray();
     }
-
-    /* ================= RUN VIEW ================= */
 
     public function get_run($req)
     {
@@ -149,8 +145,6 @@ class RunController extends WP_REST_Controller
         ];
     }
 
-    /* ================= REPLAY ================= */
-
     public function replay_run($req)
     {
         $oldId = (int) $req['id'];
@@ -179,8 +173,6 @@ class RunController extends WP_REST_Controller
         return ['run_id' => $newRun->id];
     }
 
-    /* ================= STOP ================= */
-
     public function stop_run($req)
     {
         $id = (int) $req['id'];
@@ -202,8 +194,6 @@ class RunController extends WP_REST_Controller
 
         return ['stopped' => true];
     }
-
-    /* ================= NODE ================= */
 
     public function get_node_run($req)
     {
@@ -235,8 +225,6 @@ class RunController extends WP_REST_Controller
 
         return ['requeued' => true];
     }
-
-    /* ================= EXECUTE FULL ================= */
 
     public function execute_workflow($req)
     {
@@ -281,8 +269,6 @@ class RunController extends WP_REST_Controller
 
         return ['run_id' => $run->id];
     }
-
-    /* ================= EXECUTE SINGLE NODE ================= */
 
     public function execute_single_node($req)
     {

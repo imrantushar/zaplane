@@ -54,9 +54,6 @@ class ListenerController extends WP_REST_Controller
         ]);
     }
 
-    /**
-     * Cleanup all stale listeners
-     */
     public function cleanup_all_listeners()
     {
         $stateOptions = Option::where('option_name', 'LIKE', 'zaplane_listener_state_%')->get();
@@ -87,9 +84,6 @@ class ListenerController extends WP_REST_Controller
         return current_user_can('manage_options');
     }
 
-    /**
-     * Start listening for a trigger node
-     */
     public function start_listener($req)
     {
         $workflowId = (int) $req['workflow_id'];
@@ -107,7 +101,6 @@ class ListenerController extends WP_REST_Controller
         $graph = $version->getGraph();
         $targetNode = null;
 
-        // Find the trigger node in the workflow
         foreach ($graph['nodes'] as $node) {
             if (($node['type'] ?? '') === 'trigger') {
                 $targetNode = $node;
@@ -128,19 +121,15 @@ class ListenerController extends WP_REST_Controller
 
         $optionName = $this->get_option_name($workflowId);
 
-        // Check if already listening - with fresh DB read
         $existingState = $this->get_state_fresh($optionName);
         if ($existingState && $existingState['status'] === 'listening') {
-            // Check if it's stale (older than timeout)
             $startedAt = strtotime($existingState['started_at'] ?? '');
             if ($startedAt && (time() - $startedAt) < self::LISTENER_TIMEOUT) {
                 return new WP_Error('already_listening', 'Listener is already active for this workflow', ['status' => 409]);
             }
-            // Stale listener, clean it up
             Option::remove($optionName);
         }
 
-        // Initialize listener state in database
         $initialState = [
             'status' => 'listening',
             'started_at' => current_time('mysql'),
@@ -152,18 +141,14 @@ class ListenerController extends WP_REST_Controller
         ];
         Option::set($optionName, $initialState, 'no');
 
-        // Register the hook listener info
         $this->register_listener_hook($workflowId, $hook, $targetNode, $version);
 
-        // Long-poll: wait for trigger to fire or timeout
         $startTime = time();
 
         while (time() - $startTime < self::LISTENER_TIMEOUT) {
-            // Force fresh read from database (bypass all caches)
             $state = $this->get_state_fresh($optionName);
 
             if (!$state) {
-                // State was deleted - stopped
                 $this->unregister_listener_hook($workflowId);
                 return [
                     'status' => 'stopped',
@@ -173,7 +158,6 @@ class ListenerController extends WP_REST_Controller
                 ];
             }
 
-            // Check if stopped manually
             if ($state['status'] === 'stopped') {
                 $this->cleanup($optionName, $workflowId);
                 return [
@@ -184,12 +168,10 @@ class ListenerController extends WP_REST_Controller
                 ];
             }
 
-            // Check if trigger fired
             if ($state['status'] === 'triggered' && $state['data'] !== null) {
                 $triggerData = $state['data'];
                 $this->cleanup($optionName, $workflowId);
 
-                // Execute the workflow with the captured data
                 $result = $this->execute_triggered_workflow($version, $targetNode, $triggerData);
 
                 return [
@@ -208,11 +190,9 @@ class ListenerController extends WP_REST_Controller
                 ];
             }
 
-            // Sleep before next check
             sleep(self::POLL_INTERVAL);
         }
 
-        // Timeout reached
         $this->cleanup($optionName, $workflowId);
 
         return [
@@ -223,9 +203,6 @@ class ListenerController extends WP_REST_Controller
         ];
     }
 
-    /**
-     * Stop an active listener
-     */
     public function stop_listener($req)
     {
         $workflowId = (int) $req['workflow_id'];
@@ -234,7 +211,6 @@ class ListenerController extends WP_REST_Controller
         $state = $this->get_state_fresh($optionName);
 
         if (!$state) {
-            // No listener found, clean up anyway
             $this->cleanup($optionName, $workflowId);
             return [
                 'status' => 'success',
@@ -243,7 +219,6 @@ class ListenerController extends WP_REST_Controller
             ];
         }
 
-        // Full cleanup - delete state and hook info
         $this->cleanup($optionName, $workflowId);
 
         return [
@@ -253,9 +228,6 @@ class ListenerController extends WP_REST_Controller
         ];
     }
 
-    /**
-     * Get listener status
-     */
     public function get_listener_status($req)
     {
         $workflowId = (int) $req['workflow_id'];
@@ -279,9 +251,6 @@ class ListenerController extends WP_REST_Controller
         ];
     }
 
-    /**
-     * Register hook info for the listener
-     */
     private function register_listener_hook(int $workflowId, string $hook, array $node, WorkflowVersion $version): void
     {
         $hookInfoOption = 'zaplane_listener_hook_' . $workflowId;
@@ -293,18 +262,12 @@ class ListenerController extends WP_REST_Controller
         ], 'no');
     }
 
-    /**
-     * Unregister listener hook info
-     */
     private function unregister_listener_hook(int $workflowId): void
     {
         $hookInfoOption = 'zaplane_listener_hook_' . $workflowId;
         Option::remove($hookInfoOption);
     }
 
-    /**
-     * Execute the workflow after trigger fires
-     */
     private function execute_triggered_workflow(WorkflowVersion $version, array $triggerNode, array $payload): array
     {
         $run = Run::create([
@@ -316,7 +279,6 @@ class ListenerController extends WP_REST_Controller
             'started_at' => current_time('mysql'),
         ]);
 
-        // Execute trigger node synchronously
         $nodeRun = NodeRun::create([
             'run_id' => $run->id,
             'node_key' => (int) $triggerNode['id'],
@@ -328,7 +290,6 @@ class ListenerController extends WP_REST_Controller
             'finished_at' => current_time('mysql'),
         ]);
 
-        // Spawn child nodes asynchronously
         $graph = $version->getGraph();
         foreach ($graph['edges'] as $edge) {
             if ((int) $edge['source'] === (int) $triggerNode['id']) {
@@ -349,33 +310,21 @@ class ListenerController extends WP_REST_Controller
         ];
     }
 
-    /**
-     * Cleanup all listener resources
-     */
     private function cleanup(string $optionName, int $workflowId): void
     {
         Option::remove($optionName);
         $this->unregister_listener_hook($workflowId);
     }
 
-    /**
-     * Get option name for listener state
-     */
     private function get_option_name(int $workflowId): string
     {
         return 'zaplane_listener_state_' . $workflowId;
     }
 
-    /**
-     * Get state with fresh DB read (bypass all caches)
-     * Note: Using direct DB query here to ensure we always get fresh data
-     * during the polling loop, bypassing any ORM or WordPress caching
-     */
     private function get_state_fresh(string $optionName): ?array
     {
         global $wpdb;
 
-        // Direct DB query to bypass all caches
         $value = $wpdb->get_var(
             $wpdb->prepare(
                 "SELECT option_value FROM {$wpdb->options} WHERE option_name = %s LIMIT 1",
