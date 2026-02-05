@@ -1,13 +1,14 @@
 <?php
 
-namespace Zaplane\Framework\Models\WordPress;
+namespace Zaplane\Framework\Models;
 
 if (!defined('ABSPATH')) exit;
 
-class Term extends WPModel
+class Term extends WpModel
 {
     protected static string $table = 'terms';
     protected static string $primaryKey = 'term_id';
+    protected static bool $timestamps = false;
 
     protected static array $fillable = [
         'name',

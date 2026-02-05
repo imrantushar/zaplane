@@ -1,13 +1,14 @@
 <?php
 
-namespace Zaplane\Framework\Models\WordPress;
+namespace Zaplane\Framework\Models;
 
 if (!defined('ABSPATH')) exit;
 
-class TermTaxonomy extends WPModel
+class TermTaxonomy extends WpModel
 {
     protected static string $table = 'term_taxonomy';
     protected static string $primaryKey = 'term_taxonomy_id';
+    protected static bool $timestamps = false;
 
     protected static array $fillable = [
         'term_id',
