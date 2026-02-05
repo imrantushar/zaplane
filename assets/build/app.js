@@ -3402,6 +3402,14 @@ function ActionDrawer({
     resetForm();
     onClose();
   };
+  //haction hook 
+  const actionHook = val => {
+    console.log(mode);
+    const integration = (0,_helper__WEBPACK_IMPORTED_MODULE_21__.getIntegration)(mode, selectedItem);
+    if (!integration) return [];
+    const currentTrigger = Object.values(integration.triggers || {}).find(item => item.key === val);
+    if (currentTrigger) return currentTrigger.hook;else return '';
+  };
   const handleContinue = () => {
     if (step === "select") return setStep("configure");
     if (step === "configure") return setStep("test");
@@ -3409,6 +3417,7 @@ function ActionDrawer({
       app: selectedItem.name,
       name: selectedItem.name,
       event: values.actionType,
+      hook: values.hook,
       config: selectedActionFields.reduce((acc, f) => {
         acc[f.key] = values[f.key];
         return acc;
@@ -3521,7 +3530,10 @@ function ActionDrawer({
             label: isTrigger ? (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_17__.__)('Trigger Type', 'gemboards') : (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_17__.__)('Action Type', 'gemboards'),
             options: actionOptions,
             value: values.actionType,
-            onChange: val => setFieldValue("actionType", val),
+            onChange: val => {
+              setFieldValue("actionType", val);
+              setFieldValue("hook", actionHook(values.actionType));
+            },
             placeholder: "Select Action Type",
             isClearable: true,
             mb: 4

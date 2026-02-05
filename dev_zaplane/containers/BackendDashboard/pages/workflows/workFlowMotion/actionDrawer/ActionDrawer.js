@@ -36,6 +36,7 @@ export default function ActionDrawer({ open, context, onClose, updateNodeData, c
   const { mode, setMode, selectedItem, setSelectedItem, search, setSearch, list, searchList } =
     useActionDrawer(open, node, source, setFieldValue, isTrigger);
 
+
   // Auto-set actionType if only one tool action
 
   useEffect(() => {
@@ -70,7 +71,7 @@ export default function ActionDrawer({ open, context, onClose, updateNodeData, c
 
   const getKey = (field) => `${mode}:${selectedItem?.id}:${field.key}`;
 
-//Generate dynamic keys and fetch dynamic options
+  //Generate dynamic keys and fetch dynamic options
 
   const fetchDynamicOptions = async (field) => {
     if (!field.dynamic) return;
@@ -97,7 +98,14 @@ export default function ActionDrawer({ open, context, onClose, updateNodeData, c
     resetForm();
     onClose();
   };
-
+  //haction hook 
+  const actionHook = (val) => {
+   const integration = getIntegration(mode, selectedItem);
+    if (!integration) return [];
+    const currentTrigger = Object.values(integration.triggers || {}).find(item => item.key === val);
+    if (currentTrigger) return currentTrigger.hook;
+    else return '';
+  }
   const handleContinue = () => {
     if (step === "select") return setStep("configure");
     if (step === "configure") return setStep("test");
@@ -106,12 +114,12 @@ export default function ActionDrawer({ open, context, onClose, updateNodeData, c
       app: selectedItem.name,
       name: selectedItem.name,
       event: values.actionType,
+      hook: values.hook,
       config: selectedActionFields.reduce((acc, f) => {
         acc[f.key] = values[f.key];
         return acc;
       }, {}),
     };
-
     context?.source === "node" ? updateNodeData(payload) : createActionNode(payload);
     resetAll();
   };
@@ -208,7 +216,10 @@ export default function ActionDrawer({ open, context, onClose, updateNodeData, c
                     }
                     options={actionOptions}
                     value={values.actionType}
-                    onChange={val => setFieldValue("actionType", val)}
+                    onChange={val => {
+                      setFieldValue("actionType", val)
+                      setFieldValue("hook", actionHook(values.actionType))
+                    }}
                     placeholder="Select Action Type"
                     isClearable
                     mb={4}
