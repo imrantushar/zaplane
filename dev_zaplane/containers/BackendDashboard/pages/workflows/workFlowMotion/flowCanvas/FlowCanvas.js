@@ -8,8 +8,6 @@ import {
 } from "@xyflow/react";
 import "@xyflow/react/dist/base.css";
 import { __ } from '@wordpress/i18n';
-
-
 import CustomEdge from "../CustomEdge/CustomEdge";
 import ActionDrawer from "../ActionDrawer/ActionDrawer";
 import { useFormikContext } from "formik";
@@ -35,7 +33,7 @@ import { toggleFullscreenMode, mapGraphFromBackend } from "./helper";
 import Select from "react-select";
 import ZAPLoading from "@ZAPComponents/Loading";
 import { statusOptions } from "../../helper";
-import { useFlowActions } from "../../../../../../hooks/useFlowActions/useFlowActions";
+import { useFlowActions } from "@ZAPHooks/useFlowActions/useFlowActions";
 import CustomNode from "../customNode/CustomNode";
 import { primaryBtn } from "../../../../../../../assets/scss/chakra/recipe";
 

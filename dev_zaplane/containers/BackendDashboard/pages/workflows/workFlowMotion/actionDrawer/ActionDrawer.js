@@ -19,8 +19,8 @@ import ZAPTab from "@ZAPComponents/Tab";
 import { IoIosArrowForward } from "react-icons/io";
 import { __, sprintf } from "@wordpress/i18n";
 import { primaryBtn } from "../../../../../../../assets/scss/chakra/recipe";
-import { useActionDrawer } from "../../../../../../hooks/useActionDrawer/useActionDrawer";
-import { TOOLS } from "../../../../../../hooks/useActionDrawer/helper";
+import { useActionDrawer } from "@ZAPHooks/useActionDrawer/useActionDrawer";
+import { TOOLS } from "@ZAPHooks/useActionDrawer/helper";
 import { getActionHook, getIntegration } from "./helper";
 
 
