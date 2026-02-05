@@ -185,7 +185,7 @@ export const workflowNodeListiner = createAsyncThunk(
 	async (id, thunkAPI) => {
 		try {
 			const res = await API.get(
-				namespace + `node-listiner/${id}`
+				namespace + `node-listener/${id}`
 			);
 			return res.data;
 		} catch (e) {
@@ -198,7 +198,7 @@ export const workflowNodeListinerStop = createAsyncThunk(
 	async (id, thunkAPI) => {
 		try {
 			const res = await API.get(
-				namespace + `node-listiner/${id}/stop`
+				namespace + `node-listener/${id}/stop`
 			);
 			return res.data;
 		} catch (e) {
