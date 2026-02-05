@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-01-28 13:24:10",
+    "generated_at": "2026-02-05 09:02:44",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -2872,50 +2872,6 @@
                 }
             }
         },
-        "woo": {
-            "slug": "woo",
-            "name": "Woocommerce",
-            "icon": "",
-            "category": "app",
-            "triggers": {
-                "new_order": {
-                    "key": "new_order",
-                    "label": "New Order",
-                    "hook": "woocommerce_new_order",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "order_status_changed": {
-                    "key": "order_status_changed",
-                    "label": "Order Status Changed",
-                    "hook": "woocommerce_order_status_changed",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                }
-            },
-            "actions": {
-                "create_order": {
-                    "key": "create_order",
-                    "label": "Create Order",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "update_order": {
-                    "key": "update_order",
-                    "label": "Update Order",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                }
-            }
-        },
         "slack": {
             "slug": "slack",
             "name": "Slack",
@@ -3239,14 +3195,14 @@
                 }
             }
         },
-        "fluentCRM": {
-            "slug": "fluentCRM",
+        "fluentcrm": {
+            "slug": "fluentcrm",
             "name": "FluentCRM",
             "icon": "",
             "category": "app",
             "triggers": {
-                "tag_added": {
-                    "key": "tag_added",
+                "added_tag": {
+                    "key": "added_tag",
                     "label": "Tag Added To Contact",
                     "hook": "fluentcrm_contact_added_to_tags",
                     "schema": [
@@ -3260,20 +3216,298 @@
                                     "value": "any"
                                 },
                                 {
-                                    "label": "grf",
+                                    "label": "jh",
                                     "value": 1
                                 },
                                 {
-                                    "label": "tea",
+                                    "label": "nb",
                                     "value": 2
                                 },
                                 {
-                                    "label": "coffe",
+                                    "label": "erter",
                                     "value": 3
                                 },
                                 {
-                                    "label": "base",
+                                    "label": "nu",
                                     "value": 4
+                                },
+                                {
+                                    "label": "fun",
+                                    "value": 5
+                                }
+                            ],
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "removed_tag": {
+                    "key": "removed_tag",
+                    "label": "Tag Removed From Contact",
+                    "hook": "fluentcrm_contact_removed_from_tags",
+                    "schema": [
+                        {
+                            "key": "tag_id",
+                            "label": "Tags",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Any Tag",
+                                    "value": "any"
+                                },
+                                {
+                                    "label": "jh",
+                                    "value": 1
+                                },
+                                {
+                                    "label": "nb",
+                                    "value": 2
+                                },
+                                {
+                                    "label": "erter",
+                                    "value": 3
+                                },
+                                {
+                                    "label": "nu",
+                                    "value": 4
+                                },
+                                {
+                                    "label": "fun",
+                                    "value": 5
+                                }
+                            ],
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "added_list": {
+                    "key": "added_list",
+                    "label": "Contact Added To List",
+                    "hook": "fluentcrm_contact_added_to_lists",
+                    "schema": [
+                        {
+                            "key": "list_id",
+                            "label": "List",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Any List",
+                                    "value": "any"
+                                },
+                                {
+                                    "label": "zmvbxczxxzx",
+                                    "value": 1
+                                },
+                                {
+                                    "label": "lghfdssarerrt",
+                                    "value": 2
+                                },
+                                {
+                                    "label": "bbbbbbbbbccccsssss",
+                                    "value": 3
+                                }
+                            ],
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "removed_list": {
+                    "key": "removed_list",
+                    "label": "Contact Removed From List",
+                    "hook": "fluentcrm_contact_removed_from_lists",
+                    "schema": [
+                        {
+                            "key": "list_id",
+                            "label": "List",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Any List",
+                                    "value": "any"
+                                },
+                                {
+                                    "label": "zmvbxczxxzx",
+                                    "value": 1
+                                },
+                                {
+                                    "label": "lghfdssarerrt",
+                                    "value": 2
+                                },
+                                {
+                                    "label": "bbbbbbbbbccccsssss",
+                                    "value": 3
+                                }
+                            ],
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "created_contact": {
+                    "key": "created_contact",
+                    "label": "Created Contact",
+                    "hook": "fluentcrm_contact_created",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "contact_status_updated": {
+                    "key": "contact_status_updated",
+                    "label": "Contact Status Updated",
+                    "hook": "fluentcrm_subscriber_status_to_subscribed",
+                    "schema": [
+                        {
+                            "key": "status",
+                            "label": "Status Updated",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Any Status",
+                                    "value": "any"
+                                },
+                                {
+                                    "label": "Subscribed",
+                                    "value": "subscribed"
+                                },
+                                {
+                                    "label": "Pending",
+                                    "value": "pending"
+                                },
+                                {
+                                    "label": "Unsubscribed",
+                                    "value": "unsubscribed"
+                                },
+                                {
+                                    "label": "Transactional",
+                                    "value": "transactional"
+                                },
+                                {
+                                    "label": "Bounced",
+                                    "value": "bounced"
+                                },
+                                {
+                                    "label": "Complained",
+                                    "value": "complained"
+                                },
+                                {
+                                    "label": "Spammed",
+                                    "value": "Spammed"
+                                }
+                            ],
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "updated_custom_fields": {
+                    "key": "updated_custom_fields",
+                    "label": "Updated Custom Fields",
+                    "hook": "fluentcrm_contact_updated",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "contact_deleted": {
+                    "key": "contact_deleted",
+                    "label": "Deleted Contact",
+                    "hook": "fluentcrm_contact_deleted",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "company_created": {
+                    "key": "company_created",
+                    "label": "Company Created",
+                    "hook": "fluent_crm/company_created",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "company_updated": {
+                    "key": "company_updated",
+                    "label": "Company Updated",
+                    "hook": "fluent_crm/company_updated",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "company_deleted": {
+                    "key": "company_deleted",
+                    "label": "Company Deleted",
+                    "hook": "fluent_crm/company_deleted",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "email_opened": {
+                    "key": "email_opened",
+                    "label": "Email Opened",
+                    "hook": "fluent_crm/email_opened",
+                    "schema": [
+                        {
+                            "key": "campaign_id",
+                            "label": "Campaign",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Any Campaign",
+                                    "value": "any"
+                                },
+                                {
+                                    "label": "fdhgfd",
+                                    "value": 1
+                                },
+                                {
+                                    "label": "fgdsgdfg",
+                                    "value": 3
+                                }
+                            ],
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "email_clicked": {
+                    "key": "email_clicked",
+                    "label": "Email Clicked",
+                    "hook": "fluent_crm/email_url_clicked",
+                    "schema": [
+                        {
+                            "key": "campaign_id",
+                            "label": "Campaign",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Any Campaign",
+                                    "value": "any"
+                                },
+                                {
+                                    "label": "fdhgfd",
+                                    "value": 1
+                                },
+                                {
+                                    "label": "fgdsgdfg",
+                                    "value": 3
                                 }
                             ],
                             "required": true
@@ -3284,7 +3518,781 @@
                     ]
                 }
             },
-            "actions": []
+            "actions": {
+                "created_contact": {
+                    "key": "created_contact",
+                    "label": "Create Contact",
+                    "schema": [
+                        {
+                            "key": "lists",
+                            "label": "Lists",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Any List",
+                                    "value": "any"
+                                },
+                                {
+                                    "label": "zmvbxczxxzx",
+                                    "value": 1
+                                },
+                                {
+                                    "label": "lghfdssarerrt",
+                                    "value": 2
+                                },
+                                {
+                                    "label": "bbbbbbbbbccccsssss",
+                                    "value": 3
+                                }
+                            ]
+                        },
+                        {
+                            "key": "tags",
+                            "label": "Tags",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Any Tag",
+                                    "value": "any"
+                                },
+                                {
+                                    "label": "jh",
+                                    "value": 1
+                                },
+                                {
+                                    "label": "nb",
+                                    "value": 2
+                                },
+                                {
+                                    "label": "erter",
+                                    "value": 3
+                                },
+                                {
+                                    "label": "nu",
+                                    "value": 4
+                                },
+                                {
+                                    "label": "fun",
+                                    "value": 5
+                                }
+                            ]
+                        },
+                        {
+                            "key": "primary_company",
+                            "label": "Primary Company",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Any Campaign",
+                                    "value": "any"
+                                },
+                                {
+                                    "label": "fdhgfd",
+                                    "value": 1
+                                },
+                                {
+                                    "label": "fgdsgdfg",
+                                    "value": 3
+                                }
+                            ]
+                        },
+                        {
+                            "key": "field_map",
+                            "label": "Field Map",
+                            "type": "repeater",
+                            "button_label": "Add Field",
+                            "fields": [
+                                {
+                                    "key": "field",
+                                    "label": "Field",
+                                    "type": "select",
+                                    "options": [
+                                        {
+                                            "label": "Prefix",
+                                            "value": "prefix"
+                                        },
+                                        {
+                                            "label": "First Name",
+                                            "value": "first_name"
+                                        },
+                                        {
+                                            "label": "Last Name",
+                                            "value": "last_name"
+                                        },
+                                        {
+                                            "label": "Full Name",
+                                            "value": "full_name"
+                                        },
+                                        {
+                                            "label": "Email",
+                                            "value": "email"
+                                        },
+                                        {
+                                            "label": "Timezone",
+                                            "value": "timezone"
+                                        },
+                                        {
+                                            "label": "Address Line 1",
+                                            "value": "address_line_1"
+                                        },
+                                        {
+                                            "label": "Address Line 2",
+                                            "value": "address_line_2"
+                                        },
+                                        {
+                                            "label": "City",
+                                            "value": "city"
+                                        },
+                                        {
+                                            "label": "State",
+                                            "value": "state"
+                                        },
+                                        {
+                                            "label": "Postal Code",
+                                            "value": "postal_code"
+                                        },
+                                        {
+                                            "label": "Country",
+                                            "value": "country"
+                                        },
+                                        {
+                                            "label": "IP",
+                                            "value": "ip"
+                                        },
+                                        {
+                                            "label": "Phone",
+                                            "value": "phone"
+                                        },
+                                        {
+                                            "label": "Source",
+                                            "value": "source"
+                                        },
+                                        {
+                                            "label": "Date of Birth",
+                                            "value": "date_of_birth"
+                                        },
+                                        {
+                                            "label": "Status",
+                                            "value": "status"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "key": "value",
+                                    "label": "Value",
+                                    "type": "text"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "custom_field_map",
+                            "label": "Custom Field Map",
+                            "type": "repeater",
+                            "button_label": "Add Custom Field",
+                            "fields": [
+                                {
+                                    "key": "field",
+                                    "label": "Field",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "value",
+                                    "label": "Value",
+                                    "type": "text"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_contact_all": {
+                    "key": "get_contact_all",
+                    "label": "Get Contact (All)",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_contact_id": {
+                    "key": "get_contact_id",
+                    "label": "Get Contact (By Id)",
+                    "schema": [
+                        {
+                            "key": "contact_id",
+                            "label": "ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_contact_email": {
+                    "key": "get_contact_email",
+                    "label": "Get Contact (By Email)",
+                    "schema": [
+                        {
+                            "key": "email",
+                            "label": "Email Address",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_contact_by_tags": {
+                    "key": "get_contact_by_tags",
+                    "label": "Get Contact (By Tag ID)",
+                    "schema": [
+                        {
+                            "key": "tag_id",
+                            "label": "Tag ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_contact_by_lists": {
+                    "key": "get_contact_by_lists",
+                    "label": "Get Contact (By Lists ID)",
+                    "schema": [
+                        {
+                            "key": "list_id",
+                            "label": "List ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_contact_by_status": {
+                    "key": "get_contact_by_status",
+                    "label": "Get Contact (By Status)",
+                    "schema": [
+                        {
+                            "key": "status",
+                            "label": "Contact Status",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Subscribed",
+                                    "value": "subscribed"
+                                },
+                                {
+                                    "label": "Pending",
+                                    "value": "pending"
+                                },
+                                {
+                                    "label": "Unsubscribed",
+                                    "value": "unsubscribed"
+                                },
+                                {
+                                    "label": "Transactional",
+                                    "value": "transactional"
+                                },
+                                {
+                                    "label": "Bounced",
+                                    "value": "bounced"
+                                },
+                                {
+                                    "label": "Complained",
+                                    "value": "complained"
+                                },
+                                {
+                                    "label": "Spammed",
+                                    "value": "Spammed"
+                                }
+                            ],
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_tag_all": {
+                    "key": "get_tag_all",
+                    "label": "Get Tag (All)",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "created_tag": {
+                    "key": "created_tag",
+                    "label": "Created Tag",
+                    "schema": [
+                        {
+                            "key": "title",
+                            "label": "Tag Title",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "slug",
+                            "label": "Tag Slug",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "description",
+                            "label": "Description",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add_tag_to_contact": {
+                    "key": "add_tag_to_contact",
+                    "label": "Add Tag To Contact",
+                    "schema": [
+                        {
+                            "key": "contact_id",
+                            "label": "Contact ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "tags",
+                            "label": "Tags",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Any Tag",
+                                    "value": "any"
+                                },
+                                {
+                                    "label": "jh",
+                                    "value": 1
+                                },
+                                {
+                                    "label": "nb",
+                                    "value": 2
+                                },
+                                {
+                                    "label": "erter",
+                                    "value": 3
+                                },
+                                {
+                                    "label": "nu",
+                                    "value": 4
+                                },
+                                {
+                                    "label": "fun",
+                                    "value": 5
+                                }
+                            ],
+                            "required": true,
+                            "multiple": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "remove_tag_from_contact": {
+                    "key": "remove_tag_from_contact",
+                    "label": "Remove Tag From Contact",
+                    "schema": [
+                        {
+                            "key": "contact_id",
+                            "label": "Contact ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "tags",
+                            "label": "Tags",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Any Tag",
+                                    "value": "any"
+                                },
+                                {
+                                    "label": "jh",
+                                    "value": 1
+                                },
+                                {
+                                    "label": "nb",
+                                    "value": 2
+                                },
+                                {
+                                    "label": "erter",
+                                    "value": 3
+                                },
+                                {
+                                    "label": "nu",
+                                    "value": 4
+                                },
+                                {
+                                    "label": "fun",
+                                    "value": 5
+                                }
+                            ],
+                            "required": true,
+                            "multiple": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_list_all": {
+                    "key": "get_list_all",
+                    "label": "Get List (All)",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "created_list": {
+                    "key": "created_list",
+                    "label": "Created List",
+                    "schema": [
+                        {
+                            "key": "title",
+                            "label": "List Title",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "slug",
+                            "label": "List Slug",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "description",
+                            "label": "Description",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add_list_to_contact": {
+                    "key": "add_list_to_contact",
+                    "label": "Add List To Contact",
+                    "schema": [
+                        {
+                            "key": "contact_id",
+                            "label": "Contact ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "lists",
+                            "label": "Lists",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Any List",
+                                    "value": "any"
+                                },
+                                {
+                                    "label": "zmvbxczxxzx",
+                                    "value": 1
+                                },
+                                {
+                                    "label": "lghfdssarerrt",
+                                    "value": 2
+                                },
+                                {
+                                    "label": "bbbbbbbbbccccsssss",
+                                    "value": 3
+                                }
+                            ],
+                            "required": true,
+                            "multiple": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "remove_list_from_contact": {
+                    "key": "remove_list_from_contact",
+                    "label": "Remove List From Contact",
+                    "schema": [
+                        {
+                            "key": "contact_id",
+                            "label": "Contact ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "lists",
+                            "label": "Lists",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Any List",
+                                    "value": "any"
+                                },
+                                {
+                                    "label": "zmvbxczxxzx",
+                                    "value": 1
+                                },
+                                {
+                                    "label": "lghfdssarerrt",
+                                    "value": 2
+                                },
+                                {
+                                    "label": "bbbbbbbbbccccsssss",
+                                    "value": 3
+                                }
+                            ],
+                            "required": true,
+                            "multiple": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_company_all": {
+                    "key": "get_company_all",
+                    "label": "Get Company (All)",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_company_id": {
+                    "key": "get_company_id",
+                    "label": "Get Company (By Id)",
+                    "schema": [
+                        {
+                            "key": "company_id",
+                            "label": "Company ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "created_company": {
+                    "key": "created_company",
+                    "label": "Created company",
+                    "schema": [
+                        {
+                            "key": "field_map",
+                            "label": "Field Map",
+                            "type": "repeater",
+                            "button_label": "Add Field",
+                            "fields": [
+                                {
+                                    "key": "field",
+                                    "label": "Field",
+                                    "type": "select",
+                                    "options": [
+                                        {
+                                            "label": "Company Name",
+                                            "value": "name"
+                                        },
+                                        {
+                                            "label": "Owner Name",
+                                            "value": "owner_name"
+                                        },
+                                        {
+                                            "label": "Owner Email",
+                                            "value": "email"
+                                        },
+                                        {
+                                            "label": "Company Email",
+                                            "value": "email"
+                                        },
+                                        {
+                                            "label": "Company Phone Number",
+                                            "value": "phone"
+                                        },
+                                        {
+                                            "label": "Company Logo",
+                                            "value": "Company_logo"
+                                        },
+                                        {
+                                            "label": "Industry",
+                                            "value": "industry"
+                                        },
+                                        {
+                                            "label": "Type",
+                                            "value": "type"
+                                        },
+                                        {
+                                            "label": "Company Owner",
+                                            "value": "owner_id"
+                                        },
+                                        {
+                                            "label": "Description",
+                                            "value": "description"
+                                        },
+                                        {
+                                            "label": "Number of Employees",
+                                            "value": "employees_number"
+                                        },
+                                        {
+                                            "label": "Address Line 1",
+                                            "value": "address_line_1"
+                                        },
+                                        {
+                                            "label": "Address Line 2",
+                                            "value": "address_line_2"
+                                        },
+                                        {
+                                            "label": "City",
+                                            "value": "city"
+                                        },
+                                        {
+                                            "label": "State",
+                                            "value": "state"
+                                        },
+                                        {
+                                            "label": "Postal Code",
+                                            "value": "postal_code"
+                                        },
+                                        {
+                                            "label": "Country",
+                                            "value": "country"
+                                        },
+                                        {
+                                            "label": "LinkedIn URL",
+                                            "value": "linkedin_url"
+                                        },
+                                        {
+                                            "label": "Facebook Page URL",
+                                            "value": "facebook_url"
+                                        },
+                                        {
+                                            "label": "Twitter URL",
+                                            "value": "twitter_url"
+                                        },
+                                        {
+                                            "label": "Website",
+                                            "value": "website"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "key": "value",
+                                    "label": "Value",
+                                    "type": "text"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "custom_field_map",
+                            "label": "Custom Field Map",
+                            "type": "repeater",
+                            "button_label": "Add Custom Field",
+                            "fields": [
+                                {
+                                    "key": "field",
+                                    "label": "Field",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "value",
+                                    "label": "Value",
+                                    "type": "text"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add_company_to_contact": {
+                    "key": "add_company_to_contact",
+                    "label": "Add Company To Contact",
+                    "schema": [
+                        {
+                            "key": "contact_id",
+                            "label": "Contact ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "company",
+                            "label": "company",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "tyyyyyrh",
+                                    "value": 1
+                                },
+                                {
+                                    "label": "1",
+                                    "value": 2
+                                },
+                                {
+                                    "label": "sdgfdhg",
+                                    "value": 3
+                                }
+                            ],
+                            "required": true,
+                            "multiple": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "remove_company_from_contact": {
+                    "key": "remove_company_from_contact",
+                    "label": "Remove Company From Contact",
+                    "schema": [
+                        {
+                            "key": "contact_id",
+                            "label": "Contact ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "company",
+                            "label": "company",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "tyyyyyrh",
+                                    "value": 1
+                                },
+                                {
+                                    "label": "1",
+                                    "value": 2
+                                },
+                                {
+                                    "label": "sdgfdhg",
+                                    "value": 3
+                                }
+                            ],
+                            "required": true,
+                            "multiple": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
         }
     },
     "tools": {

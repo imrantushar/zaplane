@@ -7,7 +7,7 @@ return [
     'iterator' => ['file' => 'iterator.php', 'class' => \Zaplane\Integrations\Iterator::class],
     // apps
     'wordpress' => ['file' => 'wordpress.php', 'class' => \Zaplane\Integrations\Wordpress::class],
-    'woo'       => ['file' => 'woo.php', 'class' => \Zaplane\Integrations\Woo::class],
+    // 'woo'       => ['file' => 'woo.php', 'class' => \Zaplane\Integrations\Woo::class],
     'slack'     => ['file' => 'slack.php', 'class' => \Zaplane\Integrations\Slack::class],
     'trello'    => ['file' => 'trello.php', 'class' => \Zaplane\Integrations\Trello::class],
     'stripe'    => ['file' => 'stripe.php', 'class' => \Zaplane\Integrations\Stripe::class],
@@ -15,5 +15,5 @@ return [
     'variable' => ['file' => 'variable.php', 'class' => \Zaplane\Integrations\Variable::class],
     'webhook' => ['file' => 'webhook.php', 'class' => \Zaplane\Integrations\Webhook::class],
     'storeengine' => ['file' => 'storeengine.php', 'class' => \Zaplane\Integrations\Storeengine::class],
-    'fluentCRM' => ['file' => 'fluent-crm.php', 'class' => \Zaplane\Integrations\FluentCrm::class],
+    'fluentcrm' => ['file' => 'fluent-crm.php', 'class' => \Zaplane\Integrations\FluentCrm::class],
 ];
