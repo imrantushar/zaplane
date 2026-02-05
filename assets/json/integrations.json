@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-01-22 12:06:39",
+    "generated_at": "2026-02-05 05:41:21",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -3238,6 +3238,172 @@
                     ]
                 }
             }
+        },
+        "tutor": {
+            "slug": "tutor",
+            "name": "Tutorlms",
+            "icon": "",
+            "category": "app",
+            "triggers": {
+                "user_enroll_course": {
+                    "key": "user_enroll_course",
+                    "label": "User enrolled in a course",
+                    "hook": [
+                        "tutor_after_enroll",
+                        10,
+                        2
+                    ],
+                    "schema": [
+                        {
+                            "key": "course_id",
+                            "label": "Course",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Any Course",
+                                    "value": "any"
+                                },
+                                {
+                                    "label": "New Course",
+                                    "value": 14
+                                }
+                            ],
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "tutor_quiz_course_attempt": {
+                    "key": "tutor_quiz_course_attempt",
+                    "label": "User attempted (submitted) a quiz",
+                    "hook": [
+                        "tutor_quiz/attempt_ended",
+                        10,
+                        1
+                    ],
+                    "schema": [
+                        {
+                            "key": "course_id",
+                            "label": "Course",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Any Course",
+                                    "value": "any"
+                                },
+                                {
+                                    "label": "New Course",
+                                    "value": 14
+                                }
+                            ],
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "lesson_complete": {
+                    "key": "lesson_complete",
+                    "label": "User completed a lesson",
+                    "hook": [
+                        "tutor_lesson_completed_after",
+                        10,
+                        4
+                    ],
+                    "schema": [
+                        {
+                            "key": "lesson_id",
+                            "label": "Lesson",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Any Lesson",
+                                    "value": "any"
+                                },
+                                {
+                                    "label": "lesson",
+                                    "value": 16
+                                }
+                            ],
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "course_complete": {
+                    "key": "course_complete",
+                    "label": "User completed a course",
+                    "hook": [
+                        "tutor_course_complete_after",
+                        10,
+                        1
+                    ],
+                    "schema": [
+                        {
+                            "key": "course_id",
+                            "label": "Course",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Any Course",
+                                    "value": "any"
+                                },
+                                {
+                                    "label": "New Course",
+                                    "value": 14
+                                }
+                            ],
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "quiz_target": {
+                    "key": "quiz_target",
+                    "label": "User achieved target percentage on a quiz",
+                    "hook": [
+                        "tutor_quiz/attempt_ended",
+                        10,
+                        1
+                    ],
+                    "schema": [
+                        {
+                            "key": "course_id",
+                            "label": "Course",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Any Course",
+                                    "value": "any"
+                                },
+                                {
+                                    "label": "New Course",
+                                    "value": 14
+                                }
+                            ],
+                            "required": true
+                        },
+                        {
+                            "key": "target_percentage",
+                            "label": "Target Percentage",
+                            "type": "number",
+                            "required": false,
+                            "help": "Trigger only if user score is equal or higher than this percentage"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": []
         }
     },
     "tools": {

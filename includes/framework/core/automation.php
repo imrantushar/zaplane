@@ -56,7 +56,7 @@ class Automation
     public function dispatch_active_triggers(): void
     {
         foreach (Query::get_active_trigger_events() as $event) {
-            if (!isset($this->registered_hooks[$event])) {
+            if (is_string($event) && !isset($this->registered_hooks[$event])) {
                 $cb = [$this, 'trigger_router'];
                 add_action($event, $cb, 10, 99);
                 $this->registered_hooks[$event] = $cb;
