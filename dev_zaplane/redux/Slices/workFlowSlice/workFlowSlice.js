@@ -197,7 +197,7 @@ export const workflowNodeListinerStop = createAsyncThunk(
 	'zaplane/workflowNodeListinerStop',
 	async (id, thunkAPI) => {
 		try {
-			const res = await API.get(
+			const res = await API.post(
 				namespace + `node-listener/${id}/stop`
 			);
 			return res.data;
