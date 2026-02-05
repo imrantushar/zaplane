@@ -1,13 +1,14 @@
 <?php
 
-namespace Zaplane\Framework\Models\WordPress;
+namespace Zaplane\Framework\Models;
 
 if (!defined('ABSPATH')) exit;
 
-class User extends WPModel
+class User extends WpModel
 {
     protected static string $table = 'users';
     protected static string $primaryKey = 'ID';
+    protected static bool $timestamps = false;
 
     protected static array $fillable = [
         'user_login',
