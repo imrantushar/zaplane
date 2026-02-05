@@ -7,7 +7,7 @@ import {
   VStack,
 
 } from "@chakra-ui/react";
-import { __ } from "@wordpress/i18n";
+import { __, sprintf } from "@wordpress/i18n";
 import ZAPLoading from "@ZAPComponents/Loading";
 
 import { useSelector } from "react-redux";
@@ -32,17 +32,20 @@ const LogDetails = ({ runId, onBack }) => {
           const output = log?.output_json || {};
 
           return (
-            <Accordion.Item key={log.id} value={log.id}>
-              <Accordion.ItemTrigger>
+            <Accordion.Item key={log.id} value={log.id} border='1px solid var(--zaplane-border-color)'
+            p='10px' borderRadius='8px' mb='10px'>
+              <Accordion.ItemTrigger p='0' >
                 <HStack flex="1" justify="space-between">
-                  <HStack>
+                  <VStack gap={0}>
                     <Text fontWeight="medium" className="zaplane-label">
-                      {__(`Node ${log.node_key}`, 'zaplane')}
+                      {sprintf(
+                        __('%s', 'zaplane'),log?.node?.app)}
                     </Text>
-                    <Badge>
-                      {__(`Log ${log.id}`, 'zaplane')}
-                    </Badge>
-                  </HStack>
+                    <Text className="zaplane-sub-title">
+                      {sprintf(
+                        __('%s', 'zaplane'),log?.node?.event)}
+                    </Text>
+                  </VStack>
 
                   <Badge
                     colorPalette={

@@ -662,17 +662,24 @@ const LogDetails = ({
         const output = log?.output_json || {};
         return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.AccordionItem, {
           value: log.id,
+          border: "1px solid var(--zaplane-border-color)",
+          p: "10px",
+          borderRadius: "8px",
+          mb: "10px",
           children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.AccordionItemTrigger, {
+            p: "0",
             children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.HStack, {
               flex: "1",
               justify: "space-between",
-              children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.HStack, {
+              children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.VStack, {
+                gap: 0,
                 children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
                   fontWeight: "medium",
                   className: "zaplane-label",
-                  children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_6__.__)(`Node ${log.node_key}`, 'zaplane')
-                }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Badge, {
-                  children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_6__.__)(`Log ${log.id}`, 'zaplane')
+                  children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_6__.sprintf)((0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_6__.__)('%s', 'zaplane'), log?.node?.app)
+                }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
+                  className: "zaplane-sub-title",
+                  children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_6__.sprintf)((0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_6__.__)('%s', 'zaplane'), log?.node?.event)
                 })]
               }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Badge, {
                 colorPalette: log.status === "completed" ? "green" : log.status === "failed" ? "red" : "blue",
