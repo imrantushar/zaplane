@@ -9,6 +9,7 @@ import {
 } from "@chakra-ui/react";
 import { __, sprintf } from "@wordpress/i18n";
 import ZAPLoading from "@ZAPComponents/Loading";
+import ReactJson from "react-json-view";
 
 import { useSelector } from "react-redux";
 const LogDetails = ({ runId, onBack }) => {
@@ -75,7 +76,13 @@ const LogDetails = ({ runId, onBack }) => {
                       <Text className="zaplane-label" fontWeight="bold" mb="2">
                         {__('Input', 'zaplane')}
                       </Text>
-                      <pre>{JSON.stringify(input, null, 2)}</pre>
+                     <ReactJson
+                        src={input}
+                        name="root"
+                        collapsed={1}
+                        enableClipboard={false}
+                        displayDataTypes={false}
+                      />
                     </Box>
 
                     <Box
@@ -87,7 +94,13 @@ const LogDetails = ({ runId, onBack }) => {
                       <Text fontWeight="bold" mb="2">
                         {__('Output', 'zaplane')}
                       </Text>
-                      <pre>{JSON.stringify(output, null, 2)}</pre>
+                      <ReactJson
+                        src={output}
+                        name="root"
+                        collapsed={1}
+                        enableClipboard={false}
+                        displayDataTypes={false}
+                      />
                     </Box>
                   </VStack>
                 </Accordion.ItemBody>

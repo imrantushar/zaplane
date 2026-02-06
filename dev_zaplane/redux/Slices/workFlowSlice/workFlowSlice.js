@@ -95,7 +95,7 @@ export const deleteWorkFlow = createAsyncThunk(
 );
 export const updateWorkFlowStatus = createAsyncThunk(
 	'zaplane/updateWorkFlowStatus',
-	async (payload , thunkAPI) => {
+	async (payload, thunkAPI) => {
 		try {
 			await makeRequest('update_workflow_status', {
 				id: payload.id,
@@ -146,38 +146,38 @@ export const getSingleRun = createAsyncThunk(
 );
 // workflow exctions api
 export const workFLowExction = createAsyncThunk(
-  'zaplane/workFLowExction',
-  async (payload, thunkAPI) => {
+	'zaplane/workFLowExction',
+	async (payload, thunkAPI) => {
 
-    try {
-      const res = await API.post(
-        namespace + 'execute',
-        payload
-      );
+		try {
+			const res = await API.post(
+				namespace + 'execute',
+				payload
+			);
 
-      handleSliceSuccess(thunkAPI, __('Run fetched successfully', 'workflow'));
-      return res.data;
+			handleSliceSuccess(thunkAPI, __('Run fetched successfully', 'workflow'));
+			return res.data;
 
-    } catch (e) {
-      return handleSliceError(thunkAPI, e);
-    }
-  }
+		} catch (e) {
+			return handleSliceError(thunkAPI, e);
+		}
+	}
 );
 export const workFLowSingeNodeExction = createAsyncThunk(
-  'zaplane/workFLowSingeNodeExction',
-  async (payload, thunkAPI) => {
+	'zaplane/workFLowSingeNodeExction',
+	async (payload, thunkAPI) => {
 
-    try {
-      const res = await API.post(
-        namespace + 'execute-node',
-        payload
-      );
-      return res.data;
+		try {
+			const res = await API.post(
+				namespace + 'execute-node',
+				payload
+			);
+			return res.data;
 
-    } catch (e) {
-      return handleSliceError(thunkAPI, e);
-    }
-  }
+		} catch (e) {
+			return handleSliceError(thunkAPI, e);
+		}
+	}
 );
 // work flow listnner
 export const workflowNodeListiner = createAsyncThunk(
@@ -255,7 +255,7 @@ export const getAllVersion = createAsyncThunk(
 export const getPreviewOldVersion = createAsyncThunk(
 	'zaplane/getPreviewOldVersion',
 	async ({ id, versionID }, thunkAPI) => {
-	
+
 		try {
 			const res = await API.get(
 				namespace + `workflows/${id}/versions/${parseInt(versionID)}`
@@ -295,7 +295,8 @@ const workflowsSlice = createSlice({
 		runs: [],
 		versions: [],
 		nodeDetails: [],
-		isLoading:true
+		isLoading: true,
+		singleNodeExecution: null,
 
 
 	},
@@ -309,7 +310,7 @@ const workflowsSlice = createSlice({
 			})
 			.addCase(getWorkFlow.fulfilled, (state, action) => {
 				state.data = [...action.payload].reverse();
-				state.isLoading=false
+				state.isLoading = false
 			})
 
 			.addCase(getSingleWorkFlow.fulfilled, (state, action) => {
@@ -338,7 +339,7 @@ const workflowsSlice = createSlice({
 			})
 			.addCase(getRunWorkFlow.fulfilled, (state, action) => {
 				state.runs = action.payload;
-				state.isLoading=false
+				state.isLoading = false
 			})
 			.addCase(getPreviewOldVersion.fulfilled, (state, action) => {
 				if (!state.data.length) return;
@@ -351,7 +352,7 @@ const workflowsSlice = createSlice({
 			})
 			.addCase(getAllVersion.fulfilled, (state, action) => {
 				state.versions = action.payload;
-				state.isLoading=false
+				state.isLoading = false
 			})
 			.addCase(versionActive.fulfilled, (state, action) => {
 				const activeVersionId = action.meta.arg.versionID;
@@ -365,7 +366,11 @@ const workflowsSlice = createSlice({
 			})
 			.addCase(nodeLogsRunDetails.fulfilled, (state, action) => {
 				state.nodeDetails = action.payload;
-				state.isLoading=false
+				state.isLoading = false
+			})
+			.addCase(workFLowSingeNodeExction.fulfilled, (state, action) => {
+				state.isLoading = false;
+				state.singleNodeExecution = action.payload?.data || null;
 			})
 
 
