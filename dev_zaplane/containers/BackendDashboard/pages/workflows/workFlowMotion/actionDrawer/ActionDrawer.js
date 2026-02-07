@@ -257,7 +257,7 @@ export default function ActionDrawer({ open, context, onClose, updateNodeData, c
                   }>
                     {__("Run test", "zaplane")}
                   </Button>
-                  <TestDetails/>
+                  <TestDetails id={node?.id}/>
                 </>
               )
             }

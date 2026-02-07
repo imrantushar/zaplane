@@ -1,26 +1,30 @@
 import { VStack, Box, Text } from '@chakra-ui/react';
 import { __ } from '@wordpress/i18n';
-import React from 'react';
+import ZAPLoading from '@ZAPComponents/Loading';
+import { resetSingleNodeExecution } from '@ZAPRedux/Slices/workFlowSlice/workFlowSlice';
+import React, { useEffect } from 'react';
 import ReactJson from 'react-json-view';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
-const TestDetails = () => {
+const TestDetails = ({ id }) => {
+    const dispatch = useDispatch()
     const { singleNodeExecution, isLoading } = useSelector(
         (state) => state.workflows
     );
 
 
-    console.log(singleNodeExecution);
-    if (!singleNodeExecution) {
-        return <Text>{__('No data available', 'zaplane')}</Text>;
-    }
-
     const inputData = singleNodeExecution?.input || {};
     const outputData = singleNodeExecution?.output?.data || {};
+    useEffect(() => {
+        dispatch(resetSingleNodeExecution());
+    }, [id, dispatch]);
+
+    if (!singleNodeExecution) return
+    if (isLoading) return <ZAPLoading/>
 
     return (
+
         <VStack spacing="4" align="stretch">
-            {/* Input */}
             <Box
                 p="3"
                 border="1px solid var(--zaplane-border-color)"
@@ -40,7 +44,6 @@ const TestDetails = () => {
                 />
             </Box>
 
-            {/* Output */}
             <Box
                 p="3"
                 border="1px solid var(--zaplane-border-color)"

@@ -301,7 +301,10 @@ const workflowsSlice = createSlice({
 
 	},
 	reducers: {
-
+		resetSingleNodeExecution(state) {
+			state.singleNodeExecution = null;
+			state.isLoading = false;
+		}
 	},
 	extraReducers: (builder) => {
 		builder
@@ -402,5 +405,5 @@ export async function fetchDynamic({
 }
 
 
-export const { createWorkflowTitle } = workflowsSlice.actions;
+export const { resetSingleNodeExecution } = workflowsSlice.actions;
 export default workflowsSlice.reducer;
