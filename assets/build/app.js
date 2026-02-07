@@ -4881,9 +4881,9 @@ const VersionHistoryTable = ({
         py: "0.5",
         rounded: "md",
         fontSize: "xs",
-        color: row.is_active === "1" ? "#16A34A" : "#4B5563",
-        bg: row.is_active === "1" ? "#DCFCE7" : "#F3F4F6",
-        children: row.is_active === "1" ? "Active" : "Inactive"
+        color: row.is_active ? "#16A34A" : "#4B5563",
+        bg: row.is_active ? "#DCFCE7" : "#F3F4F6",
+        children: row.is_active ? "Active" : "Inactive"
       })
     }, {
       label: "Created At",
@@ -4895,7 +4895,7 @@ const VersionHistoryTable = ({
     actionsRenderer: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.HStack, {
       justify: "flex-end",
       spacing: 1,
-      children: [row.is_active !== "1" && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Button, {
+      children: [!row.is_active && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Button, {
         size: "xs",
         variant: "outline",
         onClick: () => dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_7__.versionActive)({

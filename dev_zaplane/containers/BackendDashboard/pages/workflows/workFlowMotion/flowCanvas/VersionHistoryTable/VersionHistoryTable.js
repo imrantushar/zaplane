@@ -51,11 +51,11 @@ const VersionHistoryTable = ({
               py="0.5"
               rounded="md"
               fontSize="xs"
-              color={row.is_active === "1" ? "#16A34A" : "#4B5563"}
-              bg={row.is_active === "1" ? "#DCFCE7" : "#F3F4F6"}
+              color={row.is_active  ? "#16A34A" : "#4B5563"}
+              bg={row.is_active  ? "#DCFCE7" : "#F3F4F6"}
 
             >
-              {row.is_active === "1" ? "Active" : "Inactive"}
+              {row.is_active ? "Active" : "Inactive"}
             </Badge>
           ),
         },
@@ -67,7 +67,7 @@ const VersionHistoryTable = ({
       ]}
       actionsRenderer={(row) => (
         <HStack justify="flex-end" spacing={1}>
-          {row.is_active !== "1" && (
+          {!row.is_active && (
             <Button
               size="xs"
               variant="outline"
