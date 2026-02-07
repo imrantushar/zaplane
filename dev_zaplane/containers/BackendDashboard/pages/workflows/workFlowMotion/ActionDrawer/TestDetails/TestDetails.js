@@ -10,11 +10,9 @@ const TestDetails = () => {
     );
 
 
-    console.log(singleNodeExecution);
     if (!singleNodeExecution) {
         return <Text>{__('No data available', 'zaplane')}</Text>;
     }
-
     const inputData = singleNodeExecution?.input || {};
     const outputData = singleNodeExecution?.output?.data || {};
 

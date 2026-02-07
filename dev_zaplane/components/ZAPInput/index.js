@@ -11,6 +11,7 @@ const ZAPInput = ({
   containerStyle,
   inputStyle,
   textAreaSize,
+  onKeyDown
 
 }) => {
 
@@ -29,6 +30,7 @@ const ZAPInput = ({
         value={value}
         onChange={onChange}
         style={{ ...inputStyle }}
+         onKeyDown={onKeyDown}
         
       />
     </Flex>

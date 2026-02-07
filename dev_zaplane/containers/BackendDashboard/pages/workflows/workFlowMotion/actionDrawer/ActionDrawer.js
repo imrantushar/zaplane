@@ -9,7 +9,7 @@ import {
 } from "@chakra-ui/react";
 import ZAPDrawer from "@ZAPComponents/Drawer";
 import ZAPSelect from "@ZAPComponents/ZAPSelect";
-import { fetchDynamic, workFLowSingeNodeExction } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
+import { addDynamicContent, fetchDynamic, workFLowSingeNodeExction } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
 import { integrations } from "@ZAPUtils/helper";
 import { useFormikContext } from "formik";
 import { useEffect, useMemo, useState } from "react";
@@ -115,13 +115,14 @@ export default function ActionDrawer({ open, context, onClose, updateNodeData, c
       }, {}),
     };
     context?.source === "node" ? updateNodeData(payload) : createActionNode(payload);
+    dispatch(addDynamicContent({id:node?.id,name:selectedItem?.name}))
     resetAll();
   };
   return (
     <ZAPDrawer
       open={open}
       onClose={resetAll}
-      closeOnOverlayClick
+      // closeOnOverlayClick
       title={!mode ? "Add Action" : selectedItem?.name || __('App', 'zaplane')}
       placement="end"
       size="md"

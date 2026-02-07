@@ -1,14 +1,21 @@
-import { Box, Button, Flex, Text } from "@chakra-ui/react";
+import { Box, Button, Flex, Text,Accordion  } from "@chakra-ui/react";
 import { FieldArray } from "formik";
 import { FiTrash2 } from "react-icons/fi";
 import ZAPInput from "@ZAPComponents/ZAPInput";
 import ZAPSelect from "@ZAPComponents/ZAPSelect";
 import { __ } from "@wordpress/i18n";
 import { buildEmptyRule } from "./helper";
+import WPModal from "@ZAPComponents/Modal/WPModal";
+import { useState } from "react";
+import { useSelector } from "react-redux";
+
 
 export default function ConditionGroupField({ value, onChange, field }) {
     const ruleFields = field?.fields;
     const EMPTY_RULE = buildEmptyRule(ruleFields);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const testResults = useSelector(state => state.workflows.testResults);
+
 
     return (
         <FieldArray name={field.key}>
@@ -62,12 +69,20 @@ export default function ConditionGroupField({ value, onChange, field }) {
                                                                 key={f.key}
                                                                 label={f.label}
                                                                 value={rule[f.key]}
-                                                                onChange={(e) =>
+                                                                onChange={(e) => {
+                                                                    const val = e.target.value;
                                                                     ruleHelpers.replace(rIndex, {
                                                                         ...rule,
-                                                                        [f.key]: e.target.value,
-                                                                    })
-                                                                }
+                                                                        [f.key]: val,
+                                                                    });
+                                                                    if (val.includes("@")) {
+                                                                        setIsModalOpen(true);
+                                                                    } else {
+                                                                        setIsModalOpen(false);
+                                                                    }
+                                                                }}
+
+
                                                                 containerStyle={{ width: "30%" }}
                                                             />
                                                         );
@@ -113,6 +128,16 @@ export default function ConditionGroupField({ value, onChange, field }) {
                         >
                             {__("OR Group", "zaplane")}
                         </Button>
+                        <WPModal
+                            title={__("Create Workflow", "zaplane")}
+                            isOpen={isModalOpen}
+                            onRequestClose={() => setIsModalOpen(false)}
+                            size="medium"
+                        >
+                           
+
+                        </WPModal>
+
                     </Flex>
                 );
             }}
