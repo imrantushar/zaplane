@@ -1,0 +1,68 @@
+import { VStack, Box, Text } from '@chakra-ui/react';
+import { __ } from '@wordpress/i18n';
+import ZAPLoading from '@ZAPComponents/Loading';
+import { resetSingleNodeExecution } from '@ZAPRedux/Slices/workFlowSlice/workFlowSlice';
+import React, { useEffect } from 'react';
+import ReactJson from 'react-json-view';
+import { useDispatch, useSelector } from 'react-redux';
+
+const TestDetails = ({ id }) => {
+    const dispatch = useDispatch()
+    const { singleNodeExecution, isLoading } = useSelector(
+        (state) => state.workflows
+    );
+
+
+    const inputData = singleNodeExecution?.input || {};
+    const outputData = singleNodeExecution?.output?.data || {};
+    useEffect(() => {
+        dispatch(resetSingleNodeExecution());
+    }, [id, dispatch]);
+
+    if (!singleNodeExecution) return
+    if (isLoading) return <ZAPLoading/>
+
+    return (
+
+        <VStack spacing="4" align="stretch">
+            <Box
+                p="3"
+                border="1px solid var(--zaplane-border-color)"
+                borderRadius="md"
+                bg="var(--zaplane-gray)"
+            >
+                <Text className="zaplane-label" fontWeight="bold" mb="2">
+                    {__('Input', 'zaplane')}
+                </Text>
+
+                <ReactJson
+                    src={inputData}
+                    name="root"
+                    collapsed={1}
+                    enableClipboard={false}
+                    displayDataTypes={false}
+                />
+            </Box>
+
+            <Box
+                p="3"
+                border="1px solid var(--zaplane-border-color)"
+                borderRadius="md"
+                bg="var(--zaplane-gray)"
+            >
+                <Text fontWeight="bold" mb="2">
+                    {__('Output', 'zaplane')}
+                </Text>
+                <ReactJson
+                    src={outputData}
+                    name="root"
+                    collapsed={2}
+                    enableClipboard={false}
+                    displayDataTypes={false}
+                />
+            </Box>
+        </VStack>
+    );
+};
+
+export default TestDetails;

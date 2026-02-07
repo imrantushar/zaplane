@@ -1,0 +1,33 @@
+.zaplane-popover-wrapper {
+  display: inline-block;
+  position: relative;
+
+  .zaplane-popover-trigger {
+    background-color: #0073aa;
+    color: #fff;
+    border: none;
+
+    &:hover {
+      background-color: #006799;
+    }
+  }
+
+  .zaplane-popover {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    min-width: 200px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 9999;
+
+    .zaplane-popover-content {
+      padding: 12px;
+      font-size: 14px;
+      color: #333;
+
+      p {
+        margin: 0;
+      }
+    }
+  }
+}

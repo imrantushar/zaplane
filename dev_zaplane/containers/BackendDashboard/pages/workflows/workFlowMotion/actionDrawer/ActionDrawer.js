@@ -14,7 +14,6 @@ import { integrations } from "@ZAPUtils/helper";
 import { useFormikContext } from "formik";
 import { useEffect, useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
-import ActionFieldRenderer from "../Components/ActionFieldRenderer/ActionFieldRenderer";
 import ZAPTab from "@ZAPComponents/Tab";
 import { IoIosArrowForward } from "react-icons/io";
 import { __, sprintf } from "@wordpress/i18n";
@@ -22,6 +21,8 @@ import { primaryBtn } from "../../../../../../../assets/scss/chakra/recipe";
 import { useActionDrawer } from "@ZAPHooks/useActionDrawer/useActionDrawer";
 import { TOOLS } from "@ZAPHooks/useActionDrawer/helper";
 import { getActionHook, getIntegration } from "./helper";
+import TestDetails from "./TestDetails/TestDetails";
+import ActionFieldRenderer from "./ActionFieldRenderer/ActionFieldRenderer";
 
 
 export default function ActionDrawer({ open, context, onClose, updateNodeData, createActionNode, singleData }) {
@@ -256,7 +257,7 @@ export default function ActionDrawer({ open, context, onClose, updateNodeData, c
                   }>
                     {__("Run test", "zaplane")}
                   </Button>
-                  <Code w="100%">{__("Output", "zaplane")}</Code>
+                  <TestDetails id={node?.id}/>
                 </>
               )
             }
