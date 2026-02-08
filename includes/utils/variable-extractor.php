@@ -9,12 +9,30 @@ class VariableExtractor
     /**
      * Extract variables from an output array with auto-detected types
      *
-     * @param array $data The output data to extract variables from
+     * @param mixed $data The output data to extract variables from
      * @param string $prefix Optional prefix for nested keys
      * @return array Array of variable definitions with key, type, and sample
      */
-    public static function extract(array $data, string $prefix = ''): array
+    public static function extract($data, string $prefix = ''): array
     {
+        // Handle non-array data
+        if (!is_array($data)) {
+            if ($data === null) {
+                return [];
+            }
+            return [
+                [
+                    'key' => $prefix ?: 'value',
+                    'type' => self::detectType($data),
+                    'sample' => self::getSample($data),
+                ]
+            ];
+        }
+
+        if (empty($data)) {
+            return [];
+        }
+
         $variables = [];
 
         foreach ($data as $key => $value) {

@@ -170,4 +170,50 @@ class VariableExtractorTest extends TestCase
         $this->assertStringEndsWith('...', $variables[0]['sample']);
         $this->assertEquals(103, strlen($variables[0]['sample']));
     }
+
+    /**
+     * @test
+     */
+    public function it_handles_non_array_scalar_input(): void
+    {
+        $variables = VariableExtractor::extract('hello world');
+
+        $this->assertCount(1, $variables);
+        $this->assertEquals('value', $variables[0]['key']);
+        $this->assertEquals('string', $variables[0]['type']);
+        $this->assertEquals('hello world', $variables[0]['sample']);
+    }
+
+    /**
+     * @test
+     */
+    public function it_handles_non_array_integer_input(): void
+    {
+        $variables = VariableExtractor::extract(42);
+
+        $this->assertCount(1, $variables);
+        $this->assertEquals('value', $variables[0]['key']);
+        $this->assertEquals('integer', $variables[0]['type']);
+        $this->assertEquals(42, $variables[0]['sample']);
+    }
+
+    /**
+     * @test
+     */
+    public function it_handles_null_input(): void
+    {
+        $variables = VariableExtractor::extract(null);
+
+        $this->assertCount(0, $variables);
+    }
+
+    /**
+     * @test
+     */
+    public function it_handles_empty_array_input(): void
+    {
+        $variables = VariableExtractor::extract([]);
+
+        $this->assertCount(0, $variables);
+    }
 }

@@ -37,12 +37,12 @@ class Run extends Model
     protected static string $createdAt = 'started_at';
     protected static string $updatedAt = 'finished_at';
 
-    public function nodeRuns(): array
+    public function nodeRuns(): Collection
     {
         return NodeRun::where('run_id', $this->id)->orderBy('id', 'asc')->get();
     }
 
-    public function executionEdges(): array
+    public function executionEdges(): Collection
     {
         return ExecutionEdge::where('run_id', $this->id)->get();
     }
@@ -88,12 +88,12 @@ class Run extends Model
         return $this->status === 'failed';
     }
 
-    public static function running(): array
+    public static function running(): Collection
     {
         return static::where('status', 'running')->get();
     }
 
-    public static function forWorkflowVersion(string $hash): array
+    public static function forWorkflowVersion(string $hash): Collection
     {
         return static::where('workflow_version_hash', $hash)
             ->orderBy('id', 'desc')
@@ -121,7 +121,6 @@ class Run extends Model
             $nodeRuns = $run->nodeRuns();
             foreach ($nodeRuns as $nodeRun) {
                 $key = (string) $nodeRun->node_key;
-                // Only keep the most recent test output per node
                 if (!isset($nodeOutputs[$key]) && $nodeRun->isCompleted()) {
                     $nodeOutputs[$key] = $nodeRun;
                 }

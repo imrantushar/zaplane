@@ -96,6 +96,14 @@ class WorkflowsController extends WP_REST_Controller
                 'permission_callback' => [$this, 'permissions_check'],
             ],
         ]);
+
+        register_rest_route($namespace, '/condition-variables', [
+            [
+                'methods' => WP_REST_Server::CREATABLE,
+                'callback' => [$this, 'get_condition_variables'],
+                'permission_callback' => [$this, 'permissions_check'],
+            ],
+        ]);
     }
 
     public function permissions_check()
@@ -186,7 +194,6 @@ class WorkflowsController extends WP_REST_Controller
             foreach ($nodeRuns as $nodeKey => $nodeRun) {
                 $output = $nodeRun->getOutput();
 
-                // For action nodes, the output is in 'data' key
                 $outputData = $output['data'] ?? $output;
 
                 $testOutputs[$nodeKey] = [
@@ -304,5 +311,107 @@ class WorkflowsController extends WP_REST_Controller
                 ])
                 ->toArray()
         );
+    }
+
+    public function get_condition_variables($request)
+    {
+        $params = $request->get_json_params();
+
+        $workflowHash = $params['workflow_hash'] ?? null;
+        $nodes = $params['nodes'] ?? [];
+        $edges = $params['edges'] ?? [];
+        $targetNodeKey = (string) ($params['target_node_key'] ?? '');
+
+        if (empty($nodes) || empty($targetNodeKey)) {
+            return new WP_Error('invalid_params', 'nodes and target_node_key are required', ['status' => 400]);
+        }
+
+        $nodeMap = [];
+        foreach ($nodes as $node) {
+            $nodeMap[(string) $node['id']] = $node;
+        }
+
+        $previousNodeIds = $this->findPreviousNodes($targetNodeKey, $edges);
+
+        $testNodeRuns = [];
+        if ($workflowHash) {
+            $testNodeRuns = Run::latestTestNodeRuns($workflowHash);
+        }
+
+        $variables = [];
+        foreach ($previousNodeIds as $nodeId) {
+            $node = $nodeMap[$nodeId] ?? null;
+            if (!$node) continue;
+
+            $nodeType = $node['type'] ?? '';
+            if (!in_array($nodeType, ['action', 'trigger'])) continue;
+
+            $nodeRun = $testNodeRuns[$nodeId] ?? null;
+            $nodeLabel = $node['data']['label'] ?? $node['data']['event'] ?? "Node {$nodeId}";
+            $nodeApp = $node['data']['app'] ?? 'unknown';
+
+            if ($nodeRun) {
+                $output = $nodeRun->getOutput();
+                $outputData = $output['data'] ?? $output;
+
+                // Ensure outputData is an array
+                if (!is_array($outputData)) {
+                    $outputData = ['value' => $outputData];
+                }
+
+                $variables[] = [
+                    'node_id' => $nodeId,
+                    'node_label' => $nodeLabel,
+                    'node_app' => $nodeApp,
+                    'node_event' => $node['data']['event'] ?? null,
+                    'has_test_data' => true,
+                    'node_run_id' => $nodeRun->id,
+                    'tested_at' => $nodeRun->finished_at,
+                    'output' => $outputData,
+                    'variables' => VariableExtractor::extract($outputData),
+                ];
+            } else {
+                $variables[] = [
+                    'node_id' => $nodeId,
+                    'node_label' => $nodeLabel,
+                    'node_app' => $nodeApp,
+                    'node_event' => $node['data']['event'] ?? null,
+                    'has_test_data' => false,
+                    'node_run_id' => null,
+                    'tested_at' => null,
+                    'output' => null,
+                    'variables' => [],
+                ];
+            }
+        }
+
+        return rest_ensure_response([
+            'target_node_key' => $targetNodeKey,
+            'previous_nodes' => $variables,
+        ]);
+    }
+
+    private function findPreviousNodes(string $targetNodeId, array $edges): array
+    {
+        $previousNodes = [];
+        $queue = [$targetNodeId];
+        $visited = [$targetNodeId => true];
+
+        while (!empty($queue)) {
+            $currentId = array_shift($queue);
+
+            foreach ($edges as $edge) {
+                $target = (string) $edge['target'];
+                $source = (string) $edge['source'];
+
+                if ($target === $currentId && !isset($visited[$source])) {
+                    $visited[$source] = true;
+                    $previousNodes[] = $source;
+                    $queue[] = $source;
+                }
+            }
+        }
+
+        return $previousNodes;
     }
 }
