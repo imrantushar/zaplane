@@ -1789,7 +1789,7 @@ svg.react-flow__connectionline {
   \******************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
 .zaplane-canvas-controls {
   gap: 5px;
-  margin-top: 57px;
+  margin-top: 125px;
 }
 
 .react-flow__controls-button {
@@ -1809,7 +1809,7 @@ svg.react-flow__connectionline {
 
 .zaplane-canvas-layout-icon {
   width: 60px;
-  margin: 22px 15px 10px 0;
+  margin: 86px 15px 10px 0;
   gap: 5px;
   cursor: pointer;
   position: absolute;

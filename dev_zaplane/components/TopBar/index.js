@@ -19,6 +19,7 @@ const TopBar = ({
 	return (
 		<React.Fragment>
 			<Flex
+			   className='zaplane-topbar'
 				style={topBarStyles}
 				direction={{ base: 'column', md: 'row' }}
 				justifyContent="space-between"

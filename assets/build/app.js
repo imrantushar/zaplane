@@ -1386,6 +1386,7 @@ const TopBar = ({
   // if (!is_admin) return null;
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)((react__WEBPACK_IMPORTED_MODULE_0___default().Fragment), {
     children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Flex, {
+      className: "zaplane-topbar",
       style: topBarStyles,
       direction: {
         base: 'column',
@@ -5141,12 +5142,15 @@ const toggleFullscreenMode = (containerRef, isFullscreen, setIsFullscreen) => {
   const wpAdminBar = document.getElementById("wpadminbar");
   const adminMenuBack = document.getElementById("adminmenuback");
   const adminMenuWrap = document.getElementById("adminmenuwrap");
+  const topBar = document.querySelector(".zaplane-topbar");
   if (!document.fullscreenElement) {
     document.documentElement.requestFullscreen();
   } else {
     document.exitFullscreen();
   }
   const isEnter = !isFullscreen;
+
+  // Apply styles to the main container
   applyStyles(elem, {
     position: isEnter ? "fixed" : "",
     top: isEnter ? "0" : "",
@@ -5155,20 +5159,36 @@ const toggleFullscreenMode = (containerRef, isFullscreen, setIsFullscreen) => {
     height: isEnter ? "100vh" : "",
     zIndex: isEnter ? "9999" : ""
   });
+
+  // Hide WordPress menu elements
   const menuElements = [adminMenu, adminMenuBack, adminMenuWrap, ...wpSubMenus];
   menuElements.forEach(el => {
+    if (!el) return;
     applyStyles(el, {
       width: isEnter ? "0" : "",
       backgroundColor: isEnter ? "transparent" : "",
       display: el === adminMenu && isEnter ? "none" : el === adminMenu && !isEnter ? "" : ""
     });
   });
+
+  // Adjust wpWrap & wpAdminBar
   applyStyles(wpWrap, {
     marginLeft: isEnter ? "0" : ""
   });
   applyStyles(wpAdminBar, {
     display: isEnter ? "none" : ""
   });
+
+  // Adjust zaplane-topbar
+  if (topBar) {
+    applyStyles(topBar, {
+      position: isEnter ? "fixed" : "",
+      top: isEnter ? "0" : "",
+      left: isEnter ? "0" : "",
+      width: isEnter ? "100%" : "",
+      zIndex: isEnter ? "10000" : ""
+    });
+  }
   setIsFullscreen(isEnter);
 };
 
