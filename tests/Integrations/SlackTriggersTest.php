@@ -15,8 +15,4 @@ class SlackTriggersTest extends IntegrationTestCase
     }
 
     // Slack has no triggers
-    protected function getTriggers(): array
-    {
-        return [];
-    }
 }

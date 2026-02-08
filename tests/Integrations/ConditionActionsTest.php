@@ -14,11 +14,52 @@ class ConditionActionsTest extends IntegrationTestCase
         return Condition::class;
     }
 
-    protected function getActions(): array
+    protected function getActionTests(): array
     {
         return [
-            'if',
+            'if' => ['expression' => '{{value}}'],
         ];
+    }
+
+    protected function setupMockData(): void
+    {
+        // No mock data needed for condition
+    }
+
+    /**
+     * @test
+     */
+    public function condition_true_returns_true_port(): void
+    {
+        $node = $this->makeActionNode('if', ['expression' => '{{value}}']);
+        $result = Condition::execute_node($node, ['value' => true]);
+
+        $this->assertEquals('true', $result['port']);
+    }
+
+    /**
+     * @test
+     */
+    public function condition_false_returns_false_port(): void
+    {
+        $node = $this->makeActionNode('if', ['expression' => '{{value}}']);
+        $result = Condition::execute_node($node, ['value' => false]);
+
+        $this->assertEquals('false', $result['port']);
+    }
+
+    /**
+     * @test
+     */
+    public function condition_with_comparison(): void
+    {
+        $node = $this->makeActionNode('if', ['expression' => '{{count > 5}}']);
+
+        $resultTrue = Condition::execute_node($node, ['count' => 10]);
+        $this->assertEquals('true', $resultTrue['port']);
+
+        $resultFalse = Condition::execute_node($node, ['count' => 3]);
+        $this->assertEquals('false', $resultFalse['port']);
     }
 
     /**
