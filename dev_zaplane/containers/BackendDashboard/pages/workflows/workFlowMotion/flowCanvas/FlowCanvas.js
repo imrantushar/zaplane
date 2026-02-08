@@ -22,14 +22,14 @@ import {
     FiArrowLeft
 } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
-import { getAllVersion, getRunWorkFlow, getSingleWorkFlow, workFLowExction, workflowNodeListiner, workflowNodeListinerStop } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
+import { getAllVersion, getRunWorkFlow, getSingleWorkFlow, startApiCountdown, workFLowExction, workflowNodeListiner, workflowNodeListinerStop } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
 import { useDispatch, useSelector } from "react-redux";
 import ZAPDrawer from "@ZAPComponents/Drawer";
 import { LucideHistory } from "lucide-react";
 import RunsTable from "./RunsTable/RunsTable";
 import VersionHistoryTable from "./VersionHistoryTable/VersionHistoryTable";
 import { LuFullscreen, LuMinimize } from "react-icons/lu";
-import { toggleFullscreenMode, mapGraphFromBackend } from "./helper";
+import { toggleFullscreenMode, mapGraphFromBackend, formatTime } from "./helper";
 import Select from "react-select";
 import ZAPLoading from "@ZAPComponents/Loading";
 import { statusOptions } from "../../helper";
@@ -40,6 +40,7 @@ import { primaryBtn } from "../../../../../../../assets/scss/chakra/recipe";
 import './styles.scss'
 import { IoSwapHorizontal, IoSwapVerticalOutline } from "react-icons/io5";
 import ZAPTooltip from "@ZAPComponents/ZAPTooltip";
+import { useApiCountdown } from "@ZAPHooks/useApiCountdown/useApiCountdown";
 
 export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdgesChange, onNodesChange, getNewNodeId, singleData }) {
     const dispatch = useDispatch();
@@ -47,7 +48,7 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
     const [drawerOpen, setDrawerOpen] = useState(false);
     const { values, setFieldValue, handleSubmit, } = useFormikContext()
     const [loading, setLoading] = useState(false);
-    const { runs, versions } = useSelector((state) => state.workflows);
+    const { runs, versions, apiCountdown, apiRequestRunning } = useSelector((state) => state.workflows);
     const containerRef = useRef(null);
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [activeDrawer, setActiveDrawer] = useState(null);
@@ -131,7 +132,9 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
             />
         ),
     };
+    //listiner
 
+    useApiCountdown()
     // useEffect(() => {
     //     const interval = setInterval(() => {
     //         dispatch(getRunWorkFlow());
@@ -158,14 +161,25 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
                         <Text fontSize="md" fontWeight="medium">
                             {singleData?.workflow?.title || __("Untitled Workflow", "zaplane")}
                         </Text>
-                        <Button size="sm" variant="outline"
-                            onClick={() => dispatch(workflowNodeListiner(id))}>
-                            {__("Runs ", "zaplane")}
-                        </Button>
-                        <Button size="sm" variant="outline"
-                            onClick={() => dispatch(workflowNodeListinerStop(id))}>
-                            {__("Stop", "zaplane")}
-                        </Button>
+                        {
+                            !apiRequestRunning ? <Button {...primaryBtn}
+                                onClick={() => {
+                                    dispatch(startApiCountdown(120));
+                                    dispatch(workflowNodeListiner(id));
+                                }}>
+                                {__("Test Flow Once", "zaplane")}
+                            </Button> : <Button {...primaryBtn}
+                                onClick={() => dispatch(workflowNodeListinerStop(id))}>
+                                {__("Stop", "zaplane")}
+                            </Button>
+                        }
+                        {apiRequestRunning && (
+                            <Text m='0' fontSize="18px">
+                                {__("Listening...", "zaplane")} {formatTime(apiCountdown)}
+                            </Text>
+                        )}
+
+
                     </>
                 )}
                 rightContent={() => (
