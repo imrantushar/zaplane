@@ -372,36 +372,36 @@ class FluentCrm extends IntegrationBase {
 
     public static function get_actions(): array {
         return [
-           'created_contact' => ['label' => 'Create Contact'],
-           'get_contact_all' => ['label' => 'Get Contact (All)'],
-           'get_contact_id' => ['label' => 'Get Contact (By Id)'],
-           'get_contact_email' => ['label' => 'Get Contact (By Email)'],
-           'get_contact_by_tags' => ['label' => 'Get Contact (By Tag ID)'],
-           'get_contact_by_lists' => ['label' => 'Get Contact (By Lists ID)'],
-           'get_contact_by_status' => ['label' => 'Get Contact (By Status)'],
-           'delete_contact' => ['label' => 'Delete Contact'],
-           'get_tag_all' => ['label' => 'Get Tag (All)'],
-           'created_tag' => ['label' => 'Created Tag'],
-           'add_tag_to_contact' => ['label' => 'Add Tag To Contact'],
-           'remove_tag_from_contact' => ['label' => 'Remove Tag From Contact'],
-           'delete_tag' => ['label' => 'Delete Tag'],
-           'get_list_all' => ['label' => 'Get List (All)'],
-           'created_list' => ['label' => 'Created List'],
-           'add_list_to_contact' => ['label' => 'Add List To Contact'],
-           'remove_list_from_contact' => ['label' => 'Remove List From Contact'],
-           'delete_list' => ['label' => 'Delete List'],
-           'get_company_all' => ['label' => 'Get Company (All)'],
-           'get_company_id' => ['label' => 'Get Company (By Id)'],
-           'created_company' => ['label' => 'Created company'],
-           'add_company_to_contact' => ['label' => 'Add Company To Contact'],
+           'created_contact'             => ['label' => 'Create Contact'],
+           'get_contact_all'             => ['label' => 'Get Contact (All)'],
+           'get_contact_id'              => ['label' => 'Get Contact (By Id)'],
+           'get_contact_email'           => ['label' => 'Get Contact (By Email)'],
+           'get_contact_by_tags'         => ['label' => 'Get Contact (By Tag ID)'],
+           'get_contact_by_lists'        => ['label' => 'Get Contact (By Lists ID)'],
+           'get_contact_by_status'       => ['label' => 'Get Contact (By Status)'],
+           'delete_contact'              => ['label' => 'Delete Contact'],
+           'get_tag_all'                 => ['label' => 'Get Tag (All)'],
+           'created_tag'                 => ['label' => 'Created Tag'],
+           'add_tag_to_contact'          => ['label' => 'Add Tag To Contact'],
+           'remove_tag_from_contact'     => ['label' => 'Remove Tag From Contact'],
+           'delete_tag'                  => ['label' => 'Delete Tag'],
+           'get_list_all'                => ['label' => 'Get List (All)'],
+           'created_list'                => ['label' => 'Created List'],
+           'add_list_to_contact'         => ['label' => 'Add List To Contact'],
+           'remove_list_from_contact'    => ['label' => 'Remove List From Contact'],
+           'delete_list'                 => ['label' => 'Delete List'],
+           'get_company_all'             => ['label' => 'Get Company (All)'],
+           'get_company_id'              => ['label' => 'Get Company (By Id)'],
+           'created_company'             => ['label' => 'Created company'],
+           'add_company_to_contact'      => ['label' => 'Add Company To Contact'],
            'remove_company_from_contact' => ['label' => 'Remove Company From Contact'],
-           'delete_company' => ['label' => 'Delete Company'],
-           'get_campaign_all' => ['label' => 'Get Campaign (All)'],
-           'get_campaign_single' => ['label' => 'Get Campaign (Single)'],
-           'create_campaign' => ['label' => 'Create Campaign'],
-           'delete_campaign' => ['label' => 'Delete Campaign'],
-           'add_event_tracking' => ['label' => 'Add Event Tracking'],
-           'add_note' => ['label' => 'Add Note'],
+           'delete_company'              => ['label' => 'Delete Company'],
+           'get_campaign_all'            => ['label' => 'Get Campaign (All)'],
+           'get_campaign_single'         => ['label' => 'Get Campaign (Single)'],
+           'create_campaign'             => ['label' => 'Create Campaign'],
+           'delete_campaign'             => ['label' => 'Delete Campaign'],
+           'add_event_tracking'          => ['label' => 'Add Event Tracking'],
+           'add_note'                    => ['label' => 'Add Note'],
         ];
     }
 
@@ -558,8 +558,8 @@ class FluentCrm extends IntegrationBase {
                 ['key'=>'primary_company','label'=>'Primary Company','type'=>'select','options'=>self::get_company()],
                 ['key' => 'field_map','label' => 'Field Map','type' => 'repeater','button_label' => 'Add Field','fields' => [
                     ['key' => 'field', 'label' => 'Field', 'type' => 'select','options'=> self::options_field()],
-                    ['key' => 'value', 'label' => 'Value', 'type' => 'text'],]
-                ],
+                    ['key' => 'value', 'label' => 'Value', 'type' => 'text'],
+                ]],
                 ...self::custom_field_map(),       
             ],
             'get_contact_id' =>  self::contact_id(),
@@ -613,8 +613,8 @@ class FluentCrm extends IntegrationBase {
             'created_company' => [
                 ['key' => 'field_map','label' => 'Field Map','type' => 'repeater','button_label' => 'Add Field','fields' => [
                     ['key' => 'field', 'label' => 'Field', 'type' => 'select','options'=> self::company_field()],
-                    ['key' => 'value', 'label' => 'Value', 'type' => 'text'],]
-                ],
+                    ['key' => 'value', 'label' => 'Value', 'type' => 'text'],
+                ]],
                 ...self::custom_field_map(),      
             ],
             'add_company_to_contact' => [
@@ -777,7 +777,7 @@ class FluentCrm extends IntegrationBase {
                     return ['port'=>'main','data'=>['success' => false, 'message' => 'FluentCRM Subscriber Not Found',],];
                 }
                 $subscriber = \FluentCrm\App\Models\Subscriber::all();
-                $contacts = [];
+                $contacts   = [];
                 foreach ( $subscriber as $sub ) {
                     $contacts[] = self::resolve_contact_payload($sub);
                 }
@@ -923,7 +923,7 @@ class FluentCrm extends IntegrationBase {
 
             case 'add_tag_to_contact':
                 $contact_id = $config['contact_id'] ?? 0;
-                $tags        = $config['tags'] ?? '';
+                $tags       = $config['tags'] ?? '';
                 if ( ! $contact_id )  {
                     return ['port'=>'main','data'=>['success' => false, 'message' => 'Contact ID is required',],];
                 }
@@ -947,7 +947,7 @@ class FluentCrm extends IntegrationBase {
             
             case 'remove_tag_from_contact':
                 $contact_id = $config['contact_id'] ?? 0;
-                $tags = array_map('intval', (array) ($config['tags'] ?? []));
+                $tags       = array_map('intval', (array) ($config['tags'] ?? []));
 
                 if ( ! $contact_id )  {
                     return ['port'=>'main','data'=>['success' => false, 'message' => 'Contact ID is required',],];
@@ -1044,7 +1044,7 @@ class FluentCrm extends IntegrationBase {
             
             case 'remove_list_from_contact':
                 $contact_id = $config['contact_id'] ?? 0;
-                $lists = array_map('intval', (array) ($config['lists'] ?? []));
+                $lists      = array_map('intval', (array) ($config['lists'] ?? []));
 
                 if ( ! $contact_id )  {
                     return ['port'=>'main','data'=>['success' => false, 'message' => 'Contact ID is required',],];
@@ -1313,9 +1313,9 @@ class FluentCrm extends IntegrationBase {
                 return ['port' => 'main','data' => ['success' => true,'contact'=> self::resolve_contact_payload( $contact ), 'event' => $event,],];
 
             case 'add_note':
-                $contact_id = $config['contact_id'] ?? 0;
-                $note_title = sanitize_text_field( $config['title'] ?? '');
-                $note_type = sanitize_text_field( $config['note_type'] ?? '');
+                $contact_id  = $config['contact_id'] ?? 0;
+                $note_title  = sanitize_text_field( $config['title'] ?? '');
+                $note_type   = sanitize_text_field( $config['note_type'] ?? '');
                 $description = sanitize_text_field( $config['description'] ?? '');
                 if ( ! $contact_id )  {
                     return ['port'=>'main','data'=>['success' => false, 'message' => 'Contact Id is required',],];
@@ -1333,7 +1333,7 @@ class FluentCrm extends IntegrationBase {
                 $note = new \FluentCrm\App\Models\SubscriberNote();
                 $note->subscriber_id = $contact_id;
                 $note->title         = $note_title;
-                $note->description       = $description;
+                $note->description   = $description;
                 $note->type          = $note_type;
                 $note->created_by    = $contact->user_id ?? 0;
                 $note->save();
