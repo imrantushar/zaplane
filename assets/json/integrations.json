@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-02-05 09:02:44",
+    "generated_at": "2026-02-08 11:20:32",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -3216,24 +3216,16 @@
                                     "value": "any"
                                 },
                                 {
-                                    "label": "jh",
+                                    "label": "lkj",
                                     "value": 1
                                 },
                                 {
-                                    "label": "nb",
+                                    "label": "jhg",
                                     "value": 2
                                 },
                                 {
-                                    "label": "erter",
+                                    "label": "vcvc",
                                     "value": 3
-                                },
-                                {
-                                    "label": "nu",
-                                    "value": 4
-                                },
-                                {
-                                    "label": "fun",
-                                    "value": 5
                                 }
                             ],
                             "required": true
@@ -3258,24 +3250,16 @@
                                     "value": "any"
                                 },
                                 {
-                                    "label": "jh",
+                                    "label": "lkj",
                                     "value": 1
                                 },
                                 {
-                                    "label": "nb",
+                                    "label": "jhg",
                                     "value": 2
                                 },
                                 {
-                                    "label": "erter",
+                                    "label": "vcvc",
                                     "value": 3
-                                },
-                                {
-                                    "label": "nu",
-                                    "value": 4
-                                },
-                                {
-                                    "label": "fun",
-                                    "value": 5
                                 }
                             ],
                             "required": true
@@ -3300,16 +3284,12 @@
                                     "value": "any"
                                 },
                                 {
-                                    "label": "zmvbxczxxzx",
+                                    "label": "nvcjkgbduf",
                                     "value": 1
                                 },
                                 {
-                                    "label": "lghfdssarerrt",
+                                    "label": "werewtryuyiuy",
                                     "value": 2
-                                },
-                                {
-                                    "label": "bbbbbbbbbccccsssss",
-                                    "value": 3
                                 }
                             ],
                             "required": true
@@ -3334,16 +3314,12 @@
                                     "value": "any"
                                 },
                                 {
-                                    "label": "zmvbxczxxzx",
+                                    "label": "nvcjkgbduf",
                                     "value": 1
                                 },
                                 {
-                                    "label": "lghfdssarerrt",
+                                    "label": "werewtryuyiuy",
                                     "value": 2
-                                },
-                                {
-                                    "label": "bbbbbbbbbccccsssss",
-                                    "value": 3
                                 }
                             ],
                             "required": true
@@ -3365,7 +3341,7 @@
                 "contact_status_updated": {
                     "key": "contact_status_updated",
                     "label": "Contact Status Updated",
-                    "hook": "fluentcrm_subscriber_status_to_subscribed",
+                    "hook": "fluentcrm_subscriber_status_subscribed",
                     "schema": [
                         {
                             "key": "status",
@@ -3402,7 +3378,7 @@
                                 },
                                 {
                                     "label": "Spammed",
-                                    "value": "Spammed"
+                                    "value": "spammed"
                                 }
                             ],
                             "required": true
@@ -3470,14 +3446,6 @@
                                 {
                                     "label": "Any Campaign",
                                     "value": "any"
-                                },
-                                {
-                                    "label": "fdhgfd",
-                                    "value": 1
-                                },
-                                {
-                                    "label": "fgdsgdfg",
-                                    "value": 3
                                 }
                             ],
                             "required": true
@@ -3500,14 +3468,6 @@
                                 {
                                     "label": "Any Campaign",
                                     "value": "any"
-                                },
-                                {
-                                    "label": "fdhgfd",
-                                    "value": 1
-                                },
-                                {
-                                    "label": "fgdsgdfg",
-                                    "value": 3
                                 }
                             ],
                             "required": true
@@ -3533,18 +3493,16 @@
                                     "value": "any"
                                 },
                                 {
-                                    "label": "zmvbxczxxzx",
+                                    "label": "nvcjkgbduf",
                                     "value": 1
                                 },
                                 {
-                                    "label": "lghfdssarerrt",
+                                    "label": "werewtryuyiuy",
                                     "value": 2
-                                },
-                                {
-                                    "label": "bbbbbbbbbccccsssss",
-                                    "value": 3
                                 }
-                            ]
+                            ],
+                            "required": true,
+                            "multiple": true
                         },
                         {
                             "key": "tags",
@@ -3556,26 +3514,20 @@
                                     "value": "any"
                                 },
                                 {
-                                    "label": "jh",
+                                    "label": "lkj",
                                     "value": 1
                                 },
                                 {
-                                    "label": "nb",
+                                    "label": "jhg",
                                     "value": 2
                                 },
                                 {
-                                    "label": "erter",
+                                    "label": "vcvc",
                                     "value": 3
-                                },
-                                {
-                                    "label": "nu",
-                                    "value": 4
-                                },
-                                {
-                                    "label": "fun",
-                                    "value": 5
                                 }
-                            ]
+                            ],
+                            "required": true,
+                            "multiple": true
                         },
                         {
                             "key": "primary_company",
@@ -3583,16 +3535,8 @@
                             "type": "select",
                             "options": [
                                 {
-                                    "label": "Any Campaign",
-                                    "value": "any"
-                                },
-                                {
-                                    "label": "fdhgfd",
+                                    "label": "fdghd",
                                     "value": 1
-                                },
-                                {
-                                    "label": "fgdsgdfg",
-                                    "value": 3
                                 }
                             ]
                         },
@@ -3721,7 +3665,7 @@
                     "schema": [
                         {
                             "key": "contact_id",
-                            "label": "ID",
+                            "label": "Contact ID",
                             "type": "expression",
                             "required": true
                         }
@@ -3810,9 +3754,24 @@
                                 },
                                 {
                                     "label": "Spammed",
-                                    "value": "Spammed"
+                                    "value": "spammed"
                                 }
                             ],
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_contact": {
+                    "key": "delete_contact",
+                    "label": "Delete Contact",
+                    "schema": [
+                        {
+                            "key": "contact_id",
+                            "label": "Contact ID",
+                            "type": "expression",
                             "required": true
                         }
                     ],
@@ -3834,7 +3793,7 @@
                     "schema": [
                         {
                             "key": "title",
-                            "label": "Tag Title",
+                            "label": "Title",
                             "type": "text",
                             "required": true
                         },
@@ -3875,24 +3834,16 @@
                                     "value": "any"
                                 },
                                 {
-                                    "label": "jh",
+                                    "label": "lkj",
                                     "value": 1
                                 },
                                 {
-                                    "label": "nb",
+                                    "label": "jhg",
                                     "value": 2
                                 },
                                 {
-                                    "label": "erter",
+                                    "label": "vcvc",
                                     "value": 3
-                                },
-                                {
-                                    "label": "nu",
-                                    "value": 4
-                                },
-                                {
-                                    "label": "fun",
-                                    "value": 5
                                 }
                             ],
                             "required": true,
@@ -3923,28 +3874,35 @@
                                     "value": "any"
                                 },
                                 {
-                                    "label": "jh",
+                                    "label": "lkj",
                                     "value": 1
                                 },
                                 {
-                                    "label": "nb",
+                                    "label": "jhg",
                                     "value": 2
                                 },
                                 {
-                                    "label": "erter",
+                                    "label": "vcvc",
                                     "value": 3
-                                },
-                                {
-                                    "label": "nu",
-                                    "value": 4
-                                },
-                                {
-                                    "label": "fun",
-                                    "value": 5
                                 }
                             ],
                             "required": true,
                             "multiple": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_tag": {
+                    "key": "delete_tag",
+                    "label": "Delete Tag",
+                    "schema": [
+                        {
+                            "key": "tag_id",
+                            "label": "Tag ID",
+                            "type": "expression",
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -3965,7 +3923,7 @@
                     "schema": [
                         {
                             "key": "title",
-                            "label": "List Title",
+                            "label": "Title",
                             "type": "text",
                             "required": true
                         },
@@ -4006,16 +3964,12 @@
                                     "value": "any"
                                 },
                                 {
-                                    "label": "zmvbxczxxzx",
+                                    "label": "nvcjkgbduf",
                                     "value": 1
                                 },
                                 {
-                                    "label": "lghfdssarerrt",
+                                    "label": "werewtryuyiuy",
                                     "value": 2
-                                },
-                                {
-                                    "label": "bbbbbbbbbccccsssss",
-                                    "value": 3
                                 }
                             ],
                             "required": true,
@@ -4046,20 +4000,31 @@
                                     "value": "any"
                                 },
                                 {
-                                    "label": "zmvbxczxxzx",
+                                    "label": "nvcjkgbduf",
                                     "value": 1
                                 },
                                 {
-                                    "label": "lghfdssarerrt",
+                                    "label": "werewtryuyiuy",
                                     "value": 2
-                                },
-                                {
-                                    "label": "bbbbbbbbbccccsssss",
-                                    "value": 3
                                 }
                             ],
                             "required": true,
                             "multiple": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_list": {
+                    "key": "delete_list",
+                    "label": "Delete List",
+                    "schema": [
+                        {
+                            "key": "list_id",
+                            "label": "List ID",
+                            "type": "expression",
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -4114,7 +4079,7 @@
                                         },
                                         {
                                             "label": "Owner Email",
-                                            "value": "email"
+                                            "value": "owner_email"
                                         },
                                         {
                                             "label": "Company Email",
@@ -4236,16 +4201,8 @@
                             "type": "select",
                             "options": [
                                 {
-                                    "label": "tyyyyyrh",
+                                    "label": "fdghd",
                                     "value": 1
-                                },
-                                {
-                                    "label": "1",
-                                    "value": 2
-                                },
-                                {
-                                    "label": "sdgfdhg",
-                                    "value": 3
                                 }
                             ],
                             "required": true,
@@ -4272,20 +4229,152 @@
                             "type": "select",
                             "options": [
                                 {
-                                    "label": "tyyyyyrh",
+                                    "label": "fdghd",
                                     "value": 1
-                                },
-                                {
-                                    "label": "1",
-                                    "value": 2
-                                },
-                                {
-                                    "label": "sdgfdhg",
-                                    "value": 3
                                 }
                             ],
                             "required": true,
                             "multiple": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_company": {
+                    "key": "delete_company",
+                    "label": "Delete Company",
+                    "schema": [
+                        {
+                            "key": "company_id",
+                            "label": "Company ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_campaign_all": {
+                    "key": "get_campaign_all",
+                    "label": "Get Campaign (All)",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_campaign_single": {
+                    "key": "get_campaign_single",
+                    "label": "Get Campaign (Single)",
+                    "schema": [
+                        {
+                            "key": "campaign_id",
+                            "label": "Campaign ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_campaign": {
+                    "key": "create_campaign",
+                    "label": "Create Campaign",
+                    "schema": [
+                        {
+                            "key": "title",
+                            "label": "Title",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_campaign": {
+                    "key": "delete_campaign",
+                    "label": "Delete Campaign",
+                    "schema": [
+                        {
+                            "key": "campaign_id",
+                            "label": "Campaign ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add_event_tracking": {
+                    "key": "add_event_tracking",
+                    "label": "Add Event Tracking",
+                    "schema": [
+                        {
+                            "key": "email",
+                            "label": "Contact Email",
+                            "type": "email",
+                            "required": true
+                        },
+                        {
+                            "key": "event_key",
+                            "label": "Event Tracking Key",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "event_title",
+                            "label": "Event Tracking Title",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "event_value",
+                            "label": "Event Value",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "provider",
+                            "label": "Provider",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add_note": {
+                    "key": "add_note",
+                    "label": "Add Note",
+                    "schema": [
+                        {
+                            "key": "contact_id",
+                            "label": "Contact ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "title",
+                            "label": "Title",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "note_type",
+                            "label": "Type",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "description",
+                            "label": "Description",
+                            "type": "text",
+                            "required": false
                         }
                     ],
                     "outputs": [
