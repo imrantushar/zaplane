@@ -17,7 +17,14 @@ class ConditionActionsTest extends IntegrationTestCase
     protected function getActionTests(): array
     {
         return [
-            'if' => ['expression' => '{{value}}'],
+            'if' => [
+                'conditions' => [
+                    'logic' => 'AND',
+                    'conditions' => [
+                        ['left' => '{{value}}', 'operator' => '==', 'right' => 'true'],
+                    ],
+                ],
+            ],
         ];
     }
 
@@ -31,8 +38,15 @@ class ConditionActionsTest extends IntegrationTestCase
      */
     public function condition_true_returns_true_port(): void
     {
-        $node = $this->makeActionNode('if', ['expression' => '{{value}}']);
-        $result = Condition::execute_node($node, ['value' => true]);
+        $node = $this->makeActionNode('if', [
+            'conditions' => [
+                'logic' => 'AND',
+                'conditions' => [
+                    ['left' => '{{value}}', 'operator' => '==', 'right' => 'yes'],
+                ],
+            ],
+        ]);
+        $result = Condition::execute_node($node, ['value' => 'yes']);
 
         $this->assertEquals('true', $result['port']);
     }
@@ -42,8 +56,15 @@ class ConditionActionsTest extends IntegrationTestCase
      */
     public function condition_false_returns_false_port(): void
     {
-        $node = $this->makeActionNode('if', ['expression' => '{{value}}']);
-        $result = Condition::execute_node($node, ['value' => false]);
+        $node = $this->makeActionNode('if', [
+            'conditions' => [
+                'logic' => 'AND',
+                'conditions' => [
+                    ['left' => '{{value}}', 'operator' => '==', 'right' => 'yes'],
+                ],
+            ],
+        ]);
+        $result = Condition::execute_node($node, ['value' => 'no']);
 
         $this->assertEquals('false', $result['port']);
     }
@@ -53,7 +74,14 @@ class ConditionActionsTest extends IntegrationTestCase
      */
     public function condition_with_comparison(): void
     {
-        $node = $this->makeActionNode('if', ['expression' => '{{count > 5}}']);
+        $node = $this->makeActionNode('if', [
+            'conditions' => [
+                'logic' => 'AND',
+                'conditions' => [
+                    ['left' => '{{count}}', 'operator' => '>', 'right' => '5'],
+                ],
+            ],
+        ]);
 
         $resultTrue = Condition::execute_node($node, ['count' => 10]);
         $this->assertEquals('true', $resultTrue['port']);

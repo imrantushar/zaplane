@@ -76,7 +76,8 @@ class Condition extends IntegrationBase {
      * Execute condition node
      */
     public static function execute_node(array $node, array $input): array {
-        $conditions = $node['config']['conditions'] ?? [];
+        $config = $node['data']['config'] ?? [];
+        $conditions = $config['conditions'] ?? [];
         $result = self::evaluate_condition_group($conditions, $input);
 
         return [
