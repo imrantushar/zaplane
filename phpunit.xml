@@ -8,20 +8,14 @@
     convertWarningsToExceptions="true"
 >
     <testsuites>
-        <testsuite name="Unit">
-            <directory suffix="Test.php">./tests/Unit</directory>
-        </testsuite>
-        <testsuite name="Integration">
-            <directory suffix="Test.php">./tests/Integration</directory>
-        </testsuite>
-        <testsuite name="API">
-            <directory suffix="Test.php">./tests/API</directory>
+        <testsuite name="Integrations">
+            <directory suffix="Test.php">./tests/Integrations</directory>
         </testsuite>
     </testsuites>
     <filter>
         <whitelist processUncoveredFilesFromWhitelist="true">
             <directory suffix=".php">./includes</directory>
-            <directory suffix=".php">./integration</directory>
+            <directory suffix=".php">./integrations</directory>
             <exclude>
                 <directory suffix=".php">./vendor</directory>
                 <directory suffix=".php">./tests</directory>
