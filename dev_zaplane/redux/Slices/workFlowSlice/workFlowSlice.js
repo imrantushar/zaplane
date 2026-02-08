@@ -187,6 +187,7 @@ export const workflowNodeListiner = createAsyncThunk(
 			const res = await API.get(
 				namespace + `node-listener/${id}`
 			);
+			handleSliceSuccess(thunkAPI, __('Work Flow run successfully', 'workflow'));
 			return res.data;
 		} catch (e) {
 			return handleSliceError(thunkAPI, e);
@@ -389,7 +390,12 @@ const workflowsSlice = createSlice({
 			})
 
 
-			.addCase(workflowNodeListiner.fulfilled, (state, action) => {
+			.addCase(workflowNodeListiner.fulfilled, (state) => {
+				state.isLoading = false;
+				state.apiRequestRunning = false;
+				state.apiCountdown = 0;
+			})
+			.addCase(workflowNodeListiner.rejected, (state) => {
 				state.isLoading = false;
 				state.apiRequestRunning = false;
 				state.apiCountdown = 0;
