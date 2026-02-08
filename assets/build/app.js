@@ -3630,9 +3630,10 @@ function ActionDrawer({
               node_key: node?.id,
               input: values
             })),
-            children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_15__.__)("Run test", "zaplane")
+            children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_15__.__)("Test Action", "zaplane")
           }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(_TestDetails_TestDetails__WEBPACK_IMPORTED_MODULE_20__["default"], {
-            id: node?.id
+            id: node?.id,
+            singleData: singleData
           })]
         })
       }]
@@ -3777,7 +3778,6 @@ function ConditionGroupField({
   const ruleFields = field?.fields;
   const EMPTY_RULE = (0,_helper__WEBPACK_IMPORTED_MODULE_10__.buildEmptyRule)(ruleFields);
   const [isPopoverOpen, setPopoverOpen] = (0,react__WEBPACK_IMPORTED_MODULE_12__.useState)(false);
-  console.log(isPopoverOpen);
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(formik__WEBPACK_IMPORTED_MODULE_5__.FieldArray, {
     name: field.key,
     children: groupHelpers => {
@@ -3973,13 +3973,15 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__);
 /* harmony import */ var _ZAPComponents_Loading__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @ZAPComponents/Loading */ "./dev_zaplane/components/Loading/index.js");
 /* harmony import */ var _ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @ZAPRedux/Slices/workFlowSlice/workFlowSlice */ "./dev_zaplane/redux/Slices/workFlowSlice/workFlowSlice.js");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! react */ "react");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_6__);
-/* harmony import */ var react_json_view__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! react-json-view */ "./node_modules/react-json-view/dist/main.js");
-/* harmony import */ var react_json_view__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(react_json_view__WEBPACK_IMPORTED_MODULE_7__);
-/* harmony import */ var react_redux__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/dist/react-redux.mjs");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__);
+/* harmony import */ var formik__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! formik */ "./node_modules/formik/dist/formik.esm.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_7__);
+/* harmony import */ var react_json_view__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! react-json-view */ "./node_modules/react-json-view/dist/main.js");
+/* harmony import */ var react_json_view__WEBPACK_IMPORTED_MODULE_8___default = /*#__PURE__*/__webpack_require__.n(react_json_view__WEBPACK_IMPORTED_MODULE_8__);
+/* harmony import */ var react_redux__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/dist/react-redux.mjs");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__);
+
 
 
 
@@ -3989,50 +3991,54 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const TestDetails = ({
-  id
+  id,
+  singleData
 }) => {
-  const dispatch = (0,react_redux__WEBPACK_IMPORTED_MODULE_8__.useDispatch)();
+  const dispatch = (0,react_redux__WEBPACK_IMPORTED_MODULE_9__.useDispatch)();
   const {
     singleNodeExecution,
     isLoading
-  } = (0,react_redux__WEBPACK_IMPORTED_MODULE_8__.useSelector)(state => state.workflows);
-  const inputData = singleNodeExecution?.input || {};
-  const outputData = singleNodeExecution?.output?.data || {};
-  (0,react__WEBPACK_IMPORTED_MODULE_6__.useEffect)(() => {
+  } = (0,react_redux__WEBPACK_IMPORTED_MODULE_9__.useSelector)(state => state.workflows);
+  const {
+    values
+  } = (0,formik__WEBPACK_IMPORTED_MODULE_6__.useFormikContext)();
+  const selectedOutput = singleData?.test_outputs?.[id]?.output || {};
+  const inputData = singleNodeExecution?.input || values;
+  const outputData = singleNodeExecution?.output?.data || selectedOutput;
+  (0,react__WEBPACK_IMPORTED_MODULE_7__.useEffect)(() => {
     dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_5__.resetSingleNodeExecution)());
   }, [id, dispatch]);
-  if (!singleNodeExecution) return;
-  if (isLoading) return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_ZAPComponents_Loading__WEBPACK_IMPORTED_MODULE_4__["default"], {});
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.VStack, {
+  if (isLoading) return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_ZAPComponents_Loading__WEBPACK_IMPORTED_MODULE_4__["default"], {});
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.VStack, {
     spacing: "4",
     align: "stretch",
-    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
       p: "3",
       border: "1px solid var(--zaplane-border-color)",
       borderRadius: "md",
       bg: "var(--zaplane-gray)",
-      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
         className: "zaplane-label",
         fontWeight: "bold",
         mb: "2",
         children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Input', 'zaplane')
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)((react_json_view__WEBPACK_IMPORTED_MODULE_7___default()), {
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)((react_json_view__WEBPACK_IMPORTED_MODULE_8___default()), {
         src: inputData,
         name: "root",
         collapsed: 1,
         enableClipboard: false,
         displayDataTypes: false
       })]
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
       p: "3",
       border: "1px solid var(--zaplane-border-color)",
       borderRadius: "md",
       bg: "var(--zaplane-gray)",
-      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
         fontWeight: "bold",
         mb: "2",
         children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Output', 'zaplane')
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)((react_json_view__WEBPACK_IMPORTED_MODULE_7___default()), {
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)((react_json_view__WEBPACK_IMPORTED_MODULE_8___default()), {
         src: outputData,
         name: "root",
         collapsed: 2,
@@ -5503,7 +5509,6 @@ const useFlowActions = ({
     const layoutLR = canvasLayout === 'LR';
     const LRGap = 250;
     const TBGap = 98;
-    console.log(layoutLR, 'layot');
     const {
       edge,
       node

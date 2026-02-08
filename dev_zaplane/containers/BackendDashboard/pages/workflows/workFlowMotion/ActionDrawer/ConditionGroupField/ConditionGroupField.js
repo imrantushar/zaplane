@@ -16,7 +16,6 @@ export default function ConditionGroupField({ value, onChange, field }) {
     const ruleFields = field?.fields;
     const EMPTY_RULE = buildEmptyRule(ruleFields);
     const [isPopoverOpen, setPopoverOpen] = useState(false);
-    console.log(isPopoverOpen);
 
     return (
         <FieldArray name={field.key}>
