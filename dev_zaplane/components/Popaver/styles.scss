@@ -1,33 +1,39 @@
-.zaplane-popover-wrapper {
-  display: inline-block;
-  position: relative;
+.zaplane-popover {
+  max-width: 500px;
+  width: 500px;
+  background: var(--zaplane-background);
+  border: 1px solid var(--zaplane-border-color);
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 9999;
+  left: -506px !important;
+  top: -224px !important;
 
-  .zaplane-popover-trigger {
-    background-color: #0073aa;
-    color: #fff;
-    border: none;
-
-    &:hover {
-      background-color: #006799;
-    }
+  .components-popover__content {
+    width: 100%;
   }
 
-  .zaplane-popover {
-    background: #fff;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    min-width: 200px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    z-index: 9999;
+  .zaplane-popover-inner {
+    width: 100%;
+  }
 
-    .zaplane-popover-content {
-      padding: 12px;
-      font-size: 14px;
-      color: #333;
 
-      p {
-        margin: 0;
-      }
+  .zaplane-popover-title {
+    font-size: 13px;
+    font-weight: 600;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--zaplane-border-color);
+    background: #f6f7f7;
+    color: #1e1e1e;
+  }
+
+  .zaplane-popover-content {
+    padding: 12px;
+    font-size: 14px;
+    color: var(--zaplane-font-color);
+
+    p {
+      margin: 0;
     }
   }
 }

@@ -121,7 +121,7 @@ export default function ActionDrawer({ open, context, onClose, updateNodeData, c
     <ZAPDrawer
       open={open}
       onClose={resetAll}
-      closeOnOverlayClick
+      // closeOnOverlayClick
       title={!mode ? "Add Action" : selectedItem?.name || __('App', 'zaplane')}
       placement="end"
       size="md"
