@@ -150,9 +150,6 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
         >
 
             <TopBar
-                topBarStyles={
-                    { top: 0, margin: 0 }
-                }
                 leftContent={() => (
                     <>
                         <Button variant="outline" onClick={() => navigate(-1)}>

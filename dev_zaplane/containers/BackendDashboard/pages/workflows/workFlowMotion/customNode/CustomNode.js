@@ -9,8 +9,9 @@ import { Box, HStack, Icon, Text } from "@chakra-ui/react";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import { FaRegCopy } from "react-icons/fa";
 import FloatingEdge from "../FloatingEdge/FloatingEdge";
-import { __ } from "@wordpress/i18n";
-export default function CustomNode({ id, data,canvasLayout}) {
+import { __, sprintf } from "@wordpress/i18n";
+import { formatLabel } from "./helper";
+export default function CustomNode({ id, data, canvasLayout }) {
   const [hovered, setHovered] = useState(false);
 
   const { getEdges } = useReactFlow();
@@ -18,6 +19,7 @@ export default function CustomNode({ id, data,canvasLayout}) {
 
   const hasOutgoingEdge = edges.some((e) => e.source === id);
   const isLR = canvasLayout === "LR"
+  const isSelectApp = data.app === "Select an app";
 
   return (
     <Box
@@ -54,7 +56,7 @@ export default function CustomNode({ id, data,canvasLayout}) {
             bg="var(--zaplane-border-color)"
             color="var(--zaplane-font-color)"
             p="6px"
-            marginTop= "4px"
+            marginTop="4px"
             marginLeft={isLR ? "0" : "100px"}
             borderRadius="full"
             boxShadow="lg"
@@ -78,8 +80,8 @@ export default function CustomNode({ id, data,canvasLayout}) {
 
       <Box
         bg="var(--zaplane-body-background)"
-        border="1px solid"
-        borderColor="var(--zaplane-border-color)"
+        // border="1px solid"
+        // borderColor="var(--zaplane-border-color)"
         borderRadius="md"
         px={4}
         py={2}
@@ -91,7 +93,7 @@ export default function CustomNode({ id, data,canvasLayout}) {
         {data?.action !== "trigger" && (
           <Handle
             type="target"
-            position={canvasLayout === "LR"? Position.Left : Position.Top}
+            position={canvasLayout === "LR" ? Position.Left : Position.Top}
             style={{
               width: 10,
               height: 10,
@@ -101,14 +103,31 @@ export default function CustomNode({ id, data,canvasLayout}) {
             }}
           />
         )}
-
-        <Text className="zaplane-label" fontSize="sm" fontWeight="medium">
-          {__(data.app, "zaplane")}
+        <Text
+          className={isSelectApp ? "zaplane-label" : "zaplane-title"}
+          fontSize="sm"
+          fontWeight={isSelectApp ? "medium" : "semibold"}
+          lineHeight={isSelectApp ? "2.2" : "1.2"}
+        >
+          {isSelectApp
+            ? __(data.app, "zaplane")
+            : sprintf(__('%s', 'zaplane'), formatLabel(data.event))
+          }
         </Text>
+
+        {!isSelectApp && (
+          <Text
+            className="zaplane-sub-title"
+            fontSize="xs"
+            lineHeight="1.2"
+          >
+            {sprintf(__('%s', 'zaplane'), data.app)}
+          </Text>
+        )}
         {!data.conditions && (
           <Handle
             type="source"
-            position={canvasLayout === "LR"? Position.Right : Position.Bottom}
+            position={canvasLayout === "LR" ? Position.Right : Position.Bottom}
             style={{
               width: 10,
               height: 10,
