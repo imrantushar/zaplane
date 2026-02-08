@@ -154,9 +154,11 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
             <TopBar
                 leftContent={() => (
                     <>
-                        <Button variant="outline" onClick={() => navigate(-1)}>
-                            <FiArrowLeft />
-                        </Button>
+                        {
+                            !isFullscreen && <Button variant="outline" onClick={() => navigate(-1)}>
+                                <FiArrowLeft />
+                            </Button>
+                        }
                         <Text fontSize="md" fontWeight="medium">
                             {singleData?.workflow?.title || __("Untitled Workflow", "zaplane")}
                         </Text>
