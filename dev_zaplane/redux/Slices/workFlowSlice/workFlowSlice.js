@@ -287,7 +287,21 @@ export const versionActive = createAsyncThunk(
 	}
 );
 
+export const conditionVariables = createAsyncThunk(
+	'zaplane/conditionVariables',
+	async (payload, thunkAPI) => {
+		try {
+			const res = await API.post(
+				namespace + 'condition-variables',
+				payload
+			);
+			return res.data;
 
+		} catch (e) {
+			return handleSliceError(thunkAPI, e);
+		}
+	}
+);
 const workflowsSlice = createSlice({
 	name: 'workflows',
 	initialState: {

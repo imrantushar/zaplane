@@ -10,6 +10,8 @@ const ActionFieldRenderer = ({
   dynamicOptions,
   loadingFields,
   fetchDynamicOptions,
+  nodeId,
+  singleData
 }) => {
   const handleChange = (val) => setFieldValue(field.key, val);
   const commonProps = {
@@ -52,7 +54,7 @@ const ActionFieldRenderer = ({
     }
 
     case "condition_group":
-      return <ConditionGroupField value={value} field={field} />;
+      return <ConditionGroupField value={value} field={field} nodeId={nodeId} singleData={singleData}/>;
 
     default:
       return null;

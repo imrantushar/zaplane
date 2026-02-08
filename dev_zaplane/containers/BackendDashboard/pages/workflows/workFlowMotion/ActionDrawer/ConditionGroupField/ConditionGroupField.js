@@ -7,16 +7,27 @@ import { __ } from "@wordpress/i18n";
 import { buildEmptyRule } from "./helper";
 import WPPopover from "@ZAPComponents/Popaver/WPPopover";
 import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { conditionVariables } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
 const items = [
     { value: "a", title: "First Item", text: "Some value 1..." },
     { value: "b", title: "Second Item", text: "Some value 2..." },
     { value: "c", title: "Third Item", text: "Some value 3..." },
 ]
-export default function ConditionGroupField({ value, onChange, field }) {
+export default function ConditionGroupField({ value, onChange, field, nodeId ,singleData}) {
+    console.log(nodeId, 'values');
     const ruleFields = field?.fields;
     const EMPTY_RULE = buildEmptyRule(ruleFields);
     const [isPopoverOpen, setPopoverOpen] = useState(false);
-    console.log(isPopoverOpen);
+    const dispatch = useDispatch()
+    dispatch(
+        conditionVariables({
+            nodeKey: nodeId,
+            workflow_hash: singleData?.version?.hash,
+        })
+    );
+
+
 
     return (
         <FieldArray name={field.key}>
@@ -140,8 +151,8 @@ export default function ConditionGroupField({ value, onChange, field }) {
                                         value={item.value}
                                         border="1px solid var(--zaplane-border-color)"
                                         borderBottom={index === items.length - 1 ? "1px solid" : "0"}
-                                        borderBottomRadius={index === items.length - 1 ? "md" : "0"} 
-                                        borderTopRadius={index === 0 ? "md" : "0"} 
+                                        borderBottomRadius={index === items.length - 1 ? "md" : "0"}
+                                        borderTopRadius={index === 0 ? "md" : "0"}
                                         overflow="hidden"
                                     >
                                         <Accordion.ItemTrigger
