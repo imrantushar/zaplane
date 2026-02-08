@@ -9,6 +9,7 @@ use Zaplane\Framework\Classes\Container;
 use Zaplane\Models\Workflow;
 use Zaplane\Models\WorkflowVersion;
 use Zaplane\Models\Run;
+use Zaplane\Utils\VariableExtractor;
 
 if (!defined('ABSPATH')) exit;
 
@@ -177,6 +178,27 @@ class WorkflowsController extends WP_REST_Controller
         $version = $workflow->activeVersion();
         $graph = $version ? $version->getGraph() : ['nodes' => [], 'edges' => []];
 
+        // Get test outputs for each node
+        $testOutputs = [];
+        if ($version) {
+            $nodeRuns = Run::latestTestNodeRuns($version->graph_hash);
+
+            foreach ($nodeRuns as $nodeKey => $nodeRun) {
+                $output = $nodeRun->getOutput();
+
+                // For action nodes, the output is in 'data' key
+                $outputData = $output['data'] ?? $output;
+
+                $testOutputs[$nodeKey] = [
+                    'node_run_id' => $nodeRun->id,
+                    'run_id' => $nodeRun->run_id,
+                    'output' => $outputData,
+                    'variables' => VariableExtractor::extract($outputData),
+                    'tested_at' => $nodeRun->finished_at,
+                ];
+            }
+        }
+
         return rest_ensure_response([
             'workflow' => [
                 'id' => $workflow->id,
@@ -191,6 +213,7 @@ class WorkflowsController extends WP_REST_Controller
                 'created_at' => $version->created_at,
             ] : null,
             'graph' => $graph,
+            'test_outputs' => $testOutputs,
         ]);
     }
 
