@@ -23,6 +23,7 @@ class CreateRunsTable extends Migration
             $table->datetime('started_at')->nullable()->useCurrent();
             $table->datetime('finished_at')->nullable();
             $table->text('last_error')->nullable();
+            $table->boolean('is_test')->default(false);
 
             $table->index('workflow_version_hash');
             $table->index('status');

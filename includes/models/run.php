@@ -16,6 +16,7 @@ class Run extends Model
         'target_node_key',
         'start_node_key',
         'status',
+        'is_test',
         'trigger_data',
         'attempts',
         'started_at',
@@ -28,6 +29,7 @@ class Run extends Model
         'start_node_key' => 'integer',
         'target_node_key' => 'integer',
         'attempts' => 'integer',
+        'is_test' => 'boolean',
         'trigger_data' => 'json',
     ];
 
@@ -101,5 +103,31 @@ class Run extends Model
     public static function recent(int $limit = 100): Collection
     {
         return static::orderBy('id', 'desc')->limit($limit)->get();
+    }
+
+    /**
+     * Get the latest test runs for a workflow version, grouped by node_key
+     */
+    public static function latestTestNodeRuns(string $hash): array
+    {
+        $testRuns = static::where('workflow_version_hash', $hash)
+            ->where('is_test', 1)
+            ->orderBy('id', 'desc')
+            ->get();
+
+        $nodeOutputs = [];
+
+        foreach ($testRuns as $run) {
+            $nodeRuns = $run->nodeRuns();
+            foreach ($nodeRuns as $nodeRun) {
+                $key = (string) $nodeRun->node_key;
+                // Only keep the most recent test output per node
+                if (!isset($nodeOutputs[$key]) && $nodeRun->isCompleted()) {
+                    $nodeOutputs[$key] = $nodeRun;
+                }
+            }
+        }
+
+        return $nodeOutputs;
     }
 }

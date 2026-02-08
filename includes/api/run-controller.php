@@ -299,6 +299,7 @@ class RunController extends WP_REST_Controller
         $run = Run::create([
             'workflow_version_hash' => $workflowHash,
             'status' => 'running',
+            'is_test' => true,
             'trigger_data' => $input,
             'start_node_key' => $targetKey,
             'target_node_key' => $targetKey,
