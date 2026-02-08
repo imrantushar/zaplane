@@ -21,6 +21,8 @@ const TestDetails = ({ id, singleData }) => {
     }, [id, dispatch]);
 
     if (isLoading) return <ZAPLoading />
+    if (Object.keys(outputData).length === 0) return;
+
 
     return (
 
