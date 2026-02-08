@@ -187,7 +187,7 @@ export const workflowNodeListiner = createAsyncThunk(
 			const res = await API.get(
 				namespace + `node-listener/${id}`
 			);
-			handleSliceSuccess(thunkAPI, __('Work Flow run successfully', 'workflow'));
+			handleSliceSuccess(thunkAPI,res?.data?.message);
 			return res.data;
 		} catch (e) {
 			return handleSliceError(thunkAPI, e);
