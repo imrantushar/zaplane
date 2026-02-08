@@ -128,7 +128,9 @@ export default function ActionDrawer({ open, context, onClose, updateNodeData, c
       footer={
         <HStack justify="space-between">
           <Button variant="ghost" onClick={resetAll}>{__("Cancel", "zaplane")}</Button>
-          <Button {...primaryBtn} onClick={handleContinue}>{step === 'test' ? __('Submit', 'zaplane') : __('Continue', 'zaplane')}
+          <Button {...primaryBtn}
+          disabled={!values.actionType}
+           onClick={handleContinue}>{step === 'test' ? __('Submit', 'zaplane') : __('Continue', 'zaplane')}
           </Button>
         </HStack>
       }
@@ -255,9 +257,9 @@ export default function ActionDrawer({ open, context, onClose, updateNodeData, c
                       input: values,
                     }))
                   }>
-                    {__("Run test", "zaplane")}
+                    {__("Test Action", "zaplane")}
                   </Button>
-                  <TestDetails id={node?.id}/>
+                  <TestDetails id={node?.id} singleData={singleData}/>
                 </>
               )
             }

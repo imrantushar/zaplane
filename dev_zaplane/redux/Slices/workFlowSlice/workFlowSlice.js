@@ -187,6 +187,7 @@ export const workflowNodeListiner = createAsyncThunk(
 			const res = await API.get(
 				namespace + `node-listener/${id}`
 			);
+			handleSliceSuccess(thunkAPI, __('Work Flow run successfully', 'workflow'));
 			return res.data;
 		} catch (e) {
 			return handleSliceError(thunkAPI, e);
@@ -297,6 +298,8 @@ const workflowsSlice = createSlice({
 		nodeDetails: [],
 		isLoading: true,
 		singleNodeExecution: null,
+		apiCountdown: 0,     
+		apiRequestRunning: false, 
 
 
 	},
@@ -304,7 +307,17 @@ const workflowsSlice = createSlice({
 		resetSingleNodeExecution(state) {
 			state.singleNodeExecution = null;
 			state.isLoading = false;
-		}
+		},
+		startApiCountdown(state, action) {
+			state.apiCountdown = action.payload; 
+			state.apiRequestRunning = true;
+		},
+
+		decrementApiCountdown(state) {
+			if (state.apiCountdown > 1 && state.apiRequestRunning) {
+				state.apiCountdown -= 1;
+			}
+		},
 	},
 	extraReducers: (builder) => {
 		builder
@@ -377,6 +390,27 @@ const workflowsSlice = createSlice({
 			})
 
 
+			.addCase(workflowNodeListiner.fulfilled, (state) => {
+				state.isLoading = false;
+				state.apiRequestRunning = false;
+				state.apiCountdown = 0;
+			})
+			.addCase(workflowNodeListiner.rejected, (state) => {
+				state.isLoading = false;
+				state.apiRequestRunning = false;
+				state.apiCountdown = 0;
+			})
+			.addCase(workflowNodeListinerStop.fulfilled, (state) => {
+				state.isLoading = false;
+				state.apiRequestRunning = false;
+				state.apiCountdown = 0;
+			})
+
+
+
+
+
+
 
 
 
@@ -405,5 +439,10 @@ export async function fetchDynamic({
 }
 
 
-export const { resetSingleNodeExecution } = workflowsSlice.actions;
+export const {
+	resetSingleNodeExecution,
+	startApiCountdown,
+	decrementApiCountdown,
+} = workflowsSlice.actions;
+
 export default workflowsSlice.reducer;
