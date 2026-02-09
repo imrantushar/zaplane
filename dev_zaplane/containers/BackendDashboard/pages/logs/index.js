@@ -141,6 +141,7 @@ const Logs = () => {
             </div>
             <ZAPDrawer
                 open={drawerOpen}
+                arrowClose={true}
                 onClose={() => {
                     setDrawerOpen(false);
                     setActiveRunId(null);

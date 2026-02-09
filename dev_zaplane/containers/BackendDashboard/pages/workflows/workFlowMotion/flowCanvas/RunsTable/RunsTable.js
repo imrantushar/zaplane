@@ -98,6 +98,7 @@ const RunsTable = ({ runs = [] }) => {
       />
       <ZAPDrawer
         open={drawerOpen}
+        arrowClose={true}
         onClose={() => {
           setDrawerOpen(false);
           setActiveRunId(null);
