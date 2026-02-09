@@ -234,11 +234,15 @@ const Connections = () => {
                                 {__('Details', 'zaplane')}
                             </Button>
                             <Button
-                                {...removeBtn}
+                                // {...removeBtn}
                                 leftIcon={<FiTrash2 />}
-                                onClick={() =>
-                                    dispatch(deleteConnection(row.id))
-                                }
+                                onClick={() => {
+                                    const confirmed = window.confirm("Are you sure you want to delete this connection?");
+                                    if (confirmed) {
+                                        dispatch(deleteConnection(row.id));
+                                    }
+                                }}
+
                             >
                                 {__('Delete', 'zaplane')}
                             </Button>
@@ -269,7 +273,7 @@ const Connections = () => {
                                 setCredentials({});
                             }}
                             options={[{ value: "slack", label: "Slack" }]}
-                            
+
                         />
                         {Object.keys(authTypes).map((key) => (
                             <Button
