@@ -5330,7 +5330,6 @@ function Workflows({
   const {
     workFlow
   } = (0,react_redux__WEBPACK_IMPORTED_MODULE_5__.useSelector)(state => state.workflows);
-  console.log(workFlow, 'fk');
   const [nodes, setNodes, onNodesChange] = (0,_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.useNodesState)([{
     id: getNewNodeId(),
     type: 'custom',

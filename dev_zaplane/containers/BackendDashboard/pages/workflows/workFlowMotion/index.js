@@ -12,7 +12,6 @@ export default function Workflows({ id }) {
   const nodeIdRef = useRef(createNodeIdGenerator());
   const getNewNodeId = nodeIdRef.current;
    const { workFlow} = useSelector((state) => state.workflows);
-   console.log(workFlow,'fk');
   const [nodes, setNodes, onNodesChange] = useNodesState([
     {
       id: getNewNodeId(),
