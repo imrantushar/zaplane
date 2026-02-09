@@ -3906,7 +3906,7 @@ function ConditionGroupField({
             children: items.map((item, index) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.AccordionItem, {
               value: item.value,
               border: "1px solid var(--zaplane-border-color)",
-              borderBottom: index === items.length - 1 ? "1px solid" : "0",
+              borderBottom: index === items.length - 1 ? "1px solid var(--zaplane-border-color)" : "0",
               borderBottomRadius: index === items.length - 1 ? "md" : "0",
               borderTopRadius: index === 0 ? "md" : "0",
               overflow: "hidden",
