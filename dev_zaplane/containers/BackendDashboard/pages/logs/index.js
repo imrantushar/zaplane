@@ -12,7 +12,7 @@ import {
     getRunsList,
     retryNodeRun,
 } from "@ZAPRedux/Slices/logsSlice/logsSlice";
-import { nodeLogsRunDetails } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
+
 import LogDetails from "@ZAPComponents/LogDetails";
 import ZAPLoading from "@ZAPComponents/Loading";
 import ZAPTable from "@ZAPComponents/Table";
@@ -20,6 +20,7 @@ import { __, sprintf } from "@wordpress/i18n";
 import { getDuration } from "@ZAPUtils/helper";
 import TopBar from "@ZAPComponents/TopBar";
 import ZAPDrawer from "@ZAPComponents/Drawer";
+import { nodeLogsRunDetails } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlowLogs";
 
 const Logs = () => {
     const dispatch = useDispatch();

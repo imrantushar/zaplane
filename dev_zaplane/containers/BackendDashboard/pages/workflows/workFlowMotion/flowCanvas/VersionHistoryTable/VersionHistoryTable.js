@@ -10,7 +10,7 @@ import {
 import { __ } from "@wordpress/i18n";
 import ZAPLoading from "@ZAPComponents/Loading";
 import ZAPTable from "@ZAPComponents/Table";
-import { getPreviewOldVersion, versionActive } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
+import { getPreviewOldVersion, versionActive } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlowVersion";
 import { CheckCircle, Eye } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 

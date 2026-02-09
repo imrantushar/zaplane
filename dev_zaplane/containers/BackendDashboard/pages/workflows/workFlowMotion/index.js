@@ -4,9 +4,9 @@ import FlowCanvas from "./flowCanvas/FlowCanvas";
 import {Formik } from "formik";
 import { mapEdgesForBackend, mapNodesForBackend } from "./helper";
 import { useDispatch, useSelector } from "react-redux";
-import { updateWorkFlow, updateWorkFlowStatus } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
 import { createNodeIdGenerator } from "./flowCanvas/helper";
 import { Box, Flex } from "@chakra-ui/react";
+import { updateWorkFlow, updateWorkFlowStatus } from "@ZAPRedux/Slices/workFlowSlice/actions/workflow";
 
 export default function Workflows({ id }) {
   const nodeIdRef = useRef(createNodeIdGenerator());
