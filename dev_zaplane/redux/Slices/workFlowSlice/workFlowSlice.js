@@ -289,13 +289,10 @@ export const versionActive = createAsyncThunk(
 
 export const conditionVariables = createAsyncThunk(
 	'zaplane/conditionVariables',
-	async (payload, thunkAPI) => {
+	async ({workflowHash,targetNodeKey}, thunkAPI) => {
 		try {
-			const res = await API.post(
-				namespace + 'condition-variables',
-				payload
-			);
-			return res.data;
+			const res = await API.get(namespace + `workflows?workflow_hash=${workflowHash}&target_node_key=${targetNodeKey}`);
+			return res.data
 
 		} catch (e) {
 			return handleSliceError(thunkAPI, e);

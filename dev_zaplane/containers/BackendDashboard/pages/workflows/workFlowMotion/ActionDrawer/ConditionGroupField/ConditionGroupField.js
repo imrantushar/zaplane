@@ -22,8 +22,8 @@ export default function ConditionGroupField({ value, onChange, field, nodeId ,si
     const dispatch = useDispatch()
     dispatch(
         conditionVariables({
-            nodeKey: nodeId,
-            workflow_hash: singleData?.version?.hash,
+            targetNodeKey: nodeId,
+            workflowHash: singleData?.version?.hash,
         })
     );
 
