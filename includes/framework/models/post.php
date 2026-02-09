@@ -1,13 +1,14 @@
 <?php
 
-namespace Zaplane\Framework\Models\WordPress;
+namespace Zaplane\Framework\Models;
 
 if (!defined('ABSPATH')) exit;
 
-class Post extends WPModel
+class Post extends WpModel
 {
     protected static string $table = 'posts';
     protected static string $primaryKey = 'ID';
+    protected static bool $timestamps = false;
 
     protected static array $fillable = [
         'post_author',

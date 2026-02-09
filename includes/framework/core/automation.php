@@ -6,6 +6,7 @@ use Zaplane\Framework\Classes\Container;
 use Zaplane\Framework\Classes\Query;
 use Zaplane\Framework\Exceptions\WorkflowException;
 use Zaplane\Framework\Exceptions\IntegrationException;
+use Zaplane\Framework\Models\Option;
 use Zaplane\Models\Run;
 use Zaplane\Models\NodeRun;
 use Zaplane\Models\WorkflowVersion;
@@ -40,6 +41,7 @@ class Automation
         }
 
         add_action('init', [$this, 'dispatch_active_triggers']);
+        add_action('init', [$this, 'dispatch_active_listeners']);
         add_action('zaplane_execute_node_run', [$this, 'dispatch_node_run'], 10, 1);
         add_action('zaplane_workflow_updated', [$this, 'reload_triggers']);
     }
@@ -47,10 +49,13 @@ class Automation
     public function reload_triggers()
     {
         foreach ($this->registered_hooks as $event => $cb) {
-            remove_action($event, $cb, 10);
+            if (is_array($cb)) {
+                remove_action($event, $cb, 10);
+            }
         }
         $this->registered_hooks = [];
         $this->dispatch_active_triggers();
+        $this->dispatch_active_listeners();
     }
 
     public function dispatch_active_triggers(): void
@@ -61,6 +66,80 @@ class Automation
                 add_action($event, $cb, 10, 99);
                 $this->registered_hooks[$event] = $cb;
             }
+        }
+    }
+
+    public function dispatch_active_listeners(): void
+    {
+        $listeners = Option::where('option_name', 'LIKE', 'zaplane_listener_state_%')->get();
+
+        foreach ($listeners as $listener) {
+            $state = $listener->getValue();
+
+            if (!$state || !is_array($state) || ($state['status'] ?? '') !== 'listening') {
+                continue;
+            }
+
+            $hook = $state['hook'] ?? '';
+            if (!$hook) {
+                continue;
+            }
+
+            // Register hook if not already registered
+            if (!isset($this->registered_hooks['listener_' . $hook])) {
+                add_action($hook, [$this, 'listener_hook_handler'], 1, 99);
+                $this->registered_hooks['listener_' . $hook] = true;
+            }
+        }
+    }
+
+    public function listener_hook_handler()
+    {
+        $currentHook = current_filter();
+        $args = func_get_args();
+
+        $listeners = Option::where('option_name', 'LIKE', 'zaplane_listener_state_%')->get();
+
+        foreach ($listeners as $listener) {
+            $state = $listener->getValue();
+
+            if (!$state || !is_array($state) || ($state['status'] ?? '') !== 'listening') {
+                continue;
+            }
+
+            if (($state['hook'] ?? '') !== $currentHook) {
+                continue;
+            }
+
+            $workflowId = $state['workflow_id'] ?? 0;
+            $hookInfoOption = 'zaplane_listener_hook_' . $workflowId;
+            $hookInfo = Option::get($hookInfoOption);
+
+            if (!$hookInfo || !is_array($hookInfo)) {
+                continue;
+            }
+
+            $node = $hookInfo['node'];
+
+            // Resolve trigger data using the integration
+            $integration = $this->container->get('integrations')->get(strtolower($node['data']['app']));
+            if (!$integration) {
+                continue;
+            }
+
+            $payload = $integration::resolve_trigger($node['data'], $args);
+            if (!$payload) {
+                continue;
+            }
+
+            // Update state with captured data
+            $state['status'] = 'triggered';
+            $state['data'] = $payload;
+            $state['triggered_at'] = current_time('mysql');
+
+            Option::set($listener->option_name, $state, 'no');
+
+            // Handle this listener, continue to check others
         }
     }
 
@@ -106,11 +185,16 @@ class Automation
             'started_at' => current_time('mysql'),
         ]);
 
-        as_enqueue_async_action(
-            'zaplane_execute_node_run',
-            ['node_run_id' => $nodeRun->id],
-            'zaplane'
-        );
+        if (function_exists('as_enqueue_async_action')) {
+            as_enqueue_async_action(
+                'zaplane_execute_node_run',
+                ['node_run_id' => $nodeRun->id],
+                'zaplane'
+            );
+        } else {
+            wp_schedule_single_event(time(), 'zaplane_execute_node_run', ['node_run_id' => $nodeRun->id]);
+            spawn_cron();
+        }
     }
 
     public function dispatch_node_run(int $node_run_id)

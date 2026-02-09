@@ -25,6 +25,8 @@ class Run extends Model
 
     protected static array $casts = [
         'id' => 'integer',
+        'start_node_key' => 'integer',
+        'target_node_key' => 'integer',
         'attempts' => 'integer',
         'trigger_data' => 'json',
     ];
