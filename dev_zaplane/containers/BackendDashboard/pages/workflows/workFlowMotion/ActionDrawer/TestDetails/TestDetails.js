@@ -7,13 +7,13 @@ import React, { useEffect } from 'react';
 import ReactJson from 'react-json-view';
 import { useDispatch, useSelector } from 'react-redux';
 
-const TestDetails = ({ id, singleData }) => {
+const TestDetails = ({ id, workFlow }) => {
     const dispatch = useDispatch()
     const { singleNodeExecution, isLoading } = useSelector(
         (state) => state.workflows
     );
     const { values } = useFormikContext();
-    const selectedOutput = singleData?.test_outputs?.[id]?.output || {};
+    const selectedOutput = workFlow?.test_outputs?.[id]?.output || {};
     const inputData = singleNodeExecution?.input || values;
     const outputData = singleNodeExecution?.output?.data || selectedOutput;
     useEffect(() => {

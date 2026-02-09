@@ -6,13 +6,13 @@ import { mapEdgesForBackend, mapNodesForBackend } from "./helper";
 import { useDispatch, useSelector } from "react-redux";
 import { createNodeIdGenerator } from "./flowCanvas/helper";
 import { Box, Flex } from "@chakra-ui/react";
-import { updateWorkFlow, updateWorkFlowStatus } from "@ZAPRedux/Slices/workFlowSlice/actions/workflow";
+import { updateWorkFlow, updateWorkFlowStatus } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow";
 
 export default function Workflows({ id }) {
   const nodeIdRef = useRef(createNodeIdGenerator());
   const getNewNodeId = nodeIdRef.current;
-   const { data} = useSelector((state) => state.workflows);
-    const singleData = data[0]
+   const { workFlow} = useSelector((state) => state.workflows);
+   console.log(workFlow,'fk');
   const [nodes, setNodes, onNodesChange] = useNodesState([
     {
       id: getNewNodeId(),
@@ -27,7 +27,7 @@ export default function Workflows({ id }) {
   ]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const dispatch = useDispatch();
-  const onSubmitHandler = async (values, actions) => {
+  const onSubmitHandler = async (values) => {
     const payload = {
       nodes: mapNodesForBackend(nodes)
       , edges: mapEdgesForBackend(edges),
@@ -36,7 +36,7 @@ export default function Workflows({ id }) {
       status: values?.status,
       id: id,
     }
-    if (values.status && values.status !== singleData?.workflow.status) {
+    if (values.status && values.status !== workFlow?.workflow.status) {
       await dispatch(updateWorkFlowStatus(statusPaylod));
     }
     await dispatch(
@@ -56,7 +56,7 @@ export default function Workflows({ id }) {
             <Box flex="1" >
               <FlowCanvas setNodes={setNodes} setEdges={setEdges} onEdgesChange={onEdgesChange}
                 onNodesChange={onNodesChange} nodes={nodes} edges={edges} getNewNodeId={getNewNodeId} 
-                singleData={singleData} id={id} />
+                workFlow={workFlow} id={id} />
             </Box>
           )}
 

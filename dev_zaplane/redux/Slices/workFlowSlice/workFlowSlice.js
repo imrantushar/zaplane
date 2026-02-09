@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-import { createWorkflows, deleteWorkFlow, getSingleWorkFlow, getWorkFlow, updateWorkFlow, updateWorkFlowStatus } from './actions/workflow';
+import { createWorkflows, deleteWorkFlow, getSingleWorkFlow, getWorkFlow, updateWorkFlow, updateWorkFlowStatus } from './actions/workFlow';
 import { getRunWorkFlow,getSingleRun } from './actions/workFlowRuns';
 import { getAllVersion, getPreviewOldVersion, versionActive } from './actions/workFlowVersion';
 import { nodeLogsRunDetails ,getNodeLogDetails} from './actions/workFlowLogs';
@@ -11,7 +11,8 @@ import { workflowNodeListiner, workflowNodeListinerStop } from './actions/workFl
 const workflowsSlice = createSlice({
 	name: 'workflows',
 	initialState: {
-		data: [],
+		allWorkFlows: [],
+		workFlow:{},
 		runs: [],
 		versions: [],
 		nodeDetails: [],
@@ -41,34 +42,33 @@ const workflowsSlice = createSlice({
 	extraReducers: (builder) => {
 		builder
 			.addCase(createWorkflows.fulfilled, (state, action) => {
-				state.data = action.payload;
+				state.allWorkFlows = action.payload;
 			})
 			.addCase(getWorkFlow.fulfilled, (state, action) => {
-				state.data = [...action.payload].reverse();
+				state.allWorkFlows = [...action.payload].reverse();
 				state.isLoading = false
 			})
 
 			.addCase(getSingleWorkFlow.fulfilled, (state, action) => {
 				if (!action.payload) return;
-				state.data = [action.payload];
+				state.workFlow = action.payload;
 			})
 			.addCase(updateWorkFlow.fulfilled, (state, action) => {
-				state.data = state.data.map((item) => {
-					if (parseInt(item.id) === parseInt(action.payload.id)) {
-						return { ...item, ...action.payload };
-					}
-					return item;
-				});
+				state.allWorkFlows = action.payload
 			})
 			.addCase(deleteWorkFlow.fulfilled, (state, action) => {
-				state.data = state.data.filter(
+				state.allWorkFlows = state.data.filter(
 					(item) => parseInt(item.id) !== parseInt(action.payload)
 				);
 			})
 			.addCase(updateWorkFlowStatus.fulfilled, (state, action) => {
-				state.data = state.data.map((item) =>
-					parseInt(item.id) === parseInt(action.payload?.id)
-						? { ...item, status: action.payload.status }
+				const { id, status } = action.payload || {};
+				if (state.workFlow?.workflow?.id === id) {
+					state.workFlow.workflow.status = status;
+				}
+				state.allWorkFlows = state.allWorkFlows.map((item) =>
+					parseInt(item.id) === parseInt(id)
+						? { ...item, status: status }
 						: item
 				);
 			})
@@ -77,9 +77,9 @@ const workflowsSlice = createSlice({
 				state.isLoading = false
 			})
 			.addCase(getPreviewOldVersion.fulfilled, (state, action) => {
-				if (!state.data.length) return;
-				state.data[0] = {
-					...state.data[0],
+				if (!state.allWorkFlows.length) return;
+				state.allWorkFlows[0] = {
+					...state.allWorkFlows[0],
 					graph: action.payload.graph,
 					is_preview: true,
 					preview_version_id: action.payload.version?.id,

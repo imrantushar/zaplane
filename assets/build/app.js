@@ -3131,7 +3131,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react_icons_fi__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! react-icons/fi */ "./node_modules/react-icons/fi/index.mjs");
 /* harmony import */ var _assets_scss_chakra_recipe__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ../../../../../assets/scss/chakra/recipe */ "./assets/scss/chakra/recipe.js");
 /* harmony import */ var _helper__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! ./helper */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/helper.js");
-/* harmony import */ var _ZAPRedux_Slices_workFlowSlice_actions_workflow__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! @ZAPRedux/Slices/workFlowSlice/actions/workflow */ "./dev_zaplane/redux/Slices/workFlowSlice/actions/workflow.js");
+/* harmony import */ var _ZAPRedux_Slices_workFlowSlice_actions_workFlow__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! @ZAPRedux/Slices/workFlowSlice/actions/workFlow */ "./dev_zaplane/redux/Slices/workFlowSlice/actions/workFlow.js");
 /* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
 /* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__);
 
@@ -3158,15 +3158,15 @@ const CreateWorkflows = () => {
   const navigate = (0,react_router_dom__WEBPACK_IMPORTED_MODULE_8__.useNavigate)();
   const dispatch = (0,react_redux__WEBPACK_IMPORTED_MODULE_10__.useDispatch)();
   const {
-    data,
+    allWorkFlows,
     isLoading
   } = (0,react_redux__WEBPACK_IMPORTED_MODULE_10__.useSelector)(state => state.workflows);
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
-    dispatch((0,_ZAPRedux_Slices_workFlowSlice_actions_workflow__WEBPACK_IMPORTED_MODULE_21__.getWorkFlow)());
+    dispatch((0,_ZAPRedux_Slices_workFlowSlice_actions_workFlow__WEBPACK_IMPORTED_MODULE_21__.getWorkFlow)());
   }, [dispatch]);
   const handleCreate = async () => {
     if (!workflowName.trim()) return;
-    const res = await dispatch((0,_ZAPRedux_Slices_workFlowSlice_actions_workflow__WEBPACK_IMPORTED_MODULE_21__.createWorkflows)({
+    const res = await dispatch((0,_ZAPRedux_Slices_workFlowSlice_actions_workFlow__WEBPACK_IMPORTED_MODULE_21__.createWorkflows)({
       title: workflowName
     }));
     if (res?.payload.id) {
@@ -3177,7 +3177,7 @@ const CreateWorkflows = () => {
   };
   const workflowDeleteHandler = id => {
     if (window.confirm((0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Are you sure you want to permanently delete ?', 'zaplane'))) {
-      dispatch((0,_ZAPRedux_Slices_workFlowSlice_actions_workflow__WEBPACK_IMPORTED_MODULE_21__.deleteWorkFlow)(id));
+      dispatch((0,_ZAPRedux_Slices_workFlowSlice_actions_workFlow__WEBPACK_IMPORTED_MODULE_21__.deleteWorkFlow)(id));
     }
   };
   const onSubmitHandler = async (item, status) => {
@@ -3187,7 +3187,7 @@ const CreateWorkflows = () => {
       id: item.id
     };
     try {
-      await dispatch((0,_ZAPRedux_Slices_workFlowSlice_actions_workflow__WEBPACK_IMPORTED_MODULE_21__.updateWorkFlowStatus)(payload));
+      await dispatch((0,_ZAPRedux_Slices_workFlowSlice_actions_workFlow__WEBPACK_IMPORTED_MODULE_21__.updateWorkFlowStatus)(payload));
     } catch (error) {
       console.log(error);
     }
@@ -3215,7 +3215,7 @@ const CreateWorkflows = () => {
     }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)("div", {
       className: "zaplane-page-content",
       children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(_ZAPComponents_Table__WEBPACK_IMPORTED_MODULE_14__["default"], {
-        data: data,
+        data: allWorkFlows,
         rowKey: "id",
         size: "sm",
         variant: "outline",
@@ -3389,7 +3389,7 @@ function ActionDrawer({
   onClose,
   updateNodeData,
   createActionNode,
-  singleData
+  workFlow
 }) {
   const {
     source,
@@ -3640,14 +3640,14 @@ function ActionDrawer({
           children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Button, {
             mb: 4,
             onClick: () => dispatch((0,_ZAPRedux_Slices_workFlowSlice_actions_workflowExctions__WEBPACK_IMPORTED_MODULE_21__.workFLowSingeNodeExction)({
-              workflow_hash: singleData?.version?.hash,
+              workflow_hash: workFlow?.version?.hash,
               node_key: node?.id,
               input: values
             })),
             children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_14__.__)("Test Action", "zaplane")
           }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_TestDetails_TestDetails__WEBPACK_IMPORTED_MODULE_19__["default"], {
             id: node?.id,
-            singleData: singleData
+            workFlow: workFlow
           })]
         })
       }]
@@ -4006,7 +4006,7 @@ __webpack_require__.r(__webpack_exports__);
 
 const TestDetails = ({
   id,
-  singleData
+  workFlow
 }) => {
   const dispatch = (0,react_redux__WEBPACK_IMPORTED_MODULE_9__.useDispatch)();
   const {
@@ -4016,7 +4016,7 @@ const TestDetails = ({
   const {
     values
   } = (0,formik__WEBPACK_IMPORTED_MODULE_6__.useFormikContext)();
-  const selectedOutput = singleData?.test_outputs?.[id]?.output || {};
+  const selectedOutput = workFlow?.test_outputs?.[id]?.output || {};
   const inputData = singleNodeExecution?.input || values;
   const outputData = singleNodeExecution?.output?.data || selectedOutput;
   (0,react__WEBPACK_IMPORTED_MODULE_7__.useEffect)(() => {
@@ -4533,7 +4533,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react_icons_io5__WEBPACK_IMPORTED_MODULE_29__ = __webpack_require__(/*! react-icons/io5 */ "./node_modules/react-icons/io5/index.mjs");
 /* harmony import */ var _ZAPComponents_ZAPTooltip__WEBPACK_IMPORTED_MODULE_30__ = __webpack_require__(/*! @ZAPComponents/ZAPTooltip */ "./dev_zaplane/components/ZAPTooltip/index.js");
 /* harmony import */ var _ZAPHooks_useApiCountdown_useApiCountdown__WEBPACK_IMPORTED_MODULE_31__ = __webpack_require__(/*! @ZAPHooks/useApiCountdown/useApiCountdown */ "./dev_zaplane/hooks/useApiCountdown/useApiCountdown.js");
-/* harmony import */ var _ZAPRedux_Slices_workFlowSlice_actions_workflow__WEBPACK_IMPORTED_MODULE_32__ = __webpack_require__(/*! @ZAPRedux/Slices/workFlowSlice/actions/workflow */ "./dev_zaplane/redux/Slices/workFlowSlice/actions/workflow.js");
+/* harmony import */ var _ZAPRedux_Slices_workFlowSlice_actions_workFlow__WEBPACK_IMPORTED_MODULE_32__ = __webpack_require__(/*! @ZAPRedux/Slices/workFlowSlice/actions/workFlow */ "./dev_zaplane/redux/Slices/workFlowSlice/actions/workFlow.js");
 /* harmony import */ var _ZAPRedux_Slices_workFlowSlice_actions_workflowExctions__WEBPACK_IMPORTED_MODULE_33__ = __webpack_require__(/*! @ZAPRedux/Slices/workFlowSlice/actions/workflowExctions */ "./dev_zaplane/redux/Slices/workFlowSlice/actions/workflowExctions.js");
 /* harmony import */ var _ZAPRedux_Slices_workFlowSlice_actions_workFlowListiner__WEBPACK_IMPORTED_MODULE_34__ = __webpack_require__(/*! @ZAPRedux/Slices/workFlowSlice/actions/workFlowListiner */ "./dev_zaplane/redux/Slices/workFlowSlice/actions/workFlowListiner.js");
 /* harmony import */ var _ZAPRedux_Slices_workFlowSlice_actions_workFlowVersion__WEBPACK_IMPORTED_MODULE_35__ = __webpack_require__(/*! @ZAPRedux/Slices/workFlowSlice/actions/workFlowVersion */ "./dev_zaplane/redux/Slices/workFlowSlice/actions/workFlowVersion.js");
@@ -4585,7 +4585,7 @@ function FlowCanvas({
   onEdgesChange,
   onNodesChange,
   getNewNodeId,
-  singleData
+  workFlow
 }) {
   const dispatch = (0,react_redux__WEBPACK_IMPORTED_MODULE_15__.useDispatch)();
   const navigate = (0,react_router_dom__WEBPACK_IMPORTED_MODULE_14__.useNavigate)();
@@ -4608,15 +4608,15 @@ function FlowCanvas({
   //if we menage layout syestem then we need to save databse this value
   const [canvasLayout, setCanvasLayout] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)("LR");
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
-    if (!singleData?.graph) return;
+    if (!workFlow?.graph) return;
     const {
       nodes,
       edges
-    } = (0,_helper__WEBPACK_IMPORTED_MODULE_21__.mapGraphFromBackend)(singleData.graph);
+    } = (0,_helper__WEBPACK_IMPORTED_MODULE_21__.mapGraphFromBackend)(workFlow.graph);
     if (nodes.length === 0) return;
     setNodes(nodes);
     setEdges(edges);
-  }, [singleData?.graph]);
+  }, [workFlow?.graph]);
   const [drawerContext, setDrawerContext] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)({
     source: null,
     node: null,
@@ -4624,7 +4624,7 @@ function FlowCanvas({
   });
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
     setLoading(true);
-    dispatch((0,_ZAPRedux_Slices_workFlowSlice_actions_workflow__WEBPACK_IMPORTED_MODULE_32__.getSingleWorkFlow)(id)).finally(() => setLoading(false));
+    dispatch((0,_ZAPRedux_Slices_workFlowSlice_actions_workFlow__WEBPACK_IMPORTED_MODULE_32__.getSingleWorkFlow)(id)).finally(() => setLoading(false));
   }, [id]);
   const {
     updateNodeData,
@@ -4710,7 +4710,7 @@ function FlowCanvas({
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_38__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_10__.Text, {
           fontSize: "md",
           fontWeight: "medium",
-          children: singleData?.workflow?.title || (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("Untitled Workflow", "zaplane")
+          children: workFlow?.workflow?.title || (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("Untitled Workflow", "zaplane")
         }), !apiRequestRunning ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_38__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {
           ..._assets_scss_chakra_recipe__WEBPACK_IMPORTED_MODULE_27__.primaryBtn,
           onClick: () => {
@@ -4760,7 +4760,7 @@ function FlowCanvas({
               variant: "outline",
               onClick: () => {
                 const paylod = {
-                  workflow_hash: singleData?.version?.hash
+                  workflow_hash: workFlow?.version?.hash
                 };
                 dispatch((0,_ZAPRedux_Slices_workFlowSlice_actions_workflowExctions__WEBPACK_IMPORTED_MODULE_33__.workFLowExction)(paylod));
               },
@@ -4788,7 +4788,7 @@ function FlowCanvas({
           })
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_38__.jsx)(react_select__WEBPACK_IMPORTED_MODULE_22__["default"], {
           options: _helper__WEBPACK_IMPORTED_MODULE_24__.statusOptions,
-          value: values?.status ? _helper__WEBPACK_IMPORTED_MODULE_24__.statusOptions.find(opt => opt.value === values.status) : _helper__WEBPACK_IMPORTED_MODULE_24__.statusOptions.find(opt => opt.value === singleData?.workflow?.status),
+          value: values?.status ? _helper__WEBPACK_IMPORTED_MODULE_24__.statusOptions.find(opt => opt.value === values.status) : _helper__WEBPACK_IMPORTED_MODULE_24__.statusOptions.find(opt => opt.value === workFlow?.workflow?.status),
           onChange: selected => setFieldValue('status', selected.value),
           isClearable: false,
           isSearchable: false,
@@ -4856,7 +4856,7 @@ function FlowCanvas({
       context: drawerContext,
       createActionNode: createActionNode,
       updateNodeData: updateNodeData,
-      singleData: singleData
+      workFlow: workFlow
     })]
   });
 }
@@ -5303,7 +5303,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _flowCanvas_helper__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./flowCanvas/helper */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/helper.js");
 /* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/box/index.js");
 /* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/flex/flex.js");
-/* harmony import */ var _ZAPRedux_Slices_workFlowSlice_actions_workflow__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @ZAPRedux/Slices/workFlowSlice/actions/workflow */ "./dev_zaplane/redux/Slices/workFlowSlice/actions/workflow.js");
+/* harmony import */ var _ZAPRedux_Slices_workFlowSlice_actions_workFlow__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @ZAPRedux/Slices/workFlowSlice/actions/workFlow */ "./dev_zaplane/redux/Slices/workFlowSlice/actions/workFlow.js");
 /* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
 /* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__);
 
@@ -5322,9 +5322,9 @@ function Workflows({
   const nodeIdRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)((0,_flowCanvas_helper__WEBPACK_IMPORTED_MODULE_6__.createNodeIdGenerator)());
   const getNewNodeId = nodeIdRef.current;
   const {
-    data
+    workFlow
   } = (0,react_redux__WEBPACK_IMPORTED_MODULE_5__.useSelector)(state => state.workflows);
-  const singleData = data[0];
+  console.log(workFlow, 'fk');
   const [nodes, setNodes, onNodesChange] = (0,_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.useNodesState)([{
     id: getNewNodeId(),
     type: 'custom',
@@ -5340,7 +5340,7 @@ function Workflows({
   }]);
   const [edges, setEdges, onEdgesChange] = (0,_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.useEdgesState)([]);
   const dispatch = (0,react_redux__WEBPACK_IMPORTED_MODULE_5__.useDispatch)();
-  const onSubmitHandler = async (values, actions) => {
+  const onSubmitHandler = async values => {
     const payload = {
       nodes: (0,_helper__WEBPACK_IMPORTED_MODULE_4__.mapNodesForBackend)(nodes),
       edges: (0,_helper__WEBPACK_IMPORTED_MODULE_4__.mapEdgesForBackend)(edges)
@@ -5349,10 +5349,10 @@ function Workflows({
       status: values?.status,
       id: id
     };
-    if (values.status && values.status !== singleData?.workflow.status) {
-      await dispatch((0,_ZAPRedux_Slices_workFlowSlice_actions_workflow__WEBPACK_IMPORTED_MODULE_9__.updateWorkFlowStatus)(statusPaylod));
+    if (values.status && values.status !== workFlow?.workflow.status) {
+      await dispatch((0,_ZAPRedux_Slices_workFlowSlice_actions_workFlow__WEBPACK_IMPORTED_MODULE_9__.updateWorkFlowStatus)(statusPaylod));
     }
-    await dispatch((0,_ZAPRedux_Slices_workFlowSlice_actions_workflow__WEBPACK_IMPORTED_MODULE_9__.updateWorkFlow)({
+    await dispatch((0,_ZAPRedux_Slices_workFlowSlice_actions_workFlow__WEBPACK_IMPORTED_MODULE_9__.updateWorkFlow)({
       id,
       payload
     }));
@@ -5373,7 +5373,7 @@ function Workflows({
             nodes: nodes,
             edges: edges,
             getNewNodeId: getNewNodeId,
-            singleData: singleData,
+            workFlow: workFlow,
             id: id
           })
         })
@@ -6293,6 +6293,104 @@ const settingSlice = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createSlic
 
 /***/ },
 
+/***/ "./dev_zaplane/redux/Slices/workFlowSlice/actions/workFlow.js"
+/*!********************************************************************!*\
+  !*** ./dev_zaplane/redux/Slices/workFlowSlice/actions/workFlow.js ***!
+  \********************************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   createWorkflows: () => (/* binding */ createWorkflows),
+/* harmony export */   deleteWorkFlow: () => (/* binding */ deleteWorkFlow),
+/* harmony export */   getSingleWorkFlow: () => (/* binding */ getSingleWorkFlow),
+/* harmony export */   getWorkFlow: () => (/* binding */ getWorkFlow),
+/* harmony export */   updateWorkFlow: () => (/* binding */ updateWorkFlow),
+/* harmony export */   updateWorkFlowStatus: () => (/* binding */ updateWorkFlowStatus)
+/* harmony export */ });
+/* harmony import */ var _reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @reduxjs/toolkit */ "./node_modules/@reduxjs/toolkit/dist/redux-toolkit.modern.mjs");
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @ZAPUtils/helper */ "./dev_zaplane/utils/helper.js");
+/* harmony import */ var _notificationSlice_notificationSlice__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../notificationSlice/notificationSlice */ "./dev_zaplane/redux/Slices/notificationSlice/notificationSlice.js");
+
+
+
+
+const createWorkflows = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyncThunk)('zaplane/createWorkflows', async (payload, thunkAPI) => {
+  return await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.post(_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.namespace + 'workflows', payload).then(res => {
+    return res?.data;
+  }).catch(err => {
+    return (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.handleSliceError)(thunkAPI, "Data fetching failed");
+  });
+});
+const getWorkFlow = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyncThunk)('zaplane/getWorkFlow', async thunkAPI => {
+  try {
+    const res = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.get(_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.namespace + "workflows");
+    return res.data;
+  } catch (e) {
+    return (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.handleSliceError)(thunkAPI, e);
+  }
+});
+const updateWorkFlow = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyncThunk)('zaplane/updateWorkFlow', async ({
+  id,
+  payload
+}, thunkAPI) => {
+  try {
+    const res = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.put(_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.namespace + "workflows/" + parseInt(id), payload);
+    (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.handleSliceSuccess)(thunkAPI, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Updated workflow Successfully', 'workflow'));
+    return res.data;
+  } catch (e) {
+    (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.handleSliceError)(thunkAPI, e);
+  }
+});
+const getSingleWorkFlow = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyncThunk)('zaplane/getSingleWorkFlow', async (id, thunkAPI) => {
+  try {
+    const res = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.get(_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.namespace + "workflows/" + parseInt(id) + "/graph", {});
+    return res.data;
+  } catch (e) {
+    return (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.handleSliceError)(thunkAPI, e);
+  }
+});
+const deleteWorkFlow = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyncThunk)('zaplane/deleteWorkFlow', async (id, thunkAPI) => {
+  try {
+    const res = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.delete(_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.namespace + "workflows/" + parseInt(id), {
+      data: {
+        force: true
+      },
+      headers: {
+        'X-HTTP-Method-Override': 'DELETE'
+      }
+    });
+    thunkAPI.dispatch((0,_notificationSlice_notificationSlice__WEBPACK_IMPORTED_MODULE_3__.showNotification)({
+      message: 'workflow Deleted',
+      isShow: true,
+      type: 'success'
+    }));
+    return res?.data?.data?.odd?.id || id;
+  } catch (e) {
+    return (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.handleSliceError)(thunkAPI, e);
+  }
+});
+const updateWorkFlowStatus = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyncThunk)('zaplane/updateWorkFlowStatus', async (payload, thunkAPI) => {
+  try {
+    await (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.makeRequest)('update_workflow_status', {
+      id: payload.id,
+      ...payload
+    });
+    return payload;
+  } catch (e) {
+    thunkAPI.dispatch((0,_notificationSlice_notificationSlice__WEBPACK_IMPORTED_MODULE_3__.showNotification)({
+      message: e,
+      isShow: true,
+      type: 'error'
+    }));
+  }
+});
+
+/***/ },
+
 /***/ "./dev_zaplane/redux/Slices/workFlowSlice/actions/workFlowListiner.js"
 /*!****************************************************************************!*\
   !*** ./dev_zaplane/redux/Slices/workFlowSlice/actions/workFlowListiner.js ***!
@@ -6470,104 +6568,6 @@ const versionActive = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsy
 
 /***/ },
 
-/***/ "./dev_zaplane/redux/Slices/workFlowSlice/actions/workflow.js"
-/*!********************************************************************!*\
-  !*** ./dev_zaplane/redux/Slices/workFlowSlice/actions/workflow.js ***!
-  \********************************************************************/
-(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   createWorkflows: () => (/* binding */ createWorkflows),
-/* harmony export */   deleteWorkFlow: () => (/* binding */ deleteWorkFlow),
-/* harmony export */   getSingleWorkFlow: () => (/* binding */ getSingleWorkFlow),
-/* harmony export */   getWorkFlow: () => (/* binding */ getWorkFlow),
-/* harmony export */   updateWorkFlow: () => (/* binding */ updateWorkFlow),
-/* harmony export */   updateWorkFlowStatus: () => (/* binding */ updateWorkFlowStatus)
-/* harmony export */ });
-/* harmony import */ var _reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @reduxjs/toolkit */ "./node_modules/@reduxjs/toolkit/dist/redux-toolkit.modern.mjs");
-/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
-/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @ZAPUtils/helper */ "./dev_zaplane/utils/helper.js");
-/* harmony import */ var _notificationSlice_notificationSlice__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../notificationSlice/notificationSlice */ "./dev_zaplane/redux/Slices/notificationSlice/notificationSlice.js");
-
-
-
-
-const createWorkflows = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyncThunk)('zaplane/createWorkflows', async (payload, thunkAPI) => {
-  return await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.post(_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.namespace + 'workflows', payload).then(res => {
-    return res?.data;
-  }).catch(err => {
-    return (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.handleSliceError)(thunkAPI, "Data fetching failed");
-  });
-});
-const getWorkFlow = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyncThunk)('zaplane/getWorkFlow', async thunkAPI => {
-  try {
-    const res = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.get(_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.namespace + "workflows");
-    return res.data;
-  } catch (e) {
-    return (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.handleSliceError)(thunkAPI, e);
-  }
-});
-const updateWorkFlow = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyncThunk)('zaplane/updateWorkFlow', async ({
-  id,
-  payload
-}, thunkAPI) => {
-  try {
-    const res = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.put(_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.namespace + "workflows/" + parseInt(id), payload);
-    (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.handleSliceSuccess)(thunkAPI, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Updated workflow Successfully', 'workflow'));
-    return res.data;
-  } catch (e) {
-    (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.handleSliceError)(thunkAPI, e);
-  }
-});
-const getSingleWorkFlow = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyncThunk)('zaplane/getSingleWorkFlow', async (id, thunkAPI) => {
-  try {
-    const res = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.get(_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.namespace + "workflows/" + parseInt(id) + "/graph", {});
-    return res.data;
-  } catch (e) {
-    return (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.handleSliceError)(thunkAPI, e);
-  }
-});
-const deleteWorkFlow = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyncThunk)('zaplane/deleteWorkFlow', async (id, thunkAPI) => {
-  try {
-    const res = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.delete(_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.namespace + "workflows/" + parseInt(id), {
-      data: {
-        force: true
-      },
-      headers: {
-        'X-HTTP-Method-Override': 'DELETE'
-      }
-    });
-    thunkAPI.dispatch((0,_notificationSlice_notificationSlice__WEBPACK_IMPORTED_MODULE_3__.showNotification)({
-      message: 'workflow Deleted',
-      isShow: true,
-      type: 'success'
-    }));
-    return res?.data?.data?.odd?.id || id;
-  } catch (e) {
-    return (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.handleSliceError)(thunkAPI, e);
-  }
-});
-const updateWorkFlowStatus = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyncThunk)('zaplane/updateWorkFlowStatus', async (payload, thunkAPI) => {
-  try {
-    await (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.makeRequest)('update_workflow_status', {
-      id: payload.id,
-      ...payload
-    });
-    return payload;
-  } catch (e) {
-    thunkAPI.dispatch((0,_notificationSlice_notificationSlice__WEBPACK_IMPORTED_MODULE_3__.showNotification)({
-      message: e,
-      isShow: true,
-      type: 'error'
-    }));
-  }
-});
-
-/***/ },
-
 /***/ "./dev_zaplane/redux/Slices/workFlowSlice/actions/workflowExctions.js"
 /*!****************************************************************************!*\
   !*** ./dev_zaplane/redux/Slices/workFlowSlice/actions/workflowExctions.js ***!
@@ -6663,7 +6663,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   startApiCountdown: () => (/* binding */ startApiCountdown)
 /* harmony export */ });
 /* harmony import */ var _reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @reduxjs/toolkit */ "./node_modules/@reduxjs/toolkit/dist/redux-toolkit.modern.mjs");
-/* harmony import */ var _actions_workflow__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./actions/workflow */ "./dev_zaplane/redux/Slices/workFlowSlice/actions/workflow.js");
+/* harmony import */ var _actions_workFlow__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./actions/workFlow */ "./dev_zaplane/redux/Slices/workFlowSlice/actions/workFlow.js");
 /* harmony import */ var _actions_workFlowRuns__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./actions/workFlowRuns */ "./dev_zaplane/redux/Slices/workFlowSlice/actions/workFlowRuns.js");
 /* harmony import */ var _actions_workFlowVersion__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./actions/workFlowVersion */ "./dev_zaplane/redux/Slices/workFlowSlice/actions/workFlowVersion.js");
 /* harmony import */ var _actions_workFlowLogs__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./actions/workFlowLogs */ "./dev_zaplane/redux/Slices/workFlowSlice/actions/workFlowLogs.js");
@@ -6679,7 +6679,8 @@ __webpack_require__.r(__webpack_exports__);
 const workflowsSlice = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createSlice)({
   name: 'workflows',
   initialState: {
-    data: [],
+    allWorkFlows: [],
+    workFlow: {},
     runs: [],
     versions: [],
     nodeDetails: [],
@@ -6704,38 +6705,37 @@ const workflowsSlice = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createSl
     }
   },
   extraReducers: builder => {
-    builder.addCase(_actions_workflow__WEBPACK_IMPORTED_MODULE_1__.createWorkflows.fulfilled, (state, action) => {
-      state.data = action.payload;
-    }).addCase(_actions_workflow__WEBPACK_IMPORTED_MODULE_1__.getWorkFlow.fulfilled, (state, action) => {
-      state.data = [...action.payload].reverse();
+    builder.addCase(_actions_workFlow__WEBPACK_IMPORTED_MODULE_1__.createWorkflows.fulfilled, (state, action) => {
+      state.allWorkFlows = action.payload;
+    }).addCase(_actions_workFlow__WEBPACK_IMPORTED_MODULE_1__.getWorkFlow.fulfilled, (state, action) => {
+      state.allWorkFlows = [...action.payload].reverse();
       state.isLoading = false;
-    }).addCase(_actions_workflow__WEBPACK_IMPORTED_MODULE_1__.getSingleWorkFlow.fulfilled, (state, action) => {
+    }).addCase(_actions_workFlow__WEBPACK_IMPORTED_MODULE_1__.getSingleWorkFlow.fulfilled, (state, action) => {
       if (!action.payload) return;
-      state.data = [action.payload];
-    }).addCase(_actions_workflow__WEBPACK_IMPORTED_MODULE_1__.updateWorkFlow.fulfilled, (state, action) => {
-      state.data = state.data.map(item => {
-        if (parseInt(item.id) === parseInt(action.payload.id)) {
-          return {
-            ...item,
-            ...action.payload
-          };
-        }
-        return item;
-      });
-    }).addCase(_actions_workflow__WEBPACK_IMPORTED_MODULE_1__.deleteWorkFlow.fulfilled, (state, action) => {
-      state.data = state.data.filter(item => parseInt(item.id) !== parseInt(action.payload));
-    }).addCase(_actions_workflow__WEBPACK_IMPORTED_MODULE_1__.updateWorkFlowStatus.fulfilled, (state, action) => {
-      state.data = state.data.map(item => parseInt(item.id) === parseInt(action.payload?.id) ? {
+      state.workFlow = action.payload;
+    }).addCase(_actions_workFlow__WEBPACK_IMPORTED_MODULE_1__.updateWorkFlow.fulfilled, (state, action) => {
+      state.allWorkFlows = action.payload;
+    }).addCase(_actions_workFlow__WEBPACK_IMPORTED_MODULE_1__.deleteWorkFlow.fulfilled, (state, action) => {
+      state.allWorkFlows = state.data.filter(item => parseInt(item.id) !== parseInt(action.payload));
+    }).addCase(_actions_workFlow__WEBPACK_IMPORTED_MODULE_1__.updateWorkFlowStatus.fulfilled, (state, action) => {
+      const {
+        id,
+        status
+      } = action.payload || {};
+      if (state.workFlow?.workflow?.id === id) {
+        state.workFlow.workflow.status = status;
+      }
+      state.allWorkFlows = state.allWorkFlows.map(item => parseInt(item.id) === parseInt(id) ? {
         ...item,
-        status: action.payload.status
+        status: status
       } : item);
     }).addCase(_actions_workFlowRuns__WEBPACK_IMPORTED_MODULE_2__.getRunWorkFlow.fulfilled, (state, action) => {
       state.runs = action.payload;
       state.isLoading = false;
     }).addCase(_actions_workFlowVersion__WEBPACK_IMPORTED_MODULE_3__.getPreviewOldVersion.fulfilled, (state, action) => {
-      if (!state.data.length) return;
-      state.data[0] = {
-        ...state.data[0],
+      if (!state.allWorkFlows.length) return;
+      state.allWorkFlows[0] = {
+        ...state.allWorkFlows[0],
         graph: action.payload.graph,
         is_preview: true,
         preview_version_id: action.payload.version?.id
