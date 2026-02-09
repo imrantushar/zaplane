@@ -21,7 +21,7 @@ import OptionMenu from "@ZAPComponents/OptionMenu";
 import { FiEdit, FiTrash2 } from "react-icons/fi";
 import { primaryBtn } from "../../../../../assets/scss/chakra/recipe";
 import { statusOptions } from "./helper";
-import { createWorkflows, deleteWorkFlow, getWorkFlow, updateWorkFlowStatus } from "@ZAPRedux/Slices/workFlowSlice/actions/workflow";
+import { createWorkflows, deleteWorkFlow, getWorkFlow, updateWorkFlowStatus } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow";
 
 
 const CreateWorkflows = () => {
@@ -31,7 +31,7 @@ const CreateWorkflows = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const { data, isLoading } = useSelector((state) => state.workflows);
+  const { allWorkFlows, isLoading } = useSelector((state) => state.workflows);
 
   useEffect(() => {
     dispatch(getWorkFlow());
@@ -110,7 +110,7 @@ const CreateWorkflows = () => {
       />
       <div className="zaplane-page-content">
         <ZAPTable
-          data={data}
+          data={allWorkFlows}
           rowKey="id"
           size="sm"
           variant="outline"

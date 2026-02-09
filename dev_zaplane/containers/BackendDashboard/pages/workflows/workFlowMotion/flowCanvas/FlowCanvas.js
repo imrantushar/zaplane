@@ -40,14 +40,14 @@ import './styles.scss'
 import { IoSwapHorizontal, IoSwapVerticalOutline } from "react-icons/io5";
 import ZAPTooltip from "@ZAPComponents/ZAPTooltip";
 import { useApiCountdown } from "@ZAPHooks/useApiCountdown/useApiCountdown";
-import { getSingleWorkFlow } from "@ZAPRedux/Slices/workFlowSlice/actions/workflow";
+import { getSingleWorkFlow } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow";
 import { workFLowExction } from "@ZAPRedux/Slices/workFlowSlice/actions/workflowExctions";
 import { workflowNodeListiner, workflowNodeListinerStop } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlowListiner";
 import { getAllVersion } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlowVersion";
 import { startApiCountdown } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
 import { getRunWorkFlow } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlowRuns";
 
-export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdgesChange, onNodesChange, getNewNodeId, singleData }) {
+export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdgesChange, onNodesChange, getNewNodeId, workFlow }) {
     const dispatch = useDispatch();
     const navigate = useNavigate()
     const [drawerOpen, setDrawerOpen] = useState(false);
@@ -61,12 +61,12 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
     const [canvasLayout, setCanvasLayout] = useState("LR")
 
     useEffect(() => {
-        if (!singleData?.graph) return;
-        const { nodes, edges } = mapGraphFromBackend(singleData.graph);
+        if (!workFlow?.graph) return;
+        const { nodes, edges } = mapGraphFromBackend(workFlow.graph);
         if (nodes.length === 0) return;
         setNodes(nodes);
         setEdges(edges);
-    }, [singleData?.graph]);
+    }, [workFlow?.graph]);
 
     const [drawerContext, setDrawerContext] = useState({
         source: null,
@@ -165,7 +165,7 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
                             </Button>
                         }
                         <Text fontSize="md" fontWeight="medium">
-                            {singleData?.workflow?.title || __("Untitled Workflow", "zaplane")}
+                            {workFlow?.workflow?.title || __("Untitled Workflow", "zaplane")}
                         </Text>
                         {
                             !apiRequestRunning ? <Button {...primaryBtn}
@@ -221,7 +221,7 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
                                 <Button size="sm" variant="outline"
                                     onClick={() => {
                                         const paylod = {
-                                            workflow_hash: singleData?.version?.hash,
+                                            workflow_hash: workFlow?.version?.hash,
                                         }
                                         dispatch(workFLowExction(paylod))
                                     }}>
@@ -259,7 +259,7 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
                             value={
                                 values?.status
                                     ? statusOptions.find(opt => opt.value === values.status)
-                                    : statusOptions.find(opt => opt.value === singleData?.workflow?.status)
+                                    : statusOptions.find(opt => opt.value === workFlow?.workflow?.status)
                             }
 
                             onChange={(selected) =>
@@ -339,7 +339,7 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
                 context={drawerContext}
                 createActionNode={createActionNode}
                 updateNodeData={updateNodeData}
-                singleData={singleData}
+                workFlow={workFlow}
 
             />
 

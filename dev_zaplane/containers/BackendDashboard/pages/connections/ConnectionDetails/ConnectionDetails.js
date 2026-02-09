@@ -2,14 +2,14 @@ import { Box, Flex, Badge, Spinner, Text } from "@chakra-ui/react";
 import WPModal from "@ZAPComponents/Modal/WPModal";
 import { __ } from "@wordpress/i18n";
 
-const ConnectionDetails = ({ isOpen, onClose, singleData }) => {
+const ConnectionDetails = ({ isOpen, onClose, connection }) => {
   return (
     <WPModal
       title={__("Connection Details", "zaplane")}
       isOpen={isOpen}
       onRequestClose={onClose}
     >
-      {!singleData ? (
+      {!connection ? (
         <Flex justify="center" align="center" py={12}>
           <Spinner size="lg" />
         </Flex>
@@ -26,10 +26,10 @@ const ConnectionDetails = ({ isOpen, onClose, singleData }) => {
             <Flex justify="space-between" align="center">
               <Box>
                 <Text className="zaplane-label" fontSize="xl" fontWeight="semibold">
-                  {__(singleData.name, "zaplane")}
+                  {__(connection.name, "zaplane")}
                 </Text>
                 <Text className="zaplane-label" fontSize="sm" color="gray.500">
-                  {__(singleData.app, "zaplane")}
+                  {__(connection.app, "zaplane")}
                 </Text>
               </Box>
               <Badge
@@ -37,10 +37,10 @@ const ConnectionDetails = ({ isOpen, onClose, singleData }) => {
                 py={1.5}
                 fontSize="sm"
                 borderRadius="full"
-                colorPalette={singleData.status === "active" ? "green" : "gray"}
+                colorPalette={connection.status === "active" ? "green" : "gray"}
                 textTransform="capitalize"
               >
-                {__(singleData.status, "zaplane")}
+                {__(connection.status, "zaplane")}
               </Badge>
             </Flex>
           </Box>
@@ -50,7 +50,7 @@ const ConnectionDetails = ({ isOpen, onClose, singleData }) => {
                 {__('AUTH TYPE', 'zaplane')}
               </Text>
               <Text className="zaplane-label" fontSize="md" fontWeight="medium">
-                {__(singleData.auth_type, 'zaplane')}
+                {__(connection.auth_type, 'zaplane')}
               </Text>
             </Box>
 
@@ -59,7 +59,7 @@ const ConnectionDetails = ({ isOpen, onClose, singleData }) => {
                 {__('CREATED AT', 'zaplane')}
               </Text>
               <Text fontSize="md" fontWeight="medium" className="zaplane-label" >
-                {__(singleData.created_at, "zaplane")}
+                {__(connection.created_at, "zaplane")}
               </Text>
             </Box>
 
@@ -68,7 +68,7 @@ const ConnectionDetails = ({ isOpen, onClose, singleData }) => {
                 {__('LAST USED', 'zaplane')}
               </Text>
               <Text className="zaplane-label" fontSize="md" fontWeight="medium">
-                {__(singleData.last_used_at || "--", "zaplane")}
+                {__(connection.last_used_at || "--", "zaplane")}
               </Text>
             </Box>
 
@@ -77,7 +77,7 @@ const ConnectionDetails = ({ isOpen, onClose, singleData }) => {
                 {__('LAST TESTED', 'zaplane')}
               </Text>
               <Text fontSize="md" fontWeight="medium" className="zaplane-label">
-                {singleData.last_tested_at || "--"}
+                {connection.last_tested_at || "--"}
               </Text>
             </Box>
           </Flex>
