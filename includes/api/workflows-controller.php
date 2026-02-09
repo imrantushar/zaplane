@@ -99,7 +99,7 @@ class WorkflowsController extends WP_REST_Controller
 
         register_rest_route($namespace, '/condition-variables', [
             [
-                'methods' => WP_REST_Server::CREATABLE,
+                'methods' => WP_REST_Server::READABLE,
                 'callback' => [$this, 'get_condition_variables'],
                 'permission_callback' => [$this, 'permissions_check'],
             ],
@@ -315,16 +315,22 @@ class WorkflowsController extends WP_REST_Controller
 
     public function get_condition_variables($request)
     {
-        $params = $request->get_json_params();
+        $workflowHash = $request->get_param('workflow_hash');
+        $targetNodeKey = (string) $request->get_param('target_node_key');
 
-        $workflowHash = $params['workflow_hash'] ?? null;
-        $nodes = $params['nodes'] ?? [];
-        $edges = $params['edges'] ?? [];
-        $targetNodeKey = (string) ($params['target_node_key'] ?? '');
-
-        if (empty($nodes) || empty($targetNodeKey)) {
-            return new WP_Error('invalid_params', 'nodes and target_node_key are required', ['status' => 400]);
+        if (empty($workflowHash) || empty($targetNodeKey)) {
+            return new WP_Error('invalid_params', 'workflow_hash and target_node_key are required', ['status' => 400]);
         }
+
+        $version = WorkflowVersion::where('graph_hash', $workflowHash)->first();
+
+        if (!$version) {
+            return new WP_Error('not_found', 'Workflow version not found', ['status' => 404]);
+        }
+
+        $graph = $version->getGraph();
+        $nodes = $graph['nodes'] ?? [];
+        $edges = $graph['edges'] ?? [];
 
         $nodeMap = [];
         foreach ($nodes as $node) {
@@ -332,11 +338,7 @@ class WorkflowsController extends WP_REST_Controller
         }
 
         $previousNodeIds = $this->findPreviousNodes($targetNodeKey, $edges);
-
-        $testNodeRuns = [];
-        if ($workflowHash) {
-            $testNodeRuns = Run::latestTestNodeRuns($workflowHash);
-        }
+        $testNodeRuns = Run::latestTestNodeRuns($workflowHash);
 
         $variables = [];
         foreach ($previousNodeIds as $nodeId) {
@@ -354,7 +356,6 @@ class WorkflowsController extends WP_REST_Controller
                 $output = $nodeRun->getOutput();
                 $outputData = $output['data'] ?? $output;
 
-                // Ensure outputData is an array
                 if (!is_array($outputData)) {
                     $outputData = ['value' => $outputData];
                 }
