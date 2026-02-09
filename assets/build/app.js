@@ -1990,13 +1990,13 @@ __webpack_require__.r(__webpack_exports__);
 const ConnectionDetails = ({
   isOpen,
   onClose,
-  singleData
+  connection
 }) => {
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_ZAPComponents_Modal_WPModal__WEBPACK_IMPORTED_MODULE_5__["default"], {
     title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_6__.__)("Connection Details", "zaplane"),
     isOpen: isOpen,
     onRequestClose: onClose,
-    children: !singleData ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Flex, {
+    children: !connection ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Flex, {
       justify: "center",
       align: "center",
       py: 12,
@@ -2019,21 +2019,21 @@ const ConnectionDetails = ({
               className: "zaplane-label",
               fontSize: "xl",
               fontWeight: "semibold",
-              children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_6__.__)(singleData.name, "zaplane")
+              children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_6__.__)(connection.name, "zaplane")
             }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
               className: "zaplane-label",
               fontSize: "sm",
               color: "gray.500",
-              children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_6__.__)(singleData.app, "zaplane")
+              children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_6__.__)(connection.app, "zaplane")
             })]
           }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Badge, {
             px: 4,
             py: 1.5,
             fontSize: "sm",
             borderRadius: "full",
-            colorPalette: singleData.status === "active" ? "green" : "gray",
+            colorPalette: connection.status === "active" ? "green" : "gray",
             textTransform: "capitalize",
-            children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_6__.__)(singleData.status, "zaplane")
+            children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_6__.__)(connection.status, "zaplane")
           })]
         })
       }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Flex, {
@@ -2052,7 +2052,7 @@ const ConnectionDetails = ({
             className: "zaplane-label",
             fontSize: "md",
             fontWeight: "medium",
-            children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_6__.__)(singleData.auth_type, 'zaplane')
+            children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_6__.__)(connection.auth_type, 'zaplane')
           })]
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
           flex: "1 1 45%",
@@ -2067,7 +2067,7 @@ const ConnectionDetails = ({
             fontSize: "md",
             fontWeight: "medium",
             className: "zaplane-label",
-            children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_6__.__)(singleData.created_at, "zaplane")
+            children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_6__.__)(connection.created_at, "zaplane")
           })]
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
           flex: "1 1 45%",
@@ -2082,7 +2082,7 @@ const ConnectionDetails = ({
             className: "zaplane-label",
             fontSize: "md",
             fontWeight: "medium",
-            children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_6__.__)(singleData.last_used_at || "--", "zaplane")
+            children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_6__.__)(connection.last_used_at || "--", "zaplane")
           })]
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
           flex: "1 1 45%",
@@ -2097,7 +2097,7 @@ const ConnectionDetails = ({
             fontSize: "md",
             fontWeight: "medium",
             className: "zaplane-label",
-            children: singleData.last_tested_at || "--"
+            children: connection.last_tested_at || "--"
           })]
         })]
       })]
@@ -2166,8 +2166,8 @@ const statusOptions = [{
 const Connections = () => {
   const dispatch = (0,react_redux__WEBPACK_IMPORTED_MODULE_1__.useDispatch)();
   const {
-    list,
-    singleData,
+    allConnection,
+    connection,
     authFields
   } = (0,react_redux__WEBPACK_IMPORTED_MODULE_1__.useSelector)(state => state.connections || []);
   const [isModalOpen, setIsModalOpen] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
@@ -2211,7 +2211,7 @@ const Connections = () => {
         const popup = window.open(res.auth_url, "oauth_popup", "width=600,height=700");
         const handler = event => {
           if (event.data?.type === "zaplane_oauth_callback") {
-            window.removeEventListener("message", handler);
+            window.removeEventallConnectionener("message", handler);
             popup?.close();
             if (event.data.data?.success) {
               dispatch((0,_ZAPRedux_Slices_connectionsSlice_connectionsSlice__WEBPACK_IMPORTED_MODULE_13__.fetchConnections)());
@@ -2219,7 +2219,7 @@ const Connections = () => {
             }
           }
         };
-        window.addEventListener("message", handler);
+        window.addEventallConnectionener("message", handler);
       } catch (e) {
         console.error(e);
       } finally {
@@ -2257,7 +2257,7 @@ const Connections = () => {
     }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)("div", {
       className: "zaplane-page-content",
       children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_ZAPComponents_Table__WEBPACK_IMPORTED_MODULE_15__["default"], {
-        data: list,
+        data: allConnection,
         rowKey: "id",
         size: "sm",
         columns: [{
@@ -2324,7 +2324,7 @@ const Connections = () => {
     }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_ConnectionDetails_ConnectionDetails__WEBPACK_IMPORTED_MODULE_16__["default"], {
       isOpen: detailsOpen,
       onClose: () => setDetailsOpen(false),
-      singleData: singleData
+      connection: connection
     }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_ZAPComponents_Modal_WPModal__WEBPACK_IMPORTED_MODULE_14__["default"], {
       title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_9__.__)("Create credential", "zaplane"),
       isOpen: isModalOpen,
@@ -5998,12 +5998,12 @@ const updateConnection = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.create
 const connectionsSlice = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createSlice)({
   name: 'connections',
   initialState: {
-    list: [],
+    allConnection: [],
     authFields: {},
     oauthData: null,
     loading: false,
     error: null,
-    singleData: []
+    connection: {}
   },
   reducers: {
     resetAuthFields: state => {
@@ -6016,31 +6016,31 @@ const connectionsSlice = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.create
   extraReducers: builder => {
     builder.addCase(fetchConnections.fulfilled, (state, action) => {
       state.loading = false;
-      state.list = action.payload;
+      state.allConnection = action.payload;
     }).addCase(fetchAuthFields.fulfilled, (state, action) => {
       state.authFields = action.payload || {};
     }).addCase(initOAuth.fulfilled, (state, action) => {
       state.oauthData = action.payload;
     }).addCase(createTokenConnection.fulfilled, (state, action) => {
-      state.list.push(action.payload);
+      state.allConnection.push(action.payload);
     }).addCase(testConnection.fulfilled, (state, action) => {
-      const index = state.list.findIndex(c => c.id === action.payload.id);
+      const index = state.allConnection.findIndex(c => c.id === action.payload.id);
       if (index !== -1) {
-        state.list[index].last_tested_at = new Date().toISOString();
-        state.list[index].last_test_status = action.payload.result.success ? 'success' : 'failed';
+        state.allConnection[index].last_tested_at = new Date().toISOString();
+        state.allConnection[index].last_test_status = action.payload.result.success ? 'success' : 'failed';
       }
     }).addCase(deleteConnection.fulfilled, (state, action) => {
-      state.list = state.list.filter(c => c.id !== action.payload);
+      state.allConnection = state.allConnection.filter(c => c.id !== action.payload);
     }).addCase(fetchSingleConnection.fulfilled, (state, action) => {
       state.loading = false;
-      state.singleData = action.payload;
+      state.connection = action.payload;
     }).addCase(updateConnection.fulfilled, (state, action) => {
-      const index = state.list.findIndex(c => c.id === action.payload.id);
+      const index = state.allConnection.findIndex(c => c.id === action.payload.id);
       if (index !== -1) {
-        state.list[index] = action.payload;
+        state.allConnection[index] = action.payload;
       }
-      if (state.singleData?.id === action.payload.id) {
-        state.singleData = action.payload;
+      if (state.connection?.id === action.payload.id) {
+        state.connection = action.payload;
       }
     });
   }

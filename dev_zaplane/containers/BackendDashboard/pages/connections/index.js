@@ -44,7 +44,7 @@ const statusOptions = [
 const Connections = () => {
     const dispatch = useDispatch();
 
-    const { list, singleData, authFields } = useSelector(
+    const { allConnection, connection, authFields } = useSelector(
         (state) => state.connections || []
     );
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -105,7 +105,7 @@ const Connections = () => {
 
                 const handler = (event) => {
                     if (event.data?.type === "zaplane_oauth_callback") {
-                        window.removeEventListener("message", handler);
+                        window.removeEventallConnectionener("message", handler);
                         popup?.close();
 
                         if (event.data.data?.success) {
@@ -115,7 +115,7 @@ const Connections = () => {
                     }
                 };
 
-                window.addEventListener("message", handler);
+                window.addEventallConnectionener("message", handler);
             } catch (e) {
                 console.error(e);
             } finally {
@@ -162,7 +162,7 @@ const Connections = () => {
             />
             <div className="zaplane-page-content">
                 <ZAPTable
-                    data={list}
+                    data={allConnection}
                     rowKey="id"
                     size="sm"
                     columns={[
@@ -249,7 +249,7 @@ const Connections = () => {
             <ConnectionDetails
                 isOpen={detailsOpen}
                 onClose={() => setDetailsOpen(false)}
-                singleData={singleData}
+                connection={connection}
             />
             <WPModal
                 title={__("Create credential", "zaplane")}
