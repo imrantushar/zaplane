@@ -15,4 +15,5 @@ return [
     'variable' => ['file' => 'variable.php', 'class' => \Zaplane\Integrations\Variable::class],
     'webhook' => ['file' => 'webhook.php', 'class' => \Zaplane\Integrations\Webhook::class],
     'storeengine' => ['file' => 'storeengine.php', 'class' => \Zaplane\Integrations\Storeengine::class],
+    'groundhogg' => ['file' => 'groundhogg.php', 'class' => \Zaplane\Integrations\Groundhogg::class],
 ];
