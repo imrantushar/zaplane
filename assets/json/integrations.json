@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-02-05 10:39:04",
+    "generated_at": "2026-02-09 06:03:13",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -3238,6 +3238,68 @@
                     ]
                 }
             }
+        },
+        "groundhogg": {
+            "slug": "groundhogg",
+            "name": "Groundhogg",
+            "icon": "",
+            "category": "app",
+            "triggers": {
+                "created_contact": {
+                    "key": "created_contact",
+                    "label": "Created Contact",
+                    "hook": "groundhogg/contact/post_create",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "added_tag": {
+                    "key": "added_tag",
+                    "label": "Tag Added To Contact",
+                    "hook": "groundhogg/contact/tag_applied",
+                    "schema": [
+                        {
+                            "key": "tag_id",
+                            "label": "Tags",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Any Tag",
+                                    "value": "any"
+                                }
+                            ],
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "removed_tag": {
+                    "key": "removed_tag",
+                    "label": "Tag Remove From Contact",
+                    "hook": "groundhogg/contact/tag_removed",
+                    "schema": [
+                        {
+                            "key": "tag_id",
+                            "label": "Tags",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Any Tag",
+                                    "value": "any"
+                                }
+                            ],
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": []
         }
     },
     "tools": {
