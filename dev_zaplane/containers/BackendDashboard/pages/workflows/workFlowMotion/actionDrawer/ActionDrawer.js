@@ -26,7 +26,7 @@ import { workFLowSingeNodeExction } from "@ZAPRedux/Slices/workFlowSlice/actions
 import { fetchDynamic } from "@ZAPRedux/Slices/workFlowSlice/helper";
 
 
-export default function ActionDrawer({ open, context, onClose, updateNodeData, createActionNode, singleData }) {
+export default function ActionDrawer({ open, context, onClose, updateNodeData, createActionNode, workFlow }) {
   const { source, node } = context;
   const dispatch = useDispatch();
   const { values, setFieldValue, resetForm } = useFormikContext();
@@ -253,14 +253,14 @@ export default function ActionDrawer({ open, context, onClose, updateNodeData, c
                 <>
                   <Button mb={4} onClick={() =>
                     dispatch(workFLowSingeNodeExction({
-                      workflow_hash: singleData?.version?.hash,
+                      workflow_hash: workFlow?.version?.hash,
                       node_key: node?.id,
                       input: values,
                     }))
                   }>
                     {__("Test Action", "zaplane")}
                   </Button>
-                  <TestDetails id={node?.id} singleData={singleData}/>
+                  <TestDetails id={node?.id} workFlow={workFlow}/>
                 </>
               )
             }
