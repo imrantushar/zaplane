@@ -182,11 +182,16 @@ class Automation
             'started_at' => current_time('mysql'),
         ]);
 
-        as_enqueue_async_action(
-            'zaplane_execute_node_run',
-            ['node_run_id' => $nodeRun->id],
-            'zaplane'
-        );
+        if (function_exists('as_enqueue_async_action')) {
+            as_enqueue_async_action(
+                'zaplane_execute_node_run',
+                ['node_run_id' => $nodeRun->id],
+                'zaplane'
+            );
+        } else {
+            wp_schedule_single_event(time(), 'zaplane_execute_node_run', ['node_run_id' => $nodeRun->id]);
+            spawn_cron();
+        }
     }
 
     public function dispatch_node_run(int $node_run_id)
