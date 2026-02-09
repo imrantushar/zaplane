@@ -6,7 +6,7 @@ import ZAPSelect from "@ZAPComponents/ZAPSelect";
 import { __ } from "@wordpress/i18n";
 import { buildEmptyRule } from "./helper";
 import WPPopover from "@ZAPComponents/Popaver/WPPopover";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { conditionVariables } from "@ZAPRedux/Slices/workFlowSlice/actions/conditonVariales";
 const items = [
@@ -14,18 +14,23 @@ const items = [
     { value: "b", title: "Second Item", text: "Some value 2..." },
     { value: "c", title: "Third Item", text: "Some value 3..." },
 ]
-export default function ConditionGroupField({ value, onChange, field, nodeId ,singleData}) {
+export default function ConditionGroupField({ value, onChange, field, nodeId, singleData }) {
     console.log(nodeId, 'values');
     const ruleFields = field?.fields;
     const EMPTY_RULE = buildEmptyRule(ruleFields);
     const [isPopoverOpen, setPopoverOpen] = useState(false);
     const dispatch = useDispatch()
-    dispatch(
-        conditionVariables({
-            targetNodeKey: nodeId,
-            workflowHash: singleData?.version?.hash,
-        })
-    );
+    useEffect(() => {
+        if (!nodeId || !singleData?.version?.hash) return;
+
+        dispatch(
+            conditionVariables({
+                targetNodeKey: nodeId,
+                workflowHash: singleData.version.hash,
+            })
+        );
+    }, [dispatch, nodeId, singleData?.version?.hash]);
+
 
 
 
@@ -151,8 +156,8 @@ export default function ConditionGroupField({ value, onChange, field, nodeId ,si
                                         value={item.value}
                                         border="1px solid var(--zaplane-border-color)"
                                         borderBottom={index === items.length - 1 ? "1px solid var(--zaplane-border-color)" : "0"}
-                                        borderBottomRadius={index === items.length - 1 ? "md" : "0"} 
-                                        borderTopRadius={index === 0 ? "md" : "0"} 
+                                        borderBottomRadius={index === items.length - 1 ? "md" : "0"}
+                                        borderTopRadius={index === 0 ? "md" : "0"}
                                         overflow="hidden"
                                     >
                                         <Accordion.ItemTrigger
