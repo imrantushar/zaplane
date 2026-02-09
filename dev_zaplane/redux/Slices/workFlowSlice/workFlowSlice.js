@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice , createAsyncThunk} from '@reduxjs/toolkit';
 
 import { createWorkflows, deleteWorkFlow, getSingleWorkFlow, getWorkFlow, updateWorkFlow, updateWorkFlowStatus } from './actions/workflow';
 import { getRunWorkFlow,getSingleRun } from './actions/workFlowRuns';
@@ -7,18 +7,7 @@ import { nodeLogsRunDetails ,getNodeLogDetails} from './actions/workFlowLogs';
 import { workFLowSingeNodeExction } from './actions/workflowExctions';
 import { workflowNodeListiner, workflowNodeListinerStop } from './actions/workFlowListiner';
 
-export const conditionVariables = createAsyncThunk(
-	'zaplane/conditionVariables',
-	async ({workflowHash,targetNodeKey}, thunkAPI) => {
-		try {
-			const res = await API.get(namespace + `workflows?workflow_hash=${workflowHash}&target_node_key=${targetNodeKey}`);
-			return res.data
 
-		} catch (e) {
-			return handleSliceError(thunkAPI, e);
-		}
-	}
-);
 const workflowsSlice = createSlice({
 	name: 'workflows',
 	initialState: {

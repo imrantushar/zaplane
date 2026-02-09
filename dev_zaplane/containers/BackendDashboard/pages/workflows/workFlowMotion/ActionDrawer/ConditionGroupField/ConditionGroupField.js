@@ -8,7 +8,7 @@ import { buildEmptyRule } from "./helper";
 import WPPopover from "@ZAPComponents/Popaver/WPPopover";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import { conditionVariables } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
+import { conditionVariables } from "@ZAPRedux/Slices/workFlowSlice/actions/conditonVariales";
 const items = [
     { value: "a", title: "First Item", text: "Some value 1..." },
     { value: "b", title: "Second Item", text: "Some value 2..." },
