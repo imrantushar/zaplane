@@ -7,10 +7,6 @@ import {
 } from "@chakra-ui/react";
 import { useDispatch, useSelector } from "react-redux";
 import { useState } from "react";
-import {
-  getSingleRun,
-  nodeLogsRunDetails,
-} from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
 import LogDetails from "@ZAPComponents/LogDetails";
 import ZAPLoading from "@ZAPComponents/Loading";
 import { getDuration } from "@ZAPUtils/helper";
@@ -18,6 +14,8 @@ import ZAPTable from "@ZAPComponents/Table";
 import { __ } from "@wordpress/i18n";
 import ZAPDrawer from "@ZAPComponents/Drawer";
 import { statusStyle } from "../../../helper";
+import { nodeLogsRunDetails } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlowLogs";
+import { getSingleRun } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlowRuns";
 
 
 

@@ -9,7 +9,6 @@ import {
 } from "@chakra-ui/react";
 import ZAPDrawer from "@ZAPComponents/Drawer";
 import ZAPSelect from "@ZAPComponents/ZAPSelect";
-import { fetchDynamic, workFLowSingeNodeExction } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
 import { integrations } from "@ZAPUtils/helper";
 import { useFormikContext } from "formik";
 import { useEffect, useMemo, useState } from "react";
@@ -23,6 +22,8 @@ import { TOOLS } from "@ZAPHooks/useActionDrawer/helper";
 import { getActionHook, getIntegration } from "./helper";
 import TestDetails from "./TestDetails/TestDetails";
 import ActionFieldRenderer from "./ActionFieldRenderer/ActionFieldRenderer";
+import { workFLowSingeNodeExction } from "@ZAPRedux/Slices/workFlowSlice/actions/workflowExctions";
+import { fetchDynamic } from "@ZAPRedux/Slices/workFlowSlice/helper";
 
 
 export default function ActionDrawer({ open, context, onClose, updateNodeData, createActionNode, singleData }) {

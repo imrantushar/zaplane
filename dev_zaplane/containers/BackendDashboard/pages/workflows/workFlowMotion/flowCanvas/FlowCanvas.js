@@ -22,7 +22,6 @@ import {
     FiArrowLeft
 } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
-import { getAllVersion, getRunWorkFlow, getSingleWorkFlow, startApiCountdown, workFLowExction, workflowNodeListiner, workflowNodeListinerStop } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
 import { useDispatch, useSelector } from "react-redux";
 import ZAPDrawer from "@ZAPComponents/Drawer";
 import { LucideHistory } from "lucide-react";
@@ -41,6 +40,12 @@ import './styles.scss'
 import { IoSwapHorizontal, IoSwapVerticalOutline } from "react-icons/io5";
 import ZAPTooltip from "@ZAPComponents/ZAPTooltip";
 import { useApiCountdown } from "@ZAPHooks/useApiCountdown/useApiCountdown";
+import { getSingleWorkFlow } from "@ZAPRedux/Slices/workFlowSlice/actions/workflow";
+import { workFLowExction } from "@ZAPRedux/Slices/workFlowSlice/actions/workflowExctions";
+import { workflowNodeListiner, workflowNodeListinerStop } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlowListiner";
+import { getAllVersion } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlowVersion";
+import { startApiCountdown } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
+import { getRunWorkFlow } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlowRuns";
 
 export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdgesChange, onNodesChange, getNewNodeId, singleData }) {
     const dispatch = useDispatch();
