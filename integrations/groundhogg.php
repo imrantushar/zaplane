@@ -59,7 +59,7 @@ class Groundhogg extends IntegrationBase {
         return [
             'first_name'       => $contact->first_name ?? '',
             'last_name'        => $contact->last_name ?? '',
-            'email_address'    => $contact->email ?? '',
+            'email'            => $contact->email ?? '',
             'primary_phone'    => $contact->phone ?? '',
             'phone_ext'        => $contact->phone_ext ?? '',
             'opt_in_status'    => $contact->opt_in_status ?? '',
@@ -78,9 +78,11 @@ class Groundhogg extends IntegrationBase {
 
             case 'created_contact':
                 $contact = $args[0] ?? null;
-                error_log( print_r( $args, true ) );
 
                 if ( ! $contact ) return false;
+
+                $contact = $args[2];
+
                 return [
                     'success' => true,
                     'contact' => self::resolve_contact_payload( $contact ),
