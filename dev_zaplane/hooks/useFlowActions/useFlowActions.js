@@ -70,7 +70,6 @@ export const useFlowActions = ({
         const layoutLR = canvasLayout === 'LR';
         const LRGap = 250
         const TBGap = 98
-        console.log(layoutLR, 'layot');
         const { edge, node } = drawerContext;
         let sourceNode = null;
         let targetNode = null;

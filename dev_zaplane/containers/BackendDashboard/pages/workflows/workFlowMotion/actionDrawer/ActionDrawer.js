@@ -9,7 +9,6 @@ import {
 } from "@chakra-ui/react";
 import ZAPDrawer from "@ZAPComponents/Drawer";
 import ZAPSelect from "@ZAPComponents/ZAPSelect";
-import { fetchDynamic, workFLowSingeNodeExction } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
 import { integrations } from "@ZAPUtils/helper";
 import { useFormikContext } from "formik";
 import { useEffect, useMemo, useState } from "react";
@@ -23,6 +22,8 @@ import { TOOLS } from "@ZAPHooks/useActionDrawer/helper";
 import { getActionHook, getIntegration } from "./helper";
 import TestDetails from "./TestDetails/TestDetails";
 import ActionFieldRenderer from "./ActionFieldRenderer/ActionFieldRenderer";
+import { workFLowSingeNodeExction } from "@ZAPRedux/Slices/workFlowSlice/actions/workflowExctions";
+import { fetchDynamic } from "@ZAPRedux/Slices/workFlowSlice/helper";
 
 
 export default function ActionDrawer({ open, context, onClose, updateNodeData, createActionNode, singleData }) {
@@ -128,7 +129,9 @@ export default function ActionDrawer({ open, context, onClose, updateNodeData, c
       footer={
         <HStack justify="space-between">
           <Button variant="ghost" onClick={resetAll}>{__("Cancel", "zaplane")}</Button>
-          <Button {...primaryBtn} onClick={handleContinue}>{step === 'test' ? __('Submit', 'zaplane') : __('Continue', 'zaplane')}
+          <Button {...primaryBtn}
+          disabled={!values.actionType}
+           onClick={handleContinue}>{step === 'test' ? __('Submit', 'zaplane') : __('Continue', 'zaplane')}
           </Button>
         </HStack>
       }
@@ -257,9 +260,9 @@ export default function ActionDrawer({ open, context, onClose, updateNodeData, c
                       input: values,
                     }))
                   }>
-                    {__("Run test", "zaplane")}
+                    {__("Test Action", "zaplane")}
                   </Button>
-                  <TestDetails id={node?.id}/>
+                  <TestDetails id={node?.id} singleData={singleData}/>
                 </>
               )
             }

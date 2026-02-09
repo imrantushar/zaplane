@@ -150,9 +150,9 @@ export default function ConditionGroupField({ value, onChange, field, nodeId ,si
                                         key={index}
                                         value={item.value}
                                         border="1px solid var(--zaplane-border-color)"
-                                        borderBottom={index === items.length - 1 ? "1px solid" : "0"}
-                                        borderBottomRadius={index === items.length - 1 ? "md" : "0"}
-                                        borderTopRadius={index === 0 ? "md" : "0"}
+                                        borderBottom={index === items.length - 1 ? "1px solid var(--zaplane-border-color)" : "0"}
+                                        borderBottomRadius={index === items.length - 1 ? "md" : "0"} 
+                                        borderTopRadius={index === 0 ? "md" : "0"} 
                                         overflow="hidden"
                                     >
                                         <Accordion.ItemTrigger

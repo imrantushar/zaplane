@@ -6,12 +6,6 @@ import { __ } from '@wordpress/i18n';
 import './styles.scss';
 import ZAPLabel from '@ZAPComponents/Labels/ZAPLabel';
 
-const propTypes = {
-	title: PropTypes.string,
-	render: PropTypes.func,
-	rightContent: PropTypes.func,
-	leftContent: PropTypes.func,
-};
 
 const TopBar = ({
 	title = '',
@@ -25,6 +19,7 @@ const TopBar = ({
 	return (
 		<React.Fragment>
 			<Flex
+			   className='zaplane-topbar'
 				style={topBarStyles}
 				direction={{ base: 'column', md: 'row' }}
 				justifyContent="space-between"
@@ -32,7 +27,6 @@ const TopBar = ({
 				height='80px'
 				px={6}
 				py={4}
-				mb={6}
 				top="32px"
 				borderBottomWidth="1px"
 				borderColor="var(--zaplane-border-color)"
@@ -80,5 +74,5 @@ const TopBar = ({
 	);
 };
 
-TopBar.propTypes = propTypes;
+
 export default TopBar;

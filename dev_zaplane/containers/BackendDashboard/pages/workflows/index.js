@@ -14,12 +14,6 @@ import { useDispatch, useSelector } from "react-redux";
 import ZAPInput from "@ZAPComponents/ZAPInput";
 import WPModal from "@ZAPComponents/Modal/WPModal";
 import Select from "react-select";
-import {
-  createWorkflows,
-  deleteWorkFlow,
-  getWorkFlow,
-  updateWorkFlowStatus,
-} from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
 import ZAPTable from "@ZAPComponents/Table";
 import ZAPMenu from "@ZAPComponents/ZapMenu";
 import TopBar from "@ZAPComponents/TopBar";
@@ -27,6 +21,7 @@ import OptionMenu from "@ZAPComponents/OptionMenu";
 import { FiEdit, FiTrash2 } from "react-icons/fi";
 import { primaryBtn } from "../../../../../assets/scss/chakra/recipe";
 import { statusOptions } from "./helper";
+import { createWorkflows, deleteWorkFlow, getWorkFlow, updateWorkFlowStatus } from "@ZAPRedux/Slices/workFlowSlice/actions/workflow";
 
 
 const CreateWorkflows = () => {
