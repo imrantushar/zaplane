@@ -57,7 +57,7 @@ const workflowsSlice = createSlice({
 				state.allWorkFlows = action.payload
 			})
 			.addCase(deleteWorkFlow.fulfilled, (state, action) => {
-				state.allWorkFlows = state.data.filter(
+				state.allWorkFlows = state.allWorkFlows.filter(
 					(item) => parseInt(item.id) !== parseInt(action.payload)
 				);
 			})

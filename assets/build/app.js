@@ -6778,7 +6778,7 @@ const workflowsSlice = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createSl
     }).addCase(_actions_workFlow__WEBPACK_IMPORTED_MODULE_1__.updateWorkFlow.fulfilled, (state, action) => {
       state.allWorkFlows = action.payload;
     }).addCase(_actions_workFlow__WEBPACK_IMPORTED_MODULE_1__.deleteWorkFlow.fulfilled, (state, action) => {
-      state.allWorkFlows = state.data.filter(item => parseInt(item.id) !== parseInt(action.payload));
+      state.allWorkFlows = state.allWorkFlows.filter(item => parseInt(item.id) !== parseInt(action.payload));
     }).addCase(_actions_workFlow__WEBPACK_IMPORTED_MODULE_1__.updateWorkFlowStatus.fulfilled, (state, action) => {
       const {
         id,
