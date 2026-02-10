@@ -1485,9 +1485,16 @@ const ZAPInput = ({
   onChange,
   type = 'text',
   containerStyle,
-  inputStyle,
-  textAreaSize
+  inputStyle
 }) => {
+  const textareaRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    if (type === 'textarea' && textareaRef.current) {
+      const el = textareaRef.current;
+      el.style.height = '0px';
+      el.style.height = el.scrollHeight + 'px';
+    }
+  }, [value, type]);
   const InputComponent = type === 'textarea' ? _chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Textarea : _chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Input;
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Flex, {
     as: "label",
@@ -1502,13 +1509,16 @@ const ZAPInput = ({
       fontSize: "0.875rem",
       children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_5__.__)(label, 'zaplane')
     }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(InputComponent, {
+      ref: type === 'textarea' ? textareaRef : null,
       className: `zaplane-${type === 'textarea' ? 'textarea' : 'input'}`,
-      type: type !== "textarea" ? type : undefined,
+      type: type !== 'textarea' ? type : undefined,
       placeholder: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_5__.__)(placeholder, 'zaplane'),
       value: value,
       onChange: onChange,
       style: {
-        ...inputStyle
+        ...inputStyle,
+        overflow: type === 'textarea' ? 'hidden' : undefined,
+        resize: 'none'
       }
     })]
   });
@@ -3802,7 +3812,6 @@ const items = [{
 }];
 function ConditionGroupField({
   value,
-  onChange,
   field,
   nodeId,
   workFlow
@@ -3826,33 +3835,33 @@ function ConditionGroupField({
           ...EMPTY_RULE
         }]);
       }
-      const groups = value && value.length ? value : [];
+      const groups = value || [];
       return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Flex, {
         direction: "column",
         gap: 4,
         children: [groups.map((group, gIndex) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
           children: [groups.length > 1 && gIndex !== 0 && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Flex, {
             align: "center",
+            mb: 3,
             children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
               flex: "1",
               h: "1px",
               bg: "gray.300"
             }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
-              className: "zaplane-label",
               mx: 3,
               fontSize: "sm",
               children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_9__.__)("OR", "zaplane")
             }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
               flex: "1",
               h: "1px",
-              bg: "var(--zaplane-border-color)"
+              bg: "gray.300"
             })]
           }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(formik__WEBPACK_IMPORTED_MODULE_5__.FieldArray, {
             name: `${field.key}.${gIndex}`,
             children: ruleHelpers => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.Fragment, {
               children: group.map((rule, rIndex) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Flex, {
                 gap: 4,
-                align: "flex-end",
+                align: "flex-start",
                 mb: "15px",
                 children: [ruleFields.map(f => {
                   if (f.type === "select") {
@@ -3870,6 +3879,7 @@ function ConditionGroupField({
                     }, f.key);
                   }
                   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_ZAPComponents_ZAPInput__WEBPACK_IMPORTED_MODULE_7__["default"], {
+                    type: "textarea",
                     label: f.label,
                     value: rule[f.key],
                     onChange: e => {
@@ -3878,19 +3888,18 @@ function ConditionGroupField({
                         ...rule,
                         [f.key]: val
                       });
-                      if (val.includes("@")) {
-                        setPopoverOpen(true);
-                      } else {
-                        setPopoverOpen(false);
-                      }
+                      setPopoverOpen(val.includes("@"));
                     },
                     containerStyle: {
-                      width: "30%"
+                      width: "30%",
+                      alignSelf: "stretch"
                     }
                   }, f.key);
                 }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Flex, {
                   gap: 2,
-                  mt: "25px",
+                  mt: "22px",
+                  align: "center",
+                  minH: "30px",
                   children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Button, {
                     type: "button",
                     onClick: () => ruleHelpers.push({
@@ -3899,7 +3908,6 @@ function ConditionGroupField({
                     children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_9__.__)("Add", "zaplane")
                   }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Button, {
                     type: "button",
-                    colorScheme: "#FF0000",
                     variant: "ghost",
                     size: "sm",
                     disabled: group.length === 1 && groups.length === 1 && !gIndex,
@@ -3931,32 +3939,18 @@ function ConditionGroupField({
             collapsible: true,
             children: items.map((item, index) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.AccordionItem, {
               value: item.value,
-              border: "1px solid var(--zaplane-border-color)",
-              borderBottom: index === items.length - 1 ? "1px solid var(--zaplane-border-color)" : "0",
-              borderBottomRadius: index === items.length - 1 ? "md" : "0",
-              borderTopRadius: index === 0 ? "md" : "0",
-              overflow: "hidden",
-              children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.AccordionItemTrigger, {
+              children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.AccordionItemTrigger, {
                 px: "12px",
                 py: "10px",
-                _hover: {
-                  bg: "gray.50"
-                },
-                children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Flex, {
-                  align: "center",
-                  w: "100%",
-                  children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
-                    flex: "1",
-                    fontSize: "sm",
-                    fontWeight: "500",
-                    children: item.title
-                  }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.AccordionItemIndicator, {})]
-                })
+                children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
+                  flex: "1",
+                  fontSize: "sm",
+                  children: item.title
+                }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.AccordionItemIndicator, {})]
               }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.AccordionItemContent, {
                 children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.AccordionItemBody, {
                   px: "12px",
                   py: "10px",
-                  bg: "gray.50",
                   children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
                     fontSize: "sm",
                     children: item.text
