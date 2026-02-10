@@ -3630,7 +3630,7 @@ function ActionDrawer({
               loadingFields: loadingFields,
               fetchDynamicOptions: fetchDynamicOptions,
               nodeId: node?.id,
-              singleData: singleData
+              workFlow: workFlow
             }, field.key))
           })]
         })
@@ -3694,7 +3694,7 @@ const ActionFieldRenderer = ({
   loadingFields,
   fetchDynamicOptions,
   nodeId,
-  singleData
+  workFlow
 }) => {
   const handleChange = val => setFieldValue(field.key, val);
   const commonProps = {
@@ -3735,7 +3735,7 @@ const ActionFieldRenderer = ({
         value: value,
         field: field,
         nodeId: nodeId,
-        singleData: singleData
+        workFlow: workFlow
       });
     default:
       return null;
@@ -3805,20 +3805,19 @@ function ConditionGroupField({
   onChange,
   field,
   nodeId,
-  singleData
+  workFlow
 }) {
-  console.log(nodeId, 'values');
   const ruleFields = field?.fields;
   const EMPTY_RULE = (0,_helper__WEBPACK_IMPORTED_MODULE_10__.buildEmptyRule)(ruleFields);
   const [isPopoverOpen, setPopoverOpen] = (0,react__WEBPACK_IMPORTED_MODULE_12__.useState)(false);
   const dispatch = (0,react_redux__WEBPACK_IMPORTED_MODULE_13__.useDispatch)();
   (0,react__WEBPACK_IMPORTED_MODULE_12__.useEffect)(() => {
-    if (!nodeId || !singleData?.version?.hash) return;
+    if (!nodeId || !workFlow?.version?.hash) return;
     dispatch((0,_ZAPRedux_Slices_workFlowSlice_actions_conditonVariales__WEBPACK_IMPORTED_MODULE_14__.conditionVariables)({
       targetNodeKey: nodeId,
-      workflowHash: singleData.version.hash
+      workflowHash: workFlow.version.hash
     }));
-  }, [dispatch, nodeId, singleData?.version?.hash]);
+  }, [dispatch, nodeId, workFlow?.version?.hash]);
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(formik__WEBPACK_IMPORTED_MODULE_5__.FieldArray, {
     name: field.key,
     children: groupHelpers => {

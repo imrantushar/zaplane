@@ -9,27 +9,27 @@ import WPPopover from "@ZAPComponents/Popaver/WPPopover";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { conditionVariables } from "@ZAPRedux/Slices/workFlowSlice/actions/conditonVariales";
+
 const items = [
     { value: "a", title: "First Item", text: "Some value 1..." },
     { value: "b", title: "Second Item", text: "Some value 2..." },
     { value: "c", title: "Third Item", text: "Some value 3..." },
 ]
-export default function ConditionGroupField({ value, onChange, field, nodeId, singleData }) {
-    console.log(nodeId, 'values');
+export default function ConditionGroupField({ value, onChange, field, nodeId, workFlow }) {
     const ruleFields = field?.fields;
     const EMPTY_RULE = buildEmptyRule(ruleFields);
     const [isPopoverOpen, setPopoverOpen] = useState(false);
     const dispatch = useDispatch()
     useEffect(() => {
-        if (!nodeId || !singleData?.version?.hash) return;
+        if (!nodeId || !workFlow?.version?.hash) return;
 
         dispatch(
             conditionVariables({
                 targetNodeKey: nodeId,
-                workflowHash: singleData.version.hash,
+                workflowHash: workFlow.version.hash,
             })
         );
-    }, [dispatch, nodeId, singleData?.version?.hash]);
+    }, [dispatch, nodeId, workFlow?.version?.hash]);
 
 
 

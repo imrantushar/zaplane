@@ -240,7 +240,7 @@ export default function ActionDrawer({ open, context, onClose, updateNodeData, c
                         loadingFields={loadingFields}
                         fetchDynamicOptions={fetchDynamicOptions}
                         nodeId={node?.id}
-                        singleData={singleData}
+                        workFlow={workFlow}
                       />
                     ))}
                   </Flex>
