@@ -10,10 +10,40 @@ import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { conditionVariables } from "@ZAPRedux/Slices/workFlowSlice/actions/conditonVariales";
 
+
 const items = [
-    { value: "a", title: "First Item", text: "Some value 1..." },
-    { value: "b", title: "Second Item", text: "Some value 2..." },
-    { value: "c", title: "Third Item", text: "Some value 3..." },
+    {
+        name: "Wordpress",
+        variable: [
+            {
+                "key": "post_modified",
+                "type": "string",
+                "value": "2026-02-09 02:11:10"
+            },
+            {
+                "key": "post_modified_gmt",
+                "type": "string",
+                "value": "0000-00-00 00:00:00"
+            },
+            {
+                "key": "post_content_filtered",
+                "type": "string",
+                "value": ""
+            },
+            {
+                "key": "post_parent",
+                "type": "integer",
+                "value": 0
+            },
+            {
+                "key": "guid",
+                "type": "string",
+                "value": "http:\/\/localhost\/kodezen\/?p=13"
+            },
+
+        ]
+    },
+    { name: "slack", variable: [] }
 ];
 
 export default function ConditionGroupField({
@@ -188,7 +218,7 @@ export default function ConditionGroupField({
                                         >
                                             <Flex align="center" w="100%">
                                                 <Text flex="1" fontSize="sm" fontWeight="500">
-                                                    {item.title}
+                                                    {item.name}
                                                 </Text>
                                                 <Accordion.ItemIndicator />
                                             </Flex>
@@ -196,9 +226,11 @@ export default function ConditionGroupField({
 
                                         <Accordion.ItemContent>
                                             <Accordion.ItemBody px="12px" py="10px" bg="gray.50">
-                                                <Text fontSize="sm">
-                                                    {item.text}
-                                                </Text>
+                                                {item.variable.map((v, vi) => (
+                                                    <Text key={vi}>
+                                                        {v.key}: {v.value}
+                                                    </Text>
+                                                ))}
                                             </Accordion.ItemBody>
                                         </Accordion.ItemContent>
                                     </Accordion.Item>

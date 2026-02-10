@@ -3801,17 +3801,31 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const items = [{
-  value: "a",
-  title: "First Item",
-  text: "Some value 1..."
+  name: "Wordpress",
+  variable: [{
+    "key": "post_modified",
+    "type": "string",
+    "value": "2026-02-09 02:11:10"
+  }, {
+    "key": "post_modified_gmt",
+    "type": "string",
+    "value": "0000-00-00 00:00:00"
+  }, {
+    "key": "post_content_filtered",
+    "type": "string",
+    "value": ""
+  }, {
+    "key": "post_parent",
+    "type": "integer",
+    "value": 0
+  }, {
+    "key": "guid",
+    "type": "string",
+    "value": "http:\/\/localhost\/kodezen\/?p=13"
+  }]
 }, {
-  value: "b",
-  title: "Second Item",
-  text: "Some value 2..."
-}, {
-  value: "c",
-  title: "Third Item",
-  text: "Some value 3..."
+  name: "slack",
+  variable: []
 }];
 function ConditionGroupField({
   value,
@@ -3961,7 +3975,7 @@ function ConditionGroupField({
                     flex: "1",
                     fontSize: "sm",
                     fontWeight: "500",
-                    children: item.title
+                    children: item.name
                   }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.AccordionItemIndicator, {})]
                 })
               }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.AccordionItemContent, {
@@ -3969,10 +3983,9 @@ function ConditionGroupField({
                   px: "12px",
                   py: "10px",
                   bg: "gray.50",
-                  children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
-                    fontSize: "sm",
-                    children: item.text
-                  })
+                  children: item.variable.map((v, vi) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
+                    children: [v.key, ": ", v.value]
+                  }, vi))
                 })
               })]
             }, index))
