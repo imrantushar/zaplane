@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-02-10 08:36:15",
+    "generated_at": "2026-02-10 08:58:37",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -3038,6 +3038,69 @@
             "category": "app",
             "triggers": [],
             "actions": []
+        },
+        "easyDigitalDownload": {
+            "slug": "easyDigitalDownload",
+            "name": "Easy Digital Download",
+            "icon": "",
+            "category": "app",
+            "triggers": {
+                "edd_purchase_complete": {
+                    "key": "edd_purchase_complete",
+                    "label": "Purchase Complete",
+                    "hook": "edd_complete_purchase",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "edd_download_purchased": {
+                    "key": "edd_download_purchased",
+                    "label": "Download Purchased",
+                    "hook": "edd_insert_payment",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "edd_customer_created": {
+                    "key": "edd_customer_created",
+                    "label": "Customer Created",
+                    "hook": "edd_customer_post_create",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "edd_subscription_created": {
+                    "key": "edd_subscription_created",
+                    "label": "Subscription Created",
+                    "hook": "edd_subscription_post_create",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "edd_subscription_cancelled": {
+                    "key": "edd_subscription_cancelled",
+                    "label": "Subscription Cancelled",
+                    "hook": "edd_subscription_cancelled",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "edd_refund_created": {
+                    "key": "edd_refund_created",
+                    "label": "Refund Created",
+                    "hook": "edd_refund_order",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": {}
         },
         "storeengine": {
             "slug": "storeengine",
