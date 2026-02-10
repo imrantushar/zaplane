@@ -3803,25 +3803,25 @@ __webpack_require__.r(__webpack_exports__);
 const items = [{
   name: "Wordpress",
   variable: [{
-    "key": "post_modified",
-    "type": "string",
-    "value": "2026-02-09 02:11:10"
+    key: "post_modified",
+    type: "string",
+    value: "2026-02-09 02:11:10"
   }, {
-    "key": "post_modified_gmt",
-    "type": "string",
-    "value": "0000-00-00 00:00:00"
+    key: "post_modified_gmt",
+    type: "string",
+    value: "0000-00-00 00:00:00"
   }, {
-    "key": "post_content_filtered",
-    "type": "string",
-    "value": ""
+    key: "post_content_filtered",
+    type: "string",
+    value: ""
   }, {
-    "key": "post_parent",
-    "type": "integer",
-    "value": 0
+    key: "post_parent",
+    type: "integer",
+    value: 0
   }, {
-    "key": "guid",
-    "type": "string",
-    "value": "http:\/\/localhost\/kodezen\/?p=13"
+    key: "guid",
+    type: "string",
+    value: "http://localhost/kodezen/?p=13"
   }]
 }, {
   name: "slack",
@@ -3836,6 +3836,7 @@ function ConditionGroupField({
   const ruleFields = field?.fields;
   const EMPTY_RULE = (0,_helper__WEBPACK_IMPORTED_MODULE_10__.buildEmptyRule)(ruleFields);
   const [isPopoverOpen, setPopoverOpen] = (0,react__WEBPACK_IMPORTED_MODULE_12__.useState)(false);
+  const [activeInput, setActiveInput] = (0,react__WEBPACK_IMPORTED_MODULE_12__.useState)(null);
   const dispatch = (0,react_redux__WEBPACK_IMPORTED_MODULE_13__.useDispatch)();
   (0,react__WEBPACK_IMPORTED_MODULE_12__.useEffect)(() => {
     if (!nodeId || !workFlow?.version?.hash) return;
@@ -3905,7 +3906,14 @@ function ConditionGroupField({
                         ...rule,
                         [f.key]: val
                       });
-                      setPopoverOpen(val.includes("@"));
+                      if (val.endsWith("@")) {
+                        setActiveInput({
+                          gIndex,
+                          rIndex,
+                          fieldKey: f.key
+                        });
+                        setPopoverOpen(true);
+                      }
                     },
                     containerStyle: {
                       width: "30%",
@@ -3951,7 +3959,10 @@ function ConditionGroupField({
           children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_9__.__)("OR Group", "zaplane")
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_ZAPComponents_Popaver_WPPopover__WEBPACK_IMPORTED_MODULE_11__["default"], {
           isOpen: isPopoverOpen,
-          onClose: () => setPopoverOpen(false),
+          onClose: () => {
+            setPopoverOpen(false);
+            setActiveInput(null);
+          },
           title: "Insert data for Dynamic content",
           children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.AccordionRoot, {
             collapsible: true,
@@ -3984,6 +3995,21 @@ function ConditionGroupField({
                   py: "10px",
                   bg: "gray.50",
                   children: item.variable.map((v, vi) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
+                    cursor: "pointer",
+                    fontSize: "sm",
+                    _hover: {
+                      color: "blue.600"
+                    },
+                    onClick: () => {
+                      (0,_helper__WEBPACK_IMPORTED_MODULE_10__.insertVariableIntoGroup)({
+                        activeInput,
+                        groups,
+                        groupHelpers,
+                        valueToInsert: v.key,
+                        setPopoverOpen,
+                        setActiveInput
+                      });
+                    },
                     children: [v.key, ": ", v.value]
                   }, vi))
                 })
@@ -4007,7 +4033,8 @@ function ConditionGroupField({
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   buildEmptyRule: () => (/* binding */ buildEmptyRule)
+/* harmony export */   buildEmptyRule: () => (/* binding */ buildEmptyRule),
+/* harmony export */   insertVariableIntoGroup: () => (/* binding */ insertVariableIntoGroup)
 /* harmony export */ });
 const buildEmptyRule = fields => {
   const rule = {};
@@ -4016,6 +4043,41 @@ const buildEmptyRule = fields => {
     rule[f.key] = f.type === "select" ? (_f$options$0$value = f.options?.[0]?.value) !== null && _f$options$0$value !== void 0 ? _f$options$0$value : "" : "";
   });
   return rule;
+};
+const insertVariableIntoGroup = ({
+  activeInput,
+  groups,
+  groupHelpers,
+  valueToInsert,
+  setPopoverOpen,
+  setActiveInput
+}) => {
+  if (!activeInput) return;
+  const {
+    gIndex,
+    rIndex,
+    fieldKey
+  } = activeInput;
+  const newGroups = [...groups];
+  const currentRule = newGroups[gIndex][rIndex];
+
+  // Remove last '@' if present
+  let baseValue = currentRule[fieldKey] || "";
+  if (baseValue.endsWith("@")) baseValue = baseValue.slice(0, -1);
+
+  // Append selected variable
+  const newValue = baseValue ? `${baseValue}, ${valueToInsert}` : valueToInsert;
+  newGroups[gIndex][rIndex] = {
+    ...currentRule,
+    [fieldKey]: newValue
+  };
+
+  // Update Formik state
+  groupHelpers.replace(gIndex, newGroups[gIndex]);
+
+  // Close popover and reset active input
+  setPopoverOpen(false);
+  setActiveInput(null);
 };
 
 /***/ },
