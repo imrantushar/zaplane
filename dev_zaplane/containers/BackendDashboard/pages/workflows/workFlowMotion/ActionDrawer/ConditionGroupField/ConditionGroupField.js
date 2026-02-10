@@ -68,7 +68,7 @@ export default function ConditionGroupField({
                                                 <Flex
                                                     key={rIndex}
                                                     gap={4}
-                                                    align="flex-start" 
+                                                    align="flex-start"
                                                     mb="15px"
                                                 >
                                                     {ruleFields.map((f) => {
@@ -169,19 +169,35 @@ export default function ConditionGroupField({
                             onClose={() => setPopoverOpen(false)}
                             title="Insert data for Dynamic content"
                         >
-                            <Accordion.Root collapsible>
+                            <Accordion.Root collapsible >
                                 {items.map((item, index) => (
-                                    <Accordion.Item key={index} value={item.value}>
-                                        <Accordion.ItemTrigger px="12px" py="10px">
-                                            <Text flex="1" fontSize="sm">
-                                                {item.title}
-                                            </Text>
-                                            <Accordion.ItemIndicator />
+                                    <Accordion.Item
+                                        key={index}
+                                        value={item.value}
+                                        border="1px solid var(--zaplane-border-color)"
+                                        borderBottom={index === items.length - 1 ? "1px solid var(--zaplane-border-color)" : "0"}
+                                        borderBottomRadius={index === items.length - 1 ? "md" : "0"}
+                                        borderTopRadius={index === 0 ? "md" : "0"}
+                                        overflow="hidden"
+                                    >
+                                        <Accordion.ItemTrigger
+                                            px="12px"
+                                            py="10px"
+                                            _hover={{ bg: "gray.50" }}
+                                        >
+                                            <Flex align="center" w="100%">
+                                                <Text flex="1" fontSize="sm" fontWeight="500">
+                                                    {item.title}
+                                                </Text>
+                                                <Accordion.ItemIndicator />
+                                            </Flex>
                                         </Accordion.ItemTrigger>
 
                                         <Accordion.ItemContent>
-                                            <Accordion.ItemBody px="12px" py="10px">
-                                                <Text fontSize="sm">{item.text}</Text>
+                                            <Accordion.ItemBody px="12px" py="10px" bg="gray.50">
+                                                <Text fontSize="sm">
+                                                    {item.text}
+                                                </Text>
                                             </Accordion.ItemBody>
                                         </Accordion.ItemContent>
                                     </Accordion.Item>
