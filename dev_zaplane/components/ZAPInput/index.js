@@ -15,10 +15,15 @@ const ZAPInput = ({
   useEffect(() => {
     if (type === 'textarea' && textareaRef.current) {
       const el = textareaRef.current;
-      el.style.height = '0px';
-      el.style.height = el.scrollHeight + 'px';
+      const minHeight = 35;
+      el.style.height = minHeight + 'px';
+      if (value && value.length > 0) {
+        el.style.height = el.scrollHeight + 'px';
+      }
     }
   }, [value, type]);
+
+
 
 
 

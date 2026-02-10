@@ -115,12 +115,13 @@ export default function ConditionGroupField({
 
                                                     <Flex
                                                         gap={2}
-                                                        mt="22px"
+                                                        mt="34px"
                                                         align="center"
                                                         minH="30px"
                                                     >
                                                         <Button
                                                             type="button"
+                                                            height="34px"
                                                             onClick={() =>
                                                                 ruleHelpers.push({ ...EMPTY_RULE })
                                                             }

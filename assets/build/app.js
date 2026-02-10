@@ -1491,8 +1491,11 @@ const ZAPInput = ({
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
     if (type === 'textarea' && textareaRef.current) {
       const el = textareaRef.current;
-      el.style.height = '0px';
-      el.style.height = el.scrollHeight + 'px';
+      const minHeight = 35;
+      el.style.height = minHeight + 'px';
+      if (value && value.length > 0) {
+        el.style.height = el.scrollHeight + 'px';
+      }
     }
   }, [value, type]);
   const InputComponent = type === 'textarea' ? _chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Textarea : _chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Input;
@@ -3897,11 +3900,12 @@ function ConditionGroupField({
                   }, f.key);
                 }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Flex, {
                   gap: 2,
-                  mt: "22px",
+                  mt: "34px",
                   align: "center",
                   minH: "30px",
                   children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Button, {
                     type: "button",
+                    height: "34px",
                     onClick: () => ruleHelpers.push({
                       ...EMPTY_RULE
                     }),
