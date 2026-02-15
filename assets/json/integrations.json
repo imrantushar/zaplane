@@ -3238,6 +3238,42 @@
                     ]
                 }
             }
+        },
+        "beaverbuilder": {
+            "slug": "beaverbuilder",
+            "name": "Beaver Builder",
+            "icon": "",
+            "category": "app",
+            "triggers": {
+                "contact_form_submission": {
+                    "key": "contact_form_submission",
+                    "label": "Contact Form Submission",
+                    "hook": "fl_builder_contact_form_submission",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "login_form_submission": {
+                    "key": "login_form_submission",
+                    "label": "Login Form Submission",
+                    "hook": "fl_builder_login_form_submission",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "subscribe_form_submission": {
+                    "key": "subscribe_form_submission",
+                    "label": "Subscribe Form Submission",
+                    "hook": "fl_builder_subscribe_form_submission",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": {}
         }
     },
     "tools": {
