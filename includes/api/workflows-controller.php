@@ -317,7 +317,7 @@ class WorkflowsController extends WP_REST_Controller
     public function get_condition_variables($request)
     {
         $workflowHash = $request->get_param('workflow_hash');
-        $targetNodeKey = (string) $request->get_param('target_node_key');
+        $targetNodeKey = (int) $request->get_param('target_node_key');
 
         if (empty($workflowHash) || empty($targetNodeKey)) {
             return new WP_Error('invalid_params', 'workflow_hash and target_node_key are required', ['status' => 400]);
@@ -335,7 +335,7 @@ class WorkflowsController extends WP_REST_Controller
 
         $nodeMap = [];
         foreach ($nodes as $node) {
-            $nodeMap[(string) $node['id']] = $node;
+            $nodeMap[(int) $node['id']] = $node;
         }
 
         $previousNodeIds = $this->findPreviousNodes($targetNodeKey, $edges);
@@ -377,7 +377,7 @@ class WorkflowsController extends WP_REST_Controller
         ]);
     }
 
-    private function findPreviousNodes(string $targetNodeId, array $edges): array
+    private function findPreviousNodes(int $targetNodeId, array $edges): array
     {
         $previousNodes = [];
         $queue = [$targetNodeId];
@@ -387,8 +387,8 @@ class WorkflowsController extends WP_REST_Controller
             $currentId = array_shift($queue);
 
             foreach ($edges as $edge) {
-                $target = (string) $edge['target'];
-                $source = (string) $edge['source'];
+                $target = (int) $edge['target'];
+                $source = (int) $edge['source'];
 
                 if ($target === $currentId && !isset($visited[$source])) {
                     $visited[$source] = true;

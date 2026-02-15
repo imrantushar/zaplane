@@ -117,7 +117,7 @@ class Run extends Model
         foreach ($testRuns as $run) {
             $nodeRuns = $run->nodeRuns();
             foreach ($nodeRuns as $nodeRun) {
-                $key = (string) $nodeRun->node_key;
+                $key = $nodeRun->node_key;
                 if (!isset($nodeOutputs[$key]) && $nodeRun->isCompleted()) {
                     $nodeOutputs[$key] = $nodeRun;
                 }
@@ -139,7 +139,7 @@ class Run extends Model
         foreach ($runs as $run) {
             $nodeRuns = $run->nodeRuns();
             foreach ($nodeRuns as $nodeRun) {
-                $key = (string) $nodeRun->node_key;
+                $key = $nodeRun->node_key;
                 if (!isset($nodeOutputs[$key]) && $nodeRun->isCompleted()) {
                     $nodeOutputs[$key] = $nodeRun;
                 }

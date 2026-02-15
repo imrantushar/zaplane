@@ -252,18 +252,20 @@ class RunController extends WP_REST_Controller
             return new WP_Error('no_trigger', 'No trigger node found', ['status' => 400]);
         }
 
+        $triggerKey = (int) $trigger['id'];
+
         $run = Run::create([
             'workflow_version_hash' => $workflowHash,
             'status' => 'running',
             'trigger_data' => $data,
-            'start_node_key' => $trigger['id'],
+            'start_node_key' => $triggerKey,
             'target_node_key' => null,
             'started_at' => current_time('mysql'),
         ]);
 
         $this->container->get('automation')->spawn_node_run(
             $run->id,
-            $trigger['id'],
+            $triggerKey,
             $data,
             null
         );
