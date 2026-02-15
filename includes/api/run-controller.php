@@ -221,7 +221,12 @@ class RunController extends WP_REST_Controller
         $nodeRun->output_json = null;
         $nodeRun->save();
 
-        as_enqueue_async_action('zaplane_execute_node_run', ['node_run_id' => $id], 'zaplane');
+        if (function_exists('as_enqueue_async_action')) {
+            as_enqueue_async_action('zaplane_execute_node_run', ['node_run_id' => $id], 'zaplane');
+        } else {
+            wp_schedule_single_event(time(), 'zaplane_execute_node_run', ['node_run_id' => $id]);
+            spawn_cron();
+        }
 
         return ['requeued' => true];
     }
