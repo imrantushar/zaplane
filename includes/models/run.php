@@ -105,9 +105,6 @@ class Run extends Model
         return static::orderBy('id', 'desc')->limit($limit)->get();
     }
 
-    /**
-     * Get the latest test runs for a workflow version, grouped by node_key
-     */
     public static function latestTestNodeRuns(string $hash): array
     {
         $testRuns = static::where('workflow_version_hash', $hash)
@@ -118,6 +115,28 @@ class Run extends Model
         $nodeOutputs = [];
 
         foreach ($testRuns as $run) {
+            $nodeRuns = $run->nodeRuns();
+            foreach ($nodeRuns as $nodeRun) {
+                $key = (string) $nodeRun->node_key;
+                if (!isset($nodeOutputs[$key]) && $nodeRun->isCompleted()) {
+                    $nodeOutputs[$key] = $nodeRun;
+                }
+            }
+        }
+
+        return $nodeOutputs;
+    }
+
+    public static function latestNodeOutputs(string $hash): array
+    {
+        $runs = static::where('workflow_version_hash', $hash)
+            ->whereIn('status', ['completed', 'failed', 'running'])
+            ->orderBy('id', 'desc')
+            ->get();
+
+        $nodeOutputs = [];
+
+        foreach ($runs as $run) {
             $nodeRuns = $run->nodeRuns();
             foreach ($nodeRuns as $nodeRun) {
                 $key = (string) $nodeRun->node_key;

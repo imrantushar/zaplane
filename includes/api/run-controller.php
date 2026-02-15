@@ -5,6 +5,7 @@ namespace Zaplane\API;
 use WP_REST_Controller;
 use WP_Error;
 use Zaplane\Framework\Classes\Container;
+use Zaplane\Framework\Core\Automation;
 use Zaplane\Models\Run;
 use Zaplane\Models\NodeRun;
 use Zaplane\Models\WorkflowVersion;
@@ -221,7 +222,7 @@ class RunController extends WP_REST_Controller
         $nodeRun->output_json = null;
         $nodeRun->save();
 
-        as_enqueue_async_action('zaplane_execute_node_run', ['node_run_id' => $id], 'zaplane');
+        Automation::enqueue_node_run($id);
 
         return ['requeued' => true];
     }

@@ -339,9 +339,9 @@ class WorkflowsController extends WP_REST_Controller
         }
 
         $previousNodeIds = $this->findPreviousNodes($targetNodeKey, $edges);
-        $testNodeRuns = Run::latestTestNodeRuns($workflowHash);
+        $nodeOutputs = Run::latestNodeOutputs($workflowHash);
 
-        $variables = [];
+        $data = [];
         foreach ($previousNodeIds as $nodeId) {
             $node = $nodeMap[$nodeId] ?? null;
             if (!$node) continue;
@@ -349,47 +349,31 @@ class WorkflowsController extends WP_REST_Controller
             $nodeType = $node['type'] ?? '';
             if (!in_array($nodeType, ['action', 'trigger'])) continue;
 
-            $nodeRun = $testNodeRuns[$nodeId] ?? null;
-            $nodeLabel = $node['data']['label'] ?? $node['data']['event'] ?? "Node {$nodeId}";
-            $nodeApp = $node['data']['app'] ?? 'unknown';
+            $nodeRun = $nodeOutputs[$nodeId] ?? null;
 
             if ($nodeRun) {
                 $output = $nodeRun->getOutput();
-                $outputData = $output['data'] ?? $output;
 
-                if (!is_array($outputData)) {
-                    $outputData = ['value' => $outputData];
+                if (!is_array($output)) {
+                    $output = ['value' => $output];
                 }
 
-                $variables[] = [
+                $data[] = [
                     'node_id' => $nodeId,
-                    'node_label' => $nodeLabel,
-                    'node_app' => $nodeApp,
-                    'node_event' => $node['data']['event'] ?? null,
-                    'has_test_data' => true,
-                    'node_run_id' => $nodeRun->id,
-                    'tested_at' => $nodeRun->finished_at,
-                    'output' => $outputData,
-                    'variables' => VariableExtractor::extract($outputData),
+                    'variables' => VariableExtractor::extract($output),
                 ];
             } else {
-                $variables[] = [
+                $data[] = [
                     'node_id' => $nodeId,
-                    'node_label' => $nodeLabel,
-                    'node_app' => $nodeApp,
-                    'node_event' => $node['data']['event'] ?? null,
-                    'has_test_data' => false,
-                    'node_run_id' => null,
-                    'tested_at' => null,
-                    'output' => null,
                     'variables' => [],
                 ];
             }
         }
 
         return rest_ensure_response([
-            'target_node_key' => $targetNodeKey,
-            'previous_nodes' => $variables,
+            'status' => 'success',
+            'code' => 'SUCCESS',
+            'data' => $data,
         ]);
     }
 

@@ -182,11 +182,21 @@ class Automation
             'started_at' => current_time('mysql'),
         ]);
 
-        as_enqueue_async_action(
-            'zaplane_execute_node_run',
-            ['node_run_id' => $nodeRun->id],
-            'zaplane'
-        );
+        self::enqueue_node_run($nodeRun->id);
+    }
+
+    public static function enqueue_node_run(int $node_run_id): void
+    {
+        if (function_exists('as_enqueue_async_action')) {
+            as_enqueue_async_action(
+                'zaplane_execute_node_run',
+                ['node_run_id' => $node_run_id],
+                'zaplane'
+            );
+            return;
+        }
+
+        do_action('zaplane_execute_node_run', $node_run_id);
     }
 
     public function dispatch_node_run(int $node_run_id)
