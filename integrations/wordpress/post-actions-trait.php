@@ -326,7 +326,7 @@ trait PostActionsTrait
     {
         $added = wp_set_object_terms(
             $config['post_id'] ?? 0,
-            Helper::normalize_list($config['terms'] ?? []),
+            WordpressHelpers::normalize_list($config['terms'] ?? []),
             $config['taxonomy'] ?? '',
             $config['append'] ?? false
         );
@@ -337,7 +337,7 @@ trait PostActionsTrait
     {
         $removed = wp_remove_object_terms(
             $config['post_id'] ?? 0,
-            Helper::normalize_list($config['terms'] ?? []),
+            WordpressHelpers::normalize_list($config['terms'] ?? []),
             $config['taxonomy'] ?? ''
         );
         return static::success(['removed' => $removed]);
@@ -346,8 +346,8 @@ trait PostActionsTrait
     protected static function action_bulk_assign_terms_to_posts(array $config): array
     {
         $results = [];
-        $post_ids = Helper::normalize_list($config['post_ids'] ?? []);
-        $terms = Helper::normalize_list($config['terms'] ?? []);
+        $post_ids = WordpressHelpers::normalize_list($config['post_ids'] ?? []);
+        $terms = WordpressHelpers::normalize_list($config['terms'] ?? []);
         $taxonomy = $config['taxonomy'] ?? '';
         $append   = $config['append'] ?? false;
 
@@ -361,8 +361,8 @@ trait PostActionsTrait
     protected static function action_bulk_remove_terms_from_posts(array $config): array
     {
         $results = [];
-        $post_ids = Helper::normalize_list($config['post_ids'] ?? []);
-        $terms = Helper::normalize_list($config['terms'] ?? []);
+        $post_ids = WordpressHelpers::normalize_list($config['post_ids'] ?? []);
+        $terms = WordpressHelpers::normalize_list($config['terms'] ?? []);
         $taxonomy = $config['taxonomy'] ?? '';
 
         foreach ($post_ids as $post_id) {
@@ -376,7 +376,7 @@ trait PostActionsTrait
     {
         $added = wp_set_post_categories(
             $config['post_id'] ?? 0,
-            Helper::normalize_list($config['categories'] ?? []),
+            WordpressHelpers::normalize_list($config['categories'] ?? []),
             $config['append'] ?? false
         );
         return static::success(['added' => $added]);
@@ -386,7 +386,7 @@ trait PostActionsTrait
     {
         $added = wp_set_post_tags(
             $config['post_id'] ?? 0,
-            Helper::normalize_list($config['tags'] ?? []),
+            WordpressHelpers::normalize_list($config['tags'] ?? []),
             $config['append'] ?? false
         );
         return static::success(['added' => $added]);
@@ -396,7 +396,7 @@ trait PostActionsTrait
     {
         $removed = wp_remove_object_terms(
             $config['post_id'] ?? 0,
-            Helper::normalize_list($config['tags'] ?? []),
+            WordpressHelpers::normalize_list($config['tags'] ?? []),
             'post_tag'
         );
         return static::success(['removed' => $removed]);

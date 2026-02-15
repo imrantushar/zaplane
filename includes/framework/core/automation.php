@@ -6,6 +6,7 @@ use Zaplane\Framework\Classes\Container;
 use Zaplane\Framework\Classes\Query;
 use Zaplane\Framework\Exceptions\WorkflowException;
 use Zaplane\Framework\Exceptions\IntegrationException;
+use Zaplane\Framework\Models\Option;
 use Zaplane\Models\Run;
 use Zaplane\Models\NodeRun;
 use Zaplane\Models\WorkflowVersion;
@@ -40,6 +41,7 @@ class Automation
         }
 
         add_action('init', [$this, 'dispatch_active_triggers']);
+        add_action('init', [$this, 'dispatch_active_listeners']);
         add_action('zaplane_execute_node_run', [$this, 'dispatch_node_run'], 10, 1);
         add_action('zaplane_workflow_updated', [$this, 'reload_triggers']);
     }
@@ -47,10 +49,13 @@ class Automation
     public function reload_triggers()
     {
         foreach ($this->registered_hooks as $event => $cb) {
-            remove_action($event, $cb, 10);
+            if (is_array($cb)) {
+                remove_action($event, $cb, 10);
+            }
         }
         $this->registered_hooks = [];
         $this->dispatch_active_triggers();
+        $this->dispatch_active_listeners();
     }
 
     public function dispatch_active_triggers(): void
@@ -61,6 +66,80 @@ class Automation
                 add_action($event, $cb, 10, 99);
                 $this->registered_hooks[$event] = $cb;
             }
+        }
+    }
+
+    public function dispatch_active_listeners(): void
+    {
+        $listeners = Option::where('option_name', 'LIKE', 'zaplane_listener_state_%')->get();
+
+        foreach ($listeners as $listener) {
+            $state = $listener->getValue();
+
+            if (!$state || !is_array($state) || ($state['status'] ?? '') !== 'listening') {
+                continue;
+            }
+
+            $hook = $state['hook'] ?? '';
+            if (!$hook) {
+                continue;
+            }
+
+            // Register hook if not already registered
+            if (!isset($this->registered_hooks['listener_' . $hook])) {
+                add_action($hook, [$this, 'listener_hook_handler'], 1, 99);
+                $this->registered_hooks['listener_' . $hook] = true;
+            }
+        }
+    }
+
+    public function listener_hook_handler()
+    {
+        $currentHook = current_filter();
+        $args = func_get_args();
+
+        $listeners = Option::where('option_name', 'LIKE', 'zaplane_listener_state_%')->get();
+
+        foreach ($listeners as $listener) {
+            $state = $listener->getValue();
+
+            if (!$state || !is_array($state) || ($state['status'] ?? '') !== 'listening') {
+                continue;
+            }
+
+            if (($state['hook'] ?? '') !== $currentHook) {
+                continue;
+            }
+
+            $workflowId = $state['workflow_id'] ?? 0;
+            $hookInfoOption = 'zaplane_listener_hook_' . $workflowId;
+            $hookInfo = Option::get($hookInfoOption);
+
+            if (!$hookInfo || !is_array($hookInfo)) {
+                continue;
+            }
+
+            $node = $hookInfo['node'];
+
+            // Resolve trigger data using the integration
+            $integration = $this->container->get('integrations')->get(strtolower($node['data']['app']));
+            if (!$integration) {
+                continue;
+            }
+
+            $payload = $integration::resolve_trigger($node['data'], $args);
+            if (!$payload) {
+                continue;
+            }
+
+            // Update state with captured data
+            $state['status'] = 'triggered';
+            $state['data'] = $payload;
+            $state['triggered_at'] = current_time('mysql');
+
+            Option::set($listener->option_name, $state, 'no');
+
+            // Handle this listener, continue to check others
         }
     }
 
@@ -80,19 +159,21 @@ class Automation
 
     private function start_trigger_run(array $trigger, array $payload)
     {
+        $nodeKey = (int) $trigger['id'];
+
         $run = Run::create([
             'workflow_version_hash' => $trigger['workflow_version_hash'],
             'trigger_data' => $payload,
             'status' => 'running',
-            'start_node_key' => $trigger['id'],
+            'start_node_key' => $nodeKey,
             'target_node_key' => null,
             'started_at' => current_time('mysql'),
         ]);
 
-        $this->spawn_node_run($run->id, $trigger['id'], $payload, null);
+        $this->spawn_node_run($run->id, $nodeKey, $payload, null);
     }
 
-    public function spawn_node_run(int $run_id, string $node_key, array $input, ?int $parent)
+    public function spawn_node_run(int $run_id, int $node_key, array $input, ?int $parent)
     {
         $nodeRun = NodeRun::create([
             'run_id' => $run_id,
@@ -103,11 +184,21 @@ class Automation
             'started_at' => current_time('mysql'),
         ]);
 
-        as_enqueue_async_action(
-            'zaplane_execute_node_run',
-            ['node_run_id' => $nodeRun->id],
-            'zaplane'
-        );
+        self::enqueue_node_run($nodeRun->id);
+    }
+
+    public static function enqueue_node_run(int $node_run_id): void
+    {
+        if (function_exists('as_enqueue_async_action')) {
+            as_enqueue_async_action(
+                'zaplane_execute_node_run',
+                ['node_run_id' => $node_run_id],
+                'zaplane'
+            );
+            return;
+        }
+
+        do_action('zaplane_execute_node_run', $node_run_id);
     }
 
     public function dispatch_node_run(int $node_run_id)
@@ -176,10 +267,10 @@ class Automation
         }
 
         foreach ($graph['edges'] as $edge) {
-            if ($edge['source'] === $nodeRun->node_key) {
+            if ((int) $edge['source'] === $nodeRun->node_key) {
                 $this->spawn_node_run(
                     $nodeRun->run_id,
-                    $edge['target'],
+                    (int) $edge['target'],
                     $output,
                     $nodeRun->id
                 );
@@ -213,10 +304,10 @@ class Automation
         return $version ? $version->getGraph() : ['nodes' => [], 'edges' => []];
     }
 
-    private function find_node(array $graph, string $key, int $run_id = 0): array
+    private function find_node(array $graph, int $key, int $run_id = 0): array
     {
         foreach ($graph['nodes'] as $node) {
-            if ((string) $node['id'] === (string) $key) {
+            if ((int) $node['id'] === $key) {
                 return $node;
             }
         }
