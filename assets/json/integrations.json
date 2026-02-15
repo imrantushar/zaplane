@@ -3045,55 +3045,91 @@
             "icon": "",
             "category": "app",
             "triggers": {
-                "edd_purchase_complete": {
-                    "key": "edd_purchase_complete",
-                    "label": "Purchase Complete",
+                "product_purchased_discount": {
+                    "key": "product_purchased_discount",
+                    "label": "Product purchased with a discount code",
                     "hook": "edd_complete_purchase",
                     "schema": [],
                     "outputs": [
                         "main"
                     ]
                 },
-                "edd_download_purchased": {
-                    "key": "edd_download_purchased",
-                    "label": "Download Purchased",
-                    "hook": "edd_insert_payment",
+                "order_refunded_stripe": {
+                    "key": "order_refunded_stripe",
+                    "label": "User order refunded via Stripe gateway",
+                    "hook": "edd_stripe_refund_order",
                     "schema": [],
                     "outputs": [
                         "main"
                     ]
                 },
-                "edd_customer_created": {
-                    "key": "edd_customer_created",
-                    "label": "Customer Created",
-                    "hook": "edd_customer_post_create",
+                "subscription_renewed": {
+                    "key": "subscription_renewed",
+                    "label": "User Subscription Renewed",
+                    "hook": "edd_subscription_post_renew",
                     "schema": [],
                     "outputs": [
                         "main"
                     ]
                 },
-                "edd_subscription_created": {
-                    "key": "edd_subscription_created",
-                    "label": "Subscription Created",
-                    "hook": "edd_subscription_post_create",
+                "license_key_created": {
+                    "key": "license_key_created",
+                    "label": "User License Key Create",
+                    "hook": "edd_sl_post_insert_license",
                     "schema": [],
                     "outputs": [
                         "main"
                     ]
                 },
-                "edd_subscription_cancelled": {
-                    "key": "edd_subscription_cancelled",
-                    "label": "Subscription Cancelled",
-                    "hook": "edd_subscription_cancelled",
+                "license_key_activated": {
+                    "key": "license_key_activated",
+                    "label": "User License Key Activated",
+                    "hook": "edd_sl_post_activate_license",
                     "schema": [],
                     "outputs": [
                         "main"
                     ]
                 },
-                "edd_refund_created": {
-                    "key": "edd_refund_created",
-                    "label": "Refund Created",
-                    "hook": "edd_refund_order",
+                "license_key_deactivated": {
+                    "key": "license_key_deactivated",
+                    "label": "User License Key Deactivated",
+                    "hook": "edd_sl_post_deactivate_license",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "license_status_active": {
+                    "key": "license_status_active",
+                    "label": "User License Key Status Change To Active",
+                    "hook": "edd_sl_license_status_active",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "license_status_inactive": {
+                    "key": "license_status_inactive",
+                    "label": "User License Key Status Change To Inactive",
+                    "hook": "edd_sl_license_status_inactive",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "license_status_disabled": {
+                    "key": "license_status_disabled",
+                    "label": "User License Key Status Change To Disabled",
+                    "hook": "edd_sl_license_status_disabled",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "license_status_expired": {
+                    "key": "license_status_expired",
+                    "label": "User License Key Status Change To Expired",
+                    "hook": "edd_sl_license_status_expired",
                     "schema": [],
                     "outputs": [
                         "main"

@@ -18,12 +18,16 @@ class EasyDigitalDownload extends IntegrationBase {
 
     public static function get_triggers(): array {
         return [
-            'edd_purchase_complete' => ['label' => 'Purchase Complete', 'hook' => 'edd_complete_purchase'],
-            'edd_download_purchased' => ['label' => 'Download Purchased', 'hook' => 'edd_insert_payment'],
-            'edd_customer_created' => ['label' => 'Customer Created', 'hook' => 'edd_customer_post_create'],
-            'edd_subscription_created' => ['label' => 'Subscription Created', 'hook' => 'edd_subscription_post_create'],
-            'edd_subscription_cancelled' => ['label' => 'Subscription Cancelled', 'hook' => 'edd_subscription_cancelled'],
-            'edd_refund_created' => ['label' => 'Refund Created', 'hook' => 'edd_refund_order'],
+            'product_purchased_discount' => ['label' => 'Product purchased with a discount code', 'hook' => 'edd_complete_purchase'],
+            'order_refunded_stripe' => ['label' => 'User order refunded via Stripe gateway', 'hook' => 'edd_stripe_refund_order'],
+            'subscription_renewed' => ['label' => 'User Subscription Renewed', 'hook' => 'edd_subscription_post_renew'],
+            'license_key_created' => ['label' => 'User License Key Create', 'hook' => 'edd_sl_post_insert_license'],
+            'license_key_activated' => ['label' => 'User License Key Activated', 'hook' => 'edd_sl_post_activate_license'],
+            'license_key_deactivated' => ['label' => 'User License Key Deactivated', 'hook' => 'edd_sl_post_deactivate_license'],
+            'license_status_active' => ['label' => 'User License Key Status Change To Active', 'hook' => 'edd_sl_license_status_active'],
+            'license_status_inactive' => ['label' => 'User License Key Status Change To Inactive', 'hook' => 'edd_sl_license_status_inactive'],
+            'license_status_disabled' => ['label' => 'User License Key Status Change To Disabled', 'hook' => 'edd_sl_license_status_disabled'],
+            'license_status_expired' => ['label' => 'User License Key Status Change To Expired', 'hook' => 'edd_sl_license_status_expired'],
         ];
     }
 
@@ -33,51 +37,65 @@ class EasyDigitalDownload extends IntegrationBase {
 
     public static function resolve_trigger(array $node, array $args) {
         switch ($node['event']) {
-            case 'edd_purchase_complete':
-            case 'edd_download_purchased':
+            case 'product_purchased_discount':
                 $payment_id = $args[0] ?? 0;
                 if (!$payment_id) return false;
                 
                 $payment = edd_get_payment($payment_id);
-                if (!$payment) return false;
+                if (!$payment || empty($payment->discounts)) return false;
 
                 return [
                     'payment_id' => $payment_id,
+                    'discount_code' => $payment->discounts,
                     'customer_email' => $payment->email,
                     'total' => $payment->total,
-                    'customer_id' => $payment->customer_id,
                 ];
 
-            case 'edd_customer_created':
-                $customer_id = $args[0] ?? 0;
-                if (!$customer_id) return false;
-                
-                $customer = edd_get_customer($customer_id);
-                if (!$customer) return false;
+            case 'order_refunded_stripe':
+                $payment_id = $args[0] ?? 0;
+                if (!$payment_id) return false;
 
                 return [
-                    'customer_id' => $customer_id,
-                    'customer_email' => $customer->email,
-                    'customer_name' => $customer->name,
+                    'payment_id' => $payment_id,
+                    'refund_id' => $args[1] ?? '',
                 ];
 
-            case 'edd_subscription_created':
-            case 'edd_subscription_cancelled':
+            case 'subscription_renewed':
                 $subscription_id = $args[0] ?? 0;
                 if (!$subscription_id) return false;
 
                 return [
                     'subscription_id' => $subscription_id,
-                    'customer_id' => $args[1] ?? 0,
                 ];
 
-            case 'edd_refund_created':
-                $order_id = $args[0] ?? 0;
-                if (!$order_id) return false;
+            case 'license_key_created':
+                $license_id = $args[0] ?? 0;
+                if (!$license_id) return false;
 
                 return [
-                    'order_id' => $order_id,
-                    'refund_amount' => $args[1] ?? 0,
+                    'license_id' => $license_id,
+                    'license_key' => $args[1] ?? '',
+                ];
+
+            case 'license_key_activated':
+            case 'license_key_deactivated':
+                $license_id = $args[0] ?? 0;
+                if (!$license_id) return false;
+
+                return [
+                    'license_id' => $license_id,
+                ];
+
+            case 'license_status_active':
+            case 'license_status_inactive':
+            case 'license_status_disabled':
+            case 'license_status_expired':
+                $license_id = $args[0] ?? 0;
+                if (!$license_id) return false;
+
+                return [
+                    'license_id' => $license_id,
+                    'status' => $args[1] ?? '',
                 ];
         }
 
