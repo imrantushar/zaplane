@@ -15,8 +15,8 @@ class CreateRunsTable extends Migration
         Schema::create('runs', function (Blueprint $table) {
             $table->id();
             $table->char('workflow_version_hash', 64);
-            $table->string('target_node_key', 64)->nullable();
-            $table->string('start_node_key', 64)->nullable();
+            $table->unsignedInteger('target_node_key')->nullable();
+            $table->unsignedInteger('start_node_key')->nullable();
             $table->string('status', 20)->default('running');
             $table->longText('trigger_data')->nullable();
             $table->unsignedTinyInteger('attempts')->default(0);

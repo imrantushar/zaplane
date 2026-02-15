@@ -1,9 +1,9 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
 import { createWorkflows, deleteWorkFlow, getSingleWorkFlow, getWorkFlow, updateWorkFlow, updateWorkFlowStatus } from './actions/workFlow';
-import { getRunWorkFlow,getSingleRun } from './actions/workFlowRuns';
+import { getRunWorkFlow, getSingleRun } from './actions/workFlowRuns';
 import { getAllVersion, getPreviewOldVersion, versionActive } from './actions/workFlowVersion';
-import { nodeLogsRunDetails ,getNodeLogDetails} from './actions/workFlowLogs';
+import { nodeLogsRunDetails, getNodeLogDetails } from './actions/workFlowLogs';
 import { workFLowSingeNodeExction } from './actions/workflowExctions';
 import { workflowNodeListiner, workflowNodeListinerStop } from './actions/workFlowListiner';
 
@@ -12,7 +12,7 @@ const workflowsSlice = createSlice({
 	name: 'workflows',
 	initialState: {
 		allWorkFlows: [],
-		workFlow:{},
+		workFlow: {},
 		runs: [],
 		versions: [],
 		nodeDetails: [],
@@ -57,7 +57,7 @@ const workflowsSlice = createSlice({
 				state.allWorkFlows = action.payload
 			})
 			.addCase(deleteWorkFlow.fulfilled, (state, action) => {
-				state.allWorkFlows = state.data.filter(
+				state.allWorkFlows = state.allWorkFlows.filter(
 					(item) => parseInt(item.id) !== parseInt(action.payload)
 				);
 			})
@@ -66,11 +66,13 @@ const workflowsSlice = createSlice({
 				if (state.workFlow?.workflow?.id === id) {
 					state.workFlow.workflow.status = status;
 				}
-				state.allWorkFlows = state.allWorkFlows.map((item) =>
-					parseInt(item.id) === parseInt(id)
-						? { ...item, status: status }
-						: item
-				);
+				state.allWorkFlows = Array.isArray(state.allWorkFlows)
+					? state.allWorkFlows.map((item) =>
+						Number(item.id) === Number(id)
+							? { ...item, status }
+							: item
+					)
+					: [];
 			})
 			.addCase(getRunWorkFlow.fulfilled, (state, action) => {
 				state.runs = action.payload;
@@ -95,8 +97,8 @@ const workflowsSlice = createSlice({
 					...version,
 					is_active:
 						parseInt(version.id) === parseInt(activeVersionId)
-							? "1"
-							: "0",
+							? true
+							: false,
 				}));
 			})
 			.addCase(nodeLogsRunDetails.fulfilled, (state, action) => {

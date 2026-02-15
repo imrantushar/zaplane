@@ -239,6 +239,8 @@ export default function ActionDrawer({ open, context, onClose, updateNodeData, c
                         dynamicOptions={dynamicOptions}
                         loadingFields={loadingFields}
                         fetchDynamicOptions={fetchDynamicOptions}
+                        nodeId={node?.id}
+                        workFlow={workFlow}
                       />
                     ))}
                   </Flex>

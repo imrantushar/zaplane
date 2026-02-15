@@ -159,19 +159,21 @@ class Automation
 
     private function start_trigger_run(array $trigger, array $payload)
     {
+        $nodeKey = (int) $trigger['id'];
+
         $run = Run::create([
             'workflow_version_hash' => $trigger['workflow_version_hash'],
             'trigger_data' => $payload,
             'status' => 'running',
-            'start_node_key' => $trigger['id'],
+            'start_node_key' => $nodeKey,
             'target_node_key' => null,
             'started_at' => current_time('mysql'),
         ]);
 
-        $this->spawn_node_run($run->id, $trigger['id'], $payload, null);
+        $this->spawn_node_run($run->id, $nodeKey, $payload, null);
     }
 
-    public function spawn_node_run(int $run_id, string $node_key, array $input, ?int $parent)
+    public function spawn_node_run(int $run_id, int $node_key, array $input, ?int $parent)
     {
         $nodeRun = NodeRun::create([
             'run_id' => $run_id,
@@ -182,11 +184,21 @@ class Automation
             'started_at' => current_time('mysql'),
         ]);
 
-        as_enqueue_async_action(
-            'zaplane_execute_node_run',
-            ['node_run_id' => $nodeRun->id],
-            'zaplane'
-        );
+        self::enqueue_node_run($nodeRun->id);
+    }
+
+    public static function enqueue_node_run(int $node_run_id): void
+    {
+        if (function_exists('as_enqueue_async_action')) {
+            as_enqueue_async_action(
+                'zaplane_execute_node_run',
+                ['node_run_id' => $node_run_id],
+                'zaplane'
+            );
+            return;
+        }
+
+        do_action('zaplane_execute_node_run', $node_run_id);
     }
 
     public function dispatch_node_run(int $node_run_id)
@@ -255,10 +267,10 @@ class Automation
         }
 
         foreach ($graph['edges'] as $edge) {
-            if ($edge['source'] === $nodeRun->node_key) {
+            if ((int) $edge['source'] === $nodeRun->node_key) {
                 $this->spawn_node_run(
                     $nodeRun->run_id,
-                    $edge['target'],
+                    (int) $edge['target'],
                     $output,
                     $nodeRun->id
                 );
@@ -292,10 +304,10 @@ class Automation
         return $version ? $version->getGraph() : ['nodes' => [], 'edges' => []];
     }
 
-    private function find_node(array $graph, string $key, int $run_id = 0): array
+    private function find_node(array $graph, int $key, int $run_id = 0): array
     {
         foreach ($graph['nodes'] as $node) {
-            if ((string) $node['id'] === (string) $key) {
+            if ((int) $node['id'] === $key) {
                 return $node;
             }
         }
