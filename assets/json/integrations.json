@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-02-05 10:26:45",
+    "generated_at": "2026-02-15 17:46:22",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -3241,14 +3241,14 @@
         },
         "beaverbuilder": {
             "slug": "beaverbuilder",
-            "name": "Beaver Builder",
+            "name": "Beaverbuilder",
             "icon": "",
             "category": "app",
             "triggers": {
                 "contact_form_submission": {
                     "key": "contact_form_submission",
                     "label": "Contact Form Submission",
-                    "hook": "fl_builder_contact_form_submission",
+                    "hook": "fl_module_contact_form_after_send",
                     "schema": [],
                     "outputs": [
                         "main"
@@ -3257,7 +3257,7 @@
                 "login_form_submission": {
                     "key": "login_form_submission",
                     "label": "Login Form Submission",
-                    "hook": "fl_builder_login_form_submission",
+                    "hook": "fl_builder_login_form_submission_complete",
                     "schema": [],
                     "outputs": [
                         "main"
@@ -3266,14 +3266,14 @@
                 "subscribe_form_submission": {
                     "key": "subscribe_form_submission",
                     "label": "Subscribe Form Submission",
-                    "hook": "fl_builder_subscribe_form_submission",
+                    "hook": "fl_builder_subscribe_form_submission_complete",
                     "schema": [],
                     "outputs": [
                         "main"
                     ]
                 }
             },
-            "actions": {}
+            "actions": []
         }
     },
     "tools": {

@@ -13,9 +13,9 @@ class Beaverbuilder extends IntegrationBase {
 
     public static function get_triggers(): array {
         return [
-            'contact_form_submission' => ['label' => 'Contact Form Submission', 'hook' => 'fl_builder_contact_form_submission'],
-            'login_form_submission' => ['label' => 'Login Form Submission', 'hook' => 'fl_builder_login_form_submission'],
-            'subscribe_form_submission' => ['label' => 'Subscribe Form Submission', 'hook' => 'fl_builder_subscribe_form_submission'],
+            'contact_form_submission' => ['label' => 'Contact Form Submission', 'hook' => 'fl_module_contact_form_after_send'],
+            'login_form_submission' => ['label' => 'Login Form Submission', 'hook' => 'fl_builder_login_form_submission_complete'],
+            'subscribe_form_submission' => ['label' => 'Subscribe Form Submission', 'hook' => 'fl_builder_subscribe_form_submission_complete'],
         ];
     }
 
