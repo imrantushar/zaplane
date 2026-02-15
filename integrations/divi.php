@@ -11,10 +11,6 @@ class Divi extends IntegrationBase {
         return 'divi';
     }
 
-    public static function get_name(): string {
-        return 'Divi Builder';
-    }
-
     public static function get_triggers(): array {
         return [
             'divi_theme_activated' => ['label' => 'Divi Theme Activated', 'hook' => 'after_switch_theme'],
@@ -123,9 +119,10 @@ class Divi extends IntegrationBase {
                 ];
 
             case 'divi_contact_form_submitted':
-            case 'divi_optin_form_submitted':
+                 ray($args);
                 $form_data = $args[0] ?? [];
-                
+                    ray($form_data);
+
                 return [
                     'form_id' => $form_data['form_id'] ?? '',
                     'post_id' => $form_data['post_id'] ?? 0,
