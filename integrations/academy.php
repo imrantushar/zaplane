@@ -21,26 +21,37 @@ class Academy extends IntegrationBase {
         return [
             'user_enroll_course' => [
                 'label' => 'User enrolled in a course',
-                'hook'  => ['academy/course/after_enroll', 10, 2],
+                'hook'  => 'academy/course/after_enroll',
+                'priority' => 10,
+                'accepted_args' => 2,
             ],
             'academy_quiz_course_attempt' => [
                 'label' => 'User attempted (submitted) a quiz',
-                'hook'  => ['academy_quizzes/api/after_quiz_attempt_finished', 10, 1],
+                'hook'  => 'academy_quizzes/api/after_quiz_attempt_finished',
+                'priority' => 10,
+                'accepted_args' => 1,
             ],
             'lesson_complete' => [
                 'label' => 'User completed a lesson',
-                'hook'  => ['academy/frontend/after_mark_topic_complete', 10, 4],
+                'hook'  => 'academy/frontend/after_mark_topic_complete',
+                'priority' => 10,
+                'accepted_args' => 4,
             ],
             'course_complete' => [
                 'label' => 'User completed a course',
-                'hook'  => ['academy/admin/course_complete_after', 10, 1],
+                'hook'  => 'academy/admin/course_complete_after',
+                'priority' => 10,
+                'accepted_args' => 1,
             ],
             'quiz_target' => [
                 'label' => 'User achieved target percentage on a quiz',
-                'hook'  => ['academy_quizzes/api/after_quiz_attempt_finished', 10, 1],
+                'hook'  => 'academy_quizzes/api/after_quiz_attempt_finished',
+                'priority' => 10,
+                'accepted_args' => 1,
             ],
         ];
     }
+
 
     /**
      * Trigger config schema
@@ -142,23 +153,37 @@ class Academy extends IntegrationBase {
 
     public static function resolve_trigger( array $node, array $args ) {
 
-        $event  = $node['event'] ?? '';
-        $config = $node['config'] ?? [];
+        // 1) Normalize event key (some builders store it as "trigger")
+        $event = $node['event'] ?? ($node['trigger'] ?? '');
 
-        if ( empty($event) || !is_array($args) ) {
+        // 2) Sometimes UI sends event as array like ['value'=>'user_enroll_course', ...]
+        if (is_array($event)) {
+            $event = $event['value'] ?? ($event['key'] ?? ($event['slug'] ?? ''));
+        }
+
+        $event  = is_string($event) ? trim($event) : '';
+        $config = is_array($node['config'] ?? null) ? ($node['config'] ?? []) : [];
+
+        // args always array
+        $args = is_array($args) ? $args : [];
+
+        if (empty($event)) {
             return false;
         }
 
         switch ( $event ) {
 
             case 'user_enroll_course': {
-
                 $course_id = (int) ($args[0] ?? 0);
                 $enroll_id = (int) ($args[1] ?? 0);
 
                 if ( ! $course_id ) return false;
 
+                // current user sometimes 0 (cron/admin)
                 $user_id = (int) get_current_user_id();
+                if (!$user_id && !empty($args[2])) {
+                    $user_id = (int) $args[2];
+                }
 
                 if ( ! empty( $config['course_id'] ) && $config['course_id'] !== 'any' ) {
                     if ( (int) $config['course_id'] !== $course_id ) {
@@ -174,8 +199,20 @@ class Academy extends IntegrationBase {
             }
 
             case 'academy_quiz_course_attempt': {
+                $payload = $args[0] ?? null;
 
-                $attempt = is_array( $args[0] ?? null ) ? $args[0] : [];
+                // attempt can be array OR attemptId (int)
+                $attempt = is_array($payload) ? $payload : [];
+                $attempt_id = is_numeric($payload) ? (int) $payload : 0;
+
+                // If you only get attemptId and you can't fetch full attempt,
+                // still return something usable (workflow can use attempt_id)
+                if (empty($attempt) && $attempt_id) {
+                    return [
+                        'attempt_id' => $attempt_id,
+                    ];
+                }
+
                 if ( empty($attempt) ) return false;
 
                 $course_id = (int) ($attempt['course_id'] ?? 0);
@@ -197,9 +234,20 @@ class Academy extends IntegrationBase {
             }
 
             case 'lesson_complete': {
+                // Hook: academy/frontend/after_mark_topic_complete (10, 4)
+                // Different versions can send args in different order.
+                // We'll detect the most likely user_id as last arg if numeric.
+                $a0 = $args[0] ?? 0;
+                $a1 = $args[1] ?? 0;
+                $a2 = $args[2] ?? 0;
+                $a3 = $args[3] ?? 0;
 
-                $lesson_id = (int) ($args[0] ?? 0);
-                $user_id   = (int) ($args[1] ?? get_current_user_id());
+                // user_id usually last
+                $user_id = is_numeric($a3) ? (int)$a3 : (is_numeric($a1) ? (int)$a1 : (int)get_current_user_id());
+                if (!$user_id) $user_id = (int)get_current_user_id();
+
+                // lesson_id often comes as 3rd arg, but fallback to first
+                $lesson_id = is_numeric($a2) ? (int)$a2 : (int)$a0;
 
                 if ( ! $lesson_id ) return false;
 
@@ -212,15 +260,18 @@ class Academy extends IntegrationBase {
                 return [
                     'lesson_id' => $lesson_id,
                     'user_id'   => $user_id,
+                    'raw_args'  => $args, // debug friendly
                 ];
             }
 
             case 'course_complete': {
-
                 $course_id = (int) ($args[0] ?? 0);
                 if ( ! $course_id ) return false;
 
                 $user_id = (int) get_current_user_id();
+                if (!$user_id && !empty($args[1])) {
+                    $user_id = (int) $args[1];
+                }
 
                 if ( ! empty( $config['course_id'] ) && $config['course_id'] !== 'any' ) {
                     if ( (int) $config['course_id'] !== $course_id ) {
@@ -235,8 +286,19 @@ class Academy extends IntegrationBase {
             }
 
             case 'quiz_target': {
+                $payload = $args[0] ?? null;
 
-                $attempt = is_array( $args[0] ?? null ) ? $args[0] : [];
+                $attempt = is_array($payload) ? $payload : [];
+                $attempt_id = is_numeric($payload) ? (int) $payload : 0;
+
+                // attemptId only -> can't calculate score/target unless you fetch attempt
+                if (empty($attempt) && $attempt_id) {
+                    return [
+                        'attempt_id' => $attempt_id,
+                        'target_percentage' => (int) ($config['target_percentage'] ?? 0),
+                    ];
+                }
+
                 if ( empty($attempt) ) return false;
 
                 $course_id = (int) ($attempt['course_id'] ?? 0);
@@ -254,17 +316,18 @@ class Academy extends IntegrationBase {
                 }
 
                 return [
-                    'course_id' => $course_id,
-                    'user_id'   => $user_id,
-                    'score'     => $score,
-                    'attempt'   => $attempt,
-                    'target_percentage' => (int) ($config['target_percentage'] ?? 0),
+                    'course_id'          => $course_id,
+                    'user_id'            => $user_id,
+                    'score'              => $score,
+                    'attempt'            => $attempt,
+                    'target_percentage'  => (int) ($config['target_percentage'] ?? 0),
                 ];
             }
         }
 
         return false;
     }
+
 
     /**
      * Register actions

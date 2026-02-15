@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-02-01 05:59:17",
+    "generated_at": "2026-02-09 12:43:57",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -2925,11 +2925,7 @@
                 "user_enroll_course": {
                     "key": "user_enroll_course",
                     "label": "User enrolled in a course",
-                    "hook": [
-                        "academy/course/after_enroll",
-                        10,
-                        2
-                    ],
+                    "hook": "academy/course/after_enroll",
                     "schema": [
                         {
                             "key": "course_id",
@@ -2946,11 +2942,7 @@
                 "academy_quiz_course_attempt": {
                     "key": "academy_quiz_course_attempt",
                     "label": "User attempted (submitted) a quiz",
-                    "hook": [
-                        "academy_quizzes/api/after_quiz_attempt_finished",
-                        10,
-                        1
-                    ],
+                    "hook": "academy_quizzes/api/after_quiz_attempt_finished",
                     "schema": [
                         {
                             "key": "course_id",
@@ -2962,20 +2954,8 @@
                                     "value": "any"
                                 },
                                 {
-                                    "label": "dfsgdfg",
-                                    "value": 25
-                                },
-                                {
-                                    "label": "dfgag",
-                                    "value": 21
-                                },
-                                {
-                                    "label": "asdfas",
-                                    "value": 18
-                                },
-                                {
-                                    "label": "testing",
-                                    "value": 14
+                                    "label": "sdfasdf",
+                                    "value": 42
                                 }
                             ],
                             "required": true
@@ -2988,11 +2968,7 @@
                 "lesson_complete": {
                     "key": "lesson_complete",
                     "label": "User completed a lesson",
-                    "hook": [
-                        "academy/frontend/after_mark_topic_complete",
-                        10,
-                        4
-                    ],
+                    "hook": "academy/frontend/after_mark_topic_complete",
                     "schema": [
                         {
                             "key": "lesson_id",
@@ -3014,11 +2990,7 @@
                 "course_complete": {
                     "key": "course_complete",
                     "label": "User completed a course",
-                    "hook": [
-                        "academy/admin/course_complete_after",
-                        10,
-                        1
-                    ],
+                    "hook": "academy/admin/course_complete_after",
                     "schema": [
                         {
                             "key": "course_id",
@@ -3030,20 +3002,8 @@
                                     "value": "any"
                                 },
                                 {
-                                    "label": "dfsgdfg",
-                                    "value": 25
-                                },
-                                {
-                                    "label": "dfgag",
-                                    "value": 21
-                                },
-                                {
-                                    "label": "asdfas",
-                                    "value": 18
-                                },
-                                {
-                                    "label": "testing",
-                                    "value": 14
+                                    "label": "sdfasdf",
+                                    "value": 42
                                 }
                             ],
                             "required": true
@@ -3056,11 +3016,7 @@
                 "quiz_target": {
                     "key": "quiz_target",
                     "label": "User achieved target percentage on a quiz",
-                    "hook": [
-                        "academy_quizzes/api/after_quiz_attempt_finished",
-                        10,
-                        1
-                    ],
+                    "hook": "academy_quizzes/api/after_quiz_attempt_finished",
                     "schema": [
                         {
                             "key": "course_id",
@@ -3072,20 +3028,8 @@
                                     "value": "any"
                                 },
                                 {
-                                    "label": "dfsgdfg",
-                                    "value": 25
-                                },
-                                {
-                                    "label": "dfgag",
-                                    "value": 21
-                                },
-                                {
-                                    "label": "asdfas",
-                                    "value": 18
-                                },
-                                {
-                                    "label": "testing",
-                                    "value": 14
+                                    "label": "sdfasdf",
+                                    "value": 42
                                 }
                             ],
                             "required": true
