@@ -1,21 +1,49 @@
-import { Box, Button, Flex, Text, Accordion, Span } from "@chakra-ui/react";
+
+import { Box, Button, Flex, Text, Accordion } from "@chakra-ui/react";
 import { FieldArray } from "formik";
 import { FiTrash2 } from "react-icons/fi";
 import ZAPInput from "@ZAPComponents/ZAPInput";
 import ZAPSelect from "@ZAPComponents/ZAPSelect";
 import { __ } from "@wordpress/i18n";
-import { buildEmptyRule } from "./helper";
+import { buildEmptyRule, insertVariableIntoGroup } from "./helper";
 import WPPopover from "@ZAPComponents/Popaver/WPPopover";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import { conditionVariables } from "@ZAPRedux/Slices/workFlowSlice/actions/conditonVariales";
+
 const items = [
-    { value: "a", title: "First Item", text: "Some value 1..." },
-    { value: "b", title: "Second Item", text: "Some value 2..." },
-    { value: "c", title: "Third Item", text: "Some value 3..." },
-]
-export default function ConditionGroupField({ value, onChange, field }) {
+    {
+        name: "Wordpress",
+        variable: [
+            { key: "post_modified", type: "string", value: "2026-02-09 02:11:10" },
+            { key: "post_modified_gmt", type: "string", value: "0000-00-00 00:00:00" },
+            { key: "post_content_filtered", type: "string", value: "" },
+            { key: "post_parent", type: "integer", value: 0 },
+            { key: "guid", type: "string", value: "http://localhost/kodezen/?p=13" },
+        ],
+    },
+    { name: "slack", variable: [] },
+];
+
+export default function ConditionGroupField({ value, field, nodeId, workFlow }) {
     const ruleFields = field?.fields;
     const EMPTY_RULE = buildEmptyRule(ruleFields);
+
     const [isPopoverOpen, setPopoverOpen] = useState(false);
+    const [activeInput, setActiveInput] = useState(null);
+
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        if (!nodeId || !workFlow?.version?.hash) return;
+
+        dispatch(
+            conditionVariables({
+                targetNodeKey: nodeId,
+                workflowHash: workFlow.version.hash,
+            })
+        );
+    }, [dispatch, nodeId, workFlow?.version?.hash]);
 
     return (
         <FieldArray name={field.key}>
@@ -24,19 +52,19 @@ export default function ConditionGroupField({ value, onChange, field }) {
                     groupHelpers.push([{ ...EMPTY_RULE }]);
                 }
 
-                const groups = value && value.length ? value : [];
+                const groups = value || [];
 
                 return (
                     <Flex direction="column" gap={4}>
                         {groups.map((group, gIndex) => (
                             <Box key={gIndex}>
                                 {groups.length > 1 && gIndex !== 0 && (
-                                    <Flex align="center">
+                                    <Flex align="center" mb={3}>
                                         <Box flex="1" h="1px" bg="gray.300" />
-                                        <Text className="zaplane-label" mx={3} fontSize="sm">
+                                        <Text mx={3} fontSize="sm">
                                             {__("OR", "zaplane")}
                                         </Text>
-                                        <Box flex="1" h="1px" bg="var(--zaplane-border-color)" />
+                                        <Box flex="1" h="1px" bg="gray.300" />
                                     </Flex>
                                 )}
 
@@ -44,7 +72,7 @@ export default function ConditionGroupField({ value, onChange, field }) {
                                     {(ruleHelpers) => (
                                         <>
                                             {group.map((rule, rIndex) => (
-                                                <Flex key={rIndex} gap={4} align="flex-end" mb="15px">
+                                                <Flex key={rIndex} gap={4} align="flex-start" mb="15px">
                                                     {ruleFields.map((f) => {
                                                         if (f.type === "select") {
                                                             return (
@@ -54,10 +82,7 @@ export default function ConditionGroupField({ value, onChange, field }) {
                                                                     options={f.options}
                                                                     value={rule[f.key]}
                                                                     onChange={(val) =>
-                                                                        ruleHelpers.replace(rIndex, {
-                                                                            ...rule,
-                                                                            [f.key]: val,
-                                                                        })
+                                                                        ruleHelpers.replace(rIndex, { ...rule, [f.key]: val })
                                                                     }
                                                                     containerStyle={{ width: "30%" }}
                                                                 />
@@ -67,29 +92,26 @@ export default function ConditionGroupField({ value, onChange, field }) {
                                                         return (
                                                             <ZAPInput
                                                                 key={f.key}
+                                                                type="textarea"
                                                                 label={f.label}
                                                                 value={rule[f.key]}
                                                                 onChange={(e) => {
-                                                                    const val = e.target.value
-                                                                    ruleHelpers.replace(rIndex, {
-                                                                        ...rule,
-                                                                        [f.key]: val,
-                                                                    })
-                                                                    if (val.includes("@")) {
+                                                                    const val = e.target.value;
+                                                                    ruleHelpers.replace(rIndex, { ...rule, [f.key]: val });
+                                                                    if (val.endsWith("@")) {
+                                                                        setActiveInput({ gIndex, rIndex, fieldKey: f.key });
                                                                         setPopoverOpen(true);
-                                                                    } else {
-                                                                        setPopoverOpen(false);
                                                                     }
-                                                                }
-                                                                }
-                                                                containerStyle={{ width: "30%" }}
+                                                                }}
+                                                                containerStyle={{ width: "30%", alignSelf: "stretch" }}
                                                             />
                                                         );
                                                     })}
 
-                                                    <Flex gap={2} mt="25px">
+                                                    <Flex gap={2} mt="34px" align="center" minH="30px">
                                                         <Button
                                                             type="button"
+                                                            height="34px"
                                                             onClick={() => ruleHelpers.push({ ...EMPTY_RULE })}
                                                         >
                                                             {__("Add", "zaplane")}
@@ -97,7 +119,6 @@ export default function ConditionGroupField({ value, onChange, field }) {
 
                                                         <Button
                                                             type="button"
-                                                            colorScheme="#FF0000"
                                                             variant="ghost"
                                                             size="sm"
                                                             disabled={group.length === 1 && groups.length === 1 && !gIndex}
@@ -120,37 +141,33 @@ export default function ConditionGroupField({ value, onChange, field }) {
                             </Box>
                         ))}
 
-                        <Button
-                            size="sm"
-                            width="140px"
-                            onClick={() => groupHelpers.push([{ ...EMPTY_RULE }])}
-                        >
+                        <Button size="sm" width="140px" onClick={() => groupHelpers.push([{ ...EMPTY_RULE }])}>
                             {__("OR Group", "zaplane")}
                         </Button>
+
                         <WPPopover
                             isOpen={isPopoverOpen}
-                            onClose={() => setPopoverOpen(false)}
+                            onClose={() => {
+                                setPopoverOpen(false);
+                                setActiveInput(null);
+                            }}
                             title="Insert data for Dynamic content"
                         >
-                            <Accordion.Root collapsible >
+                            <Accordion.Root collapsible>
                                 {items.map((item, index) => (
                                     <Accordion.Item
                                         key={index}
                                         value={item.value}
                                         border="1px solid var(--zaplane-border-color)"
                                         borderBottom={index === items.length - 1 ? "1px solid var(--zaplane-border-color)" : "0"}
-                                        borderBottomRadius={index === items.length - 1 ? "md" : "0"} 
-                                        borderTopRadius={index === 0 ? "md" : "0"} 
+                                        borderBottomRadius={index === items.length - 1 ? "md" : "0"}
+                                        borderTopRadius={index === 0 ? "md" : "0"}
                                         overflow="hidden"
                                     >
-                                        <Accordion.ItemTrigger
-                                            px="12px"
-                                            py="10px"
-                                            _hover={{ bg: "gray.50" }}
-                                        >
+                                        <Accordion.ItemTrigger px="12px" py="10px" _hover={{ bg: "gray.50" }}>
                                             <Flex align="center" w="100%">
                                                 <Text flex="1" fontSize="sm" fontWeight="500">
-                                                    {item.title}
+                                                    {item.name}
                                                 </Text>
                                                 <Accordion.ItemIndicator />
                                             </Flex>
@@ -158,16 +175,32 @@ export default function ConditionGroupField({ value, onChange, field }) {
 
                                         <Accordion.ItemContent>
                                             <Accordion.ItemBody px="12px" py="10px" bg="gray.50">
-                                                <Text fontSize="sm">
-                                                    {item.text}
-                                                </Text>
+                                                {item.variable.map((v, vi) => (
+                                                    <Text
+                                                        key={vi}
+                                                        cursor="pointer"
+                                                        fontSize="sm"
+                                                        _hover={{ color: "blue.600" }}
+                                                        onClick={() => {
+                                                            insertVariableIntoGroup({
+                                                                activeInput,
+                                                                groups,
+                                                                groupHelpers,
+                                                                valueToInsert: v.key,
+                                                                setPopoverOpen,
+                                                                setActiveInput,
+                                                            });
+                                                        }}
+                                                    >
+                                                        {v.key}: {v.value}
+                                                    </Text>
+                                                ))}
                                             </Accordion.ItemBody>
                                         </Accordion.ItemContent>
                                     </Accordion.Item>
                                 ))}
                             </Accordion.Root>
                         </WPPopover>
-
                     </Flex>
                 );
             }}

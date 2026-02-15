@@ -99,7 +99,7 @@ class WorkflowsController extends WP_REST_Controller
 
         register_rest_route($namespace, '/condition-variables', [
             [
-                'methods' => WP_REST_Server::CREATABLE,
+                'methods' => WP_REST_Server::READABLE,
                 'callback' => [$this, 'get_condition_variables'],
                 'permission_callback' => [$this, 'permissions_check'],
             ],
@@ -279,7 +279,8 @@ class WorkflowsController extends WP_REST_Controller
 
         return rest_ensure_response([
             'workflow_id' => $workflowId,
-            'active_version' => $versionId,
+            'version_id' => $versionId,
+            'is_active' => $version->is_active,
         ]);
     }
 
@@ -315,30 +316,32 @@ class WorkflowsController extends WP_REST_Controller
 
     public function get_condition_variables($request)
     {
-        $params = $request->get_json_params();
+        $workflowHash = $request->get_param('workflow_hash');
+        $targetNodeKey = (int) $request->get_param('target_node_key');
 
-        $workflowHash = $params['workflow_hash'] ?? null;
-        $nodes = $params['nodes'] ?? [];
-        $edges = $params['edges'] ?? [];
-        $targetNodeKey = (string) ($params['target_node_key'] ?? '');
-
-        if (empty($nodes) || empty($targetNodeKey)) {
-            return new WP_Error('invalid_params', 'nodes and target_node_key are required', ['status' => 400]);
+        if (empty($workflowHash) || empty($targetNodeKey)) {
+            return new WP_Error('invalid_params', 'workflow_hash and target_node_key are required', ['status' => 400]);
         }
+
+        $version = WorkflowVersion::where('graph_hash', $workflowHash)->first();
+
+        if (!$version) {
+            return new WP_Error('not_found', 'Workflow version not found', ['status' => 404]);
+        }
+
+        $graph = $version->getGraph();
+        $nodes = $graph['nodes'] ?? [];
+        $edges = $graph['edges'] ?? [];
 
         $nodeMap = [];
         foreach ($nodes as $node) {
-            $nodeMap[(string) $node['id']] = $node;
+            $nodeMap[(int) $node['id']] = $node;
         }
 
         $previousNodeIds = $this->findPreviousNodes($targetNodeKey, $edges);
+        $nodeOutputs = Run::latestNodeOutputs($workflowHash);
 
-        $testNodeRuns = [];
-        if ($workflowHash) {
-            $testNodeRuns = Run::latestTestNodeRuns($workflowHash);
-        }
-
-        $variables = [];
+        $data = [];
         foreach ($previousNodeIds as $nodeId) {
             $node = $nodeMap[$nodeId] ?? null;
             if (!$node) continue;
@@ -346,52 +349,35 @@ class WorkflowsController extends WP_REST_Controller
             $nodeType = $node['type'] ?? '';
             if (!in_array($nodeType, ['action', 'trigger'])) continue;
 
-            $nodeRun = $testNodeRuns[$nodeId] ?? null;
-            $nodeLabel = $node['data']['label'] ?? $node['data']['event'] ?? "Node {$nodeId}";
-            $nodeApp = $node['data']['app'] ?? 'unknown';
+            $nodeRun = $nodeOutputs[$nodeId] ?? null;
 
             if ($nodeRun) {
                 $output = $nodeRun->getOutput();
-                $outputData = $output['data'] ?? $output;
 
-                // Ensure outputData is an array
-                if (!is_array($outputData)) {
-                    $outputData = ['value' => $outputData];
+                if (!is_array($output)) {
+                    $output = ['value' => $output];
                 }
 
-                $variables[] = [
+                $data[] = [
                     'node_id' => $nodeId,
-                    'node_label' => $nodeLabel,
-                    'node_app' => $nodeApp,
-                    'node_event' => $node['data']['event'] ?? null,
-                    'has_test_data' => true,
-                    'node_run_id' => $nodeRun->id,
-                    'tested_at' => $nodeRun->finished_at,
-                    'output' => $outputData,
-                    'variables' => VariableExtractor::extract($outputData),
+                    'variables' => VariableExtractor::extract($output),
                 ];
             } else {
-                $variables[] = [
+                $data[] = [
                     'node_id' => $nodeId,
-                    'node_label' => $nodeLabel,
-                    'node_app' => $nodeApp,
-                    'node_event' => $node['data']['event'] ?? null,
-                    'has_test_data' => false,
-                    'node_run_id' => null,
-                    'tested_at' => null,
-                    'output' => null,
                     'variables' => [],
                 ];
             }
         }
 
         return rest_ensure_response([
-            'target_node_key' => $targetNodeKey,
-            'previous_nodes' => $variables,
+            'status' => 'success',
+            'code' => 'SUCCESS',
+            'data' => $data,
         ]);
     }
 
-    private function findPreviousNodes(string $targetNodeId, array $edges): array
+    private function findPreviousNodes(int $targetNodeId, array $edges): array
     {
         $previousNodes = [];
         $queue = [$targetNodeId];
@@ -401,8 +387,8 @@ class WorkflowsController extends WP_REST_Controller
             $currentId = array_shift($queue);
 
             foreach ($edges as $edge) {
-                $target = (string) $edge['target'];
-                $source = (string) $edge['source'];
+                $target = (int) $edge['target'];
+                $source = (int) $edge['source'];
 
                 if ($target === $currentId && !isset($visited[$source])) {
                     $visited[$source] = true;
