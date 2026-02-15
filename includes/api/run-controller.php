@@ -5,6 +5,7 @@ namespace Zaplane\API;
 use WP_REST_Controller;
 use WP_Error;
 use Zaplane\Framework\Classes\Container;
+use Zaplane\Framework\Core\Automation;
 use Zaplane\Models\Run;
 use Zaplane\Models\NodeRun;
 use Zaplane\Models\WorkflowVersion;
@@ -221,12 +222,7 @@ class RunController extends WP_REST_Controller
         $nodeRun->output_json = null;
         $nodeRun->save();
 
-        if (function_exists('as_enqueue_async_action')) {
-            as_enqueue_async_action('zaplane_execute_node_run', ['node_run_id' => $id], 'zaplane');
-        } else {
-            wp_schedule_single_event(time(), 'zaplane_execute_node_run', ['node_run_id' => $id]);
-            spawn_cron();
-        }
+        Automation::enqueue_node_run($id);
 
         return ['requeued' => true];
     }
@@ -256,18 +252,20 @@ class RunController extends WP_REST_Controller
             return new WP_Error('no_trigger', 'No trigger node found', ['status' => 400]);
         }
 
+        $triggerKey = (int) $trigger['id'];
+
         $run = Run::create([
             'workflow_version_hash' => $workflowHash,
             'status' => 'running',
             'trigger_data' => $data,
-            'start_node_key' => $trigger['id'],
+            'start_node_key' => $triggerKey,
             'target_node_key' => null,
             'started_at' => current_time('mysql'),
         ]);
 
         $this->container->get('automation')->spawn_node_run(
             $run->id,
-            $trigger['id'],
+            $triggerKey,
             $data,
             null
         );
@@ -304,6 +302,7 @@ class RunController extends WP_REST_Controller
         $run = Run::create([
             'workflow_version_hash' => $workflowHash,
             'status' => 'running',
+            'is_test' => true,
             'trigger_data' => $input,
             'start_node_key' => $targetKey,
             'target_node_key' => $targetKey,
