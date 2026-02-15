@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-02-05 10:26:45",
+    "generated_at": "2026-02-15 09:58:59",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -3238,6 +3238,141 @@
                     ]
                 }
             }
+        },
+        "divi": {
+            "slug": "divi",
+            "name": "Divi Builder",
+            "icon": "",
+            "category": "app",
+            "triggers": {
+                "divi_theme_activated": {
+                    "key": "divi_theme_activated",
+                    "label": "Divi Theme Activated",
+                    "hook": "after_switch_theme",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "divi_builder_enabled": {
+                    "key": "divi_builder_enabled",
+                    "label": "Divi Builder Enabled",
+                    "hook": "et_builder_enabled",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "divi_layout_saved": {
+                    "key": "divi_layout_saved",
+                    "label": "Divi Layout Saved",
+                    "hook": "et_builder_layout_saved",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "divi_module_added": {
+                    "key": "divi_module_added",
+                    "label": "Divi Module Added",
+                    "hook": "et_builder_module_added",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "divi_page_built": {
+                    "key": "divi_page_built",
+                    "label": "Page Built with Divi",
+                    "hook": "et_builder_page_built",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "divi_library_item_saved": {
+                    "key": "divi_library_item_saved",
+                    "label": "Divi Library Item Saved",
+                    "hook": "et_builder_library_item_saved",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "divi_section_added": {
+                    "key": "divi_section_added",
+                    "label": "Divi Section Added",
+                    "hook": "et_builder_section_added",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "divi_row_added": {
+                    "key": "divi_row_added",
+                    "label": "Divi Row Added",
+                    "hook": "et_builder_row_added",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "divi_template_applied": {
+                    "key": "divi_template_applied",
+                    "label": "Divi Template Applied",
+                    "hook": "et_builder_template_applied",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "divi_global_module_updated": {
+                    "key": "divi_global_module_updated",
+                    "label": "Divi Global Module Updated",
+                    "hook": "et_builder_global_module_updated",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "divi_theme_builder_used": {
+                    "key": "divi_theme_builder_used",
+                    "label": "Divi Theme Builder Used",
+                    "hook": "et_theme_builder_template_used",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "divi_ab_test_started": {
+                    "key": "divi_ab_test_started",
+                    "label": "Divi A/B Test Started",
+                    "hook": "et_builder_ab_test_started",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "divi_contact_form_submitted": {
+                    "key": "divi_contact_form_submitted",
+                    "label": "Divi Contact Form Submitted",
+                    "hook": "et_pb_contact_form_submit",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "divi_optin_form_submitted": {
+                    "key": "divi_optin_form_submitted",
+                    "label": "Divi Optin Form Submitted",
+                    "hook": "et_pb_signup_form_submit",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": []
         }
     },
     "tools": {
