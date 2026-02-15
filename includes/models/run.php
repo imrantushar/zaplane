@@ -16,6 +16,7 @@ class Run extends Model
         'target_node_key',
         'start_node_key',
         'status',
+        'is_test',
         'trigger_data',
         'attempts',
         'started_at',
@@ -28,6 +29,7 @@ class Run extends Model
         'start_node_key' => 'integer',
         'target_node_key' => 'integer',
         'attempts' => 'integer',
+        'is_test' => 'boolean',
         'trigger_data' => 'json',
     ];
 
@@ -35,12 +37,12 @@ class Run extends Model
     protected static string $createdAt = 'started_at';
     protected static string $updatedAt = 'finished_at';
 
-    public function nodeRuns(): array
+    public function nodeRuns(): Collection
     {
         return NodeRun::where('run_id', $this->id)->orderBy('id', 'asc')->get();
     }
 
-    public function executionEdges(): array
+    public function executionEdges(): Collection
     {
         return ExecutionEdge::where('run_id', $this->id)->get();
     }
@@ -86,12 +88,12 @@ class Run extends Model
         return $this->status === 'failed';
     }
 
-    public static function running(): array
+    public static function running(): Collection
     {
         return static::where('status', 'running')->get();
     }
 
-    public static function forWorkflowVersion(string $hash): array
+    public static function forWorkflowVersion(string $hash): Collection
     {
         return static::where('workflow_version_hash', $hash)
             ->orderBy('id', 'desc')
@@ -101,5 +103,49 @@ class Run extends Model
     public static function recent(int $limit = 100): Collection
     {
         return static::orderBy('id', 'desc')->limit($limit)->get();
+    }
+
+    public static function latestTestNodeRuns(string $hash): array
+    {
+        $testRuns = static::where('workflow_version_hash', $hash)
+            ->where('is_test', 1)
+            ->orderBy('id', 'desc')
+            ->get();
+
+        $nodeOutputs = [];
+
+        foreach ($testRuns as $run) {
+            $nodeRuns = $run->nodeRuns();
+            foreach ($nodeRuns as $nodeRun) {
+                $key = $nodeRun->node_key;
+                if (!isset($nodeOutputs[$key]) && $nodeRun->isCompleted()) {
+                    $nodeOutputs[$key] = $nodeRun;
+                }
+            }
+        }
+
+        return $nodeOutputs;
+    }
+
+    public static function latestNodeOutputs(string $hash): array
+    {
+        $runs = static::where('workflow_version_hash', $hash)
+            ->whereIn('status', ['completed', 'failed', 'running'])
+            ->orderBy('id', 'desc')
+            ->get();
+
+        $nodeOutputs = [];
+
+        foreach ($runs as $run) {
+            $nodeRuns = $run->nodeRuns();
+            foreach ($nodeRuns as $nodeRun) {
+                $key = $nodeRun->node_key;
+                if (!isset($nodeOutputs[$key]) && $nodeRun->isCompleted()) {
+                    $nodeOutputs[$key] = $nodeRun;
+                }
+            }
+        }
+
+        return $nodeOutputs;
     }
 }

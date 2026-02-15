@@ -9,6 +9,7 @@ use Zaplane\Framework\Classes\Container;
 use Zaplane\Models\Workflow;
 use Zaplane\Models\WorkflowVersion;
 use Zaplane\Models\Run;
+use Zaplane\Utils\VariableExtractor;
 
 if (!defined('ABSPATH')) exit;
 
@@ -95,6 +96,14 @@ class WorkflowsController extends WP_REST_Controller
                 'permission_callback' => [$this, 'permissions_check'],
             ],
         ]);
+
+        register_rest_route($namespace, '/condition-variables', [
+            [
+                'methods' => WP_REST_Server::READABLE,
+                'callback' => [$this, 'get_condition_variables'],
+                'permission_callback' => [$this, 'permissions_check'],
+            ],
+        ]);
     }
 
     public function permissions_check()
@@ -177,6 +186,26 @@ class WorkflowsController extends WP_REST_Controller
         $version = $workflow->activeVersion();
         $graph = $version ? $version->getGraph() : ['nodes' => [], 'edges' => []];
 
+        // Get test outputs for each node
+        $testOutputs = [];
+        if ($version) {
+            $nodeRuns = Run::latestTestNodeRuns($version->graph_hash);
+
+            foreach ($nodeRuns as $nodeKey => $nodeRun) {
+                $output = $nodeRun->getOutput();
+
+                $outputData = $output['data'] ?? $output;
+
+                $testOutputs[$nodeKey] = [
+                    'node_run_id' => $nodeRun->id,
+                    'run_id' => $nodeRun->run_id,
+                    'output' => $outputData,
+                    'variables' => VariableExtractor::extract($outputData),
+                    'tested_at' => $nodeRun->finished_at,
+                ];
+            }
+        }
+
         return rest_ensure_response([
             'workflow' => [
                 'id' => $workflow->id,
@@ -191,6 +220,7 @@ class WorkflowsController extends WP_REST_Controller
                 'created_at' => $version->created_at,
             ] : null,
             'graph' => $graph,
+            'test_outputs' => $testOutputs,
         ]);
     }
 
@@ -249,7 +279,8 @@ class WorkflowsController extends WP_REST_Controller
 
         return rest_ensure_response([
             'workflow_id' => $workflowId,
-            'active_version' => $versionId,
+            'version_id' => $versionId,
+            'is_active' => $version->is_active,
         ]);
     }
 
@@ -281,5 +312,92 @@ class WorkflowsController extends WP_REST_Controller
                 ])
                 ->toArray()
         );
+    }
+
+    public function get_condition_variables($request)
+    {
+        $workflowHash = $request->get_param('workflow_hash');
+        $targetNodeKey = (int) $request->get_param('target_node_key');
+
+        if (empty($workflowHash) || empty($targetNodeKey)) {
+            return new WP_Error('invalid_params', 'workflow_hash and target_node_key are required', ['status' => 400]);
+        }
+
+        $version = WorkflowVersion::where('graph_hash', $workflowHash)->first();
+
+        if (!$version) {
+            return new WP_Error('not_found', 'Workflow version not found', ['status' => 404]);
+        }
+
+        $graph = $version->getGraph();
+        $nodes = $graph['nodes'] ?? [];
+        $edges = $graph['edges'] ?? [];
+
+        $nodeMap = [];
+        foreach ($nodes as $node) {
+            $nodeMap[(int) $node['id']] = $node;
+        }
+
+        $previousNodeIds = $this->findPreviousNodes($targetNodeKey, $edges);
+        $nodeOutputs = Run::latestNodeOutputs($workflowHash);
+
+        $data = [];
+        foreach ($previousNodeIds as $nodeId) {
+            $node = $nodeMap[$nodeId] ?? null;
+            if (!$node) continue;
+
+            $nodeType = $node['type'] ?? '';
+            if (!in_array($nodeType, ['action', 'trigger'])) continue;
+
+            $nodeRun = $nodeOutputs[$nodeId] ?? null;
+
+            if ($nodeRun) {
+                $output = $nodeRun->getOutput();
+
+                if (!is_array($output)) {
+                    $output = ['value' => $output];
+                }
+
+                $data[] = [
+                    'node_id' => $nodeId,
+                    'variables' => VariableExtractor::extract($output),
+                ];
+            } else {
+                $data[] = [
+                    'node_id' => $nodeId,
+                    'variables' => [],
+                ];
+            }
+        }
+
+        return rest_ensure_response([
+            'status' => 'success',
+            'code' => 'SUCCESS',
+            'data' => $data,
+        ]);
+    }
+
+    private function findPreviousNodes(int $targetNodeId, array $edges): array
+    {
+        $previousNodes = [];
+        $queue = [$targetNodeId];
+        $visited = [$targetNodeId => true];
+
+        while (!empty($queue)) {
+            $currentId = array_shift($queue);
+
+            foreach ($edges as $edge) {
+                $target = (int) $edge['target'];
+                $source = (int) $edge['source'];
+
+                if ($target === $currentId && !isset($visited[$source])) {
+                    $visited[$source] = true;
+                    $previousNodes[] = $source;
+                    $queue[] = $source;
+                }
+            }
+        }
+
+        return $previousNodes;
     }
 }

@@ -305,7 +305,10 @@ class Wordpress extends IntegrationBase {
                 return self::resolve_post_payload( $args[0] ?? 0 );
 
             case 'transition_post_status':
-                $post = Post::find( $args[2] ?? 0 );
+                // $args[2] is WP_Post object, not ID
+                $wpPost = $args[2] ?? null;
+                $postId = $wpPost instanceof \WP_Post ? $wpPost->ID : (int) $wpPost;
+                $post = Post::find( $postId );
                 if ( ! $post || ( $args[1] ?? '' ) === 'new' ) return false;
 
                 return array_merge( $post->toArray(), [
