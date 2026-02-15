@@ -2875,8 +2875,8 @@ const Logs = () => {
           }),
           textAlign: "center"
         }],
-        actionsRenderer: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.Fragment, {
-          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Button, {
+        actionsRenderer: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.Fragment, {
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Button, {
             size: "xs",
             variant: "outline",
             onClick: () => {
@@ -2885,12 +2885,7 @@ const Logs = () => {
               dispatch((0,_ZAPRedux_Slices_workFlowSlice_actions_workFlowLogs__WEBPACK_IMPORTED_MODULE_14__.nodeLogsRunDetails)(row.id));
             },
             children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_10__.__)("Details", "zaplane")
-          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Button, {
-            size: "xs",
-            variant: "outline",
-            onClick: () => dispatch((0,_ZAPRedux_Slices_logsSlice_logsSlice__WEBPACK_IMPORTED_MODULE_6__.retryNodeRun)(row.id)),
-            children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_10__.__)("Re-execute", "zaplane")
-          })]
+          })
         })
       })
     }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_ZAPComponents_Drawer__WEBPACK_IMPORTED_MODULE_13__["default"], {

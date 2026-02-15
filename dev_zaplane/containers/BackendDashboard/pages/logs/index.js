@@ -126,7 +126,7 @@ const Logs = () => {
                                 {__("Details", "zaplane")}
                             </Button>
 
-                            <Button
+                            {/* <Button
                                 size="xs"
                                 variant="outline"
                                 onClick={() =>
@@ -134,7 +134,7 @@ const Logs = () => {
                                 }
                             >
                                 {__("Re-execute", "zaplane")}
-                            </Button>
+                            </Button> */}
                         </>
                     )}
                 />
