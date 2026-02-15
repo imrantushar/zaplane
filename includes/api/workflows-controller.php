@@ -279,7 +279,8 @@ class WorkflowsController extends WP_REST_Controller
 
         return rest_ensure_response([
             'workflow_id' => $workflowId,
-            'active_version' => $versionId,
+            'version_id' => $versionId,
+            'is_active' => $version->is_active,
         ]);
     }
 
