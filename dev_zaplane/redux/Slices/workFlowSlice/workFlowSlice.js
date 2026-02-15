@@ -97,8 +97,8 @@ const workflowsSlice = createSlice({
 					...version,
 					is_active:
 						parseInt(version.id) === parseInt(activeVersionId)
-							? "1"
-							: "0",
+							? true
+							: false,
 				}));
 			})
 			.addCase(nodeLogsRunDetails.fulfilled, (state, action) => {

@@ -6889,7 +6889,7 @@ const workflowsSlice = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createSl
       const activeVersionId = action.meta.arg.versionID;
       state.versions = state.versions.map(version => ({
         ...version,
-        is_active: parseInt(version.id) === parseInt(activeVersionId) ? "1" : "0"
+        is_active: parseInt(version.id) === parseInt(activeVersionId) ? true : false
       }));
     }).addCase(_actions_workFlowLogs__WEBPACK_IMPORTED_MODULE_4__.nodeLogsRunDetails.fulfilled, (state, action) => {
       state.nodeDetails = action.payload;
