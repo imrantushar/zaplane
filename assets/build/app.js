@@ -6905,12 +6905,12 @@ const workflowsSlice = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createSl
       state.runs = action.payload;
       state.isLoading = false;
     }).addCase(_actions_workFlowVersion__WEBPACK_IMPORTED_MODULE_3__.getPreviewOldVersion.fulfilled, (state, action) => {
-      if (!state.allWorkFlows.length) return;
-      state.allWorkFlows[0] = {
-        ...state.allWorkFlows[0],
-        graph: action.payload.graph,
+      if (!state.workFlow || Object.keys(state.workFlow).length === 0) return;
+      state.workFlow = {
+        ...state.workFlow,
+        graph: action.payload.graph || state.workFlow.graph,
         is_preview: true,
-        preview_version_id: action.payload.version?.id
+        preview_version_id: action.payload.version?.id || null
       };
     }).addCase(_actions_workFlowVersion__WEBPACK_IMPORTED_MODULE_3__.getAllVersion.fulfilled, (state, action) => {
       state.versions = action.payload;
