@@ -1,4 +1,3 @@
-
 import { Box, Button, Flex, Text, Accordion } from "@chakra-ui/react";
 import { FieldArray } from "formik";
 import { FiTrash2 } from "react-icons/fi";
@@ -8,22 +7,9 @@ import { __ } from "@wordpress/i18n";
 import { buildEmptyRule, insertVariableIntoGroup } from "./helper";
 import WPPopover from "@ZAPComponents/Popaver/WPPopover";
 import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { conditionVariables } from "@ZAPRedux/Slices/workFlowSlice/actions/conditonVariales";
-
-const items = [
-    {
-        name: "Wordpress",
-        variable: [
-            { key: "post_modified", type: "string", value: "2026-02-09 02:11:10" },
-            { key: "post_modified_gmt", type: "string", value: "0000-00-00 00:00:00" },
-            { key: "post_content_filtered", type: "string", value: "" },
-            { key: "post_parent", type: "integer", value: 0 },
-            { key: "guid", type: "string", value: "http://localhost/kodezen/?p=13" },
-        ],
-    },
-    { name: "slack", variable: [] },
-];
+import VariablePopover from "./VariablePopover";
 
 export default function ConditionGroupField({ value, field, nodeId, workFlow }) {
     const ruleFields = field?.fields;
@@ -31,6 +17,8 @@ export default function ConditionGroupField({ value, field, nodeId, workFlow }) 
 
     const [isPopoverOpen, setPopoverOpen] = useState(false);
     const [activeInput, setActiveInput] = useState(null);
+
+    const { data } = useSelector((state) => state.workflows?.workflowVariables);
 
     const dispatch = useDispatch();
 
@@ -98,12 +86,13 @@ export default function ConditionGroupField({ value, field, nodeId, workFlow }) 
                                                                 onChange={(e) => {
                                                                     const val = e.target.value;
                                                                     ruleHelpers.replace(rIndex, { ...rule, [f.key]: val });
+
                                                                     if (val.endsWith("@")) {
                                                                         setActiveInput({ gIndex, rIndex, fieldKey: f.key });
                                                                         setPopoverOpen(true);
                                                                     }
                                                                 }}
-                                                                containerStyle={{ width: "30%", alignSelf: "stretch" }}
+                                                                containerStyle={{ width: "30%" }}
                                                             />
                                                         );
                                                     })}
@@ -145,62 +134,19 @@ export default function ConditionGroupField({ value, field, nodeId, workFlow }) 
                             {__("OR Group", "zaplane")}
                         </Button>
 
-                        <WPPopover
+                        <VariablePopover
                             isOpen={isPopoverOpen}
                             onClose={() => {
                                 setPopoverOpen(false);
                                 setActiveInput(null);
                             }}
-                            title="Insert data for Dynamic content"
-                        >
-                            <Accordion.Root collapsible>
-                                {items.map((item, index) => (
-                                    <Accordion.Item
-                                        key={index}
-                                        value={item.value}
-                                        border="1px solid var(--zaplane-border-color)"
-                                        borderBottom={index === items.length - 1 ? "1px solid var(--zaplane-border-color)" : "0"}
-                                        borderBottomRadius={index === items.length - 1 ? "md" : "0"}
-                                        borderTopRadius={index === 0 ? "md" : "0"}
-                                        overflow="hidden"
-                                    >
-                                        <Accordion.ItemTrigger px="12px" py="10px" _hover={{ bg: "gray.50" }}>
-                                            <Flex align="center" w="100%">
-                                                <Text flex="1" fontSize="sm" fontWeight="500">
-                                                    {item.name}
-                                                </Text>
-                                                <Accordion.ItemIndicator />
-                                            </Flex>
-                                        </Accordion.ItemTrigger>
-
-                                        <Accordion.ItemContent>
-                                            <Accordion.ItemBody px="12px" py="10px" bg="gray.50">
-                                                {item.variable.map((v, vi) => (
-                                                    <Text
-                                                        key={vi}
-                                                        cursor="pointer"
-                                                        fontSize="sm"
-                                                        _hover={{ color: "blue.600" }}
-                                                        onClick={() => {
-                                                            insertVariableIntoGroup({
-                                                                activeInput,
-                                                                groups,
-                                                                groupHelpers,
-                                                                valueToInsert: v.key,
-                                                                setPopoverOpen,
-                                                                setActiveInput,
-                                                            });
-                                                        }}
-                                                    >
-                                                        {v.key}: {v.value}
-                                                    </Text>
-                                                ))}
-                                            </Accordion.ItemBody>
-                                        </Accordion.ItemContent>
-                                    </Accordion.Item>
-                                ))}
-                            </Accordion.Root>
-                        </WPPopover>
+                            data={data}
+                            activeInput={activeInput}
+                            groups={groups}
+                            groupHelpers={groupHelpers}
+                            setPopoverOpen={setPopoverOpen}
+                            setActiveInput={setActiveInput}
+                        />
                     </Flex>
                 );
             }}

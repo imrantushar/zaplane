@@ -6,6 +6,7 @@ import { getAllVersion, getPreviewOldVersion, versionActive } from './actions/wo
 import { nodeLogsRunDetails, getNodeLogDetails } from './actions/workFlowLogs';
 import { workFLowSingeNodeExction } from './actions/workflowExctions';
 import { workflowNodeListiner, workflowNodeListinerStop } from './actions/workFlowListiner';
+import { conditionVariables } from './actions/conditonVariales';
 
 
 const workflowsSlice = createSlice({
@@ -20,6 +21,7 @@ const workflowsSlice = createSlice({
 		singleNodeExecution: null,
 		apiCountdown: 0,
 		apiRequestRunning: false,
+		workflowVariables:[]
 
 
 	},
@@ -125,6 +127,10 @@ const workflowsSlice = createSlice({
 				state.isLoading = false;
 				state.apiRequestRunning = false;
 				state.apiCountdown = 0;
+			})
+			.addCase(conditionVariables.fulfilled, (state, action) => {
+				if (!action.payload) return;
+				state.workflowVariables = action.payload;
 			})
 	},
 });
