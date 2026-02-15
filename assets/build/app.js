@@ -4132,6 +4132,7 @@ const TestDetails = ({
   const selectedOutput = workFlow?.test_outputs?.[id]?.output || {};
   const inputData = singleNodeExecution?.input || values;
   const outputData = singleNodeExecution?.output?.data || selectedOutput;
+  console.log(inputData, outputData, 'pp');
   (0,react__WEBPACK_IMPORTED_MODULE_7__.useEffect)(() => {
     dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_5__.resetSingleNodeExecution)());
   }, [id, dispatch]);
@@ -6866,10 +6867,10 @@ const workflowsSlice = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createSl
       if (state.workFlow?.workflow?.id === id) {
         state.workFlow.workflow.status = status;
       }
-      state.allWorkFlows = state.allWorkFlows.map(item => parseInt(item.id) === parseInt(id) ? {
+      state.allWorkFlows = Array.isArray(state.allWorkFlows) ? state.allWorkFlows.map(item => Number(item.id) === Number(id) ? {
         ...item,
-        status: status
-      } : item);
+        status
+      } : item) : [];
     }).addCase(_actions_workFlowRuns__WEBPACK_IMPORTED_MODULE_2__.getRunWorkFlow.fulfilled, (state, action) => {
       state.runs = action.payload;
       state.isLoading = false;
