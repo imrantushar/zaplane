@@ -1,13 +1,14 @@
 <?php
 
-namespace Zaplane\Framework\Models\WordPress;
+namespace Zaplane\Framework\Models;
 
 if (!defined('ABSPATH')) exit;
 
-class Option extends WPModel
+class Option extends WpModel
 {
     protected static string $table = 'options';
     protected static string $primaryKey = 'option_id';
+    protected static bool $timestamps = false;
 
     protected static array $fillable = [
         'option_name',
