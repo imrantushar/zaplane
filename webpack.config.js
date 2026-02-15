@@ -23,6 +23,7 @@ const config = {
 			'@ZAPGlobal': path.resolve( __dirname, 'dev_zaplane/global/' ),
 			'@ZAPRedux': path.resolve( __dirname, 'dev_zaplane/redux/' ),
 			'@ZAPUtils': path.resolve( __dirname, 'dev_zaplane/utils/' ),
+			 '@ZAPHooks': path.resolve( __dirname, 'dev_zaplane/hooks/' ),
 		},
 	},
 };

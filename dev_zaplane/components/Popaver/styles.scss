@@ -1,0 +1,38 @@
+.zaplane-popover {
+  max-width: 500px;
+  width: 500px;
+  background: var(--zaplane-background);
+  border: 1px solid var(--zaplane-border-color);
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 9999;
+  left: -506px !important;
+
+  .components-popover__content {
+    width: 100%;
+  }
+
+  .zaplane-popover-inner {
+    width: 100%;
+  }
+
+
+  .zaplane-popover-title {
+    font-size: 13px;
+    font-weight: 600;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--zaplane-border-color);
+    background: #f6f7f7;
+    color: #1e1e1e;
+  }
+
+  .zaplane-popover-content {
+    padding: 12px;
+    font-size: 14px;
+    color: var(--zaplane-font-color);
+
+    p {
+      margin: 0;
+    }
+  }
+}

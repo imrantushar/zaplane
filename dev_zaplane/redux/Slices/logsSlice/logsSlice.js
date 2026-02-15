@@ -42,12 +42,6 @@ export const getRunsList = createAsyncThunk(
 			const res = await API.get(
 				namespace + `runs`
 			);
-
-			handleSliceSuccess(
-				thunkAPI,
-				__('Runs fetched successfully', 'workflow')
-			);
-
 			return res.data; 
 		} catch (e) {
 			return handleSliceError(thunkAPI, e);

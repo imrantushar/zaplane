@@ -1,0 +1,44 @@
+.zaplane-oops {
+	&__icon {
+		display: flex;
+		justify-content: center;
+		img {
+			width: 100%;
+		}
+	}
+	&__message {
+		padding: 0 0 40px 0;
+		svg {
+			width: 100%;
+		}
+
+		.zaplane-oops__heading {
+			font-size: 24px;
+			font-weight: 500;
+			line-height: 36px;
+			text-align: center;
+			padding-top: 12px;
+			margin: 0;
+			color: var(--zaplane-font-color);
+		}
+		.zaplane-oops__text {
+			font-size: 14px;
+			font-weight: 400;
+			line-height: 20px;
+			text-align: center;
+			margin: 0;
+			padding-top: 4px;
+			color: var(--zaplane-text-muted);
+		}
+	}
+	&__content{
+		display: flex;
+		justify-content: center;
+		flex-direction: column;
+		align-items: center;
+	}
+	&__button{
+		max-width: fit-content;
+		margin-top: 24px;
+	}
+}
