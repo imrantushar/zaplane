@@ -194,13 +194,15 @@ class WorkflowsController extends WP_REST_Controller
             foreach ($nodeRuns as $nodeKey => $nodeRun) {
                 $output = $nodeRun->getOutput();
 
-                $outputData = $output['data'] ?? $output;
+                if (!is_array($output)) {
+                    $output = ['value' => $output];
+                }
 
                 $testOutputs[$nodeKey] = [
                     'node_run_id' => $nodeRun->id,
                     'run_id' => $nodeRun->run_id,
-                    'output' => $outputData,
-                    'variables' => VariableExtractor::extract($outputData),
+                    'output' => $output,
+                    'variables' => VariableExtractor::extract($output),
                     'tested_at' => $nodeRun->finished_at,
                 ];
             }

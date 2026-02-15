@@ -47,12 +47,18 @@ class Condition extends IntegrationBase {
                         'label'    => 'Operator',
                         'type'     => 'select',
                         'options'  => [
-                            ['label' => '==', 'value' => '=='],
-                            ['label' => '!=', 'value' => '!='],
-                            ['label' => '<',  'value' => '<'],
-                            ['label' => '>',  'value' => '>'],
-                            ['label' => '<=', 'value' => '<='],
-                            ['label' => '>=', 'value' => '>='],
+                            ['label' => 'Equals',           'value' => '=='],
+                            ['label' => 'Not Equals',       'value' => '!='],
+                            ['label' => 'Greater Than',     'value' => '>'],
+                            ['label' => 'Less Than',        'value' => '<'],
+                            ['label' => 'Greater or Equal', 'value' => '>='],
+                            ['label' => 'Less or Equal',    'value' => '<='],
+                            ['label' => 'Contains',         'value' => 'contains'],
+                            ['label' => 'Not Contains',     'value' => 'not_contains'],
+                            ['label' => 'Starts With',      'value' => 'starts_with'],
+                            ['label' => 'Ends With',        'value' => 'ends_with'],
+                            ['label' => 'Is Empty',         'value' => 'is_empty'],
+                            ['label' => 'Is Not Empty',     'value' => 'is_not_empty'],
                         ],
                         'required' => true,
                     ],
@@ -119,12 +125,18 @@ class Condition extends IntegrationBase {
      */
     protected static function compare($left, $right, string $op): bool {
         switch ($op) {
-            case '==': return $left == $right;
-            case '!=': return $left != $right;
-            case '<':  return $left < $right;
-            case '>':  return $left > $right;
-            case '<=': return $left <= $right;
-            case '>=': return $left >= $right;
+            case '==':           return $left == $right;
+            case '!=':           return $left != $right;
+            case '<':            return $left < $right;
+            case '>':            return $left > $right;
+            case '<=':           return $left <= $right;
+            case '>=':           return $left >= $right;
+            case 'contains':     return str_contains((string) $left, (string) $right);
+            case 'not_contains': return !str_contains((string) $left, (string) $right);
+            case 'starts_with':  return str_starts_with((string) $left, (string) $right);
+            case 'ends_with':    return str_ends_with((string) $left, (string) $right);
+            case 'is_empty':     return empty($left);
+            case 'is_not_empty': return !empty($left);
         }
         return false;
     }
