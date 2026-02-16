@@ -19,41 +19,32 @@ class Beaverbuilder extends IntegrationBase {
         ];
     }
 
-    public static function get_actions(): array {
-        return [];
-    }
-
     public static function resolve_trigger(array $node, array $args) {
         switch ($node['event']) {
             case 'contact_form_submission':
-                 ray($args);
-                $form_data = $args[0] ?? [];
-                if (empty($form_data)) return false;
-
+                $message = $args[2] ?? '';
+                
+                // Parse the message string
+                preg_match('/Name: (.+)/', $message, $name_match);
+                preg_match('/Email: (.+)/', $message, $email_match);
+                preg_match('/Message:\s*(.+)/s', $message, $message_match);
                 return [
-                    'name' => $form_data['name'] ?? '',
-                    'email' => $form_data['email'] ?? '',
-                    'message' => $form_data['message'] ?? '',
+                    'name' => trim($name_match[1] ?? ''),
+                    'email' => trim($email_match[1] ?? ''),
+                    'message' => trim($message_match[1] ?? ''),
                 ];
 
             case 'login_form_submission':
-                $form_data = $args[0] ?? [];
-                ray($args);
-                if (empty($form_data)) return false;
-
                 return [
-                    'username' => $form_data['username'] ?? '',
-                    'user_id' => $form_data['user_id'] ?? 0,
+                    'user_pass' =>  $args[1] ?? '',
+                    'username' =>  $args[2] ?? '',
                 ];
 
             case 'subscribe_form_submission':
-                $form_data = $args[0] ?? [];
-                ray($args);
-                if (empty($form_data)) return false;
 
                 return [
-                    'email' => $form_data['email'] ?? '',
-                    'name' => $form_data['name'] ?? '',
+                    'email' => $args[2] ?? '',
+                    'name' => $args[3] ?? '',
                 ];
         }
 
