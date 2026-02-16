@@ -23,6 +23,11 @@ class Helper {
 			'title'       => __( 'Connections', 'zaplane' ),
 			'capability'  => 'manage_options',
 		];
+		// $menu[ ZAPLANE_PLUGIN_SLUG . '-queue' ] = [
+		// 	'parent_slug' => ZAPLANE_PLUGIN_SLUG,
+		// 	'title'       => __( 'Queue', 'zaplane' ),
+		// 	'capability'  => 'manage_options',
+		// ];
 		$menu[ ZAPLANE_PLUGIN_SLUG . '-logs' ] = [
 			'parent_slug' => ZAPLANE_PLUGIN_SLUG,
 			'title'       => __( 'Logs', 'zaplane' ),

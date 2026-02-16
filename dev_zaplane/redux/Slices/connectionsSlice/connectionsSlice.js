@@ -149,12 +149,12 @@ export const updateConnection = createAsyncThunk(
 const connectionsSlice = createSlice({
   name: 'connections',
   initialState: {
-    list: [],
+    allConnection: [],
     authFields: {},
     oauthData: null,
     loading: false,
     error: null,
-    singleData:[],
+    connection:{},
   },
   reducers: {
     resetAuthFields: (state) => {
@@ -168,7 +168,7 @@ const connectionsSlice = createSlice({
     builder
       .addCase(fetchConnections.fulfilled, (state, action) => {
         state.loading = false;
-        state.list = action.payload;
+        state.allConnection = action.payload;
       })
       .addCase(fetchAuthFields.fulfilled, (state, action) => {
         state.authFields = action.payload || {};
@@ -179,31 +179,31 @@ const connectionsSlice = createSlice({
       })
 
       .addCase(createTokenConnection.fulfilled, (state, action) => {
-        state.list.push(action.payload);
+        state.allConnection.push(action.payload);
       })
       .addCase(testConnection.fulfilled, (state, action) => {
-        const index = state.list.findIndex(c => c.id === action.payload.id);
+        const index = state.allConnection.findIndex(c => c.id === action.payload.id);
         if (index !== -1) {
-          state.list[index].last_tested_at = new Date().toISOString();
-          state.list[index].last_test_status = action.payload.result.success ? 'success' : 'failed';
+          state.allConnection[index].last_tested_at = new Date().toISOString();
+          state.allConnection[index].last_test_status = action.payload.result.success ? 'success' : 'failed';
         }
       })
       .addCase(deleteConnection.fulfilled, (state, action) => {
-        state.list = state.list.filter(c => c.id !== action.payload);
+        state.allConnection = state.allConnection.filter(c => c.id !== action.payload);
       })
       .addCase(fetchSingleConnection.fulfilled, (state, action) => {
       state.loading = false;
-      state.singleData = action.payload;
+      state.connection = action.payload;
     })
     .addCase(updateConnection.fulfilled, (state, action) => {
-      const index = state.list.findIndex(
+      const index = state.allConnection.findIndex(
         (c) => c.id === action.payload.id
       );
       if (index !== -1) {
-        state.list[index] = action.payload;
+        state.allConnection[index] = action.payload;
       }
-      if (state.singleData?.id === action.payload.id) {
-        state.singleData = action.payload;
+      if (state.connection?.id === action.payload.id) {
+        state.connection = action.payload;
       }
     })
   },
