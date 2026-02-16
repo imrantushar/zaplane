@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { Text, Button, Flex } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
 
 import { clearBtn, clearPrimaryBtn } from '../../../assets/scss/chakra/recipe';
+import { sliceString } from '@ZAPUtils/helper';
 
 const ZAPLabel = ({
 	type = "title",
@@ -112,17 +113,17 @@ const ZAPLabel = ({
 
 	const needsSlicing = enableSlice && label && label.length > sliceLength;
 
-	// const getDisplayText = () => {
-	// 	if (!enableSlice || !needsSlicing) {
-	// 		return label;
-	// 	}
+	const getDisplayText = () => {
+		if (!enableSlice || !needsSlicing) {
+			return label;
+		}
 
-	// 	if (isExpanded) {
-	// 		return label;
-	// 	}
+		if (isExpanded) {
+			return label;
+		}
 
-	// 	return sliceString(label, sliceLength, sliceMore);
-	// };
+		return sliceString(label, sliceLength, sliceMore);
+	};
 
 	const displayText = getDisplayText();
 

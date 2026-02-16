@@ -5,56 +5,60 @@ import {
   HStack,
   Text,
   VStack,
-} from "@chakra-ui/react";
-import { parseJSON } from "@ZAPUtils/helper";
-import { useSelector } from "react-redux";
 
+} from "@chakra-ui/react";
+import { __, sprintf } from "@wordpress/i18n";
+import ZAPLoading from "@ZAPComponents/Loading";
+import ReactJson from "react-json-view";
+
+import { useSelector } from "react-redux";
 const LogDetails = ({ runId, onBack }) => {
-  const { nodeDetails = [] } = useSelector(
+  const { nodeDetails = [], isloading } = useSelector(
     (state) => state.workflows
   );
-
+  if (isloading) {
+    return <ZAPLoading />;
+  }
+  //after the  response I’ll add translation support.
   return (
     <Box>
-      <Text
-        mb="4"
-        cursor="pointer"
-        color="blue.500"
-        onClick={onBack}
-      >
-        ← Back to Runs
-      </Text>
+      <Text mb="4" fontWeight="bold"
+        className="zaplane-label">
 
-      <Text mb="4" fontWeight="bold">
-        Run ID: #{runId}
+        {__(`Run ID: ${runId}`, 'zaplane')}
       </Text>
-
       <Accordion.Root collapsible>
         {nodeDetails?.nodes?.map((log) => {
-          const input = parseJSON(log.input_json);
-          const output = parseJSON(log.output_json);
+          const input = log?.input_json || {};
+          const output = log?.output_json || {};
 
           return (
-            <Accordion.Item key={log.id} value={log.id}>
-              <Accordion.ItemTrigger>
+            <Accordion.Item key={log.id} value={log.id} border='1px solid var(--zaplane-border-color)'
+            p='10px' borderRadius='8px' mb='10px'>
+              <Accordion.ItemTrigger p='0' >
                 <HStack flex="1" justify="space-between">
-                  <HStack>
-                    <Text fontWeight="medium">
-                      Node #{log.node_key}
+                  <VStack gap={0}>
+                    <Text fontWeight="medium" className="zaplane-label">
+                      {sprintf(
+                        __('%s', 'zaplane'),log?.node?.app)}
                     </Text>
-                    <Badge>Log {log.id}</Badge>
-                  </HStack>
+                    <Text className="zaplane-sub-title">
+                      {sprintf(
+                        __('%s', 'zaplane'),log?.node?.event)}
+                    </Text>
+                  </VStack>
 
                   <Badge
-                    colorScheme={
+                    colorPalette={
                       log.status === "completed"
                         ? "green"
                         : log.status === "failed"
-                        ? "red"
-                        : "blue"
+                          ? "red"
+                          : "blue"
+
                     }
                   >
-                    {log.status}
+                    {__(log.status, 'zaplane')}
                   </Badge>
                 </HStack>
                 <Accordion.ItemIndicator />
@@ -65,28 +69,38 @@ const LogDetails = ({ runId, onBack }) => {
                   <VStack spacing="4" align="stretch">
                     <Box
                       p="3"
-                      border="1px solid"
-                      borderColor="gray.200"
+                      border="1px solid var(--zaplane-border-color)"
                       borderRadius="md"
-                      bg="gray.50"
+                      bg="var(--zaplane-gray)"
                     >
-                      <Text fontWeight="bold" mb="2">
-                        Input
+                      <Text className="zaplane-label" fontWeight="bold" mb="2">
+                        {__('Input', 'zaplane')}
                       </Text>
-                      <pre>{JSON.stringify(input, null, 2)}</pre>
+                     <ReactJson
+                        src={input}
+                        name="root"
+                        collapsed={1}
+                        enableClipboard={false}
+                        displayDataTypes={false}
+                      />
                     </Box>
 
                     <Box
                       p="3"
-                      border="1px solid"
-                      borderColor="gray.200"
+                      border="1px solid var(--zaplane-border-color)"
                       borderRadius="md"
-                      bg="gray.50"
+                      bg="var(--zaplane-gray)"
                     >
                       <Text fontWeight="bold" mb="2">
-                        Output
+                        {__('Output', 'zaplane')}
                       </Text>
-                      <pre>{JSON.stringify(output, null, 2)}</pre>
+                      <ReactJson
+                        src={output}
+                        name="root"
+                        collapsed={1}
+                        enableClipboard={false}
+                        displayDataTypes={false}
+                      />
                     </Box>
                   </VStack>
                 </Accordion.ItemBody>

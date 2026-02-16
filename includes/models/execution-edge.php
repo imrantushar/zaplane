@@ -22,6 +22,7 @@ class ExecutionEdge extends Model
         'id' => 'integer',
         'run_id' => 'integer',
         'from_node_run_id' => 'integer',
+        'to_node_key' => 'integer',
         'payload_json' => 'json',
     ];
 
