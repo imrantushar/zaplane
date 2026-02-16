@@ -86,8 +86,8 @@ const workflowsSlice = createSlice({
 				state.workFlow = {
 					...state.workFlow,
 					graph: action.payload.graph || state.workFlow.graph,
-					is_preview: true,
-					preview_version_id: action.payload.version?.id || null,
+					// is_preview: true,
+					// preview_version_id: action.payload.version?.id || null,
 				};
 			})
 
