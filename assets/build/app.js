@@ -1582,7 +1582,7 @@ const ZAPSelect = ({
       isClearable: isClearable,
       value: options.find(o => o.value === value) || null,
       onMenuOpen: onMenuOpen,
-      onChange: opt => onChange?.(opt)
+      onChange: opt => onChange?.(opt?.value)
     })]
   });
 };
