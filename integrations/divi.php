@@ -25,16 +25,15 @@ class Divi extends IntegrationBase {
     public static function resolve_trigger(array $node, array $args) {
         switch ($node['event']) {
             case 'divi_contact_form_submitted':
-                 ray($args);
-                $form_data = $args[0] ?? [];
-                    ray($form_data);
+                $form_fields = $args[0] ?? [];
+                $form_meta = $args[2] ?? [];
 
                 return [
-                    'form_id' => $form_data['form_id'] ?? '',
-                    'post_id' => $form_data['post_id'] ?? 0,
-                    'email' => $form_data['email'] ?? '',
-                    'name' => $form_data['name'] ?? '',
-                    'message' => $form_data['message'] ?? '',
+                    'form_id' => $form_meta['contact_form_id'] ?? '',
+                    'post_id' => $form_meta['post_id'] ?? 0,
+                    'email' => $form_fields['email']['value'] ?? '',
+                    'name' => $form_fields['name']['value'] ?? '',
+                    'message' => $form_fields['message']['value'] ?? '',
                     'submitted_at' => current_time('mysql'),
                 ];
         }
