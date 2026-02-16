@@ -22,32 +22,22 @@ class Academy extends IntegrationBase {
             'user_enroll_course' => [
                 'label' => 'User enrolled in a course',
                 'hook'  => 'academy/course/after_enroll',
-                'priority' => 10,
-                'accepted_args' => 2,
             ],
             'academy_quiz_course_attempt' => [
                 'label' => 'User attempted (submitted) a quiz',
                 'hook'  => 'academy_quizzes/api/after_quiz_attempt_finished',
-                'priority' => 10,
-                'accepted_args' => 1,
             ],
             'lesson_complete' => [
                 'label' => 'User completed a lesson',
                 'hook'  => 'academy/frontend/after_mark_topic_complete',
-                'priority' => 10,
-                'accepted_args' => 4,
             ],
             'course_complete' => [
                 'label' => 'User completed a course',
                 'hook'  => 'academy/admin/course_complete_after',
-                'priority' => 10,
-                'accepted_args' => 1,
             ],
             'quiz_target' => [
                 'label' => 'User achieved target percentage on a quiz',
                 'hook'  => 'academy_quizzes/api/after_quiz_attempt_finished',
-                'priority' => 10,
-                'accepted_args' => 1,
             ],
         ];
     }

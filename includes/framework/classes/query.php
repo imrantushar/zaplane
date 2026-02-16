@@ -35,7 +35,6 @@ class Query
                 }
             }
         }
-        error_log(print_r($event , true));
         return array_unique($events);
     }
 

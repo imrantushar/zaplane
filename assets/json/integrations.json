@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-02-09 12:43:57",
+    "generated_at": "2026-02-15 11:48:33",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -2954,8 +2954,8 @@
                                     "value": "any"
                                 },
                                 {
-                                    "label": "sdfasdf",
-                                    "value": 42
+                                    "label": "sfasdf",
+                                    "value": 12
                                 }
                             ],
                             "required": true
@@ -3002,8 +3002,8 @@
                                     "value": "any"
                                 },
                                 {
-                                    "label": "sdfasdf",
-                                    "value": 42
+                                    "label": "sfasdf",
+                                    "value": 12
                                 }
                             ],
                             "required": true
@@ -3028,8 +3028,8 @@
                                     "value": "any"
                                 },
                                 {
-                                    "label": "sdfasdf",
-                                    "value": 42
+                                    "label": "sfasdf",
+                                    "value": 12
                                 }
                             ],
                             "required": true
