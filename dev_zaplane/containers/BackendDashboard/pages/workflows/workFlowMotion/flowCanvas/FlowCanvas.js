@@ -37,6 +37,7 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
     const containerRef = useRef(null);
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [activeDrawer, setActiveDrawer] = useState(null);
+     const {versions} = useSelector((state) => state.workflows);
     //if we menage layout syestem then we need to save databse this value
     const [canvasLayout, setCanvasLayout] = useState("LR")
 
@@ -53,11 +54,12 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
         node: null,
         edge: null,
     });
+    const activeVersionId = versions?.find(v => v.is_active)?.id;
     useEffect(() => {
         setLoading(true);
         dispatch(getSingleWorkFlow(id)).finally(() => setLoading(false));
 
-    }, [id]);
+    }, [id,activeVersionId]);
     const {
         updateNodeData,
         deleteNode,

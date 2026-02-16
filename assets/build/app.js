@@ -4708,6 +4708,9 @@ function FlowCanvas({
   const containerRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
   const [isFullscreen, setIsFullscreen] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
   const [activeDrawer, setActiveDrawer] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(null);
+  const {
+    versions
+  } = (0,react_redux__WEBPACK_IMPORTED_MODULE_11__.useSelector)(state => state.workflows);
   //if we menage layout syestem then we need to save databse this value
   const [canvasLayout, setCanvasLayout] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)("LR");
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
@@ -4725,10 +4728,11 @@ function FlowCanvas({
     node: null,
     edge: null
   });
+  const activeVersionId = versions?.find(v => v.is_active)?.id;
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
     setLoading(true);
     dispatch((0,_ZAPRedux_Slices_workFlowSlice_actions_workFlow__WEBPACK_IMPORTED_MODULE_20__.getSingleWorkFlow)(id)).finally(() => setLoading(false));
-  }, [id]);
+  }, [id, activeVersionId]);
   const {
     updateNodeData,
     deleteNode,
