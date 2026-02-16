@@ -3708,7 +3708,7 @@ const ActionFieldRenderer = ({
   nodeId,
   workFlow
 }) => {
-  const handleChange = val => setFieldValue(field.key, val?.value);
+  const handleChange = val => setFieldValue(field.key, val);
   const commonProps = {
     label: field.label,
     placeholder: field.placeholder || "",
