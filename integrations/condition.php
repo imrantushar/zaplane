@@ -24,14 +24,46 @@ class Condition extends IntegrationBase {
         ];
     }
 
+    /**
+     * Condition node config schema
+     */
     public static function get_action_config_schema(string $action): array {
         return [
             [
-                'key' => 'expression',
-                'label' => 'Condition',
-                'type' => 'expression',
+                'key'      => 'conditions',
+                'label'    => 'Conditions',
+                'type'     => 'condition_group',
                 'required' => true,
-                'help' => 'Example: {{post.status}} == "publish"'
+                'help'     => 'Build complex conditions with AND/OR groups',
+                'fields'   => [
+                    [
+                        'key'      => 'left',
+                        'label'    => 'Left Value',
+                        'type'     => 'expression', // {{post.status}}, {{user.role}}, etc.
+                        'required' => true,
+                    ],
+                    [
+                        'key'      => 'operator',
+                        'label'    => 'Operator',
+                        'type'     => 'select',
+                        'options'  => [
+                            ['label' => '==', 'value' => '=='],
+                            ['label' => '!=', 'value' => '!='],
+                            ['label' => '<',  'value' => '<'],
+                            ['label' => '>',  'value' => '>'],
+                            ['label' => '<=', 'value' => '<='],
+                            ['label' => '>=', 'value' => '>='],
+                        ],
+                        'required' => true,
+                    ],
+                    [
+                        'key'      => 'right',
+                        'label'    => 'Right Value',
+                        'type'     => 'expression', // Could be static string/number or dynamic reference
+                        'required' => true,
+                    ],
+                ],
+                'logic_options' => ['AND', 'OR'], // Group logic
             ]
         ];
     }
@@ -40,14 +72,60 @@ class Condition extends IntegrationBase {
         return ['true', 'false'];
     }
 
+    /**
+     * Execute condition node
+     */
     public static function execute_node(array $node, array $input): array {
-        $expr = $node['data']['config']['expression'] ?? '';
-
-        $result = Expression::evaluate($expr, $input);
+        $config = $node['data']['config'] ?? [];
+        $conditions = $config['conditions'] ?? [];
+        $result = self::evaluate_condition_group($conditions, $input);
 
         return [
             'port' => $result ? 'true' : 'false',
             'data' => $input,
         ];
+    }
+
+    /**
+     * Evaluate a condition group recursively
+     */
+    protected static function evaluate_condition_group(array $group, array $input): bool {
+        $logic = $group['logic'] ?? 'AND';
+        $results = [];
+
+        foreach ($group['conditions'] ?? [] as $cond) {
+            if (!empty($cond['conditions'])) {
+                // Nested group
+                $results[] = self::evaluate_condition_group($cond, $input);
+            } else {
+                // Single condition
+                $left  = Expression::evaluate($cond['left'] ?? '', $input);
+                $right = Expression::evaluate($cond['right'] ?? '', $input);
+                $op    = $cond['operator'] ?? '==';
+
+                $results[] = self::compare($left, $right, $op);
+            }
+        }
+
+        if ($logic === 'AND') {
+            return !in_array(false, $results, true);
+        } else { // OR
+            return in_array(true, $results, true);
+        }
+    }
+
+    /**
+     * Compare two values with operator
+     */
+    protected static function compare($left, $right, string $op): bool {
+        switch ($op) {
+            case '==': return $left == $right;
+            case '!=': return $left != $right;
+            case '<':  return $left < $right;
+            case '>':  return $left > $right;
+            case '<=': return $left <= $right;
+            case '>=': return $left >= $right;
+        }
+        return false;
     }
 }

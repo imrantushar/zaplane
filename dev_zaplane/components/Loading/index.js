@@ -1,5 +1,6 @@
 import React from "react";
 import { Flex, Spinner, Text } from "@chakra-ui/react";
+import { __ } from '@wordpress/i18n';
 
 const ZAPLoading = ({
   height = "300px",
@@ -19,8 +20,8 @@ const ZAPLoading = ({
       <Spinner size={size} />
 
       {label && (
-        <Text fontSize="sm" color="gray.500">
-          {label}
+        <Text fontSize="sm" color="var(--zaplane-body-background)">
+         { __(label, 'zaplane')}
         </Text>
       )}
     </Flex>

@@ -3,7 +3,7 @@ import { menu, makeRequest } from '@ZAPUtils/helper';
 import { showNotification } from '../notificationSlice/notificationSlice';
 
 export const fetchAdminMenuItems = createAsyncThunk(
-	'gamify/fetchAdminMenuItems',
+	'Zaplane/fetchAdminMenuItems',
 	( thunkAPI ) => {
 		try {
 			return makeRequest( 'get_admin_menu_items' ).then( ( res ) => {
