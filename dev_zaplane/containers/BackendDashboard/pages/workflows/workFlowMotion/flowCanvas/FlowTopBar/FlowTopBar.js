@@ -78,6 +78,7 @@ export default function FlowTopBar({
           <ZAPDrawer
             title={__("Log History", "zaplane")}
             size="md"
+            isFullscreen={isFullscreen}
             open={activeDrawer === "logs"}
             onClose={() => setActiveDrawer(null)}
             trigger={
@@ -121,6 +122,7 @@ export default function FlowTopBar({
           <ZAPDrawer
             title={__("Version History", "zaplane")}
             open={activeDrawer === "history"}
+            isFullscreen={isFullscreen}
             onClose={() => setActiveDrawer(null)}
             trigger={
               <Text

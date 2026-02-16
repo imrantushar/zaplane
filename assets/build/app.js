@@ -4994,6 +4994,7 @@ function FlowTopBar({
       }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsxs)(_ZAPComponents_Drawer__WEBPACK_IMPORTED_MODULE_10__["default"], {
         title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_9__.__)("Log History", "zaplane"),
         size: "md",
+        isFullscreen: isFullscreen,
         open: activeDrawer === "logs",
         onClose: () => setActiveDrawer(null),
         trigger: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Button, {
@@ -5026,6 +5027,7 @@ function FlowTopBar({
       }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(_ZAPComponents_Drawer__WEBPACK_IMPORTED_MODULE_10__["default"], {
         title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_9__.__)("Version History", "zaplane"),
         open: activeDrawer === "history",
+        isFullscreen: isFullscreen,
         onClose: () => setActiveDrawer(null),
         trigger: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
           m: "0",
