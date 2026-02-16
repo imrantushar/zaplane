@@ -217,7 +217,7 @@ export default function ActionDrawer({ open, context, onClose, updateNodeData, c
                       setFieldValue("actionType", val?.value);
                       setFieldValue(
                         "hook",
-                        val?.value
+                        val?.hook
                       );
                     }}
                     placeholder="Select Action Type"
