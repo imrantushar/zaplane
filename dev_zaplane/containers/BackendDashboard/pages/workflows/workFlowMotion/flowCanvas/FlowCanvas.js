@@ -11,23 +11,41 @@ import { __ } from '@wordpress/i18n';
 import CustomEdge from "../CustomEdge/CustomEdge";
 import ActionDrawer from "../ActionDrawer/ActionDrawer";
 import { useFormikContext } from "formik";
+import TopBar from "@ZAPComponents/TopBar";
 import {
     Box,
     Flex,
+    Button,
+    Text,
 } from "@chakra-ui/react";
+import {
+    FiArrowLeft
+} from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import ZAPDrawer from "@ZAPComponents/Drawer";
+import { LucideHistory } from "lucide-react";
+import RunsTable from "./RunsTable/RunsTable";
+import VersionHistoryTable from "./VersionHistoryTable/VersionHistoryTable";
+import { LuFullscreen, LuMinimize } from "react-icons/lu";
 import { toggleFullscreenMode, mapGraphFromBackend, formatTime } from "./helper";
+import Select from "react-select";
 import ZAPLoading from "@ZAPComponents/Loading";
 import { statusOptions } from "../../helper";
 import { useFlowActions } from "@ZAPHooks/useFlowActions/useFlowActions";
 import CustomNode from "../customNode/CustomNode";
+import { primaryBtn } from "../../../../../../../assets/scss/chakra/recipe";
+
 import './styles.scss'
 import { IoSwapHorizontal, IoSwapVerticalOutline } from "react-icons/io5";
 import ZAPTooltip from "@ZAPComponents/ZAPTooltip";
 import { useApiCountdown } from "@ZAPHooks/useApiCountdown/useApiCountdown";
 import { getSingleWorkFlow } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow";
-import FlowTopBar from "./FlowTopBar/FlowTopBar";
+import { workFLowExction } from "@ZAPRedux/Slices/workFlowSlice/actions/workflowExctions";
+import { workflowNodeListiner, workflowNodeListinerStop } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlowListiner";
+import { getAllVersion } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlowVersion";
+import { startApiCountdown } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
+import { getRunWorkFlow } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlowRuns";
 
 export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdgesChange, onNodesChange, getNewNodeId, workFlow }) {
     const dispatch = useDispatch();
@@ -35,6 +53,7 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
     const [drawerOpen, setDrawerOpen] = useState(false);
     const { values, setFieldValue, handleSubmit, } = useFormikContext()
     const [loading, setLoading] = useState(false);
+    const { runs, versions, apiCountdown, apiRequestRunning } = useSelector((state) => state.workflows);
     const containerRef = useRef(null);
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [activeDrawer, setActiveDrawer] = useState(null);
@@ -137,21 +156,131 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
             transition="margin-right 0.4s ease"
         >
 
-            <FlowTopBar
-                navigate={navigate}
-                workFlow={workFlow}
-                isFullscreen={isFullscreen}
-                toggleFullscreen={() =>
-                    toggleFullscreenMode(containerRef, isFullscreen, setIsFullscreen)
-                }
-                id={id}
-                values={values}
-                setFieldValue={setFieldValue}
-                handleSubmit={handleSubmit}
-                activeDrawer={activeDrawer}
-                setActiveDrawer={setActiveDrawer}
-            />
+            <TopBar
+                leftContent={() => (
+                    <>
+                        {
+                            !isFullscreen && <Button variant="outline" onClick={() => navigate(-1)}>
+                                <FiArrowLeft />
+                            </Button>
+                        }
+                        <Text fontSize="md" fontWeight="medium">
+                            {workFlow?.workflow?.title || __("Untitled Workflow", "zaplane")}
+                        </Text>
+                        {
+                            !apiRequestRunning ? <Button {...primaryBtn}
+                                onClick={() => {
+                                    dispatch(startApiCountdown(120));
+                                    dispatch(workflowNodeListiner(id));
+                                }}>
+                                {__("Test Flow Once", "zaplane")}
+                            </Button> : <Button {...primaryBtn}
+                                onClick={() => dispatch(workflowNodeListinerStop(id))}>
+                                {__("Stop", "zaplane")}
+                            </Button>
+                        }
+                        {apiRequestRunning && (
+                            <Text m='0' fontSize="18px">
+                                {__("Listening...", "zaplane")} {formatTime(apiCountdown)}
+                            </Text>
+                        )}
 
+
+                    </>
+                )}
+                rightContent={() => (
+                    <>
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => toggleFullscreenMode(containerRef, isFullscreen, setIsFullscreen)}
+                        >
+                            {isFullscreen ? <LuMinimize /> : <LuFullscreen />}
+                        </Button>
+                        <ZAPDrawer
+                            title={__("Log History", "Zaplane")}
+                            size="md"
+                            open={activeDrawer === "logs"}
+                            onClose={() => setActiveDrawer(null)}
+                            isFullscreen={isFullscreen}
+                            trigger={
+                                <Button size="sm" variant="outline"
+                                    onClick={() => {
+                                        dispatch(getRunWorkFlow(id))
+                                        setActiveDrawer("logs")
+                                    }}
+
+                                >
+                                    {__("Logs ", "zaplane")}
+                                </Button>
+                            }>
+                            <Flex gap="5px">
+                                <Button size="sm" variant="outline"
+                                    onClick={() => dispatch(getRunWorkFlow(id))}>
+                                    {__("🔄 Refresh ", "zaplane")}
+                                </Button>
+                                <Button size="sm" variant="outline"
+                                    onClick={() => {
+                                        const paylod = {
+                                            workflow_hash: workFlow?.version?.hash,
+                                        }
+                                        dispatch(workFLowExction(paylod))
+                                    }}>
+                                    {__("🔄 Replay ", "zaplane")}
+                                </Button>
+                            </Flex>
+                            <RunsTable
+                                runs={runs}
+                            />
+
+
+                        </ZAPDrawer>
+                        <ZAPDrawer
+                            title={__("Version History", 'zaplane')}
+                            open={activeDrawer === "history"}
+                            isFullscreen={isFullscreen}
+                            onClose={() => setActiveDrawer(null)}
+                            trigger={
+                                <Text margin='0' cursor="pointer" onClick={() => {
+                                    setActiveDrawer("history");
+                                    dispatch(getAllVersion(id))
+                                }
+                                }> <LucideHistory /></Text>
+
+                            }>
+
+                            <VersionHistoryTable
+                                versions={versions}
+                                id={id}
+
+                            />
+
+                        </ZAPDrawer>
+                        <Select
+                            options={statusOptions}
+                            value={
+                                values?.status
+                                    ? statusOptions.find(opt => opt.value === values.status)
+                                    : statusOptions.find(opt => opt.value === workFlow?.workflow?.status)
+                            }
+
+                            onChange={(selected) =>
+                                setFieldValue('status', selected.value)}
+                            isClearable={false}
+                            isSearchable={false}
+                            placeholder="Select status"
+                        />
+                        <Button
+                            {...primaryBtn}
+                            size="sm"
+                            onClick={handleSubmit}
+                        >
+                            {__("Update", "zaplane")}
+                        </Button>
+
+                    </>
+                )}
+            />
             {
                 loading ? <ZAPLoading /> : <ReactFlow
                     nodes={nodes}
