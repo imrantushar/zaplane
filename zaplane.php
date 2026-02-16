@@ -119,4 +119,4 @@ final class Zaplane {
 }
 
 // Bootstrap plugin
-Zaplane::init();
+// Zaplane::init();

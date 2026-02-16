@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-02-09 06:51:30",
+    "generated_at": "2026-02-16 05:40:18",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -3264,20 +3264,8 @@
                                     "value": "any"
                                 },
                                 {
-                                    "label": "New Course 2",
-                                    "value": "34"
-                                },
-                                {
                                     "label": "New Course",
-                                    "value": "33"
-                                },
-                                {
-                                    "label": "dasdfa",
-                                    "value": "20"
-                                },
-                                {
-                                    "label": "New Course",
-                                    "value": "14"
+                                    "value": "11"
                                 }
                             ],
                             "required": true
@@ -3306,20 +3294,8 @@
                                     "value": "any"
                                 },
                                 {
-                                    "label": "New Course 2",
-                                    "value": "34"
-                                },
-                                {
                                     "label": "New Course",
-                                    "value": "33"
-                                },
-                                {
-                                    "label": "dasdfa",
-                                    "value": "20"
-                                },
-                                {
-                                    "label": "New Course",
-                                    "value": "14"
+                                    "value": "11"
                                 }
                             ],
                             "required": true
@@ -3346,22 +3322,6 @@
                                 {
                                     "label": "Any Quiz",
                                     "value": "any"
-                                },
-                                {
-                                    "label": "asdfasd",
-                                    "value": "36"
-                                },
-                                {
-                                    "label": "dfasd",
-                                    "value": "23"
-                                },
-                                {
-                                    "label": "Quiz",
-                                    "value": "18"
-                                },
-                                {
-                                    "label": "dfgsdgsd",
-                                    "value": "17"
                                 }
                             ],
                             "required": true
@@ -3388,14 +3348,6 @@
                                 {
                                     "label": "Any Lesson",
                                     "value": "any"
-                                },
-                                {
-                                    "label": "fdsf",
-                                    "value": "22"
-                                },
-                                {
-                                    "label": "lesson",
-                                    "value": "16"
                                 }
                             ],
                             "required": true
@@ -3422,22 +3374,6 @@
                                 {
                                     "label": "Any Quiz",
                                     "value": "any"
-                                },
-                                {
-                                    "label": "asdfasd",
-                                    "value": "36"
-                                },
-                                {
-                                    "label": "dfasd",
-                                    "value": "23"
-                                },
-                                {
-                                    "label": "Quiz",
-                                    "value": "18"
-                                },
-                                {
-                                    "label": "dfgsdgsd",
-                                    "value": "17"
                                 }
                             ],
                             "required": true
@@ -3448,6 +3384,68 @@
                             "type": "number",
                             "required": false,
                             "help": "Trigger only if user score is equal or higher than this percentage"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": []
+        },
+        "groundhogg": {
+            "slug": "groundhogg",
+            "name": "Groundhogg",
+            "icon": "",
+            "category": "app",
+            "triggers": {
+                "created_contact": {
+                    "key": "created_contact",
+                    "label": "Created Contact",
+                    "hook": "groundhogg/contact/post_create",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "added_tag": {
+                    "key": "added_tag",
+                    "label": "Tag Added To Contact",
+                    "hook": "groundhogg/contact/tag_applied",
+                    "schema": [
+                        {
+                            "key": "tag_id",
+                            "label": "Tags",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Any Tag",
+                                    "value": "any"
+                                }
+                            ],
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "removed_tag": {
+                    "key": "removed_tag",
+                    "label": "Tag Remove From Contact",
+                    "hook": "groundhogg/contact/tag_removed",
+                    "schema": [
+                        {
+                            "key": "tag_id",
+                            "label": "Tags",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Any Tag",
+                                    "value": "any"
+                                }
+                            ],
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -3471,11 +3469,61 @@
                     "label": "If Condition",
                     "schema": [
                         {
-                            "key": "expression",
-                            "label": "Condition",
-                            "type": "expression",
+                            "key": "conditions",
+                            "label": "Conditions",
+                            "type": "condition_group",
                             "required": true,
-                            "help": "Example: {{post.status}} == \"publish\""
+                            "help": "Build complex conditions with AND/OR groups",
+                            "fields": [
+                                {
+                                    "key": "left",
+                                    "label": "Left Value",
+                                    "type": "expression",
+                                    "required": true
+                                },
+                                {
+                                    "key": "operator",
+                                    "label": "Operator",
+                                    "type": "select",
+                                    "options": [
+                                        {
+                                            "label": "==",
+                                            "value": "=="
+                                        },
+                                        {
+                                            "label": "!=",
+                                            "value": "!="
+                                        },
+                                        {
+                                            "label": "<",
+                                            "value": "<"
+                                        },
+                                        {
+                                            "label": ">",
+                                            "value": ">"
+                                        },
+                                        {
+                                            "label": "<=",
+                                            "value": "<="
+                                        },
+                                        {
+                                            "label": ">=",
+                                            "value": ">="
+                                        }
+                                    ],
+                                    "required": true
+                                },
+                                {
+                                    "key": "right",
+                                    "label": "Right Value",
+                                    "type": "expression",
+                                    "required": true
+                                }
+                            ],
+                            "logic_options": [
+                                "AND",
+                                "OR"
+                            ]
                         }
                     ],
                     "outputs": [
