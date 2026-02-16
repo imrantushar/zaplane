@@ -27,9 +27,6 @@ import { IoSwapHorizontal, IoSwapVerticalOutline } from "react-icons/io5";
 import ZAPTooltip from "@ZAPComponents/ZAPTooltip";
 import { useApiCountdown } from "@ZAPHooks/useApiCountdown/useApiCountdown";
 import { getSingleWorkFlow } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow";
-import { workFLowExction } from "@ZAPRedux/Slices/workFlowSlice/actions/workflowExctions";
-import { workflowNodeListiner, workflowNodeListinerStop } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlowListiner";
-import { startApiCountdown } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
 import FlowTopBar from "./FlowTopBar/FlowTopBar";
 
 export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdgesChange, onNodesChange, getNewNodeId, workFlow }) {
@@ -38,7 +35,6 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
     const [drawerOpen, setDrawerOpen] = useState(false);
     const { values, setFieldValue, handleSubmit, } = useFormikContext()
     const [loading, setLoading] = useState(false);
-    const { runs, versions, apiCountdown, apiRequestRunning } = useSelector((state) => state.workflows);
     const containerRef = useRef(null);
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [activeDrawer, setActiveDrawer] = useState(null);
@@ -148,12 +144,10 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
                 toggleFullscreen={() =>
                     toggleFullscreenMode(containerRef, isFullscreen, setIsFullscreen)
                 }
-                apiRequestRunning={apiRequestRunning}
                 id={id}
                 values={values}
                 setFieldValue={setFieldValue}
                 handleSubmit={handleSubmit}
-                statusOptions={statusOptions}
                 activeDrawer={activeDrawer}
                 setActiveDrawer={setActiveDrawer}
             />

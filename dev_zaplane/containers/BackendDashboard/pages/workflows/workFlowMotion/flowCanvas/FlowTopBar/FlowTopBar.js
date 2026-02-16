@@ -11,20 +11,19 @@ import RunsTable from "../RunsTable/RunsTable";
 import VersionHistoryTable from "../VersionHistoryTable/VersionHistoryTable";
 import { primaryBtn } from "../../../../../../../../assets/scss/chakra/recipe";
 import { getRunWorkFlow } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlowRuns";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { getAllVersion } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlowVersion";
 import { formatTime } from "../helper";
 import { statusOptions } from "../../../helper";
 import { workflowNodeListiner, workflowNodeListinerStop } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlowListiner";
 import { startApiCountdown } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
+import { workFLowExction } from "@ZAPRedux/Slices/workFlowSlice/actions/workflowExctions";
 
 export default function FlowTopBar({
   navigate,
   workFlow,
   isFullscreen,
   toggleFullscreen,
-  startListening,
-  stopListening,
   id,
   values,
   setFieldValue,
@@ -98,7 +97,7 @@ export default function FlowTopBar({
               <Button
                 size="sm"
                 variant="outline"
-                onClick={() => getRunWorkFlow(id)}
+                onClick={() =>  dispatch(getRunWorkFlow(id))}
               >
                 {__("🔄 Refresh", "zaplane")}
               </Button>
