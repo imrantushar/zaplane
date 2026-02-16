@@ -18,10 +18,6 @@ class Divi extends IntegrationBase {
         ];
     }
 
-    public static function get_actions(): array {
-        return [];
-    }
-
     public static function resolve_trigger(array $node, array $args) {
         switch ($node['event']) {
             case 'divi_contact_form_submitted':
