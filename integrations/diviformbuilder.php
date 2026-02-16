@@ -18,10 +18,6 @@ class Diviformbuilder extends IntegrationBase {
         ];
     }
 
-    public static function get_actions(): array {
-        return [];
-    }
-
     public static function resolve_trigger(array $node, array $args) {
         switch ($node['event']) {
             case 'df_after_process':
