@@ -60,7 +60,6 @@ export default function ActionDrawer({ open, context, onClose, updateNodeData, c
         : Object.values(integration.actions || {});
     return list.map(i => ({ label: i.label, value: i.key, hook: i?.hook ?? '' }));
   }, [mode, selectedItem, isTrigger]);
-
   //Get schema fields for the selected action
 
   const selectedActionFields = useMemo(() => {
@@ -217,7 +216,7 @@ export default function ActionDrawer({ open, context, onClose, updateNodeData, c
                       setFieldValue("actionType", val?.value);
                       setFieldValue(
                         "hook",
-                        val?.value
+                        val?.hook
                       );
                     }}
                     placeholder="Select Action Type"

@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-02-16 05:49:36",
+    "generated_at": "2026-02-16 08:49:20",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -3239,17 +3239,85 @@
                 }
             }
         },
-        "divi": {
-            "slug": "divi",
-            "name": "Divi",
+        "groundhogg": {
+            "slug": "groundhogg",
+            "name": "Groundhogg",
             "icon": "",
             "category": "app",
             "triggers": {
-                "divi_contact_form_submitted": {
-                    "key": "divi_contact_form_submitted",
-                    "label": "Divi Contact Form Submitted",
-                    "hook": "et_pb_contact_form_submit",
+                "created_contact": {
+                    "key": "created_contact",
+                    "label": "Created Contact",
+                    "hook": "groundhogg/contact/post_create",
                     "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "added_tag": {
+                    "key": "added_tag",
+                    "label": "Tag Added To Contact",
+                    "hook": "groundhogg/contact/tag_applied",
+                    "schema": [
+                        {
+                            "key": "tag_id",
+                            "label": "Tags",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Any Tag",
+                                    "value": "any"
+                                },
+                                {
+                                    "value": "3",
+                                    "label": "DB"
+                                },
+                                {
+                                    "value": "2",
+                                    "label": "this"
+                                },
+                                {
+                                    "value": "1",
+                                    "label": "fun"
+                                }
+                            ],
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "removed_tag": {
+                    "key": "removed_tag",
+                    "label": "Tag Remove From Contact",
+                    "hook": "groundhogg/contact/tag_removed",
+                    "schema": [
+                        {
+                            "key": "tag_id",
+                            "label": "Tags",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Any Tag",
+                                    "value": "any"
+                                },
+                                {
+                                    "value": "3",
+                                    "label": "DB"
+                                },
+                                {
+                                    "value": "2",
+                                    "label": "this"
+                                },
+                                {
+                                    "value": "1",
+                                    "label": "fun"
+                                }
+                            ],
+                            "required": true
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
