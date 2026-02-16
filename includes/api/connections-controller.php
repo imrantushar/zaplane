@@ -25,7 +25,6 @@ class ConnectionsController extends WP_REST_Controller {
 	}
 
 	public function register_routes() {
-		// List user's connections
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base,
@@ -50,7 +49,6 @@ class ConnectionsController extends WP_REST_Controller {
 			)
 		);
 
-		// Single connection operations
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/(?P<id>\d+)',
@@ -74,7 +72,6 @@ class ConnectionsController extends WP_REST_Controller {
 			)
 		);
 
-		// Test connection
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/(?P<id>\d+)/test',
@@ -85,7 +82,6 @@ class ConnectionsController extends WP_REST_Controller {
 			)
 		);
 
-		// OAuth: Initialize flow
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/oauth/init',
@@ -112,7 +108,6 @@ class ConnectionsController extends WP_REST_Controller {
 			)
 		);
 
-		// OAuth: Callback (handles the redirect from provider)
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/oauth/callback',
@@ -138,7 +133,6 @@ class ConnectionsController extends WP_REST_Controller {
 			)
 		);
 
-		// Get auth fields for an integration
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/auth-fields/(?P<app>[a-z0-9_-]+)',

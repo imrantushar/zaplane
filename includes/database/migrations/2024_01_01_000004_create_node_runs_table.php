@@ -15,7 +15,7 @@ class CreateNodeRunsTable extends Migration
         Schema::create('node_runs', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('run_id');
-            $table->string('node_key', 64);
+            $table->unsignedInteger('node_key');
             $table->unsignedBigInteger('parent_node_run_id')->nullable();
             $table->integer('iteration')->default(0);
             $table->string('status', 20)->default('pending');
