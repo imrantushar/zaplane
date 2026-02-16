@@ -325,7 +325,8 @@ const ZAPDrawer = ({
   zIndex = 9999,
   onClose,
   open,
-  arrowClose
+  arrowClose,
+  isFullscreen = false
 }) => {
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.DrawerRoot, {
     placement: placement,
@@ -344,8 +345,8 @@ const ZAPDrawer = ({
       children: trigger
     }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Portal, {
       children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.DrawerPositioner, {
-        marginTop: "32px",
-        height: "calc(100vh - 32px)",
+        marginTop: isFullscreen ? '0' : "32px",
+        height: isFullscreen ? '100%' : 'calc(100vh - 32px)',
         zIndex: "9999",
         pointerEvents: "none",
         children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.DrawerContent, {
@@ -3403,7 +3404,8 @@ function ActionDrawer({
   onClose,
   updateNodeData,
   createActionNode,
-  workFlow
+  workFlow,
+  isFullscreen
 }) {
   const {
     source,
@@ -3511,6 +3513,7 @@ function ActionDrawer({
   };
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsxs)(_ZAPComponents_Drawer__WEBPACK_IMPORTED_MODULE_6__["default"], {
     open: open,
+    isFullscreen: isFullscreen,
     onClose: resetAll
     // closeOnOverlayClick
     ,
@@ -4875,6 +4878,7 @@ function FlowCanvas({
           size: "md",
           open: activeDrawer === "logs",
           onClose: () => setActiveDrawer(null),
+          isFullscreen: isFullscreen,
           trigger: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_38__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_11__.Button, {
             size: "sm",
             variant: "outline",
@@ -4908,6 +4912,7 @@ function FlowCanvas({
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_38__.jsx)(_ZAPComponents_Drawer__WEBPACK_IMPORTED_MODULE_16__["default"], {
           title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("Version History", 'zaplane'),
           open: activeDrawer === "history",
+          isFullscreen: isFullscreen,
           onClose: () => setActiveDrawer(null),
           trigger: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_38__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_10__.Text, {
             margin: "0",
@@ -4981,6 +4986,7 @@ function FlowCanvas({
       })]
     }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_38__.jsx)(_ActionDrawer_ActionDrawer__WEBPACK_IMPORTED_MODULE_6__["default"], {
       open: drawerOpen,
+      isFullscreen: isFullscreen,
       onClose: () => {
         setDrawerOpen(false);
         setDrawerContext({
@@ -5345,7 +5351,7 @@ const toggleFullscreenMode = (containerRef, isFullscreen, setIsFullscreen) => {
   // Adjust zaplane-topbar
   if (topBar) {
     applyStyles(topBar, {
-      position: isEnter ? "fixed" : "",
+      // position: isEnter ? "fixed" : "",
       top: isEnter ? "0" : "",
       left: isEnter ? "0" : "",
       width: isEnter ? "100%" : "",

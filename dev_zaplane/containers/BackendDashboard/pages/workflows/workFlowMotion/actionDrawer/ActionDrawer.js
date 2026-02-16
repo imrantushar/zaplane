@@ -26,7 +26,7 @@ import { workFLowSingeNodeExction } from "@ZAPRedux/Slices/workFlowSlice/actions
 import { fetchDynamic } from "@ZAPRedux/Slices/workFlowSlice/helper";
 
 
-export default function ActionDrawer({ open, context, onClose, updateNodeData, createActionNode, workFlow }) {
+export default function ActionDrawer({ open, context, onClose, updateNodeData, createActionNode, workFlow,isFullscreen }) {
   const { source, node } = context;
   const dispatch = useDispatch();
   const { values, setFieldValue, resetForm } = useFormikContext();
@@ -121,6 +121,7 @@ export default function ActionDrawer({ open, context, onClose, updateNodeData, c
   return (
     <ZAPDrawer
       open={open}
+      isFullscreen={isFullscreen}
       onClose={resetAll}
       // closeOnOverlayClick
       title={!mode ? "Add Action" : selectedItem?.name || __('App', 'zaplane')}

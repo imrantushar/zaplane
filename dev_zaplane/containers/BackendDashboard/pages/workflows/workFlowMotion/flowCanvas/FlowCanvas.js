@@ -202,6 +202,7 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
                             size="md"
                             open={activeDrawer === "logs"}
                             onClose={() => setActiveDrawer(null)}
+                            isFullscreen={isFullscreen}
                             trigger={
                                 <Button size="sm" variant="outline"
                                     onClick={() => {
@@ -237,6 +238,7 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
                         <ZAPDrawer
                             title={__("Version History", 'zaplane')}
                             open={activeDrawer === "history"}
+                            isFullscreen={isFullscreen}
                             onClose={() => setActiveDrawer(null)}
                             trigger={
                                 <Text margin='0' cursor="pointer" onClick={() => {
@@ -332,6 +334,7 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
 
             <ActionDrawer
                 open={drawerOpen}
+                isFullscreen={isFullscreen}
                 onClose={() => {
                     setDrawerOpen(false)
                     setDrawerContext({ source: null, node: null, edge: null });
