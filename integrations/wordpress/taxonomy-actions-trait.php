@@ -58,15 +58,15 @@ trait TaxonomyActionsTrait
 
     protected static function action_delete_term(array $config): array
     {
-        return static::success(\wp_delete_term($config['term_id'] ?? 0, $config['taxonomy'] ?? ''));
+        return static::success(wp_delete_term($config['term_id'] ?? 0, $config['taxonomy'] ?? ''));
     }
 
     protected static function action_register_taxonomy(array $config): array
     {
-        return static::success(\register_taxonomy(
+        return static::success(register_taxonomy(
             $config['taxonomy'] ?? '',
-            Helper::normalize_list($config['object_type'] ?? []),
-            Helper::normalize_taxonomy_args($config['args'] ?? [])
+            WordpressHelpers::normalize_list($config['object_type'] ?? []),
+            WordpressHelpers::normalize_taxonomy_args($config['args'] ?? [])
         ));
     }
 
