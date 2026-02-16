@@ -13,7 +13,7 @@ const ActionFieldRenderer = ({
   nodeId,
   workFlow
 }) => {
-  const handleChange = (val) => setFieldValue(field.key, val?.value);
+  const handleChange = (val) => setFieldValue(field.key, val);
   const commonProps = {
     label: field.label,
     placeholder: field.placeholder || "",
@@ -44,7 +44,7 @@ const ActionFieldRenderer = ({
           label={field.label}
           options={options}
           value={value}
-          onChange={handleChange}
+          onChange={(opt) => setFieldValue(field.key, opt?.value)}
           placeholder={field.placeholder || `Select ${field.label}`}
           isClearable
           isLoading={field.dynamic ? loadingFields[key] : false}
