@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-02-03 04:27:58",
+    "generated_at": "2026-02-16 11:20:31",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -3245,9 +3245,9 @@
             "icon": "",
             "category": "app",
             "triggers": {
-                "form_success": {
-                    "key": "form_success",
-                    "label": "UAGB Form Success",
+                "uagb_form_success": {
+                    "key": "uagb_form_success",
+                    "label": "Form Submission",
                     "hook": "uagb_form_success",
                     "schema": [],
                     "outputs": [
@@ -3271,11 +3271,61 @@
                     "label": "If Condition",
                     "schema": [
                         {
-                            "key": "expression",
-                            "label": "Condition",
-                            "type": "expression",
+                            "key": "conditions",
+                            "label": "Conditions",
+                            "type": "condition_group",
                             "required": true,
-                            "help": "Example: {{post.status}} == \"publish\""
+                            "help": "Build complex conditions with AND/OR groups",
+                            "fields": [
+                                {
+                                    "key": "left",
+                                    "label": "Left Value",
+                                    "type": "expression",
+                                    "required": true
+                                },
+                                {
+                                    "key": "operator",
+                                    "label": "Operator",
+                                    "type": "select",
+                                    "options": [
+                                        {
+                                            "label": "==",
+                                            "value": "=="
+                                        },
+                                        {
+                                            "label": "!=",
+                                            "value": "!="
+                                        },
+                                        {
+                                            "label": "<",
+                                            "value": "<"
+                                        },
+                                        {
+                                            "label": ">",
+                                            "value": ">"
+                                        },
+                                        {
+                                            "label": "<=",
+                                            "value": "<="
+                                        },
+                                        {
+                                            "label": ">=",
+                                            "value": ">="
+                                        }
+                                    ],
+                                    "required": true
+                                },
+                                {
+                                    "key": "right",
+                                    "label": "Right Value",
+                                    "type": "expression",
+                                    "required": true
+                                }
+                            ],
+                            "logic_options": [
+                                "AND",
+                                "OR"
+                            ]
                         }
                     ],
                     "outputs": [

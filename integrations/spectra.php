@@ -13,10 +13,8 @@ class Spectra extends IntegrationBase {
 
     public static function get_triggers(): array {
         return [
-            'form_success' => [
-                'label' => 'UAGB Form Success',
-                'hook'  => 'uagb_form_success'
-            ]
+     'uagb_form_success' => ['label' => 'Form Submission', 'hook' => 'uagb_form_success'],
+
         ];
     }
 
@@ -25,26 +23,20 @@ class Spectra extends IntegrationBase {
     }
 
     public static function resolve_trigger( array $node, array $args ) {
-        $form_data = $_POST['form_data'] ?? '';
-        $form_id   = $_POST['id'] ?? 0;
-        
-        if ( empty( $form_data ) ) {
-            return false;
+        switch ($node['event']) {
+            case 'uagb_form_success':
+                $form_fields = $args[0] ?? [];
+                return [
+                    'form_id' => $form_fields['id'] ?? '',
+                    'form_fname' => $form_fields['First Name'] ?? '',
+                    'form_lname' => $form_fields['Last Name'] ?? '',
+                    'form_email' => $form_fields['Email'] ?? '',
+                    'form_message' => $form_fields['Message'] ?? '',
+                    'submitted_time' => current_time('mysql'),
+                ];
         }
-        
-        return [
-            'form_data'    => json_decode($form_data, true),
-            'form_id'      => $form_id,
-            'submitted_at' => current_time('mysql'),
-        ];
-    }
 
-   public static function get_actions(): array {
-        return [];
-    }
-
-    public static function get_action_config_schema( string $action ): array {
-        return [];
+        return false;
     }
 
     public static function execute_node( array $node, array $input ): array {
