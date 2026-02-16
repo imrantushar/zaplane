@@ -18,6 +18,7 @@ import { statusOptions } from "../../../helper";
 import { workflowNodeListiner, workflowNodeListinerStop } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlowListiner";
 import { startApiCountdown } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
 import { workFLowExction } from "@ZAPRedux/Slices/workFlowSlice/actions/workflowExctions";
+import { useApiCountdown } from "@ZAPHooks/useApiCountdown/useApiCountdown";
 
 export default function FlowTopBar({
   navigate,
@@ -33,6 +34,7 @@ export default function FlowTopBar({
 }) {
   const { runs, versions, apiCountdown, apiRequestRunning } = useSelector((state) => state.workflows);
   const dispatch = useDispatch()
+      useApiCountdown()
   return (
     <TopBar
       leftContent={() => (
@@ -56,7 +58,7 @@ export default function FlowTopBar({
               {__("Test Flow Once", "zaplane")}
             </Button>
           ) : (
-            <Button {...primaryBtn} onClick={dispatch(workflowNodeListinerStop(id))}>
+            <Button {...primaryBtn} onClick={() => dispatch(workflowNodeListinerStop(id))}>
               {__("Stop", "zaplane")}
             </Button>
           )}
