@@ -3421,6 +3421,18 @@
                                 {
                                     "label": "Any Tag",
                                     "value": "any"
+                                },
+                                {
+                                    "value": "3",
+                                    "label": "DB"
+                                },
+                                {
+                                    "value": "2",
+                                    "label": "this"
+                                },
+                                {
+                                    "value": "1",
+                                    "label": "fun"
                                 }
                             ],
                             "required": true
@@ -3443,6 +3455,18 @@
                                 {
                                     "label": "Any Tag",
                                     "value": "any"
+                                },
+                                {
+                                    "value": "3",
+                                    "label": "DB"
+                                },
+                                {
+                                    "value": "2",
+                                    "label": "this"
+                                },
+                                {
+                                    "value": "1",
+                                    "label": "fun"
                                 }
                             ],
                             "required": true

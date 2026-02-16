@@ -4,6 +4,7 @@ namespace Zaplane\Integrations;
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 use Zaplane\Framework\Classes\IntegrationBase;
+use Groundhogg\Tag;
 
 class Groundhogg extends IntegrationBase {
 
@@ -37,8 +38,8 @@ class Groundhogg extends IntegrationBase {
                 $tags = \Groundhogg\get_db('tags')->query(['limit' => 1000]);
                 foreach ( $tags as $tag ) {
                     $options[] = [
-                        'value' => $tag->id,
-                        'label' => $tag->title,
+                        'value' => $tag->tag_id,
+                        'label' => $tag->tag_name,
                     ];
                 }
             }
@@ -56,19 +57,26 @@ class Groundhogg extends IntegrationBase {
     }
 
     private static function resolve_contact_payload( $contact ): array {
+        $owner_data = null;
+        $owner_id   = method_exists( $contact, 'get_owner_id' ) ? $contact->get_owner_id() : 0;
+        if ( $owner_id ) {
+            $user = get_userdata( $owner_id );
+            if ( $user ) {
+                $owner_data = [
+                    'id'        => $user->ID,
+                    'name'      => $user->display_name,
+                    'email'     => $user->user_email,
+                ];
+            }
+        }
         return [
-            'first_name'       => $contact->first_name ?? '',
-            'last_name'        => $contact->last_name ?? '',
-            'email'            => $contact->email ?? '',
-            'primary_phone'    => $contact->phone ?? '',
-            'phone_ext'        => $contact->phone_ext ?? '',
-            'opt_in_status'    => $contact->opt_in_status ?? '',
-            'mobile_phone'     => $contact->mobile_phone ?? '',
-            'owner'            => $contact->owner->email ?? null,
-            'tags'             => $contact->tags ?? [],
-            'gdpr_terms'       => $contact->gdpr_terms ?? '',
-            'gdpr_data'        => $contact->gdpr_data ?? '',
-            'gdpr_marketing'   => $contact->gdpr_marketing ?? '',
+            'id'            => $contact->get_id(),
+            'first_name'    => (string) $contact->get_first_name(),
+            'last_name'     => (string) $contact->get_last_name(),
+            'email'         => (string) $contact->get_email(),
+            'optin_status'  => $contact->get_optin_status(),
+            'date_created'  => $contact->get_date_created(),
+            'owner'         => $owner_data,
         ];
     }
 
@@ -77,15 +85,44 @@ class Groundhogg extends IntegrationBase {
         switch ( $node['event'] ) {
 
             case 'created_contact':
-                $contact = $args[0] ?? null;
-
+                $contact = $args[2] ?? null;
                 if ( ! $contact ) return false;
-
-                $contact = $args[2];
-
                 return [
                     'success' => true,
                     'contact' => self::resolve_contact_payload( $contact ),
+                ];
+
+            case 'added_tag':
+            case 'removed_tag':
+                
+                $contact = $args[0] ?? null;
+                $tag_id  = $args[1] ?? null;
+
+                if ( ! $contact instanceof \Groundhogg\Contact ) return false;
+                if ( ! is_numeric( $tag_id ) ) return false;
+
+                $tag_id     = (int) $tag_id;
+
+                $select_tag = $node['config']['tag_id'] ?? 'any';
+                if ( $select_tag !== 'any' && (int) $select_tag !== (int) $tag_id ) {
+                    return false;
+                }
+
+                $tag_data = null;
+                $tag      = new Tag( $tag_id );
+
+                if ( $tag && $tag->exists() ) {
+                    $tag_data = [
+                        'id'   => $tag->get_id(),
+                        'name' => $tag->get_name(),
+                        'slug' => $tag->get_slug(),
+                    ];
+                }
+                return [
+                    'success'   => true,
+                    'contact'   => self::resolve_contact_payload( $contact ),
+                    'object_id' => $tag_id,
+                    'tag'       => $tag_data,
                 ];
 
         }
