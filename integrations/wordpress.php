@@ -1,11 +1,12 @@
 <?php
 namespace Zaplane\Integrations;
 
-
-
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 use Zaplane\Framework\Classes\IntegrationBase;
+use Zaplane\Framework\Models\Post;
+use Zaplane\Framework\Models\User;
+use Zaplane\Framework\Models\Comment;
 use Zaplane\Integrations\Wordpress\PostActionsTrait;
 use Zaplane\Integrations\Wordpress\TaxonomyActionsTrait;
 use Zaplane\Integrations\Wordpress\UserActionsTrait;
@@ -255,44 +256,32 @@ class Wordpress extends IntegrationBase {
     }
 
     private static function resolve_post_payload( int $post_id ) {
-        $post = get_post( $post_id );
+        $post = Post::find( $post_id );
         if ( ! $post ) return false;
 
-        return [
-            'post_id'    => $post->ID,
-            'post_title' => $post->post_title,
-            'post_type'  => $post->post_type,
-            'status'     => $post->post_status,
-        ];
+        return $post->toArray();
     }
 
     private static function resolve_media_payload( int $attachment_id ) {
         if ( ! $attachment_id ) return false;
 
-        $attachment = get_post( $attachment_id );
+        $attachment = Post::find( $attachment_id );
         if ( ! $attachment || $attachment->post_type !== 'attachment' ) return false;
 
-        return [
-            'attachment_id' => $attachment_id,
-            'post_title'    => $attachment->post_title,
-            'mime_type'     => get_post_mime_type( $attachment_id ),
-            'url'           => wp_get_attachment_url( $attachment_id ),
-            'user_id'       => get_current_user_id(),
-            'time'          => current_time( 'mysql' ),
-        ];
+        $currentUser = User::current();
+
+        return array_merge( $attachment->toArray(), [
+            'url'     => wp_get_attachment_url( $attachment_id ),
+            'user_id' => $currentUser ? $currentUser->ID : 0,
+            'time'    => current_time( 'mysql' ),
+        ]);
     }
 
     private static function resolve_comment_payload( int $comment_id ) {
-        $comment = get_comment( $comment_id );
+        $comment = Comment::find( $comment_id );
         if ( ! $comment ) return false;
 
-        return [
-            'comment_id' => $comment->comment_ID,
-            'post_id'    => $comment->comment_post_ID,
-            'content'    => $comment->comment_content, 
-            'status'     => $comment->comment_approved,
-            'author'     => $comment->comment_author,
-        ];
+        return $comment->toArray();
     }
 
 
@@ -316,31 +305,29 @@ class Wordpress extends IntegrationBase {
                 return self::resolve_post_payload( $args[0] ?? 0 );
 
             case 'transition_post_status':
-                $post = get_post( $args[2] ?? 0 );
+                // $args[2] is WP_Post object, not ID
+                $wpPost = $args[2] ?? null;
+                $postId = $wpPost instanceof \WP_Post ? $wpPost->ID : (int) $wpPost;
+                $post = Post::find( $postId );
                 if ( ! $post || ( $args[1] ?? '' ) === 'new' ) return false;
 
-                return [
-                    'post_id'    => $post->ID,
-                    'post_title' => $post->post_title,
-                    'post_type'  => $post->post_type,
+                return array_merge( $post->toArray(), [
                     'old_status' => $args[1] ?? '',
                     'new_status' => $args[0] ?? '',
-                ];
+                ]);
 
             case 'wp_insert_post':
-                $post = get_post( $args[0] ?? 0 );
+                $post = Post::find( $args[0] ?? 0 );
                 if ( ! $post || $post->post_type !== 'revision' ) return false;
 
-                $parent = get_post( $post->post_parent );
-                return [
-                    'revision_id'    => $post->ID,
-                    'parent_post_id' => $post->post_parent,
-                    'parent_title'   => $parent->post_title ?? '',
-                    'post_type'      => $parent->post_type ?? '',
-                ];
+                $parent = Post::find( $post->post_parent );
+                return array_merge( $post->toArray(), [
+                    'revision_id' => $post->ID,
+                    'parent'      => $parent ? $parent->toArray() : null,
+                ]);
 
             case 'wp_after_insert_post':
-                $post = get_post( $args[0] ?? 0 );
+                $post = Post::find( $args[0] ?? 0 );
                 if ( ! $post ) return false;
 
                 return array_merge(
@@ -368,23 +355,20 @@ class Wordpress extends IntegrationBase {
             case 'media_edit' :
                 return self::resolve_media_payload( $args[0] ?? 0 );
 
-            case 'save_attachment' : 
+            case 'save_attachment' :
                 $post_id = $args[0] ?? 0;
-                $attachment = $args[1] ?? [];
+                $attachment_fields = $args[1] ?? [];
                 if ( ! $post_id ) return false;
 
-                $attachment_post = get_post( $post_id );
-                if ( ! $attachment_post || $attachment_post->post_type !== 'attachment' ) return false;
+                $attachment = Post::find( $post_id );
+                if ( ! $attachment || $attachment->post_type !== 'attachment' ) return false;
 
-                return [
-                    'attachment_id' => $post_id,
-                    'post_title'    => $attachment_post->post_title,
-                    'mime_type'     => get_post_mime_type( $post_id ),
-                    'url'           => wp_get_attachment_url( $post_id ),
-                    'user_id'       => get_current_user_id(),
-                    'time'          => current_time( 'mysql' ),
-                    'fields'        => $attachment,
-                ];
+                return array_merge( $attachment->toArray(), [
+                    'url'     => wp_get_attachment_url( $post_id ),
+                    'user_id' => get_current_user_id(),
+                    'time'    => current_time( 'mysql' ),
+                    'fields'  => $attachment_fields,
+                ]);
 
             case 'attachment_count' :
                 $post_type = $args[0] ?? 0;
@@ -401,18 +385,15 @@ class Wordpress extends IntegrationBase {
                 $attachment_id = $args[1] ?? 0;
                 if ( ! $attachment_id || empty( $metadata ) ) return false;
 
-                $attachment = get_post( $attachment_id );
+                $attachment = Post::find( $attachment_id );
                 if ( ! $attachment || $attachment->post_type !== 'attachment' ) return false;
 
-                return [
-                    'attachment_id' => $attachment_id,
-                    'post_title'    => $attachment->post_title,
-                    'mime_type'     => get_post_mime_type( $attachment_id ),
-                    'url'           => wp_get_attachment_url( $attachment_id ),
-                    'matadata'      => $metadata,
-                    'user_id'       => get_current_user_id(),
-                    'time'          => current_time( 'mysql' ),
-                ];
+                return array_merge( $attachment->toArray(), [
+                    'url'      => wp_get_attachment_url( $attachment_id ),
+                    'metadata' => $metadata,
+                    'user_id'  => get_current_user_id(),
+                    'time'     => current_time( 'mysql' ),
+                ]);
             
             case 'delete_attachment' :
                 $attachment_id = $args[0] ?? 0;
@@ -457,16 +438,13 @@ class Wordpress extends IntegrationBase {
                 return self::resolve_comment_payload( $args[0] ?? 0 );
 
             case 'transition_comment_status':
-                $comment = get_comment( $args[1] ?? 0 );
+                $comment = Comment::find( $args[1] ?? 0 );
                 if ( ! $comment ) return false;
 
-                return [
-                    'comment_id' => $comment->comment_ID,
-                    'post_id'    => $comment->comment_post_ID,
+                return array_merge( $comment->toArray(), [
                     'old_status' => $args[2] ?? '',
                     'new_status' => $args[0] ?? '',
-                    'content'    => $comment->comment_content,
-                ];
+                ]);
 
             case 'wp_set_comment_status':
                 return self::resolve_comment_payload( $args[0] ?? 0 );
@@ -504,15 +482,15 @@ class Wordpress extends IntegrationBase {
 
             case 'wp_login':
             case 'validate_reset' :
-                $user = $args[1] ?? null;
-                if ( ! $user instanceof \WP_User ) return false;
+                $wpUser = $args[1] ?? null;
+                if ( ! $wpUser instanceof \WP_User ) return false;
 
-                return [
-                    'user_id'  => $user->ID,
-                    'username' => $user->user_login,
-                    'email'    => $user->user_email,
-                    'roles'    => $user->roles,
-                ];
+                $user = User::find( $wpUser->ID );
+                if ( ! $user ) return false;
+
+                return array_merge( $user->toArray(), [
+                    'roles' => $wpUser->roles,
+                ]);
 
             case 'wp_login_failed':
                 return [
@@ -521,48 +499,48 @@ class Wordpress extends IntegrationBase {
                 ];
 
             case 'wp_logout':
-                $user = wp_get_current_user();
-                if ( ! $user || ! $user->ID ) return false;
+                $currentUser = User::current();
+                if ( ! $currentUser ) return false;
 
-                return [
-                    'user_id'  => $user->ID,
-                    'username' => $user->user_login,
-                ];
+                return $currentUser->toArray();
 
             case 'create_application_password' :
                 $user_id      = $args[0] ?? 0;
                 $new_password = $args[1] ?? '';
                 if ( ! $user_id || empty( $new_password ) ) return false;
-                $user = get_userdata( $user_id );
+                $user = User::find( $user_id );
                 if ( ! $user ) return false;
 
-                return [
-                    'user_id'      => $user_id,
-                    'user_login'   => $user->user_login,
+                return array_merge( $user->toArray(), [
                     'new_password' => $new_password,
                     'time'         => current_time( 'mysql' ),
-                ];
+                ]);
 
             case 'update_application_password' :
                 $user_id = $args[0] ?? 0;
                 $item    = $args[1] ?? null;
                 if ( ! $user_id || empty( $item ) ) return false;
 
-                return [
-                    'user_id'   => $user_id,
+                $user = User::find( $user_id );
+                if ( ! $user ) return false;
+
+                return array_merge( $user->toArray(), [
                     'item_name' => $item['name'] ?? '',
                     'item_id'   => $item['uuid'] ?? '',
                     'time'      => current_time( 'mysql' ),
-                ];
+                ]);
 
             case 'delete_application_password' :
                 $user_id = $args[0] ?? 0;
                 $uuid    = $args[1] ?? '';
                 if ( ! $user_id ) return false;
-                return [
-                    'user_id' => $user_id,
-                    'uuid'    => $uuid,
-                ];
+
+                $user = User::find( $user_id );
+                if ( ! $user ) return false;
+
+                return array_merge( $user->toArray(), [
+                    'uuid' => $uuid,
+                ]);
 
             /* ---------------- TERMS ---------------- */
 

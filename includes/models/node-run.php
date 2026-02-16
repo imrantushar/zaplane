@@ -29,6 +29,7 @@ class NodeRun extends Model
     protected static array $casts = [
         'id' => 'integer',
         'run_id' => 'integer',
+        'node_key' => 'integer',
         'parent_node_run_id' => 'integer',
         'iteration' => 'integer',
         'attempts' => 'integer',

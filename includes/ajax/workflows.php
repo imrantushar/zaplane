@@ -78,7 +78,7 @@ class Workflows extends AbstractAjaxHandler
             return new \WP_Error('missing_params', __('ID and status are required', 'zaplane'), ['code' => 400]);
         }
 
-        if (!in_array($status, ['active', 'draft', 'inactive'])) {
+        if (!in_array($status, ['active', 'draft', 'paused'])) {
             return new \WP_Error('invalid_status', __('Invalid status value', 'zaplane'), ['code' => 400]);
         }
 
