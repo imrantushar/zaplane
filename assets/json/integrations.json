@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-02-05 05:41:21",
+    "generated_at": "2026-02-09 12:10:55",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -3264,68 +3264,20 @@
                                     "value": "any"
                                 },
                                 {
-                                    "label": "New Course",
-                                    "value": 14
-                                }
-                            ],
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "tutor_quiz_course_attempt": {
-                    "key": "tutor_quiz_course_attempt",
-                    "label": "User attempted (submitted) a quiz",
-                    "hook": [
-                        "tutor_quiz/attempt_ended",
-                        10,
-                        1
-                    ],
-                    "schema": [
-                        {
-                            "key": "course_id",
-                            "label": "Course",
-                            "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any Course",
-                                    "value": "any"
+                                    "label": "New Course 2",
+                                    "value": "34"
                                 },
                                 {
                                     "label": "New Course",
-                                    "value": 14
-                                }
-                            ],
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "lesson_complete": {
-                    "key": "lesson_complete",
-                    "label": "User completed a lesson",
-                    "hook": [
-                        "tutor_lesson_completed_after",
-                        10,
-                        4
-                    ],
-                    "schema": [
-                        {
-                            "key": "lesson_id",
-                            "label": "Lesson",
-                            "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any Lesson",
-                                    "value": "any"
+                                    "value": "33"
                                 },
                                 {
-                                    "label": "lesson",
-                                    "value": 16
+                                    "label": "dasdfa",
+                                    "value": "20"
+                                },
+                                {
+                                    "label": "New Course",
+                                    "value": "14"
                                 }
                             ],
                             "required": true
@@ -3354,8 +3306,96 @@
                                     "value": "any"
                                 },
                                 {
+                                    "label": "New Course 2",
+                                    "value": "34"
+                                },
+                                {
                                     "label": "New Course",
-                                    "value": 14
+                                    "value": "33"
+                                },
+                                {
+                                    "label": "dasdfa",
+                                    "value": "20"
+                                },
+                                {
+                                    "label": "New Course",
+                                    "value": "14"
+                                }
+                            ],
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "tutor_quiz_course_attempt": {
+                    "key": "tutor_quiz_course_attempt",
+                    "label": "User attempted (submitted) a quiz",
+                    "hook": [
+                        "tutor_quiz/attempt_ended",
+                        10,
+                        1
+                    ],
+                    "schema": [
+                        {
+                            "key": "quiz_id",
+                            "label": "Quiz",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Any Quiz",
+                                    "value": "any"
+                                },
+                                {
+                                    "label": "asdfasd",
+                                    "value": "36"
+                                },
+                                {
+                                    "label": "dfasd",
+                                    "value": "23"
+                                },
+                                {
+                                    "label": "Quiz",
+                                    "value": "18"
+                                },
+                                {
+                                    "label": "dfgsdgsd",
+                                    "value": "17"
+                                }
+                            ],
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "lesson_complete": {
+                    "key": "lesson_complete",
+                    "label": "User completed a lesson",
+                    "hook": [
+                        "tutor_lesson_completed_after",
+                        10,
+                        4
+                    ],
+                    "schema": [
+                        {
+                            "key": "lesson_id",
+                            "label": "Lesson",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Any Lesson",
+                                    "value": "any"
+                                },
+                                {
+                                    "label": "fdsf",
+                                    "value": "22"
+                                },
+                                {
+                                    "label": "lesson",
+                                    "value": "16"
                                 }
                             ],
                             "required": true
@@ -3375,17 +3415,29 @@
                     ],
                     "schema": [
                         {
-                            "key": "course_id",
-                            "label": "Course",
+                            "key": "quiz_id",
+                            "label": "Quiz",
                             "type": "select",
                             "options": [
                                 {
-                                    "label": "Any Course",
+                                    "label": "Any Quiz",
                                     "value": "any"
                                 },
                                 {
-                                    "label": "New Course",
-                                    "value": 14
+                                    "label": "asdfasd",
+                                    "value": "36"
+                                },
+                                {
+                                    "label": "dfasd",
+                                    "value": "23"
+                                },
+                                {
+                                    "label": "Quiz",
+                                    "value": "18"
+                                },
+                                {
+                                    "label": "dfgsdgsd",
+                                    "value": "17"
                                 }
                             ],
                             "required": true
