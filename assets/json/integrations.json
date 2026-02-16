@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-02-09 06:51:30",
+    "generated_at": "2026-02-16 08:49:20",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -3267,6 +3267,18 @@
                                 {
                                     "label": "Any Tag",
                                     "value": "any"
+                                },
+                                {
+                                    "value": "3",
+                                    "label": "DB"
+                                },
+                                {
+                                    "value": "2",
+                                    "label": "this"
+                                },
+                                {
+                                    "value": "1",
+                                    "label": "fun"
                                 }
                             ],
                             "required": true
@@ -3289,6 +3301,18 @@
                                 {
                                     "label": "Any Tag",
                                     "value": "any"
+                                },
+                                {
+                                    "value": "3",
+                                    "label": "DB"
+                                },
+                                {
+                                    "value": "2",
+                                    "label": "this"
+                                },
+                                {
+                                    "value": "1",
+                                    "label": "fun"
                                 }
                             ],
                             "required": true
@@ -3315,11 +3339,61 @@
                     "label": "If Condition",
                     "schema": [
                         {
-                            "key": "expression",
-                            "label": "Condition",
-                            "type": "expression",
+                            "key": "conditions",
+                            "label": "Conditions",
+                            "type": "condition_group",
                             "required": true,
-                            "help": "Example: {{post.status}} == \"publish\""
+                            "help": "Build complex conditions with AND/OR groups",
+                            "fields": [
+                                {
+                                    "key": "left",
+                                    "label": "Left Value",
+                                    "type": "expression",
+                                    "required": true
+                                },
+                                {
+                                    "key": "operator",
+                                    "label": "Operator",
+                                    "type": "select",
+                                    "options": [
+                                        {
+                                            "label": "==",
+                                            "value": "=="
+                                        },
+                                        {
+                                            "label": "!=",
+                                            "value": "!="
+                                        },
+                                        {
+                                            "label": "<",
+                                            "value": "<"
+                                        },
+                                        {
+                                            "label": ">",
+                                            "value": ">"
+                                        },
+                                        {
+                                            "label": "<=",
+                                            "value": "<="
+                                        },
+                                        {
+                                            "label": ">=",
+                                            "value": ">="
+                                        }
+                                    ],
+                                    "required": true
+                                },
+                                {
+                                    "key": "right",
+                                    "label": "Right Value",
+                                    "type": "expression",
+                                    "required": true
+                                }
+                            ],
+                            "logic_options": [
+                                "AND",
+                                "OR"
+                            ]
                         }
                     ],
                     "outputs": [
