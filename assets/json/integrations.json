@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-01-29 05:44:26",
+    "generated_at": "2026-02-17 05:30:39",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -3239,15 +3239,15 @@
                 }
             }
         },
-        "contact-form": {
-            "slug": "contact-form",
-            "name": "Contact Form 7",
+        "contact-form-7": {
+            "slug": "contact-form-7",
+            "name": "Contact-form-7",
             "icon": "",
             "category": "app",
             "triggers": {
                 "form_submitted": {
                     "key": "form_submitted",
-                    "label": "Form Submitted ( Before Mail )",
+                    "label": "Form Submitted",
                     "hook": "wpcf7_before_send_mail",
                     "schema": [
                         {
@@ -3261,47 +3261,16 @@
                                 },
                                 {
                                     "label": "Contact form 1",
-                                    "value": 6
+                                    "value": 5
                                 },
                                 {
                                     "label": "Contact form 1_copy",
                                     "value": 10
-                                },
-                                {
-                                    "label": "Contact form 1_copy_copy",
-                                    "value": 11
                                 }
                             ],
                             "required": true
                         }
                     ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "form_mail_sent": {
-                    "key": "form_mail_sent",
-                    "label": "Form Mail Sent",
-                    "hook": "wpcf7_mail_sent",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "form_mail_failed": {
-                    "key": "form_mail_failed",
-                    "label": "Form Mail Failed",
-                    "hook": "wpcf7_mail_failed",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "form_submit": {
-                    "key": "form_submit",
-                    "label": "Form Submit",
-                    "hook": "wpcf7_submit",
-                    "schema": [],
                     "outputs": [
                         "main"
                     ]
@@ -3319,15 +3288,6 @@
                     "key": "form_updated",
                     "label": "Form Updated",
                     "hook": "wpcf7_after_update",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "form_save": {
-                    "key": "form_save",
-                    "label": "Form Save",
-                    "hook": "wpcf7_after_save",
                     "schema": [],
                     "outputs": [
                         "main"
@@ -3350,11 +3310,61 @@
                     "label": "If Condition",
                     "schema": [
                         {
-                            "key": "expression",
-                            "label": "Condition",
-                            "type": "expression",
+                            "key": "conditions",
+                            "label": "Conditions",
+                            "type": "condition_group",
                             "required": true,
-                            "help": "Example: {{post.status}} == \"publish\""
+                            "help": "Build complex conditions with AND/OR groups",
+                            "fields": [
+                                {
+                                    "key": "left",
+                                    "label": "Left Value",
+                                    "type": "expression",
+                                    "required": true
+                                },
+                                {
+                                    "key": "operator",
+                                    "label": "Operator",
+                                    "type": "select",
+                                    "options": [
+                                        {
+                                            "label": "==",
+                                            "value": "=="
+                                        },
+                                        {
+                                            "label": "!=",
+                                            "value": "!="
+                                        },
+                                        {
+                                            "label": "<",
+                                            "value": "<"
+                                        },
+                                        {
+                                            "label": ">",
+                                            "value": ">"
+                                        },
+                                        {
+                                            "label": "<=",
+                                            "value": "<="
+                                        },
+                                        {
+                                            "label": ">=",
+                                            "value": ">="
+                                        }
+                                    ],
+                                    "required": true
+                                },
+                                {
+                                    "key": "right",
+                                    "label": "Right Value",
+                                    "type": "expression",
+                                    "required": true
+                                }
+                            ],
+                            "logic_options": [
+                                "AND",
+                                "OR"
+                            ]
                         }
                     ],
                     "outputs": [

@@ -15,5 +15,5 @@ return [
     'variable' => ['file' => 'variable.php', 'class' => \Zaplane\Integrations\Variable::class],
     'webhook' => ['file' => 'webhook.php', 'class' => \Zaplane\Integrations\Webhook::class],
     'storeengine' => ['file' => 'storeengine.php', 'class' => \Zaplane\Integrations\Storeengine::class],
-    'contact-form' => ['file' => 'contact-form.php', 'class' => \Zaplane\Integrations\ContactForm::class],
+    'contact-form-7' => ['file' => 'contact-form.php', 'class' => \Zaplane\Integrations\ContactForm::class],
 ];
