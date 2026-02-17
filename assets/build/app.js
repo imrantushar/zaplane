@@ -5232,7 +5232,7 @@ function VariablePopover({
               flex: "1",
               fontSize: "sm",
               fontWeight: "500",
-              children: item.node_id
+              children: item.node_name
             }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.AccordionItemIndicator, {})]
           })
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.AccordionItemContent, {
@@ -5943,19 +5943,7 @@ function FlowCanvas({
       nodes,
       edges
     } = (0,_helper__WEBPACK_IMPORTED_MODULE_12__.mapGraphFromBackend)(workFlow.graph);
-    if (nodes.length === 0) return setNodes([{
-      id: getNewNodeId(),
-      type: 'custom',
-      data: {
-        app: "Select an app",
-        action: 'trigger',
-        config: {}
-      },
-      position: {
-        x: 125,
-        y: 300
-      }
-    }]);
+    if (nodes.length === 0) return;
     setNodes(nodes);
     setEdges(edges);
   }, [workFlow?.graph]);
@@ -6763,18 +6751,19 @@ function Workflows({
   const {
     workFlow
   } = (0,react_redux__WEBPACK_IMPORTED_MODULE_5__.useSelector)(state => state.workflows);
-  const [nodes, setNodes, onNodesChange] = (0,_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.useNodesState)([
-    // {
-    //   id: getNewNodeId(),
-    //   type: 'custom',
-    //   data: {
-    //     app: "Select an app",
-    //     action: 'trigger',
-    //     config: {}
-    //   },
-    //   position: { x: 125, y: 300 },
-    // }
-  ]);
+  const [nodes, setNodes, onNodesChange] = (0,_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.useNodesState)([{
+    id: getNewNodeId(),
+    type: 'custom',
+    data: {
+      app: "Select an app",
+      action: 'trigger',
+      config: {}
+    },
+    position: {
+      x: 125,
+      y: 300
+    }
+  }]);
   const [edges, setEdges, onEdgesChange] = (0,_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.useEdgesState)([]);
   const dispatch = (0,react_redux__WEBPACK_IMPORTED_MODULE_5__.useDispatch)();
   const onSubmitHandler = async values => {

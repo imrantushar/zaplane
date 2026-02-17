@@ -11,7 +11,7 @@ export default function VariablePopover({ isOpen, onClose, data, activeInput, gr
                     <Accordion.Item key={item.node_id} value={`node-${item.node_id}`} border="1px solid var(--zaplane-border-color)" borderBottom={index === data.length - 1 ? "1px solid var(--zaplane-border-color)" : "0"}>
                         <Accordion.ItemTrigger px="12px" py="10px" bg='var(--zaplane-body-background)'>
                             <Flex align="center" w="100%">
-                                <Text flex="1" fontSize="sm" fontWeight="500">{item.node_id}</Text>
+                                <Text flex="1" fontSize="sm" fontWeight="500">{item.node_name}</Text>
                                 <Accordion.ItemIndicator />
                             </Flex>
                         </Accordion.ItemTrigger>

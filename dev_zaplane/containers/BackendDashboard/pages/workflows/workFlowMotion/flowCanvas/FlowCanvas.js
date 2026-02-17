@@ -44,18 +44,7 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
     useEffect(() => {
         if (!workFlow?.graph) return;
         const { nodes, edges } = mapGraphFromBackend(workFlow.graph);
-        if (nodes.length === 0) return setNodes([
-            {
-                id: getNewNodeId(),
-                type: 'custom',
-                data: {
-                    app: "Select an app",
-                    action: 'trigger',
-                    config: {}
-                },
-                position: { x: 125, y: 300 },
-            }
-        ]);
+        if (nodes.length === 0) return
         setNodes(nodes);
         setEdges(edges);
     }, [workFlow?.graph]);
