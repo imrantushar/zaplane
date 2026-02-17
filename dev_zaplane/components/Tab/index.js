@@ -12,7 +12,7 @@ const ZAPTab=({ value, tabs })=>{
             </Tabs.List>
 
             {tabs.map(tab => (
-                <Tabs.Content key={tab.value} value={tab.value}>
+                <Tabs.Content p='0' key={tab.value} value={tab.value}>
                     {tab.content}
                 </Tabs.Content>
             ))}

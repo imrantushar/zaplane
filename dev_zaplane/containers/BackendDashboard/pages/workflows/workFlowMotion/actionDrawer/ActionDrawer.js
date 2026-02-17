@@ -209,8 +209,8 @@ export default function ActionDrawer({ open, context, onClose, updateNodeData, c
                   <ZAPSelect
                     label={
                       isTrigger
-                        ? __('Trigger Type', 'gemboards')
-                        : __('Action Type', 'gemboards')
+                        ? __('Trigger Type', 'zaplane')
+                        : __('Action Type', 'zaplane')
                     }
                     options={actionOptions}
                     value={values.actionType}

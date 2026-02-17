@@ -2214,6 +2214,7 @@ const ZAPTab = ({
         children: tab.label
       }, tab.value))
     }), tabs.map(tab => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.TabsContent, {
+      p: "0",
       value: tab.value,
       children: tab.content
     }, tab.value))]
@@ -4698,7 +4699,7 @@ function ActionDrawer({
         label: "Select",
         content: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.Fragment, {
           children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_ZAPComponents_ZAPSelect__WEBPACK_IMPORTED_MODULE_7__["default"], {
-            label: isTrigger ? (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_14__.__)('Trigger Type', 'gemboards') : (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_14__.__)('Action Type', 'gemboards'),
+            label: isTrigger ? (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_14__.__)('Trigger Type', 'zaplane') : (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_14__.__)('Action Type', 'zaplane'),
             options: actionOptions,
             value: values.actionType,
             onChange: val => {
