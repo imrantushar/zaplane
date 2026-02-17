@@ -1,8 +1,11 @@
 import { Tabs } from "@chakra-ui/react";
 
-const ZAPTab=({ value, tabs })=>{
+const ZAPTab = ({ value, tabs, onChange }) => {
     return (
-        <Tabs.Root value={value} isManual>
+        <Tabs.Root
+            value={value}
+            onValueChange={(e) => onChange?.(e.value)}
+        >
             <Tabs.List mb={4}>
                 {tabs.map(tab => (
                     <Tabs.Trigger key={tab.value} value={tab.value}>
@@ -18,5 +21,6 @@ const ZAPTab=({ value, tabs })=>{
             ))}
         </Tabs.Root>
     );
-}
+};
+
 export default ZAPTab;

@@ -2202,11 +2202,12 @@ __webpack_require__.r(__webpack_exports__);
 
 const ZAPTab = ({
   value,
-  tabs
+  tabs,
+  onChange
 }) => {
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.TabsRoot, {
     value: value,
-    isManual: true,
+    onValueChange: e => onChange?.(e.value),
     children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.TabsList, {
       mb: 4,
       children: tabs.map(tab => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.TabsTrigger, {
@@ -4599,8 +4600,9 @@ function ActionDrawer({
     onClose();
   };
   const handleContinue = () => {
-    if (step === "select") return setStep("configure");
-    if (step === "configure") return setStep("test");
+    if (step === "select") return setStep("test");
+    // if (step === "configure") return setStep("test");
+
     const payload = {
       app: selectedItem.name,
       name: selectedItem.name,
@@ -4713,6 +4715,7 @@ function ActionDrawer({
       })]
     }), selectedItem && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_ZAPComponents_Tab__WEBPACK_IMPORTED_MODULE_12__["default"], {
       value: step,
+      onChange: values?.actionType && setStep,
       tabs: [{
         value: "select",
         label: "Select",
@@ -4744,14 +4747,9 @@ function ActionDrawer({
             }, field.key))
           })]
         })
-      }, {
-        value: "configure",
-        label: "Configure",
-        content: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Text, {
-          fontSize: "sm",
-          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_14__.__)("Configure step", "zaplane")
-        })
-      }, {
+      },
+      // { value: "configure", label: "Configure", content: <Text fontSize="sm">{__("Configure step", "zaplane")}</Text> },
+      {
         value: "test",
         label: "Test",
         content: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.Fragment, {
