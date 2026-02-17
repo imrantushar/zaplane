@@ -26,7 +26,7 @@ import { workFLowSingeNodeExction } from "@ZAPRedux/Slices/workFlowSlice/actions
 import { fetchDynamic } from "@ZAPRedux/Slices/workFlowSlice/helper";
 
 
-export default function ActionDrawer({ open, context, onClose, updateNodeData, createActionNode, workFlow,isFullscreen }) {
+export default function ActionDrawer({ open, context, onClose, updateNodeData, createActionNode, workFlow, isFullscreen }) {
   const { source, node } = context;
   const dispatch = useDispatch();
   const { values, setFieldValue, resetForm } = useFormikContext();
@@ -58,7 +58,7 @@ export default function ActionDrawer({ open, context, onClose, updateNodeData, c
       : isTrigger
         ? Object.values(integration.triggers || {})
         : Object.values(integration.actions || {});
-    return list.map(i => ({ label: i.label, value: i.key }));
+    return list.map(i => ({ label: i.label, value: i.key, hook: i.hook }));
   }, [mode, selectedItem, isTrigger]);
 
   //Get schema fields for the selected action
@@ -100,10 +100,10 @@ export default function ActionDrawer({ open, context, onClose, updateNodeData, c
     resetForm();
     onClose();
   };
-  
+
   const handleContinue = () => {
-    if (step === "select") return setStep("configure");
-    if (step === "configure") return setStep("test");
+    if (step === "select") return setStep("test");
+    // if (step === "configure") return setStep("test");
 
     const payload = {
       app: selectedItem.name,
@@ -131,8 +131,8 @@ export default function ActionDrawer({ open, context, onClose, updateNodeData, c
         <HStack justify="space-between">
           <Button variant="ghost" onClick={resetAll}>{__("Cancel", "zaplane")}</Button>
           <Button {...primaryBtn}
-          disabled={!values.actionType}
-           onClick={handleContinue}>{step === 'test' ? __('Submit', 'zaplane') : __('Continue', 'zaplane')}
+            disabled={!values.actionType}
+            onClick={handleContinue}>{step === 'test' ? __('Submit', 'zaplane') : __('Continue', 'zaplane')}
           </Button>
         </HStack>
       }
@@ -200,6 +200,7 @@ export default function ActionDrawer({ open, context, onClose, updateNodeData, c
       {selectedItem && (
         <ZAPTab
           value={step}
+          onChange={values?.actionType && setStep}
           tabs={[
             {
               value: "select",
@@ -209,20 +210,16 @@ export default function ActionDrawer({ open, context, onClose, updateNodeData, c
                   <ZAPSelect
                     label={
                       isTrigger
-                        ? __('Trigger Type', 'gemboards')
-                        : __('Action Type', 'gemboards')
+                        ? __('Trigger Type', 'zaplane')
+                        : __('Action Type', 'zaplane')
                     }
                     options={actionOptions}
                     value={values.actionType}
                     onChange={val => {
-                      setFieldValue("actionType", val)
+                      setFieldValue("actionType", val?.value)
                       setFieldValue(
                         "hook",
-                        getActionHook({
-                          mode,
-                          selectedItem,
-                          actionKey: val,
-                        })
+                        val?.hook
                       );
                     }}
                     placeholder="Select Action Type"
@@ -248,7 +245,7 @@ export default function ActionDrawer({ open, context, onClose, updateNodeData, c
                 </>
               )
             },
-            { value: "configure", label: "Configure", content: <Text fontSize="sm">{__("Configure step", "zaplane")}</Text> },
+            // { value: "configure", label: "Configure", content: <Text fontSize="sm">{__("Configure step", "zaplane")}</Text> },
             {
               value: "test",
               label: "Test",
@@ -263,7 +260,7 @@ export default function ActionDrawer({ open, context, onClose, updateNodeData, c
                   }>
                     {__("Test Action", "zaplane")}
                   </Button>
-                  <TestDetails id={node?.id} workFlow={workFlow}/>
+                  <TestDetails id={node?.id} workFlow={workFlow} />
                 </>
               )
             }

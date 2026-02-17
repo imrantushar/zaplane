@@ -70,7 +70,7 @@ export default function ConditionGroupField({ value, field, nodeId, workFlow }) 
                                                                     options={f.options}
                                                                     value={rule[f.key]}
                                                                     onChange={(val) =>
-                                                                        ruleHelpers.replace(rIndex, { ...rule, [f.key]: val })
+                                                                        ruleHelpers.replace(rIndex, { ...rule, [f.key]: val.value })
                                                                     }
                                                                     containerStyle={{ width: "30%" }}
                                                                 />
