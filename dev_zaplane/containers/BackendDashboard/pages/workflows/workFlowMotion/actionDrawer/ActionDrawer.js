@@ -58,7 +58,7 @@ export default function ActionDrawer({ open, context, onClose, updateNodeData, c
       : isTrigger
         ? Object.values(integration.triggers || {})
         : Object.values(integration.actions || {});
-    return list.map(i => ({ label: i.label, value: i.key }));
+    return list.map(i => ({ label: i.label, value: i.key,hook:i.hook }));
   }, [mode, selectedItem, isTrigger]);
 
   //Get schema fields for the selected action
@@ -215,14 +215,10 @@ export default function ActionDrawer({ open, context, onClose, updateNodeData, c
                     options={actionOptions}
                     value={values.actionType}
                     onChange={val => {
-                      setFieldValue("actionType", val)
+                      setFieldValue("actionType", val?.value)
                       setFieldValue(
                         "hook",
-                        getActionHook({
-                          mode,
-                          selectedItem,
-                          actionKey: val,
-                        })
+                       val?.hook
                       );
                     }}
                     placeholder="Select Action Type"

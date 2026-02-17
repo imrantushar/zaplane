@@ -2558,7 +2558,7 @@ const ZAPSelect = ({
       isClearable: isClearable,
       value: options.find(o => o.value === value) || null,
       onMenuOpen: onMenuOpen,
-      onChange: opt => onChange?.(opt?.value)
+      onChange: opt => onChange?.(opt)
     })]
   });
 };
@@ -4531,7 +4531,8 @@ function ActionDrawer({
     const list = mode === "tools" ? Object.values(integration.actions || {}) : isTrigger ? Object.values(integration.triggers || {}) : Object.values(integration.actions || {});
     return list.map(i => ({
       label: i.label,
-      value: i.key
+      value: i.key,
+      hook: i.hook
     }));
   }, [mode, selectedItem, isTrigger]);
 
@@ -4701,12 +4702,8 @@ function ActionDrawer({
             options: actionOptions,
             value: values.actionType,
             onChange: val => {
-              setFieldValue("actionType", val);
-              setFieldValue("hook", (0,_helper__WEBPACK_IMPORTED_MODULE_18__.getActionHook)({
-                mode,
-                selectedItem,
-                actionKey: val
-              }));
+              setFieldValue("actionType", val?.value);
+              setFieldValue("hook", val?.hook);
             },
             placeholder: "Select Action Type",
             isClearable: true,
@@ -4816,7 +4813,7 @@ const ActionFieldRenderer = ({
           label: field.label,
           options: options,
           value: value,
-          onChange: handleChange,
+          onChange: opt => setFieldValue(field.key, opt?.value),
           placeholder: field.placeholder || `Select ${field.label}`,
           isClearable: true,
           isLoading: field.dynamic ? loadingFields[key] : false,
@@ -4946,7 +4943,7 @@ function ConditionGroupField({
                       value: rule[f.key],
                       onChange: val => ruleHelpers.replace(rIndex, {
                         ...rule,
-                        [f.key]: val
+                        [f.key]: val.value
                       }),
                       containerStyle: {
                         width: "30%"

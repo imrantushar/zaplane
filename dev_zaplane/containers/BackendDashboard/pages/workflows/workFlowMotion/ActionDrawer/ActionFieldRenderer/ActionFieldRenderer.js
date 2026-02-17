@@ -44,7 +44,7 @@ const ActionFieldRenderer = ({
           label={field.label}
           options={options}
           value={value}
-          onChange={handleChange}
+          onChange={(opt) => setFieldValue(field.key, opt?.value)}
           placeholder={field.placeholder || `Select ${field.label}`}
           isClearable
           isLoading={field.dynamic ? loadingFields[key] : false}
