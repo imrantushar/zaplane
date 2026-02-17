@@ -229,7 +229,7 @@ class Automation
         try {
             if ($node['type'] === 'trigger') {
                 $output = $input;
-            } elseif ($node['type'] === 'condition') {
+            } elseif ($node['type'] === 'condition' || $node['type'] === 'filter') {
                 $integration = $this->container->get('integrations')->get(strtolower($node['data']['app']));
                 if (!$integration) {
                     throw IntegrationException::notFound($node['data']['app']);
@@ -271,6 +271,15 @@ class Automation
     {
         if ($run->target_node_key && $nodeRun->node_key === $run->target_node_key) {
             return;
+        }
+
+        // Filter gate: if filter returned pass=false, stop execution entirely
+        // If pass=true, extract the data for downstream nodes
+        if (isset($output['pass'])) {
+            if ($output['pass'] === false) {
+                return;
+            }
+            $output = $output['data'] ?? $output;
         }
 
         $port = $output['port'] ?? null;

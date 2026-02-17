@@ -7,8 +7,6 @@ use Zaplane\Traits\ActionResponseTrait;
 
 trait UserActionsTrait
 {
-    use ActionResponseTrait; // inherit success/error helpers
-
     protected static function action_create_user(array $config): array
     {
         $user_id = wp_insert_user($config);

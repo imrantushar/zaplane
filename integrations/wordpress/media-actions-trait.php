@@ -5,8 +5,6 @@ use Zaplane\Traits\ActionResponseTrait;
 
 trait MediaActionsTrait
 {
-    use ActionResponseTrait;
-
     protected static function action_generate_attachment_metadata(array $config): array
     {
         $file = get_attached_file($config['attachment_id'] ?? 0);

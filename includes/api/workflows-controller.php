@@ -349,7 +349,7 @@ class WorkflowsController extends WP_REST_Controller
             if (!$node) continue;
 
             $nodeType = $node['type'] ?? '';
-            if (!in_array($nodeType, ['action', 'trigger'])) continue;
+            if (!in_array($nodeType, ['action', 'trigger', 'condition', 'filter'])) continue;
 
             $nodeRun = $nodeOutputs[$nodeId] ?? null;
 
