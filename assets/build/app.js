@@ -570,6 +570,718 @@ const ZAPLabel = ({
 
 /***/ },
 
+/***/ "./dev_zaplane/components/ListTable/SortableColumns.js"
+/*!*************************************************************!*\
+  !*** ./dev_zaplane/components/ListTable/SortableColumns.js ***!
+  \*************************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/button/button.js");
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__);
+
+
+
+// import { sortableContainer, sortableElement } from 'react-sortable-hoc';
+// import { arrayMoveImmutable } from 'array-move';
+// import ReactModal from '@Components/Modal/ReactModal';
+
+// const SortableColumnItem = sortableElement(
+// 	( { copyColumn, itemIndex, checkedChange } ) => {
+// 		return (
+// 			<div
+// 				className="zaplane-table__filter-checked-item"
+// 				key={ `column-${ itemIndex }` }
+// 			>
+// 				<span className="zaplane-table-filter-item-left">
+// 					<span className="zaplane-icon zaplane-icon--move" />
+// 					<span className="zaplane-table-filter-item-title">
+// 						{ copyColumn.name }
+// 					</span>
+// 				</span>
+// 				<input
+// 					id={ copyColumn.name }
+// 					type="checkbox"
+// 					checked={ copyColumn.visible }
+// 					onChange={ ( event ) =>
+// 						checkedChange( {
+// 							id: copyColumn.id,
+// 							visible: event.target.checked,
+// 						} )
+// 					}
+// 				/>
+// 			</div>
+// 		);
+// 	}
+// );
+
+// const SortableColumnItemContainer = sortableContainer( ( props ) => {
+// 	return (
+// 		<ul className="zaplane-table__filter-items">{ props.children }</ul>
+// 	);
+// } );
+
+const SortableColumns = ({
+  setTempCopyColumns,
+  tempCopyColumns,
+  showColumnFilter,
+  checkedChange,
+  setCopyColumns,
+  copyColumns,
+  suffix
+}) => {
+  const [modalOpen, isModalOpen] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
+  const [defaultColumns, setDefaultColumns] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)([]);
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    setDefaultColumns([...tempCopyColumns]);
+  }, []);
+  const onRequestClose = () => {
+    isModalOpen(false);
+  };
+
+  // const onSortEnd = ( { oldIndex, newIndex } ) => {
+  // 	const sortedColumn = arrayMoveImmutable(
+  // 		tempCopyColumns,
+  // 		oldIndex,
+  // 		newIndex
+  // 	);
+  // 	setTempCopyColumns( sortedColumn );
+  // };
+
+  const handleToggle = () => {
+    isModalOpen(!modalOpen);
+  };
+  const handleReset = () => {
+    setTempCopyColumns([...defaultColumns]);
+  };
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)((react__WEBPACK_IMPORTED_MODULE_0___default().Fragment), {
+    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
+      className: "zaplane-table__sub-header-filter-icon",
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Button, {
+        color: "var(--zaplane-font-color)",
+        borderColor: "var(--zaplane-border-color)",
+        borderWidth: "1px",
+        bg: "transparent",
+        onClick: handleToggle,
+        _hover: {
+          bg: 'var(--zaplane-secondary-color)'
+        },
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("span", {
+          className: "zaplane-icon zaplane-icon--columns"
+        }), (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Columns', 'zaplane')]
+      })
+    })
+  });
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (SortableColumns);
+
+/***/ },
+
+/***/ "./dev_zaplane/components/ListTable/TableBody.js"
+/*!*******************************************************!*\
+  !*** ./dev_zaplane/components/ListTable/TableBody.js ***!
+  \*******************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/checkbox/checkbox.js");
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/table/table.js");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__);
+
+
+
+
+const TableBody = ({
+  copyDataArr,
+  visibleColumn,
+  isCheckboxColumnVisible,
+  selectRowChange,
+  bodyRef
+}) => {
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.TableBody, {
+    ref: bodyRef,
+    children: copyDataArr.length > 0 && copyDataArr.map((row, rowIndex) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.TableRow, {
+      role: "group",
+      borderBottomWidth: "1px",
+      borderColor: "var(--zaplane-border-color)",
+      children: [isCheckboxColumnVisible && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.TableCell, {
+        width: "40px",
+        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.CheckboxRoot, {
+          size: "sm",
+          mt: "0.5",
+          "aria-label": "Select row",
+          checked: row.select,
+          onCheckedChange: changes => selectRowChange({
+            row,
+            select: changes.checked
+          }),
+          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.CheckboxHiddenInput, {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.CheckboxControl, {})]
+        })
+      }), visibleColumn.map((column, columnIndex) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.TableCell, {
+        position: "relative",
+        textAlign: column?.textAlign ? column?.textAlign : "center",
+        width: column?.width,
+        children: column?.cell(row, rowIndex)
+      }, columnIndex))]
+    }, rowIndex))
+  });
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (TableBody);
+
+/***/ },
+
+/***/ "./dev_zaplane/components/ListTable/TableFooter.js"
+/*!*********************************************************!*\
+  !*** ./dev_zaplane/components/ListTable/TableFooter.js ***!
+  \*********************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _ZAPComponents_Pagination__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @ZAPComponents/Pagination */ "./dev_zaplane/components/Pagination/index.js");
+/* harmony import */ var react_select__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! react-select */ "./node_modules/react-select/dist/react-select.esm.js");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__);
+
+
+
+
+
+
+const options = [{
+  value: '10',
+  label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('10', 'zaplane')
+}, {
+  value: '15',
+  label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('15', 'zaplane')
+}, {
+  value: '20',
+  label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('20', 'zaplane')
+}, {
+  value: '25',
+  label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('25', 'zaplane')
+}, {
+  value: '30',
+  label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('30', 'zaplane')
+}];
+const TableFooter = ({
+  data,
+  totalItems,
+  paginationPerPageChange,
+  rowsPerPage,
+  onChangePage,
+  currentPageNumber
+}) => {
+  react__WEBPACK_IMPORTED_MODULE_0___default().useEffect(() => {
+    const selector = document.getElementById('zaplane-table-row-per-page-selector');
+    if (!selector) return;
+    selector.childNodes.forEach(function (element) {
+      if (element.className.includes('zaplane-select__control')) {
+        return element.id = 'zaplane-table-row-per-page-selector-control';
+      }
+      return element;
+    });
+    const selectorControl = document.getElementById('zaplane-table-row-per-page-selector-control');
+    if (!selectorControl) return;
+    selectorControl.childNodes.forEach(function (element) {
+      if (element.className.includes('zaplane-select__indicators')) {
+        return element.id = 'zaplane-table-row-per-page-selector-indicators';
+      }
+      return element;
+    });
+    const selectorIndicators = document.getElementById('zaplane-table-row-per-page-selector-indicators');
+    if (!selectorIndicators) return;
+    selectorIndicators.removeChild(selectorIndicators.childNodes[0]);
+    selectorIndicators.childNodes[0].style.padding = '0 8px 0 0';
+    selectorControl.childNodes[0].style.padding = '2px 0px 0px 8px';
+  }, []);
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)("div", {
+    className: "zaplane-table__footer",
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("p", {
+      className: "zaplane-table__footer-label",
+      children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.sprintf)(
+      // translators: %s: totalItems
+      (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Showing result %s out of %s', 'zaplane'), data?.length, totalItems)
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)("div", {
+      className: "zaplane-table__footer-right",
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)("div", {
+        className: "zaplane-table__footer-pagination-per-page",
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("p", {
+          className: "zaplane-table__footer-label",
+          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Rows per page', 'zaplane')
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(react_select__WEBPACK_IMPORTED_MODULE_3__["default"], {
+          id: "zaplane-table-row-per-page-selector",
+          menuPlacement: "top",
+          className: "zaplane-select zaplane-select--65",
+          classNamePrefix: "zaplane-select",
+          options: options,
+          value: rowsPerPage ? options.find(item => Number(item.value) === Number(rowsPerPage)) : options[0],
+          onChange: paginationPerPageChange
+        })]
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("div", {
+        className: "zaplane-table__footer-pagination-pages icons",
+        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_ZAPComponents_Pagination__WEBPACK_IMPORTED_MODULE_2__["default"], {
+          totalItems: totalItems,
+          fetchHandler: onChangePage,
+          currentPageNumber: currentPageNumber,
+          rowsPerPage: rowsPerPage
+        })
+      })]
+    })]
+  });
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (TableFooter);
+
+/***/ },
+
+/***/ "./dev_zaplane/components/ListTable/TableHeader.js"
+/*!*********************************************************!*\
+  !*** ./dev_zaplane/components/ListTable/TableHeader.js ***!
+  \*********************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/checkbox/checkbox.js");
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/table/table.js");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__);
+
+
+
+const TableHeader = ({
+  visibleColumn,
+  isCheckboxColumnVisible,
+  copyDataArr,
+  selectAllRow,
+  data
+}) => {
+  const isCheckboxChecked = data?.length > 0 && copyDataArr?.length > 0 && copyDataArr?.every(row => row.select);
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.TableHeader, {
+    bg: "var(--zaplane-secondary-color)",
+    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.TableRow, {
+      children: [isCheckboxColumnVisible && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.TableColumnHeader, {
+        width: "40px",
+        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.CheckboxRoot, {
+          size: "sm",
+          mt: "0.5",
+          "aria-label": "Select row",
+          checked: isCheckboxChecked,
+          onCheckedChange: selectAllRow,
+          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.CheckboxHiddenInput, {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.CheckboxControl, {})]
+        })
+      }), visibleColumn?.map((column, index) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.TableColumnHeader, {
+        minW: column?.columnWidth ? column?.columnWidth : "auto",
+        maxW: column?.columnWidth ? column?.columnWidth : "auto",
+        w: column?.columnWidth ? column?.columnWidth : "auto",
+        textAlign: column?.textAlign ? column?.textAlign : "center",
+        whiteSpace: "nowrap",
+        children: column?.name
+      }, index))]
+    })
+  });
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (TableHeader);
+
+/***/ },
+
+/***/ "./dev_zaplane/components/ListTable/TableSubHeader.js"
+/*!************************************************************!*\
+  !*** ./dev_zaplane/components/ListTable/TableSubHeader.js ***!
+  \************************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _SortableColumns__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./SortableColumns */ "./dev_zaplane/components/ListTable/SortableColumns.js");
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/box/index.js");
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/flex/flex.js");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__);
+
+
+
+
+const TableSubHeader = ({
+  subHeaderComponent,
+  setTempCopyColumns,
+  tempCopyColumns,
+  showColumnFilter,
+  checkedChange,
+  setCopyColumns,
+  copyColumns,
+  suffix
+}) => {
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Flex, {
+    className: "zaplane-table__sub-header",
+    justifyContent: 'space-between',
+    width: '100%',
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Flex, {
+      justifyContent: 'space-between',
+      className: "zaplane-table__sub-header-left",
+      width: '100%',
+      children: subHeaderComponent && subHeaderComponent
+    }), showColumnFilter ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Box, {
+      className: "zaplane-table__sub-header-right",
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_SortableColumns__WEBPACK_IMPORTED_MODULE_1__["default"], {
+        setTempCopyColumns: setTempCopyColumns,
+        tempCopyColumns: tempCopyColumns,
+        showColumnFilter: showColumnFilter,
+        checkedChange: checkedChange,
+        setCopyColumns: setCopyColumns,
+        copyColumns: copyColumns,
+        suffix: suffix
+      })
+    }) : null]
+  });
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (TableSubHeader);
+
+/***/ },
+
+/***/ "./dev_zaplane/components/ListTable/index.js"
+/*!***************************************************!*\
+  !*** ./dev_zaplane/components/ListTable/index.js ***!
+  \***************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _TableSubHeader__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./TableSubHeader */ "./dev_zaplane/components/ListTable/TableSubHeader.js");
+/* harmony import */ var _TableHeader__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./TableHeader */ "./dev_zaplane/components/ListTable/TableHeader.js");
+/* harmony import */ var _TableBody__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./TableBody */ "./dev_zaplane/components/ListTable/TableBody.js");
+/* harmony import */ var _TableFooter__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./TableFooter */ "./dev_zaplane/components/ListTable/TableFooter.js");
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! lodash */ "lodash");
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_6__);
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/flex/flex.js");
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/table/table.js");
+/* harmony import */ var _ZAPComponents_Oops_CustomTableMessage__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @ZAPComponents/Oops/CustomTableMessage */ "./dev_zaplane/components/Oops/CustomTableMessage.js");
+/* harmony import */ var _ZAPComponents_ZaplaneLoader_TableSkeleton__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @ZAPComponents/ZaplaneLoader/TableSkeleton */ "./dev_zaplane/components/ZaplaneLoader/TableSkeleton.js");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__);
+
+
+
+
+
+
+
+
+
+
+
+const ListTable = props => {
+  const {
+    columns = [],
+    data = [],
+    isRowSelectable = true,
+    getSelectRowValue,
+    showSubHeader = true,
+    subHeaderComponent,
+    showColumnFilter = true,
+    showPagination = false,
+    onChangePage,
+    onChangeItemsPerPage,
+    suffix = '',
+    noDataText = (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Please, create data to see the available list here.', 'zaplane'),
+    totalItems = 0,
+    dataFetchingStatus = false,
+    resetSelected = false,
+    currentPageNumber = 1,
+    rowsPerPage = 10,
+    Button = false,
+    hoverAction = false,
+    interactive = true,
+    striped = false,
+    showColumnBorder = false
+  } = props;
+  const bodyRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
+
+  // eslint-disable-next-line
+  const [isRowsPerPage, setIsRowsPerPage] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)('10');
+  const [loadingHeight, setLoadingHeight] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)('0px');
+  const [copyDataArr, setCopyDataArr] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)([]);
+  const [copyColumns, setCopyColumns] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(columns?.map((copyColumn, index) => ({
+    ...copyColumn,
+    visible: true,
+    id: `column-${index}`
+  })));
+  const shouldRerender = lodash__WEBPACK_IMPORTED_MODULE_6___default().isEqual(data, copyDataArr);
+  const [visibleColumn, setVisibleColumn] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(copyColumns?.filter(copyColumn => copyColumn.visible));
+  const [tempCopyColumns, setTempCopyColumns] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)([...copyColumns]);
+  const [showSlider, setShowSlider] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
+  const isCheckboxColumnVisible = visibleColumn.length > 0 && isRowSelectable;
+  const selectRowChange = ({
+    row,
+    select
+  }) => {
+    const updatedDataArr = copyDataArr.map(dataItem => {
+      if (dataItem.rowId === row.rowId) {
+        return {
+          ...dataItem,
+          select
+        };
+      }
+      return dataItem;
+    });
+    setCopyDataArr(updatedDataArr);
+  };
+  const selectAllRow = changes => setCopyDataArr(prev => prev.map(prevData => ({
+    ...prevData,
+    select: changes.checked
+  })));
+  const checkedChange = ({
+    id,
+    visible
+  }) => {
+    let updatedColumns;
+    if (id === 'reset') {
+      updatedColumns = tempCopyColumns.map(column => ({
+        ...column,
+        visible: true
+      }));
+    } else {
+      updatedColumns = tempCopyColumns.map(column => {
+        if (column.id === id) {
+          return {
+            ...column,
+            visible
+          };
+        }
+        return column;
+      });
+    }
+    setTempCopyColumns(updatedColumns);
+  };
+  const paginationPerPageChange = option => {
+    setIsRowsPerPage(option.value);
+    setLoadingHeight(`${bodyRef.current.offsetHeight}px`);
+    onChangeItemsPerPage(Number(option.value), Number(currentPageNumber));
+  };
+
+  // Reset copyDataArr if shouldRerender is false
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    if (!shouldRerender) {
+      setCopyDataArr(data?.map((row, index) => ({
+        ...row,
+        rowId: `row-${index}`,
+        select: false
+      })));
+    }
+  }, [shouldRerender, data]);
+
+  //side effect
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    setCopyDataArr(data && data?.map((row, index) => ({
+      ...row,
+      rowId: `row-${index}`,
+      select: false
+    })));
+  }, [data?.length]);
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    if (0 === data.length || false === data) {
+      setLoadingHeight('400px');
+    } else if (bodyRef.current.offsetHeight < 100) {
+      setLoadingHeight(`100px`);
+    } else {
+      setLoadingHeight(`${bodyRef.current.offsetHeight}px`);
+    }
+  }, [data?.length, bodyRef, rowsPerPage]);
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    const visibleColumns = copyColumns.filter(item => item.visible === true);
+    function handleResponsiveSlideShow() {
+      if (window.innerWidth < 1280 || visibleColumns.length > 6) {
+        setShowSlider(true);
+      } else {
+        setShowSlider(false);
+      }
+    }
+
+    // Add event listener for window resize
+    window.addEventListener('resize', handleResponsiveSlideShow);
+
+    // Initial check on component mount
+    handleResponsiveSlideShow();
+
+    // Clean up the event listener when the component unmounts
+    return () => {
+      window.removeEventListener('resize', handleResponsiveSlideShow);
+    };
+  }, [window.innerWidth, copyColumns]);
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    setVisibleColumn(copyColumns?.filter(copyColumn => copyColumn.visible));
+    setLoadingHeight(false);
+  }, [copyColumns]);
+
+  // get Local storage data every time page refresh
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    const localColumns = JSON.parse(localStorage.getItem(suffix));
+    if (localColumns) {
+      const mergeColumns = copyColumns.reduce((acc, column) => {
+        localColumns.forEach(item => {
+          if (item.id === column.id) {
+            acc.push({
+              ...item,
+              cell: column.cell
+            });
+          }
+        });
+        return acc;
+      }, []);
+      const sortColumn = localColumns.reduce((acc, column) => {
+        mergeColumns.forEach(item => {
+          if (column.id === item.id) {
+            acc.push({
+              ...item
+            });
+          }
+        });
+        return acc;
+      }, []);
+      setTempCopyColumns(sortColumn);
+      setCopyColumns(sortColumn);
+    }
+  }, []);
+
+  // current select row
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    if (typeof getSelectRowValue === 'function') {
+      getSelectRowValue(copyDataArr && copyDataArr?.filter(copyRow => copyRow.select));
+    }
+  }, [copyDataArr]);
+
+  // reset selected
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    if (resetSelected && copyDataArr) {
+      setCopyDataArr(copyDataArr && copyDataArr?.map(row => ({
+        ...row,
+        select: false
+      })));
+    }
+  }, [resetSelected]);
+  const showPaginationData = showPagination && copyDataArr?.length > 0;
+  const classes = ['zaplane-table', suffix && 'zaplane-table--' + suffix].filter(Boolean).join(" ");
+  const isLoading = dataFetchingStatus;
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsxs)("div", {
+    className: classes,
+    children: [showSubHeader && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_TableSubHeader__WEBPACK_IMPORTED_MODULE_2__["default"], {
+      subHeaderComponent: subHeaderComponent,
+      setTempCopyColumns: setTempCopyColumns,
+      tempCopyColumns: tempCopyColumns,
+      showColumnFilter: showColumnFilter,
+      checkedChange: checkedChange,
+      setCopyColumns: setCopyColumns,
+      copyColumns: copyColumns,
+      suffix: suffix
+    }), isLoading ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_7__.Flex, {
+      minH: loadingHeight,
+      align: "center",
+      justify: "center",
+      ref: bodyRef,
+      width: '100%',
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_ZAPComponents_ZaplaneLoader_TableSkeleton__WEBPACK_IMPORTED_MODULE_10__["default"], {})
+    }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.Fragment, {
+      children: copyDataArr.length === 0 ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.Fragment, {
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_8__.TableRoot, {
+          variant: "outline",
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_TableHeader__WEBPACK_IMPORTED_MODULE_3__["default"], {
+            data: data,
+            visibleColumn: visibleColumn,
+            copyDataArr: copyDataArr,
+            selectAllRow: selectAllRow,
+            isCheckboxColumnVisible: isCheckboxColumnVisible
+          })
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)("div", {
+          ref: bodyRef,
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_ZAPComponents_Oops_CustomTableMessage__WEBPACK_IMPORTED_MODULE_9__["default"], {
+            title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('No Data Available!!!', 'zaplane'),
+            subText: noDataText
+          })
+        })]
+      }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_8__.TableScrollArea, {
+        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_8__.TableRoot, {
+          borderBottomWidth: "1px",
+          borderColor: "var(--zaplane-border-color)",
+          variant: "outline",
+          interactive: interactive,
+          showColumnBorder: showColumnBorder,
+          striped: striped,
+          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_TableHeader__WEBPACK_IMPORTED_MODULE_3__["default"], {
+            data: data,
+            visibleColumn: visibleColumn,
+            copyDataArr: copyDataArr,
+            selectAllRow: selectAllRow,
+            isCheckboxColumnVisible: isCheckboxColumnVisible
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_TableBody__WEBPACK_IMPORTED_MODULE_4__["default"], {
+            dataFetchingStatus: dataFetchingStatus,
+            copyDataArr: copyDataArr,
+            visibleColumn: visibleColumn,
+            isCheckboxColumnVisible: isCheckboxColumnVisible,
+            selectRowChange: selectRowChange,
+            noDataText: noDataText,
+            button: Button,
+            hoverAction: hoverAction,
+            loadingHeight: loadingHeight,
+            bodyRef: bodyRef
+          })]
+        })
+      })
+    }), showPaginationData && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_TableFooter__WEBPACK_IMPORTED_MODULE_5__["default"], {
+      data: data,
+      totalItems: totalItems,
+      paginationPerPageChange: paginationPerPageChange,
+      rowsPerPage: rowsPerPage,
+      onChangePage: onChangePage,
+      currentPageNumber: currentPageNumber
+    })]
+  });
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (ListTable);
+
+/***/ },
+
 /***/ "./dev_zaplane/components/Loading/index.js"
 /*!*************************************************!*\
   !*** ./dev_zaplane/components/Loading/index.js ***!
@@ -1149,6 +1861,268 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ },
 
+/***/ "./dev_zaplane/components/Pagination/index.js"
+/*!****************************************************!*\
+  !*** ./dev_zaplane/components/Pagination/index.js ***!
+  \****************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/button/button.js");
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/icon/icon.js");
+/* harmony import */ var react_icons_hi__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! react-icons/hi */ "./node_modules/react-icons/hi/index.mjs");
+/* harmony import */ var react_icons_io__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! react-icons/io */ "./node_modules/react-icons/io/index.mjs");
+/* harmony import */ var _styles_scss__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./styles.scss */ "./dev_zaplane/components/Pagination/styles.scss");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__);
+
+
+
+
+
+
+const Pagination = ({
+  totalItems = 0,
+  currentPageNumber = 1,
+  fetchHandler = () => {},
+  rowsPerPage = 10
+}) => {
+  const [page, setPage] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(currentPageNumber ? currentPageNumber : 1);
+  const totalPages = Math.ceil(totalItems / rowsPerPage) || 0;
+  const renderFirstPage = rowsPerPage >= totalItems ? 1 : currentPageNumber;
+  const pageNumbers = Array.from({
+    length: totalPages
+  }, (_, index) => index + 1);
+  const showNextButton = page < pageNumbers.length && totalItems > rowsPerPage;
+  const showPrevButton = page > 1 && totalItems > rowsPerPage;
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    setPage(renderFirstPage);
+  }, [rowsPerPage]);
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useMemo)(() => {
+    if (currentPageNumber !== page) {
+      setPage(currentPageNumber);
+    }
+  }, [currentPageNumber]);
+  const handlePageChange = newPage => {
+    setPage(newPage);
+    fetchHandler(newPage, rowsPerPage);
+  };
+  const renderPageNumbers = () => {
+    const renderedPages = [];
+    if (pageNumbers.length <= 5) {
+      // when total number of pages is less than or equal to 5, render all the page numbers
+      pageNumbers.forEach((item, index) => {
+        const pageItem = /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("li", {
+          className: `zaplane-pagination-list__item ${item === page && 'zaplane-pagination-list__item-active'}`,
+          onClick: () => {
+            handlePageChange(item);
+          },
+          role: "presentation",
+          children: item
+        }, index);
+        renderedPages.push(pageItem);
+      });
+    } else if (page <= 3) {
+      // when current page is within the first three pages
+      for (let i = 1; i <= 3; i++) {
+        const pageItem = /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("li", {
+          className: `zaplane-pagination-list__item ${i === page && 'zaplane-pagination-list__item-active'}`,
+          onClick: () => {
+            handlePageChange(i);
+          },
+          role: "presentation",
+          children: i
+        }, i);
+        renderedPages.push(pageItem);
+      }
+      renderedPages.push(/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("li", {
+        className: "zaplane-pagination-list__item zaplane-pagination-list__item-dots",
+        children: "..."
+      }, "dots"));
+      const lastPageItem = /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("li", {
+        className: "zaplane-pagination-list__item",
+        onClick: () => {
+          handlePageChange(totalPages);
+        },
+        role: "presentation",
+        children: totalPages
+      }, totalPages);
+      renderedPages.push(lastPageItem);
+    } else if (page >= totalPages - 2) {
+      // when current page is within the last three pages
+      const firstPageItem = /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("li", {
+        className: "zaplane-pagination-list__item",
+        onClick: () => {
+          handlePageChange(1);
+        },
+        role: "presentation",
+        children: 1
+      }, 1);
+      renderedPages.push(firstPageItem);
+      renderedPages.push(/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("li", {
+        className: "zaplane-pagination-list__item zaplane-pagination-list__item-dots",
+        children: "..."
+      }, "dots"));
+      for (let i = totalPages - 2; i <= totalPages; i++) {
+        const pageItem = /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("li", {
+          className: `zaplane-pagination-list__item ${i === page && 'zaplane-pagination-list__item-active'}`,
+          onClick: () => {
+            handlePageChange(i);
+          },
+          role: "presentation",
+          children: i
+        }, i);
+        renderedPages.push(pageItem);
+      }
+    } else {
+      // If the current page is in the middle range
+      const firstPageItem = /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("li", {
+        className: "zaplane-pagination-list__item",
+        onClick: () => {
+          handlePageChange(1);
+        },
+        role: "presentation",
+        children: 1
+      }, 1);
+      renderedPages.push(firstPageItem);
+      renderedPages.push(/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("li", {
+        className: "zaplane-pagination-list__item zaplane-pagination-list__item-dots",
+        children: "..."
+      }, "dots-start"));
+      for (let i = page - 1; i <= page + 1; i++) {
+        const pageItem = /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("li", {
+          className: `zaplane-pagination-list__item ${i === page && 'zaplane-pagination-list__item-active'}`,
+          onClick: () => {
+            handlePageChange(i);
+          },
+          role: "presentation",
+          children: i
+        }, i);
+        renderedPages.push(pageItem);
+      }
+      renderedPages.push(/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("li", {
+        className: "zaplane-pagination-list__item zaplane-pagination-list__item-dots",
+        children: "..."
+      }, "dots-end"));
+      const lastPageItem = /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("li", {
+        className: "zaplane-pagination-list__item",
+        onClick: () => {
+          handlePageChange(totalPages);
+        },
+        role: "presentation",
+        children: totalPages
+      }, totalPages);
+      renderedPages.push(lastPageItem);
+    }
+    return renderedPages;
+  };
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("div", {
+    className: "zaplane-pagination",
+    children: [showPrevButton && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.Fragment, {
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Button, {
+        color: "var(--zaplane-font-color)",
+        borderColor: "var(--zaplane-border-color)",
+        borderWidth: "1px",
+        bg: "transparent",
+        _hover: {
+          bg: 'var(--zaplane-secondary-color)'
+        },
+        height: "auto",
+        minWidth: "auto",
+        padding: "6px",
+        onClick: () => {
+          handlePageChange(1);
+        },
+        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Icon, {
+          as: react_icons_io__WEBPACK_IMPORTED_MODULE_4__.IoIosArrowBack,
+          boxSize: "16px"
+        })
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Button, {
+        color: "var(--zaplane-font-color)",
+        borderColor: "var(--zaplane-border-color)",
+        borderWidth: "1px",
+        bg: "transparent",
+        _hover: {
+          bg: 'var(--zaplane-secondary-color)'
+        },
+        height: "auto",
+        minWidth: "auto",
+        padding: "6px",
+        onClick: () => {
+          handlePageChange(page - 1);
+        },
+        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Icon, {
+          as: react_icons_hi__WEBPACK_IMPORTED_MODULE_3__.HiChevronDoubleLeft,
+          boxSize: "16px"
+        })
+      })]
+    }), pageNumbers.length > 1 && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("ul", {
+      className: "zaplane-pagination-list",
+      children: renderPageNumbers()
+    }), showNextButton && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.Fragment, {
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Button, {
+        color: "var(--zaplane-font-color)",
+        borderColor: "var(--zaplane-border-color)",
+        borderWidth: "1px",
+        bg: "transparent",
+        _hover: {
+          bg: 'var(--zaplane-secondary-color)'
+        },
+        height: "auto",
+        minWidth: "auto",
+        padding: "6px",
+        onClick: () => {
+          handlePageChange(page + 1);
+        },
+        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Icon, {
+          as: react_icons_io__WEBPACK_IMPORTED_MODULE_4__.IoIosArrowForward,
+          boxSize: "16px"
+        })
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Button, {
+        color: "var(--zaplane-font-color)",
+        borderColor: "var(--zaplane-border-color)",
+        borderWidth: "1px",
+        bg: "transparent",
+        _hover: {
+          bg: 'var(--zaplane-secondary-color)'
+        },
+        height: "auto",
+        minWidth: "auto",
+        padding: "6px",
+        onClick: () => {
+          handlePageChange(pageNumbers.length);
+        },
+        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Icon, {
+          as: react_icons_hi__WEBPACK_IMPORTED_MODULE_3__.HiChevronDoubleRight,
+          boxSize: "16px"
+        })
+      })]
+    })]
+  });
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Pagination);
+
+/***/ },
+
+/***/ "./dev_zaplane/components/Pagination/styles.scss"
+/*!*******************************************************!*\
+  !*** ./dev_zaplane/components/Pagination/styles.scss ***!
+  \*******************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+// extracted by mini-css-extract-plugin
+
+
+/***/ },
+
 /***/ "./dev_zaplane/components/Popaver/WPPopover.js"
 /*!*****************************************************!*\
   !*** ./dev_zaplane/components/Popaver/WPPopover.js ***!
@@ -1680,6 +2654,46 @@ const ZAPMenu = ({
   });
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (ZAPMenu);
+
+/***/ },
+
+/***/ "./dev_zaplane/components/ZaplaneLoader/TableSkeleton.js"
+/*!***************************************************************!*\
+  !*** ./dev_zaplane/components/ZaplaneLoader/TableSkeleton.js ***!
+  \***************************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/skeleton/skeleton.js");
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/table/table.js");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__);
+
+
+
+const TableSkeleton = ({
+  makeItems = 5
+}) => {
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.TableRoot, {
+    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.TableBody, {
+      children: [...Array(makeItems)].map((_, i) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.TableRow, {
+        children: [...Array(makeItems)].map((_, i) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.TableCell, {
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Skeleton, {
+            height: "4",
+            width: "100%"
+          })
+        }, i))
+      }))
+    })
+  });
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (TableSkeleton);
 
 /***/ },
 
@@ -2784,21 +3798,23 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/box/index.js");
 /* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/text/index.js");
-/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/button/button.js");
-/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/stack/h-stack.js");
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/badge/badge.js");
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/button/button.js");
 /* harmony import */ var react_redux__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/dist/react-redux.mjs");
-/* harmony import */ var _ZAPRedux_Slices_logsSlice_logsSlice__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @ZAPRedux/Slices/logsSlice/logsSlice */ "./dev_zaplane/redux/Slices/logsSlice/logsSlice.js");
-/* harmony import */ var _ZAPComponents_LogDetails__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @ZAPComponents/LogDetails */ "./dev_zaplane/components/LogDetails/index.js");
-/* harmony import */ var _ZAPComponents_Loading__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @ZAPComponents/Loading */ "./dev_zaplane/components/Loading/index.js");
-/* harmony import */ var _ZAPComponents_Table__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @ZAPComponents/Table */ "./dev_zaplane/components/Table/index.js");
-/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
-/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_10___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_10__);
-/* harmony import */ var _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @ZAPUtils/helper */ "./dev_zaplane/utils/helper.js");
-/* harmony import */ var _ZAPComponents_TopBar__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @ZAPComponents/TopBar */ "./dev_zaplane/components/TopBar/index.js");
-/* harmony import */ var _ZAPComponents_Drawer__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! @ZAPComponents/Drawer */ "./dev_zaplane/components/Drawer/index.js");
-/* harmony import */ var _ZAPRedux_Slices_workFlowSlice_actions_workFlowLogs__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! @ZAPRedux/Slices/workFlowSlice/actions/workFlowLogs */ "./dev_zaplane/redux/Slices/workFlowSlice/actions/workFlowLogs.js");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__);
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_6__);
+/* harmony import */ var _ZAPRedux_Slices_logsSlice_logsSlice__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @ZAPRedux/Slices/logsSlice/logsSlice */ "./dev_zaplane/redux/Slices/logsSlice/logsSlice.js");
+/* harmony import */ var _ZAPRedux_Slices_workFlowSlice_actions_workFlowLogs__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @ZAPRedux/Slices/workFlowSlice/actions/workFlowLogs */ "./dev_zaplane/redux/Slices/workFlowSlice/actions/workFlowLogs.js");
+/* harmony import */ var _ZAPComponents_LogDetails__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @ZAPComponents/LogDetails */ "./dev_zaplane/components/LogDetails/index.js");
+/* harmony import */ var _ZAPComponents_Loading__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @ZAPComponents/Loading */ "./dev_zaplane/components/Loading/index.js");
+/* harmony import */ var _ZAPComponents_TopBar__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @ZAPComponents/TopBar */ "./dev_zaplane/components/TopBar/index.js");
+/* harmony import */ var _ZAPComponents_Drawer__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @ZAPComponents/Drawer */ "./dev_zaplane/components/Drawer/index.js");
+/* harmony import */ var _ZAPComponents_ListTable__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! @ZAPComponents/ListTable */ "./dev_zaplane/components/ListTable/index.js");
+/* harmony import */ var _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! @ZAPUtils/helper */ "./dev_zaplane/utils/helper.js");
+/* harmony import */ var _workflows_helper__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ../workflows/helper */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/helper.js");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__);
+
 
 
 
@@ -2817,79 +3833,89 @@ const Logs = () => {
   const [activeRunId, setActiveRunId] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(null);
   const [drawerOpen, setDrawerOpen] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
   const {
-    data,
+    data = [],
     isLoading
   } = (0,react_redux__WEBPACK_IMPORTED_MODULE_5__.useSelector)(state => state.logs || {});
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
-    dispatch((0,_ZAPRedux_Slices_logsSlice_logsSlice__WEBPACK_IMPORTED_MODULE_6__.getRunsList)());
+    dispatch((0,_ZAPRedux_Slices_logsSlice_logsSlice__WEBPACK_IMPORTED_MODULE_7__.getRunsList)());
   }, [dispatch]);
-  const isSuccess = status => status === "completed";
+  const columns = (0,react__WEBPACK_IMPORTED_MODULE_0__.useMemo)(() => [{
+    name: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_6__.__)('CREATED AT', 'zaplane'),
+    cell: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsxs)("div", {
+      className: "zaplane-table-flex-col",
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)("span", {
+        style: {
+          fontWeight: 600
+        },
+        children: row.started_at || "--"
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsxs)("span", {
+        style: {
+          fontSize: '12px',
+          color: '#666'
+        },
+        children: ["ID: ", row.id]
+      })]
+    }),
+    columnWidth: "180px",
+    textAlign: "start"
+  }, {
+    name: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_6__.__)('DURATION', 'zaplane'),
+    cell: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
+      fontSize: "sm",
+      children: (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_14__.getDuration)(row.started_at, row.finished_at)
+    }),
+    columnWidth: "150px"
+  }, {
+    name: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_6__.__)('Status', 'zaplane'),
+    cell: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Badge, {
+      ...(0,_workflows_helper__WEBPACK_IMPORTED_MODULE_15__.statusStyle)(row.status),
+      borderRadius: "full",
+      px: 3,
+      children: row.status
+    }),
+    columnWidth: "120px"
+  }, {
+    name: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_6__.__)('Action', 'zaplane'),
+    cell: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Button, {
+      size: "sm",
+      variant: "ghost",
+      onClick: () => {
+        setActiveRunId(row.id);
+        setDrawerOpen(true);
+        dispatch((0,_ZAPRedux_Slices_workFlowSlice_actions_workFlowLogs__WEBPACK_IMPORTED_MODULE_8__.nodeLogsRunDetails)(row.id));
+      },
+      children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_6__.__)("Details", "zaplane")
+    }),
+    columnWidth: "100px",
+    textAlign: "end"
+  }], [dispatch]);
   if (isLoading) {
-    return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_ZAPComponents_Loading__WEBPACK_IMPORTED_MODULE_8__["default"], {});
+    return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_ZAPComponents_Loading__WEBPACK_IMPORTED_MODULE_10__["default"], {});
   }
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.Fragment, {
-    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_ZAPComponents_TopBar__WEBPACK_IMPORTED_MODULE_12__["default"], {
-      render: () => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Box, {
-        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.Fragment, {
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_ZAPComponents_TopBar__WEBPACK_IMPORTED_MODULE_11__["default"], {
+      render: () => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Box, {
+        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
           fontSize: "lg",
           fontWeight: "600",
-          className: "zaplane-label",
-          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_10__.__)("Workflow Logs", "zaplane")
+          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_6__.__)("Workflow Logs", "zaplane")
         })
       })
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)("div", {
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)("div", {
       className: "zaplane-page-content",
-      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_ZAPComponents_Table__WEBPACK_IMPORTED_MODULE_9__["default"], {
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_ZAPComponents_ListTable__WEBPACK_IMPORTED_MODULE_13__["default"], {
+        columns: columns,
+        isRowSelectable: true,
         data: data,
-        rowKey: "id",
-        variant: "outline",
-        size: "sm",
-        columns: [{
-          label: "CREATED AT",
-          key: "started_at",
-          render: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
-            fontSize: "sm",
-            children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_10__.sprintf)((0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_10__.__)("%s", "zaplane"), row.started_at) || "--"
-          }),
-          textAlign: "center"
-        }, {
-          label: "STATUS",
-          key: "status",
-          render: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.HStack, {
-            spacing: 2,
-            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Box, {
-              w: "8px",
-              h: "8px",
-              borderRadius: "full",
-              bg: isSuccess(row.status) ? "green.500" : "red.500"
-            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
-              fontSize: "sm",
-              children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_10__.sprintf)((0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_10__.__)('Status: %s', 'zapplane'), isSuccess(row.status) ? (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_10__.__)('Success', 'zaplane') : (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_10__.__)('Failed', 'zapplane'))
-            })]
-          })
-        }, {
-          label: "DURATION / SIZE",
-          key: "duration",
-          render: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
-            fontSize: "sm",
-            children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_10__.sprintf)((0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_10__.__)('%s', 'zapplane'), (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_11__.getDuration)(row.started_at, row.finished_at))
-          }),
-          textAlign: "center"
-        }],
-        actionsRenderer: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.Fragment, {
-          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Button, {
-            size: "xs",
-            variant: "outline",
-            onClick: () => {
-              setActiveRunId(row.id);
-              setDrawerOpen(true);
-              dispatch((0,_ZAPRedux_Slices_workFlowSlice_actions_workFlowLogs__WEBPACK_IMPORTED_MODULE_14__.nodeLogsRunDetails)(row.id));
-            },
-            children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_10__.__)("Details", "zaplane")
-          })
-        })
+        showSubHeader: false,
+        showColumnFilter: false,
+        showPagination: false,
+        noDataText: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_6__.__)("No logs found", "zaplane"),
+        totalItems: data.length,
+        dataFetchingStatus: isLoading,
+        suffix: "logs-table"
       })
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_ZAPComponents_Drawer__WEBPACK_IMPORTED_MODULE_13__["default"], {
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_ZAPComponents_Drawer__WEBPACK_IMPORTED_MODULE_12__["default"], {
       open: drawerOpen,
       arrowClose: true,
       onClose: () => {
@@ -2897,16 +3923,16 @@ const Logs = () => {
         setActiveRunId(null);
       },
       closeOnOverlayClick: true,
-      title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_10__.__)("Run Details", "zaplane"),
+      title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_6__.__)("Run Details", "zaplane"),
       placement: "end",
       size: "md",
-      children: activeRunId ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_ZAPComponents_LogDetails__WEBPACK_IMPORTED_MODULE_7__["default"], {
+      children: activeRunId && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_ZAPComponents_LogDetails__WEBPACK_IMPORTED_MODULE_9__["default"], {
         runId: activeRunId,
         onBack: () => {
           setDrawerOpen(false);
           setActiveRunId(null);
         }
-      }) : null
+      })
     })]
   });
 };
@@ -7684,6 +8710,276 @@ const carouselAnatomy = _zag_js_carousel__WEBPACK_IMPORTED_MODULE_0__.anatomy.ex
 
 /***/ },
 
+/***/ "./node_modules/@ark-ui/react/dist/components/checkbox/checkbox-context.js"
+/*!*********************************************************************************!*\
+  !*** ./node_modules/@ark-ui/react/dist/components/checkbox/checkbox-context.js ***!
+  \*********************************************************************************/
+(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   CheckboxContext: () => (/* binding */ CheckboxContext)
+/* harmony export */ });
+/* harmony import */ var _use_checkbox_context_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./use-checkbox-context.js */ "./node_modules/@ark-ui/react/dist/components/checkbox/use-checkbox-context.js");
+'use client';
+
+
+const CheckboxContext = (props) => props.children((0,_use_checkbox_context_js__WEBPACK_IMPORTED_MODULE_0__.useCheckboxContext)());
+
+
+
+
+/***/ },
+
+/***/ "./node_modules/@ark-ui/react/dist/components/checkbox/checkbox-control.js"
+/*!*********************************************************************************!*\
+  !*** ./node_modules/@ark-ui/react/dist/components/checkbox/checkbox-control.js ***!
+  \*********************************************************************************/
+(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   CheckboxControl: () => (/* binding */ CheckboxControl)
+/* harmony export */ });
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var _zag_js_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @zag-js/react */ "./node_modules/@zag-js/core/dist/index.mjs");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var _factory_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../factory.js */ "./node_modules/@ark-ui/react/dist/components/factory.js");
+/* harmony import */ var _use_checkbox_context_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./use-checkbox-context.js */ "./node_modules/@ark-ui/react/dist/components/checkbox/use-checkbox-context.js");
+'use client';
+
+
+
+
+
+
+const CheckboxControl = (0,react__WEBPACK_IMPORTED_MODULE_2__.forwardRef)((props, ref) => {
+  const checkbox = (0,_use_checkbox_context_js__WEBPACK_IMPORTED_MODULE_4__.useCheckboxContext)();
+  const mergedProps = (0,_zag_js_react__WEBPACK_IMPORTED_MODULE_1__.mergeProps)(checkbox.getControlProps(), props);
+  return /* @__PURE__ */ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_factory_js__WEBPACK_IMPORTED_MODULE_3__.ark.div, { ...mergedProps, ref });
+});
+CheckboxControl.displayName = "CheckboxControl";
+
+
+
+
+/***/ },
+
+/***/ "./node_modules/@ark-ui/react/dist/components/checkbox/checkbox-group.js"
+/*!*******************************************************************************!*\
+  !*** ./node_modules/@ark-ui/react/dist/components/checkbox/checkbox-group.js ***!
+  \*******************************************************************************/
+(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   CheckboxGroup: () => (/* binding */ CheckboxGroup)
+/* harmony export */ });
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var _utils_create_split_props_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../utils/create-split-props.js */ "./node_modules/@ark-ui/react/dist/utils/create-split-props.js");
+/* harmony import */ var _factory_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../factory.js */ "./node_modules/@ark-ui/react/dist/components/factory.js");
+/* harmony import */ var _checkbox_anatomy_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./checkbox.anatomy.js */ "./node_modules/@ark-ui/react/dist/components/checkbox/checkbox.anatomy.js");
+/* harmony import */ var _use_checkbox_group_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./use-checkbox-group.js */ "./node_modules/@ark-ui/react/dist/components/checkbox/use-checkbox-group.js");
+/* harmony import */ var _use_checkbox_group_context_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./use-checkbox-group-context.js */ "./node_modules/@ark-ui/react/dist/components/checkbox/use-checkbox-group-context.js");
+'use client';
+
+
+
+
+
+
+
+
+const splitGroupProps = (0,_utils_create_split_props_js__WEBPACK_IMPORTED_MODULE_2__.createSplitProps)();
+const CheckboxGroup = (0,react__WEBPACK_IMPORTED_MODULE_1__.forwardRef)((props, ref) => {
+  const [checkboxGroupProps, localProps] = splitGroupProps(props, [
+    "defaultValue",
+    "value",
+    "onValueChange",
+    "disabled",
+    "invalid",
+    "readOnly",
+    "name"
+  ]);
+  const checkboxGroup = (0,_use_checkbox_group_js__WEBPACK_IMPORTED_MODULE_5__.useCheckboxGroup)(checkboxGroupProps);
+  return /* @__PURE__ */ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_use_checkbox_group_context_js__WEBPACK_IMPORTED_MODULE_6__.CheckboxGroupContextProvider, { value: checkboxGroup, children: /* @__PURE__ */ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_factory_js__WEBPACK_IMPORTED_MODULE_3__.ark.div, { ref, role: "group", ...localProps, ..._checkbox_anatomy_js__WEBPACK_IMPORTED_MODULE_4__.checkboxAnatomy.build().group.attrs }) });
+});
+CheckboxGroup.displayName = "CheckboxGroup";
+
+
+
+
+/***/ },
+
+/***/ "./node_modules/@ark-ui/react/dist/components/checkbox/checkbox-hidden-input.js"
+/*!**************************************************************************************!*\
+  !*** ./node_modules/@ark-ui/react/dist/components/checkbox/checkbox-hidden-input.js ***!
+  \**************************************************************************************/
+(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   CheckboxHiddenInput: () => (/* binding */ CheckboxHiddenInput)
+/* harmony export */ });
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var _zag_js_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @zag-js/react */ "./node_modules/@zag-js/core/dist/index.mjs");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var _factory_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../factory.js */ "./node_modules/@ark-ui/react/dist/components/factory.js");
+/* harmony import */ var _field_use_field_context_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../field/use-field-context.js */ "./node_modules/@ark-ui/react/dist/components/field/use-field-context.js");
+/* harmony import */ var _use_checkbox_context_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./use-checkbox-context.js */ "./node_modules/@ark-ui/react/dist/components/checkbox/use-checkbox-context.js");
+'use client';
+
+
+
+
+
+
+
+const CheckboxHiddenInput = (0,react__WEBPACK_IMPORTED_MODULE_2__.forwardRef)((props, ref) => {
+  const checkbox = (0,_use_checkbox_context_js__WEBPACK_IMPORTED_MODULE_5__.useCheckboxContext)();
+  const mergedProps = (0,_zag_js_react__WEBPACK_IMPORTED_MODULE_1__.mergeProps)(checkbox.getHiddenInputProps(), props);
+  const field = (0,_field_use_field_context_js__WEBPACK_IMPORTED_MODULE_4__.useFieldContext)();
+  return /* @__PURE__ */ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_factory_js__WEBPACK_IMPORTED_MODULE_3__.ark.input, { "aria-describedby": field?.ariaDescribedby, ...mergedProps, ref });
+});
+CheckboxHiddenInput.displayName = "CheckboxHiddenInput";
+
+
+
+
+/***/ },
+
+/***/ "./node_modules/@ark-ui/react/dist/components/checkbox/checkbox-label.js"
+/*!*******************************************************************************!*\
+  !*** ./node_modules/@ark-ui/react/dist/components/checkbox/checkbox-label.js ***!
+  \*******************************************************************************/
+(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   CheckboxLabel: () => (/* binding */ CheckboxLabel)
+/* harmony export */ });
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var _zag_js_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @zag-js/react */ "./node_modules/@zag-js/core/dist/index.mjs");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var _factory_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../factory.js */ "./node_modules/@ark-ui/react/dist/components/factory.js");
+/* harmony import */ var _use_checkbox_context_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./use-checkbox-context.js */ "./node_modules/@ark-ui/react/dist/components/checkbox/use-checkbox-context.js");
+'use client';
+
+
+
+
+
+
+const CheckboxLabel = (0,react__WEBPACK_IMPORTED_MODULE_2__.forwardRef)((props, ref) => {
+  const checkbox = (0,_use_checkbox_context_js__WEBPACK_IMPORTED_MODULE_4__.useCheckboxContext)();
+  const mergedProps = (0,_zag_js_react__WEBPACK_IMPORTED_MODULE_1__.mergeProps)(checkbox.getLabelProps(), props);
+  return /* @__PURE__ */ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_factory_js__WEBPACK_IMPORTED_MODULE_3__.ark.span, { ...mergedProps, ref });
+});
+CheckboxLabel.displayName = "CheckboxLabel";
+
+
+
+
+/***/ },
+
+/***/ "./node_modules/@ark-ui/react/dist/components/checkbox/checkbox-root-provider.js"
+/*!***************************************************************************************!*\
+  !*** ./node_modules/@ark-ui/react/dist/components/checkbox/checkbox-root-provider.js ***!
+  \***************************************************************************************/
+(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   CheckboxRootProvider: () => (/* binding */ CheckboxRootProvider)
+/* harmony export */ });
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var _zag_js_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @zag-js/react */ "./node_modules/@zag-js/core/dist/index.mjs");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var _utils_create_split_props_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../utils/create-split-props.js */ "./node_modules/@ark-ui/react/dist/utils/create-split-props.js");
+/* harmony import */ var _factory_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../factory.js */ "./node_modules/@ark-ui/react/dist/components/factory.js");
+/* harmony import */ var _use_checkbox_context_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./use-checkbox-context.js */ "./node_modules/@ark-ui/react/dist/components/checkbox/use-checkbox-context.js");
+'use client';
+
+
+
+
+
+
+
+const splitRootProviderProps = (0,_utils_create_split_props_js__WEBPACK_IMPORTED_MODULE_3__.createSplitProps)();
+const CheckboxRootProvider = (0,react__WEBPACK_IMPORTED_MODULE_2__.forwardRef)((props, ref) => {
+  const [{ value: checkbox }, localProps] = splitRootProviderProps(props, ["value"]);
+  const mergedProps = (0,_zag_js_react__WEBPACK_IMPORTED_MODULE_1__.mergeProps)(checkbox.getRootProps(), localProps);
+  return /* @__PURE__ */ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_use_checkbox_context_js__WEBPACK_IMPORTED_MODULE_5__.CheckboxProvider, { value: checkbox, children: /* @__PURE__ */ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_factory_js__WEBPACK_IMPORTED_MODULE_4__.ark.label, { ...mergedProps, ref }) });
+});
+CheckboxRootProvider.displayName = "CheckboxRootProvider";
+
+
+
+
+/***/ },
+
+/***/ "./node_modules/@ark-ui/react/dist/components/checkbox/checkbox-root.js"
+/*!******************************************************************************!*\
+  !*** ./node_modules/@ark-ui/react/dist/components/checkbox/checkbox-root.js ***!
+  \******************************************************************************/
+(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   CheckboxRoot: () => (/* binding */ CheckboxRoot)
+/* harmony export */ });
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var _zag_js_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @zag-js/react */ "./node_modules/@zag-js/core/dist/index.mjs");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var _utils_create_split_props_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../utils/create-split-props.js */ "./node_modules/@ark-ui/react/dist/utils/create-split-props.js");
+/* harmony import */ var _factory_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../factory.js */ "./node_modules/@ark-ui/react/dist/components/factory.js");
+/* harmony import */ var _use_checkbox_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./use-checkbox.js */ "./node_modules/@ark-ui/react/dist/components/checkbox/use-checkbox.js");
+/* harmony import */ var _use_checkbox_context_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./use-checkbox-context.js */ "./node_modules/@ark-ui/react/dist/components/checkbox/use-checkbox-context.js");
+'use client';
+
+
+
+
+
+
+
+
+const splitRootProps = (0,_utils_create_split_props_js__WEBPACK_IMPORTED_MODULE_3__.createSplitProps)();
+const CheckboxRoot = (0,react__WEBPACK_IMPORTED_MODULE_2__.forwardRef)((props, ref) => {
+  const [useCheckboxProps, localProps] = splitRootProps(props, [
+    "checked",
+    "defaultChecked",
+    "disabled",
+    "form",
+    "id",
+    "ids",
+    "invalid",
+    "name",
+    "onCheckedChange",
+    "readOnly",
+    "required",
+    "value"
+  ]);
+  const checkbox = (0,_use_checkbox_js__WEBPACK_IMPORTED_MODULE_5__.useCheckbox)(useCheckboxProps);
+  const mergedProps = (0,_zag_js_react__WEBPACK_IMPORTED_MODULE_1__.mergeProps)(checkbox.getRootProps(), localProps);
+  return /* @__PURE__ */ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_use_checkbox_context_js__WEBPACK_IMPORTED_MODULE_6__.CheckboxProvider, { value: checkbox, children: /* @__PURE__ */ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_factory_js__WEBPACK_IMPORTED_MODULE_4__.ark.label, { ...mergedProps, ref }) });
+});
+CheckboxRoot.displayName = "CheckboxRoot";
+
+
+
+
+/***/ },
+
 /***/ "./node_modules/@ark-ui/react/dist/components/checkbox/checkbox.anatomy.js"
 /*!*********************************************************************************!*\
   !*** ./node_modules/@ark-ui/react/dist/components/checkbox/checkbox.anatomy.js ***!
@@ -7700,6 +8996,206 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const checkboxAnatomy = _zag_js_checkbox__WEBPACK_IMPORTED_MODULE_0__.anatomy.extendWith("group");
+
+
+
+
+/***/ },
+
+/***/ "./node_modules/@ark-ui/react/dist/components/checkbox/use-checkbox-context.js"
+/*!*************************************************************************************!*\
+  !*** ./node_modules/@ark-ui/react/dist/components/checkbox/use-checkbox-context.js ***!
+  \*************************************************************************************/
+(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   CheckboxProvider: () => (/* binding */ CheckboxProvider),
+/* harmony export */   useCheckboxContext: () => (/* binding */ useCheckboxContext)
+/* harmony export */ });
+/* harmony import */ var _utils_create_context_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../utils/create-context.js */ "./node_modules/@ark-ui/react/dist/utils/create-context.js");
+'use client';
+
+
+const [CheckboxProvider, useCheckboxContext] = (0,_utils_create_context_js__WEBPACK_IMPORTED_MODULE_0__.createContext)({
+  name: "CheckboxContext",
+  hookName: "useCheckboxContext",
+  providerName: "<CheckboxProvider />"
+});
+
+
+
+
+/***/ },
+
+/***/ "./node_modules/@ark-ui/react/dist/components/checkbox/use-checkbox-group-context.js"
+/*!*******************************************************************************************!*\
+  !*** ./node_modules/@ark-ui/react/dist/components/checkbox/use-checkbox-group-context.js ***!
+  \*******************************************************************************************/
+(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   CheckboxGroupContextProvider: () => (/* binding */ CheckboxGroupContextProvider),
+/* harmony export */   useCheckboxGroupContext: () => (/* binding */ useCheckboxGroupContext)
+/* harmony export */ });
+/* harmony import */ var _utils_create_context_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../utils/create-context.js */ "./node_modules/@ark-ui/react/dist/utils/create-context.js");
+'use client';
+
+
+const [CheckboxGroupContextProvider, useCheckboxGroupContext] = (0,_utils_create_context_js__WEBPACK_IMPORTED_MODULE_0__.createContext)({
+  name: "CheckboxGroupContext",
+  hookName: "useCheckboxGroupContext",
+  providerName: "<CheckboxGroupProvider />",
+  strict: false
+});
+
+
+
+
+/***/ },
+
+/***/ "./node_modules/@ark-ui/react/dist/components/checkbox/use-checkbox-group.js"
+/*!***********************************************************************************!*\
+  !*** ./node_modules/@ark-ui/react/dist/components/checkbox/use-checkbox-group.js ***!
+  \***********************************************************************************/
+(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   useCheckboxGroup: () => (/* binding */ useCheckboxGroup)
+/* harmony export */ });
+/* harmony import */ var _utils_use_controllable_state_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../utils/use-controllable-state.js */ "./node_modules/@ark-ui/react/dist/utils/use-controllable-state.js");
+/* harmony import */ var _utils_use_event_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../utils/use-event.js */ "./node_modules/@ark-ui/react/dist/utils/use-event.js");
+/* harmony import */ var _fieldset_use_fieldset_context_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../fieldset/use-fieldset-context.js */ "./node_modules/@ark-ui/react/dist/components/fieldset/use-fieldset-context.js");
+'use client';
+
+
+
+
+function useCheckboxGroup(props = {}) {
+  const fieldset = (0,_fieldset_use_fieldset_context_js__WEBPACK_IMPORTED_MODULE_2__.useFieldsetContext)();
+  const {
+    defaultValue,
+    value: controlledValue,
+    onValueChange,
+    disabled = fieldset?.disabled,
+    readOnly,
+    name,
+    invalid = fieldset?.invalid
+  } = props;
+  const interactive = !(disabled || readOnly);
+  const onChangeProp = (0,_utils_use_event_js__WEBPACK_IMPORTED_MODULE_1__.useEvent)(onValueChange, { sync: true });
+  const [value, setValue] = (0,_utils_use_controllable_state_js__WEBPACK_IMPORTED_MODULE_0__.useControllableState)({
+    value: controlledValue,
+    defaultValue: defaultValue || [],
+    onChange: onChangeProp
+  });
+  const isChecked = (val) => {
+    return value.some((v) => String(v) === String(val));
+  };
+  const toggleValue = (val) => {
+    isChecked(val) ? removeValue(val) : addValue(val);
+  };
+  const addValue = (val) => {
+    if (!interactive) return;
+    if (isChecked(val)) return;
+    setValue(value.concat(val));
+  };
+  const removeValue = (val) => {
+    if (!interactive) return;
+    setValue(value.filter((v) => String(v) !== String(val)));
+  };
+  const getItemProps = (props2) => {
+    return {
+      checked: props2.value != null ? isChecked(props2.value) : void 0,
+      onCheckedChange() {
+        if (props2.value != null) {
+          toggleValue(props2.value);
+        }
+      },
+      name,
+      disabled,
+      readOnly,
+      invalid
+    };
+  };
+  return {
+    isChecked,
+    value,
+    name,
+    disabled: !!disabled,
+    readOnly: !!readOnly,
+    invalid: !!invalid,
+    setValue,
+    addValue,
+    toggleValue,
+    getItemProps
+  };
+}
+
+
+
+
+/***/ },
+
+/***/ "./node_modules/@ark-ui/react/dist/components/checkbox/use-checkbox.js"
+/*!*****************************************************************************!*\
+  !*** ./node_modules/@ark-ui/react/dist/components/checkbox/use-checkbox.js ***!
+  \*****************************************************************************/
+(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   useCheckbox: () => (/* binding */ useCheckbox)
+/* harmony export */ });
+/* harmony import */ var _zag_js_checkbox__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @zag-js/checkbox */ "./node_modules/@zag-js/checkbox/dist/index.mjs");
+/* harmony import */ var _zag_js_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @zag-js/react */ "./node_modules/@zag-js/react/dist/index.mjs");
+/* harmony import */ var _zag_js_react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @zag-js/react */ "./node_modules/@zag-js/core/dist/index.mjs");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var _providers_environment_use_environment_context_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../providers/environment/use-environment-context.js */ "./node_modules/@ark-ui/react/dist/providers/environment/use-environment-context.js");
+/* harmony import */ var _providers_locale_use_locale_context_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../providers/locale/use-locale-context.js */ "./node_modules/@ark-ui/react/dist/providers/locale/use-locale-context.js");
+/* harmony import */ var _field_use_field_context_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../field/use-field-context.js */ "./node_modules/@ark-ui/react/dist/components/field/use-field-context.js");
+/* harmony import */ var _use_checkbox_group_context_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./use-checkbox-group-context.js */ "./node_modules/@ark-ui/react/dist/components/checkbox/use-checkbox-group-context.js");
+'use client';
+
+
+
+
+
+
+
+
+const useCheckbox = (ownProps = {}) => {
+  const checkboxGroup = (0,_use_checkbox_group_context_js__WEBPACK_IMPORTED_MODULE_7__.useCheckboxGroupContext)();
+  const field = (0,_field_use_field_context_js__WEBPACK_IMPORTED_MODULE_6__.useFieldContext)();
+  const props = (0,react__WEBPACK_IMPORTED_MODULE_3__.useMemo)(() => {
+    return (0,_zag_js_react__WEBPACK_IMPORTED_MODULE_2__.mergeProps)(ownProps, checkboxGroup?.getItemProps({ value: ownProps.value }) ?? {});
+  }, [ownProps, checkboxGroup]);
+  const id = (0,react__WEBPACK_IMPORTED_MODULE_3__.useId)();
+  const { getRootNode } = (0,_providers_environment_use_environment_context_js__WEBPACK_IMPORTED_MODULE_4__.useEnvironmentContext)();
+  const { dir } = (0,_providers_locale_use_locale_context_js__WEBPACK_IMPORTED_MODULE_5__.useLocaleContext)();
+  const machineProps = {
+    id,
+    ids: {
+      label: field?.ids.label,
+      hiddenInput: field?.ids.control
+    },
+    dir,
+    disabled: field?.disabled,
+    readOnly: field?.readOnly,
+    invalid: field?.invalid,
+    required: field?.required,
+    getRootNode,
+    ...props
+  };
+  const service = (0,_zag_js_react__WEBPACK_IMPORTED_MODULE_1__.useMachine)(_zag_js_checkbox__WEBPACK_IMPORTED_MODULE_0__.machine, machineProps);
+  return _zag_js_checkbox__WEBPACK_IMPORTED_MODULE_0__.connect(service, _zag_js_react__WEBPACK_IMPORTED_MODULE_1__.normalizeProps);
+};
 
 
 
@@ -8627,6 +10123,34 @@ __webpack_require__.r(__webpack_exports__);
 
 const fieldsetAnatomy = (0,_zag_js_anatomy__WEBPACK_IMPORTED_MODULE_0__.createAnatomy)("fieldset").parts("root", "errorText", "helperText", "legend");
 const parts = fieldsetAnatomy.build();
+
+
+
+
+/***/ },
+
+/***/ "./node_modules/@ark-ui/react/dist/components/fieldset/use-fieldset-context.js"
+/*!*************************************************************************************!*\
+  !*** ./node_modules/@ark-ui/react/dist/components/fieldset/use-fieldset-context.js ***!
+  \*************************************************************************************/
+(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   FieldsetProvider: () => (/* binding */ FieldsetProvider),
+/* harmony export */   useFieldsetContext: () => (/* binding */ useFieldsetContext)
+/* harmony export */ });
+/* harmony import */ var _utils_create_context_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../utils/create-context.js */ "./node_modules/@ark-ui/react/dist/utils/create-context.js");
+'use client';
+
+
+const [FieldsetProvider, useFieldsetContext] = (0,_utils_create_context_js__WEBPACK_IMPORTED_MODULE_0__.createContext)({
+  name: "FieldsetContext",
+  hookName: "useFieldsetContext",
+  providerName: "<FieldsetProvider />",
+  strict: false
+});
 
 
 
@@ -10833,6 +12357,44 @@ const splitRenderStrategyProps = (props) => (0,_create_split_props_js__WEBPACK_I
 
 /***/ },
 
+/***/ "./node_modules/@ark-ui/react/dist/utils/use-controllable-state.js"
+/*!*************************************************************************!*\
+  !*** ./node_modules/@ark-ui/react/dist/utils/use-controllable-state.js ***!
+  \*************************************************************************/
+(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   useControllableState: () => (/* binding */ useControllableState)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
+'use client';
+
+
+function useControllableState(props) {
+  const { value, onChange, defaultValue } = props;
+  const [uncontrolledValue, setUncontrolledValue] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(defaultValue);
+  const controlled = value !== void 0;
+  const currentValue = controlled ? value : uncontrolledValue;
+  const setValue = (0,react__WEBPACK_IMPORTED_MODULE_0__.useCallback)(
+    (value2) => {
+      if (controlled) {
+        return onChange?.(value2);
+      }
+      setUncontrolledValue(value2);
+      return onChange?.(value2);
+    },
+    [controlled, onChange]
+  );
+  return [currentValue, setValue];
+}
+
+
+
+
+/***/ },
+
 /***/ "./node_modules/@ark-ui/react/dist/utils/use-effect-once.js"
 /*!******************************************************************!*\
   !*** ./node_modules/@ark-ui/react/dist/utils/use-effect-once.js ***!
@@ -12297,6 +13859,225 @@ Center.displayName = "Center";
 
 /***/ },
 
+/***/ "./node_modules/@chakra-ui/react/dist/esm/components/checkbox/checkbox.js"
+/*!********************************************************************************!*\
+  !*** ./node_modules/@chakra-ui/react/dist/esm/components/checkbox/checkbox.js ***!
+  \********************************************************************************/
+(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   CheckboxContext: () => (/* binding */ CheckboxContext),
+/* harmony export */   CheckboxControl: () => (/* binding */ CheckboxControl),
+/* harmony export */   CheckboxGroup: () => (/* binding */ CheckboxGroup),
+/* harmony export */   CheckboxHiddenInput: () => (/* binding */ CheckboxHiddenInput),
+/* harmony export */   CheckboxIndicator: () => (/* binding */ CheckboxIndicator),
+/* harmony export */   CheckboxLabel: () => (/* binding */ CheckboxLabel),
+/* harmony export */   CheckboxPropsProvider: () => (/* binding */ CheckboxPropsProvider),
+/* harmony export */   CheckboxRoot: () => (/* binding */ CheckboxRoot),
+/* harmony export */   CheckboxRootProvider: () => (/* binding */ CheckboxRootProvider),
+/* harmony export */   useCheckboxStyles: () => (/* binding */ useCheckboxStyles)
+/* harmony export */ });
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var _ark_ui_react_checkbox__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @ark-ui/react/checkbox */ "./node_modules/@ark-ui/react/dist/components/checkbox/use-checkbox-context.js");
+/* harmony import */ var _ark_ui_react_checkbox__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @ark-ui/react/checkbox */ "./node_modules/@ark-ui/react/dist/components/checkbox/checkbox-root-provider.js");
+/* harmony import */ var _ark_ui_react_checkbox__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @ark-ui/react/checkbox */ "./node_modules/@ark-ui/react/dist/components/checkbox/checkbox-root.js");
+/* harmony import */ var _ark_ui_react_checkbox__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @ark-ui/react/checkbox */ "./node_modules/@ark-ui/react/dist/components/checkbox/checkbox-label.js");
+/* harmony import */ var _ark_ui_react_checkbox__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @ark-ui/react/checkbox */ "./node_modules/@ark-ui/react/dist/components/checkbox/checkbox-control.js");
+/* harmony import */ var _ark_ui_react_checkbox__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @ark-ui/react/checkbox */ "./node_modules/@ark-ui/react/dist/components/checkbox/checkbox-group.js");
+/* harmony import */ var _ark_ui_react_checkbox__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @ark-ui/react/checkbox */ "./node_modules/@ark-ui/react/dist/components/checkbox/checkbox-context.js");
+/* harmony import */ var _ark_ui_react_checkbox__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @ark-ui/react/checkbox */ "./node_modules/@ark-ui/react/dist/components/checkbox/checkbox-hidden-input.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var _styled_system_create_slot_recipe_context_js__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../../styled-system/create-slot-recipe-context.js */ "./node_modules/@chakra-ui/react/dist/esm/styled-system/create-slot-recipe-context.js");
+/* harmony import */ var _styled_system_factory_js__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ../../styled-system/factory.js */ "./node_modules/@chakra-ui/react/dist/esm/styled-system/factory.js");
+/* harmony import */ var _checkmark_checkmark_js__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ../checkmark/checkmark.js */ "./node_modules/@chakra-ui/react/dist/esm/components/checkmark/checkmark.js");
+
+"use client";
+
+
+
+
+
+
+
+const {
+  withProvider,
+  withContext,
+  useStyles: useCheckboxStyles,
+  PropsProvider
+} = (0,_styled_system_create_slot_recipe_context_js__WEBPACK_IMPORTED_MODULE_10__.createSlotRecipeContext)({ key: "checkbox" });
+const CheckboxRootProvider = withProvider(_ark_ui_react_checkbox__WEBPACK_IMPORTED_MODULE_2__.CheckboxRootProvider, "root", { forwardAsChild: true });
+const CheckboxRoot = withProvider(
+  _ark_ui_react_checkbox__WEBPACK_IMPORTED_MODULE_3__.CheckboxRoot,
+  "root",
+  { forwardAsChild: true }
+);
+const CheckboxPropsProvider = PropsProvider;
+const CheckboxLabel = withContext(
+  _ark_ui_react_checkbox__WEBPACK_IMPORTED_MODULE_4__.CheckboxLabel,
+  "label",
+  { forwardAsChild: true }
+);
+const CheckboxIndicator = (0,react__WEBPACK_IMPORTED_MODULE_9__.forwardRef)(function CheckboxIndicator2(props, ref) {
+  const { checked, indeterminate, ...rest } = props;
+  const api = (0,_ark_ui_react_checkbox__WEBPACK_IMPORTED_MODULE_1__.useCheckboxContext)();
+  const styles = useCheckboxStyles();
+  if (checked && api.checked) {
+    return /* @__PURE__ */ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(
+      _styled_system_factory_js__WEBPACK_IMPORTED_MODULE_11__.chakra.svg,
+      {
+        ref,
+        asChild: true,
+        ...rest,
+        css: [styles.indicator, props.css],
+        children: checked
+      }
+    );
+  }
+  if (indeterminate && api.indeterminate) {
+    return /* @__PURE__ */ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(
+      _styled_system_factory_js__WEBPACK_IMPORTED_MODULE_11__.chakra.svg,
+      {
+        ref,
+        asChild: true,
+        ...rest,
+        css: [styles.indicator, props.css],
+        children: indeterminate
+      }
+    );
+  }
+  return /* @__PURE__ */ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(
+    _checkmark_checkmark_js__WEBPACK_IMPORTED_MODULE_12__.Checkmark,
+    {
+      ref,
+      checked: api.checked,
+      indeterminate: api.indeterminate,
+      disabled: api.disabled,
+      unstyled: true,
+      ...rest,
+      css: [styles.indicator, props.css]
+    }
+  );
+});
+const CheckboxControl = withContext(
+  _ark_ui_react_checkbox__WEBPACK_IMPORTED_MODULE_5__.CheckboxControl,
+  "control",
+  {
+    forwardAsChild: true,
+    defaultProps: { children: /* @__PURE__ */ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(CheckboxIndicator, {}) }
+  }
+);
+const CheckboxGroup = (0,_styled_system_factory_js__WEBPACK_IMPORTED_MODULE_11__.chakra)(
+  _ark_ui_react_checkbox__WEBPACK_IMPORTED_MODULE_6__.CheckboxGroup,
+  {
+    base: {
+      display: "flex",
+      flexDirection: "column",
+      gap: "1.5"
+    }
+  },
+  { forwardAsChild: true }
+);
+const CheckboxContext = _ark_ui_react_checkbox__WEBPACK_IMPORTED_MODULE_7__.CheckboxContext;
+const CheckboxHiddenInput = _ark_ui_react_checkbox__WEBPACK_IMPORTED_MODULE_8__.CheckboxHiddenInput;
+
+
+
+
+/***/ },
+
+/***/ "./node_modules/@chakra-ui/react/dist/esm/components/checkmark/checkmark.js"
+/*!**********************************************************************************!*\
+  !*** ./node_modules/@chakra-ui/react/dist/esm/components/checkmark/checkmark.js ***!
+  \**********************************************************************************/
+(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   Checkmark: () => (/* binding */ Checkmark)
+/* harmony export */ });
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var _styled_system_empty_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../styled-system/empty.js */ "./node_modules/@chakra-ui/react/dist/esm/styled-system/empty.js");
+/* harmony import */ var _styled_system_factory_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../styled-system/factory.js */ "./node_modules/@chakra-ui/react/dist/esm/styled-system/factory.js");
+/* harmony import */ var _styled_system_use_recipe_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../styled-system/use-recipe.js */ "./node_modules/@chakra-ui/react/dist/esm/styled-system/use-recipe.js");
+/* harmony import */ var _utils_attr_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../utils/attr.js */ "./node_modules/@chakra-ui/react/dist/esm/utils/attr.js");
+
+"use client";
+
+
+
+
+
+
+
+const Checkmark = (0,react__WEBPACK_IMPORTED_MODULE_1__.forwardRef)(
+  function Checkmark2(props, ref) {
+    const recipe = (0,_styled_system_use_recipe_js__WEBPACK_IMPORTED_MODULE_4__.useRecipe)({ key: "checkmark", recipe: props.recipe });
+    const [variantProps, restProps] = recipe.splitVariantProps(props);
+    const { checked, indeterminate, disabled, unstyled, children, ...rest } = restProps;
+    const styles = unstyled ? _styled_system_empty_js__WEBPACK_IMPORTED_MODULE_2__.EMPTY_STYLES : recipe(variantProps);
+    return /* @__PURE__ */ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(
+      _styled_system_factory_js__WEBPACK_IMPORTED_MODULE_3__.chakra.svg,
+      {
+        ref,
+        viewBox: "0 0 24 24",
+        fill: "none",
+        stroke: "currentColor",
+        strokeWidth: "3px",
+        strokeLinecap: "round",
+        strokeLinejoin: "round",
+        "data-state": indeterminate ? "indeterminate" : checked ? "checked" : "unchecked",
+        "data-disabled": (0,_utils_attr_js__WEBPACK_IMPORTED_MODULE_5__.dataAttr)(disabled),
+        css: [styles, props.css],
+        ...rest,
+        children: indeterminate ? /* @__PURE__ */ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("path", { d: "M5 12h14" }) : checked ? /* @__PURE__ */ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("polyline", { points: "20 6 9 17 4 12" }) : null
+      }
+    );
+  }
+);
+Checkmark.displayName = "Checkmark";
+
+
+
+
+/***/ },
+
+/***/ "./node_modules/@chakra-ui/react/dist/esm/components/circle/index.js"
+/*!***************************************************************************!*\
+  !*** ./node_modules/@chakra-ui/react/dist/esm/components/circle/index.js ***!
+  \***************************************************************************/
+(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   Circle: () => (/* binding */ Circle)
+/* harmony export */ });
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var _square_index_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../square/index.js */ "./node_modules/@chakra-ui/react/dist/esm/components/square/index.js");
+
+"use client";
+
+
+
+
+const Circle = (0,react__WEBPACK_IMPORTED_MODULE_1__.forwardRef)(
+  function Circle2(props, ref) {
+    const { size, ...rest } = props;
+    return /* @__PURE__ */ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_square_index_js__WEBPACK_IMPORTED_MODULE_2__.Square, { size, ref, borderRadius: "9999px", ...rest });
+  }
+);
+Circle.displayName = "Circle";
+
+
+
+
+/***/ },
+
 /***/ "./node_modules/@chakra-ui/react/dist/esm/components/drawer/drawer.js"
 /*!****************************************************************************!*\
   !*** ./node_modules/@chakra-ui/react/dist/esm/components/drawer/drawer.js ***!
@@ -13062,6 +14843,65 @@ const MenuItemContext = _ark_ui_react_menu__WEBPACK_IMPORTED_MODULE_21__.MenuIte
 
 /***/ },
 
+/***/ "./node_modules/@chakra-ui/react/dist/esm/components/skeleton/skeleton.js"
+/*!********************************************************************************!*\
+  !*** ./node_modules/@chakra-ui/react/dist/esm/components/skeleton/skeleton.js ***!
+  \********************************************************************************/
+(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   Skeleton: () => (/* binding */ Skeleton),
+/* harmony export */   SkeletonCircle: () => (/* binding */ SkeletonCircle),
+/* harmony export */   SkeletonPropsProvider: () => (/* binding */ SkeletonPropsProvider),
+/* harmony export */   SkeletonText: () => (/* binding */ SkeletonText)
+/* harmony export */ });
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var _styled_system_create_recipe_context_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../styled-system/create-recipe-context.js */ "./node_modules/@chakra-ui/react/dist/esm/styled-system/create-recipe-context.js");
+/* harmony import */ var _circle_index_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../circle/index.js */ "./node_modules/@chakra-ui/react/dist/esm/components/circle/index.js");
+/* harmony import */ var _stack_stack_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../stack/stack.js */ "./node_modules/@chakra-ui/react/dist/esm/components/stack/stack.js");
+
+"use client";
+
+
+
+
+
+
+const { withContext, PropsProvider } = (0,_styled_system_create_recipe_context_js__WEBPACK_IMPORTED_MODULE_2__.createRecipeContext)({
+  key: "skeleton"
+});
+const Skeleton = withContext("div");
+Skeleton.displayName = "Skeleton";
+const SkeletonPropsProvider = PropsProvider;
+const SkeletonCircle = react__WEBPACK_IMPORTED_MODULE_1__.forwardRef(function SkeletonCircle2(props, ref) {
+  const { size, ...rest } = props;
+  return /* @__PURE__ */ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_circle_index_js__WEBPACK_IMPORTED_MODULE_3__.Circle, { size, asChild: true, ref, children: /* @__PURE__ */ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(Skeleton, { ...rest }) });
+});
+SkeletonCircle.displayName = "SkeletonCircle";
+const SkeletonText = react__WEBPACK_IMPORTED_MODULE_1__.forwardRef(
+  function SkeletonText2(props, ref) {
+    const { noOfLines = 3, gap, rootProps, ...rest } = props;
+    return /* @__PURE__ */ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_stack_stack_js__WEBPACK_IMPORTED_MODULE_4__.Stack, { gap, width: "full", ref, ...rootProps, children: Array.from({ length: noOfLines }).map((_, index) => /* @__PURE__ */ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(
+      Skeleton,
+      {
+        height: "4",
+        _last: { maxW: noOfLines === 1 ? "100%" : "80%" },
+        ...rest
+      },
+      index
+    )) });
+  }
+);
+SkeletonText.displayName = "SkeletonText";
+
+
+
+
+/***/ },
+
 /***/ "./node_modules/@chakra-ui/react/dist/esm/components/span/index.js"
 /*!*************************************************************************!*\
   !*** ./node_modules/@chakra-ui/react/dist/esm/components/span/index.js ***!
@@ -13109,6 +14949,54 @@ const { withContext, PropsProvider } = (0,_styled_system_create_recipe_context_j
 const Spinner = withContext("span");
 Spinner.displayName = "Spinner";
 const SpinnerPropsProvider = PropsProvider;
+
+
+
+
+/***/ },
+
+/***/ "./node_modules/@chakra-ui/react/dist/esm/components/square/index.js"
+/*!***************************************************************************!*\
+  !*** ./node_modules/@chakra-ui/react/dist/esm/components/square/index.js ***!
+  \***************************************************************************/
+(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   Square: () => (/* binding */ Square)
+/* harmony export */ });
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var _box_index_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../box/index.js */ "./node_modules/@chakra-ui/react/dist/esm/components/box/index.js");
+
+"use client";
+
+
+
+
+const Square = (0,react__WEBPACK_IMPORTED_MODULE_1__.forwardRef)(
+  function Square2(props, ref) {
+    const { size, ...rest } = props;
+    return /* @__PURE__ */ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(
+      _box_index_js__WEBPACK_IMPORTED_MODULE_2__.Box,
+      {
+        ...rest,
+        ref,
+        boxSize: size,
+        css: {
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexShrink: 0,
+          flexGrow: 0,
+          ...props.css
+        }
+      }
+    );
+  }
+);
+Square.displayName = "Square";
 
 
 
@@ -193196,6 +195084,17 @@ module.exports = window["wp"]["element"];
 
 "use strict";
 module.exports = window["wp"]["i18n"];
+
+/***/ },
+
+/***/ "lodash"
+/*!*************************!*\
+  !*** external "lodash" ***!
+  \*************************/
+(module) {
+
+"use strict";
+module.exports = window["lodash"];
 
 /***/ },
 

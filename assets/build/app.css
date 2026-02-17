@@ -6,6 +6,7 @@
   --zaplane-primary: #09090B;
   --zaplane-second-primary: #8F7EE7;
   --zaplane-secondary: #738496;
+  --zaplane-secondary-color: #F6F7F8;
   --zaplane-border-color: #CBD1D7;
   --zaplane-body-background: #F6F7F8;
   --zaplane-background: #FFFFFF;
@@ -1877,6 +1878,62 @@ svg.react-flow__connectionline {
   cursor: pointer;
   position: absolute;
   z-index: 999;
+}
+/*!******************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/@wordpress/scripts/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./dev_zaplane/components/Pagination/styles.scss ***!
+  \******************************************************************************************************************************************************************************************************************************************************************************************************/
+.zaplane-pagination {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+}
+.zaplane-pagination .zaplane-pagination-list {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px;
+  margin: 0;
+}
+.zaplane-pagination .zaplane-pagination-list__item {
+  width: 30px;
+  height: 30px;
+  border-radius: 4px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  margin: 0;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 36px;
+  color: var(--zaplane-font-color);
+  border: 1px solid var(--zaplane-border-color);
+}
+.zaplane-pagination .zaplane-pagination-list__item:hover {
+  background: var(--zaplane-secondary-color);
+}
+.zaplane-pagination .zaplane-pagination-list__item-dots {
+  letter-spacing: 4px;
+  font-weight: 500;
+  padding-left: 4px;
+  color: none;
+  pointer-events: none;
+}
+.zaplane-pagination .zaplane-pagination-list__item-dots:hover {
+  background: none;
+  color: none;
+  border-radius: unset;
+}
+.zaplane-pagination .zaplane-pagination-list__item-active {
+  background: var(--zaplane-primary);
+  color: #fff;
+  cursor: default;
+}
+.zaplane-pagination .zaplane-pagination-list__item-active:hover {
+  background: var(--zaplane-primary);
+  color: #fff;
 }
 /*!****************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/@wordpress/scripts/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./dev_zaplane/containers/BackendDashboard/pages/dashboard/styles.scss ***!
