@@ -344,6 +344,7 @@ class WorkflowsController extends WP_REST_Controller
         $nodeOutputs = Run::latestNodeOutputs($workflowHash);
 
         $data = [];
+
         foreach ($previousNodeIds as $nodeId) {
             $node = $nodeMap[$nodeId] ?? null;
             if (!$node) continue;
@@ -362,11 +363,15 @@ class WorkflowsController extends WP_REST_Controller
 
                 $data[] = [
                     'node_id' => $nodeId,
+                    'node_name' => $node['data']['name'] ?? '',
+                    'node_event' => $node['data']['event'] ?? '',
                     'variables' => VariableExtractor::extract($output),
                 ];
             } else {
                 $data[] = [
                     'node_id' => $nodeId,
+                    'node_name' => $node['data']['name'] ?? '',
+                    'node_event' => $node['data']['event'] ?? '',
                     'variables' => [],
                 ];
             }

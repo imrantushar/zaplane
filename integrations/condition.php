@@ -83,12 +83,58 @@ class Condition extends IntegrationBase {
      */
     public static function execute_node(array $node, array $input): array {
         $config = $node['data']['config'] ?? [];
-        $conditions = $config['conditions'] ?? [];
+        $rawConditions = $config['conditions'] ?? $input['conditions'] ?? [];
+        $conditions = self::normalizeConditions($rawConditions);
         $result = self::evaluate_condition_group($conditions, $input);
 
         return [
             'port' => $result ? 'true' : 'false',
             'data' => $input,
+        ];
+    }
+
+    /**
+     * Normalize frontend condition format to backend format.
+     *
+     * Frontend sends: [[cond1, cond2], [cond3, cond4]]
+     *   - Outer array = AND (all groups must pass)
+     *   - Inner array = OR  (at least one must pass)
+     *
+     * Backend expects: {logic: "AND", conditions: [{logic: "OR", conditions: [...]}, ...]}
+     */
+    protected static function normalizeConditions(array $conditions): array {
+        // Already in normalized format
+        if (isset($conditions['logic'])) {
+            return $conditions;
+        }
+
+        // Empty conditions
+        if (empty($conditions)) {
+            return ['logic' => 'AND', 'conditions' => []];
+        }
+
+        $groups = [];
+        foreach ($conditions as $group) {
+            if (!is_array($group)) {
+                continue;
+            }
+
+            // Single condition object (not wrapped in array)
+            if (isset($group['left'])) {
+                $groups[] = $group;
+                continue;
+            }
+
+            // Array of conditions = OR group
+            $groups[] = [
+                'logic' => 'OR',
+                'conditions' => $group,
+            ];
+        }
+
+        return [
+            'logic' => 'AND',
+            'conditions' => $groups,
         ];
     }
 

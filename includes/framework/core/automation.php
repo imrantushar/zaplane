@@ -275,8 +275,9 @@ class Automation
 
         // Filter gate: if filter returned pass=false, stop execution entirely
         // If pass=true, extract the data for downstream nodes
-        if (isset($output['pass'])) {
-            if ($output['pass'] === false) {
+        $pass = $output['pass'] ?? $output['data']['pass'] ?? null;
+        if ($pass !== null) {
+            if ($pass === false) {
                 return;
             }
             $output = $output['data'] ?? $output;
