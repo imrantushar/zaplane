@@ -154,7 +154,7 @@ const WorkflowTable = () => {
                   suffix: 'trash',
                   icon: <Icon as={FiTrash2} />,
                   type: 'button',
-                  onClick: () => workflowDeleteHandler(row.id),
+                  onClick: () => handleDelete(row.id),
                   hasBorder: false,
                 },
               ]}

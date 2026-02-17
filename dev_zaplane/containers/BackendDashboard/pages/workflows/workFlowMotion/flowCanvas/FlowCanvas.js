@@ -37,14 +37,25 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
     const containerRef = useRef(null);
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [activeDrawer, setActiveDrawer] = useState(null);
-     const {versions} = useSelector((state) => state.workflows);
+    const { versions } = useSelector((state) => state.workflows);
     //if we menage layout syestem then we need to save databse this value
     const [canvasLayout, setCanvasLayout] = useState("LR")
 
     useEffect(() => {
         if (!workFlow?.graph) return;
         const { nodes, edges } = mapGraphFromBackend(workFlow.graph);
-        if (nodes.length === 0) return;
+        if (nodes.length === 0) return setNodes([
+            {
+                id: getNewNodeId(),
+                type: 'custom',
+                data: {
+                    app: "Select an app",
+                    action: 'trigger',
+                    config: {}
+                },
+                position: { x: 125, y: 300 },
+            }
+        ]);
         setNodes(nodes);
         setEdges(edges);
     }, [workFlow?.graph]);
@@ -59,7 +70,7 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
         setLoading(true);
         dispatch(getSingleWorkFlow(id)).finally(() => setLoading(false));
 
-    }, [id,activeVersionId]);
+    }, [id, activeVersionId]);
     const {
         updateNodeData,
         deleteNode,

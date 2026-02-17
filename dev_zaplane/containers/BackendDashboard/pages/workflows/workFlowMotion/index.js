@@ -13,16 +13,16 @@ export default function Workflows({ id }) {
   const getNewNodeId = nodeIdRef.current;
    const { workFlow} = useSelector((state) => state.workflows);
   const [nodes, setNodes, onNodesChange] = useNodesState([
-    {
-      id: getNewNodeId(),
-      type: 'custom',
-      data: {
-        app: "Select an app",
-        action: 'trigger',
-        config: {}
-      },
-      position: { x: 125, y: 300 },
-    }
+    // {
+    //   id: getNewNodeId(),
+    //   type: 'custom',
+    //   data: {
+    //     app: "Select an app",
+    //     action: 'trigger',
+    //     config: {}
+    //   },
+    //   position: { x: 125, y: 300 },
+    // }
   ]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const dispatch = useDispatch();

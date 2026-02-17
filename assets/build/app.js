@@ -4255,7 +4255,7 @@ const WorkflowTable = () => {
           as: react_icons_fi__WEBPACK_IMPORTED_MODULE_10__.FiTrash2
         }),
         type: 'button',
-        onClick: () => workflowDeleteHandler(row.id),
+        onClick: () => handleDelete(row.id),
         hasBorder: false
       }]
     }),
@@ -5816,7 +5816,19 @@ function FlowCanvas({
       nodes,
       edges
     } = (0,_helper__WEBPACK_IMPORTED_MODULE_12__.mapGraphFromBackend)(workFlow.graph);
-    if (nodes.length === 0) return;
+    if (nodes.length === 0) return setNodes([{
+      id: getNewNodeId(),
+      type: 'custom',
+      data: {
+        app: "Select an app",
+        action: 'trigger',
+        config: {}
+      },
+      position: {
+        x: 125,
+        y: 300
+      }
+    }]);
     setNodes(nodes);
     setEdges(edges);
   }, [workFlow?.graph]);
@@ -6624,19 +6636,18 @@ function Workflows({
   const {
     workFlow
   } = (0,react_redux__WEBPACK_IMPORTED_MODULE_5__.useSelector)(state => state.workflows);
-  const [nodes, setNodes, onNodesChange] = (0,_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.useNodesState)([{
-    id: getNewNodeId(),
-    type: 'custom',
-    data: {
-      app: "Select an app",
-      action: 'trigger',
-      config: {}
-    },
-    position: {
-      x: 125,
-      y: 300
-    }
-  }]);
+  const [nodes, setNodes, onNodesChange] = (0,_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.useNodesState)([
+    // {
+    //   id: getNewNodeId(),
+    //   type: 'custom',
+    //   data: {
+    //     app: "Select an app",
+    //     action: 'trigger',
+    //     config: {}
+    //   },
+    //   position: { x: 125, y: 300 },
+    // }
+  ]);
   const [edges, setEdges, onEdgesChange] = (0,_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.useEdgesState)([]);
   const dispatch = (0,react_redux__WEBPACK_IMPORTED_MODULE_5__.useDispatch)();
   const onSubmitHandler = async values => {
