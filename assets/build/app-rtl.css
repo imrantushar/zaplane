@@ -1065,6 +1065,66 @@
 .zaplane-btn svg {
   overflow: visible;
 }
+
+.zaplane-table {
+  background: #fff;
+  padding: 24px;
+}
+
+.zaplane-table__sub-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--zaplane-border-color);
+}
+
+.zaplane-table .zaplane-table-flex-col {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.zaplane-table__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.zaplane-table__footer-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.zaplane-table__footer-pagination-per-page {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.zaplane-table__footer-label {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 14px;
+  margin: 0;
+}
+
+.zaplane-table--logs-table .zaplane-table__sub-header-left {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.zaplane-table--logs-table .zaplane-table__sub-header-left .zaplane-table__sub-header-left-items {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 /*!*************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/@wordpress/scripts/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./dev_zaplane/components/Modal/styles.scss ***!
   \*************************************************************************************************************************************************************************************************************************************************************************************************/
