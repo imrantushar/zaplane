@@ -344,7 +344,6 @@ class WorkflowsController extends WP_REST_Controller
         $nodeOutputs = Run::latestNodeOutputs($workflowHash);
 
         $data = [];
-
         foreach ($previousNodeIds as $nodeId) {
             $node = $nodeMap[$nodeId] ?? null;
             if (!$node) continue;

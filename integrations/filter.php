@@ -92,8 +92,9 @@ class Filter extends IntegrationBase {
         $result = self::evaluate_condition_group($conditions, $input);
 
         return [
-            'pass' => $result,
-            'data' => $input,
+            'data' => [
+                'pass' => $result
+            ],
         ];
     }
 
