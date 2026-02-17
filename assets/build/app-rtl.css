@@ -414,7 +414,7 @@
 .zaplane-page-content {
   max-width: 1250px;
   width: 100%;
-  margin: 32px auto 100px auto;
+  margin: 0 auto 100px auto;
   padding: 0 15px;
   box-sizing: border-box;
 }
@@ -1126,12 +1126,76 @@
   align-items: center;
   gap: 8px;
 }
+/*!**************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/@wordpress/scripts/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./dev_zaplane/components/TopBar/styles.scss ***!
+  \**************************************************************************************************************************************************************************************************************************************************************************************************/
+.zaplane-topbar-logo {
+  background: #E2E0FF;
+  padding: 6px;
+  border-radius: 50%;
+}
 /*!*************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/@wordpress/scripts/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./dev_zaplane/components/Modal/styles.scss ***!
   \*************************************************************************************************************************************************************************************************************************************************************************************************/
 .zaplane-wp-modal {
   width: 600px;
   min-height: 220px;
+}
+/*!******************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/@wordpress/scripts/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./dev_zaplane/components/Pagination/styles.scss ***!
+  \******************************************************************************************************************************************************************************************************************************************************************************************************/
+.zaplane-pagination {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+}
+.zaplane-pagination .zaplane-pagination-list {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px;
+  margin: 0;
+}
+.zaplane-pagination .zaplane-pagination-list__item {
+  width: 30px;
+  height: 30px;
+  border-radius: 4px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  margin: 0;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 36px;
+  color: var(--zaplane-font-color);
+  border: 1px solid var(--zaplane-border-color);
+}
+.zaplane-pagination .zaplane-pagination-list__item:hover {
+  background: var(--zaplane-secondary-color);
+}
+.zaplane-pagination .zaplane-pagination-list__item-dots {
+  letter-spacing: 4px;
+  font-weight: 500;
+  padding-right: 4px;
+  color: none;
+  pointer-events: none;
+}
+.zaplane-pagination .zaplane-pagination-list__item-dots:hover {
+  background: none;
+  color: none;
+  border-radius: unset;
+}
+.zaplane-pagination .zaplane-pagination-list__item-active {
+  background: var(--zaplane-primary);
+  color: #fff;
+  cursor: default;
+}
+.zaplane-pagination .zaplane-pagination-list__item-active:hover {
+  background: var(--zaplane-primary);
+  color: #fff;
 }
 /*!************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/@wordpress/scripts/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./dev_zaplane/components/Oops/styles.scss ***!
@@ -1177,14 +1241,6 @@
   max-width: -moz-fit-content;
   max-width: fit-content;
   margin-top: 24px;
-}
-/*!**************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/@wordpress/scripts/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./dev_zaplane/components/TopBar/styles.scss ***!
-  \**************************************************************************************************************************************************************************************************************************************************************************************************/
-.zaplane-topbar-logo {
-  background: #E2E0FF;
-  padding: 6px;
-  border-radius: 50%;
 }
 /*!******************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/@wordpress/scripts/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./dev_zaplane/components/OptionMenu/styles.scss ***!
@@ -1878,62 +1934,6 @@ svg.react-flow__connectionline {
   cursor: pointer;
   position: absolute;
   z-index: 999;
-}
-/*!******************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/@wordpress/scripts/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./dev_zaplane/components/Pagination/styles.scss ***!
-  \******************************************************************************************************************************************************************************************************************************************************************************************************/
-.zaplane-pagination {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 5px;
-}
-.zaplane-pagination .zaplane-pagination-list {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 4px;
-  margin: 0;
-}
-.zaplane-pagination .zaplane-pagination-list__item {
-  width: 30px;
-  height: 30px;
-  border-radius: 4px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-  margin: 0;
-  font-weight: 500;
-  font-size: 14px;
-  line-height: 36px;
-  color: var(--zaplane-font-color);
-  border: 1px solid var(--zaplane-border-color);
-}
-.zaplane-pagination .zaplane-pagination-list__item:hover {
-  background: var(--zaplane-secondary-color);
-}
-.zaplane-pagination .zaplane-pagination-list__item-dots {
-  letter-spacing: 4px;
-  font-weight: 500;
-  padding-right: 4px;
-  color: none;
-  pointer-events: none;
-}
-.zaplane-pagination .zaplane-pagination-list__item-dots:hover {
-  background: none;
-  color: none;
-  border-radius: unset;
-}
-.zaplane-pagination .zaplane-pagination-list__item-active {
-  background: var(--zaplane-primary);
-  color: #fff;
-  cursor: default;
-}
-.zaplane-pagination .zaplane-pagination-list__item-active:hover {
-  background: var(--zaplane-primary);
-  color: #fff;
 }
 /*!****************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/@wordpress/scripts/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./dev_zaplane/containers/BackendDashboard/pages/dashboard/styles.scss ***!

@@ -91,9 +91,9 @@ const Logs = () => {
         },
     ], [dispatch]);
 
-    if (isLoading) {
-        return <ZAPLoading />;
-    }
+    // if (isLoading) {
+    //     return <ZAPLoading />;
+    // }
 
     return (
         <>
