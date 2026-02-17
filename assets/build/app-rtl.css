@@ -1344,6 +1344,88 @@
   padding: 0;
   color: var(--zaplane-placing);
 }
+/*!*********************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/@wordpress/scripts/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./dev_zaplane/components/StatusOptions/styles.scss ***!
+  \*********************************************************************************************************************************************************************************************************************************************************************************************************/
+.zaplane-dropdown-option {
+  position: relative;
+  cursor: pointer;
+  padding: 8px 12px !important;
+  border-radius: 999px;
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 125px;
+  width: -moz-fit-content;
+  width: fit-content;
+  margin: 0 auto;
+}
+.zaplane-dropdown-option span.label {
+  text-transform: capitalize;
+  font-size: 14px;
+  line-height: 18px;
+}
+.zaplane-dropdown-option--completed, .zaplane-dropdown-option--active, .zaplane-dropdown-option--approved, .zaplane-dropdown-option--pass, .zaplane-dropdown-option--future {
+  color: #00AD6B;
+  border: none;
+  background: rgba(36, 161, 72, 0.1);
+}
+.zaplane-dropdown-option--processing, .zaplane-dropdown-option--paused, .zaplane-dropdown-option--submitted {
+  color: #FDB022;
+  border: none;
+  background: rgba(236, 152, 20, 0.12);
+}
+.zaplane-dropdown-option--draft, .zaplane-dropdown-option--private {
+  color: #0F0E16;
+  border: none;
+  background: rgba(114, 114, 114, 0.12);
+}
+.zaplane-dropdown-option--cancel, .zaplane-dropdown-option--trash, .zaplane-dropdown-option--failed {
+  color: #FF4D4D;
+  border: none;
+  background: rgba(244, 72, 63, 0.12);
+}
+.zaplane-dropdown-option .zaplane-icon--angle-down {
+  pointer-events: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.zaplane-dropdown-option .zaplane-icon--angle-down::before {
+  font-size: 8px;
+}
+.zaplane-dropdown-option__lists .zaplane-more-status-options {
+  position: relative;
+  min-width: 175px;
+  z-index: 99999;
+  border-radius: 4px;
+  background: #fff;
+  margin: 0;
+  padding: 5px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: var(--zaplane-border-color);
+  box-shadow: rgba(0, 0, 0, 0.04) 0px 1px 1px;
+}
+.zaplane-dropdown-option__lists .zaplane-more-status-options__item {
+  display: flex;
+  color: var(--zaplane-font-color);
+  background: #fff;
+  font-size: 12px;
+  font-weight: 500;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 15px;
+  margin-bottom: 5px;
+  cursor: pointer;
+}
+.zaplane-dropdown-option__lists .zaplane-more-status-options__item:last-child {
+  margin-bottom: 0;
+}
+.zaplane-dropdown-option__lists .zaplane-more-status-options__item:hover, .zaplane-dropdown-option__lists .zaplane-more-status-options__item.active {
+  color: #0F0E16;
+  background: #F5F5F5;
+}
 /*!**********************************************************************************************************************************************************************************************!*\
   !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[2].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[2].use[2]!./node_modules/@xyflow/react/dist/base.css ***!
   \**********************************************************************************************************************************************************************************************/

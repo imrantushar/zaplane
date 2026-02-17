@@ -1,0 +1,82 @@
+
+.zaplane-dropdown-option {
+    position: relative;
+    cursor: pointer;
+    padding: 8px 12px !important;
+    border-radius: 999px;
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    min-width: 125px;
+    width: fit-content;
+    margin: 0 auto;
+    span.label {
+        text-transform: capitalize;
+        font-size: 14px;
+        line-height: 18px;
+    }
+    &--completed, &--active, &--approved, &--pass, &--future {
+        color: #00AD6B;
+        border: none;
+        background: rgba(36, 161, 72, 0.1);
+    }
+    &--processing, &--paused, &--submitted {
+        color: #FDB022;
+        border: none;
+        background: rgba(236, 152, 20, 0.12);
+    }
+    &--draft, &--private {
+        color: #0F0E16;
+        border: none;
+        background: rgba(114, 114, 114, .12);   
+    }
+    &--cancel,&--trash, &--failed {
+        color: #FF4D4D;
+        border: none;
+        background: rgba(244, 72, 63, 0.12);
+    }
+    .zaplane-icon--angle-down {
+        pointer-events: none;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        &::before{
+            font-size: 8px;
+        }
+    }
+    &__lists {
+        .zaplane-more-status-options {
+            position: relative;
+            min-width: 175px;
+            z-index: 99999;
+            border-radius: 4px;
+            background: #fff;
+            margin: 0;
+            padding: 5px;
+            border-width: 1px;
+            border-style: solid;
+            border-color: var(--zaplane-border-color);
+            box-shadow: rgba(0, 0, 0, 0.04) 0px 1px 1px;
+            
+            &__item{
+                display: flex;
+                color: var(--zaplane-font-color);
+                background: #fff;
+                font-size: 12px;
+                font-weight: 500;
+                border: none;
+                border-radius: 6px;
+                padding: 8px 15px;
+                margin-bottom: 5px;
+                cursor: pointer;
+                &:last-child {
+                    margin-bottom: 0;
+                }
+                &:hover, &.active {
+                    color: #0F0E16;
+                    background:  #F5F5F5;
+                }
+            }
+        }
+    }
+}
