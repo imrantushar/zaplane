@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-02-05 10:26:45",
+    "generated_at": "2026-02-17 12:49:48",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -3238,6 +3238,24 @@
                     ]
                 }
             }
+        },
+        "elementor": {
+            "slug": "elementor",
+            "name": "Elementor",
+            "icon": "",
+            "category": "app",
+            "triggers": {
+                "elementor_pro/forms/new_record": {
+                    "key": "elementor_pro/forms/new_record",
+                    "label": "Form New Record",
+                    "hook": "elementor_pro/forms/new_record",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": []
         }
     },
     "tools": {

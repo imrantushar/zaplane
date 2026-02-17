@@ -16,10 +16,24 @@ class Elementor extends IntegrationBase {
     }
 
 
-    public static function resolve_trigger(array $node, array $args) {
-        ray($args)
+       public static function resolve_trigger(array $node, array $args) {
+        
+        switch ($node['event']) {
+         case 'elementor_pro/forms/new_record':
+          $form_data  = $args[0] ?? '';
+          if(!$form_data){
+            return [] ;
+          }
+          $data  = $form_data->get('sent_data');
+          $result  = [];
+          foreach($data as $form_field  => $value){
+            $result[$form_field]  = $value ;
+          }
+          return $result ;
 
+        }
 
+        return false;
     }
 
     public static function execute_node(array $node, array $input): array {
