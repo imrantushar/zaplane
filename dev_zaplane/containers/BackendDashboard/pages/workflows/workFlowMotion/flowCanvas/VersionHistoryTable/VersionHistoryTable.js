@@ -1,15 +1,11 @@
 import {
-  Table,
   Badge,
   Button,
   HStack,
   Text,
-  Flex,
-  Spinner,
 } from "@chakra-ui/react";
 import { __ } from "@wordpress/i18n";
-import ZAPLoading from "@ZAPComponents/Loading";
-import ZAPTable from "@ZAPComponents/Table";
+import ListTable from "@ZAPComponents/ListTable";
 import { getPreviewOldVersion, versionActive } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlowVersion";
 import { CheckCircle, Eye } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
@@ -20,52 +16,44 @@ const VersionHistoryTable = ({
 }) => {
   const dispatch = useDispatch()
   const { isLoading } = useSelector((state) => state.workflows);
-  return (
-    <ZAPTable
-      data={versions}
-      rowKey="id"
-      variant="line"
-      isLoading={isLoading}
-      noDataText={"Right now Have no Version"}
-      size="sm"
-      columns={[
-        {
-          label: "ID",
-          key: "id",
-          textAlign: "center",
-          render: (row) => <Text className="zaplane-label" fontWeight="medium">{__(row.id, "zaplane")}</Text>,
-        },
-        {
-          label: "Graph Hash",
-          key: "graph_hash",
-          render: (row) => (
-            <Text fontSize="sm" >{row.graph_hash.slice(0, 12)}</Text>
-          ),
-        },
-        {
-          label: "Status",
-          key: "is_active",
-          render: (row) => (
-            <Badge
-              px="2"
-              py="0.5"
-              rounded="md"
-              fontSize="xs"
-              color={row.is_active  ? "#16A34A" : "#4B5563"}
-              bg={row.is_active  ? "#DCFCE7" : "#F3F4F6"}
+  const columns = [
+    {
+      name: __('ID', 'zaplane'),
+      cell: (row) => (
+        <Text className="zaplane-label">{__(row.id, "zaplane")}</Text>
+      ),
+      // columnWidth: "180px",
+      textAlign: "center",
+    },
+    {
+      name: __('Created At', 'zaplane'),
+      cell: (row) => (
+        <Text className="zaplane-label">{__(row.created_at, "zaplane")}</Text>
+      ),
+      // columnWidth: "180px",
+      textAlign: "center",
+    },
+    {
+      name: __('Status', 'zaplane'),
+      cell: (row) => (
+        <Badge
+          px="2"
+          py="0.5"
+          rounded="md"
+          fontSize="xs"
+          color={row.is_active ? "#16A34A" : "#4B5563"}
+          bg={row.is_active ? "#DCFCE7" : "#F3F4F6"}
 
-            >
-              {row.is_active ? "Active" : "Inactive"}
-            </Badge>
-          ),
-        },
-        {
-          label: "Created At",
-          key: "created_at",
-          render: (row) => <Text>{__(row.created_at, "zaplane")}</Text>,
-        },
-      ]}
-      actionsRenderer={(row) => (
+        >
+          {row.is_active ? "Active" : "Inactive"}
+        </Badge>
+      ),
+      columnWidth: "120px",
+    },
+
+    {
+      name: __('Action', 'zaplane'),
+      cell: (row) => (
         <HStack justify="flex-end" spacing={1}>
           {!row.is_active && (
             <Button
@@ -84,7 +72,24 @@ const VersionHistoryTable = ({
             <Eye size={14} />
           </Button>
         </HStack>
-      )}
+      ),
+      // columnWidth: "100px",
+      textAlign: "center",
+    },
+  ]
+  return (
+
+    <ListTable
+      columns={columns}
+      isRowSelectable={false}
+      data={versions}
+      showSubHeader={false}
+      showColumnFilter={false}
+      showPagination={false}
+      noDataText={__("No history found", "zaplane")}
+      totalItems={versions?.length}
+      dataFetchingStatus={isLoading}
+      suffix="version-table"
     />
 
   );

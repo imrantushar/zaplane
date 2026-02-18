@@ -18,8 +18,7 @@ import { statusStyle } from "../../../helper";
 import { nodeLogsRunDetails } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlowLogs";
 import { getSingleRun } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlowRuns";
 import ListTable from "@ZAPComponents/ListTable";
-import { history, HistoryIcon, ReExcutionIcon } from "@ZAPUtils/icons";
-import "../styles.scss"
+import {  HistoryIcon, ReExcutionIcon } from "@ZAPUtils/icons";
 
 
 

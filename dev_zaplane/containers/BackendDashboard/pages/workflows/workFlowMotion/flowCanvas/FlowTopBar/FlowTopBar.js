@@ -20,6 +20,7 @@ import { workflowNodeListiner, workflowNodeListinerStop } from "@ZAPRedux/Slices
 import { startApiCountdown } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
 import { workFLowExction } from "@ZAPRedux/Slices/workFlowSlice/actions/workflowExctions";
 import { useApiCountdown } from "@ZAPHooks/useApiCountdown/useApiCountdown";
+import '../styles.scss'
 
 export default function FlowTopBar({
   navigate,
