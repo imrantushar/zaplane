@@ -20,6 +20,8 @@ export default function CustomNode({ id, data, canvasLayout }) {
   const hasOutgoingEdge = edges.some((e) => e.source === id);
   const isLR = canvasLayout === "LR"
   const isSelectApp = data.app === "Select an app";
+  const formattedAction = data?.action.charAt(0).toUpperCase() + data.action.slice(1);
+
 
   return (
     <Box
@@ -41,7 +43,7 @@ export default function CustomNode({ id, data, canvasLayout }) {
             className="zaplane-label"
             margin={0}
           >
-            {data.action || "Action"}
+            {formattedAction || "Action"}
           </Text>
         </HStack>
       </NodeToolbar>

@@ -5782,6 +5782,7 @@ function CustomNode({
   const hasOutgoingEdge = edges.some(e => e.source === id);
   const isLR = canvasLayout === "LR";
   const isSelectApp = data.app === "Select an app";
+  const formattedAction = data?.action.charAt(0).toUpperCase() + data.action.slice(1);
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Box, {
     position: "relative",
     onMouseEnter: () => setHovered(true),
@@ -5798,7 +5799,7 @@ function CustomNode({
           fontWeight: "medium",
           className: "zaplane-label",
           margin: 0,
-          children: data.action || "Action"
+          children: formattedAction || "Action"
         })
       })
     }), data.action !== 'trigger' && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.NodeToolbar, {
