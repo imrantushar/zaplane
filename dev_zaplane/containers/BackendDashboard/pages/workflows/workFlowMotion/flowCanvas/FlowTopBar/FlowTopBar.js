@@ -2,7 +2,8 @@ import React from "react";
 import { Button, Text, Flex } from "@chakra-ui/react";
 import TopBar from "@ZAPComponents/TopBar";
 import { FiArrowLeft } from "react-icons/fi";
-import { LuFullscreen, LuMinimize } from "react-icons/lu";
+import { TfiReload } from "react-icons/tfi";
+import { LuFullscreen, LuMinimize, LuSquarePlay } from "react-icons/lu";
 import { LucideHistory } from "lucide-react";
 import Select from "react-select";
 import { __ } from "@wordpress/i18n";
@@ -100,20 +101,26 @@ export default function FlowTopBar({
               <Button
                 size="sm"
                 variant="outline"
+                color='#454F59'
+                fontWeight="500"
+                border={"none"}
                 onClick={() =>  dispatch(getRunWorkFlow(id))}
               >
-                {__("🔄 Refresh", "zaplane")}
+                <TfiReload />{__("Refresh", "zaplane")}
               </Button>
               <Button
                 size="sm"
                 variant="outline"
+                color='#454F59'
+                fontWeight="500"
+                border={"none"}
                 onClick={() =>
                   dispatch(workFLowExction({
                     workflow_hash: workFlow?.version?.hash,
                   }))
                 }
               >
-                {__("🔄 Replay", "zaplane")}
+               <LuSquarePlay /> {__("Replay", "zaplane")}
               </Button>
             </Flex>
 
