@@ -18,34 +18,29 @@ class Essentialaddons extends IntegrationBase {
     }
 
 
-       public static function resolve_trigger(array $node, array $args) {
-        
+    public static function resolve_trigger(array $node, array $args) {
         switch ($node['event']) {
-         case 'eael/login-register/after-login':
-             ray($args);
+            case 'eael/login-register/after-login':
+                $user = $args[0] ?? null;
+              ray($args);
+                return [
+                    'user_id' => $user->ID ?? 0,
+                    'user_login' => $user->user_login ?? '',
+                    'user_email' => $user->user_email ?? '',
+                    'display_name' => $user->display_name ?? '',
+                ];
 
-          $form_data  = $args[0] ?? '';
-          if(!$form_data){
-            return [] ;
-          }
-          $data  = $form_data->get('sent_data');
-          $result  = [];
-          foreach($data as $form_field  => $value){
-            $result[$form_field]  = $value ;
-          }
+            case 'eael/login-register/after-insert-user':
+                $user_id = $args[0] ?? 0;
 
-         case 'eael/login-register/after-insert-user':
-           ray($args);
-          $form_data  = $args[0] ?? '';
-          if(!$form_data){
-            return [] ;
-          }
-          $data  = $form_data->get('sent_data');
-          $result  = [];
-          foreach($data as $form_field  => $value){
-            $result[$form_field]  = $value ;
-          }
+                 ray($args);
 
+                return [
+                    'user_id' => $user->ID,
+                    'user_login' => $user->user_login,
+                    'user_email' => $user->user_email,
+                    'display_name' => $user->display_name,
+                ];
         }
 
         return false;
