@@ -100,8 +100,8 @@ export default function CustomNode({ id, data, canvasLayout }) {
               width: 10,
               height: 10,
               borderRadius: "50%",
-              background: "var(--zaplane-secondary)",
-              border: "2px solid var(--zaplane-body-background)",
+              background: "var(--zaplane-primary)",
+              border: "2px solid var(--zaplane-background)",
             }}
           />
         )}
@@ -134,8 +134,8 @@ export default function CustomNode({ id, data, canvasLayout }) {
               width: 10,
               height: 10,
               borderRadius: "50%",
-              background: "var(--zaplane-secondary)",
-              border: "2px solid var(--zaplane-body-background)",
+              background: "var(--zaplane-primary)",
+              border: "2px solid var(--zaplane-background)",
             }}
           />
         )}

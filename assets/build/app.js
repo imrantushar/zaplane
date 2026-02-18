@@ -5940,8 +5940,8 @@ function CustomNode({
           width: 10,
           height: 10,
           borderRadius: "50%",
-          background: "var(--zaplane-secondary)",
-          border: "2px solid var(--zaplane-body-background)"
+          background: "var(--zaplane-primary)",
+          border: "2px solid var(--zaplane-background)"
         }
       }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Text, {
         className: isSelectApp ? "zaplane-label" : "zaplane-title",
@@ -5961,8 +5961,8 @@ function CustomNode({
           width: 10,
           height: 10,
           borderRadius: "50%",
-          background: "var(--zaplane-secondary)",
-          border: "2px solid var(--zaplane-body-background)"
+          background: "var(--zaplane-primary)",
+          border: "2px solid var(--zaplane-background)"
         }
       })]
     }), !hasOutgoingEdge && !data.conditions && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_FloatingEdge_FloatingEdge__WEBPACK_IMPORTED_MODULE_9__["default"]
