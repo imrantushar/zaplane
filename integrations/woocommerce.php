@@ -14,7 +14,7 @@ use Zaplane\Integrations\Woo\ReviewActionsTrait;
 
 if (!defined('ABSPATH')) exit;
 
-class Woo extends IntegrationBase {
+class woocommerce extends IntegrationBase {
     use Helper;
     use OrderActionsTrait;
     use CustomerActionsTrait;
