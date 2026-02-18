@@ -5024,6 +5024,7 @@ function ActionDrawer({
         content: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.Fragment, {
           children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Button, {
             mb: 4,
+            ..._assets_scss_chakra_recipe__WEBPACK_IMPORTED_MODULE_15__.primaryBtn,
             onClick: () => dispatch((0,_ZAPRedux_Slices_workFlowSlice_actions_workflowExctions__WEBPACK_IMPORTED_MODULE_21__.workFLowSingeNodeExction)({
               workflow_hash: workFlow?.version?.hash,
               node_key: node?.id,

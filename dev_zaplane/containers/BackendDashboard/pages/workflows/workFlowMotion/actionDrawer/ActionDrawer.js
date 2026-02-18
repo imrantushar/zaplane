@@ -251,7 +251,9 @@ export default function ActionDrawer({ open, context, onClose, updateNodeData, c
               label: "Test",
               content: (
                 <>
-                  <Button mb={4} onClick={() =>
+                  <Button mb={4} 
+                  {...primaryBtn}
+                  onClick={() =>
                     dispatch(workFLowSingeNodeExction({
                       workflow_hash: workFlow?.version?.hash,
                       node_key: node?.id,
