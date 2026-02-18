@@ -25,10 +25,10 @@ class Essentialaddons extends IntegrationBase {
                 if (!$user instanceof \WP_User) return false;
                 
                 return [
-                    'user_id' => $user->ID,
-                    'user_login' => $user->user_login,
-                    'user_email' => $user->user_email,
-                    'display_name' => $user->display_name,
+                    'user_id' => $user->ID ?? '',
+                    'user_login' => $user->user_login ?? '',
+                    'user_email' => $user->user_email ?? '',
+                    'display_name' => $user->display_name ?? '',
                 ];
 
             case 'eael/login-register/after-insert-user':
@@ -40,10 +40,10 @@ class Essentialaddons extends IntegrationBase {
                 if (!$user) return false;
                 
                 return [
-                    'user_id' => $user->ID,
-                    'user_login' => $user->user_login,
-                    'user_email' => $user->user_email,
-                    'display_name' => $user->display_name,
+                    'user_id' => $user->ID ?? '',
+                    'user_login' => $user->user_login ?? '',
+                    'user_email' => $user->user_email ?? '',
+                    'display_name' => $user->display_name ?? '',
                 ];
         }
 
