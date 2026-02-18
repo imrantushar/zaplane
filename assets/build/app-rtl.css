@@ -20,10 +20,6 @@
   --zaplane-gray: #F6F7F8;
 }
 
-.wp-admin {
-  overflow: hidden;
-}
-
 #wpbody-content {
   padding: 0;
 }
@@ -411,12 +407,24 @@
   color: #EAB308;
 }
 
+.zaplane-app {
+  background: #F6F7F8;
+  display: flex;
+  flex-direction: column;
+  right: 0;
+  min-height: calc(100vh - 100px);
+  position: relative;
+  top: 0;
+  width: 100% !important;
+}
+
 .zaplane-page-content {
   max-width: 1250px;
   width: 100%;
   margin: 0 auto 100px auto;
   padding: 0 15px;
   box-sizing: border-box;
+  min-height: 100vh;
 }
 
 .react-flow {
