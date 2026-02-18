@@ -27,6 +27,7 @@ const StatusOptions = ( props ) => {
 		active: __( 'Active', 'zaplane' ),
 		paused: __( 'Paused', 'zaplane' ),
 		draft: __( 'Draft', 'zaplane' ),
+		inactive: __('inactive', 'zaplane' ),
 		trash: __( 'Trash', 'zaplane' ),
 		completed: __( 'Approved', 'zaplane' ),
 		approved: __( 'Approve', 'zaplane' ),

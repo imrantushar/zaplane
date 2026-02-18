@@ -1383,7 +1383,7 @@
   border: none;
   background: rgba(236, 152, 20, 0.12);
 }
-.zaplane-dropdown-option--draft, .zaplane-dropdown-option--private {
+.zaplane-dropdown-option--draft, .zaplane-dropdown-option--private, .zaplane-dropdown-option--inactive {
   color: #0F0E16;
   border: none;
   background: rgba(114, 114, 114, 0.12);
