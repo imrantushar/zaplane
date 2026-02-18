@@ -2569,6 +2569,45 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ },
 
+/***/ "./dev_zaplane/components/ZAPDivider/index.js"
+/*!****************************************************!*\
+  !*** ./dev_zaplane/components/ZAPDivider/index.js ***!
+  \****************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/box/index.js");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__);
+
+
+
+const ZAPDivider = ({
+  height = "1px",
+  bg = "var(--zaplane-border-color)",
+  w = "100%",
+  my,
+  ...props
+}) => {
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Box, {
+    role: "separator",
+    bg: bg,
+    height: height,
+    w: w,
+    my: my,
+    ...props
+  });
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (ZAPDivider);
+
+/***/ },
+
 /***/ "./dev_zaplane/components/ZAPInput/index.js"
 /*!**************************************************!*\
   !*** ./dev_zaplane/components/ZAPInput/index.js ***!
@@ -3589,12 +3628,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/box/index.js");
 /* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/text/index.js");
-/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/flex/flex.js");
-/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/stack/stack.js");
-/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
-/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/stack/stack.js");
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var _ZAPComponents_ZAPDivider__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @ZAPComponents/ZAPDivider */ "./dev_zaplane/components/ZAPDivider/index.js");
 /* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
 /* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__);
+
 
 
 
@@ -3603,25 +3643,29 @@ const ExecutedFlows = () => {
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Box, {
     bg: "var(--zaplane-background)",
     borderRadius: "lg",
-    boxShadow: "md",
-    p: 4,
-    w: "100%",
-    maxW: "400px",
+    boxShadow: "md"
+    // p={"24px"}
+    ,
+    w: "100%"
+    // maxW="400px"
+    ,
     children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
       className: "zaplane-label",
-      mb: 3,
-      children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_5__.__)('Top Executed Flows', 'zaplane')
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Stack, {
+      p: "24px",
+      children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)('Top Executed Flows', 'zaplane')
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_ZAPComponents_ZAPDivider__WEBPACK_IMPORTED_MODULE_5__["default"], {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Stack, {
       spacing: 2,
-      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Flex, {
-        justify: "space-between",
-        align: "center",
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Box, {
+        p: "24px",
         children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
           className: "zaplane-label",
-          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_5__.__)('Untitled Flow', 'zaplane')
+          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)('Untitled Flow', 'zaplane')
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
           className: "zaplane-label",
-          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_5__.__)('0', 'zaplane')
+          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)('Untitled Flow', 'zaplane')
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
+          className: "zaplane-label",
+          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)('0', 'zaplane')
         })]
       })
     })]
@@ -3752,8 +3796,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
 /* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_10___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_10__);
 /* harmony import */ var _styles_scss__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./styles.scss */ "./dev_zaplane/containers/BackendDashboard/pages/dashboard/styles.scss");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__);
+/* harmony import */ var _ZAPComponents_ZAPDivider__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @ZAPComponents/ZAPDivider */ "./dev_zaplane/components/ZAPDivider/index.js");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__);
+
 
 
 
@@ -3777,37 +3823,43 @@ const TotalExecutions = ({
     });
     return result;
   }, [data]);
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Box, {
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Box, {
     bg: "var(--zaplane-background)",
-    p: 4,
     borderRadius: "lg",
     boxShadow: "md",
     w: "100%",
-    h: "320px",
-    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
-      fontWeight: "semibold",
-      mb: 3,
+    h: "388px",
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
+      className: "zaplane-label",
+      p: "24px",
       children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_10__.__)("Total Executions", "zaplane")
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(recharts__WEBPACK_IMPORTED_MODULE_4__.ResponsiveContainer, {
-      width: "100%",
-      height: "100%",
-      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsxs)(recharts__WEBPACK_IMPORTED_MODULE_9__.LineChart, {
-        data: chartData,
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(recharts__WEBPACK_IMPORTED_MODULE_5__.CartesianGrid, {
-          strokeDasharray: "3 3"
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(recharts__WEBPACK_IMPORTED_MODULE_7__.XAxis, {
-          dataKey: "month"
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(recharts__WEBPACK_IMPORTED_MODULE_8__.YAxis, {
-          allowDecimals: false
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(recharts__WEBPACK_IMPORTED_MODULE_3__.Tooltip, {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(recharts__WEBPACK_IMPORTED_MODULE_6__.Line, {
-          type: "monotone",
-          dataKey: "value",
-          stroke: "#1A202C",
-          strokeWidth: 2,
-          dot: {
-            r: 5
-          }
-        })]
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_ZAPComponents_ZAPDivider__WEBPACK_IMPORTED_MODULE_12__["default"], {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Box, {
+      h: "315px",
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(recharts__WEBPACK_IMPORTED_MODULE_4__.ResponsiveContainer, {
+        style: {
+          padding: "24px",
+          marginLeft: '-42px'
+        },
+        width: "106%",
+        height: "100%",
+        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsxs)(recharts__WEBPACK_IMPORTED_MODULE_9__.LineChart, {
+          data: chartData,
+          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(recharts__WEBPACK_IMPORTED_MODULE_5__.CartesianGrid, {
+            strokeDasharray: "3 3"
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(recharts__WEBPACK_IMPORTED_MODULE_7__.XAxis, {
+            dataKey: "month"
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(recharts__WEBPACK_IMPORTED_MODULE_8__.YAxis, {
+            allowDecimals: false
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(recharts__WEBPACK_IMPORTED_MODULE_3__.Tooltip, {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(recharts__WEBPACK_IMPORTED_MODULE_6__.Line, {
+            type: "monotone",
+            dataKey: "value",
+            stroke: "#1A202C",
+            strokeWidth: 2,
+            dot: {
+              r: 5
+            }
+          })]
+        })
       })
     })]
   });
@@ -3870,7 +3922,7 @@ function Dashboard() {
     children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsx)(_ZAPComponents_TopBar__WEBPACK_IMPORTED_MODULE_2__["default"], {
       leftContent: () => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsx)(_ZAPComponents_Labels_ZAPLabel__WEBPACK_IMPORTED_MODULE_3__["default"], {
         label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Dashboard', 'zaplane'),
-        variant: "primary"
+        variant: "bold"
       }),
       rightContent: () => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_6__.Flex, {
         gap: 3,
@@ -3911,6 +3963,8 @@ function Dashboard() {
     }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Box, {
       className: "zaplane-page-content",
       children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_6__.Flex, {
+        gap: "24px",
+        mb: "24px",
         children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Box, {
           width: "40%",
           children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsx)(_ExecutedFlows__WEBPACK_IMPORTED_MODULE_11__["default"], {})
