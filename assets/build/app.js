@@ -5998,7 +5998,7 @@ function FlowCanvas({
       nodes,
       edges
     } = (0,_helper__WEBPACK_IMPORTED_MODULE_12__.mapGraphFromBackend)(workFlow.graph);
-    if (nodes.length === 0) return;
+    if (!nodes.length) return;
     setNodes(nodes);
     setEdges(edges);
   }, [workFlow?.graph]);
@@ -6821,6 +6821,22 @@ function Workflows({
   }]);
   const [edges, setEdges, onEdgesChange] = (0,_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.useEdgesState)([]);
   const dispatch = (0,react_redux__WEBPACK_IMPORTED_MODULE_5__.useDispatch)();
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    setNodes([{
+      id: getNewNodeId(),
+      type: "custom",
+      data: {
+        app: "Select an app",
+        action: "trigger",
+        config: {}
+      },
+      position: {
+        x: 125,
+        y: 300
+      }
+    }]);
+    setEdges([]);
+  }, [id]);
   const onSubmitHandler = async values => {
     const payload = {
       nodes: (0,_helper__WEBPACK_IMPORTED_MODULE_4__.mapNodesForBackend)(nodes),

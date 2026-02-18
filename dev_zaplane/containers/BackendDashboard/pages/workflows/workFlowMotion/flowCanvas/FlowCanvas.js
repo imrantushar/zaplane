@@ -44,7 +44,7 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
     useEffect(() => {
         if (!workFlow?.graph) return;
         const { nodes, edges } = mapGraphFromBackend(workFlow.graph);
-        if (nodes.length === 0) return
+        if (!nodes.length) return 
         setNodes(nodes);
         setEdges(edges);
     }, [workFlow?.graph]);
