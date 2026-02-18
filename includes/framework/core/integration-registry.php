@@ -15,5 +15,5 @@ return [
     'variable' => ['file' => 'variable.php', 'class' => \Zaplane\Integrations\Variable::class],
     'webhook' => ['file' => 'webhook.php', 'class' => \Zaplane\Integrations\Webhook::class],
     'storeengine' => ['file' => 'storeengine.php', 'class' => \Zaplane\Integrations\Storeengine::class],
-    'easyDigitalDownload' => ['file' => 'easyDigitalDownload.php', 'class' => \Zaplane\Integrations\EasyDigitalDownload::class],
+    'easydigitaldownload' => ['file' => 'easydigitaldownload.php', 'class' => \Zaplane\Integrations\Easydigitaldownload::class],
 ];

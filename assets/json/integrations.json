@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-02-10 08:58:37",
+    "generated_at": "2026-02-18 12:27:38",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -3039,105 +3039,6 @@
             "triggers": [],
             "actions": []
         },
-        "easyDigitalDownload": {
-            "slug": "easyDigitalDownload",
-            "name": "Easy Digital Download",
-            "icon": "",
-            "category": "app",
-            "triggers": {
-                "product_purchased_discount": {
-                    "key": "product_purchased_discount",
-                    "label": "Product purchased with a discount code",
-                    "hook": "edd_complete_purchase",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "order_refunded_stripe": {
-                    "key": "order_refunded_stripe",
-                    "label": "User order refunded via Stripe gateway",
-                    "hook": "edd_stripe_refund_order",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "subscription_renewed": {
-                    "key": "subscription_renewed",
-                    "label": "User Subscription Renewed",
-                    "hook": "edd_subscription_post_renew",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "license_key_created": {
-                    "key": "license_key_created",
-                    "label": "User License Key Create",
-                    "hook": "edd_sl_post_insert_license",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "license_key_activated": {
-                    "key": "license_key_activated",
-                    "label": "User License Key Activated",
-                    "hook": "edd_sl_post_activate_license",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "license_key_deactivated": {
-                    "key": "license_key_deactivated",
-                    "label": "User License Key Deactivated",
-                    "hook": "edd_sl_post_deactivate_license",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "license_status_active": {
-                    "key": "license_status_active",
-                    "label": "User License Key Status Change To Active",
-                    "hook": "edd_sl_license_status_active",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "license_status_inactive": {
-                    "key": "license_status_inactive",
-                    "label": "User License Key Status Change To Inactive",
-                    "hook": "edd_sl_license_status_inactive",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "license_status_disabled": {
-                    "key": "license_status_disabled",
-                    "label": "User License Key Status Change To Disabled",
-                    "hook": "edd_sl_license_status_disabled",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "license_status_expired": {
-                    "key": "license_status_expired",
-                    "label": "User License Key Status Change To Expired",
-                    "hook": "edd_sl_license_status_expired",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                }
-            },
-            "actions": {}
-        },
         "storeengine": {
             "slug": "storeengine",
             "name": "Storeengine",
@@ -3337,6 +3238,114 @@
                     ]
                 }
             }
+        },
+        "easydigitaldownload": {
+            "slug": "easydigitaldownload",
+            "name": "Easydigitaldownload",
+            "icon": "",
+            "category": "app",
+            "triggers": {
+                "purchase_product": {
+                    "key": "purchase_product",
+                    "label": "Product Purchased",
+                    "hook": "edd_complete_purchase",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "product_purchased_discount": {
+                    "key": "product_purchased_discount",
+                    "label": "Product purchased with a discount code",
+                    "hook": "edd_complete_purchase",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "order_refunded": {
+                    "key": "order_refunded",
+                    "label": "User order refunded",
+                    "hook": "edds_payment_refunded",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "subscription_renewed": {
+                    "key": "subscription_renewed",
+                    "label": "User Subscription Renewed",
+                    "hook": "edd_subscription_post_renew",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "license_key_created": {
+                    "key": "license_key_created",
+                    "label": "User License Key Create",
+                    "hook": "edd_sl_store_license",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "license_key_activated": {
+                    "key": "license_key_activated",
+                    "label": "User License Key Activated",
+                    "hook": "edd_sl_activate_license",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "license_key_deactivated": {
+                    "key": "license_key_deactivated",
+                    "label": "User License Key Deactivated",
+                    "hook": "edd_sl_deactivate_license",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "license_status_active": {
+                    "key": "license_status_active",
+                    "label": "User License Key Status Change To Active",
+                    "hook": "edd_sl_post_set_status",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "license_status_inactive": {
+                    "key": "license_status_inactive",
+                    "label": "User License Key Status Change To Inactive",
+                    "hook": "edd_sl_post_set_status",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "license_status_disabled": {
+                    "key": "license_status_disabled",
+                    "label": "User License Key Status Change To Disabled",
+                    "hook": "edd_sl_post_set_status",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "license_status_expired": {
+                    "key": "license_status_expired",
+                    "label": "User License Key Status Change To Expired",
+                    "hook": "edd_sl_post_set_status",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": []
         }
     },
     "tools": {
@@ -3352,11 +3361,61 @@
                     "label": "If Condition",
                     "schema": [
                         {
-                            "key": "expression",
-                            "label": "Condition",
-                            "type": "expression",
+                            "key": "conditions",
+                            "label": "Conditions",
+                            "type": "condition_group",
                             "required": true,
-                            "help": "Example: {{post.status}} == \"publish\""
+                            "help": "Build complex conditions with AND/OR groups",
+                            "fields": [
+                                {
+                                    "key": "left",
+                                    "label": "Left Value",
+                                    "type": "expression",
+                                    "required": true
+                                },
+                                {
+                                    "key": "operator",
+                                    "label": "Operator",
+                                    "type": "select",
+                                    "options": [
+                                        {
+                                            "label": "==",
+                                            "value": "=="
+                                        },
+                                        {
+                                            "label": "!=",
+                                            "value": "!="
+                                        },
+                                        {
+                                            "label": "<",
+                                            "value": "<"
+                                        },
+                                        {
+                                            "label": ">",
+                                            "value": ">"
+                                        },
+                                        {
+                                            "label": "<=",
+                                            "value": "<="
+                                        },
+                                        {
+                                            "label": ">=",
+                                            "value": ">="
+                                        }
+                                    ],
+                                    "required": true
+                                },
+                                {
+                                    "key": "right",
+                                    "label": "Right Value",
+                                    "type": "expression",
+                                    "required": true
+                                }
+                            ],
+                            "logic_options": [
+                                "AND",
+                                "OR"
+                            ]
                         }
                     ],
                     "outputs": [
