@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-02-16 05:40:18",
+    "generated_at": "2026-02-18 05:04:33",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -3241,31 +3241,43 @@
         },
         "tutor": {
             "slug": "tutor",
-            "name": "Tutorlms",
+            "name": "Tutor",
             "icon": "",
             "category": "app",
             "triggers": {
                 "user_enroll_course": {
                     "key": "user_enroll_course",
                     "label": "User enrolled in a course",
-                    "hook": [
-                        "tutor_after_enroll",
-                        10,
-                        2
-                    ],
+                    "hook": "tutor_after_enroll",
                     "schema": [
                         {
                             "key": "course_id",
-                            "label": "Course",
+                            "label": "course",
                             "type": "select",
                             "options": [
                                 {
-                                    "label": "Any Course",
+                                    "label": "Any course",
                                     "value": "any"
                                 },
                                 {
+                                    "label": "New Course6",
+                                    "value": 31
+                                },
+                                {
+                                    "label": "New Course 5",
+                                    "value": 20
+                                },
+                                {
+                                    "label": "New Course 2",
+                                    "value": 16
+                                },
+                                {
+                                    "label": "New Course3",
+                                    "value": 18
+                                },
+                                {
                                     "label": "New Course",
-                                    "value": "11"
+                                    "value": 11
                                 }
                             ],
                             "required": true
@@ -3278,24 +3290,36 @@
                 "course_complete": {
                     "key": "course_complete",
                     "label": "User completed a course",
-                    "hook": [
-                        "tutor_course_complete_after",
-                        10,
-                        1
-                    ],
+                    "hook": "tutor_course_complete_after",
                     "schema": [
                         {
                             "key": "course_id",
-                            "label": "Course",
+                            "label": "course",
                             "type": "select",
                             "options": [
                                 {
-                                    "label": "Any Course",
+                                    "label": "Any course",
                                     "value": "any"
                                 },
                                 {
+                                    "label": "New Course6",
+                                    "value": 31
+                                },
+                                {
+                                    "label": "New Course 5",
+                                    "value": 20
+                                },
+                                {
+                                    "label": "New Course 2",
+                                    "value": 16
+                                },
+                                {
+                                    "label": "New Course3",
+                                    "value": 18
+                                },
+                                {
                                     "label": "New Course",
-                                    "value": "11"
+                                    "value": 11
                                 }
                             ],
                             "required": true
@@ -3308,11 +3332,7 @@
                 "tutor_quiz_course_attempt": {
                     "key": "tutor_quiz_course_attempt",
                     "label": "User attempted (submitted) a quiz",
-                    "hook": [
-                        "tutor_quiz/attempt_ended",
-                        10,
-                        1
-                    ],
+                    "hook": "tutor_quiz/attempt_ended",
                     "schema": [
                         {
                             "key": "quiz_id",
@@ -3322,6 +3342,10 @@
                                 {
                                     "label": "Any Quiz",
                                     "value": "any"
+                                },
+                                {
+                                    "label": "fsdfas",
+                                    "value": 14
                                 }
                             ],
                             "required": true
@@ -3334,11 +3358,7 @@
                 "lesson_complete": {
                     "key": "lesson_complete",
                     "label": "User completed a lesson",
-                    "hook": [
-                        "tutor_lesson_completed_after",
-                        10,
-                        4
-                    ],
+                    "hook": "tutor_lesson_completed_after",
                     "schema": [
                         {
                             "key": "lesson_id",
@@ -3346,8 +3366,12 @@
                             "type": "select",
                             "options": [
                                 {
-                                    "label": "Any Lesson",
+                                    "label": "Any lesson",
                                     "value": "any"
+                                },
+                                {
+                                    "label": "sfdafasdf",
+                                    "value": 13
                                 }
                             ],
                             "required": true
@@ -3360,11 +3384,7 @@
                 "quiz_target": {
                     "key": "quiz_target",
                     "label": "User achieved target percentage on a quiz",
-                    "hook": [
-                        "tutor_quiz/attempt_ended",
-                        10,
-                        1
-                    ],
+                    "hook": "tutor_quiz/attempt_ended",
                     "schema": [
                         {
                             "key": "quiz_id",
@@ -3374,16 +3394,13 @@
                                 {
                                     "label": "Any Quiz",
                                     "value": "any"
+                                },
+                                {
+                                    "label": "fsdfas",
+                                    "value": 14
                                 }
                             ],
                             "required": true
-                        },
-                        {
-                            "key": "target_percentage",
-                            "label": "Target Percentage",
-                            "type": "number",
-                            "required": false,
-                            "help": "Trigger only if user score is equal or higher than this percentage"
                         }
                     ],
                     "outputs": [
@@ -3421,18 +3438,6 @@
                                 {
                                     "label": "Any Tag",
                                     "value": "any"
-                                },
-                                {
-                                    "value": "3",
-                                    "label": "DB"
-                                },
-                                {
-                                    "value": "2",
-                                    "label": "this"
-                                },
-                                {
-                                    "value": "1",
-                                    "label": "fun"
                                 }
                             ],
                             "required": true
@@ -3455,18 +3460,6 @@
                                 {
                                     "label": "Any Tag",
                                     "value": "any"
-                                },
-                                {
-                                    "value": "3",
-                                    "label": "DB"
-                                },
-                                {
-                                    "value": "2",
-                                    "label": "this"
-                                },
-                                {
-                                    "value": "1",
-                                    "label": "fun"
                                 }
                             ],
                             "required": true
