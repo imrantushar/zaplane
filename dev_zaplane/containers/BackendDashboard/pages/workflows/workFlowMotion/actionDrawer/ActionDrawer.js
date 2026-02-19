@@ -19,7 +19,7 @@ import { __, sprintf } from "@wordpress/i18n";
 import { primaryBtn } from "../../../../../../../assets/scss/chakra/recipe";
 import { useActionDrawer } from "@ZAPHooks/useActionDrawer/useActionDrawer";
 import { TOOLS } from "@ZAPHooks/useActionDrawer/helper";
-import { getActionHook, getIntegration } from "./helper";
+import { getIntegration, getActionHook } from "./helper";
 import TestDetails from "./TestDetails/TestDetails";
 import ActionFieldRenderer from "./ActionFieldRenderer/ActionFieldRenderer";
 import { workFLowSingeNodeExction } from "@ZAPRedux/Slices/workFlowSlice/actions/workflowExctions";
