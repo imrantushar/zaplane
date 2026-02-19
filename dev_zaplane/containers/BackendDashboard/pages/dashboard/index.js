@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { __ } from '@wordpress/i18n';
 import TopBar from '@ZAPComponents/TopBar';
 import ZAPLabel from '@ZAPComponents/Labels/ZAPLabel';
-import { Box, Button, Flex, Text } from '@chakra-ui/react';
+import { Box, Button, Flex, Text, VStack } from '@chakra-ui/react';
 import { outlineBtn } from '../../../../../assets/scss/chakra/recipe';
 import { FiHelpCircle } from 'react-icons/fi';
 import { useDispatch, useSelector } from 'react-redux';
@@ -23,7 +23,7 @@ export default function Dashboard() {
                 leftContent={() => (
                     <ZAPLabel
                         label={__('Dashboard', 'zaplane')}
-                        variant="primary"
+                        variant="bold"
                     />
                 )}
                 rightContent={() => (
@@ -46,8 +46,8 @@ export default function Dashboard() {
                     </Flex>
                 )}
             />
-            <Box className="zaplane-page-content">
-                <Flex>
+            <Box  className="zaplane-page-content">
+                <Flex gap="24px" mb="24px">
                     <Box width="40%">
                         <ExecutedFlows />
                     </Box>
