@@ -1977,21 +1977,19 @@ svg.react-flow__connectionline {
   z-index: 9999;
 }
 .zaplane-popover .components-popover__content {
+  padding: 24px;
   width: 100%;
 }
 .zaplane-popover .zaplane-popover-inner {
   width: 100%;
 }
 .zaplane-popover .zaplane-popover-title {
-  font-size: 13px;
-  font-weight: 600;
-  padding: 10px 12px;
-  border-bottom: 1px solid var(--zaplane-border-color);
-  background: #f6f7f7;
-  color: #1e1e1e;
+  font-size: 20px;
+  padding-bottom: 24px;
+  font-weight: 500;
+  color: var(--zaplane-font-color);
 }
 .zaplane-popover .zaplane-popover-content {
-  padding: 12px;
   font-size: 14px;
   color: var(--zaplane-font-color);
 }
