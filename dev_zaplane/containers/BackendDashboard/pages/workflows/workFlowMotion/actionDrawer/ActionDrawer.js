@@ -126,7 +126,7 @@ export default function ActionDrawer({ open, context, onClose, updateNodeData, c
       // closeOnOverlayClick
       title={!mode ? "Add Action" : selectedItem?.name || __('App', 'zaplane')}
       placement="end"
-      size="md"
+      size={["filter", "condition"].includes(values?.actionType) ? "xl" : "md"}
       footer={
         <HStack justify="space-between">
           <Button variant="ghost" onClick={resetAll}>{__("Cancel", "zaplane")}</Button>

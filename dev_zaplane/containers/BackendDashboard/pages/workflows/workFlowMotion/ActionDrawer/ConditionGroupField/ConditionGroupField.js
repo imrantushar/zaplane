@@ -101,6 +101,7 @@ export default function ConditionGroupField({ value, field, nodeId, workFlow }) 
                                                         <Button
                                                             type="button"
                                                             height="34px"
+                                                            bg={"var(--zaplane-secondary)"} color="var(--zaplane-font-color)"
                                                             onClick={() => ruleHelpers.push({ ...EMPTY_RULE })}
                                                         >
                                                             {__("Add", "zaplane")}
@@ -130,7 +131,8 @@ export default function ConditionGroupField({ value, field, nodeId, workFlow }) 
                             </Box>
                         ))}
 
-                        <Button size="sm" width="140px" onClick={() => groupHelpers.push([{ ...EMPTY_RULE }])}>
+                        <Button bg={"var(--zaplane-secondary)"} color="var(--zaplane-font-color)" size="sm" width="140px" fontWeight="500"
+                         onClick={() => groupHelpers.push([{ ...EMPTY_RULE }])}>
                             {__("OR Group", "zaplane")}
                         </Button>
 

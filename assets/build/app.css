@@ -5,7 +5,7 @@
   --zaplane-font: "Roboto", sans-serif;
   --zaplane-primary: #6C4DFF;
   --zaplane-second-primary: #8F7EE7;
-  --zaplane-secondary: #738496;
+  --zaplane-secondary: #f5f5f5;
   --zaplane-secondary-color: #F6F7F8;
   --zaplane-border-color: #CBD1D7;
   --zaplane-body-background: #F6F7F8;
@@ -1973,7 +1973,7 @@ svg.react-flow__connectionline {
   left: -506px !important;
   position: fixed !important;
   top: 100px;
-  transform: translateX(1414px) translateY(240px) !important;
+  transform: translateX(1005px) translateY(240px) !important;
   z-index: 9999;
 }
 .zaplane-popover .components-popover__content {

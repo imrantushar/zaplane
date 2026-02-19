@@ -4916,7 +4916,7 @@ function ActionDrawer({
     ,
     title: !mode ? "Add Action" : selectedItem?.name || (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_14__.__)('App', 'zaplane'),
     placement: "end",
-    size: "md",
+    size: ["filter", "condition"].includes(values?.actionType) ? "xl" : "md",
     footer: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.HStack, {
       justify: "space-between",
       children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Button, {
@@ -5292,6 +5292,8 @@ function ConditionGroupField({
                   children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Button, {
                     type: "button",
                     height: "34px",
+                    bg: "var(--zaplane-secondary)",
+                    color: "var(--zaplane-font-color)",
                     onClick: () => ruleHelpers.push({
                       ...EMPTY_RULE
                     }),
@@ -5315,8 +5317,11 @@ function ConditionGroupField({
             })
           })]
         }, gIndex)), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Button, {
+          bg: "var(--zaplane-secondary)",
+          color: "var(--zaplane-font-color)",
           size: "sm",
           width: "140px",
+          fontWeight: "500",
           onClick: () => groupHelpers.push([{
             ...EMPTY_RULE
           }]),
