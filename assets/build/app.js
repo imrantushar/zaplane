@@ -2639,22 +2639,22 @@ const ZAPInput = ({
   placeholder,
   value,
   onChange,
-  type = 'text',
+  type = "text",
   containerStyle,
   inputStyle
 }) => {
   const textareaRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
-    if (type === 'textarea' && textareaRef.current) {
+    if (type === "textarea" && textareaRef.current) {
       const el = textareaRef.current;
       const minHeight = 35;
-      el.style.height = minHeight + 'px';
-      if (value && value.length > 0) {
-        el.style.height = el.scrollHeight + 'px';
+      el.style.height = minHeight + "px";
+      if (value) {
+        el.style.height = el.scrollHeight + "px";
       }
     }
   }, [value, type]);
-  const InputComponent = type === 'textarea' ? _chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Textarea : _chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Input;
+  const isTextarea = type === "textarea";
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Flex, {
     as: "label",
     direction: "column",
@@ -2666,18 +2666,28 @@ const ZAPInput = ({
       className: "zaplane-label",
       fontWeight: "600",
       fontSize: "0.875rem",
-      children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_5__.__)(label, 'zaplane')
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(InputComponent, {
-      ref: type === 'textarea' ? textareaRef : null,
-      className: `zaplane-${type === 'textarea' ? 'textarea' : 'input'}`,
-      type: type !== 'textarea' ? type : undefined,
-      placeholder: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_5__.__)(placeholder, 'zaplane'),
+      children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_5__.__)(label, "zaplane")
+    }), isTextarea ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Textarea, {
+      ref: textareaRef,
+      className: "zaplane-textarea",
+      placeholder: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_5__.__)(placeholder, "zaplane"),
       value: value,
       onChange: onChange,
+      resize: "none",
+      overflow: "hidden",
+      ...inputStyle
+    }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Input, {
+      className: "zaplane-input",
+      type: type,
+      placeholder: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_5__.__)(placeholder, "zaplane"),
+      value: value,
+      onChange: onChange,
+      ...(type === "number" && {
+        inputMode: "numeric",
+        pattern: "[0-9]*"
+      }),
       style: {
-        ...inputStyle,
-        overflow: type === 'textarea' ? 'hidden' : undefined,
-        resize: 'none'
+        ...inputStyle
       }
     })]
   });
@@ -5108,6 +5118,8 @@ const ActionFieldRenderer = ({
     case "text":
     case "expression":
     case "number":
+    case "email":
+    case "url":
     case "textarea":
       return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_ZAPComponents_ZAPInput__WEBPACK_IMPORTED_MODULE_0__["default"], {
         ...commonProps,

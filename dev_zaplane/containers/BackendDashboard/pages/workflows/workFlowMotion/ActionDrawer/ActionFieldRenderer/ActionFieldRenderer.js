@@ -25,6 +25,8 @@ const ActionFieldRenderer = ({
     case "text":
     case "expression":
     case "number":
+    case "email":
+    case "url":
     case "textarea":
       return (
         <ZAPInput
