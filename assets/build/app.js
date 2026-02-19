@@ -5436,7 +5436,6 @@ function VariablePopover(props) {
           })
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.AccordionItemContent, {
           children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.AccordionItemBody, {
-            px: "12px",
             py: "10px",
             bg: "var(--zaplane-background)",
             maxH: "200px",
@@ -5444,7 +5443,8 @@ function VariablePopover(props) {
             children: item.variables?.length > 0 ? item.variables.map((v, vi) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
               cursor: "pointer",
               fontSize: "sm",
-              p: "10px 0",
+              p: "8px 15px",
+              className: "zaplane-label",
               _hover: {
                 background: "var(--zaplane-body-background)"
               },
@@ -5459,7 +5459,7 @@ function VariablePopover(props) {
                   setActiveInput
                 });
               },
-              children: [v.key, " : ", v.sample]
+              children: [(0,_helper__WEBPACK_IMPORTED_MODULE_5__.formatVariableKey)(v.key), " : ", v.sample]
             }, vi)) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
               textAlign: "center",
               children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_6__.__)("No fields available", 'zaplane')
@@ -5483,6 +5483,7 @@ function VariablePopover(props) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   buildEmptyRule: () => (/* binding */ buildEmptyRule),
+/* harmony export */   formatVariableKey: () => (/* binding */ formatVariableKey),
 /* harmony export */   insertVariableIntoGroup: () => (/* binding */ insertVariableIntoGroup)
 /* harmony export */ });
 const buildEmptyRule = fields => {
@@ -5527,6 +5528,10 @@ const insertVariableIntoGroup = ({
   // Close popover and reset active input
   setPopoverOpen(false);
   setActiveInput(null);
+};
+const formatVariableKey = key => {
+  if (!key) return "";
+  return key.split(".").pop().replace(/\[\]/g, "").replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
 };
 
 /***/ },
