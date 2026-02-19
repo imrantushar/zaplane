@@ -8,83 +8,63 @@ use Zaplane\Framework\Classes\IntegrationBase;
 class Bricks extends IntegrationBase {
 
     public static function get_slug(): string {
-        return 'bricks_builder';
+        return 'bricks';
     }
 
     public static function get_triggers(): array {
         return [
             'bricks_form_submit' => [
-                'label' => 'Bricks Form Submitted',
-                // OFFICIAL custom action hook from Bricks docs
-                'hook'  => 'bricks/form/custom_action',
+                'label' => 'Bricks Form Submitted', 
+                'hook'  => 'bricks/form/custom_action'
             ],
-        ];
+        ]; 
     }
 
     public static function get_trigger_config_schema( string $trigger ): array {
-
-        $schemas = [
-            'bricks_form_submit' => [
+        if ( in_array( $trigger, ['bricks_form_submit'], true ) ) {
+            return [
                 [
-                    'key'         => 'form_action',
-                    'label'       => 'Form action (optional)',
-                    'type'        => 'text',
-                    'required'    => false,
-                    'placeholder' => 'Action name',
+                    'key'      => 'form_action',
+                    'label'    => 'Form action',
+                    'type'     => 'text',
+                    'required' => true,
                 ],
-            ],
-        ];
-
-        return $schemas[$trigger] ?? [];
+            ];
+        }
+        return [];
     }
 
-    private static function resolve_form_payload( $form, array $extra = [] ) {
-
-        if ( ! is_object($form) ) {
-            return false;
-        }
-
-        $settings = method_exists($form, 'get_settings') ? (array) $form->get_settings() : [];
-        $fields   = method_exists($form, 'get_fields') ? (array) $form->get_fields() : [];
-        $files    = method_exists($form, 'get_uploaded_files') ? (array) $form->get_uploaded_files() : [];
-
-        $form_action = isset($fields['action']) ? (string) $fields['action'] : '';
-        $post_id = isset($fields['postId']) ? (int) $fields['postId'] : 0;
-
-        return array_merge([
-            'form_action'        => $form_action,
-            'post_id'        => $post_id,
-            'referrer'       => $fields['referrer'] ?? '',
-            'form_fields'    => $fields,
-            'form_settings'  => $settings,
-            'uploaded_files' => $files,
-        ], $extra);
+    private static function resolve_form_payload( $form ): array {
+        return [
+            'uploaded_files' => $form->get_uploaded_files(),
+            'form_fields'    => $form->get_fields(),
+            'form_settings'  => $form->get_settings(),
+        ];
     }
 
     public static function resolve_trigger( array $node, array $args ) {
 
-        switch ( $node['event'] ?? '' ) {
+        switch ( $node['event'] ) {
 
             case 'bricks_form_submit':
-
-                // bricks/form/custom_action passes ($form)
                 $form = $args[0] ?? null;
                 if ( ! $form ) return false;
 
-                $payload = self::resolve_form_payload($form);
-                if ( ! $payload ) return false;
+                    $config = $node['data']['config'] ?? [];
+                    $required_action = $config['form_action'] ?? '';
 
-                $config = $node['config'] ?? [];
+                    $settings = $form->get_settings();
+                    $actual_action = $settings['actions']['custom_action'] ?? '';
 
-                $wanted_form_action = isset($config['form_action']) ? trim((string)$config['form_action']) : '';
-
-                if ( $wanted_form_action !== '' && ($payload['form_action'] ?? '') !== $wanted_form_action ) {
-                    return false;
-                }
-
-                return $payload;
+                    if ( $required_action && $required_action !== $actual_action ) {
+                        return false;
+                    }
+                
+                return [
+                    'success' => true,
+                    'form' => self::resolve_form_payload( $form ),
+                ];
         }
-
         return false;
     }
 
@@ -97,9 +77,11 @@ class Bricks extends IntegrationBase {
     }
 
     public static function execute_node( array $node, array $input ): array {
-        return [
-            'port' => 'main',
-            'data' => $input,
-        ];
+
+        $config = $node['data']['config'] ?? [];
+
+        switch ( $node['data']['event'] ?? '' ) {
+        }
+        return ['port'=>'main','data'=>$input];
     }
 }

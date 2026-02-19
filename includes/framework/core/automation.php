@@ -149,8 +149,6 @@ class Automation
         error_log(print_r('events' . $event , true ));
 
         $args = func_get_args();
-        error_log(print_r('args:'. $args , true ));
-
         foreach (Query::get_active_workflows_for_event($event) as $trigger) {
             $integration = $this->container->get('integrations')->get(strtolower($trigger['app']));
             $payload = $integration::resolve_trigger($trigger['graph_node']['data'], $args);

@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-02-05 10:26:45",
+    "generated_at": "2026-02-19 20:19:04",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -2916,6 +2916,31 @@
                 }
             }
         },
+        "bricks": {
+            "slug": "bricks",
+            "name": "Bricks",
+            "icon": "",
+            "category": "app",
+            "triggers": {
+                "bricks_form_submit": {
+                    "key": "bricks_form_submit",
+                    "label": "Bricks Form Submitted",
+                    "hook": "bricks/form/custom_action",
+                    "schema": [
+                        {
+                            "key": "form_action",
+                            "label": "Form action",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": []
+        },
         "slack": {
             "slug": "slack",
             "name": "Slack",
@@ -3054,35 +3079,19 @@
                         "main"
                     ]
                 },
-                "created_product": {
-                    "key": "created_product",
-                    "label": "Created Product",
-                    "hook": "storeengine/product/created",
+                "order_status_update": {
+                    "key": "order_status_update",
+                    "label": "Order Status Updated",
+                    "hook": "storeengine/order/status_changed",
                     "schema": [],
                     "outputs": [
                         "main"
                     ]
                 },
-                "updated_product": {
-                    "key": "updated_product",
-                    "label": "Updated Product",
-                    "hook": "storeengine/product/updated",
-                    "schema": [
-                        {
-                            "key": "product_id",
-                            "label": "ID",
-                            "type": "expression",
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "order_status_update": {
-                    "key": "order_status_update",
-                    "label": "Order Status Updated",
-                    "hook": "storeengine/order/status_changed",
+                "payment_refunded": {
+                    "key": "payment_refunded",
+                    "label": "Payment Refunded",
+                    "hook": "storeengine/subscription/payment_refunded",
                     "schema": [],
                     "outputs": [
                         "main"
@@ -3151,6 +3160,60 @@
                         "main"
                     ]
                 },
+                "payment_complete": {
+                    "key": "payment_complete",
+                    "label": "Completed Payment",
+                    "hook": "storeengine/payment_complete",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "payment_processing": {
+                    "key": "payment_processing",
+                    "label": "Processing Payment",
+                    "hook": "storeengine/payment_processing",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "payment_pending": {
+                    "key": "payment_pending",
+                    "label": "Pending Payment",
+                    "hook": "storeengine/payment_pending",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "payment_confirmed": {
+                    "key": "payment_confirmed",
+                    "label": "Pending Payment",
+                    "hook": "storeengine/payment_confirmed",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "customer_created": {
+                    "key": "customer_created",
+                    "label": "Customer Created",
+                    "hook": "storeengine/checkout/customer_created",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_customer": {
+                    "key": "update_customer",
+                    "label": "Customer Updated",
+                    "hook": "storeengine/stripe/update_customer",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
                 "order_customer_note_added": {
                     "key": "order_customer_note_added",
                     "label": "Customer Note Added to Order",
@@ -3179,65 +3242,7 @@
                     ]
                 }
             },
-            "actions": {
-                "create_product": {
-                    "key": "create_product",
-                    "label": "Create Product",
-                    "schema": [
-                        {
-                            "key": "product_name",
-                            "label": "Product Name",
-                            "type": "text",
-                            "required": true
-                        },
-                        {
-                            "key": "price",
-                            "label": "Price",
-                            "type": "number",
-                            "required": true
-                        },
-                        {
-                            "key": "description",
-                            "label": "Description",
-                            "type": "textarea"
-                        },
-                        {
-                            "key": "status",
-                            "label": "Status",
-                            "type": "select",
-                            "options": [
-                                {
-                                    "label": "Draft",
-                                    "value": "draft"
-                                },
-                                {
-                                    "label": "Publish",
-                                    "value": "publish"
-                                }
-                            ]
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "update_product": {
-                    "key": "update_product",
-                    "label": "Update Product",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "create_order": {
-                    "key": "create_order",
-                    "label": "Create Order",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                }
-            }
+            "actions": []
         }
     },
     "tools": {
