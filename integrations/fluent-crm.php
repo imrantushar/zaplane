@@ -33,18 +33,16 @@ class FluentCrm extends IntegrationBase {
                 'label' => 'Created Contact',
                 'hook' => 'fluentcrm_contact_created',
             ],
-            'contact_status_updated' => [
-                'label' => 'Contact Status Updated',
-                'hook' => 'fluentcrm_subscriber_status_subscribed',
-            ],
-            'updated_custom_fields' => [
-                'label' => 'Updated Custom Fields',
-                'hook' => 'fluentcrm_contact_updated',
-            ],
-            'contact_deleted' => [
-                'label' => 'Deleted Contact',
-                'hook' => 'fluentcrm_contact_deleted',
-            ],
+            // 'contact_status_updated' => [ 
+            //     'label' => 'Contact Status Updated',
+            //     'hook' => [
+            //         'fluentcrm_subscriber_status_to_subscribed',
+            //         'fluentcrm_subscriber_status_to_pending',
+            //         'fluentcrm_subscriber_status_to_unsubscribed',
+            //         'fluentcrm_subscriber_status_to_bounced',
+            //         'fluentcrm_subscriber_status_to_complained',
+            //     ],
+            // ],
             'company_created' => [
                 'label' => 'Company Created',
                 'hook' => 'fluent_crm/company_created',
@@ -56,14 +54,6 @@ class FluentCrm extends IntegrationBase {
             'company_deleted' => [
                 'label' => 'Company Deleted',
                 'hook' => 'fluent_crm/company_deleted',
-            ],
-            'email_opened' => [
-                'label' => 'Email Opened',
-                'hook' => 'fluent_crm/email_opened',
-            ],
-            'email_clicked' => [
-                'label' => 'Email Clicked',
-                'hook' => 'fluent_crm/email_url_clicked',
             ],
         ]; 
     }
@@ -83,13 +73,7 @@ class FluentCrm extends IntegrationBase {
                 }
             }
             return [
-                [
-                    'key'      => 'tag_id',
-                    'label'    => 'Tags',
-                    'type'     => 'select',
-                    'options'  => $options,
-                    'required' => true,
-                ],
+                [ 'key' => 'tag_id', 'label' => 'Tags', 'type' => 'select', 'options' => $options, 'required' => true, ],
             ];
         }
 
@@ -107,60 +91,22 @@ class FluentCrm extends IntegrationBase {
                 }
             }
             return [
-                [
-                    'key'      => 'list_id',
-                    'label'    => 'List',
-                    'type'     => 'select',
-                    'options'  => $options,
-                    'required' => true,
-                ],
+                [ 'key' => 'list_id', 'label' => 'List', 'type' => 'select', 'options' => $options, 'required' => true, ],
             ];
         }
 
-        if ( $trigger === 'contact_status_updated' ) {
-            return [
-                [
-                    'key'      => 'status',
-                    'label'    => 'Status Updated',
-                    'type'     => 'select',
-                    'options'  => [
-                        ['label' => 'Any Status', 'value' => 'any' ],
-                        ['label' => 'Subscribed', 'value' => 'subscribed' ],
-                        ['label' => 'Pending', 'value' => 'pending' ],
-                        ['label' => 'Unsubscribed',   'value' => 'unsubscribed' ],
-                        ['label' => 'Transactional',   'value' => 'transactional' ],
-                        ['label' => 'Bounced',   'value' => 'bounced' ],
-                        ['label' => 'Complained',   'value' => 'complained' ],
-                        ['label' => 'Spammed',   'value' => 'spammed' ],
-                    ],
-                    'required' => true,
-                ],
-            ];
-        }
-
-        if ( in_array( $trigger, ['email_opened', 'email_clicked'], true ) ) {
-            $options = [ 
-                ['label' => 'Any Campaign', 'value' => 'any'],
-            ];
-            if ( class_exists( 'FluentCrm\App\Models\Campaign' ) ) {
-                $campaigns = \FluentCrm\App\Models\Campaign::all();
-                foreach ( $campaigns as $campaign ) {
-                    $options[] = [
-                        'label' => $campaign->title,
-                        'value' => $campaign->id,
-                    ];
-                }
-            }
-            return [
-                [
-                    'key'      => 'campaign_id',
-                    'label'    => 'Campaign',
-                    'type'     => 'select',
-                    'options'  => $options,
-                    'required' => true,
-                ],
-            ];
-        }
+        // if ( $trigger === 'contact_status_updated' ) {
+        //     return [
+        //         [ 'key' => 'status', 'label' => 'Status Updated', 'type'  => 'select', 'options' => [
+        //                 ['label' => 'Any Status', 'value' => 'any' ],
+        //                 ['label' => 'Subscribed', 'value' => 'subscribed' ],
+        //                 ['label' => 'Pending', 'value' => 'pending' ],
+        //                 ['label' => 'Unsubscribed', 'value' => 'unsubscribed' ],
+        //                 ['label' => 'Bounced', 'value' => 'bounced' ],
+        //                 ['label' => 'Complained', 'value' => 'complained' ],
+        //             ], 'required' => true,],
+        //     ];
+        // }
 
         return [];
     }
@@ -242,130 +188,51 @@ class FluentCrm extends IntegrationBase {
                 $contact = $args[0] ?? null;
                 $tag_ids = $args[1] ?? [];
                 if ( ! $contact || empty( $tag_ids) ) return false;
-                $contact_data = self::resolve_contact_payload( $contact );
                 $tags = [];
                 if ( ! empty( $contact->tags ) ) {
                     foreach ( $contact->tags as $tag ) {
-                        $tags[] = [
-                            'id'   => $tag->id,
-                            'name' => $tag->name ?? $tag->title ?? '',
-                            'slug' => $tag->slug ?? '',
-                        ];
+                        $tags[] = array_merge( self::resolve_tag_payload( $tag ), ['pivot' => self::resolve_pivot_payload( $tag )],);
                     }
                 }
-                return [
-                    'success'    => true,
-                    'contact'    => $contact_data,
-                    'object_ids' => $tag_ids,
-                    'tags'       => $tags,
-                ];
+                return [ 'success' => true, 'contact' => $tag_ids, ];
 
             case 'added_list':
             case 'removed_list':
-                $contact = $args[0] ?? null;
+                $contact  = $args[0] ?? null;
                 $list_ids = $args[1] ?? [];
                 if ( ! $contact || empty( $list_ids) ) return false;
-                $contact_data = self::resolve_contact_payload( $contact );
                 $lists = [];
                 if ( ! empty( $contact->lists ) ) {
                     foreach ( $contact->lists as $list ) {
-                        $lists[] = [
-                            'id'   => $list->id,
-                            'name' => $list->name ?? $list->title ?? '',
-                            'slug' => $list->slug ?? '',
-                        ];
+                        $lists[] = self::resolve_list_payload($list);
                     }
                 }
-                return [
-                    'success'  => true,
-                    'contact'  => $contact_data,
-                    'list_ids' => $list_ids,
-                    'lists'     => $lists,
-                ];
+                return [ 'success' => true, 'contact' => $list_ids, ];
 
             case 'created_contact':
-            case 'contact_deleted':
                 $contact = $args[0] ?? null;
                 if ( ! $contact ) return false;
-                return [
-                    'success' => true,
-                    'contact' => self::resolve_contact_payload( $contact ),
-                ];
+                return [ 'success' => true, 'contact' => self::resolve_contact_payload( $contact ), ];
 
-            case 'contact_status_updated':
-                $contact    = $args[0] ?? null;
-                $old_status = $args[1] ?? '';
-                $new_status = $args[2] ?? '';
-                if ( ! $contact || ! $new_status ) return false;
-                return [
-                    'success'    => true,
-                    'contact'    => self::resolve_contact_payload( $contact ),
-                    'old_status' => $old_status,
-                    'new_status' => $new_status,
-                ];
-
-            case 'updated_custom_fields':
-                $contact  = $args[0] ?? null;
-                $new_data = $args[1] ?? [];
-                if ( ! $contact ) return false;
-                $new_field = $new_data['custom_fields'] ?? [];
-                return [
-                    'success'  => true,
-                    'contact'  => self::resolve_contact_payload( $contact ),
-                    'custom_fields' => $new_field,
-                ];
+            // case 'contact_status_updated':
+            //     $contact    = $args[0] ?? null;
+            //     $old_status = $args[1] ?? '';
+            //     $new_status = $args[2] ?? '';
+            //     if ( ! $contact || ! $new_status ) return false;
+            //     return [ 'success' => true, 'contact' => self::resolve_contact_payload( $contact ), 'old_status' => $old_status, 'new_status' => $new_status, ];
 
             case 'company_created':
             case 'company_deleted':
-                $company    = $args[0] ?? null;
+                $company = $args[0] ?? null;
                 if ( ! $company ) return false;
-                return [
-                    'success' => true,
-                    'company' => self::resolve_company_payload( $company ),
-                ];
+                return [ 'success' => true,'company' => self::resolve_company_payload( $company ), ];
 
             case 'company_updated':
                 $company    = $args[0] ?? null;
                 $old_status = $args[1] ?? [];
                 $new_status = $args[2] ?? [];
                 if ( ! $company ) return false;
-                return [
-                    'success'    => true,
-                    'company'    => self::resolve_company_payload( $company ),
-                    'old_status' => $old_status,
-                    'new_status' => $new_status,
-                ];
-
-            case 'email_opened':
-                $contact  = $args[0] ?? null;
-                $campaign = $args[1] ?? null;
-                if ( ! $contact ) return false;
-                return [
-                    'success'  => true,
-                    'contact'  => self::resolve_contact_payload( $contact ),
-                    'campaign' => [
-                        'id'    => $campaign->id ?? 0,
-                        'title' => $campaign->title ?? '',
-                    ],
-                ];
-
-            case 'email_clicked':
-                $contact  = $args[0] ?? null;
-                $campaign = $args[1] ?? null;
-                $link     = $args[2] ?? null;
-                if ( ! $contact ) return false;
-                return [
-                    'success'  => true,
-                    'contact'  => self::resolve_contact_payload( $contact ),
-                    'campaign' => [
-                        'id'    => $campaign->id ?? 0,
-                        'title' => $campaign->title ?? '',
-                    ],
-                    'link' => [
-                        'url'   => $link['url'] ?? '',
-                        'title' => $link['title'] ?? '',
-                    ],
-                ];
+                return ['success' => true, 'company' => self::resolve_company_payload( $company ), 'old_status' => $old_status, 'new_status' => $new_status, ];
         }
         return false;
     }
@@ -453,54 +320,6 @@ class FluentCrm extends IntegrationBase {
         }
         return $options;
     }
-    
-    private static function options_field() {
-        return [
-            ['label' => 'Prefix',          'value' => 'prefix'],
-            ['label' => 'First Name',      'value' => 'first_name'],
-            ['label' => 'Last Name',       'value' => 'last_name'],
-            ['label' => 'Full Name',       'value' => 'full_name'],
-            ['label' => 'Email',           'value' => 'email'],
-            ['label' => 'Timezone',        'value' => 'timezone'],
-            ['label' => 'Address Line 1',  'value' => 'address_line_1'],
-            ['label' => 'Address Line 2',  'value' => 'address_line_2'],
-            ['label' => 'City',            'value' => 'city'],
-            ['label' => 'State',           'value' => 'state'],
-            ['label' => 'Postal Code',     'value' => 'postal_code'],
-            ['label' => 'Country',         'value' => 'country'],
-            ['label' => 'IP',              'value' => 'ip'],
-            ['label' => 'Phone',           'value' => 'phone'],
-            ['label' => 'Source',          'value' => 'source'],
-            ['label' => 'Date of Birth',   'value' => 'date_of_birth'],
-            ['label' => 'Status',          'value' => 'status'],
-        ];
-    }
-
-    private static function company_field() {
-        return [
-            ['label' => 'Company Name',          'value' => 'name'],
-            ['label' => 'Owner Name',            'value' => 'owner_name'],
-            ['label' => 'Owner Email',           'value' => 'owner_email'],
-            ['label' => 'Company Email',         'value' => 'email'],
-            ['label' => 'Company Phone Number',  'value' => 'phone'],
-            ['label' => 'Company Logo',          'value' => 'Company_logo'],
-            ['label' => 'Industry',              'value' => 'industry'],
-            ['label' => 'Type',                  'value' => 'type'],
-            ['label' => 'Company Owner',         'value' => 'owner_id'],
-            ['label' => 'Description',           'value' => 'description'],
-            ['label' => 'Number of Employees',   'value' => 'employees_number'],
-            ['label' => 'Address Line 1',        'value' => 'address_line_1'],
-            ['label' => 'Address Line 2',        'value' => 'address_line_2'],
-            ['label' => 'City',                  'value' => 'city'],
-            ['label' => 'State',                 'value' => 'state'],
-            ['label' => 'Postal Code',           'value' => 'postal_code'],
-            ['label' => 'Country',               'value' => 'country'],
-            ['label' => 'LinkedIn URL',          'value' => 'linkedin_url'],
-            ['label' => 'Facebook Page URL',     'value' => 'facebook_url'],
-            ['label' => 'Twitter URL',           'value' => 'twitter_url'],
-            ['label' => 'Website',               'value' => 'website'],
-        ];
-    }
 
     private static function contact_id(): array {
         return [['key'=>'contact_id', 'label'=>'Contact ID', 'type'=>'expression', 'required'=>true]];
@@ -534,6 +353,10 @@ class FluentCrm extends IntegrationBase {
         return [['key'=>'lists','label'=>'Lists','type'=>'select','options'=>self::get_lists(), 'required'=>true, 'multiple' => true]];
     }
 
+    private static function contact_email(): array {
+        return [['key'=>'email', 'label'=>'Email Address', 'type'=>'expression', 'required'=>true,],];
+    }
+
     private static function select_company(): array {
         return [['key'=>'company','label'=>'company','type'=>'select','options'=>self::get_company(), 'required'=>true, 'multiple' => true]];
     }
@@ -541,45 +364,45 @@ class FluentCrm extends IntegrationBase {
         return [['key'=>'description', 'label'=>'Description', 'type'=>'text', 'required'=>false]];
     }
 
-    private static function custom_field_map(): array {
-        return [['key' => 'custom_field_map','label' => 'Custom Field Map','type' => 'repeater','button_label' => 'Add Custom Field','fields' => [
-                    ['key' => 'field', 'label' => 'Field', 'type' => 'text'],
-                    ['key' => 'value', 'label' => 'Value', 'type' => 'text']
-                    ]
-                ]];
+    private static function contact_status(): array {
+        return [['key'=>'status', 'label'=>'Status', 'type'=>'select','options'  => [
+                    ['label' => 'Subscribed', 'value' => 'subscribed' ],
+                    ['label' => 'Pending', 'value' => 'pending' ],
+                    ['label' => 'Unsubscribed', 'value' => 'unsubscribed' ],
+                    ['label' => 'Transactional', 'value' => 'transactional' ],
+                    ['label' => 'Bounced', 'value' => 'bounced' ],
+                    ['label' => 'Complained', 'value' => 'complained' ],
+                    ['label' => 'Spammed', 'value' => 'spammed' ],
+                    ],
+                'required'=>true]];
     }
     
     public static function get_action_config_schema( string $action ): array {
 
         $schemas = [
-            'created_contact' => [
+            'created_contact' => [                
+                ['key'=>'prefix','label'=>'Prefix','type'=>'text'],
+                ['key'=>'first_name','label'=>'First Name','type'=>'text'],
+                ['key'=>'last_name','label'=>'Last Name','type'=>'text'],
+                ...self::contact_email(),
+                ['key'=>'phone','label'=>'Phone','type'=>'number'],
+                ['key'=>'date_of_birth','label'=>'Date of Birth','type'=>'date'],
+                ['key'=>'address_line_1','label'=>'Address Line 1','type'=>'text'],
+                ['key'=>'address_line_2','label'=>'Address Line 2','type'=>'text'],
+                ['key'=>'city','label'=>'City','type'=>'text'],
+                ['key'=>'state','label'=>'State','type'=>'text'],
+                ['key'=>'country','label'=>'Country','type'=>'text'],
+                ['key'=>'postal_code','label'=>'Postal Code','type'=>'number'],
                 ...self::select_list(),
                 ...self::select_tag(),
-                ['key'=>'primary_company','label'=>'Primary Company','type'=>'select','options'=>self::get_company()],
-                ['key' => 'field_map','label' => 'Field Map','type' => 'repeater','button_label' => 'Add Field','fields' => [
-                    ['key' => 'field', 'label' => 'Field', 'type' => 'select','options'=> self::options_field()],
-                    ['key' => 'value', 'label' => 'Value', 'type' => 'text'],
-                ]],
-                ...self::custom_field_map(),       
+                ...self::select_company(),
+                ...self::contact_status(),                
             ],
             'get_contact_id' =>  self::contact_id(),
-            'get_contact_email' => [
-                ['key'=>'email', 'label'=>'Email Address', 'type'=>'expression', 'required'=>true,],
-            ],
+            'get_contact_email' => self::contact_email(),
             'get_contact_by_tags' => self::tag_id(),
             'get_contact_by_lists' => self::list_id(),
-            'get_contact_by_status' => [
-                ['key'=>'status', 'label'=>'Contact Status', 'type'=>'select','options'  => [
-                        ['label' => 'Subscribed', 'value' => 'subscribed' ],
-                        ['label' => 'Pending', 'value' => 'pending' ],
-                        ['label' => 'Unsubscribed', 'value' => 'unsubscribed' ],
-                        ['label' => 'Transactional', 'value' => 'transactional' ],
-                        ['label' => 'Bounced', 'value' => 'bounced' ],
-                        ['label' => 'Complained', 'value' => 'complained' ],
-                        ['label' => 'Spammed', 'value' => 'spammed' ],
-                    ],
-                'required'=>true,],
-            ],
+            'get_contact_by_status' => self::contact_status(), 
             'delete_contact' => self::contact_id(),
             'created_tag' => [
                 ...self::contact_title(),
@@ -611,11 +434,24 @@ class FluentCrm extends IntegrationBase {
             'delete_list' => self::list_id(),
             'get_company_id' => self::company_id(),
             'created_company' => [
-                ['key' => 'field_map','label' => 'Field Map','type' => 'repeater','button_label' => 'Add Field','fields' => [
-                    ['key' => 'field', 'label' => 'Field', 'type' => 'select','options'=> self::company_field()],
-                    ['key' => 'value', 'label' => 'Value', 'type' => 'text'],
-                ]],
-                ...self::custom_field_map(),      
+                ['key'=>'company_name','label'=>'Company Name','type'=>'text'],
+                ['key'=>'description','label'=>'Description','type'=>'textarea'],
+                ...self::contact_email(),
+                ['key'=>'phone','label'=>'Phone','type'=>'number'],
+                ['key'=>'address_line_1','label'=>'Address Line 1','type'=>'text'],
+                ['key'=>'address_line_2','label'=>'Address Line 2','type'=>'text'],
+                ['key'=>'city','label'=>'City','type'=>'text'],
+                ['key'=>'state','label'=>'State','type'=>'text'],
+                ['key'=>'country','label'=>'Country','type'=>'text'],
+                ['key'=>'postal_code','label'=>'Postal Code','type'=>'number'],
+                ['key'=>'company_type','label'=>'Company Type','type'=>'text'],
+                ['key'=>'company_owner_id','label'=>'Company Owner ID','type'=>'expression'],
+                ['key'=>'company_employee_count','label'=>'Company Employee Count','type'=>'number'],
+                ['key'=>'company_industry','label'=>'Company Industry','type'=>'text'],
+                ['key'=>'company_website','label'=>'Company Website','type'=>'url'],
+                ['key'=>'company_linkedin_url','label'=>'Company LinkedIn URL','type'=>'url'],
+                ['key'=>'company_facebook_url','label'=>'Company Facebook URL','type'=>'url'],
+                ['key'=>'company_twitter_url','label'=>'Company Twitter URL','type'=>'url'],       
             ],
             'add_company_to_contact' => [
                 ...self::contact_id(),
@@ -630,10 +466,10 @@ class FluentCrm extends IntegrationBase {
             'create_campaign' => self::contact_title(),
             'delete_campaign' => self::campaign_id(),
             'add_event_tracking' => [
-                ['key'=>'email', 'label'=>'Contact Email', 'type'=>'email', 'required'=>true,],
+                ...self::contact_email(),
                 ['key'=>'event_key', 'label'=>'Event Tracking Key', 'type'=>'text', 'required'=>true,],
-                ['key'=>'event_title', 'label'=>'Event Tracking Title', 'type'=>'text', 'required'=>true,],
-                ['key'=>'event_value', 'label'=>'Event Value', 'type'=>'text', 'required'=>false,],
+                ...self::contact_title(),
+                ['key'=>'value', 'label'=>'Event Value', 'type'=>'text', 'required'=>false,],
                 ['key'=>'provider', 'label'=>'Provider', 'type'=>'text', 'required'=>false,],
             ],
             'add_note' => [
@@ -730,47 +566,68 @@ class FluentCrm extends IntegrationBase {
         switch ( $node['data']['event'] ?? '' ) {
 
             case 'created_contact':
-                $field_map        = $config['field_map'] ?? [];
-                $custom_field_map = $config['custom_field_map'] ?? [];
-                $primary_company = $config['primary_company'] ?? null;
-                $lists            = $config['lists'] ?? [];
-                $tags             = $config['tags'] ?? [];
-                $data             = [];
-                $email            = '';
-                
-                foreach ( $field_map as $row ) {
-                    if ( empty( $row['field'] ) ) continue;
-                    $data[ $row['field'] ] = $row['value'] ?? '';
-                    if ( $row['field'] === 'email' ) {
-                        $email = $row['value'];
+                $email  = sanitize_email( $config[ 'email' ] ?? '' );
+                $status = sanitize_text_field( $config[ 'status' ] ?? '' );
+                if ( ! is_email( $email ) ) {
+                    return ['port' => 'main','data' => ['success' => false,'message' => 'Valid Email is required'],];
+                }
+                if ( ! class_exists( '\FluentCrm\App\Models\Subscriber' )) {
+                    return ['port' => 'main','data' => ['success' => false,'message' => 'FluentCRM Not Installed'],];
+                }
+                $data = [
+                    'email'           => $email,
+                    'status'          => $status,
+                    'prefix'          => sanitize_text_field( $config[ 'prefix' ] ?? '' ),
+                    'first_name'      => sanitize_text_field( $config[ 'first_name' ] ?? '' ),
+                    'last_name'       => sanitize_text_field( $config[ 'last_name' ] ?? '' ),
+                    'phone'           => sanitize_text_field( $config[ 'phone' ] ?? '' ),
+                    'date_of_birth'   => sanitize_text_field( $config[ 'date_of_birth' ] ?? '' ),
+                    'address_line_1'  => sanitize_text_field( $config[ 'address_line_1' ] ?? '' ),
+                    'address_line_2'  => sanitize_text_field( $config[ 'address_line_2' ] ?? '' ),
+                    'city'            => sanitize_text_field( $config[ 'city' ] ?? '' ),
+                    'state'           => sanitize_text_field( $config[ 'state' ] ?? '' ),
+                    'country'         => sanitize_text_field( $config[ 'country' ] ?? '' ),
+                    'postal_code'     => sanitize_text_field( $config[ 'postal_code' ] ?? '' ),
+                ];
+                $subscriberModel = new \FluentCrm\App\Models\Subscriber();
+                $contact = $subscriberModel->where('email', $email)->first();
+                if  ($contact ) {
+                    $contact->fill( array_filter( $data ) );
+                    $contact->save();
+                } else {
+                    $contact = $subscriberModel->create( array_filter( $data ) );
+                }
+                if ( ! $contact ) {
+                    return ['port' => 'main','data' => ['success' => false,'message' => 'Contact Create/Update Failed'],];
+                }
+                $contact = \FluentCrm\App\Models\Subscriber::find( $contact->id );
+                $custom_fields = [
+                    'date_of_birth',
+                    'address_line_1',
+                    'address_line_2',
+                    'city',
+                    'state',
+                    'country',
+                    'postal_code'
+                ];
+                foreach ( $custom_fields as $field ) {
+                    if ( ! empty( $config[ $field ] ) ) {
+                        $contact->updateMeta( $field, sanitize_text_field( $config[ $field ] ), false );
                     }
                 }
-                if ( ! $email ) {
-                    return ['port'=>'main','data'=>['success' => false, 'message' => 'Email is required',],];
+                if ( ! empty( $config[ 'lists' ] ) && $config[ 'lists' ] !== 'any' ) {
+                    $contact->attachLists( (array) $config[ 'lists' ] );
                 }
-                if ( ! class_exists('\FluentCrm\App\Models\Subscriber') ) {
-                    return ['port'=>'main','data'=>['success' => false, 'message' => 'FluentCRM Not Found',],];
+                if ( ! empty( $config[ 'tags' ]) && $config[ 'tags' ] !== 'any' ) {
+                    $contact->attachTags( (array) $config[ 'tags' ] );
                 }
-                $contact = \FluentCrm\App\Models\Subscriber::updateOrCreate(['email' => $email], $data );
-                if ( ! $contact ) {
-                    return ['port'=>'main','data'=>['success' => false, 'message' => 'Contact Create/Update Failed',], ];
-                }
-                if ( ! empty( $lists ) && $lists !== 'any' ) {
-                    $contact->attachLists( (array) $lists );
-                }
-                if ( ! empty( $tags ) && $tags !== 'any' ) {
-                    $contact->attachTags( (array) $tags );
-                }
-                foreach ( $custom_field_map as $row ) {
-                    if ( empty( $row['field'] ) ) continue;
-                    $contact->updateCustomField( $row['field'], $row['value'] ?? '' );
-                }
-                if ( $primary_company ) {
-                    $contact->attachCompanies([ (int) $primary_company ]);
-                    $contact->company_id = (int) $primary_company;
+                if ( ! empty( $config[ 'company_id' ] ) ) {
+                    $company_id = (int) $config[ 'company_id' ];
+                    $contact->attachCompanies( [ $company_id ] );
+                    $contact->company_id = $company_id;
                     $contact->save();
                 }
-                return ['port'=>'main','data'=>['success' => true, 'contact' => self::resolve_contact_payload( $contact ), ], ];
+                return ['port' => 'main','data' => ['success' => true,'contact' => self::resolve_contact_payload( $contact ) ],];
 
             case 'get_contact_all':
                 if ( ! class_exists( '\FluentCrm\App\Models\Subscriber' ) ) {
@@ -779,7 +636,7 @@ class FluentCrm extends IntegrationBase {
                 $subscriber = \FluentCrm\App\Models\Subscriber::all();
                 $contacts   = [];
                 foreach ( $subscriber as $sub ) {
-                    $contacts[] = self::resolve_contact_payload($sub);
+                    $contacts[] = self::resolve_contact_payload( $sub );
                 }
                 return ['port'=>'main','data'=>['success' => true, 'contacts' => $contacts ], ];
 
@@ -874,18 +731,19 @@ class FluentCrm extends IntegrationBase {
                 return ['port' => 'main','data' => ['success' => true,'status' => $status, 'count' => count($contacts),'contacts'=> $contacts,],];
                  
             case 'delete_contact':
-                 $contact_id = $config['contact_id'] ?? 0;
+                $contact_id = $config['contact_id'] ?? 0;
                 if ( ! $contact_id ) {
                     return ['port'=>'main','data'=>['success' => false, 'message' => 'Contact ID is required',],];
                 }
                 if ( ! class_exists( '\FluentCrm\App\Models\Subscriber' ) ) {
-                    $subscriber = \FluentCrm\App\Models\Subscriber::find( $contact_id );
-                    if ( $subscriber ) {
-                        $subscriber->delete();
-                        return ['port'=>'main','data'=>['success' => false, 'message' => 'Contact deleted successfully',],];
-                    }
+                    return ['port'=>'main','data'=>['success' => false, 'message' => 'FluentCRM Class Not Found',],];
                 }
-                return ['port'=>'main','data'=>['success' => false, 'message' => 'Contact not found',],];
+                $subscriber = \FluentCrm\App\Models\Subscriber::find( $contact_id );
+                if ( ! $subscriber ) {
+                    return ['port'=>'main','data'=>['success' => false, 'message' => 'Contact not found',],];
+                }
+                $subscriber->delete();
+                    return ['port'=>'main','data'=>['success' => true, 'message' => 'Contact deleted successfully',],];
 
             case 'get_tag_all':
                 if ( ! class_exists( '\FluentCrm\App\Models\Tag' ) ) {
@@ -947,7 +805,7 @@ class FluentCrm extends IntegrationBase {
             
             case 'remove_tag_from_contact':
                 $contact_id = $config['contact_id'] ?? 0;
-                $tags       = array_map('intval', (array) ($config['tags'] ?? []));
+                $tags       = array_map('intval', (array) ($config['tags'] ?? ''));
 
                 if ( ! $contact_id )  {
                     return ['port'=>'main','data'=>['success' => false, 'message' => 'Contact ID is required',],];
@@ -976,13 +834,14 @@ class FluentCrm extends IntegrationBase {
                     return ['port'=>'main','data'=>['success' => false, 'message' => 'Tag ID is required',],];
                 }
                 if ( ! class_exists( '\FluentCrm\App\Models\Tag' ) ) {
-                    $tag = \FluentCrm\App\Models\Tag::find( $tag_id );
-                    if ( $tag ) {
-                        $tag->delete();
-                        return ['port'=>'main','data'=>['success' => false, 'message' => 'Tag deleted successfully',],];
-                    }
+                    return ['port'=>'main','data'=>['success' => false, 'message' => 'FluentCRM Class Not Found',],];
                 }
-                return ['port'=>'main','data'=>['success' => false, 'message' => 'Tag not found',],];
+                $tag = \FluentCrm\App\Models\Tag::find( $tag_id );
+                if ( ! $tag ) {
+                    return ['port'=>'main','data'=>['success' => false, 'message' => 'Tag not found',],];
+                }
+                $tag->delete();
+                return ['port'=>'main','data'=>['success' => true, 'message' => 'Tag deleted successfully',],];
 
             case 'get_list_all':
                 if ( ! class_exists( '\FluentCrm\App\Models\Lists' ) ) {
@@ -1020,7 +879,7 @@ class FluentCrm extends IntegrationBase {
 
             case 'add_list_to_contact':
                 $contact_id = $config['contact_id'] ?? 0;
-                $lists      = $config['lists'] ?? [];
+                $lists      = $config['lists'] ?? '';
                 if ( ! $contact_id )  {
                     return ['port'=>'main','data'=>['success' => false, 'message' => 'Contact ID is required',],];
                 }
@@ -1044,7 +903,7 @@ class FluentCrm extends IntegrationBase {
             
             case 'remove_list_from_contact':
                 $contact_id = $config['contact_id'] ?? 0;
-                $lists      = array_map('intval', (array) ($config['lists'] ?? []));
+                $lists      = array_map('intval', (array) ($config['lists'] ?? ''));
 
                 if ( ! $contact_id )  {
                     return ['port'=>'main','data'=>['success' => false, 'message' => 'Contact ID is required',],];
@@ -1073,13 +932,14 @@ class FluentCrm extends IntegrationBase {
                     return ['port'=>'main','data'=>['success' => false, 'message' => 'List ID is required',],];
                 }
                 if ( ! class_exists( '\FluentCrm\App\Models\Lists' ) ) {
-                    $list = \FluentCrm\App\Models\Lists::find( $list_id );
-                    if ( $list ) {
-                        $list->delete();
-                        return ['port'=>'main','data'=>['success' => false, 'message' => 'List deleted successfully',],];
-                    }
+                    return ['port'=>'main','data'=>['success' => false, 'message' => 'FluentCRM Class Not Found',],];
                 }
-                return ['port'=>'main','data'=>['success' => false, 'message' => 'List not found',],];
+                $list = \FluentCrm\App\Models\Lists::find( $list_id );
+                if ( ! $list ) {
+                    return ['port'=>'main','data'=>['success' => false, 'message' => 'List not found',],];
+                }
+                $list->delete();
+                return ['port'=>'main','data'=>['success' => true, 'message' => 'List deleted successfully',],];
 
             case 'get_company_all':
                 if ( ! class_exists( '\FluentCrm\App\Models\Company' ) ) {
@@ -1110,70 +970,83 @@ class FluentCrm extends IntegrationBase {
                 return ['port' => 'main','data' => ['success' => true,'company' => self::resolve_company_payload( $company ),],];
             
             case 'created_company':
-                $field_map        = $config['field_map'] ?? [];
-                $custom_field_map = $config['custom_field_map'] ?? [];
-                if ( empty( $field_map ) )  {
-                    return ['port'=>'main','data'=>['success' => false, 'message' => 'Field Map is required',],];
-                }
                 if ( ! class_exists( '\FluentCrm\App\Models\Company' ) ) {
-                    return ['port'=>'main','data'=>['success' => false, 'message' => 'FluentCRM Company Not Found',],];
+                    return ['port' => 'main', 'data' => [ 'success' => false, 'message' => 'FluentCRM Company Model Not Found']];
                 }
-                $field_data = [];
-                foreach ( $field_map as $row ) {
-                    if ( empty( $row['field'] ) ) continue;
-                    $field_data[ $row['field'] ] = $row['value'] ?? null;
+                $data = [
+                    'name'            => sanitize_text_field( $config[ 'company_name' ] ?? '' ),
+                    'description'     => sanitize_textarea_field( $config[ 'description' ] ?? '' ),
+                    'email'           => sanitize_email( $config[ 'email' ] ?? ''),
+                    'phone'           => sanitize_text_field( $config[ 'phone'] ?? ''),
+                    'address_line_1'  => sanitize_text_field( $config[ 'address_line_1' ] ?? '' ),
+                    'address_line_2'  => sanitize_text_field( $config[ 'address_line_2' ] ?? '' ),
+                    'city'            => sanitize_text_field( $config[ 'city' ] ?? '' ),
+                    'state'           => sanitize_text_field( $config[ 'state' ] ?? '' ),
+                    'country'         => sanitize_text_field( $config[ 'country' ] ?? '' ),
+                    'postal_code'     => sanitize_text_field( $config[ 'postal_code' ] ?? '' ),
+                    'type'            => sanitize_text_field( $config[ 'company_type' ] ?? '' ),
+                    'owner_id'        => intval( $config[ 'company_owner_id' ] ?? 0 ),
+                    'employee_count'  => intval( $config[ 'company_employee_count' ] ?? 0 ),
+                    'industry'        => sanitize_text_field( $config[ 'company_industry' ] ?? '' ),
+                    'website'         => esc_url_raw( $config[ 'company_website' ] ?? '' ),
+                    'linkedin_url'    => esc_url_raw( $config[ 'company_linkedin_url' ] ?? '' ),
+                    'facebook_url'    => esc_url_raw( $config[ 'company_facebook_url' ] ?? '' ),
+                    'twitter_url'     => esc_url_raw( $config[ 'company_twitter_url' ] ?? '' ),
+                ];
+                if ( empty( $data[ 'name' ] ) ) {
+                    return ['port' => 'main','data' => ['success' => false,'message' => 'Company Name is required']];
                 }
-                if ( empty( $field_data['name'] ) )  {
-                    return ['port'=>'main','data'=>['success' => false, 'message' => 'Company Name is required',],];
-                }
-                $company = new \FluentCrm\App\Models\Company();
-                foreach ( $field_data as $key => $value ) {
-                    $company->{ $key } = $value;
-                }
-                $company->save();
-                $meta = $company->meta ?? ['custom_values' => []];
-                foreach ( $custom_field_map as $row ) {
-                    if ( empty( $row['field'] ) ) continue;
-                    $meta['custom_values'][ $row['field'] ] = $row['value'] ?? '';
-                }
-                $company->meta = $meta;
-                $company->save();
-                return ['port'=>'main','data'=>['success' => true, 'company' => self::resolve_company_payload( $company ), ], ];
+                $companyModel = new \FluentCrm\App\Models\Company();
+                $company = $companyModel->create( array_filter( $data ) );
+                return ['port' => 'main','data' => ['success' => true,'company' => self::resolve_company_payload( $company )]];
 
             case 'add_company_to_contact':
-                $contact_id = $config['contact_id'] ?? 0;
+                $contact_id = intval( $config['contact_id'] ?? 0 );
                 $companies  = $config['company'] ?? [];
+
                 if ( ! $contact_id )  {
                     return ['port'=>'main','data'=>['success' => false, 'message' => 'Contact ID is required',],];
                 }
+                if ( ! is_array( $companies ) ) {
+                    if ( is_string( $companies ) ) {
+                        $companies = array_map( 'intval', explode( ',', $companies ) );
+                    } else {
+                        $companies = [ (int) $companies ];
+                    }
+                }
+                $companies = array_filter( $companies );
                 if ( empty( $companies ) ) {
-                    return ['port'=>'main','data'=>['success' => false, 'message' => 'Company is required',],];
+                    return ['port'=>'main','data'=>['success' => false, 'message' => 'Companies is required',],];
                 }
-                if ( ! class_exists( '\FluentCrm\App\Models\Subscriber' ) ) {
-                    return ['port'=>'main','data'=>['success' => false, 'message' => 'FluentCRM Subscriber Not Found',],];
+                if ( ! class_exists( '\FluentCrm\App\Models\Subscriber' ) || ! class_exists( '\FluentCrm\App\Models\Company' ) ) {
+                    return ['port'=>'main','data'=>['success' => false, 'message' => 'FluentCRM Model Not Found',],];
                 }
-                $contact = \FluentCrm\App\Models\Subscriber::with('companies')->find( $contact_id );
+                $contact = \FluentCrm\App\Models\Subscriber::find( $contact_id );
                 if ( ! $contact )  {
                     return ['port'=>'main','data'=>['success' => false, 'message' => 'Contact not found',],];
                 }
-                $company_payload = [];
-                $set_primary = empty( $contact->company_id );
+                $valid_company_ids = [];
                 foreach ( $companies as $company_id ) {
-                    $company = \FluentCrm\App\Models\Company::find( $company_id );
-                    if ( ! $company ) continue;
-                    $contact->attachCompanies([$company_id]);
-                    if ( $set_primary ) {
-                        $contact->company_id = $company_id;
-                        $set_primary = false;
+                    $company = \FluentCrm\App\Models\Company::find( intval( $company_id ) );
+                    if ( $company ) {
+                        $valid_company_ids[] = $company->id;
                     }
-                    $company_payload[] = array_merge(
-                        self::resolve_company_payload( $company ),
-                        ['pivot' => self::resolve_pivot_payload( $company )]
-                    );
                 }
-                $contact->save();
-
-                $contact = \FluentCrm\App\Models\Subscriber::with('companies')->find( $contact_id );
+                if ( empty( $valid_company_ids ) ) {
+                    return ['port'=>'main','data'=>['success' => false, 'message' => 'Companies not valid',],];
+                }
+                $contact->attachCompanies( $valid_company_ids );
+                $contact = $contact->fresh( [ 'companies' ] );
+                $company_payload = [];
+                foreach ( $contact->companies as $company ) {
+                    if ( in_array( $company->id, $valid_company_ids ) ) {
+                        $company_payload[]   = self::resolve_company_payload( $company );
+                    }
+                }
+                if ( ! $contact->company_id ) {
+                    $contact->company_id = $valid_company_ids[0];
+                    $contact->save();
+                }
                 return ['port' => 'main','data' => ['success' => true,'status' => $contact->status,'contact' => self::resolve_contact_payload( $contact ),'companies' => $company_payload,],];
             
             case 'remove_company_from_contact':
@@ -1211,13 +1084,14 @@ class FluentCrm extends IntegrationBase {
                     return ['port'=>'main','data'=>['success' => false, 'message' => 'Company ID is required',],];
                 }
                 if ( ! class_exists( '\FluentCrm\App\Models\Company' ) ) {
-                    $company = \FluentCrm\App\Models\Company::find( $company_id );
-                    if ( $company ) {
-                        $company->delete();
-                        return ['port'=>'main','data'=>['success' => false, 'message' => 'Company deleted successfully',],];
-                    }
+                    return ['port'=>'main','data'=>['success' => false, 'message' => 'FluentCRM Class Not Found',],];
                 }
-                return ['port'=>'main','data'=>['success' => false, 'message' => 'Company not found',],];
+                $company = \FluentCrm\App\Models\Company::find( $company_id );
+                if ( ! $company ) {
+                    return ['port'=>'main','data'=>['success' => false, 'message' => 'Company not found',],];
+                }
+                $company->delete();
+                return ['port'=>'main','data'=>['success' => true, 'message' => 'Company deleted successfully',],];
 
             case 'get_campaign_all':
                 if ( ! class_exists( '\FluentCrm\App\Models\Campaign' ) ) {
@@ -1248,22 +1122,25 @@ class FluentCrm extends IntegrationBase {
                 return ['port' => 'main','data' => ['success' => true,'campaign'=> self::resolve_campaign_payload( $campaign )],];
             
             case 'create_campaign':
-                $title = $config['title'] ?? 0;
+                $title = $config['title'] ?? '';
                 if ( ! $title )  {
                     return ['port'=>'main','data'=>['success' => false, 'message' => 'Campaign Title is required',],];
                 }
                 if ( ! class_exists( '\FluentCrm\App\Models\Campaign' ) ) {
                     return ['port'=>'main','data'=>['success' => false, 'message' => 'FluentCRM Campaign Not Found',],];
                 }
-                $campaign                   = new \FluentCrm\App\Models\Campaign();
-                $campaign->type             = 'campaign';
-                $campaign->title            = $title;
-                $campaign->slug             = sanitize_title( $title );
-                $campaign->status           = 'draft';
-                $campaign->sending_type     = 'instant';
-                $campaign->is_transactional = 'no';
-                $campaign->created_by       = get_current_user_id();
-                $campaign->settings         = [
+                $created_by = get_current_user_id();
+                if ( ! $created_by ) {
+                    $created_by = 1;
+                }
+                $campaign             = new \FluentCrm\App\Models\Campaign();
+                $campaign->type       = 'campaign';
+                $campaign->title      = $title;
+                $campaign->slug       = sanitize_title( $title ) . '-' . time();
+                $campaign->status     = 'draft';
+                $campaign->created_by = $created_by;
+                $campaign->email_body = '';
+                $campaign->settings   = [
                     'subscribers' => [ [ 'list' => 'all', 'tag' => 'all', ] ],
                     'excludedSubscribers' => [],
                 ];
@@ -1271,25 +1148,26 @@ class FluentCrm extends IntegrationBase {
                 return ['port' => 'main','data' => ['success' => true,'campaign'=> self::resolve_campaign_payload( $campaign )],];
                 
             case 'delete_campaign':
-                 $campaign_id = $config['campaign_id'] ?? null;
+                 $campaign_id = intval( $config['campaign_id'] ?? 0 );
                 if ( ! $campaign_id ) {
                     return ['port'=>'main','data'=>['success' => false, 'message' => 'Campaign ID is required',],];
                 }
                 if ( ! class_exists( '\FluentCrm\App\Models\Campaign' ) ) {
-                    $campaign = \FluentCrm\App\Models\Campaign::find( $campaign_id );
-                    if ( $campaign ) {
-                        $campaign->delete();
-                        return ['port'=>'main','data'=>['success' => false, 'message' => 'Campaign deleted successfully',],];
-                    }
+                    return ['port'=>'main','data'=>['success' => false, 'message' => 'FluentCRM Class Not Found',],];
                 }
-                return ['port'=>'main','data'=>['success' => false, 'message' => 'Campaign not found',],];
+                $campaign = \FluentCrm\App\Models\Campaign::find( $campaign_id );
+                if ( ! $campaign ) {
+                    return ['port'=>'main','data'=>['success' => false, 'message' => 'Campaign not found',],];
+                }
+                $campaign->delete();
+                return ['port'=>'main','data'=>['success' => true, 'message' => 'Campaign deleted successfully',],];
 
             case 'add_event_tracking':
                 $email       = sanitize_email( $config['email'] ?? '');
                 $event_key   = sanitize_text_field( $config['event_key'] ?? '');
-                $event_title = sanitize_text_field( $config['event_title'] ?? '');
-                $event_value = $config['event_value'] ?? null;
-                $provider    = sanitize_text_field( $config['provider'] ?? '');
+                $event_title = sanitize_text_field( $config['title'] ?? '');
+                $event_value = $config['value'] ?? null;
+                $provider    = sanitize_text_field( $config['provider'] ?? 'custom');
                 if ( ! $email )  {
                     return ['port'=>'main','data'=>['success' => false, 'message' => 'Contact Email is required',],];
                 }
@@ -1303,13 +1181,13 @@ class FluentCrm extends IntegrationBase {
                 if ( ! $contact )  {
                     return ['port'=>'main','data'=>['success' => false, 'message' => 'Contact not found with this email',],];
                 }
-                $event = \FluentCrm\App\Services\Funnel\FunnelHelper::recordEvent([
-                    'subscriber_id' => $contact->id,
-                    'event_key'     => $event_key,
-                    'event_title'   => $event_title,
-                    'event_value'   => $event_value,
-                    'provider'      => $provider ?: 'custom',
-                ]);
+                $event = FluentCrmApi('event_tracker')->track([
+                    'email'     => $email,
+                    'event_key' => $event_key,
+                    'title'     => $event_title,
+                    'value'     => $event_value,
+                    'provider'  => $provider ?: 'custom',
+                ], true );
                 return ['port' => 'main','data' => ['success' => true,'contact'=> self::resolve_contact_payload( $contact ), 'event' => $event,],];
 
             case 'add_note':

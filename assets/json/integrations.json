@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-02-16 08:49:20",
+    "generated_at": "2026-02-19 09:27:50",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -3216,16 +3216,12 @@
                                     "value": "any"
                                 },
                                 {
-                                    "label": "lkj",
+                                    "label": "tag 1",
                                     "value": 1
                                 },
                                 {
-                                    "label": "jhg",
+                                    "label": "tag 2",
                                     "value": 2
-                                },
-                                {
-                                    "label": "vcvc",
-                                    "value": 3
                                 }
                             ],
                             "required": true
@@ -3250,16 +3246,12 @@
                                     "value": "any"
                                 },
                                 {
-                                    "label": "lkj",
+                                    "label": "tag 1",
                                     "value": 1
                                 },
                                 {
-                                    "label": "jhg",
+                                    "label": "tag 2",
                                     "value": 2
-                                },
-                                {
-                                    "label": "vcvc",
-                                    "value": 3
                                 }
                             ],
                             "required": true
@@ -3284,11 +3276,11 @@
                                     "value": "any"
                                 },
                                 {
-                                    "label": "nvcjkgbduf",
+                                    "label": "list 1",
                                     "value": 1
                                 },
                                 {
-                                    "label": "werewtryuyiuy",
+                                    "label": "list 2",
                                     "value": 2
                                 }
                             ],
@@ -3314,11 +3306,11 @@
                                     "value": "any"
                                 },
                                 {
-                                    "label": "nvcjkgbduf",
+                                    "label": "list 1",
                                     "value": 1
                                 },
                                 {
-                                    "label": "werewtryuyiuy",
+                                    "label": "list 2",
                                     "value": 2
                                 }
                             ],
@@ -3333,74 +3325,6 @@
                     "key": "created_contact",
                     "label": "Created Contact",
                     "hook": "fluentcrm_contact_created",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "contact_status_updated": {
-                    "key": "contact_status_updated",
-                    "label": "Contact Status Updated",
-                    "hook": "fluentcrm_subscriber_status_subscribed",
-                    "schema": [
-                        {
-                            "key": "status",
-                            "label": "Status Updated",
-                            "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any Status",
-                                    "value": "any"
-                                },
-                                {
-                                    "label": "Subscribed",
-                                    "value": "subscribed"
-                                },
-                                {
-                                    "label": "Pending",
-                                    "value": "pending"
-                                },
-                                {
-                                    "label": "Unsubscribed",
-                                    "value": "unsubscribed"
-                                },
-                                {
-                                    "label": "Transactional",
-                                    "value": "transactional"
-                                },
-                                {
-                                    "label": "Bounced",
-                                    "value": "bounced"
-                                },
-                                {
-                                    "label": "Complained",
-                                    "value": "complained"
-                                },
-                                {
-                                    "label": "Spammed",
-                                    "value": "spammed"
-                                }
-                            ],
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "updated_custom_fields": {
-                    "key": "updated_custom_fields",
-                    "label": "Updated Custom Fields",
-                    "hook": "fluentcrm_contact_updated",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "contact_deleted": {
-                    "key": "contact_deleted",
-                    "label": "Deleted Contact",
-                    "hook": "fluentcrm_contact_deleted",
                     "schema": [],
                     "outputs": [
                         "main"
@@ -3432,50 +3356,6 @@
                     "outputs": [
                         "main"
                     ]
-                },
-                "email_opened": {
-                    "key": "email_opened",
-                    "label": "Email Opened",
-                    "hook": "fluent_crm/email_opened",
-                    "schema": [
-                        {
-                            "key": "campaign_id",
-                            "label": "Campaign",
-                            "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any Campaign",
-                                    "value": "any"
-                                }
-                            ],
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "email_clicked": {
-                    "key": "email_clicked",
-                    "label": "Email Clicked",
-                    "hook": "fluent_crm/email_url_clicked",
-                    "schema": [
-                        {
-                            "key": "campaign_id",
-                            "label": "Campaign",
-                            "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any Campaign",
-                                    "value": "any"
-                                }
-                            ],
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
                 }
             },
             "actions": {
@@ -3483,6 +3363,67 @@
                     "key": "created_contact",
                     "label": "Create Contact",
                     "schema": [
+                        {
+                            "key": "prefix",
+                            "label": "Prefix",
+                            "type": "text"
+                        },
+                        {
+                            "key": "first_name",
+                            "label": "First Name",
+                            "type": "text"
+                        },
+                        {
+                            "key": "last_name",
+                            "label": "Last Name",
+                            "type": "text"
+                        },
+                        {
+                            "key": "email",
+                            "label": "Email Address",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "phone",
+                            "label": "Phone",
+                            "type": "number"
+                        },
+                        {
+                            "key": "date_of_birth",
+                            "label": "Date of Birth",
+                            "type": "date"
+                        },
+                        {
+                            "key": "address_line_1",
+                            "label": "Address Line 1",
+                            "type": "text"
+                        },
+                        {
+                            "key": "address_line_2",
+                            "label": "Address Line 2",
+                            "type": "text"
+                        },
+                        {
+                            "key": "city",
+                            "label": "City",
+                            "type": "text"
+                        },
+                        {
+                            "key": "state",
+                            "label": "State",
+                            "type": "text"
+                        },
+                        {
+                            "key": "country",
+                            "label": "Country",
+                            "type": "text"
+                        },
+                        {
+                            "key": "postal_code",
+                            "label": "Postal Code",
+                            "type": "number"
+                        },
                         {
                             "key": "lists",
                             "label": "Lists",
@@ -3493,11 +3434,11 @@
                                     "value": "any"
                                 },
                                 {
-                                    "label": "nvcjkgbduf",
+                                    "label": "list 1",
                                     "value": 1
                                 },
                                 {
-                                    "label": "werewtryuyiuy",
+                                    "label": "list 2",
                                     "value": 2
                                 }
                             ],
@@ -3514,137 +3455,69 @@
                                     "value": "any"
                                 },
                                 {
-                                    "label": "lkj",
+                                    "label": "tag 1",
                                     "value": 1
                                 },
                                 {
-                                    "label": "jhg",
+                                    "label": "tag 2",
                                     "value": 2
-                                },
-                                {
-                                    "label": "vcvc",
-                                    "value": 3
                                 }
                             ],
                             "required": true,
                             "multiple": true
                         },
                         {
-                            "key": "primary_company",
-                            "label": "Primary Company",
+                            "key": "company",
+                            "label": "company",
                             "type": "select",
                             "options": [
                                 {
-                                    "label": "fdghd",
+                                    "label": "Accounting",
                                     "value": 1
-                                }
-                            ]
-                        },
-                        {
-                            "key": "field_map",
-                            "label": "Field Map",
-                            "type": "repeater",
-                            "button_label": "Add Field",
-                            "fields": [
-                                {
-                                    "key": "field",
-                                    "label": "Field",
-                                    "type": "select",
-                                    "options": [
-                                        {
-                                            "label": "Prefix",
-                                            "value": "prefix"
-                                        },
-                                        {
-                                            "label": "First Name",
-                                            "value": "first_name"
-                                        },
-                                        {
-                                            "label": "Last Name",
-                                            "value": "last_name"
-                                        },
-                                        {
-                                            "label": "Full Name",
-                                            "value": "full_name"
-                                        },
-                                        {
-                                            "label": "Email",
-                                            "value": "email"
-                                        },
-                                        {
-                                            "label": "Timezone",
-                                            "value": "timezone"
-                                        },
-                                        {
-                                            "label": "Address Line 1",
-                                            "value": "address_line_1"
-                                        },
-                                        {
-                                            "label": "Address Line 2",
-                                            "value": "address_line_2"
-                                        },
-                                        {
-                                            "label": "City",
-                                            "value": "city"
-                                        },
-                                        {
-                                            "label": "State",
-                                            "value": "state"
-                                        },
-                                        {
-                                            "label": "Postal Code",
-                                            "value": "postal_code"
-                                        },
-                                        {
-                                            "label": "Country",
-                                            "value": "country"
-                                        },
-                                        {
-                                            "label": "IP",
-                                            "value": "ip"
-                                        },
-                                        {
-                                            "label": "Phone",
-                                            "value": "phone"
-                                        },
-                                        {
-                                            "label": "Source",
-                                            "value": "source"
-                                        },
-                                        {
-                                            "label": "Date of Birth",
-                                            "value": "date_of_birth"
-                                        },
-                                        {
-                                            "label": "Status",
-                                            "value": "status"
-                                        }
-                                    ]
                                 },
                                 {
-                                    "key": "value",
-                                    "label": "Value",
-                                    "type": "text"
+                                    "label": "amar company",
+                                    "value": 2
                                 }
-                            ]
+                            ],
+                            "required": true,
+                            "multiple": true
                         },
                         {
-                            "key": "custom_field_map",
-                            "label": "Custom Field Map",
-                            "type": "repeater",
-                            "button_label": "Add Custom Field",
-                            "fields": [
+                            "key": "status",
+                            "label": "Status",
+                            "type": "select",
+                            "options": [
                                 {
-                                    "key": "field",
-                                    "label": "Field",
-                                    "type": "text"
+                                    "label": "Subscribed",
+                                    "value": "subscribed"
                                 },
                                 {
-                                    "key": "value",
-                                    "label": "Value",
-                                    "type": "text"
+                                    "label": "Pending",
+                                    "value": "pending"
+                                },
+                                {
+                                    "label": "Unsubscribed",
+                                    "value": "unsubscribed"
+                                },
+                                {
+                                    "label": "Transactional",
+                                    "value": "transactional"
+                                },
+                                {
+                                    "label": "Bounced",
+                                    "value": "bounced"
+                                },
+                                {
+                                    "label": "Complained",
+                                    "value": "complained"
+                                },
+                                {
+                                    "label": "Spammed",
+                                    "value": "spammed"
                                 }
-                            ]
+                            ],
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -3725,7 +3598,7 @@
                     "schema": [
                         {
                             "key": "status",
-                            "label": "Contact Status",
+                            "label": "Status",
                             "type": "select",
                             "options": [
                                 {
@@ -3834,16 +3707,12 @@
                                     "value": "any"
                                 },
                                 {
-                                    "label": "lkj",
+                                    "label": "tag 1",
                                     "value": 1
                                 },
                                 {
-                                    "label": "jhg",
+                                    "label": "tag 2",
                                     "value": 2
-                                },
-                                {
-                                    "label": "vcvc",
-                                    "value": 3
                                 }
                             ],
                             "required": true,
@@ -3874,16 +3743,12 @@
                                     "value": "any"
                                 },
                                 {
-                                    "label": "lkj",
+                                    "label": "tag 1",
                                     "value": 1
                                 },
                                 {
-                                    "label": "jhg",
+                                    "label": "tag 2",
                                     "value": 2
-                                },
-                                {
-                                    "label": "vcvc",
-                                    "value": 3
                                 }
                             ],
                             "required": true,
@@ -3964,11 +3829,11 @@
                                     "value": "any"
                                 },
                                 {
-                                    "label": "nvcjkgbduf",
+                                    "label": "list 1",
                                     "value": 1
                                 },
                                 {
-                                    "label": "werewtryuyiuy",
+                                    "label": "list 2",
                                     "value": 2
                                 }
                             ],
@@ -4000,11 +3865,11 @@
                                     "value": "any"
                                 },
                                 {
-                                    "label": "nvcjkgbduf",
+                                    "label": "list 1",
                                     "value": 1
                                 },
                                 {
-                                    "label": "werewtryuyiuy",
+                                    "label": "list 2",
                                     "value": 2
                                 }
                             ],
@@ -4059,126 +3924,95 @@
                     "label": "Created company",
                     "schema": [
                         {
-                            "key": "field_map",
-                            "label": "Field Map",
-                            "type": "repeater",
-                            "button_label": "Add Field",
-                            "fields": [
-                                {
-                                    "key": "field",
-                                    "label": "Field",
-                                    "type": "select",
-                                    "options": [
-                                        {
-                                            "label": "Company Name",
-                                            "value": "name"
-                                        },
-                                        {
-                                            "label": "Owner Name",
-                                            "value": "owner_name"
-                                        },
-                                        {
-                                            "label": "Owner Email",
-                                            "value": "owner_email"
-                                        },
-                                        {
-                                            "label": "Company Email",
-                                            "value": "email"
-                                        },
-                                        {
-                                            "label": "Company Phone Number",
-                                            "value": "phone"
-                                        },
-                                        {
-                                            "label": "Company Logo",
-                                            "value": "Company_logo"
-                                        },
-                                        {
-                                            "label": "Industry",
-                                            "value": "industry"
-                                        },
-                                        {
-                                            "label": "Type",
-                                            "value": "type"
-                                        },
-                                        {
-                                            "label": "Company Owner",
-                                            "value": "owner_id"
-                                        },
-                                        {
-                                            "label": "Description",
-                                            "value": "description"
-                                        },
-                                        {
-                                            "label": "Number of Employees",
-                                            "value": "employees_number"
-                                        },
-                                        {
-                                            "label": "Address Line 1",
-                                            "value": "address_line_1"
-                                        },
-                                        {
-                                            "label": "Address Line 2",
-                                            "value": "address_line_2"
-                                        },
-                                        {
-                                            "label": "City",
-                                            "value": "city"
-                                        },
-                                        {
-                                            "label": "State",
-                                            "value": "state"
-                                        },
-                                        {
-                                            "label": "Postal Code",
-                                            "value": "postal_code"
-                                        },
-                                        {
-                                            "label": "Country",
-                                            "value": "country"
-                                        },
-                                        {
-                                            "label": "LinkedIn URL",
-                                            "value": "linkedin_url"
-                                        },
-                                        {
-                                            "label": "Facebook Page URL",
-                                            "value": "facebook_url"
-                                        },
-                                        {
-                                            "label": "Twitter URL",
-                                            "value": "twitter_url"
-                                        },
-                                        {
-                                            "label": "Website",
-                                            "value": "website"
-                                        }
-                                    ]
-                                },
-                                {
-                                    "key": "value",
-                                    "label": "Value",
-                                    "type": "text"
-                                }
-                            ]
+                            "key": "company_name",
+                            "label": "Company Name",
+                            "type": "text"
                         },
                         {
-                            "key": "custom_field_map",
-                            "label": "Custom Field Map",
-                            "type": "repeater",
-                            "button_label": "Add Custom Field",
-                            "fields": [
-                                {
-                                    "key": "field",
-                                    "label": "Field",
-                                    "type": "text"
-                                },
-                                {
-                                    "key": "value",
-                                    "label": "Value",
-                                    "type": "text"
-                                }
-                            ]
+                            "key": "description",
+                            "label": "Description",
+                            "type": "textarea"
+                        },
+                        {
+                            "key": "email",
+                            "label": "Email Address",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "phone",
+                            "label": "Phone",
+                            "type": "number"
+                        },
+                        {
+                            "key": "address_line_1",
+                            "label": "Address Line 1",
+                            "type": "text"
+                        },
+                        {
+                            "key": "address_line_2",
+                            "label": "Address Line 2",
+                            "type": "text"
+                        },
+                        {
+                            "key": "city",
+                            "label": "City",
+                            "type": "text"
+                        },
+                        {
+                            "key": "state",
+                            "label": "State",
+                            "type": "text"
+                        },
+                        {
+                            "key": "country",
+                            "label": "Country",
+                            "type": "text"
+                        },
+                        {
+                            "key": "postal_code",
+                            "label": "Postal Code",
+                            "type": "number"
+                        },
+                        {
+                            "key": "company_type",
+                            "label": "Company Type",
+                            "type": "text"
+                        },
+                        {
+                            "key": "company_owner_id",
+                            "label": "Company Owner ID",
+                            "type": "expression"
+                        },
+                        {
+                            "key": "company_employee_count",
+                            "label": "Company Employee Count",
+                            "type": "number"
+                        },
+                        {
+                            "key": "company_industry",
+                            "label": "Company Industry",
+                            "type": "text"
+                        },
+                        {
+                            "key": "company_website",
+                            "label": "Company Website",
+                            "type": "url"
+                        },
+                        {
+                            "key": "company_linkedin_url",
+                            "label": "Company LinkedIn URL",
+                            "type": "url"
+                        },
+                        {
+                            "key": "company_facebook_url",
+                            "label": "Company Facebook URL",
+                            "type": "url"
+                        },
+                        {
+                            "key": "company_twitter_url",
+                            "label": "Company Twitter URL",
+                            "type": "url"
                         }
                     ],
                     "outputs": [
@@ -4201,8 +4035,12 @@
                             "type": "select",
                             "options": [
                                 {
-                                    "label": "fdghd",
+                                    "label": "Accounting",
                                     "value": 1
+                                },
+                                {
+                                    "label": "amar company",
+                                    "value": 2
                                 }
                             ],
                             "required": true,
@@ -4229,8 +4067,12 @@
                             "type": "select",
                             "options": [
                                 {
-                                    "label": "fdghd",
+                                    "label": "Accounting",
                                     "value": 1
+                                },
+                                {
+                                    "label": "amar company",
+                                    "value": 2
                                 }
                             ],
                             "required": true,
@@ -4315,8 +4157,8 @@
                     "schema": [
                         {
                             "key": "email",
-                            "label": "Contact Email",
-                            "type": "email",
+                            "label": "Email Address",
+                            "type": "expression",
                             "required": true
                         },
                         {
@@ -4326,13 +4168,13 @@
                             "required": true
                         },
                         {
-                            "key": "event_title",
-                            "label": "Event Tracking Title",
+                            "key": "title",
+                            "label": "Title",
                             "type": "text",
                             "required": true
                         },
                         {
-                            "key": "event_value",
+                            "key": "value",
                             "label": "Event Value",
                             "type": "text",
                             "required": false
