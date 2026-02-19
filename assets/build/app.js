@@ -5440,11 +5440,9 @@ function VariablePopover(props) {
             bg: "var(--zaplane-background)",
             maxH: "200px",
             overflowY: "auto",
-            children: item.variables?.length > 0 ? item.variables.map((v, vi) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
-              cursor: "pointer",
-              fontSize: "sm",
+            children: item.variables?.length > 0 ? item.variables.map((v, vi) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Flex, {
               p: "8px 15px",
-              className: "zaplane-label",
+              alignItems: "center",
               _hover: {
                 background: "var(--zaplane-body-background)"
               },
@@ -5459,8 +5457,20 @@ function VariablePopover(props) {
                   setActiveInput
                 });
               },
-              children: [(0,_helper__WEBPACK_IMPORTED_MODULE_5__.formatVariableKey)(v.key), " : ", v.sample]
-            }, vi)) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
+              children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
+                as: "span",
+                cursor: "pointer",
+                fontSize: "sm",
+                className: "zaplane-label",
+                children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_6__.__)((0,_helper__WEBPACK_IMPORTED_MODULE_5__.formatVariableKey)(v.key), 'zaplane')
+              }, vi), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
+                as: "p",
+                m: "0",
+                fontWeight: "400",
+                color: "#64748b",
+                children: [" : ", (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_6__.__)(v.sample, 'zaplane')]
+              })]
+            })) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
               textAlign: "center",
               children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_6__.__)("No fields available", 'zaplane')
             })

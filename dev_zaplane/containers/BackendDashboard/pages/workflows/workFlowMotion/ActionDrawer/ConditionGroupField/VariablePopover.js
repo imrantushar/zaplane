@@ -33,11 +33,12 @@ export default function VariablePopover(props) {
                         </Accordion.ItemTrigger>
 
                         <Accordion.ItemContent>
-                            <Accordion.ItemBody  py="10px" bg="var(--zaplane-background)"
+                            <Accordion.ItemBody py="10px" bg="var(--zaplane-background)"
                                 maxH="200px" overflowY="auto">
                                 {item.variables?.length > 0 ? item.variables.map((v, vi) => (
-                                    <Text key={vi} cursor="pointer" fontSize="sm" p='8px 15px'
-                                        className="zaplane-label"
+                                    <Flex
+                                        p='8px 15px'
+                                        alignItems="center"
                                         _hover={{ background: "var(--zaplane-body-background)" }}
                                         onClick={() => {
                                             const formattedValue = `{{${item.node_id}.${v.key}}}`;
@@ -48,8 +49,13 @@ export default function VariablePopover(props) {
                                                     setPopoverOpen, setActiveInput
                                                 });
                                         }}>
-                                        {formatVariableKey(v.key)} : {v.sample}
-                                    </Text>
+                                        <Text as="span" key={vi} cursor="pointer" fontSize="sm"
+                                            className="zaplane-label"
+                                        >
+                                            {__(formatVariableKey(v.key) ,'zaplane')}
+                                        </Text>
+                                        <Text as="p" m='0' fontWeight="400" color="#64748b">{" : "}{__(v.sample,'zaplane')}</Text>
+                                    </Flex>
                                 )) : <Text textAlign="center">{__("No fields available", 'zaplane')}</Text>}
                             </Accordion.ItemBody>
                         </Accordion.ItemContent>
