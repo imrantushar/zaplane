@@ -54,7 +54,9 @@ export default function VariablePopover(props) {
                                         >
                                             {__(formatVariableKey(v.key) ,'zaplane')}
                                         </Text>
-                                        <Text as="p" m='0' fontWeight="400" color="#64748b">{" : "}{__(v.sample,'zaplane')}</Text>
+                                        <Text as="p" m='0' fontWeight="400"  color="#64748b"
+                                        textOverflow="ellipsis" overflow='hidden'>
+                                            {" : "}{__(v.sample,'zaplane')}</Text>
                                     </Flex>
                                 )) : <Text textAlign="center">{__("No fields available", 'zaplane')}</Text>}
                             </Accordion.ItemBody>

@@ -83,6 +83,7 @@ export default function ConditionGroupField({ value, field, nodeId, workFlow }) 
                                                                 type="textarea"
                                                                 label={f.label}
                                                                 value={rule[f.key]}
+                                                                placeholder={__('Type "@" here to add dynamic', 'zaplane')}
                                                                 onChange={(e) => {
                                                                     const val = e.target.value;
                                                                     ruleHelpers.replace(rIndex, { ...rule, [f.key]: val });

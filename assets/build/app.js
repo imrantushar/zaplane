@@ -5277,6 +5277,7 @@ function ConditionGroupField({
                     type: "textarea",
                     label: f.label,
                     value: rule[f.key],
+                    placeholder: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_8__.__)('Type "@" here to add dynamic', 'zaplane'),
                     onChange: e => {
                       const val = e.target.value;
                       ruleHelpers.replace(rIndex, {
@@ -5468,6 +5469,8 @@ function VariablePopover(props) {
                 m: "0",
                 fontWeight: "400",
                 color: "#64748b",
+                textOverflow: "ellipsis",
+                overflow: "hidden",
                 children: [" : ", (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_6__.__)(v.sample, 'zaplane')]
               })]
             })) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
