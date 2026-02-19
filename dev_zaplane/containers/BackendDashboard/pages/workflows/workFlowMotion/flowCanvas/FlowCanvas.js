@@ -44,7 +44,7 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
     useEffect(() => {
         if (!workFlow?.graph) return;
         const { nodes, edges } = mapGraphFromBackend(workFlow.graph);
-        if (!nodes.length) return 
+        if (!nodes.length) return
         setNodes(nodes);
         setEdges(edges);
     }, [workFlow?.graph]);
@@ -176,7 +176,16 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
 
                     <Background />
                     <Flex className="zaplane-canvas-layout-icon">
-                        <ZAPTooltip content={__("Vertical layout", "zaplane")}>
+                        <ZAPTooltip content={__("Vertical layout", "zaplane")
+
+                        }
+                            positioning={{
+                                placement: "top",
+                                offset: {
+                                    mainAxis: 8,
+                                    crossAxis: 25,
+                                }
+                            }}>
                             <ControlButton
                                 onClick={() => onLayout("TB")}
                                 className={`react-flow__controls-button ${canvasLayout === "TB" ? "zaplane-layout-active" : ""
@@ -186,7 +195,14 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
                                 <IoSwapVerticalOutline size={16} />
                             </ControlButton>
                         </ZAPTooltip>
-                        <ZAPTooltip content={__("Horizontal layout", "zaplane")}>
+                        <ZAPTooltip content={__("Horizontal layout", "zaplane")}
+                         positioning={{
+                                placement: "top",
+                                offset: {
+                                    mainAxis: 8,
+                                    crossAxis: 25,
+                                }
+                            }}>
                             <ControlButton
                                 onClick={() => onLayout("LR")}
                                 className={`react-flow__controls-button ${canvasLayout === "LR" ? "zaplane-layout-active" : ""

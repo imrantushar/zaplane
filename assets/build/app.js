@@ -2765,16 +2765,17 @@ __webpack_require__.r(__webpack_exports__);
 const ZAPTooltip = ({
   content,
   children,
-  placement = "top"
+  placement = "top",
+  positioning
 }) => {
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)(_ZAPComponents_chakra_Tooltip__WEBPACK_IMPORTED_MODULE_0__["default"], {
+    contentProps: {
+      bg: "var(--zaplane-primary)"
+    },
     content: content,
     positioning: {
-      placement,
-      offset: {
-        mainAxis: 8,
-        crossAxis: 25
-      }
+      placement: placement,
+      ...positioning
     },
     children: children
   });
@@ -2922,6 +2923,7 @@ const Tooltip = (props, ref) => {
         children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.TooltipContent, {
           ref: ref,
           ...contentProps,
+          zIndex: 9999,
           children: [showArrow && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.TooltipArrow, {
             children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.TooltipArrowTip, {})
           }), content]
@@ -4116,8 +4118,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! @ZAPUtils/helper */ "./dev_zaplane/utils/helper.js");
 /* harmony import */ var _workflows_helper__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ../workflows/helper */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/helper.js");
 /* harmony import */ var _ZAPUtils_icons__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! @ZAPUtils/icons */ "./dev_zaplane/utils/icons.js");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__);
+/* harmony import */ var _ZAPComponents_ZAPTooltip__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! @ZAPComponents/ZAPTooltip */ "./dev_zaplane/components/ZAPTooltip/index.js");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__);
+
 
 
 
@@ -4146,14 +4150,14 @@ const Logs = () => {
   }, [dispatch]);
   const columns = [{
     name: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_7__.__)('CREATED AT', 'zaplane'),
-    cell: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsxs)("div", {
+    cell: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsxs)("div", {
       className: "zaplane-table-flex-col",
-      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)("span", {
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)("span", {
         style: {
           fontWeight: 600
         },
         children: row.started_at || "--"
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsxs)("span", {
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsxs)("span", {
         style: {
           fontSize: '12px',
           color: '#666'
@@ -4165,14 +4169,14 @@ const Logs = () => {
     textAlign: "start"
   }, {
     name: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_7__.__)('DURATION', 'zaplane'),
-    cell: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
+    cell: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
       fontSize: "sm",
       children: (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_15__.getDuration)(row.started_at, row.finished_at)
     }),
     columnWidth: "150px"
   }, {
     name: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_7__.__)('Status', 'zaplane'),
-    cell: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Badge, {
+    cell: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Badge, {
       ...(0,_workflows_helper__WEBPACK_IMPORTED_MODULE_16__.statusStyle)(row.status),
       borderRadius: "full",
       px: 3,
@@ -4181,26 +4185,29 @@ const Logs = () => {
     columnWidth: "120px"
   }, {
     name: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_7__.__)('Action', 'zaplane'),
-    cell: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.HStack, {
+    cell: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.HStack, {
       justify: "flex-end",
       spacing: "1",
       justifyContent: "center",
-      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Box, {
-        display: "flex",
-        p: "5px 6px",
-        justifyContent: "center",
-        alignItems: "center",
-        borderRadius: "2.917px",
-        border: "1px solid var(--zaplane-border-color)",
-        onClick: () => {
-          setActiveRunId(row.id);
-          setDrawerOpen(true);
-          dispatch((0,_ZAPRedux_Slices_workFlowSlice_actions_workFlowLogs__WEBPACK_IMPORTED_MODULE_9__.nodeLogsRunDetails)(row.id));
-        },
-        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Icon, {
-          height: "20px",
-          width: "20px",
-          as: _ZAPUtils_icons__WEBPACK_IMPORTED_MODULE_17__.HistoryIcon
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_ZAPComponents_ZAPTooltip__WEBPACK_IMPORTED_MODULE_18__["default"], {
+        content: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_7__.__)("Details", 'zaplane'),
+        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Box, {
+          display: "flex",
+          p: "5px 6px",
+          justifyContent: "center",
+          alignItems: "center",
+          borderRadius: "2.917px",
+          border: "1px solid var(--zaplane-border-color)",
+          onClick: () => {
+            setActiveRunId(row.id);
+            setDrawerOpen(true);
+            dispatch((0,_ZAPRedux_Slices_workFlowSlice_actions_workFlowLogs__WEBPACK_IMPORTED_MODULE_9__.nodeLogsRunDetails)(row.id));
+          },
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Icon, {
+            height: "20px",
+            width: "20px",
+            as: _ZAPUtils_icons__WEBPACK_IMPORTED_MODULE_17__.HistoryIcon
+          })
         })
       })
     }),
@@ -4212,18 +4219,18 @@ const Logs = () => {
   //     return <ZAPLoading />;
   // }
 
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.Fragment, {
-    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_ZAPComponents_TopBar__WEBPACK_IMPORTED_MODULE_12__["default"], {
-      render: () => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Box, {
-        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.Fragment, {
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_ZAPComponents_TopBar__WEBPACK_IMPORTED_MODULE_12__["default"], {
+      render: () => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Box, {
+        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
           fontSize: "lg",
           fontWeight: "600",
           children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_7__.__)("Workflow Logs", "zaplane")
         })
       })
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)("div", {
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)("div", {
       className: "zaplane-page-content",
-      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_ZAPComponents_ListTable__WEBPACK_IMPORTED_MODULE_14__["default"], {
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_ZAPComponents_ListTable__WEBPACK_IMPORTED_MODULE_14__["default"], {
         columns: columns,
         isRowSelectable: true,
         data: data,
@@ -4235,7 +4242,7 @@ const Logs = () => {
         dataFetchingStatus: isLoading,
         suffix: "logs-table"
       })
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_ZAPComponents_Drawer__WEBPACK_IMPORTED_MODULE_13__["default"], {
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_ZAPComponents_Drawer__WEBPACK_IMPORTED_MODULE_13__["default"], {
       open: drawerOpen,
       arrowClose: true,
       onClose: () => {
@@ -4246,7 +4253,7 @@ const Logs = () => {
       title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_7__.__)("Run Details", "zaplane"),
       placement: "end",
       size: "md",
-      children: activeRunId && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_ZAPComponents_LogDetails__WEBPACK_IMPORTED_MODULE_10__["default"], {
+      children: activeRunId && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_ZAPComponents_LogDetails__WEBPACK_IMPORTED_MODULE_10__["default"], {
         runId: activeRunId,
         onBack: () => {
           setDrawerOpen(false);
@@ -6225,6 +6232,13 @@ function FlowCanvas({
         className: "zaplane-canvas-layout-icon",
         children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(_ZAPComponents_ZAPTooltip__WEBPACK_IMPORTED_MODULE_19__["default"], {
           content: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("Vertical layout", "zaplane"),
+          positioning: {
+            placement: "top",
+            offset: {
+              mainAxis: 8,
+              crossAxis: 25
+            }
+          },
           children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.ControlButton, {
             onClick: () => onLayout("TB"),
             className: `react-flow__controls-button ${canvasLayout === "TB" ? "zaplane-layout-active" : ""}`,
@@ -6234,6 +6248,13 @@ function FlowCanvas({
           })
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(_ZAPComponents_ZAPTooltip__WEBPACK_IMPORTED_MODULE_19__["default"], {
           content: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("Horizontal layout", "zaplane"),
+          positioning: {
+            placement: "top",
+            offset: {
+              mainAxis: 8,
+              crossAxis: 25
+            }
+          },
           children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.ControlButton, {
             onClick: () => onLayout("LR"),
             className: `react-flow__controls-button ${canvasLayout === "LR" ? "zaplane-layout-active" : ""}`,
@@ -6491,8 +6512,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _ZAPRedux_Slices_workFlowSlice_actions_workFlowRuns__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! @ZAPRedux/Slices/workFlowSlice/actions/workFlowRuns */ "./dev_zaplane/redux/Slices/workFlowSlice/actions/workFlowRuns.js");
 /* harmony import */ var _ZAPComponents_ListTable__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! @ZAPComponents/ListTable */ "./dev_zaplane/components/ListTable/index.js");
 /* harmony import */ var _ZAPUtils_icons__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! @ZAPUtils/icons */ "./dev_zaplane/utils/icons.js");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__);
+/* harmony import */ var _ZAPComponents_ZAPTooltip__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! @ZAPComponents/ZAPTooltip */ "./dev_zaplane/components/ZAPTooltip/index.js");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__);
+
 
 
 
@@ -6519,7 +6542,7 @@ const RunsTable = ({
   const [drawerOpen, setDrawerOpen] = (0,react__WEBPACK_IMPORTED_MODULE_6__.useState)(false);
   const columns = [{
     name: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_11__.__)('Run ID', 'zaplane'),
-    cell: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
+    cell: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
       className: "zaplane-label",
       children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_11__.__)(row.id, "zaplane")
     }),
@@ -6527,7 +6550,7 @@ const RunsTable = ({
     textAlign: "center"
   }, {
     name: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_11__.__)('Status', 'zaplane'),
-    cell: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Badge, {
+    cell: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Badge, {
       px: "2",
       py: "0.5",
       rounded: "md",
@@ -6539,54 +6562,60 @@ const RunsTable = ({
     columnWidth: "120px"
   }, {
     name: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_11__.__)('DURATION', 'zaplane'),
-    cell: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
+    cell: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
       className: "zaplane-label",
       children: (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_9__.getDuration)(row.started_at, row.finished_at)
     })
     // columnWidth: "150px",
   }, {
     name: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_11__.__)('Action', 'zaplane'),
-    cell: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.HStack, {
+    cell: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.HStack, {
       justify: "flex-end",
       spacing: "1",
       justifyContent: "center",
-      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
-        display: "flex",
-        p: "5px 6px",
-        justifyContent: "center",
-        alignItems: "center",
-        borderRadius: "2.917px",
-        border: "1px solid var(--zaplane-border-color)",
-        onClick: () => {
-          setActiveRunId(row.id);
-          setDrawerOpen(true);
-          dispatch((0,_ZAPRedux_Slices_workFlowSlice_actions_workFlowLogs__WEBPACK_IMPORTED_MODULE_14__.nodeLogsRunDetails)(row.id));
-        },
-        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Icon, {
-          height: "20px",
-          width: "20px",
-          as: _ZAPUtils_icons__WEBPACK_IMPORTED_MODULE_17__.HistoryIcon
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_ZAPComponents_ZAPTooltip__WEBPACK_IMPORTED_MODULE_18__["default"], {
+        content: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_11__.__)("Details", 'zaplane'),
+        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
+          display: "flex",
+          p: "5px 6px",
+          justifyContent: "center",
+          alignItems: "center",
+          borderRadius: "2.917px",
+          border: "1px solid var(--zaplane-border-color)",
+          onClick: () => {
+            setActiveRunId(row.id);
+            setDrawerOpen(true);
+            dispatch((0,_ZAPRedux_Slices_workFlowSlice_actions_workFlowLogs__WEBPACK_IMPORTED_MODULE_14__.nodeLogsRunDetails)(row.id));
+          },
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Icon, {
+            height: "20px",
+            width: "20px",
+            as: _ZAPUtils_icons__WEBPACK_IMPORTED_MODULE_17__.HistoryIcon
+          })
         })
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
-        display: "flex",
-        p: "5px 6px",
-        justifyContent: "center",
-        alignItems: "center",
-        borderRadius: "2.917px",
-        border: "1px solid var(--zaplane-border-color)",
-        onClick: () => dispatch((0,_ZAPRedux_Slices_workFlowSlice_actions_workFlowRuns__WEBPACK_IMPORTED_MODULE_15__.getSingleRun)(row.id)),
-        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Icon, {
-          height: "20px",
-          width: "20px",
-          as: _ZAPUtils_icons__WEBPACK_IMPORTED_MODULE_17__.ReExcutionIcon
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_ZAPComponents_ZAPTooltip__WEBPACK_IMPORTED_MODULE_18__["default"], {
+        content: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_11__.__)("Re-Excute", 'zaplane'),
+        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
+          display: "flex",
+          p: "5px 6px",
+          justifyContent: "center",
+          alignItems: "center",
+          borderRadius: "2.917px",
+          border: "1px solid var(--zaplane-border-color)",
+          onClick: () => dispatch((0,_ZAPRedux_Slices_workFlowSlice_actions_workFlowRuns__WEBPACK_IMPORTED_MODULE_15__.getSingleRun)(row.id)),
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Icon, {
+            height: "20px",
+            width: "20px",
+            as: _ZAPUtils_icons__WEBPACK_IMPORTED_MODULE_17__.ReExcutionIcon
+          })
         })
       })]
     }),
     // columnWidth: "100px",
     textAlign: "center"
   }];
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.Fragment, {
-    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_ZAPComponents_ListTable__WEBPACK_IMPORTED_MODULE_16__["default"], {
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.Fragment, {
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_ZAPComponents_ListTable__WEBPACK_IMPORTED_MODULE_16__["default"], {
       columns: columns,
       isRowSelectable: false,
       data: runs,
@@ -6597,7 +6626,7 @@ const RunsTable = ({
       totalItems: runs.length,
       dataFetchingStatus: isLoading,
       suffix: "history-table"
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_ZAPComponents_Drawer__WEBPACK_IMPORTED_MODULE_12__["default"], {
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_ZAPComponents_Drawer__WEBPACK_IMPORTED_MODULE_12__["default"], {
       open: drawerOpen,
       arrowClose: true,
       onClose: () => {
@@ -6607,7 +6636,7 @@ const RunsTable = ({
       title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_11__.__)("Log Details", "zaplane"),
       placement: "end",
       size: "md",
-      children: activeRunId ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_18__.jsx)(_ZAPComponents_LogDetails__WEBPACK_IMPORTED_MODULE_7__["default"], {
+      children: activeRunId ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_ZAPComponents_LogDetails__WEBPACK_IMPORTED_MODULE_7__["default"], {
         runId: activeRunId,
         onBack: () => {
           setDrawerOpen(false);
@@ -6639,12 +6668,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
 /* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__);
 /* harmony import */ var _ZAPComponents_ListTable__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @ZAPComponents/ListTable */ "./dev_zaplane/components/ListTable/index.js");
-/* harmony import */ var _ZAPRedux_Slices_workFlowSlice_actions_workFlowVersion__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @ZAPRedux/Slices/workFlowSlice/actions/workFlowVersion */ "./dev_zaplane/redux/Slices/workFlowSlice/actions/workFlowVersion.js");
-/* harmony import */ var lucide_react__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! lucide-react */ "./node_modules/lucide-react/dist/esm/icons/circle-check-big.js");
-/* harmony import */ var lucide_react__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! lucide-react */ "./node_modules/lucide-react/dist/esm/icons/eye.js");
-/* harmony import */ var react_redux__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/dist/react-redux.mjs");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__);
+/* harmony import */ var _ZAPComponents_ZAPTooltip__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @ZAPComponents/ZAPTooltip */ "./dev_zaplane/components/ZAPTooltip/index.js");
+/* harmony import */ var _ZAPRedux_Slices_workFlowSlice_actions_workFlowVersion__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @ZAPRedux/Slices/workFlowSlice/actions/workFlowVersion */ "./dev_zaplane/redux/Slices/workFlowSlice/actions/workFlowVersion.js");
+/* harmony import */ var lucide_react__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! lucide-react */ "./node_modules/lucide-react/dist/esm/icons/circle-check-big.js");
+/* harmony import */ var lucide_react__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! lucide-react */ "./node_modules/lucide-react/dist/esm/icons/eye.js");
+/* harmony import */ var react_redux__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/dist/react-redux.mjs");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__);
+
 
 
 
@@ -6656,13 +6687,13 @@ const VersionHistoryTable = ({
   versions = [],
   id
 }) => {
-  const dispatch = (0,react_redux__WEBPACK_IMPORTED_MODULE_9__.useDispatch)();
+  const dispatch = (0,react_redux__WEBPACK_IMPORTED_MODULE_10__.useDispatch)();
   const {
     isLoading
-  } = (0,react_redux__WEBPACK_IMPORTED_MODULE_9__.useSelector)(state => state.workflows);
+  } = (0,react_redux__WEBPACK_IMPORTED_MODULE_10__.useSelector)(state => state.workflows);
   const columns = [{
     name: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)('ID', 'zaplane'),
-    cell: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Text, {
+    cell: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Text, {
       className: "zaplane-label",
       children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)(row.id, "zaplane")
     }),
@@ -6670,7 +6701,7 @@ const VersionHistoryTable = ({
     textAlign: "center"
   }, {
     name: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)('Created At', 'zaplane'),
-    cell: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Text, {
+    cell: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Text, {
       className: "zaplane-label",
       children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)(row.created_at, "zaplane")
     }),
@@ -6678,7 +6709,7 @@ const VersionHistoryTable = ({
     textAlign: "center"
   }, {
     name: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)('Status', 'zaplane'),
-    cell: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Badge, {
+    cell: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Badge, {
       px: "2",
       py: "0.5",
       rounded: "md",
@@ -6690,35 +6721,41 @@ const VersionHistoryTable = ({
     columnWidth: "120px"
   }, {
     name: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)('Action', 'zaplane'),
-    cell: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.HStack, {
+    cell: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.HStack, {
       justify: "flex-end",
       spacing: 1,
-      children: [!row.is_active && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Button, {
-        size: "xs",
-        variant: "outline",
-        onClick: () => dispatch((0,_ZAPRedux_Slices_workFlowSlice_actions_workFlowVersion__WEBPACK_IMPORTED_MODULE_6__.versionActive)({
-          id,
-          versionID: row.id
-        })),
-        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(lucide_react__WEBPACK_IMPORTED_MODULE_7__["default"], {
-          size: 14
+      children: [!row.is_active && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_ZAPComponents_ZAPTooltip__WEBPACK_IMPORTED_MODULE_6__["default"], {
+        content: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("Active version", 'zaplane'),
+        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Button, {
+          size: "xs",
+          variant: "outline",
+          onClick: () => dispatch((0,_ZAPRedux_Slices_workFlowSlice_actions_workFlowVersion__WEBPACK_IMPORTED_MODULE_7__.versionActive)({
+            id,
+            versionID: row.id
+          })),
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(lucide_react__WEBPACK_IMPORTED_MODULE_8__["default"], {
+            size: 14
+          })
         })
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Button, {
-        size: "xs",
-        variant: "ghost",
-        onClick: () => dispatch((0,_ZAPRedux_Slices_workFlowSlice_actions_workFlowVersion__WEBPACK_IMPORTED_MODULE_6__.getPreviewOldVersion)({
-          id,
-          versionID: row.id
-        })),
-        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(lucide_react__WEBPACK_IMPORTED_MODULE_8__["default"], {
-          size: 14
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_ZAPComponents_ZAPTooltip__WEBPACK_IMPORTED_MODULE_6__["default"], {
+        content: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("Prevew Version", 'zaplane'),
+        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Button, {
+          size: "xs",
+          variant: "ghost",
+          onClick: () => dispatch((0,_ZAPRedux_Slices_workFlowSlice_actions_workFlowVersion__WEBPACK_IMPORTED_MODULE_7__.getPreviewOldVersion)({
+            id,
+            versionID: row.id
+          })),
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(lucide_react__WEBPACK_IMPORTED_MODULE_9__["default"], {
+            size: 14
+          })
         })
       })]
     }),
     // columnWidth: "100px",
     textAlign: "center"
   }];
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_ZAPComponents_ListTable__WEBPACK_IMPORTED_MODULE_5__["default"], {
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_ZAPComponents_ListTable__WEBPACK_IMPORTED_MODULE_5__["default"], {
     columns: columns,
     isRowSelectable: false,
     data: versions,

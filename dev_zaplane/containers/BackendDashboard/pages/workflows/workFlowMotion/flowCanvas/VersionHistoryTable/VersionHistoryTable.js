@@ -6,6 +6,7 @@ import {
 } from "@chakra-ui/react";
 import { __ } from "@wordpress/i18n";
 import ListTable from "@ZAPComponents/ListTable";
+import ZAPTooltip from "@ZAPComponents/ZAPTooltip";
 import { getPreviewOldVersion, versionActive } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlowVersion";
 import { CheckCircle, Eye } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
@@ -56,21 +57,27 @@ const VersionHistoryTable = ({
       cell: (row) => (
         <HStack justify="flex-end" spacing={1}>
           {!row.is_active && (
+            <ZAPTooltip content={__("Active version", 'zaplane')}>
+              <Button
+                size="xs"
+                variant="outline"
+                onClick={() => dispatch(versionActive({ id, versionID: row.id }))}
+              >
+                <CheckCircle size={14} />
+              </Button>
+            </ZAPTooltip>
+
+          )}
+          <ZAPTooltip content={__("Prevew Version", 'zaplane')}>
             <Button
               size="xs"
-              variant="outline"
-              onClick={() => dispatch(versionActive({ id, versionID: row.id }))}
+              variant="ghost"
+              onClick={() => dispatch(getPreviewOldVersion({ id, versionID: row.id }))}
             >
-              <CheckCircle size={14} />
+              <Eye size={14} />
             </Button>
-          )}
-          <Button
-            size="xs"
-            variant="ghost"
-            onClick={() => dispatch(getPreviewOldVersion({ id, versionID: row.id }))}
-          >
-            <Eye size={14} />
-          </Button>
+          </ZAPTooltip>
+
         </HStack>
       ),
       // columnWidth: "100px",

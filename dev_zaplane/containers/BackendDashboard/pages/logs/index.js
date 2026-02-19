@@ -24,6 +24,7 @@ import ListTable from "@ZAPComponents/ListTable";
 import { getDuration } from "@ZAPUtils/helper";
 import { statusStyle } from "../workflows/helper";
 import { HistoryIcon } from "@ZAPUtils/icons";
+import ZAPTooltip from "@ZAPComponents/ZAPTooltip";
 
 const Logs = () => {
     const dispatch = useDispatch();
@@ -77,25 +78,27 @@ const Logs = () => {
             name: __('Action', 'zaplane'),
             cell: (row) => (
                 <HStack justify="flex-end" spacing="1" justifyContent={"center"}>
-                    <Box
-                        display="flex"
-                        p={"5px 6px"}
-                        justifyContent="center"
-                        alignItems="center"
-                        borderRadius="2.917px"
-                        border="1px solid var(--zaplane-border-color)"
-                        onClick={() => {
-                            setActiveRunId(row.id);
-                            setDrawerOpen(true);
-                            dispatch(nodeLogsRunDetails(row.id));
-                        }}
-                    >
-                        <Icon
-                            height="20px"
-                            width="20px"
-                            as={HistoryIcon}
-                        />
-                    </Box>
+                    <ZAPTooltip content={__("Details", 'zaplane')}>
+                        <Box
+                            display="flex"
+                            p={"5px 6px"}
+                            justifyContent="center"
+                            alignItems="center"
+                            borderRadius="2.917px"
+                            border="1px solid var(--zaplane-border-color)"
+                            onClick={() => {
+                                setActiveRunId(row.id);
+                                setDrawerOpen(true);
+                                dispatch(nodeLogsRunDetails(row.id));
+                            }}
+                        >
+                            <Icon
+                                height="20px"
+                                width="20px"
+                                as={HistoryIcon}
+                            />
+                        </Box>
+                    </ZAPTooltip>
                 </HStack>
 
 
