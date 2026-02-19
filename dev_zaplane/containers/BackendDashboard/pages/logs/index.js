@@ -5,6 +5,7 @@ import {
     Button,
     Badge,
     HStack,
+    Icon,
 } from "@chakra-ui/react";
 import { useDispatch, useSelector } from "react-redux";
 import { __, sprintf } from "@wordpress/i18n";
@@ -22,6 +23,7 @@ import ZAPDrawer from "@ZAPComponents/Drawer";
 import ListTable from "@ZAPComponents/ListTable";
 import { getDuration } from "@ZAPUtils/helper";
 import { statusStyle } from "../workflows/helper";
+import { HistoryIcon } from "@ZAPUtils/icons";
 
 const Logs = () => {
     const dispatch = useDispatch();
@@ -33,7 +35,7 @@ const Logs = () => {
         dispatch(getRunsList());
     }, [dispatch]);
 
-    const columns = useMemo(() => [
+    const columns = [
         {
             name: __('CREATED AT', 'zaplane'),
             cell: (row) => (
@@ -53,7 +55,7 @@ const Logs = () => {
             name: __('DURATION', 'zaplane'),
             cell: (row) => (
                 <Text fontSize="sm">
-                  {getDuration(row.started_at, row.finished_at)}
+                    {getDuration(row.started_at, row.finished_at)}
                 </Text>
             ),
             columnWidth: "150px",
@@ -62,7 +64,7 @@ const Logs = () => {
             name: __('Status', 'zaplane'),
             cell: (row) => (
                 <Badge
-                     {...statusStyle(row.status)}
+                    {...statusStyle(row.status)}
                     borderRadius="full"
                     px={3}
                 >
@@ -74,22 +76,34 @@ const Logs = () => {
         {
             name: __('Action', 'zaplane'),
             cell: (row) => (
-                <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => {
-                        setActiveRunId(row.id);
-                        setDrawerOpen(true);
-                        dispatch(nodeLogsRunDetails(row.id));
-                    }}
-                >
-                    {__("Details", "zaplane")}
-                </Button>
+                <HStack justify="flex-end" spacing="1" justifyContent={"center"}>
+                    <Box
+                        display="flex"
+                        p={"5px 6px"}
+                        justifyContent="center"
+                        alignItems="center"
+                        borderRadius="2.917px"
+                        border="1px solid var(--zaplane-border-color)"
+                        onClick={() => {
+                            setActiveRunId(row.id);
+                            setDrawerOpen(true);
+                            dispatch(nodeLogsRunDetails(row.id));
+                        }}
+                    >
+                        <Icon
+                            height="20px"
+                            width="20px"
+                            as={HistoryIcon}
+                        />
+                    </Box>
+                </HStack>
+
+
             ),
             columnWidth: "100px",
-            textAlign: "end",
+            textAlign: "center",
         },
-    ], [dispatch]);
+    ];
 
     // if (isLoading) {
     //     return <ZAPLoading />;
