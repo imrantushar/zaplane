@@ -131,7 +131,6 @@ class Tutor extends IntegrationBase {
 
         switch ( $node['event'] ) {
             case 'user_enroll_course':
-            case 'course_complete':
                 $course_id = $args[0] ?? null;
                 $enroll_id = $args[1] ?? null;
                 
@@ -140,7 +139,41 @@ class Tutor extends IntegrationBase {
                     'success' => true,
                     'course_id' => $course_id,
                     'enroll_id' => $enroll_id,
+                    ];
+                    
+            case 'course_complete':
+                $course_id = $args[0] ?? null; 
+                if ( ! $course_id ) return false;
+
+                $coursePost = get_post( (int) $course_id );
+                if ( ! $coursePost ) return false;
+
+                $courseData = [
+                    'course_id'    => $coursePost->ID,
+                    'course_title' => $coursePost->post_title,
+                    'course_url'   => get_permalink( $coursePost->ID ),
                 ];
+
+                $user= get_current_user_id();
+
+                $currentUser = [
+                    'first_name' => $user['first_name'],
+                    'last_name'  => $user['last_name'],
+                    'user_email' => $user['user_email'],
+                    'nickname'   => $user['nickname'],
+                    'avatar_url' => $user['avatar_url'],
+                ];
+
+                $courseDataFinal = $courseData + $currentUser;
+
+                if ( !$courseDataFinal) return false;
+                return [
+                    'success' => true,
+                    'course_data' => $courseDataFinal,
+                    ];
+                
+                error_log(print_r($courseDataFinal , true ));
+                ray($courseDataFinal);
 
             case 'lesson_complete':
                 $lesson_id  = $args[0] ?? null;

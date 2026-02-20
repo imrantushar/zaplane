@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-02-18 05:04:33",
+    "generated_at": "2026-02-18 11:20:30",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -3260,24 +3260,36 @@
                                     "value": "any"
                                 },
                                 {
-                                    "label": "New Course6",
-                                    "value": 31
+                                    "label": "New Coursefgsdfgertwtgfdvxctx",
+                                    "value": 40
                                 },
                                 {
-                                    "label": "New Course 5",
-                                    "value": 20
+                                    "label": "fhdfghdf",
+                                    "value": 26
                                 },
                                 {
-                                    "label": "New Course 2",
-                                    "value": 16
+                                    "label": "New Coursefgsdfgs",
+                                    "value": 23
                                 },
                                 {
                                     "label": "New Course3",
-                                    "value": 18
+                                    "value": 19
+                                },
+                                {
+                                    "label": "New Coursekln.m,n",
+                                    "value": 38
+                                },
+                                {
+                                    "label": "mnb,mb",
+                                    "value": 37
+                                },
+                                {
+                                    "label": "New Course2",
+                                    "value": 14
                                 },
                                 {
                                     "label": "New Course",
-                                    "value": 11
+                                    "value": 10
                                 }
                             ],
                             "required": true
@@ -3302,24 +3314,36 @@
                                     "value": "any"
                                 },
                                 {
-                                    "label": "New Course6",
-                                    "value": 31
+                                    "label": "New Coursefgsdfgertwtgfdvxctx",
+                                    "value": 40
                                 },
                                 {
-                                    "label": "New Course 5",
-                                    "value": 20
+                                    "label": "fhdfghdf",
+                                    "value": 26
                                 },
                                 {
-                                    "label": "New Course 2",
-                                    "value": 16
+                                    "label": "New Coursefgsdfgs",
+                                    "value": 23
                                 },
                                 {
                                     "label": "New Course3",
-                                    "value": 18
+                                    "value": 19
+                                },
+                                {
+                                    "label": "New Coursekln.m,n",
+                                    "value": 38
+                                },
+                                {
+                                    "label": "mnb,mb",
+                                    "value": 37
+                                },
+                                {
+                                    "label": "New Course2",
+                                    "value": 14
                                 },
                                 {
                                     "label": "New Course",
-                                    "value": 11
+                                    "value": 10
                                 }
                             ],
                             "required": true
@@ -3342,10 +3366,6 @@
                                 {
                                     "label": "Any Quiz",
                                     "value": "any"
-                                },
-                                {
-                                    "label": "fsdfas",
-                                    "value": 14
                                 }
                             ],
                             "required": true
@@ -3368,10 +3388,6 @@
                                 {
                                     "label": "Any lesson",
                                     "value": "any"
-                                },
-                                {
-                                    "label": "sfdafasdf",
-                                    "value": 13
                                 }
                             ],
                             "required": true
@@ -3394,10 +3410,6 @@
                                 {
                                     "label": "Any Quiz",
                                     "value": "any"
-                                },
-                                {
-                                    "label": "fsdfas",
-                                    "value": 14
                                 }
                             ],
                             "required": true
