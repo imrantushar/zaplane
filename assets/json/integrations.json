@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-02-20 19:12:08",
+    "generated_at": "2026-02-21 13:17:54",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -3260,12 +3260,16 @@
                                     "value": "any"
                                 },
                                 {
-                                    "label": "New Course2",
-                                    "value": 16
+                                    "label": "test couse",
+                                    "value": 24
                                 },
                                 {
                                     "label": "New Course",
-                                    "value": 11
+                                    "value": 10
+                                },
+                                {
+                                    "label": "New Course 2",
+                                    "value": 17
                                 }
                             ],
                             "required": true
@@ -3290,12 +3294,16 @@
                                     "value": "any"
                                 },
                                 {
-                                    "label": "New Course2",
-                                    "value": 16
+                                    "label": "test couse",
+                                    "value": 24
                                 },
                                 {
                                     "label": "New Course",
-                                    "value": 11
+                                    "value": 10
+                                },
+                                {
+                                    "label": "New Course 2",
+                                    "value": 17
                                 }
                             ],
                             "required": true
@@ -3320,8 +3328,16 @@
                                     "value": "any"
                                 },
                                 {
-                                    "label": "sdfgsd",
-                                    "value": 19
+                                    "label": "gsdfgs",
+                                    "value": 27
+                                },
+                                {
+                                    "label": "dsfgsdfg",
+                                    "value": 20
+                                },
+                                {
+                                    "label": "gdsfsdg",
+                                    "value": 16
                                 }
                             ],
                             "required": true
@@ -3344,6 +3360,18 @@
                                 {
                                     "label": "Any lesson",
                                     "value": "any"
+                                },
+                                {
+                                    "label": "sdfgsdf",
+                                    "value": 26
+                                },
+                                {
+                                    "label": "dfgsdf",
+                                    "value": 19
+                                },
+                                {
+                                    "label": "gsdfs",
+                                    "value": 15
                                 }
                             ],
                             "required": true
@@ -3368,8 +3396,16 @@
                                     "value": "any"
                                 },
                                 {
-                                    "label": "sdfgsd",
-                                    "value": 19
+                                    "label": "gsdfgs",
+                                    "value": 27
+                                },
+                                {
+                                    "label": "dsfgsdfg",
+                                    "value": 20
+                                },
+                                {
+                                    "label": "gdsfsdg",
+                                    "value": 16
                                 }
                             ],
                             "required": true

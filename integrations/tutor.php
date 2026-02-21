@@ -187,10 +187,11 @@ class Tutor extends IntegrationBase {
                                 
             case 'course_complete':
 
-                $course_id = $args[0] ?? null;
-                $user_id   = $args[1] ?? get_current_user_id();
+               $course_id = $args[0] ?? null;
+                if ( ! $course_id ) return false;
 
-                if ( ! $course_id || ! $user_id ) return false;
+                $user_id = get_current_user_id();
+                if ( ! $user_id ) return false;
 
                 $coursePost = get_post( (int) $course_id );
                 $userData   = get_userdata( $user_id );
@@ -199,7 +200,7 @@ class Tutor extends IntegrationBase {
 
                 $selected_course = $node['data']['config']['course_id'] ?? 'any';
 
-                if ( $selected_course !== 'any' && (int)$selected_course !== (int)$course_id ) {
+                if ( $selected_course !== 'any' && (int) $selected_course !== (int) $course_id ) {
                     return false;
                 }
 
@@ -216,25 +217,28 @@ class Tutor extends IntegrationBase {
                 ];
 
             case 'lesson_complete':
-                $lesson_id  = $args[0] ?? null;
-                $user_id    = $args[1] ?? get_current_user_id();
-                
-                if ( ! $lesson_id || ! $user_id ) return false;
+                $ $lesson_id = $args[0] ?? null;
+                if ( ! $lesson_id ) return false;
+
+                $user_id = get_current_user_id();
+                if ( ! $user_id ) return false;
 
                 $selected_lesson = $node['data']['config']['lesson_id'] ?? 'any';
 
-                if ( $selected_lesson !== 'any' && (int)$selected_lesson !== (int)$lesson_id ) {
+                if ( $selected_lesson !== 'any' && (int) $selected_lesson !== (int) $lesson_id ) {
                     return false;
                 }
 
                 return [
-                    'success' => true,
+                    'success'   => true,
                     'lesson_id' => $lesson_id,
                     'user_id'   => $user_id,
                 ];
             case 'tutor_quiz_course_attempt':
-                $attempt = $args[0] ?? null;
+                $attempt_id = $args[0] ?? null;
+                if ( ! $attempt_id ) return false;
 
+                $attempt = tutor_utils()->get_attempt( $attempt_id );
                 if ( ! $attempt ) return false;
 
                 $quiz_id = $attempt->quiz_id ?? null;
@@ -244,7 +248,7 @@ class Tutor extends IntegrationBase {
 
                 $selected_quiz = $node['data']['config']['quiz_id'] ?? 'any';
 
-                if ( $selected_quiz !== 'any' && (int)$selected_quiz !== (int)$quiz_id ) {
+                if ( $selected_quiz !== 'any' && (int) $selected_quiz !== (int) $quiz_id ) {
                     return false;
                 }
 
@@ -254,43 +258,31 @@ class Tutor extends IntegrationBase {
                     'user_id' => $user_id,
                 ];
 
+
             case 'quiz_target':
-                $attempt = $args[0] ?? null;
+               $attempt_id = $args[0] ?? null;
+                if ( ! $attempt_id ) return false;
+
+                $attempt = tutor_utils()->get_attempt( $attempt_id );
                 if ( ! $attempt ) return false;
 
-                // Support array or object
-                $quiz_id = is_array($attempt)
-                    ? ($attempt['quiz_id'] ?? null)
-                    : ($attempt->quiz_id ?? null);
-
-                $user_id = is_array($attempt)
-                    ? ($attempt['user_id'] ?? null)
-                    : ($attempt->user_id ?? null);
-
-                $earned = is_array($attempt)
-                    ? ($attempt['earned_marks'] ?? 0)
-                    : ($attempt->earned_marks ?? 0);
-
-                $total = is_array($attempt)
-                    ? ($attempt['total_marks'] ?? 0)
-                    : ($attempt->total_marks ?? 0);
+                $quiz_id = $attempt->quiz_id ?? null;
+                $user_id = $attempt->user_id ?? null;
+                $earned  = $attempt->earned_marks ?? 0;
+                $total   = $attempt->total_marks ?? 0;
 
                 if ( ! $quiz_id || ! $user_id || ! $total ) return false;
 
-                // Quiz filter
                 $selected_quiz = $node['data']['config']['quiz_id'] ?? 'any';
 
-                if ( $selected_quiz !== 'any' && (int)$selected_quiz !== (int)$quiz_id ) {
+                if ( $selected_quiz !== 'any' && (int) $selected_quiz !== (int) $quiz_id ) {
                     return false;
                 }
 
-                // Percentage check
                 $percentage = ( $earned / $total ) * 100;
-                $target     = (float) ($node['data']['config']['target_percentage'] ?? 0);
+                $target     = (float) ( $node['data']['config']['target_percentage'] ?? 0 );
 
-                if ( $percentage < $target ) {
-                    return false;
-                }
+                if ( $percentage < $target ) return false;
 
                 return [
                     'success'     => true,
@@ -300,8 +292,6 @@ class Tutor extends IntegrationBase {
                     'total_marks' => $total,
                     'percentage'  => round( $percentage, 2 ),
                 ];
-
-
         }
         return false;
     }
