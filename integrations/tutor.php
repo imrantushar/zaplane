@@ -66,7 +66,7 @@ class Tutor extends IntegrationBase {
             ];
         }
 
-        if ( in_array( $trigger, ['tutor_quiz_course_attempt','quiz_target'], true ) ) {
+        if ( in_array( $trigger, ['tutor_quiz_course_attempt'], true ) ) {
             $options = [ 
                 ['label' => 'Any Quiz', 'value' => 'any'],
             ];
@@ -90,6 +90,44 @@ class Tutor extends IntegrationBase {
                     'label'    => 'Quiz',
                     'type'     => 'select',
                     'options'  => $options,
+                    'required' => true,
+                ],
+            ];
+        }
+
+        if ( $trigger === 'quiz_target' ) {
+
+            $options = [
+                ['label' => 'Any Quiz', 'value' => 'any'],
+            ];
+
+            if ( function_exists( 'tutor' ) ) {
+                $quizzes = get_posts([
+                    'post_type'      => 'tutor_quiz',
+                    'post_status'    => 'publish',
+                    'posts_per_page' => -1,
+                ]);
+
+                foreach ( $quizzes as $quiz ) {
+                    $options[] = [
+                        'label' => $quiz->post_title,
+                        'value' => $quiz->ID,
+                    ];
+                }
+            }
+
+            return [
+                [
+                    'key'      => 'quiz_id',
+                    'label'    => 'Quiz',
+                    'type'     => 'select',
+                    'options'  => $options,
+                    'required' => true,
+                ],
+                [
+                    'key'      => 'target_percentage',
+                    'label'    => 'Target Percentage (%)',
+                    'type'     => 'number',
                     'required' => true,
                 ],
             ];
@@ -127,75 +165,140 @@ class Tutor extends IntegrationBase {
     }
 
     public static function resolve_trigger( array $node, array $args ) {
-        error_log(print_r($node , true));
-
         switch ( $node['event'] ) {
             case 'user_enroll_course':
+
                 $course_id = $args[0] ?? null;
                 $enroll_id = $args[1] ?? null;
-                
-                if ( !$course_id && !$enroll_id ) return false;
+
+                if ( ! $course_id || ! $enroll_id ) return false;
+
+                $selected_course = $node['data']['config']['course_id'] ?? 'any';
+
+                if ( $selected_course !== 'any' && (int)$selected_course !== (int)$course_id ) {
+                    return false;
+                }
+
                 return [
-                    'success' => true,
+                    'success'   => true,
                     'course_id' => $course_id,
                     'enroll_id' => $enroll_id,
-                    ];
-                    
+                ];
+                                
             case 'course_complete':
-                $course_id = $args[0] ?? null; 
-                if ( ! $course_id ) return false;
+
+                $course_id = $args[0] ?? null;
+                $user_id   = $args[1] ?? get_current_user_id();
+
+                if ( ! $course_id || ! $user_id ) return false;
 
                 $coursePost = get_post( (int) $course_id );
-                if ( ! $coursePost ) return false;
+                $userData   = get_userdata( $user_id );
 
-                $courseData = [
-                    'course_id'    => $coursePost->ID,
-                    'course_title' => $coursePost->post_title,
-                    'course_url'   => get_permalink( $coursePost->ID ),
-                ];
+                if ( ! $coursePost || ! $userData ) return false;
 
-                $user= get_current_user_id();
+                $selected_course = $node['data']['config']['course_id'] ?? 'any';
 
-                $currentUser = [
-                    'first_name' => $user['first_name'],
-                    'last_name'  => $user['last_name'],
-                    'user_email' => $user['user_email'],
-                    'nickname'   => $user['nickname'],
-                    'avatar_url' => $user['avatar_url'],
-                ];
+                if ( $selected_course !== 'any' && (int)$selected_course !== (int)$course_id ) {
+                    return false;
+                }
 
-                $courseDataFinal = $courseData + $currentUser;
-
-                if ( !$courseDataFinal) return false;
                 return [
-                    'success' => true,
-                    'course_data' => $courseDataFinal,
-                    ];
-                
-                error_log(print_r($courseDataFinal , true ));
-                ray($courseDataFinal);
+                    'success'       => true,
+                    'course_id'     => $coursePost->ID,
+                    'course_title'  => $coursePost->post_title,
+                    'course_url'    => get_permalink( $coursePost->ID ),
+                    'user_id'       => $user_id,
+                    'first_name'    => $userData->first_name,
+                    'last_name'     => $userData->last_name,
+                    'user_email'    => $userData->user_email,
+                    'nickname'      => $userData->nickname,
+                ];
 
             case 'lesson_complete':
                 $lesson_id  = $args[0] ?? null;
                 $user_id    = $args[1] ?? get_current_user_id();
                 
-                if ( !$lesson_id && !$user_id ) return false;
+                if ( ! $lesson_id || ! $user_id ) return false;
+
+                $selected_lesson = $node['data']['config']['lesson_id'] ?? 'any';
+
+                if ( $selected_lesson !== 'any' && (int)$selected_lesson !== (int)$lesson_id ) {
+                    return false;
+                }
+
                 return [
                     'success' => true,
                     'lesson_id' => $lesson_id,
                     'user_id'   => $user_id,
                 ];
             case 'tutor_quiz_course_attempt':
-            case 'quiz_target':
+                $attempt = $args[0] ?? null;
 
-                $quiz_id = $attempt['quiz_id'] ?? $attempt['quizId'] ;
-                $user_id = $user_id ?: get_current_user_id();
-                
-                if ( !$quiz_id && !$user_id ) return false;
+                if ( ! $attempt ) return false;
+
+                $quiz_id = $attempt->quiz_id ?? null;
+                $user_id = $attempt->user_id ?? null;
+
+                if ( ! $quiz_id || ! $user_id ) return false;
+
+                $selected_quiz = $node['data']['config']['quiz_id'] ?? 'any';
+
+                if ( $selected_quiz !== 'any' && (int)$selected_quiz !== (int)$quiz_id ) {
+                    return false;
+                }
+
                 return [
                     'success' => true,
                     'quiz_id' => $quiz_id,
-                    'user_id'   => $user_id,
+                    'user_id' => $user_id,
+                ];
+
+            case 'quiz_target':
+                $attempt = $args[0] ?? null;
+                if ( ! $attempt ) return false;
+
+                // Support array or object
+                $quiz_id = is_array($attempt)
+                    ? ($attempt['quiz_id'] ?? null)
+                    : ($attempt->quiz_id ?? null);
+
+                $user_id = is_array($attempt)
+                    ? ($attempt['user_id'] ?? null)
+                    : ($attempt->user_id ?? null);
+
+                $earned = is_array($attempt)
+                    ? ($attempt['earned_marks'] ?? 0)
+                    : ($attempt->earned_marks ?? 0);
+
+                $total = is_array($attempt)
+                    ? ($attempt['total_marks'] ?? 0)
+                    : ($attempt->total_marks ?? 0);
+
+                if ( ! $quiz_id || ! $user_id || ! $total ) return false;
+
+                // Quiz filter
+                $selected_quiz = $node['data']['config']['quiz_id'] ?? 'any';
+
+                if ( $selected_quiz !== 'any' && (int)$selected_quiz !== (int)$quiz_id ) {
+                    return false;
+                }
+
+                // Percentage check
+                $percentage = ( $earned / $total ) * 100;
+                $target     = (float) ($node['data']['config']['target_percentage'] ?? 0);
+
+                if ( $percentage < $target ) {
+                    return false;
+                }
+
+                return [
+                    'success'     => true,
+                    'quiz_id'     => $quiz_id,
+                    'user_id'     => $user_id,
+                    'score'       => $earned,
+                    'total_marks' => $total,
+                    'percentage'  => round( $percentage, 2 ),
                 ];
 
 

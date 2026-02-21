@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-02-18 11:20:30",
+    "generated_at": "2026-02-20 19:12:08",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -3260,36 +3260,12 @@
                                     "value": "any"
                                 },
                                 {
-                                    "label": "New Coursefgsdfgertwtgfdvxctx",
-                                    "value": 40
-                                },
-                                {
-                                    "label": "fhdfghdf",
-                                    "value": 26
-                                },
-                                {
-                                    "label": "New Coursefgsdfgs",
-                                    "value": 23
-                                },
-                                {
-                                    "label": "New Course3",
-                                    "value": 19
-                                },
-                                {
-                                    "label": "New Coursekln.m,n",
-                                    "value": 38
-                                },
-                                {
-                                    "label": "mnb,mb",
-                                    "value": 37
-                                },
-                                {
                                     "label": "New Course2",
-                                    "value": 14
+                                    "value": 16
                                 },
                                 {
                                     "label": "New Course",
-                                    "value": 10
+                                    "value": 11
                                 }
                             ],
                             "required": true
@@ -3314,36 +3290,12 @@
                                     "value": "any"
                                 },
                                 {
-                                    "label": "New Coursefgsdfgertwtgfdvxctx",
-                                    "value": 40
-                                },
-                                {
-                                    "label": "fhdfghdf",
-                                    "value": 26
-                                },
-                                {
-                                    "label": "New Coursefgsdfgs",
-                                    "value": 23
-                                },
-                                {
-                                    "label": "New Course3",
-                                    "value": 19
-                                },
-                                {
-                                    "label": "New Coursekln.m,n",
-                                    "value": 38
-                                },
-                                {
-                                    "label": "mnb,mb",
-                                    "value": 37
-                                },
-                                {
                                     "label": "New Course2",
-                                    "value": 14
+                                    "value": 16
                                 },
                                 {
                                     "label": "New Course",
-                                    "value": 10
+                                    "value": 11
                                 }
                             ],
                             "required": true
@@ -3366,6 +3318,10 @@
                                 {
                                     "label": "Any Quiz",
                                     "value": "any"
+                                },
+                                {
+                                    "label": "sdfgsd",
+                                    "value": 19
                                 }
                             ],
                             "required": true
@@ -3410,8 +3366,18 @@
                                 {
                                     "label": "Any Quiz",
                                     "value": "any"
+                                },
+                                {
+                                    "label": "sdfgsd",
+                                    "value": 19
                                 }
                             ],
+                            "required": true
+                        },
+                        {
+                            "key": "target_percentage",
+                            "label": "Target Percentage (%)",
+                            "type": "number",
                             "required": true
                         }
                     ],
