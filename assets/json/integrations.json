@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-02-19 09:27:50",
+    "generated_at": "2026-02-22 05:25:29",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -3214,14 +3214,6 @@
                                 {
                                     "label": "Any Tag",
                                     "value": "any"
-                                },
-                                {
-                                    "label": "tag 1",
-                                    "value": 1
-                                },
-                                {
-                                    "label": "tag 2",
-                                    "value": 2
                                 }
                             ],
                             "required": true
@@ -3244,14 +3236,6 @@
                                 {
                                     "label": "Any Tag",
                                     "value": "any"
-                                },
-                                {
-                                    "label": "tag 1",
-                                    "value": 1
-                                },
-                                {
-                                    "label": "tag 2",
-                                    "value": 2
                                 }
                             ],
                             "required": true
@@ -3274,14 +3258,6 @@
                                 {
                                     "label": "Any List",
                                     "value": "any"
-                                },
-                                {
-                                    "label": "list 1",
-                                    "value": 1
-                                },
-                                {
-                                    "label": "list 2",
-                                    "value": 2
                                 }
                             ],
                             "required": true
@@ -3304,14 +3280,6 @@
                                 {
                                     "label": "Any List",
                                     "value": "any"
-                                },
-                                {
-                                    "label": "list 1",
-                                    "value": 1
-                                },
-                                {
-                                    "label": "list 2",
-                                    "value": 2
                                 }
                             ],
                             "required": true
@@ -3432,14 +3400,6 @@
                                 {
                                     "label": "Any List",
                                     "value": "any"
-                                },
-                                {
-                                    "label": "list 1",
-                                    "value": 1
-                                },
-                                {
-                                    "label": "list 2",
-                                    "value": 2
                                 }
                             ],
                             "required": true,
@@ -3453,14 +3413,6 @@
                                 {
                                     "label": "Any Tag",
                                     "value": "any"
-                                },
-                                {
-                                    "label": "tag 1",
-                                    "value": 1
-                                },
-                                {
-                                    "label": "tag 2",
-                                    "value": 2
                                 }
                             ],
                             "required": true,
@@ -3470,16 +3422,7 @@
                             "key": "company",
                             "label": "company",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Accounting",
-                                    "value": 1
-                                },
-                                {
-                                    "label": "amar company",
-                                    "value": 2
-                                }
-                            ],
+                            "options": [],
                             "required": true,
                             "multiple": true
                         },
@@ -3705,14 +3648,6 @@
                                 {
                                     "label": "Any Tag",
                                     "value": "any"
-                                },
-                                {
-                                    "label": "tag 1",
-                                    "value": 1
-                                },
-                                {
-                                    "label": "tag 2",
-                                    "value": 2
                                 }
                             ],
                             "required": true,
@@ -3741,14 +3676,6 @@
                                 {
                                     "label": "Any Tag",
                                     "value": "any"
-                                },
-                                {
-                                    "label": "tag 1",
-                                    "value": 1
-                                },
-                                {
-                                    "label": "tag 2",
-                                    "value": 2
                                 }
                             ],
                             "required": true,
@@ -3827,14 +3754,6 @@
                                 {
                                     "label": "Any List",
                                     "value": "any"
-                                },
-                                {
-                                    "label": "list 1",
-                                    "value": 1
-                                },
-                                {
-                                    "label": "list 2",
-                                    "value": 2
                                 }
                             ],
                             "required": true,
@@ -3863,14 +3782,6 @@
                                 {
                                     "label": "Any List",
                                     "value": "any"
-                                },
-                                {
-                                    "label": "list 1",
-                                    "value": 1
-                                },
-                                {
-                                    "label": "list 2",
-                                    "value": 2
                                 }
                             ],
                             "required": true,
@@ -4033,16 +3944,7 @@
                             "key": "company",
                             "label": "company",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Accounting",
-                                    "value": 1
-                                },
-                                {
-                                    "label": "amar company",
-                                    "value": 2
-                                }
-                            ],
+                            "options": [],
                             "required": true,
                             "multiple": true
                         }
@@ -4065,16 +3967,7 @@
                             "key": "company",
                             "label": "company",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Accounting",
-                                    "value": 1
-                                },
-                                {
-                                    "label": "amar company",
-                                    "value": 2
-                                }
-                            ],
+                            "options": [],
                             "required": true,
                             "multiple": true
                         }
@@ -4257,28 +4150,52 @@
                                     "type": "select",
                                     "options": [
                                         {
-                                            "label": "==",
+                                            "label": "Equals",
                                             "value": "=="
                                         },
                                         {
-                                            "label": "!=",
+                                            "label": "Not Equals",
                                             "value": "!="
                                         },
                                         {
-                                            "label": "<",
-                                            "value": "<"
-                                        },
-                                        {
-                                            "label": ">",
+                                            "label": "Greater Than",
                                             "value": ">"
                                         },
                                         {
-                                            "label": "<=",
+                                            "label": "Less Than",
+                                            "value": "<"
+                                        },
+                                        {
+                                            "label": "Greater or Equal",
+                                            "value": ">="
+                                        },
+                                        {
+                                            "label": "Less or Equal",
                                             "value": "<="
                                         },
                                         {
-                                            "label": ">=",
-                                            "value": ">="
+                                            "label": "Contains",
+                                            "value": "contains"
+                                        },
+                                        {
+                                            "label": "Not Contains",
+                                            "value": "not_contains"
+                                        },
+                                        {
+                                            "label": "Starts With",
+                                            "value": "starts_with"
+                                        },
+                                        {
+                                            "label": "Ends With",
+                                            "value": "ends_with"
+                                        },
+                                        {
+                                            "label": "Is Empty",
+                                            "value": "is_empty"
+                                        },
+                                        {
+                                            "label": "Is Not Empty",
+                                            "value": "is_not_empty"
                                         }
                                     ],
                                     "required": true
