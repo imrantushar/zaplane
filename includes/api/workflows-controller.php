@@ -194,13 +194,15 @@ class WorkflowsController extends WP_REST_Controller
             foreach ($nodeRuns as $nodeKey => $nodeRun) {
                 $output = $nodeRun->getOutput();
 
-                $outputData = $output['data'] ?? $output;
+                if (!is_array($output)) {
+                    $output = ['value' => $output];
+                }
 
                 $testOutputs[$nodeKey] = [
                     'node_run_id' => $nodeRun->id,
                     'run_id' => $nodeRun->run_id,
-                    'output' => $outputData,
-                    'variables' => VariableExtractor::extract($outputData),
+                    'output' => $output,
+                    'variables' => VariableExtractor::extract($output),
                     'tested_at' => $nodeRun->finished_at,
                 ];
             }
@@ -347,7 +349,7 @@ class WorkflowsController extends WP_REST_Controller
             if (!$node) continue;
 
             $nodeType = $node['type'] ?? '';
-            if (!in_array($nodeType, ['action', 'trigger'])) continue;
+            if (!in_array($nodeType, ['action', 'trigger', 'condition', 'filter'])) continue;
 
             $nodeRun = $nodeOutputs[$nodeId] ?? null;
 
@@ -360,11 +362,15 @@ class WorkflowsController extends WP_REST_Controller
 
                 $data[] = [
                     'node_id' => $nodeId,
+                    'node_name' => $node['data']['name'] ?? '',
+                    'node_event' => $node['data']['event'] ?? '',
                     'variables' => VariableExtractor::extract($output),
                 ];
             } else {
                 $data[] = [
                     'node_id' => $nodeId,
+                    'node_name' => $node['data']['name'] ?? '',
+                    'node_event' => $node['data']['event'] ?? '',
                     'variables' => [],
                 ];
             }

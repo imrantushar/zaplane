@@ -5,8 +5,6 @@ use Zaplane\Traits\ActionResponseTrait;
 
 trait OptionActionsTrait
 {
-    use ActionResponseTrait;
-
     protected static function action_activate_plugin(array $config): array
     {
         $plugin = $config['plugin'] ?? '';
