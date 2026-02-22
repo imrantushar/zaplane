@@ -5,7 +5,8 @@ import {
   HStack,
   Input,
   Flex,
-  Code
+  Code,
+  Box
 } from "@chakra-ui/react";
 import ZAPDrawer from "@ZAPComponents/Drawer";
 import ZAPSelect from "@ZAPComponents/ZAPSelect";
@@ -24,17 +25,19 @@ import TestDetails from "./TestDetails/TestDetails";
 import ActionFieldRenderer from "./ActionFieldRenderer/ActionFieldRenderer";
 import { workFLowSingeNodeExction } from "@ZAPRedux/Slices/workFlowSlice/actions/workflowExctions";
 import { fetchDynamic } from "@ZAPRedux/Slices/workFlowSlice/helper";
+import ZAPAlert from "@ZAPComponents/ZAPAlert";
 
 
 export default function ActionDrawer({ open, context, onClose, updateNodeData, createActionNode, workFlow, isFullscreen }) {
   const { source, node } = context;
-  console.log(context,'contextss');
+  console.log(context, 'contextss');
   const dispatch = useDispatch();
   const { values, setFieldValue, resetForm } = useFormikContext();
   const [step, setStep] = useState("select");
   const [dynamicOptions, setDynamicOptions] = useState({});
   const [loadingFields, setLoadingFields] = useState({});
   const isTrigger = node?.data?.action === "trigger" && source === "node";
+  const [showWarning, setShowWarning] = useState(false);
 
   const { mode, setMode, selectedItem, setSelectedItem, search, setSearch, list, searchList } =
     useActionDrawer(open, node, source, setFieldValue, isTrigger);
@@ -252,18 +255,43 @@ export default function ActionDrawer({ open, context, onClose, updateNodeData, c
               label: "Test",
               content: (
                 <>
-                  <Button mb={4} 
-                  {...primaryBtn}
-                  onClick={() =>
-                    dispatch(workFLowSingeNodeExction({
-                      workflow_hash: workFlow?.version?.hash,
-                      node_key: node?.id,
-                      input: values,
-                    }))
-                  }>
+                  <Button
+                    mb={4}
+                    {...primaryBtn}
+                    isDisabled={source !== "node"}
+                    onClick={() => {
+                      if (source !== "node") {
+                        setShowWarning(true);
+                        return;
+                      }
+                      setShowWarning(false);
+                      dispatch(
+                        workFLowSingeNodeExction({
+                          workflow_hash: workFlow?.version?.hash,
+                          node_key: node?.id,
+                          input: values,
+                        })
+                      );
+                    }}
+                  >
                     {__("Test Action", "zaplane")}
                   </Button>
-                  <TestDetails id={node?.id} workFlow={workFlow} source={source} />
+                  {showWarning && (
+                    <ZAPAlert
+                      status="warning"
+                      title="Action Submit Required"
+                      description="Submit node first, then test again."
+                      mt={4}
+                    />
+                  )}
+
+                  {source === "node" && (
+                    <TestDetails
+                      id={node?.id}
+                      workFlow={workFlow}
+                      source={source}
+                    />
+                  )}
                 </>
               )
             }
