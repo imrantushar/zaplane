@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-02-21 13:17:54",
+    "generated_at": "2026-02-22 06:51:26",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -3260,16 +3260,28 @@
                                     "value": "any"
                                 },
                                 {
-                                    "label": "test couse",
-                                    "value": 24
+                                    "label": "New Course 2",
+                                    "value": 21
                                 },
                                 {
                                     "label": "New Course",
                                     "value": 10
                                 },
                                 {
-                                    "label": "New Course 2",
-                                    "value": 17
+                                    "label": "New Coursesa",
+                                    "value": 37
+                                },
+                                {
+                                    "label": "dfgsd",
+                                    "value": 36
+                                },
+                                {
+                                    "label": "New Coursesdfasdfav",
+                                    "value": 33
+                                },
+                                {
+                                    "label": "New Course fgs",
+                                    "value": 27
                                 }
                             ],
                             "required": true
@@ -3294,16 +3306,28 @@
                                     "value": "any"
                                 },
                                 {
-                                    "label": "test couse",
-                                    "value": 24
+                                    "label": "New Course 2",
+                                    "value": 21
                                 },
                                 {
                                     "label": "New Course",
                                     "value": 10
                                 },
                                 {
-                                    "label": "New Course 2",
-                                    "value": 17
+                                    "label": "New Coursesa",
+                                    "value": 37
+                                },
+                                {
+                                    "label": "dfgsd",
+                                    "value": 36
+                                },
+                                {
+                                    "label": "New Coursesdfasdfav",
+                                    "value": 33
+                                },
+                                {
+                                    "label": "New Course fgs",
+                                    "value": 27
                                 }
                             ],
                             "required": true
@@ -3328,16 +3352,8 @@
                                     "value": "any"
                                 },
                                 {
-                                    "label": "gsdfgs",
-                                    "value": 27
-                                },
-                                {
-                                    "label": "dsfgsdfg",
-                                    "value": 20
-                                },
-                                {
-                                    "label": "gdsfsdg",
-                                    "value": 16
+                                    "label": "fasdfa",
+                                    "value": 13
                                 }
                             ],
                             "required": true
@@ -3362,16 +3378,16 @@
                                     "value": "any"
                                 },
                                 {
-                                    "label": "sdfgsdf",
-                                    "value": 26
+                                    "label": "zxvzx",
+                                    "value": 29
                                 },
                                 {
-                                    "label": "dfgsdf",
-                                    "value": 19
+                                    "label": "sdfgsdfg",
+                                    "value": 23
                                 },
                                 {
-                                    "label": "gsdfs",
-                                    "value": 15
+                                    "label": "fasdf",
+                                    "value": 12
                                 }
                             ],
                             "required": true
@@ -3396,16 +3412,8 @@
                                     "value": "any"
                                 },
                                 {
-                                    "label": "gsdfgs",
-                                    "value": 27
-                                },
-                                {
-                                    "label": "dsfgsdfg",
-                                    "value": 20
-                                },
-                                {
-                                    "label": "gdsfsdg",
-                                    "value": 16
+                                    "label": "fasdfa",
+                                    "value": 13
                                 }
                             ],
                             "required": true

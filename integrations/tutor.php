@@ -167,7 +167,6 @@ class Tutor extends IntegrationBase {
     public static function resolve_trigger( array $node, array $args ) {
         switch ( $node['event'] ) {
             case 'user_enroll_course':
-
                 $course_id = $args[0] ?? null;
                 $enroll_id = $args[1] ?? null;
 
@@ -186,46 +185,42 @@ class Tutor extends IntegrationBase {
                 ];
                                 
             case 'course_complete':
+                $course_id = $args[0] ?? null;
+                $user_id   = $args[1] ?? get_current_user_id();
 
-               $course_id = $args[0] ?? null;
-                if ( ! $course_id ) return false;
-
-                $user_id = get_current_user_id();
-                if ( ! $user_id ) return false;
-
-                $coursePost = get_post( (int) $course_id );
-                $userData   = get_userdata( $user_id );
-
-                if ( ! $coursePost || ! $userData ) return false;
+                if ( ! $course_id || ! $user_id ) return false;
 
                 $selected_course = $node['data']['config']['course_id'] ?? 'any';
 
-                if ( $selected_course !== 'any' && (int) $selected_course !== (int) $course_id ) {
+                if ( $selected_course !== 'any' && (int)$selected_course !== (int)$course_id ) {
                     return false;
                 }
 
+                $course = get_post( $course_id );
+                $user   = get_userdata( $user_id );
+
+                if ( ! $course || ! $user ) return false;
+
                 return [
-                    'success'       => true,
-                    'course_id'     => $coursePost->ID,
-                    'course_title'  => $coursePost->post_title,
-                    'course_url'    => get_permalink( $coursePost->ID ),
-                    'user_id'       => $user_id,
-                    'first_name'    => $userData->first_name,
-                    'last_name'     => $userData->last_name,
-                    'user_email'    => $userData->user_email,
-                    'nickname'      => $userData->nickname,
+                    'success'      => true,
+                    'course_id'    => $course->ID,
+                    'course_title' => $course->post_title,
+                    'course_url'   => get_permalink( $course->ID ),
+                    'user_id'      => $user_id,
+                    'user_email'   => $user->user_email,
+                    'first_name'   => $user->first_name,
+                    'last_name'    => $user->last_name,
                 ];
 
-            case 'lesson_complete':
-                $ $lesson_id = $args[0] ?? null;
-                if ( ! $lesson_id ) return false;
+           case 'lesson_complete':
+                $lesson_id = $args[0] ?? null;
+                $user_id   = $args[1] ?? get_current_user_id();
 
-                $user_id = get_current_user_id();
-                if ( ! $user_id ) return false;
+                if ( ! $lesson_id || ! $user_id ) return false;
 
                 $selected_lesson = $node['data']['config']['lesson_id'] ?? 'any';
 
-                if ( $selected_lesson !== 'any' && (int) $selected_lesson !== (int) $lesson_id ) {
+                if ( $selected_lesson !== 'any' && (int)$selected_lesson !== (int)$lesson_id ) {
                     return false;
                 }
 
@@ -234,6 +229,7 @@ class Tutor extends IntegrationBase {
                     'lesson_id' => $lesson_id,
                     'user_id'   => $user_id,
                 ];
+
             case 'tutor_quiz_course_attempt':
                 $attempt_id = $args[0] ?? null;
                 if ( ! $attempt_id ) return false;
