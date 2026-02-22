@@ -19,7 +19,7 @@ import { route_path } from "@ZAPUtils/helper";
 
 const CreateWorkflows = () => {
   const dispatch = useDispatch();
-  const navigate =useNavigate()
+  const navigate = useNavigate()
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [workflowName, setWorkflowName] = useState("");
 
@@ -27,7 +27,7 @@ const CreateWorkflows = () => {
     dispatch(getWorkFlow());
   }, [dispatch]);
 
-   const handleCreate = async () => {
+  const handleCreate = async () => {
     if (!workflowName.trim()) return;
     const res = await dispatch(
       createWorkflows({
@@ -55,15 +55,18 @@ const CreateWorkflows = () => {
           </Box>
         )}
         rightContent={() => (
-          <ZAPMenu
-            triggerLabel="Create Workflow"
-            items={[
-              {
-                label: "Create from Scratch",
-                onClick: () => setIsModalOpen(true),
-              },
-            ]}
-          />
+          // <ZAPMenu
+          //   triggerLabel="Create Workflow"
+          //   items={[
+          //     {
+          //       label: "Create from Scratch",
+          //       onClick: () => setIsModalOpen(true),
+          //     },
+          //   ]}
+          // />
+          <Button {...primaryBtn} onClick={() => setIsModalOpen(true)}>
+            {__('Create Workflow','zaplane')}
+          </Button>
         )}
       />
 

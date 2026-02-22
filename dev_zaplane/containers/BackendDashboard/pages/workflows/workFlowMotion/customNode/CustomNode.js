@@ -10,7 +10,7 @@ import { RiDeleteBin5Line } from "react-icons/ri";
 import { FaRegCopy } from "react-icons/fa";
 import FloatingEdge from "../FloatingEdge/FloatingEdge";
 import { __, sprintf } from "@wordpress/i18n";
-import { formatLabel } from "./helper";
+import { formatLabel } from "@ZAPUtils/helper";
 export default function CustomNode({ id, data, canvasLayout }) {
   const [hovered, setHovered] = useState(false);
 

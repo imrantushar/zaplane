@@ -122,3 +122,31 @@ export const getDuration = (start, end) => {
 
   return `${secs}s`;
 };
+export const formatDateTime = (dateString) => {
+  if (!dateString) return { date: "", time: "" };
+
+  const safeDate = dateString.replace(" ", "T");
+  const dateObj = new Date(safeDate);
+
+  if (isNaN(dateObj)) return { date: "", time: "" };
+
+  return {
+    date: dateObj.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "2-digit",
+    }),
+    time: dateObj.toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    }),
+  };
+};
+export function formatLabel(value = "") {
+
+  return value
+    .replace(/_/g, " ")
+    .toLowerCase()
+    .replace(/\b\w/g, char => char.toUpperCase());
+}

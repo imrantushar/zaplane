@@ -1,4 +1,4 @@
-import {Button,HStack, Input,} from "@chakra-ui/react";
+import { Button, HStack, Input, } from "@chakra-ui/react";
 import ZAPDrawer from "@ZAPComponents/Drawer";
 import { integrations } from "@ZAPUtils/helper";
 import { useFormikContext } from "formik";
@@ -17,7 +17,7 @@ import DrawerSearchList from "./DrawerSearchList/DrawerSearchList";
 import DrawerModeList from "./DrawerItemList/DrawerModeList";
 import DrawerItemList from "./DrawerItemList";
 
- const  ActionDrawer=({ open, context, onClose, updateNodeData, createActionNode, workFlow, isFullscreen }) =>{
+const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode, workFlow, isFullscreen }) => {
   const { source, node } = context;
   const dispatch = useDispatch();
   const { values, setFieldValue, resetForm } = useFormikContext();
@@ -111,11 +111,14 @@ import DrawerItemList from "./DrawerItemList";
     context?.source === "node" ? updateNodeData(payload) : createActionNode(payload);
     resetAll();
   };
+  console.log(mode, 'selectedItem?.name');
   return (
     <ZAPDrawer
       open={open}
       isFullscreen={isFullscreen}
       onClose={resetAll}
+      arrowClose={mode === 'app'}
+      arrowOnClick={() => setMode(null)}
       // closeOnOverlayClick
       title={!mode ? "Add Action" : selectedItem?.name || __('App', 'zaplane')}
       placement="end"

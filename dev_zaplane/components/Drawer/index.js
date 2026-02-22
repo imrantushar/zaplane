@@ -22,7 +22,8 @@ const ZAPDrawer = ({
     onClose,
     open,
     arrowClose,
-    isFullscreen=false
+    isFullscreen = false,
+    arrowOnClick
 }) => {
     return (
         <Drawer.Root
@@ -45,13 +46,16 @@ const ZAPDrawer = ({
             </Drawer.Trigger>
 
             <Portal>
-                <Drawer.Positioner marginTop={isFullscreen?'0':"32px"} height={isFullscreen?'100%':'calc(100vh - 32px)'} zIndex={"9999"}
+                <Drawer.Positioner marginTop={isFullscreen ? '0' : "32px"} height={isFullscreen ? '100%' : 'calc(100vh - 32px)'} zIndex={"9999"}
                     pointerEvents="none">
                     <Drawer.Content pointerEvents="auto">
                         {title && (
                             <Drawer.Header>
                                 {
-                                    arrowClose && <Button height="30px" width="20px" variant="outline" onClick={onClose} >
+                                    arrowClose && <Button height="30px" width="20px" variant="outline"
+                                        onClick={() => {
+                                            arrowOnClick ? arrowOnClick() : onClose?.();
+                                        }} >
                                         <FiArrowLeft />
                                     </Button>
                                 }
