@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-02-15 11:48:33",
+    "generated_at": "2026-02-22 10:19:03",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -2929,10 +2929,19 @@
                     "schema": [
                         {
                             "key": "course_id",
-                            "label": "Course ID",
-                            "type": "number",
-                            "required": false,
-                            "help": "Leave empty for any course"
+                            "label": "course",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Any course",
+                                    "value": "any"
+                                },
+                                {
+                                    "label": "asdfasdf",
+                                    "value": 47
+                                }
+                            ],
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -2945,17 +2954,17 @@
                     "hook": "academy_quizzes/api/after_quiz_attempt_finished",
                     "schema": [
                         {
-                            "key": "course_id",
-                            "label": "Course",
+                            "key": "quiz_id",
+                            "label": "Quiz",
                             "type": "select",
                             "options": [
                                 {
-                                    "label": "Any Course",
+                                    "label": "Any Quiz",
                                     "value": "any"
                                 },
                                 {
-                                    "label": "sfasdf",
-                                    "value": 12
+                                    "label": "xdfzvxvzxc",
+                                    "value": 48
                                 }
                             ],
                             "required": true
@@ -2976,8 +2985,12 @@
                             "type": "select",
                             "options": [
                                 {
-                                    "label": "Any Lesson",
+                                    "label": "Any lesson",
                                     "value": "any"
+                                },
+                                {
+                                    "label": "fasfd",
+                                    "value": "1"
                                 }
                             ],
                             "required": true
@@ -2994,16 +3007,16 @@
                     "schema": [
                         {
                             "key": "course_id",
-                            "label": "Course",
+                            "label": "course",
                             "type": "select",
                             "options": [
                                 {
-                                    "label": "Any Course",
+                                    "label": "Any course",
                                     "value": "any"
                                 },
                                 {
-                                    "label": "sfasdf",
-                                    "value": 12
+                                    "label": "asdfasdf",
+                                    "value": 47
                                 }
                             ],
                             "required": true
@@ -3019,27 +3032,26 @@
                     "hook": "academy_quizzes/api/after_quiz_attempt_finished",
                     "schema": [
                         {
-                            "key": "course_id",
-                            "label": "Course",
+                            "key": "quiz_id",
+                            "label": "Quiz",
                             "type": "select",
                             "options": [
                                 {
-                                    "label": "Any Course",
+                                    "label": "Any Quiz",
                                     "value": "any"
                                 },
                                 {
-                                    "label": "sfasdf",
-                                    "value": 12
+                                    "label": "xdfzvxvzxc",
+                                    "value": 48
                                 }
                             ],
                             "required": true
                         },
                         {
                             "key": "target_percentage",
-                            "label": "Target Percentage",
+                            "label": "Target Percentage (%)",
                             "type": "number",
-                            "required": false,
-                            "help": "Trigger only if user score is equal or higher than this percentage"
+                            "required": true
                         }
                     ],
                     "outputs": [

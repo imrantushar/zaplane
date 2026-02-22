@@ -7,336 +7,318 @@ use Zaplane\Framework\Classes\IntegrationBase;
 
 class Academy extends IntegrationBase {
 
-    /**
-     * Integration slug
-     */
     public static function get_slug(): string {
         return 'academy';
     }
 
-    /**
-     * Register triggers
-     */
     public static function get_triggers(): array {
         return [
             'user_enroll_course' => [
-                'label' => 'User enrolled in a course',
-                'hook'  => 'academy/course/after_enroll',
+                'label' => 'User enrolled in a course', 
+                'hook'  => 'academy/course/after_enroll'
             ],
             'academy_quiz_course_attempt' => [
-                'label' => 'User attempted (submitted) a quiz',
-                'hook'  => 'academy_quizzes/api/after_quiz_attempt_finished',
+                'label' => 'User attempted (submitted) a quiz', 
+                'hook'  => 'academy_quizzes/api/after_quiz_attempt_finished'
             ],
             'lesson_complete' => [
-                'label' => 'User completed a lesson',
-                'hook'  => 'academy/frontend/after_mark_topic_complete',
+                'label' => 'User completed a lesson', 
+                'hook'  => 'academy/frontend/after_mark_topic_complete'
             ],
             'course_complete' => [
-                'label' => 'User completed a course',
-                'hook'  => 'academy/admin/course_complete_after',
+                'label' => 'User completed a course', 
+                'hook'  => 'academy/admin/course_complete_after'
             ],
             'quiz_target' => [
-                'label' => 'User achieved target percentage on a quiz',
-                'hook'  => 'academy_quizzes/api/after_quiz_attempt_finished',
+                'label' => 'User achieved target percentage on a quiz', 
+                'hook'  => 'academy_quizzes/api/after_quiz_attempt_finished'
             ],
-        ];
+        ]; 
     }
 
-
-    /**
-     * Trigger config schema
-     */
     public static function get_trigger_config_schema( string $trigger ): array {
-
-        if ( $trigger === 'user_enroll_course' ) {
+        if ( in_array( $trigger, ['user_enroll_course','course_complete'], true ) ) {
+            $options = [ 
+                ['label' => 'Any course', 'value' => 'any'],
+            ];
+            if ( ! function_exists( 'Academy' ) ) {
+                $courses = get_posts([
+                    'post_type'      => 'academy_courses',
+                    'post_status'    => 'publish',
+                    'posts_per_page' => -1,
+                ]);
+                
+                foreach ( $courses as $course ) {
+                    $options[] = [
+                        'label' => $course->post_title,
+                        'value' => $course->ID
+                    ];
+                }
+            }
             return [
                 [
                     'key'      => 'course_id',
-                    'label'    => 'Course ID',
-                    'type'     => 'number',
-                    'required' => false,
-                    'help'     => 'Leave empty for any course',
-                ],
-            ];
-        }
-
-        if ( $trigger === 'academy_quiz_course_attempt' || $trigger === 'course_complete' || $trigger === 'quiz_target' ) {
-
-            $options = [
-                ['label' => 'Any Course', 'value' => 'any'],
-            ];
-
-            $courses = get_posts([
-                'post_type'      => 'academy_courses',
-                'post_status'    => 'publish',
-                'posts_per_page' => -1,
-            ]);
-
-            foreach ( $courses as $course ) {
-                $options[] = [
-                    'label' => $course->post_title,
-                    'value' => $course->ID,
-                ];
-            }
-
-            $schema = [
-                [
-                    'key'      => 'course_id',
-                    'label'    => 'Course',
+                    'label'    => 'course',
                     'type'     => 'select',
                     'options'  => $options,
                     'required' => true,
                 ],
             ];
+        }
 
-            if ( $trigger === 'quiz_target' ) {
-                $schema[] = [
+        if ( in_array( $trigger, ['academy_quiz_course_attempt'], true ) ) {
+            $options = [ 
+                ['label' => 'Any Quiz', 'value' => 'any'],
+            ];
+            if ( ! function_exists( 'Academy' ) ) {
+                $quizzes = get_posts([
+                    'post_type'      => 'academy_quiz',
+                    'post_status'    => 'publish',
+                    'posts_per_page' => -1,
+                ]);
+                
+                foreach ( $quizzes as $quiz ) {
+                    $options[] = [
+                        'label' => $quiz->post_title,
+                        'value' => $quiz->ID,
+                    ];
+                }
+            }
+            return [
+                [
+                    'key'      => 'quiz_id',
+                    'label'    => 'Quiz',
+                    'type'     => 'select',
+                    'options'  => $options,
+                    'required' => true,
+                ],
+            ];
+        }
+
+        if ( $trigger === 'quiz_target' ) {
+
+            $options = [
+                ['label' => 'Any Quiz', 'value' => 'any'],
+            ];
+
+            if ( ! function_exists( 'Academy' ) ) {
+                $quizzes = get_posts([
+                    'post_type'      => 'academy_quiz',
+                    'post_status'    => 'publish',
+                    'posts_per_page' => -1,
+                ]);
+
+                foreach ( $quizzes as $quiz ) {
+                    $options[] = [
+                        'label' => $quiz->post_title,
+                        'value' => $quiz->ID,
+                    ];
+                }
+            }
+
+            return [
+                [
+                    'key'      => 'quiz_id',
+                    'label'    => 'Quiz',
+                    'type'     => 'select',
+                    'options'  => $options,
+                    'required' => true,
+                ],
+                [
                     'key'      => 'target_percentage',
-                    'label'    => 'Target Percentage',
+                    'label'    => 'Target Percentage (%)',
                     'type'     => 'number',
-                    'required' => false,
-                    'help'     => 'Trigger only if user score is equal or higher than this percentage',
-                ];
-            }
-
-            return $schema;
-        }
-
-        if ( $trigger === 'lesson_complete' ) {
-
-            global $wpdb;
-
-            $table = $wpdb->prefix . 'academy_lessons';
-
-            $options = [
-                ['label' => 'Any Lesson', 'value' => 'any'],
-            ];
-
-            $lessons = $wpdb->get_results(
-                "SELECT ID, lesson_title 
-                 FROM {$table}
-                 WHERE lesson_status = 'publish'
-                 ORDER BY lesson_title ASC"
-            );
-
-            foreach ( $lessons as $lesson ) {
-                $options[] = [
-                    'label' => $lesson->lesson_title,
-                    'value' => $lesson->ID,
-                ];
-            }
-
-            return [
-                [
-                    'key'      => 'lesson_id',
-                    'label'    => 'Lesson',
-                    'type'     => 'select',
-                    'options'  => $options,
                     'required' => true,
                 ],
             ];
         }
 
-        return [];
-    }
+        if ( in_array( $trigger, ['lesson_complete'], true ) ) {
+            $options = [ 
+                ['label' => 'Any lesson', 'value' => 'any'],
+            ];
+            if ( !function_exists( 'Academy' ) ) {
+                global $wpdb;
+                $table = $wpdb->prefix . 'academy_lessons';
 
+                $lessons = $wpdb->get_results(
+                    "SELECT ID, lesson_title
+                    FROM {$table}
+                    WHERE lesson_status = 'publish'
+                    ORDER BY lesson_title ASC"
+                );
+
+                $options = [
+                    ['label' => 'Any lesson', 'value' => 'any'],
+                ];
+
+                foreach ( $lessons as $lesson ) {
+                    $options[] = [
+                        'label' => $lesson->lesson_title,  // lesson_title use করতে হবে
+                        'value' => $lesson->ID,
+                    ];
+                }
+
+                return [
+                    [
+                        'key'      => 'lesson_id',
+                        'label'    => 'Lesson',
+                        'type'     => 'select',
+                        'options'  => $options,
+                        'required' => true,
+                    ],
+                ];
+            }
+            return [];
+        }
+    }
 
     public static function resolve_trigger( array $node, array $args ) {
+        switch ( $node['event'] ) {
+            case 'user_enroll_course':
+                $course_id = $args[0] ?? null;
+                $enroll_id = $args[1] ?? null;
 
-        // 1) Normalize event key (some builders store it as "trigger")
-        $event = $node['event'] ?? ($node['trigger'] ?? '');
+                if ( ! $course_id || ! $enroll_id ) return false;
 
-        // 2) Sometimes UI sends event as array like ['value'=>'user_enroll_course', ...]
-        if (is_array($event)) {
-            $event = $event['value'] ?? ($event['key'] ?? ($event['slug'] ?? ''));
-        }
+                $selected_course = $node['data']['config']['course_id'] ?? 'any';
 
-        $event  = is_string($event) ? trim($event) : '';
-        $config = is_array($node['config'] ?? null) ? ($node['config'] ?? []) : [];
-
-        // args always array
-        $args = is_array($args) ? $args : [];
-
-        if (empty($event)) {
-            return false;
-        }
-
-        switch ( $event ) {
-
-            case 'user_enroll_course': {
-                $course_id = (int) ($args[0] ?? 0);
-                $enroll_id = (int) ($args[1] ?? 0);
-
-                if ( ! $course_id ) return false;
-
-                // current user sometimes 0 (cron/admin)
-                $user_id = (int) get_current_user_id();
-                if (!$user_id && !empty($args[2])) {
-                    $user_id = (int) $args[2];
-                }
-
-                if ( ! empty( $config['course_id'] ) && $config['course_id'] !== 'any' ) {
-                    if ( (int) $config['course_id'] !== $course_id ) {
-                        return false;
-                    }
-                }
-
-                return [
-                    'course_id' => $course_id,
-                    'enroll_id' => $enroll_id,
-                    'user_id'   => $user_id,
-                ];
-            }
-
-            case 'academy_quiz_course_attempt': {
-                $payload = $args[0] ?? null;
-
-                // attempt can be array OR attemptId (int)
-                $attempt = is_array($payload) ? $payload : [];
-                $attempt_id = is_numeric($payload) ? (int) $payload : 0;
-
-                // If you only get attemptId and you can't fetch full attempt,
-                // still return something usable (workflow can use attempt_id)
-                if (empty($attempt) && $attempt_id) {
-                    return [
-                        'attempt_id' => $attempt_id,
-                    ];
-                }
-
-                if ( empty($attempt) ) return false;
-
-                $course_id = (int) ($attempt['course_id'] ?? 0);
-                $user_id   = (int) ($attempt['user_id'] ?? 0);
-                $score     = (int) ($attempt['score'] ?? 0);
-
-                if ( ! empty( $config['course_id'] ) && $config['course_id'] !== 'any' ) {
-                    if ( (int) $config['course_id'] !== $course_id ) {
-                        return false;
-                    }
-                }
-
-                return [
-                    'course_id' => $course_id,
-                    'user_id'   => $user_id,
-                    'score'     => $score,
-                    'attempt'   => $attempt,
-                ];
-            }
-
-            case 'lesson_complete': {
-                // Hook: academy/frontend/after_mark_topic_complete (10, 4)
-                // Different versions can send args in different order.
-                // We'll detect the most likely user_id as last arg if numeric.
-                $a0 = $args[0] ?? 0;
-                $a1 = $args[1] ?? 0;
-                $a2 = $args[2] ?? 0;
-                $a3 = $args[3] ?? 0;
-
-                // user_id usually last
-                $user_id = is_numeric($a3) ? (int)$a3 : (is_numeric($a1) ? (int)$a1 : (int)get_current_user_id());
-                if (!$user_id) $user_id = (int)get_current_user_id();
-
-                // lesson_id often comes as 3rd arg, but fallback to first
-                $lesson_id = is_numeric($a2) ? (int)$a2 : (int)$a0;
-
-                if ( ! $lesson_id ) return false;
-
-                if ( ! empty( $config['lesson_id'] ) && $config['lesson_id'] !== 'any' ) {
-                    if ( (int) $config['lesson_id'] !== $lesson_id ) {
-                        return false;
-                    }
-                }
-
-                return [
-                    'lesson_id' => $lesson_id,
-                    'user_id'   => $user_id,
-                    'raw_args'  => $args, // debug friendly
-                ];
-            }
-
-            case 'course_complete': {
-                $course_id = (int) ($args[0] ?? 0);
-                if ( ! $course_id ) return false;
-
-                $user_id = (int) get_current_user_id();
-                if (!$user_id && !empty($args[1])) {
-                    $user_id = (int) $args[1];
-                }
-
-                if ( ! empty( $config['course_id'] ) && $config['course_id'] !== 'any' ) {
-                    if ( (int) $config['course_id'] !== $course_id ) {
-                        return false;
-                    }
-                }
-
-                return [
-                    'course_id' => $course_id,
-                    'user_id'   => $user_id,
-                ];
-            }
-
-            case 'quiz_target': {
-                $payload = $args[0] ?? null;
-
-                $attempt = is_array($payload) ? $payload : [];
-                $attempt_id = is_numeric($payload) ? (int) $payload : 0;
-
-                // attemptId only -> can't calculate score/target unless you fetch attempt
-                if (empty($attempt) && $attempt_id) {
-                    return [
-                        'attempt_id' => $attempt_id,
-                        'target_percentage' => (int) ($config['target_percentage'] ?? 0),
-                    ];
-                }
-
-                if ( empty($attempt) ) return false;
-
-                $course_id = (int) ($attempt['course_id'] ?? 0);
-                $user_id   = (int) ($attempt['user_id'] ?? 0);
-                $score     = (int) ($attempt['score'] ?? 0);
-
-                if ( ! empty( $config['course_id'] ) && $config['course_id'] !== 'any' ) {
-                    if ( (int) $config['course_id'] !== $course_id ) {
-                        return false;
-                    }
-                }
-
-                if ( ! empty( $config['target_percentage'] ) && $score < (int) $config['target_percentage'] ) {
+                if ( $selected_course !== 'any' && (int)$selected_course !== (int)$course_id ) {
                     return false;
                 }
 
                 return [
-                    'course_id'          => $course_id,
-                    'user_id'            => $user_id,
-                    'score'              => $score,
-                    'attempt'            => $attempt,
-                    'target_percentage'  => (int) ($config['target_percentage'] ?? 0),
+                    'success'   => true,
+                    'course_id' => $course_id,
+                    'enroll_id' => $enroll_id,
                 ];
-            }
-        }
+                                
+            case 'course_complete':
+                $course_id = $args[0] ?? null;
+                $user_id   = $args[1] ?? get_current_user_id();
 
+                if ( ! $course_id || ! $user_id ) return false;
+
+                $selected_course = $node['data']['config']['course_id'] ?? 'any';
+
+                if ( $selected_course !== 'any' && (int)$selected_course !== (int)$course_id ) {
+                    return false;
+                }
+
+                $course = get_post( $course_id );
+                $user   = get_userdata( $user_id );
+
+                if ( ! $course || ! $user ) return false;
+
+                return [
+                    'success'      => true,
+                    'course_id'    => $course->ID,
+                    'course_title' => $course->post_title,
+                    'course_url'   => get_permalink( $course->ID ),
+                    'user_id'      => $user_id,
+                    'user_email'   => $user->user_email,
+                    'first_name'   => $user->first_name,
+                    'last_name'    => $user->last_name,
+                ];
+
+           case 'lesson_complete':
+                $lesson_id = $args[0] ?? null;
+                $user_id   = $args[1] ?? get_current_user_id();
+
+                if ( ! $lesson_id || ! $user_id ) return false;
+
+                $selected_lesson = $node['data']['config']['lesson_id'] ?? 'any';
+
+                if ( $selected_lesson !== 'any' && (int)$selected_lesson !== (int)$lesson_id ) {
+                    return false;
+                }
+
+                return [
+                    'success'   => true,
+                    'lesson_id' => $lesson_id,
+                    'user_id'   => $user_id,
+                ];
+
+            case 'tutor_quiz_course_attempt':
+                $attempt_id = $args[0] ?? null;
+                if ( ! $attempt_id ) return false;
+
+                $attempt = tutor_utils()->get_attempt( $attempt_id );
+                if ( ! $attempt ) return false;
+
+                $quiz_id = $attempt->quiz_id ?? null;
+                $user_id = $attempt->user_id ?? null;
+
+                if ( ! $quiz_id || ! $user_id ) return false;
+
+                $selected_quiz = $node['data']['config']['quiz_id'] ?? 'any';
+
+                if ( $selected_quiz !== 'any' && (int) $selected_quiz !== (int) $quiz_id ) {
+                    return false;
+                }
+
+                return [
+                    'success' => true,
+                    'quiz_id' => $quiz_id,
+                    'user_id' => $user_id,
+                ];
+
+
+            case 'quiz_target':
+               $attempt_id = $args[0] ?? null;
+                if ( ! $attempt_id ) return false;
+
+                $attempt = tutor_utils()->get_attempt( $attempt_id );
+                if ( ! $attempt ) return false;
+
+                $quiz_id = $attempt->quiz_id ?? null;
+                $user_id = $attempt->user_id ?? null;
+                $earned  = $attempt->earned_marks ?? 0;
+                $total   = $attempt->total_marks ?? 0;
+
+                if ( ! $quiz_id || ! $user_id || ! $total ) return false;
+
+                $selected_quiz = $node['data']['config']['quiz_id'] ?? 'any';
+
+                if ( $selected_quiz !== 'any' && (int) $selected_quiz !== (int) $quiz_id ) {
+                    return false;
+                }
+
+                $percentage = ( $earned / $total ) * 100;
+                $target     = (float) ( $node['data']['config']['target_percentage'] ?? 0 );
+
+                if ( $percentage < $target ) return false;
+
+                return [
+                    'success'     => true,
+                    'quiz_id'     => $quiz_id,
+                    'user_id'     => $user_id,
+                    'score'       => $earned,
+                    'total_marks' => $total,
+                    'percentage'  => round( $percentage, 2 ),
+                ];
+        }
         return false;
     }
 
-
-    /**
-     * Register actions
-     */
     public static function get_actions(): array {
-        return [];
+        return [
+        ];
     }
 
     public static function get_action_config_schema( string $action ): array {
-        return [];
+
+        $schemas = [];
+
+        return $schemas[$action] ?? [];
     }
 
-    /**
-     * Execute node
-     */
     public static function execute_node( array $node, array $input ): array {
-        return [
-            'port' => 'main',
-            'data' => $input,
-        ];
+
+        $config = $node['data']['config'] ?? [];
+
+        switch ( $node['data']['event'] ?? '' ) {
+        }
+        return ['port'=>'main','data'=>$input];
     }
 }
