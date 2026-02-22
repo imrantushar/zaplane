@@ -11,7 +11,7 @@ class Essentialblocks extends IntegrationBase {
 
     public static function get_triggers(): array {
         return [
-            'eb_form_submit_before_email' => ['label'=>'Form Submitted','hook'=>'eb_form_submit_before_email'],
+            'eb_form_submit_before_email' => ['label'=>'Form Submission','hook'=>'eb_form_submit_before_email'],
         ];
     }
 

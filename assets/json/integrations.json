@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-02-22 11:16:45",
+    "generated_at": "2026-02-22 11:30:53",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -3247,7 +3247,7 @@
             "triggers": {
                 "eb_form_submit_before_email": {
                     "key": "eb_form_submit_before_email",
-                    "label": "Form Submitted",
+                    "label": "Form Submission",
                     "hook": "eb_form_submit_before_email",
                     "schema": [],
                     "outputs": [
