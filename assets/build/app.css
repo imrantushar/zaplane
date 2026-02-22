@@ -2775,7 +2775,7 @@ h2.react-datepicker__current-month {
   \******************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
 .zaplane-canvas-controls {
   gap: 5px;
-  margin-top: 125px;
+  margin-top: 40px;
 }
 
 .react-flow__controls-button {
@@ -2795,7 +2795,7 @@ h2.react-datepicker__current-month {
 
 .zaplane-canvas-layout-icon {
   width: 60px;
-  margin: 86px 0 10px 15px;
+  margin: 0px 0 10px 15px;
   gap: 5px;
   cursor: pointer;
   position: absolute;
