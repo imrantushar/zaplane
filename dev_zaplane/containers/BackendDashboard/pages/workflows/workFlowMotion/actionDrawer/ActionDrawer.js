@@ -111,7 +111,7 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
     context?.source === "node" ? updateNodeData(payload) : createActionNode(payload);
     resetAll();
   };
-  console.log(mode, 'selectedItem?.name');
+ 
   return (
     <ZAPDrawer
       open={open}

@@ -1,17 +1,20 @@
-import { Button, Text } from "@chakra-ui/react";
+import { Button, Flex, Text } from "@chakra-ui/react";
 import { sprintf, __ } from "@wordpress/i18n";
 
-const  DrawerItemButton=({ item, onClick, showType = true, icon })=> {
+const DrawerItemButton = ({ item, onClick, showType = true, icon,  toolIcon: ToolIcon, }) => {
   return (
     <Button
       w="100%"
       background="var(--zaplane-background)"
       color="var(--zaplane-font-color)"
       justifyContent="space-between"
-      _hover={{ bg: "var(--zaplane-body-background)", "& svg": { transform: "translateX(4px)" } }}
+      _hover={{ bg: "var(--zaplane-body-background)"}}
       onClick={onClick}
     >
-      <span>{sprintf(__("%s", "zaplane"), item.name)}</span>
+      <Flex gap="8px">
+        {ToolIcon && <ToolIcon />}
+        <Text as="span" m='0'>{sprintf(__("%s", "zaplane"), item.name)}</Text>
+      </Flex>
       {icon && icon}
       {showType && item.type && (
         <Text fontSize="xs" className="zaplane-label">

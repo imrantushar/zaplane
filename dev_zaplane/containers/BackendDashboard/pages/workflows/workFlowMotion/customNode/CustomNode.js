@@ -11,6 +11,7 @@ import { FaRegCopy } from "react-icons/fa";
 import FloatingEdge from "../FloatingEdge/FloatingEdge";
 import { __, sprintf } from "@wordpress/i18n";
 import { formatLabel } from "@ZAPUtils/helper";
+import { FaWordpress } from "react-icons/fa6";
 export default function CustomNode({ id, data, canvasLayout }) {
   const [hovered, setHovered] = useState(false);
 
@@ -105,27 +106,41 @@ export default function CustomNode({ id, data, canvasLayout }) {
             }}
           />
         )}
-        <Text
-          className={isSelectApp ? "zaplane-label" : "zaplane-title"}
-          fontSize="sm"
-          fontWeight={isSelectApp ? "medium" : "semibold"}
-          lineHeight={isSelectApp ? "2.2" : "1.2"}
-        >
-          {isSelectApp
-            ? __(data.app, "zaplane")
-            : sprintf(__('%s', 'zaplane'), formatLabel(data.event))
-          }
-        </Text>
-
-        {!isSelectApp && (
-          <Text
-            className="zaplane-sub-title"
-            fontSize="xs"
-            lineHeight="1.2"
+         <HStack spacing={3} align="center">
+          <Box
+            w="40px"
+            h="40px"
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+            borderRadius="8px"
+            bg="orange.50"
           >
-            {sprintf(__('%s', 'zaplane'), data.app)}
-          </Text>
-        )}
+            <Icon as={FaWordpress} boxSize={5} color="orange.500" />
+          </Box>
+          <Box textAlign="left">
+            <Text
+              className="zaplane-title"
+              fontSize="sm"
+              fontWeight="semibold"
+              lineHeight="1.2"
+            >
+              {isSelectApp
+                ? __(data.app, "zaplane")
+                : sprintf(__("%s", "zaplane"), formatLabel(data.event))}
+            </Text>
+
+            {!isSelectApp && (
+              <Text
+                className="zaplane-sub-title"
+                fontSize="xs"
+                color="var(--zaplane-text-muted)"
+              >
+                {sprintf(__("%s", "zaplane"), data.app)}
+              </Text>
+            )}
+          </Box>
+        </HStack>
         {!data.conditions && (
           <Handle
             type="source"

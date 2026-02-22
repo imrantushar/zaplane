@@ -27,10 +27,6 @@ const DrawerItemList = ({ list, setSelectedItem, setMode }) => {
         </Flex>
 
       ))}
-
-      <Button size="sm" mt='24px' {...secondPrimaryBtn} onClick={() => setMode(null)}>
-        {__('Back', 'zaplane')}
-      </Button>
     </VStack>
   );
 }
