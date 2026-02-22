@@ -1,6 +1,8 @@
 <?php
 namespace Zaplane\Integrations;
 
+use Zaplane\Traits\ActionResponseTrait;
+
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 use Zaplane\Framework\Classes\IntegrationBase;
@@ -18,6 +20,7 @@ use Zaplane\Integrations\Wordpress\QueryTrait;
 use Zaplane\Integrations\Wordpress\Helper;
 
 class Wordpress extends IntegrationBase {
+    use ActionResponseTrait;
     use PostActionsTrait;
     use TaxonomyActionsTrait;
     use UserActionsTrait;

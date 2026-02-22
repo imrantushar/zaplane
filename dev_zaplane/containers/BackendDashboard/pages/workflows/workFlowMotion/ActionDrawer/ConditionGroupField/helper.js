@@ -40,3 +40,13 @@ export const insertVariableIntoGroup=({
     setPopoverOpen(false);
     setActiveInput(null);
 }
+export const formatVariableKey = (key) => {
+  if (!key) return "";
+
+  return key
+    .split(".")                
+    .pop()                     
+    .replace(/\[\]/g, "")       
+    .replace(/_/g, " ")       
+    .replace(/\b\w/g, (c) => c.toUpperCase()); 
+};

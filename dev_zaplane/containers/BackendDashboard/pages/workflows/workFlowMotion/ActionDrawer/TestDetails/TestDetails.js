@@ -16,7 +16,6 @@ const TestDetails = ({ id, workFlow }) => {
     const selectedOutput = workFlow?.test_outputs?.[id]?.output || {};
     const inputData = singleNodeExecution?.input || values;
     const outputData = singleNodeExecution?.output?.data || selectedOutput;
-    console.log(inputData,outputData,'pp');
     useEffect(() => {
         dispatch(resetSingleNodeExecution());
     }, [id, dispatch]);
