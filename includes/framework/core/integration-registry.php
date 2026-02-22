@@ -7,7 +7,7 @@ return [
     'iterator' => ['file' => 'iterator.php', 'class' => \Zaplane\Integrations\Iterator::class],
     // apps
     'wordpress' => ['file' => 'wordpress.php', 'class' => \Zaplane\Integrations\Wordpress::class],
-    'woo'       => ['file' => 'woo.php', 'class' => \Zaplane\Integrations\Woo::class],
+    'surecart'       => ['file' => 'surecart.php', 'class' => \Zaplane\Integrations\Surecart::class],
     'slack'     => ['file' => 'slack.php', 'class' => \Zaplane\Integrations\Slack::class],
     'trello'    => ['file' => 'trello.php', 'class' => \Zaplane\Integrations\Trello::class],
     'stripe'    => ['file' => 'stripe.php', 'class' => \Zaplane\Integrations\Stripe::class],
