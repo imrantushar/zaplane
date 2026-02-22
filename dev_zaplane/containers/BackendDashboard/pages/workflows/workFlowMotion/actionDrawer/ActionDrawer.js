@@ -103,6 +103,7 @@ export default function ActionDrawer({ open, context, onClose, updateNodeData, c
     setSearch("");
     resetForm();
     onClose();
+    setShowWarning(false)
   };
 
   const handleContinue = () => {

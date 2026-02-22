@@ -5007,6 +5007,7 @@ function ActionDrawer({
     setSearch("");
     resetForm();
     onClose();
+    setShowWarning(false);
   };
   const handleContinue = () => {
     if (step === "select") return setStep("test");
