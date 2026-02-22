@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-02-05 10:26:45",
+    "generated_at": "2026-02-18 11:26:23",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -3238,6 +3238,33 @@
                     ]
                 }
             }
+        },
+        "essentialaddons": {
+            "slug": "essentialaddons",
+            "name": "Essentialaddons",
+            "icon": "",
+            "category": "app",
+            "triggers": {
+                "eael/login-register/after-login": {
+                    "key": "eael/login-register/after-login",
+                    "label": "User Login",
+                    "hook": "eael/login-register/after-login",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "eael/login-register/after-insert-user": {
+                    "key": "eael/login-register/after-insert-user",
+                    "label": "User Registration",
+                    "hook": "eael/login-register/after-insert-user",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": []
         }
     },
     "tools": {
