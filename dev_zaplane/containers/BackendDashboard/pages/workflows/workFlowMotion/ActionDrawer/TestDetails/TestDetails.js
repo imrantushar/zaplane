@@ -7,7 +7,7 @@ import React, { useEffect } from 'react';
 import ReactJson from 'react-json-view';
 import { useDispatch, useSelector } from 'react-redux';
 
-const TestDetails = ({ id, workFlow }) => {
+const TestDetails = ({ id, workFlow, source }) => {
     const dispatch = useDispatch()
     const { singleNodeExecution, isLoading } = useSelector(
         (state) => state.workflows
@@ -16,12 +16,14 @@ const TestDetails = ({ id, workFlow }) => {
     const selectedOutput = workFlow?.test_outputs?.[id]?.output || {};
     const inputData = singleNodeExecution?.input || values;
     const outputData = singleNodeExecution?.output?.data || selectedOutput;
+    const isNode = source === "node"
+
     useEffect(() => {
         dispatch(resetSingleNodeExecution());
     }, [id, dispatch]);
 
     if (isLoading) return <ZAPLoading />
-    if (Object.keys(outputData).length === 0) return;
+    if (!outputData || Object.keys(outputData).length === 0  && isNode) return null;
 
 
     return (
