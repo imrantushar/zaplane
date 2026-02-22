@@ -28,11 +28,17 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   primaryBtn: () => (/* binding */ primaryBtn),
 /* harmony export */   primaryClearBtn: () => (/* binding */ primaryClearBtn),
 /* harmony export */   removeBtn: () => (/* binding */ removeBtn),
+/* harmony export */   secondPrimaryBtn: () => (/* binding */ secondPrimaryBtn),
 /* harmony export */   transparentMiniBtn: () => (/* binding */ transparentMiniBtn)
 /* harmony export */ });
 const primaryBtn = {
   bg: "var(--zaplane-primary)",
   color: "#fff",
+  fontWeight: "600"
+};
+const secondPrimaryBtn = {
+  bg: "var(--zaplane-second-primary)",
+  color: "var(--zaplane-primary)",
   fontWeight: "600"
 };
 const primaryClearBtn = {
@@ -6501,14 +6507,16 @@ function FlowTopBar({
         fontWeight: "medium",
         children: workFlow?.workflow?.title || (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_10__.__)("Untitled Workflow", "zaplane")
       }), !apiRequestRunning ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_27__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Button, {
-        ..._assets_scss_chakra_recipe__WEBPACK_IMPORTED_MODULE_14__.primaryBtn,
+        ..._assets_scss_chakra_recipe__WEBPACK_IMPORTED_MODULE_14__.secondPrimaryBtn,
+        h: "36px",
         onClick: () => {
           dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_21__.startApiCountdown)(120));
           dispatch((0,_ZAPRedux_Slices_workFlowSlice_actions_workFlowListiner__WEBPACK_IMPORTED_MODULE_20__.workflowNodeListiner)(id));
         },
         children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_27__.jsx)(react_icons_ci__WEBPACK_IMPORTED_MODULE_26__.CiPlay1, {}), (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_10__.__)("Test Flow Once", "zaplane")]
       }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_27__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Button, {
-        ..._assets_scss_chakra_recipe__WEBPACK_IMPORTED_MODULE_14__.primaryBtn,
+        ..._assets_scss_chakra_recipe__WEBPACK_IMPORTED_MODULE_14__.secondPrimaryBtn,
+        h: "36px",
         onClick: () => dispatch((0,_ZAPRedux_Slices_workFlowSlice_actions_workFlowListiner__WEBPACK_IMPORTED_MODULE_20__.workflowNodeListinerStop)(id)),
         children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_27__.jsx)(react_icons_lia__WEBPACK_IMPORTED_MODULE_25__.LiaStopCircleSolid, {}), (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_10__.__)("Stop", "zaplane")]
       }), apiRequestRunning && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_27__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {

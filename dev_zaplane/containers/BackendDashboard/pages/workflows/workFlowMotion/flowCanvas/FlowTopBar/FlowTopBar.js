@@ -10,7 +10,7 @@ import { __ } from "@wordpress/i18n";
 import ZAPDrawer from "@ZAPComponents/Drawer";
 import RunsTable from "../RunsTable/RunsTable";
 import VersionHistoryTable from "../VersionHistoryTable/VersionHistoryTable";
-import { primaryBtn } from "../../../../../../../../assets/scss/chakra/recipe";
+import { primaryBtn, secondPrimaryBtn } from "../../../../../../../../assets/scss/chakra/recipe";
 import { getRunWorkFlow } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlowRuns";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllVersion } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlowVersion";
@@ -55,14 +55,14 @@ export default function FlowTopBar({
           </Text>
 
           {!apiRequestRunning ? (
-            <Button {...primaryBtn} onClick={() => {
+            <Button {...secondPrimaryBtn} h="36px" onClick={() => {
               dispatch(startApiCountdown(120));
               dispatch(workflowNodeListiner(id));
             }}>
               <CiPlay1 />{__("Test Flow Once", "zaplane")}
             </Button>
           ) : (
-            <Button {...primaryBtn} onClick={() => dispatch(workflowNodeListinerStop(id))}>
+            <Button {...secondPrimaryBtn} h='36px' onClick={() => dispatch(workflowNodeListinerStop(id))}>
               <LiaStopCircleSolid />{__("Stop", "zaplane")}
             </Button>
           )}
