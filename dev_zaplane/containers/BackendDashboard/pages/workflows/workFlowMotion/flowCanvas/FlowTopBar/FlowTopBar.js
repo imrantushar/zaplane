@@ -21,6 +21,8 @@ import { startApiCountdown } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice"
 import { workFLowExction } from "@ZAPRedux/Slices/workFlowSlice/actions/workflowExctions";
 import { useApiCountdown } from "@ZAPHooks/useApiCountdown/useApiCountdown";
 import '../styles.scss'
+import { LiaStopCircleSolid } from "react-icons/lia";
+import { CiPlay1 } from "react-icons/ci";
 
 export default function FlowTopBar({
   navigate,
@@ -36,7 +38,7 @@ export default function FlowTopBar({
 }) {
   const { runs, versions, apiCountdown, apiRequestRunning } = useSelector((state) => state.workflows);
   const dispatch = useDispatch()
-      useApiCountdown()
+  useApiCountdown()
   return (
     <TopBar
       leftContent={() => (
@@ -57,16 +59,16 @@ export default function FlowTopBar({
               dispatch(startApiCountdown(120));
               dispatch(workflowNodeListiner(id));
             }}>
-              {__("Test Flow Once", "zaplane")}
+              <CiPlay1 />{__("Test Flow Once", "zaplane")}
             </Button>
           ) : (
             <Button {...primaryBtn} onClick={() => dispatch(workflowNodeListinerStop(id))}>
-              {__("Stop", "zaplane")}
+              <LiaStopCircleSolid />{__("Stop", "zaplane")}
             </Button>
           )}
 
           {apiRequestRunning && (
-            <Text m="0" fontSize="18px">
+            <Text className="zaplane-label" fontSize="18px">
               {__("Listening...", "zaplane")} {formatTime(apiCountdown)}
             </Text>
           )}
@@ -105,7 +107,7 @@ export default function FlowTopBar({
                 color='#454F59'
                 fontWeight="500"
                 border={"none"}
-                onClick={() =>  dispatch(getRunWorkFlow(id))}
+                onClick={() => dispatch(getRunWorkFlow(id))}
               >
                 <TfiReload />{__("Refresh", "zaplane")}
               </Button>
@@ -121,7 +123,7 @@ export default function FlowTopBar({
                   }))
                 }
               >
-               <LuSquarePlay /> {__("Replay", "zaplane")}
+                <LuSquarePlay /> {__("Replay", "zaplane")}
               </Button>
             </Flex>
 
