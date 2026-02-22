@@ -21,7 +21,7 @@ import ZAPLoading from "@ZAPComponents/Loading";
 import TopBar from "@ZAPComponents/TopBar";
 import ZAPDrawer from "@ZAPComponents/Drawer";
 import ListTable from "@ZAPComponents/ListTable";
-import { formatDateTime, formatLabel, getDuration } from "@ZAPUtils/helper";
+import { getDuration } from "@ZAPUtils/helper";
 import { statusStyle } from "../workflows/helper";
 import { HistoryIcon } from "@ZAPUtils/icons";
 import ZAPTooltip from "@ZAPComponents/ZAPTooltip";
@@ -38,42 +38,17 @@ const Logs = () => {
 
     const columns = [
         {
-            name: (
-                <Text className="zaplane-label">
-                    {__("App Name", "zaplane")}
-                </Text>
+            name: __('CREATED AT', 'zaplane'),
+            cell: (row) => (
+                <div className="zaplane-table-flex-col">
+                    <span style={{ fontWeight: 600 }}>
+                        {row.started_at || "--"}
+                    </span>
+                    <span style={{ fontSize: '12px', color: '#666' }}>
+                        ID: {row.id}
+                    </span>
+                </div>
             ),
-            cell: (row) => {
-                return (
-                    <Box >
-                        <Text className="zaplane-label">{__(row?.node?.app, 'zaplane')}</Text>
-                        <Text className="zaplane-label" color="var(--zaplane-text-muted)">
-                            {__(formatLabel(row?.node?.event), 'zaplane')}
-                        </Text>
-                    </Box>
-                );
-            },
-            columnWidth: "180px",
-            textAlign: "start",
-        },
-        {
-            name: (
-                <Text className="zaplane-label">
-                    {__("Created At", "zaplane")}
-                </Text>
-            ),
-            cell: (row) => {
-                const { date, time } = formatDateTime(row.started_at);
-
-                return (
-                    <Box >
-                        <Text className="zaplane-label">{__(date, 'zaplane')}</Text>
-                        <Text className="zaplane-label" color="var(--zaplane-text-muted)">
-                            {__(time, 'zaplane')}
-                        </Text>
-                    </Box>
-                );
-            },
             columnWidth: "180px",
             textAlign: "start",
         },

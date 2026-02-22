@@ -1,6 +1,6 @@
 import { useMemo, useCallback } from "react";
 import { __ } from "@wordpress/i18n";
-import { Text, Box, Icon, HStack } from "@chakra-ui/react";
+import { Text, Box, Icon } from "@chakra-ui/react";
 import Select from "react-select";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -9,7 +9,7 @@ import ListTable from "@ZAPComponents/ListTable";
 import OptionMenu from "@ZAPComponents/OptionMenu";
 
 import { FiEdit, FiTrash2 } from "react-icons/fi";
-import { formatDateTime, route_path } from "@ZAPUtils/helper";
+import { route_path } from "@ZAPUtils/helper";
 import { statusOptions } from "./helper";
 
 import {
@@ -17,10 +17,6 @@ import {
   updateWorkFlowStatus,
 } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow";
 import StatusOptions from "@ZAPComponents/StatusOptions";
-import ZAPTooltip from "@ZAPComponents/ZAPTooltip";
-import { FaRegEdit } from "react-icons/fa";
-import { RiDeleteBin6Line } from "react-icons/ri";
-import { LiaEditSolid } from "react-icons/lia";
 
 const WorkflowTable = () => {
   const navigate = useNavigate();
@@ -60,18 +56,9 @@ const WorkflowTable = () => {
           {__("Created At", "zaplane")}
         </Text>
       ),
-      cell: (row) => {
-        const { date, time } = formatDateTime(row.created_at);
-
-        return (
-          <Box textAlign="center">
-            <Text className="zaplane-label">{date}</Text>
-            <Text className="zaplane-sub-title" color="var(--zaplane-text-muted)">
-              {time}
-            </Text>
-          </Box>
-        );
-      },
+      cell: (row) => (
+        <Text fontSize="sm">{row.created_at}</Text>
+      ),
       columnWidth: "160px",
       textAlign: "center",
     },
@@ -81,20 +68,10 @@ const WorkflowTable = () => {
           {__("Updated At", "zaplane")}
         </Text>
       ),
-      cell: (row) => {
-        const { date, time } = formatDateTime(row.updated_at);
-
-        return (
-          <Box textAlign="center">
-            <Text  className="zaplane-label">{date}</Text>
-            <Text className="zaplane-sub-title" color="var(--zaplane-text-muted)">
-              {time}
-            </Text>
-          </Box>
-        );
-      },
+      cell: (row) => (
+        <Text className="zaplane-label">{row.updated_at}</Text>
+      ),
       columnWidth: "160px",
-      textAlign: "center",
     },
     {
       name: (
@@ -128,58 +105,35 @@ const WorkflowTable = () => {
         </Text>
       ),
       cell: (row) => (
-
-        <HStack justify="flex-end" spacing="1" justifyContent={"center"}>
-          <ZAPTooltip content={__("Edit", 'zaplane')}>
-            <Box
-              display="flex"
-              p={"5px 6px"}
-              justifyContent="center"
-              alignItems="center"
-              borderRadius="2.917px"
-              border="1px solid var(--zaplane-border-color)"
-              onClick={() => {
+        <OptionMenu
+          options={[
+            {
+              label: __('Edit', 'zaplane'),
+              icon: <Icon as={FiEdit} />,
+              type: 'button',
+              onClick: () =>
                 navigate(
                   `${route_path}admin.php?page=zaplane-workflows&action=edit&id=${row.id}`
-                )
-              }}
-            >
-              <Icon
-                height="20px"
-                width="20px"
-                as={LiaEditSolid}
-              />
-            </Box>
-          </ZAPTooltip>
-          <ZAPTooltip content={__("Delete", 'zaplane')}>
-            <Box
-              display="flex"
-              p={"5px 6px"}
-              justifyContent="center"
-              alignItems="center"
-              borderRadius="2.917px"
-              border="1px solid var(--zaplane-border-color)"
-              onClick={() => {
-                if (
-                  window.confirm(
-                    __("Are you sure you want to permanently delete?", "zaplane")
-                  )
-                ) {
+                ),
+            },
+            {
+              label: __('Delete', 'zaplane'),
+              suffix: 'trash',
+              icon: <Icon as={FiTrash2} />,
+              type: 'button',
+              onClick: (id) => {
+                if (window.confirm(
+                  __("Are you sure you want to permanently delete ?", "zaplane")
+                )) {
                   dispatch(deleteWorkFlow(row.id));
                 }
-              }}
-            >
-              <Icon
-                height="20px"
-                width="20px"
-                as={RiDeleteBin6Line}
+              },
 
-              />
-            </Box>
-          </ZAPTooltip>
+              hasBorder: false,
+            },
+          ]}
 
-
-        </HStack>
+        />
       ),
       columnWidth: "90px",
       textAlign: "center",
