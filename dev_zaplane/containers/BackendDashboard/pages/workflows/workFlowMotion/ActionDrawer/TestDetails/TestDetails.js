@@ -14,20 +14,16 @@ const TestDetails = ({ id, workFlow, source }) => {
     );
     const { values } = useFormikContext();
     const selectedOutput = workFlow?.test_outputs?.[id]?.output || {};
+    const inputData = singleNodeExecution?.input || values;
+    const outputData = singleNodeExecution?.output?.data || selectedOutput;
     const isNode = source === "node"
-    const inputData = isNode
-        ? singleNodeExecution?.input ?? {}
-        : values ?? {};
 
-    const outputData = isNode
-        ? singleNodeExecution?.output?.data ?? {}
-        : selectedOutput ?? {};
     useEffect(() => {
         dispatch(resetSingleNodeExecution());
     }, [id, dispatch]);
 
     if (isLoading) return <ZAPLoading />
-    if (Object.keys(outputData).length === 0) return;
+    if (!outputData || Object.keys(outputData).length === 0  && isNode) return null;
 
 
     return (
