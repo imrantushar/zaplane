@@ -2,71 +2,115 @@ import { useMemo } from "react";
 import { Box, HStack, Text } from "@chakra-ui/react";
 import { __, sprintf } from "@wordpress/i18n";
 import ListTable from "@ZAPComponents/ListTable";
-import { getDuration } from "@ZAPUtils/helper";
+import { formatDateTime, formatLabel, getDuration } from "@ZAPUtils/helper";
 
 const RecentLogs = ({ data = [] }) => {
   const isSuccess = (status) => status === "completed";
 
-  const columns = useMemo(
-    () => [
-      {
-        name: (
-          <Text className="zaplane-label">
-            {__("CREATED AT", "zaplane")}
-          </Text>
-        ),
-        cell: (row) => (
-          <Text className="zaplane-label">
-            {sprintf(__("%s", "zaplane"), row.started_at)}
-          </Text>
-        ),
-        columnWidth: "180px",
+  const columns = [
+    {
+      name: (
+        <Text className="zaplane-label">
+          {__("App Name", "zaplane")}
+        </Text>
+      ),
+      cell: (row) => {
+        return (
+          <Box >
+            <Text className="zaplane-label">{__(row?.node?.app, 'zaplane')}</Text>
+            <Text className="zaplane-label" color="var(--zaplane-text-muted)">
+              {__(formatLabel(row?.node?.event), 'zaplane')}
+            </Text>
+          </Box>
+        );
       },
-      {
-        name: (
-          <Text className="zaplane-label">
-            {__("DURATION / SIZE", "zaplane")}
-          </Text>
-        ),
-        cell: (row) => (
+      // columnWidth: "180px",
+      textAlign: "start",
+    },
+    {
+      name: (
+        <Text className="zaplane-label">
+          {__("CREATED AT", "zaplane")}
+        </Text>
+      ),
+      cell: (row) => {
+        const { date, time } = formatDateTime(row.started_at);
+
+        return (
+          <Box >
+            <Text className="zaplane-label">{__(date, 'zaplane')}</Text>
+            <Text className="zaplane-label" color="var(--zaplane-text-muted)">
+              {__(time, 'zaplane')}
+            </Text>
+          </Box>
+        );
+      },
+      // columnWidth: "180px",
+    },
+    {
+      name: (
+        <Text className="zaplane-label">
+          {__("Updated At", "zaplane")}
+        </Text>
+      ),
+      cell: (row) => {
+        const { date, time } = formatDateTime(row.finished_at);
+
+        return (
+          <Box textAlign="center">
+            <Text className="zaplane-label">{date}</Text>
+            <Text className="zaplane-label" color="var(--zaplane-text-muted)">
+              {__(time, 'zaplane')}
+            </Text>
+          </Box>
+        );
+      },
+      columnWidth: "160px",
+      textAlign: "center",
+    },
+    {
+      name: (
+        <Text className="zaplane-label">
+          {__("DURATION / SIZE", "zaplane")}
+        </Text>
+      ),
+      cell: (row) => (
+        <Text className="zaplane-label">
+          {sprintf(
+            __("%s", "zaplane"),
+            getDuration(row.started_at, row.finished_at)
+          )}
+        </Text>
+      ),
+      // columnWidth: "180px",
+    },
+    {
+      name: (
+        <Text className="zaplane-label">
+          {__("STATUS", "zaplane")}
+        </Text>
+      ),
+      cell: (row) => (
+        <HStack spacing={2} justifyContent={"center"}>
+          <Box
+            w="8px"
+            h="8px"
+            borderRadius="full"
+            bg={isSuccess(row.status) ? "green.500" : "red.500"}
+          />
           <Text className="zaplane-label">
             {sprintf(
               __("%s", "zaplane"),
-              getDuration(row.started_at, row.finished_at)
+              isSuccess(row.status)
+                ? __("Success", "zaplane")
+                : __("Failed", "zaplane")
             )}
           </Text>
-        ),
-        columnWidth: "180px",
-      },
-      {
-        name: (
-          <Text className="zaplane-label">
-            {__("STATUS", "zaplane")}
-          </Text>
-        ),
-        cell: (row) => (
-          <HStack spacing={2} justifyContent={"center"}>
-            <Box
-              w="8px"
-              h="8px"
-              borderRadius="full"
-              bg={isSuccess(row.status) ? "green.500" : "red.500"}
-            />
-            <Text className="zaplane-label">
-              {sprintf(
-                __("%s", "zaplane"),
-                isSuccess(row.status)
-                  ? __("Success", "zaplane")
-                  : __("Failed", "zaplane")
-              )}
-            </Text>
-          </HStack>
-        ),
-        columnWidth: "160px",
-      },
-    ],
-    []
-  );
+        </HStack>
+      ),
+      // columnWidth: "160px",
+    },
+  ]
 
   return (
     <Box width="100%">

@@ -53,7 +53,7 @@ const Logs = () => {
                     </Box>
                 );
             },
-            columnWidth: "180px",
+            // columnWidth: "180px",
             textAlign: "start",
         },
         {
@@ -74,8 +74,29 @@ const Logs = () => {
                     </Box>
                 );
             },
-            columnWidth: "180px",
-            textAlign: "start",
+            // columnWidth: "180px",
+            textAlign: "center",
+        },
+        {
+            name: (
+                <Text className="zaplane-label">
+                    {__("Updated At", "zaplane")}
+                </Text>
+            ),
+            cell: (row) => {
+                const { date, time } = formatDateTime(row.finished_at);
+
+                return (
+                    <Box textAlign="center">
+                        <Text className="zaplane-label">{date}</Text>
+                        <Text className="zaplane-label" color="var(--zaplane-text-muted)">
+                            {__(time, 'zaplane')}
+                        </Text>
+                    </Box>
+                );
+            },
+            columnWidth: "160px",
+            textAlign: "center",
         },
         {
             name: __('DURATION', 'zaplane'),
@@ -84,7 +105,7 @@ const Logs = () => {
                     {getDuration(row.started_at, row.finished_at)}
                 </Text>
             ),
-            columnWidth: "150px",
+            // columnWidth: "150px",
         },
         {
             name: __('Status', 'zaplane'),
@@ -97,7 +118,7 @@ const Logs = () => {
                     {row.status}
                 </Badge>
             ),
-            columnWidth: "120px",
+            // columnWidth: "120px",
         },
         {
             name: __('Action', 'zaplane'),
@@ -128,7 +149,7 @@ const Logs = () => {
 
 
             ),
-            columnWidth: "100px",
+            // columnWidth: "100px",
             textAlign: "center",
         },
     ];

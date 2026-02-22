@@ -3913,16 +3913,71 @@ const RecentLogs = ({
   data = []
 }) => {
   const isSuccess = status => status === "completed";
-  const columns = (0,react__WEBPACK_IMPORTED_MODULE_0__.useMemo)(() => [{
+  const columns = [{
+    name: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
+      className: "zaplane-label",
+      children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("App Name", "zaplane")
+    }),
+    cell: row => {
+      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Box, {
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
+          className: "zaplane-label",
+          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)(row?.node?.app, 'zaplane')
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
+          className: "zaplane-label",
+          color: "var(--zaplane-text-muted)",
+          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)((0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_6__.formatLabel)(row?.node?.event), 'zaplane')
+        })]
+      });
+    },
+    // columnWidth: "180px",
+    textAlign: "start"
+  }, {
     name: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
       className: "zaplane-label",
       children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("CREATED AT", "zaplane")
     }),
-    cell: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
+    cell: row => {
+      const {
+        date,
+        time
+      } = (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_6__.formatDateTime)(row.started_at);
+      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Box, {
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
+          className: "zaplane-label",
+          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)(date, 'zaplane')
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
+          className: "zaplane-label",
+          color: "var(--zaplane-text-muted)",
+          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)(time, 'zaplane')
+        })]
+      });
+    }
+    // columnWidth: "180px",
+  }, {
+    name: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
       className: "zaplane-label",
-      children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.sprintf)((0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("%s", "zaplane"), row.started_at)
+      children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("Updated At", "zaplane")
     }),
-    columnWidth: "180px"
+    cell: row => {
+      const {
+        date,
+        time
+      } = (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_6__.formatDateTime)(row.finished_at);
+      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Box, {
+        textAlign: "center",
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
+          className: "zaplane-label",
+          children: date
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
+          className: "zaplane-label",
+          color: "var(--zaplane-text-muted)",
+          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)(time, 'zaplane')
+        })]
+      });
+    },
+    columnWidth: "160px",
+    textAlign: "center"
   }, {
     name: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
       className: "zaplane-label",
@@ -3931,8 +3986,8 @@ const RecentLogs = ({
     cell: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
       className: "zaplane-label",
       children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.sprintf)((0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("%s", "zaplane"), (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_6__.getDuration)(row.started_at, row.finished_at))
-    }),
-    columnWidth: "180px"
+    })
+    // columnWidth: "180px",
   }, {
     name: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
       className: "zaplane-label",
@@ -3950,9 +4005,9 @@ const RecentLogs = ({
         className: "zaplane-label",
         children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.sprintf)((0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("%s", "zaplane"), isSuccess(row.status) ? (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("Success", "zaplane") : (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("Failed", "zaplane"))
       })]
-    }),
-    columnWidth: "160px"
-  }], []);
+    })
+    // columnWidth: "160px",
+  }];
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Box, {
     width: "100%",
     children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
@@ -4281,7 +4336,7 @@ const Logs = () => {
         })]
       });
     },
-    columnWidth: "180px",
+    // columnWidth: "180px",
     textAlign: "start"
   }, {
     name: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
@@ -4304,15 +4359,39 @@ const Logs = () => {
         })]
       });
     },
-    columnWidth: "180px",
-    textAlign: "start"
+    // columnWidth: "180px",
+    textAlign: "center"
+  }, {
+    name: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
+      className: "zaplane-label",
+      children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_7__.__)("Updated At", "zaplane")
+    }),
+    cell: row => {
+      const {
+        date,
+        time
+      } = (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_15__.formatDateTime)(row.finished_at);
+      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Box, {
+        textAlign: "center",
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
+          className: "zaplane-label",
+          children: date
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
+          className: "zaplane-label",
+          color: "var(--zaplane-text-muted)",
+          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_7__.__)(time, 'zaplane')
+        })]
+      });
+    },
+    columnWidth: "160px",
+    textAlign: "center"
   }, {
     name: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_7__.__)('DURATION', 'zaplane'),
     cell: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
       fontSize: "sm",
       children: (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_15__.getDuration)(row.started_at, row.finished_at)
-    }),
-    columnWidth: "150px"
+    })
+    // columnWidth: "150px",
   }, {
     name: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_7__.__)('Status', 'zaplane'),
     cell: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Badge, {
@@ -4320,8 +4399,8 @@ const Logs = () => {
       borderRadius: "full",
       px: 3,
       children: row.status
-    }),
-    columnWidth: "120px"
+    })
+    // columnWidth: "120px",
   }, {
     name: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_7__.__)('Action', 'zaplane'),
     cell: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.HStack, {
@@ -4350,7 +4429,7 @@ const Logs = () => {
         })
       })
     }),
-    columnWidth: "100px",
+    // columnWidth: "100px",
     textAlign: "center"
   }];
 
