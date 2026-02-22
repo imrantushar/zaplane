@@ -28,6 +28,7 @@ import { fetchDynamic } from "@ZAPRedux/Slices/workFlowSlice/helper";
 
 export default function ActionDrawer({ open, context, onClose, updateNodeData, createActionNode, workFlow, isFullscreen }) {
   const { source, node } = context;
+  console.log(context,'contextss');
   const dispatch = useDispatch();
   const { values, setFieldValue, resetForm } = useFormikContext();
   const [step, setStep] = useState("select");
@@ -262,7 +263,7 @@ export default function ActionDrawer({ open, context, onClose, updateNodeData, c
                   }>
                     {__("Test Action", "zaplane")}
                   </Button>
-                  <TestDetails id={node?.id} workFlow={workFlow} />
+                  <TestDetails id={node?.id} workFlow={workFlow} source={source} />
                 </>
               )
             }

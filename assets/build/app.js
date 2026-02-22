@@ -4876,6 +4876,7 @@ function ActionDrawer({
     source,
     node
   } = context;
+  console.log(context, 'contextss');
   const dispatch = (0,react_redux__WEBPACK_IMPORTED_MODULE_11__.useDispatch)();
   const {
     values,
@@ -5126,7 +5127,8 @@ function ActionDrawer({
             children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_14__.__)("Test Action", "zaplane")
           }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_TestDetails_TestDetails__WEBPACK_IMPORTED_MODULE_19__["default"], {
             id: node?.id,
-            workFlow: workFlow
+            workFlow: workFlow,
+            source: source
           })]
         })
       }]
@@ -5655,8 +5657,10 @@ __webpack_require__.r(__webpack_exports__);
 
 const TestDetails = ({
   id,
-  workFlow
+  workFlow,
+  source
 }) => {
+  var _singleNodeExecution$, _singleNodeExecution$2;
   const dispatch = (0,react_redux__WEBPACK_IMPORTED_MODULE_9__.useDispatch)();
   const {
     singleNodeExecution,
@@ -5666,8 +5670,9 @@ const TestDetails = ({
     values
   } = (0,formik__WEBPACK_IMPORTED_MODULE_6__.useFormikContext)();
   const selectedOutput = workFlow?.test_outputs?.[id]?.output || {};
-  const inputData = singleNodeExecution?.input || values;
-  const outputData = singleNodeExecution?.output?.data || selectedOutput;
+  const isNode = source === "node";
+  const inputData = isNode ? (_singleNodeExecution$ = singleNodeExecution?.input) !== null && _singleNodeExecution$ !== void 0 ? _singleNodeExecution$ : {} : values !== null && values !== void 0 ? values : {};
+  const outputData = isNode ? (_singleNodeExecution$2 = singleNodeExecution?.output?.data) !== null && _singleNodeExecution$2 !== void 0 ? _singleNodeExecution$2 : {} : selectedOutput !== null && selectedOutput !== void 0 ? selectedOutput : {};
   (0,react__WEBPACK_IMPORTED_MODULE_7__.useEffect)(() => {
     dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_5__.resetSingleNodeExecution)());
   }, [id, dispatch]);
