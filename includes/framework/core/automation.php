@@ -232,6 +232,13 @@ class Automation
         try {
             if ($node['type'] === 'trigger') {
                 $output = $input;
+            } elseif ($node['type'] === 'condition' || $node['type'] === 'filter') {
+                $integration = $this->container->get('integrations')->get(strtolower($node['data']['app']));
+                if (!$integration) {
+                    throw IntegrationException::notFound($node['data']['app']);
+                }
+                $context = $this->buildNodeContext($run->id);
+                $output = $integration::execute_node($node, $context);
             } else {
                 $integration = $this->container->get('integrations')->get(strtolower($node['data']['app']));
                 if (!$integration) {
@@ -269,15 +276,38 @@ class Automation
             return;
         }
 
-        foreach ($graph['edges'] as $edge) {
-            if ((int) $edge['source'] === $nodeRun->node_key) {
-                $this->spawn_node_run(
-                    $nodeRun->run_id,
-                    (int) $edge['target'],
-                    $output,
-                    $nodeRun->id
-                );
+        // Filter gate: if filter returned pass=false, stop execution entirely
+        // If pass=true, extract the data for downstream nodes
+        $pass = $output['pass'] ?? $output['data']['pass'] ?? null;
+        if ($pass !== null) {
+            if ($pass === false) {
+                return;
             }
+            $output = $output['data'] ?? $output;
+        }
+
+        $port = $output['port'] ?? null;
+        $childInput = $port ? ($output['data'] ?? $output) : $output;
+
+        foreach ($graph['edges'] as $edge) {
+            if ((int) $edge['source'] !== $nodeRun->node_key) {
+                continue;
+            }
+
+            // If node returned a port (condition), only follow matching edges
+            if ($port !== null) {
+                $edgeHandle = $edge['sourceHandle'] ?? null;
+                if ($edgeHandle !== null && $edgeHandle !== $port) {
+                    continue;
+                }
+            }
+
+            $this->spawn_node_run(
+                $nodeRun->run_id,
+                (int) $edge['target'],
+                $childInput,
+                $nodeRun->id
+            );
         }
     }
 
@@ -299,6 +329,26 @@ class Automation
                 $run->save();
             }
         }
+    }
+
+    /**
+     * Build a context array keyed by node_key from all completed node runs in this run.
+     * Result: [1 => ['post_title' => 'Hello', ...], 5 => ['id' => 456, ...]]
+     */
+    private function buildNodeContext(int $run_id): array
+    {
+        $nodeRuns = NodeRun::where('run_id', $run_id)
+            ->where('status', 'completed')
+            ->orderBy('id', 'asc')
+            ->get();
+
+        $context = [];
+        foreach ($nodeRuns as $nr) {
+            $output = $nr->getOutput();
+            $context[$nr->node_key] = is_array($output) ? $output : ['value' => $output];
+        }
+
+        return $context;
     }
 
     private function load_graph(string $hash): array
