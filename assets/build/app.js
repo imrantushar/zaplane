@@ -6717,6 +6717,7 @@ function CustomNode({
           })
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Box, {
           textAlign: "left",
+          paddingRight: "20px",
           children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsx)(_ZAPComponents_Labels_ZAPLabel__WEBPACK_IMPORTED_MODULE_13__["default"], {
             label: isSelectApp ? (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_10__.__)(data.app, "zaplane") : (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_10__.sprintf)((0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_10__.__)("%s", "zaplane"), (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_11__.formatLabel)(data.event)),
             type: "basic"
