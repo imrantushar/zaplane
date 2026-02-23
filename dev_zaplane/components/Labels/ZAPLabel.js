@@ -87,6 +87,8 @@ const ZAPLabel = ({
 			fontSize: "14px",                 
 			fontWeight: "500",              
 			color: "var(--zaplane-font-color)", 
+		    lineHeight:'20px',
+			margin:'0'
 			
 		}
 		
