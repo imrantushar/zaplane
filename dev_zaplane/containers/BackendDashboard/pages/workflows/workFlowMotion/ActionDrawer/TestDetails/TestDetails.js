@@ -7,9 +7,9 @@ import React, { useEffect } from 'react';
 import ReactJson from 'react-json-view';
 import { useDispatch, useSelector } from 'react-redux';
 
-const TestDetails = ({ id, workFlow, source }) => {
+const TestDetails = ({ id, workFlow, source,isLoading }) => {
     const dispatch = useDispatch()
-    const { singleNodeExecution, isLoading } = useSelector(
+    const { singleNodeExecution } = useSelector(
         (state) => state.workflows
     );
     const { values } = useFormikContext();

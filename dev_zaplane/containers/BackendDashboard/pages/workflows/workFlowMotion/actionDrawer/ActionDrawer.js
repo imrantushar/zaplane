@@ -12,7 +12,7 @@ import { TOOLS } from "@ZAPHooks/useActionDrawer/helper";
 import { getIntegration } from "./helper";
 import { fetchDynamic } from "@ZAPRedux/Slices/workFlowSlice/helper";
 import SelectTab from "./SelectTab/SelectTab";
-import TestTab from "./TestTab/TestTab";
+import TestRun from "./TestRun/TestRun";
 import DrawerSearchList from "./DrawerSearchList/DrawerSearchList";
 import DrawerModeList from "./DrawerItemList/DrawerModeList";
 import DrawerItemList from "./DrawerItemList";
@@ -189,7 +189,7 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
               value: "test",
               label: "Test",
               content: (
-                <TestTab
+                <TestRun
                   source={source}
                   node={node}
                   workFlow={workFlow}

@@ -5070,7 +5070,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _helper__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./helper */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/helper.js");
 /* harmony import */ var _ZAPRedux_Slices_workFlowSlice_helper__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! @ZAPRedux/Slices/workFlowSlice/helper */ "./dev_zaplane/redux/Slices/workFlowSlice/helper.js");
 /* harmony import */ var _SelectTab_SelectTab__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./SelectTab/SelectTab */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/SelectTab.js");
-/* harmony import */ var _TestTab_TestTab__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./TestTab/TestTab */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/TestTab/TestTab.js");
+/* harmony import */ var _TestRun_TestRun__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./TestRun/TestRun */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/TestRun/TestRun.js");
 /* harmony import */ var _DrawerSearchList_DrawerSearchList__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ./DrawerSearchList/DrawerSearchList */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/DrawerSearchList/DrawerSearchList.js");
 /* harmony import */ var _DrawerItemList_DrawerModeList__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ./DrawerItemList/DrawerModeList */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/DrawerItemList/DrawerModeList.js");
 /* harmony import */ var _DrawerItemList__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ./DrawerItemList */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/DrawerItemList/index.js");
@@ -5279,7 +5279,7 @@ const ActionDrawer = ({
       {
         value: "test",
         label: "Test",
-        content: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_20__.jsx)(_TestTab_TestTab__WEBPACK_IMPORTED_MODULE_16__["default"], {
+        content: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_20__.jsx)(_TestRun_TestRun__WEBPACK_IMPORTED_MODULE_16__["default"], {
           source: source,
           node: node,
           workFlow: workFlow,
@@ -6130,12 +6130,12 @@ __webpack_require__.r(__webpack_exports__);
 const TestDetails = ({
   id,
   workFlow,
-  source
+  source,
+  isLoading
 }) => {
   const dispatch = (0,react_redux__WEBPACK_IMPORTED_MODULE_9__.useDispatch)();
   const {
-    singleNodeExecution,
-    isLoading
+    singleNodeExecution
   } = (0,react_redux__WEBPACK_IMPORTED_MODULE_9__.useSelector)(state => state.workflows);
   const {
     values
@@ -6192,9 +6192,9 @@ const TestDetails = ({
 
 /***/ },
 
-/***/ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/TestTab/TestTab.js"
+/***/ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/TestRun/TestRun.js"
 /*!****************************************************************************************************************!*\
-  !*** ./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/TestTab/TestTab.js ***!
+  !*** ./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/TestRun/TestRun.js ***!
   \****************************************************************************************************************/
 (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
@@ -6224,7 +6224,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-const TestTab = ({
+const TestRun = ({
   source,
   node,
   workFlow,
@@ -6232,17 +6232,24 @@ const TestTab = ({
 }) => {
   const dispatch = (0,react_redux__WEBPACK_IMPORTED_MODULE_2__.useDispatch)();
   const [showWarning, setShowWarning] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(false);
-  const handleTest = () => {
+  const [isLoading, setIsLoading] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(false);
+  const handleTest = async () => {
+    if (isLoading) return;
     if (source !== "node") {
       setShowWarning(true);
       return;
     }
     setShowWarning(false);
-    dispatch((0,_ZAPRedux_Slices_workFlowSlice_actions_workflowExctions__WEBPACK_IMPORTED_MODULE_4__.workFLowSingeNodeExction)({
-      workflow_hash: workFlow?.version?.hash,
-      node_key: node?.id,
-      input: values
-    }));
+    setIsLoading(true);
+    try {
+      await dispatch((0,_ZAPRedux_Slices_workFlowSlice_actions_workflowExctions__WEBPACK_IMPORTED_MODULE_4__.workFLowSingeNodeExction)({
+        workflow_hash: workFlow?.version?.hash,
+        node_key: node?.id,
+        input: values
+      }));
+    } finally {
+      setIsLoading(false);
+    }
   };
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.Fragment, {
     children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Button, {
@@ -6258,11 +6265,12 @@ const TestTab = ({
     }), source === "node" && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_TestDetails_TestDetails__WEBPACK_IMPORTED_MODULE_5__["default"], {
       id: node?.id,
       workFlow: workFlow,
-      source: source
+      source: source,
+      isLoading: isLoading
     })]
   });
 };
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (TestTab);
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (TestRun);
 
 /***/ },
 
