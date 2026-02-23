@@ -16,4 +16,5 @@ return [
     'variable' => ['file' => 'variable.php', 'class' => \Zaplane\Integrations\Variable::class],
     'webhook' => ['file' => 'webhook.php', 'class' => \Zaplane\Integrations\Webhook::class],
     'storeengine' => ['file' => 'storeengine.php', 'class' => \Zaplane\Integrations\Storeengine::class],
+    'metform' => ['file' => 'metform.php', 'class' => \Zaplane\Integrations\Metform::class],
 ];
