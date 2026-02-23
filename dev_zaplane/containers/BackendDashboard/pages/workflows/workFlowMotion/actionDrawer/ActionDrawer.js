@@ -1,4 +1,4 @@
-import { Button, HStack, Input, } from "@chakra-ui/react";
+import { Button, Flex, HStack, Input, } from "@chakra-ui/react";
 import ZAPDrawer from "@ZAPComponents/Drawer";
 import { integrations } from "@ZAPUtils/helper";
 import { useFormikContext } from "formik";
@@ -16,6 +16,8 @@ import TestRun from "./TestRun/TestRun";
 import DrawerSearchList from "./DrawerSearchList/DrawerSearchList";
 import DrawerModeList from "./DrawerItemList/DrawerModeList";
 import DrawerItemList from "./DrawerItemList";
+import ActionFieldRenderer from "./ActionFieldRenderer/ActionFieldRenderer";
+import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
 
 const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode, workFlow, isFullscreen }) => {
   const { source, node } = context;
@@ -95,8 +97,8 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
   };
 
   const handleContinue = () => {
-    if (step === "select") return setStep("test");
-    // if (step === "configure") return setStep("test");
+    if (step === "select") return setStep("configure");
+    if (step === "configure") return setStep("test");
 
     const payload = {
       app: selectedItem.name,
@@ -111,7 +113,7 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
     context?.source === "node" ? updateNodeData(payload) : createActionNode(payload);
     resetAll();
   };
- 
+
   return (
     <ZAPDrawer
       open={open}
@@ -184,7 +186,30 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
                 />
               )
             },
-            // { value: "configure", label: "Configure", content: <Text fontSize="sm">{__("Configure step", "zaplane")}</Text> },
+            {
+              value: "configure", label: "Configure", content: <>
+                <Flex direction="column" gap={4}>
+                  {selectedActionFields?.length > 0 ? (
+                    selectedActionFields.map((field) => (
+                      <ActionFieldRenderer
+                        key={field.key}
+                        field={field}
+                        value={values?.[field.key]}
+                        setFieldValue={setFieldValue}
+                        getKey={getKey}
+                        dynamicOptions={dynamicOptions}
+                        loadingFields={loadingFields}
+                        fetchDynamicOptions={fetchDynamicOptions}
+                        nodeId={node?.id}
+                        workFlow={workFlow}
+                      />
+                    ))
+                  ) : (
+                    <ZAPLabel label={__("No configuration required for this action.", "zaplane")} type="simple"/>
+                  )}
+                </Flex>
+              </>
+            },
             {
               value: "test",
               label: "Test",

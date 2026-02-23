@@ -2332,6 +2332,11 @@ const ZAPTab = ({
       mb: 4,
       children: tabs.map(tab => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.TabsTrigger, {
         value: tab.value,
+        _selected: {
+          _before: {
+            bg: "var(--zaplane-primary)"
+          }
+        },
         children: tab.label
       }, tab.value))
     }), tabs.map(tab => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.TabsContent, {
@@ -5102,29 +5107,34 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/button/button.js");
-/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/input/input.js");
-/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/stack/h-stack.js");
-/* harmony import */ var _ZAPComponents_Drawer__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @ZAPComponents/Drawer */ "./dev_zaplane/components/Drawer/index.js");
-/* harmony import */ var _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @ZAPUtils/helper */ "./dev_zaplane/utils/helper.js");
-/* harmony import */ var formik__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! formik */ "./node_modules/formik/dist/formik.esm.js");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! react */ "react");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_6__);
-/* harmony import */ var react_redux__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/dist/react-redux.mjs");
-/* harmony import */ var _ZAPComponents_Tab__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @ZAPComponents/Tab */ "./dev_zaplane/components/Tab/index.js");
-/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
-/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_9___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_9__);
-/* harmony import */ var _assets_scss_chakra_recipe__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../../../../../../../assets/scss/chakra/recipe */ "./assets/scss/chakra/recipe.js");
-/* harmony import */ var _ZAPHooks_useActionDrawer_useActionDrawer__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @ZAPHooks/useActionDrawer/useActionDrawer */ "./dev_zaplane/hooks/useActionDrawer/useActionDrawer.js");
-/* harmony import */ var _ZAPHooks_useActionDrawer_helper__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @ZAPHooks/useActionDrawer/helper */ "./dev_zaplane/hooks/useActionDrawer/helper.js");
-/* harmony import */ var _helper__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./helper */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/helper.js");
-/* harmony import */ var _ZAPRedux_Slices_workFlowSlice_helper__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! @ZAPRedux/Slices/workFlowSlice/helper */ "./dev_zaplane/redux/Slices/workFlowSlice/helper.js");
-/* harmony import */ var _SelectTab_SelectTab__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./SelectTab/SelectTab */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/SelectTab.js");
-/* harmony import */ var _TestRun_TestRun__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./TestRun/TestRun */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/TestRun/TestRun.js");
-/* harmony import */ var _DrawerSearchList_DrawerSearchList__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ./DrawerSearchList/DrawerSearchList */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/DrawerSearchList/DrawerSearchList.js");
-/* harmony import */ var _DrawerItemList_DrawerModeList__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ./DrawerItemList/DrawerModeList */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/DrawerItemList/DrawerModeList.js");
-/* harmony import */ var _DrawerItemList__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ./DrawerItemList */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/DrawerItemList/index.js");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_20___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_20__);
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/flex/flex.js");
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/input/input.js");
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/stack/h-stack.js");
+/* harmony import */ var _ZAPComponents_Drawer__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @ZAPComponents/Drawer */ "./dev_zaplane/components/Drawer/index.js");
+/* harmony import */ var _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @ZAPUtils/helper */ "./dev_zaplane/utils/helper.js");
+/* harmony import */ var formik__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! formik */ "./node_modules/formik/dist/formik.esm.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_7__);
+/* harmony import */ var react_redux__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/dist/react-redux.mjs");
+/* harmony import */ var _ZAPComponents_Tab__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @ZAPComponents/Tab */ "./dev_zaplane/components/Tab/index.js");
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_10___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_10__);
+/* harmony import */ var _assets_scss_chakra_recipe__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ../../../../../../../assets/scss/chakra/recipe */ "./assets/scss/chakra/recipe.js");
+/* harmony import */ var _ZAPHooks_useActionDrawer_useActionDrawer__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @ZAPHooks/useActionDrawer/useActionDrawer */ "./dev_zaplane/hooks/useActionDrawer/useActionDrawer.js");
+/* harmony import */ var _ZAPHooks_useActionDrawer_helper__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! @ZAPHooks/useActionDrawer/helper */ "./dev_zaplane/hooks/useActionDrawer/helper.js");
+/* harmony import */ var _helper__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./helper */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/helper.js");
+/* harmony import */ var _ZAPRedux_Slices_workFlowSlice_helper__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! @ZAPRedux/Slices/workFlowSlice/helper */ "./dev_zaplane/redux/Slices/workFlowSlice/helper.js");
+/* harmony import */ var _SelectTab_SelectTab__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./SelectTab/SelectTab */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/SelectTab.js");
+/* harmony import */ var _TestRun_TestRun__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ./TestRun/TestRun */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/TestRun/TestRun.js");
+/* harmony import */ var _DrawerSearchList_DrawerSearchList__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ./DrawerSearchList/DrawerSearchList */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/DrawerSearchList/DrawerSearchList.js");
+/* harmony import */ var _DrawerItemList_DrawerModeList__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ./DrawerItemList/DrawerModeList */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/DrawerItemList/DrawerModeList.js");
+/* harmony import */ var _DrawerItemList__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! ./DrawerItemList */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/DrawerItemList/index.js");
+/* harmony import */ var _ActionFieldRenderer_ActionFieldRenderer__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! ./ActionFieldRenderer/ActionFieldRenderer */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/ActionFieldRenderer/ActionFieldRenderer.js");
+/* harmony import */ var _ZAPComponents_Labels_ZAPLabel__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(/*! @ZAPComponents/Labels/ZAPLabel */ "./dev_zaplane/components/Labels/ZAPLabel.js");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__);
+
+
 
 
 
@@ -5157,17 +5167,17 @@ const ActionDrawer = ({
     source,
     node
   } = context;
-  const dispatch = (0,react_redux__WEBPACK_IMPORTED_MODULE_7__.useDispatch)();
+  const dispatch = (0,react_redux__WEBPACK_IMPORTED_MODULE_8__.useDispatch)();
   const {
     values,
     setFieldValue,
     resetForm
-  } = (0,formik__WEBPACK_IMPORTED_MODULE_5__.useFormikContext)();
-  const [step, setStep] = (0,react__WEBPACK_IMPORTED_MODULE_6__.useState)("select");
-  const [dynamicOptions, setDynamicOptions] = (0,react__WEBPACK_IMPORTED_MODULE_6__.useState)({});
-  const [loadingFields, setLoadingFields] = (0,react__WEBPACK_IMPORTED_MODULE_6__.useState)({});
+  } = (0,formik__WEBPACK_IMPORTED_MODULE_6__.useFormikContext)();
+  const [step, setStep] = (0,react__WEBPACK_IMPORTED_MODULE_7__.useState)("select");
+  const [dynamicOptions, setDynamicOptions] = (0,react__WEBPACK_IMPORTED_MODULE_7__.useState)({});
+  const [loadingFields, setLoadingFields] = (0,react__WEBPACK_IMPORTED_MODULE_7__.useState)({});
   const isTrigger = node?.data?.action === "trigger" && source === "node";
-  const [showWarning, setShowWarning] = (0,react__WEBPACK_IMPORTED_MODULE_6__.useState)(false);
+  const [showWarning, setShowWarning] = (0,react__WEBPACK_IMPORTED_MODULE_7__.useState)(false);
   const {
     mode,
     setMode,
@@ -5177,21 +5187,21 @@ const ActionDrawer = ({
     setSearch,
     list,
     searchList
-  } = (0,_ZAPHooks_useActionDrawer_useActionDrawer__WEBPACK_IMPORTED_MODULE_11__.useActionDrawer)(open, node, source, setFieldValue, isTrigger);
+  } = (0,_ZAPHooks_useActionDrawer_useActionDrawer__WEBPACK_IMPORTED_MODULE_12__.useActionDrawer)(open, node, source, setFieldValue, isTrigger);
 
   // Auto-set actionType if only one tool action
 
-  (0,react__WEBPACK_IMPORTED_MODULE_6__.useEffect)(() => {
+  (0,react__WEBPACK_IMPORTED_MODULE_7__.useEffect)(() => {
     if (mode !== "tools" || !selectedItem) return;
-    const tool = _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_4__.integrations.tools?.[selectedItem.id];
+    const tool = _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_5__.integrations.tools?.[selectedItem.id];
     const actions = Object.values(tool?.actions || {});
     if (actions.length === 1) setFieldValue("actionType", actions[0].key);
   }, [mode, selectedItem, setFieldValue]);
 
   //Generate action options for the selected item
 
-  const actionOptions = (0,react__WEBPACK_IMPORTED_MODULE_6__.useMemo)(() => {
-    const integration = (0,_helper__WEBPACK_IMPORTED_MODULE_13__.getIntegration)(mode, selectedItem);
+  const actionOptions = (0,react__WEBPACK_IMPORTED_MODULE_7__.useMemo)(() => {
+    const integration = (0,_helper__WEBPACK_IMPORTED_MODULE_14__.getIntegration)(mode, selectedItem);
     if (!integration) return [];
     const list = mode === "tools" ? Object.values(integration.actions || {}) : isTrigger ? Object.values(integration.triggers || {}) : Object.values(integration.actions || {});
     return list.map(i => ({
@@ -5203,8 +5213,8 @@ const ActionDrawer = ({
 
   //Get schema fields for the selected action
 
-  const selectedActionFields = (0,react__WEBPACK_IMPORTED_MODULE_6__.useMemo)(() => {
-    const integration = (0,_helper__WEBPACK_IMPORTED_MODULE_13__.getIntegration)(mode, selectedItem);
+  const selectedActionFields = (0,react__WEBPACK_IMPORTED_MODULE_7__.useMemo)(() => {
+    const integration = (0,_helper__WEBPACK_IMPORTED_MODULE_14__.getIntegration)(mode, selectedItem);
     if (!integration || !values?.actionType) return [];
     if (mode === "tools") return integration.actions?.[values.actionType]?.schema || [];
     if (isTrigger) return integration.triggers?.[values.actionType]?.schema || [];
@@ -5222,7 +5232,7 @@ const ActionDrawer = ({
       ...p,
       [key]: true
     }));
-    const res = await (0,_ZAPRedux_Slices_workFlowSlice_helper__WEBPACK_IMPORTED_MODULE_14__.fetchDynamic)(field.dynamic);
+    const res = await (0,_ZAPRedux_Slices_workFlowSlice_helper__WEBPACK_IMPORTED_MODULE_15__.fetchDynamic)(field.dynamic);
     setDynamicOptions(p => ({
       ...p,
       [key]: Object.values(res).map(i => ({
@@ -5245,9 +5255,8 @@ const ActionDrawer = ({
     setShowWarning(false);
   };
   const handleContinue = () => {
-    if (step === "select") return setStep("test");
-    // if (step === "configure") return setStep("test");
-
+    if (step === "select") return setStep("configure");
+    if (step === "configure") return setStep("test");
     const payload = {
       app: selectedItem.name,
       name: selectedItem.name,
@@ -5261,7 +5270,7 @@ const ActionDrawer = ({
     context?.source === "node" ? updateNodeData(payload) : createActionNode(payload);
     resetAll();
   };
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_20__.jsxs)(_ZAPComponents_Drawer__WEBPACK_IMPORTED_MODULE_3__["default"], {
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsxs)(_ZAPComponents_Drawer__WEBPACK_IMPORTED_MODULE_4__["default"], {
     open: open,
     isFullscreen: isFullscreen,
     onClose: resetAll,
@@ -5269,48 +5278,48 @@ const ActionDrawer = ({
     arrowOnClick: () => setMode(null)
     // closeOnOverlayClick
     ,
-    title: !mode ? "Add Action" : selectedItem?.name || (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_9__.__)('App', 'zaplane'),
+    title: !mode ? "Add Action" : selectedItem?.name || (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_10__.__)('App', 'zaplane'),
     placement: "end",
     size: ["filter", "condition"].includes(values?.actionType) ? "xl" : "md",
-    footer: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_20__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.HStack, {
+    footer: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.HStack, {
       justify: "space-between",
-      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_20__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Button, {
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Button, {
         variant: "ghost",
         onClick: resetAll,
-        children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_9__.__)("Cancel", "zaplane")
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_20__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Button, {
-        ..._assets_scss_chakra_recipe__WEBPACK_IMPORTED_MODULE_10__.primaryBtn,
+        children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_10__.__)("Cancel", "zaplane")
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Button, {
+        ..._assets_scss_chakra_recipe__WEBPACK_IMPORTED_MODULE_11__.primaryBtn,
         disabled: !values.actionType,
         onClick: handleContinue,
-        children: step === 'test' ? (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_9__.__)('Submit', 'zaplane') : (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_9__.__)('Continue', 'zaplane')
+        children: step === 'test' ? (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_10__.__)('Submit', 'zaplane') : (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_10__.__)('Continue', 'zaplane')
       })]
     }),
-    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_20__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Input, {
-      placeholder: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_9__.__)("Search apps or tools...", "zaplane"),
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Input, {
+      placeholder: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_10__.__)("Search apps or tools...", "zaplane"),
       value: search,
       onChange: e => setSearch(e.target.value)
-    }), search && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_20__.jsx)(_DrawerSearchList_DrawerSearchList__WEBPACK_IMPORTED_MODULE_17__["default"], {
+    }), search && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_DrawerSearchList_DrawerSearchList__WEBPACK_IMPORTED_MODULE_18__["default"], {
       searchList: searchList,
       setMode: setMode,
       setSelectedItem: setSelectedItem,
       setSearch: setSearch
-    }), !mode && !search && !selectedItem && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_20__.jsx)(_DrawerItemList_DrawerModeList__WEBPACK_IMPORTED_MODULE_18__["default"], {
+    }), !mode && !search && !selectedItem && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_DrawerItemList_DrawerModeList__WEBPACK_IMPORTED_MODULE_19__["default"], {
       setMode: setMode,
       setSelectedItem: setSelectedItem,
       isTrigger: isTrigger,
       source: source,
-      TOOLS: _ZAPHooks_useActionDrawer_helper__WEBPACK_IMPORTED_MODULE_12__.TOOLS
-    }), mode && !selectedItem && !search && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_20__.jsx)(_DrawerItemList__WEBPACK_IMPORTED_MODULE_19__["default"], {
+      TOOLS: _ZAPHooks_useActionDrawer_helper__WEBPACK_IMPORTED_MODULE_13__.TOOLS
+    }), mode && !selectedItem && !search && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_DrawerItemList__WEBPACK_IMPORTED_MODULE_20__["default"], {
       list: list,
       setSelectedItem: setSelectedItem,
       setMode: setMode
-    }), selectedItem && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_20__.jsx)(_ZAPComponents_Tab__WEBPACK_IMPORTED_MODULE_8__["default"], {
+    }), selectedItem && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_ZAPComponents_Tab__WEBPACK_IMPORTED_MODULE_9__["default"], {
       value: step,
       onChange: values?.actionType && setStep,
       tabs: [{
         value: "select",
         label: "Select",
-        content: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_20__.jsx)(_SelectTab_SelectTab__WEBPACK_IMPORTED_MODULE_15__["default"], {
+        content: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_SelectTab_SelectTab__WEBPACK_IMPORTED_MODULE_16__["default"], {
           isTrigger: isTrigger,
           actionOptions: actionOptions,
           selectedActionFields: selectedActionFields,
@@ -5323,12 +5332,33 @@ const ActionDrawer = ({
           node: node,
           workFlow: workFlow
         })
-      },
-      // { value: "configure", label: "Configure", content: <Text fontSize="sm">{__("Configure step", "zaplane")}</Text> },
-      {
+      }, {
+        value: "configure",
+        label: "Configure",
+        content: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.Fragment, {
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Flex, {
+            direction: "column",
+            gap: 4,
+            children: selectedActionFields?.length > 0 ? selectedActionFields.map(field => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_ActionFieldRenderer_ActionFieldRenderer__WEBPACK_IMPORTED_MODULE_21__["default"], {
+              field: field,
+              value: values?.[field.key],
+              setFieldValue: setFieldValue,
+              getKey: getKey,
+              dynamicOptions: dynamicOptions,
+              loadingFields: loadingFields,
+              fetchDynamicOptions: fetchDynamicOptions,
+              nodeId: node?.id,
+              workFlow: workFlow
+            }, field.key)) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_ZAPComponents_Labels_ZAPLabel__WEBPACK_IMPORTED_MODULE_22__["default"], {
+              label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_10__.__)("No configuration required for this action.", "zaplane"),
+              type: "simple"
+            })
+          })
+        })
+      }, {
         value: "test",
         label: "Test",
-        content: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_20__.jsx)(_TestRun_TestRun__WEBPACK_IMPORTED_MODULE_16__["default"], {
+        content: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_TestRun_TestRun__WEBPACK_IMPORTED_MODULE_17__["default"], {
           source: source,
           node: node,
           workFlow: workFlow,
@@ -6083,60 +6113,35 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/flex/flex.js");
-/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
-/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _ZAPComponents_ZAPSelect__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @ZAPComponents/ZAPSelect */ "./dev_zaplane/components/ZAPSelect/index.js");
-/* harmony import */ var _ActionFieldRenderer_ActionFieldRenderer__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../ActionFieldRenderer/ActionFieldRenderer */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/ActionFieldRenderer/ActionFieldRenderer.js");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__);
-
-
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _ZAPComponents_ZAPSelect__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @ZAPComponents/ZAPSelect */ "./dev_zaplane/components/ZAPSelect/index.js");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__);
 
 
 
 const SelectTab = ({
   isTrigger,
   actionOptions,
-  selectedActionFields,
   values,
-  setFieldValue,
-  dynamicOptions,
-  loadingFields,
-  fetchDynamicOptions,
-  getKey,
-  node,
-  workFlow
+  setFieldValue
 }) => {
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.Fragment, {
-    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_ZAPComponents_ZAPSelect__WEBPACK_IMPORTED_MODULE_2__["default"], {
-      label: isTrigger ? (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)("Trigger Type", "zaplane") : (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)("Action Type", "zaplane"),
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.Fragment, {
+    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)(_ZAPComponents_ZAPSelect__WEBPACK_IMPORTED_MODULE_1__["default"], {
+      label: isTrigger ? (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)("Trigger Type", "zaplane") : (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)("Action Type", "zaplane"),
       options: actionOptions,
       value: values?.actionType,
       onChange: val => {
         setFieldValue("actionType", val?.value);
         setFieldValue("hook", val?.hook);
       },
-      placeholder: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)("Select Action Type", "zaplane"),
+      placeholder: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)("Select Action Type", "zaplane"),
       isClearable: true,
       containerStyle: {
         marginBottom: "8px"
       }
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Flex, {
-      direction: "column",
-      gap: 4,
-      children: selectedActionFields?.map(field => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_ActionFieldRenderer_ActionFieldRenderer__WEBPACK_IMPORTED_MODULE_3__["default"], {
-        field: field,
-        value: values?.[field.key],
-        setFieldValue: setFieldValue,
-        getKey: getKey,
-        dynamicOptions: dynamicOptions,
-        loadingFields: loadingFields,
-        fetchDynamicOptions: fetchDynamicOptions,
-        nodeId: node?.id,
-        workFlow: workFlow
-      }, field.key))
-    })]
+    })
   });
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (SelectTab);
@@ -6548,7 +6553,7 @@ const FloatingEdge = ({
         cursor: "pointer",
         position: "absolute",
         top: isLR ? "13px" : "110px",
-        right: isLR ? "-80px" : "63px",
+        right: isLR ? "-80px" : "69px",
         _hover: {
           borderColor: "var(--zaplane-primary-color)",
           bg: "var(--zaplane-background)"

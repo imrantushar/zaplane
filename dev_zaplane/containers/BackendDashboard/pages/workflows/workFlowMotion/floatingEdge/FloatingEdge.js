@@ -37,7 +37,7 @@ const FloatingEdge = ({  openDrawerFromAdd, canvasLayout }) => {
           cursor="pointer"
           position="absolute"
           top={isLR ? "13px" : "110px"}
-          right={isLR ? "-80px" : "63px"}
+          right={isLR ? "-80px" : "69px"}
           _hover={{
             borderColor: "var(--zaplane-primary-color)",
             bg: "var(--zaplane-background)",
