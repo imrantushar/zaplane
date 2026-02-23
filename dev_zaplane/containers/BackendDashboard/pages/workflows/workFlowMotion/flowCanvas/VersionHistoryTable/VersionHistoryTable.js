@@ -1,13 +1,16 @@
 import {
   Badge,
+  Box,
   Button,
   HStack,
   Text,
 } from "@chakra-ui/react";
 import { __ } from "@wordpress/i18n";
+import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
 import ListTable from "@ZAPComponents/ListTable";
 import ZAPTooltip from "@ZAPComponents/ZAPTooltip";
 import { getPreviewOldVersion, versionActive } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlowVersion";
+import { formatDateTime } from "@ZAPUtils/helper";
 import { CheckCircle, Eye } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -28,9 +31,18 @@ const VersionHistoryTable = ({
     },
     {
       name: __('Created At', 'zaplane'),
-      cell: (row) => (
-        <Text className="zaplane-label">{__(row.created_at, "zaplane")}</Text>
-      ),
+      cell: (row) => {
+              const { date, time } = formatDateTime(row.created_at);
+      
+              return (
+               <Box >
+                  <ZAPLabel label={date} type={"simple"}/>
+                  <Text className="zaplane-sub-title" ml='-63px' color="var(--zaplane-text-muted)">
+                    {__(time, 'zaplane')}
+                  </Text>
+                </Box>
+              );
+            },
       // columnWidth: "180px",
       textAlign: "center",
     },
