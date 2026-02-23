@@ -118,7 +118,7 @@ export default function CustomNode({ id, data, canvasLayout }) {
           >
             <Icon as={FaWordpress} boxSize={5} color="orange.500" />
           </Box>
-          <Box textAlign="left" paddingRight="20px">
+          <Box textAlign="left" paddingRight="25px">
             <ZAPLabel label=
               {isSelectApp ? __(data.app, "zaplane")
                 : sprintf(__("%s", "zaplane"), formatLabel(data.event))} type="basic" />
