@@ -32,7 +32,7 @@ const SelectTab = ({
         }}
         placeholder={__("Select Action Type", "zaplane")}
         isClearable
-        mb={4}
+        containerStyle={{ marginBottom: "8px" }}
       />
 
       <Flex direction="column" gap={4}>

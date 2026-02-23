@@ -84,8 +84,8 @@ const ZAPLabel = ({
 			color: "var(--zaplane-gray-color)",
 		},
 		inputLabel: {
-			fontSize: "0.875rem",                 
-			fontWeight: "600",              
+			fontSize: "14px",                 
+			fontWeight: "500",              
 			color: "var(--zaplane-font-color)", 
 			
 		}

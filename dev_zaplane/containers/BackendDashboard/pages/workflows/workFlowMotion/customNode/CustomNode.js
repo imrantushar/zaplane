@@ -12,6 +12,7 @@ import FloatingEdge from "../FloatingEdge/FloatingEdge";
 import { __, sprintf } from "@wordpress/i18n";
 import { formatLabel } from "@ZAPUtils/helper";
 import { FaWordpress } from "react-icons/fa6";
+import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
 export default function CustomNode({ id, data, canvasLayout }) {
   const [hovered, setHovered] = useState(false);
 
@@ -42,7 +43,6 @@ export default function CustomNode({ id, data, canvasLayout }) {
             p="4px 8px"
             fontWeight="medium"
             className="zaplane-label"
-            margin={0}
           >
             {formattedAction || "Action"}
           </Text>
@@ -106,7 +106,7 @@ export default function CustomNode({ id, data, canvasLayout }) {
             }}
           />
         )}
-         <HStack spacing={3} align="center">
+        <HStack spacing={3} align="center">
           <Box
             w="40px"
             h="40px"
@@ -119,25 +119,14 @@ export default function CustomNode({ id, data, canvasLayout }) {
             <Icon as={FaWordpress} boxSize={5} color="orange.500" />
           </Box>
           <Box textAlign="left">
-            <Text
-              className="zaplane-title"
-              fontSize="sm"
-              fontWeight="semibold"
-              lineHeight="1.2"
-            >
-              {isSelectApp
-                ? __(data.app, "zaplane")
-                : sprintf(__("%s", "zaplane"), formatLabel(data.event))}
-            </Text>
+            <ZAPLabel label=
+              {isSelectApp ? __(data.app, "zaplane")
+                : sprintf(__("%s", "zaplane"), formatLabel(data.event))} type="basic" />
 
             {!isSelectApp && (
-              <Text
-                className="zaplane-sub-title"
-                fontSize="xs"
-                color="var(--zaplane-text-muted)"
-              >
-                {sprintf(__("%s", "zaplane"), data.app)}
-              </Text>
+              <ZAPLabel label=
+                {sprintf(__("%s", "zaplane"), data.app)} type="simple" />
+
             )}
           </Box>
         </HStack>
