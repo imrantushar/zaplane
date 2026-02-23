@@ -1,4 +1,4 @@
-import { Text, Icon } from "@chakra-ui/react";
+import { Text, Icon, Box } from "@chakra-ui/react";
 import { __ } from "@wordpress/i18n";
 import { useDispatch, useSelector } from "react-redux";
 import { useState } from "react";
@@ -17,6 +17,8 @@ import {
 } from "@ZAPRedux/Slices/connectionsSlice/connectionsSlice";
 
 import ConnectionDetails from "./ConnectionDetails/ConnectionDetails";
+import { formatDateTime } from "@ZAPUtils/helper";
+import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
 
 const ConnectionTable = () => {
     const dispatch = useDispatch();
@@ -49,11 +51,11 @@ const ConnectionTable = () => {
                 </Text>
             ),
             cell: (row) => (
-                <Text className="zaplane-label" fontWeight="500">
+                <Text className="zaplane-label" fontWeight="400" textOverflow="ellipsis">
                     {row.name}
                 </Text>
             ),
-            columnWidth: "150px",
+            // columnWidth: "150px",
             textAlign: "start",
         },
         {
@@ -63,9 +65,9 @@ const ConnectionTable = () => {
                 </Text>
             ),
             cell: (row) => (
-                <Text fontSize="sm">{row.auth_type}</Text>
+                 <ZAPLabel label={row.auth_type} type={"simple"}/>
             ),
-            columnWidth: "120px",
+            // columnWidth: "120px",
             textAlign: "center",
         },
         {
@@ -74,10 +76,40 @@ const ConnectionTable = () => {
                     {__("Created At", "zaplane")}
                 </Text>
             ),
-            cell: (row) => (
-                <Text fontSize="sm">{row.created_at || "--"}</Text>
+            cell: (row) => {
+                const { date, time } = formatDateTime(row.created_at);
+
+                return (
+                    <Box textAlign="center">
+                        <ZAPLabel label={date} type={"simple"} />
+                        <Text className="zaplane-sub-title" ml='-63px' color="var(--zaplane-text-muted)">
+                            {__(time, 'zaplane')}
+                        </Text>
+                    </Box>
+                );
+            },
+            // columnWidth: "160px",
+            textAlign: "center",
+        },
+        {
+            name: (
+                <Text className="zaplane-label">
+                    {__("updated_at", "zaplane")}
+                </Text>
             ),
-            columnWidth: "160px",
+            cell: (row) => {
+                const { date, time } = formatDateTime(row.updated_at);
+
+                return (
+                    <Box textAlign="center">
+                        <ZAPLabel label={date} type={"simple"} />
+                        <Text className="zaplane-sub-title" ml='-63px' color="var(--zaplane-text-muted)">
+                            {__(time, 'zaplane')}
+                        </Text>
+                    </Box>
+                );
+            },
+            // columnWidth: "160px",
             textAlign: "center",
         },
         {
@@ -100,7 +132,7 @@ const ConnectionTable = () => {
                     }
                 />
             ),
-            columnWidth: "170px",
+            // columnWidth: "170px",
             textAlign: "center",
         },
         {
@@ -143,7 +175,7 @@ const ConnectionTable = () => {
                     ]}
                 />
             ),
-            columnWidth: "100px",
+            // columnWidth: "100px",
             textAlign: "center",
         },
     ];

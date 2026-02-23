@@ -21,6 +21,7 @@ import ZAPTooltip from "@ZAPComponents/ZAPTooltip";
 import { FaRegEdit } from "react-icons/fa";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { LiaEditSolid } from "react-icons/lia";
+import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
 
 const WorkflowTable = () => {
   const navigate = useNavigate();
@@ -40,7 +41,9 @@ const WorkflowTable = () => {
       cell: (row) => (
         <Text
           className="zaplane-label"
-          fontWeight="500"
+          fontWeight="400"
+          fontSize="14px"
+          textOverflow="ellipsis"
           cursor="pointer"
           onClick={() =>
             navigate(
@@ -64,10 +67,10 @@ const WorkflowTable = () => {
         const { date, time } = formatDateTime(row.created_at);
 
         return (
-          <Box textAlign="center">
-            <Text className="zaplane-label">{date}</Text>
-            <Text className="zaplane-sub-title" color="var(--zaplane-text-muted)">
-              {time}
+         <Box>
+            <ZAPLabel label={date} type={"simple"}/>
+            <Text className="zaplane-sub-title" ml='-63px' color="var(--zaplane-text-muted)">
+              {__(time, 'zaplane')}
             </Text>
           </Box>
         );
@@ -85,10 +88,10 @@ const WorkflowTable = () => {
         const { date, time } = formatDateTime(row.updated_at);
 
         return (
-          <Box textAlign="center">
-            <Text  className="zaplane-label">{date}</Text>
-            <Text className="zaplane-sub-title" color="var(--zaplane-text-muted)">
-              {time}
+         <Box >
+            <ZAPLabel label={date} type={"simple"}/>
+            <Text className="zaplane-sub-title" ml='-63px' color="var(--zaplane-text-muted)">
+              {__(time, 'zaplane')}
             </Text>
           </Box>
         );

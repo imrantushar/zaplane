@@ -15,6 +15,7 @@ import {
 import WorkflowTable from "./WorkflowTable";
 import { useNavigate } from "react-router-dom";
 import { route_path } from "@ZAPUtils/helper";
+import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
 
 
 const CreateWorkflows = () => {
@@ -51,7 +52,11 @@ const CreateWorkflows = () => {
       <TopBar
         render={() => (
           <Box>
-            <Heading>{__("Flows", "zaplane")}</Heading>
+            <ZAPLabel
+              label={__('Flows', 'zaplane')}
+              variant="bold"
+            />
+
           </Box>
         )}
         rightContent={() => (
@@ -65,7 +70,7 @@ const CreateWorkflows = () => {
           //   ]}
           // />
           <Button {...primaryBtn} onClick={() => setIsModalOpen(true)}>
-            {__('Create Workflow','zaplane')}
+            {__('Create Workflow', 'zaplane')}
           </Button>
         )}
       />

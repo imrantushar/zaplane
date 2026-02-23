@@ -3,6 +3,7 @@ import { Box, HStack, Text } from "@chakra-ui/react";
 import { __, sprintf } from "@wordpress/i18n";
 import ListTable from "@ZAPComponents/ListTable";
 import { formatDateTime, formatLabel, getDuration } from "@ZAPUtils/helper";
+import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
 
 const RecentLogs = ({ data = [] }) => {
   const isSuccess = (status) => status === "completed";
@@ -17,8 +18,8 @@ const RecentLogs = ({ data = [] }) => {
       cell: (row) => {
         return (
           <Box >
-            <Text className="zaplane-label">{__(row?.node?.app, 'zaplane')}</Text>
-            <Text className="zaplane-label" color="var(--zaplane-text-muted)">
+            <ZAPLabel label={row?.node?.app} type={"simple"}/>
+            <Text className="zaplane-sub-title" color="var(--zaplane-text-muted)">
               {__(formatLabel(row?.node?.event), 'zaplane')}
             </Text>
           </Box>
@@ -38,8 +39,8 @@ const RecentLogs = ({ data = [] }) => {
 
         return (
           <Box >
-            <Text className="zaplane-label">{__(date, 'zaplane')}</Text>
-            <Text className="zaplane-label" color="var(--zaplane-text-muted)">
+            <ZAPLabel label={date} type={"simple"}/>
+            <Text className="zaplane-sub-title" ml='-63px' color="var(--zaplane-text-muted)">
               {__(time, 'zaplane')}
             </Text>
           </Box>
@@ -58,8 +59,8 @@ const RecentLogs = ({ data = [] }) => {
 
         return (
           <Box textAlign="center">
-            <Text className="zaplane-label">{date}</Text>
-            <Text className="zaplane-label" color="var(--zaplane-text-muted)">
+            <ZAPLabel label={date} type={"simple"}/>
+            <Text className="zaplane-sub-title" ml='-63px' color="var(--zaplane-text-muted)">
               {__(time, 'zaplane')}
             </Text>
           </Box>
@@ -75,12 +76,7 @@ const RecentLogs = ({ data = [] }) => {
         </Text>
       ),
       cell: (row) => (
-        <Text className="zaplane-label">
-          {sprintf(
-            __("%s", "zaplane"),
-            getDuration(row.started_at, row.finished_at)
-          )}
-        </Text>
+        <ZAPLabel label={getDuration(row.started_at, row.finished_at)} type={"simple"}/>
       ),
       // columnWidth: "180px",
     },
@@ -98,14 +94,9 @@ const RecentLogs = ({ data = [] }) => {
             borderRadius="full"
             bg={isSuccess(row.status) ? "green.500" : "red.500"}
           />
-          <Text className="zaplane-label">
-            {sprintf(
-              __("%s", "zaplane"),
-              isSuccess(row.status)
+          <ZAPLabel label={isSuccess(row.status)
                 ? __("Success", "zaplane")
-                : __("Failed", "zaplane")
-            )}
-          </Text>
+                : __("Failed", "zaplane")} type={"simple"}/>
         </HStack>
       ),
       // columnWidth: "160px",

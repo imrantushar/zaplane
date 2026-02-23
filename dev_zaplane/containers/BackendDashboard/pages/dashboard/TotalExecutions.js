@@ -55,7 +55,7 @@ const TotalExecutions = ({ data = [] }) => {
             w="100%"
             h="388px"
         >
-            <Text className="zaplane-label" p="24px">
+            <Text className="zaplane-label" fontSize='14px' p="24px">
                 {__("Total Executions", "zaplane")}
             </Text>
             <ZAPDivider />

@@ -25,6 +25,7 @@ import { formatDateTime, formatLabel, getDuration } from "@ZAPUtils/helper";
 import { statusStyle } from "../workflows/helper";
 import { HistoryIcon } from "@ZAPUtils/icons";
 import ZAPTooltip from "@ZAPComponents/ZAPTooltip";
+import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
 
 const Logs = () => {
     const dispatch = useDispatch();
@@ -46,8 +47,8 @@ const Logs = () => {
             cell: (row) => {
                 return (
                     <Box >
-                        <Text className="zaplane-label">{__(row?.node?.app, 'zaplane')}</Text>
-                        <Text className="zaplane-label" color="var(--zaplane-text-muted)">
+                        <ZAPLabel label={row?.node?.app} type={"simple"} />
+                        <Text className="zaplane-sub-title" color="var(--zaplane-text-muted)">
                             {__(formatLabel(row?.node?.event), 'zaplane')}
                         </Text>
                     </Box>
@@ -67,8 +68,8 @@ const Logs = () => {
 
                 return (
                     <Box >
-                        <Text className="zaplane-label">{__(date, 'zaplane')}</Text>
-                        <Text className="zaplane-label" color="var(--zaplane-text-muted)">
+                        <ZAPLabel label={date} type={"simple"} />
+                        <Text className="zaplane-sub-title" ml='-63px' color="var(--zaplane-text-muted)">
                             {__(time, 'zaplane')}
                         </Text>
                     </Box>
@@ -87,9 +88,9 @@ const Logs = () => {
                 const { date, time } = formatDateTime(row.finished_at);
 
                 return (
-                    <Box textAlign="center">
-                        <Text className="zaplane-label">{date}</Text>
-                        <Text className="zaplane-label" color="var(--zaplane-text-muted)">
+                    <Box >
+                        <ZAPLabel label={date} type={"simple"} />
+                        <Text className="zaplane-sub-title" ml='-63px' color="var(--zaplane-text-muted)">
                             {__(time, 'zaplane')}
                         </Text>
                     </Box>
@@ -101,22 +102,24 @@ const Logs = () => {
         {
             name: __('DURATION', 'zaplane'),
             cell: (row) => (
-                <Text fontSize="sm">
-                    {getDuration(row.started_at, row.finished_at)}
-                </Text>
+                <ZAPLabel label={getDuration(row.started_at, row.finished_at)} type={"simple"} />
             ),
             // columnWidth: "150px",
         },
         {
             name: __('Status', 'zaplane'),
             cell: (row) => (
-                <Badge
-                    {...statusStyle(row.status)}
-                    borderRadius="full"
-                    px={3}
-                >
-                    {row.status}
-                </Badge>
+                <HStack spacing={2} justifyContent={"center"}>
+                    <Box
+                        w="8px"
+                        h="8px"
+                        borderRadius="full"
+                        bg={row.status === 'completed' ? "green.500" : "red.500"}
+                    />
+                    <ZAPLabel label={row.status === 'completed'
+                        ? __("Success", "zaplane")
+                        : __("Failed", "zaplane")} type={"simple"} />
+                </HStack>
             ),
             // columnWidth: "120px",
         },

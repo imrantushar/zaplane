@@ -23,6 +23,7 @@ import { useApiCountdown } from "@ZAPHooks/useApiCountdown/useApiCountdown";
 import '../styles.scss'
 import { LiaStopCircleSolid } from "react-icons/lia";
 import { CiPlay1 } from "react-icons/ci";
+import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
 
 export default function FlowTopBar({
   navigate,
@@ -48,11 +49,7 @@ export default function FlowTopBar({
               <FiArrowLeft />
             </Button>
           )}
-
-          <Text fontSize="md" fontWeight="medium">
-            {workFlow?.workflow?.title ||
-              __("Untitled Workflow", "zaplane")}
-          </Text>
+          <ZAPLabel label={workFlow?.workflow?.title} type={"bold"} />
 
           {!apiRequestRunning ? (
             <Button {...secondPrimaryBtn} h="36px" onClick={() => {
@@ -68,9 +65,14 @@ export default function FlowTopBar({
           )}
 
           {apiRequestRunning && (
-            <Text className="zaplane-label" fontSize="18px">
-              {__("Listening...", "zaplane")} {formatTime(apiCountdown)}
-            </Text>
+            <Flex gap='4px'>
+              <Text className="zaplane-label">
+                {__("Listening...", "zaplane")}
+              </Text>
+              <Text className="zaplane-label" color="var(--zaplane-text-muted)">
+                {formatTime(apiCountdown)}
+              </Text>
+            </Flex>
           )}
         </>
       )}

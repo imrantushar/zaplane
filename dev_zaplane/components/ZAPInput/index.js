@@ -1,6 +1,7 @@
 import React, { useRef, useEffect } from "react";
 import { Flex, Text, Input, Textarea } from "@chakra-ui/react";
 import { __ } from "@wordpress/i18n";
+import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
 
 const ZAPInput = ({
   label,
@@ -28,10 +29,7 @@ const ZAPInput = ({
 
   return (
     <Flex as="label" direction="column" gap={2} style={{ ...containerStyle }}>
-      <Text className="zaplane-label" fontWeight="600" fontSize="0.875rem">
-        {__(label, "zaplane")}
-      </Text>
-
+      <ZAPLabel label={label} type={"inputLabel"} />
       {isTextarea ? (
         <Textarea
           ref={textareaRef}

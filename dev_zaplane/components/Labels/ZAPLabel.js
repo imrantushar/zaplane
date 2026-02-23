@@ -64,7 +64,8 @@ const ZAPLabel = ({
 		simple: {
 			fontSize: "14px",
 			fontWeight: "400",
-			color: "var(--zaplane-gray-color)",
+			color: "var(--zaplane-font-colo)",
+			lineHeight:'20px'
 		},
 		simpleLight: {
 			fontSize: "12px",
@@ -72,7 +73,8 @@ const ZAPLabel = ({
 			color: "var(--zaplane-gray-color)",
 		},
 		bold: {
-			fontSize: "16px",
+			fontSize: "20px",
+			lineHeight:'30px',
 			fontWeight: "500",
 			color: "var(--zaplane-font-color)",
 		},

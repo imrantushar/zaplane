@@ -4,19 +4,13 @@ import {
     Box,
     Button,
     VStack,
-    HStack,
     Text,
-    Badge,
-    Flex,
     Input,
-    Spinner,
     Heading,
+    Flex,
 } from "@chakra-ui/react";
 import { __ } from "@wordpress/i18n";
 import { FaSlack } from "react-icons/fa";
-import {
-    FiTrash2, FiRefreshCw, FiEye, FiLink,
-} from "react-icons/fi";
 import Select from "react-select";
 
 import {
@@ -24,28 +18,19 @@ import {
     fetchAuthFields,
     initOAuth,
     createTokenConnection,
-    testConnection,
-    deleteConnection,
-    fetchSingleConnection,
-    updateConnection,
 } from "@ZAPRedux/Slices/connectionsSlice/connectionsSlice";
 
 import WPModal from "@ZAPComponents/Modal/WPModal";
-import ZAPTable from "@ZAPComponents/Table";
-import ConnectionDetails from "./ConnectionDetails/ConnectionDetails";
 import TopBar from "@ZAPComponents/TopBar";
-import { primaryBtn, removeBtn } from "../../../../../assets/scss/chakra/recipe";
+import { primaryBtn } from "../../../../../assets/scss/chakra/recipe";
 import ConnectionTable from "./ConnectionTable";
+import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
 
-const statusOptions = [
-    { value: "active", label: "Active" },
-    { value: "inactive", label: "Inactive" },
-];
 
 const Connections = () => {
     const dispatch = useDispatch();
 
-    const { allConnection, connection, authFields } = useSelector(
+    const { authFields } = useSelector(
         (state) => state.connections || []
     );
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -71,8 +56,8 @@ const Connections = () => {
         );
     }, [selectedApp, selectedAuthType, dispatch]);
 
-    
-    
+
+
     const handleConnect = async () => {
         if (!selectedApp || !selectedAuthType) return;
 
@@ -133,10 +118,11 @@ const Connections = () => {
             <TopBar
                 render={() => (
                     <Box>
-                        <Heading className="zaplane-title">
-                            {__("Connections", "zaplane")}
-                        </Heading>
-                        <Text className="zaplane-title-subtitle">
+                        <ZAPLabel
+                            label={__('Flows', 'zaplane')}
+                            variant="bold"
+                        />
+                        <Text className="zaplane-sub-title" color="var(--zaplane-text-muted)">
                             {__("Connections between your apps", "zaplane")}
                         </Text>
                     </Box>
@@ -152,9 +138,9 @@ const Connections = () => {
                 )}
             />
             <div className="zaplane-page-content">
-                <ConnectionTable/>
+                <ConnectionTable />
             </div>
-           
+
             <WPModal
                 title={__("Create credential", "zaplane")}
                 isOpen={isModalOpen}
@@ -176,7 +162,7 @@ const Connections = () => {
 
                         />
                         {Object.keys(authTypes).map((key) => (
-                            <Button
+                            <Button 
                                 key={key}
                                 variant={selectedAuthType === key ? "solid" : "outline"}
                                 onClick={() => {
@@ -194,8 +180,8 @@ const Connections = () => {
                                         const value = credentials[fieldKey] || "";
 
                                         return (
-                                            <Box key={fieldKey}>
-                                                <Text className="zaplane-label" fontWeight="bold">   {__(field.label, "zaplane")}</Text>
+                                            <Flex flexDirection="column" gap={"4px"} key={fieldKey}>
+                                                <ZAPLabel label={field.label} type={"simple"} />
                                                 <Input
                                                     type={field.type === "password" ? "password" : "text"}
                                                     placeholder={field.placeholder || ""}
@@ -208,12 +194,12 @@ const Connections = () => {
                                                     }
                                                 />
                                                 {field.help && (
-                                                    <Text fontSize="sm" className="zaplane-label">
+                                                    <Text fontSize="sm" className="zaplane-sub-title" color="var(--zaplane-text-muted)">
 
                                                         {__(field.help, "zaplane")}
                                                     </Text>
                                                 )}
-                                            </Box>
+                                            </Flex>
                                         );
                                     }
                                 )}

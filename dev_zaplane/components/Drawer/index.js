@@ -4,10 +4,13 @@ import {
     Button,
     CloseButton,
     Drawer,
+    Icon,
     Portal,
     Text,
 } from "@chakra-ui/react";
+import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
 import { FiArrowLeft } from "react-icons/fi";
+import { IoIosArrowBack } from "react-icons/io";
 
 
 const ZAPDrawer = ({
@@ -52,14 +55,16 @@ const ZAPDrawer = ({
                         {title && (
                             <Drawer.Header>
                                 {
-                                    arrowClose && <Button height="30px" width="20px" variant="outline"
-                                        onClick={() => {
-                                            arrowOnClick ? arrowOnClick() : onClose?.();
-                                        }} >
-                                        <FiArrowLeft />
-                                    </Button>
+                                    arrowClose && <Icon as={IoIosArrowBack} height='24px' width="24px" onClick={() => {
+                                        arrowOnClick ? arrowOnClick() : onClose?.();
+                                    }}
+                                    >
+
+                                    </Icon>
                                 }
-                                <Drawer.Title margin='0' >{title}</Drawer.Title>
+                                <Drawer.Title margin='0'>
+                                    <ZAPLabel label={title} type={"bold"} />
+                                </Drawer.Title>
                                 <Drawer.CloseTrigger asChild>
                                     <CloseButton size="sm" />
                                 </Drawer.CloseTrigger>

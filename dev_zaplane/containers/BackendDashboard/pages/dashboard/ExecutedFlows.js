@@ -12,16 +12,14 @@ const ExecutedFlows = () => {
       w="100%"
       // maxW="400px"
     >
-      <Text className='zaplane-label' p={"24px"} >
+      <Text className='zaplane-label' fontSize='14px' p={"24px"} >
         {__('Top Executed Flows', 'zaplane')}
 
       </Text>
       <ZAPDivider/>
       <Stack spacing={2}>
         <Box p="24px">
-          <Text className='zaplane-label'>{__('Untitled Flow', 'zaplane')}</Text>
-          <Text className='zaplane-label'>{__('Untitled Flow', 'zaplane')}</Text>
-          <Text className='zaplane-label'>{__('0', 'zaplane')}</Text>
+          <Text className='zaplane-sub-title'>{__('Untitled Flow', 'zaplane')}</Text>
         </Box>
       </Stack>
     </Box>
