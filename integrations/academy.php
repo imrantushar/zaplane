@@ -239,12 +239,12 @@ class Academy extends IntegrationBase {
                     'user_id'   => $user_id,
                 ];
 
-            case 'tutor_quiz_course_attempt':
-                $attempt_id = $args[0] ?? null;
-                if ( ! $attempt_id ) return false;
+           case 'academy_quiz_course_attempt':
 
-                $attempt = tutor_utils()->get_attempt( $attempt_id );
+                $attempt = $args[0] ?? null;
                 if ( ! $attempt ) return false;
+
+                if ( $attempt->attempt_status === 'pending' ) return false;
 
                 $quiz_id = $attempt->quiz_id ?? null;
                 $user_id = $attempt->user_id ?? null;
@@ -253,23 +253,23 @@ class Academy extends IntegrationBase {
 
                 $selected_quiz = $node['data']['config']['quiz_id'] ?? 'any';
 
-                if ( $selected_quiz !== 'any' && (int) $selected_quiz !== (int) $quiz_id ) {
+                if ( $selected_quiz !== 'any' && (int)$selected_quiz !== (int)$quiz_id ) {
                     return false;
                 }
 
                 return [
-                    'success' => true,
-                    'quiz_id' => $quiz_id,
-                    'user_id' => $user_id,
+                    'success'  => true,
+                    'quiz_id'  => $quiz_id,
+                    'user_id'  => $user_id,
+                    'score'    => $attempt->earned_marks ?? 0,
+                    'total'    => $attempt->total_marks ?? 0,
                 ];
 
-
             case 'quiz_target':
-               $attempt_id = $args[0] ?? null;
-                if ( ! $attempt_id ) return false;
-
-                $attempt = tutor_utils()->get_attempt( $attempt_id );
+                $attempt = $args[0] ?? null;
                 if ( ! $attempt ) return false;
+
+                if ( $attempt->attempt_status === 'pending' ) return false;
 
                 $quiz_id = $attempt->quiz_id ?? null;
                 $user_id = $attempt->user_id ?? null;
@@ -280,7 +280,7 @@ class Academy extends IntegrationBase {
 
                 $selected_quiz = $node['data']['config']['quiz_id'] ?? 'any';
 
-                if ( $selected_quiz !== 'any' && (int) $selected_quiz !== (int) $quiz_id ) {
+                if ( $selected_quiz !== 'any' && (int)$selected_quiz !== (int)$quiz_id ) {
                     return false;
                 }
 
@@ -295,15 +295,14 @@ class Academy extends IntegrationBase {
                     'user_id'     => $user_id,
                     'score'       => $earned,
                     'total_marks' => $total,
-                    'percentage'  => round( $percentage, 2 ),
+                    'percentage'  => round($percentage, 2),
                 ];
         }
         return false;
     }
 
     public static function get_actions(): array {
-        return [
-        ];
+        return [];
     }
 
     public static function get_action_config_schema( string $action ): array {

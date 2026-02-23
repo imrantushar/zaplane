@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-02-22 10:19:03",
+    "generated_at": "2026-02-23 07:09:24",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -2937,6 +2937,18 @@
                                     "value": "any"
                                 },
                                 {
+                                    "label": "course 3",
+                                    "value": 78
+                                },
+                                {
+                                    "label": "course 2",
+                                    "value": 72
+                                },
+                                {
+                                    "label": "course 1",
+                                    "value": 55
+                                },
+                                {
                                     "label": "asdfasdf",
                                     "value": 47
                                 }
@@ -2961,6 +2973,22 @@
                                 {
                                     "label": "Any Quiz",
                                     "value": "any"
+                                },
+                                {
+                                    "label": "ghdfg",
+                                    "value": 79
+                                },
+                                {
+                                    "label": "Quiz 2",
+                                    "value": 58
+                                },
+                                {
+                                    "label": "fsfasf",
+                                    "value": 54
+                                },
+                                {
+                                    "label": "dsfas",
+                                    "value": 53
                                 },
                                 {
                                     "label": "xdfzvxvzxc",
@@ -2991,6 +3019,14 @@
                                 {
                                     "label": "fasfd",
                                     "value": "1"
+                                },
+                                {
+                                    "label": "Lesson",
+                                    "value": "2"
+                                },
+                                {
+                                    "label": "lesson 2",
+                                    "value": "3"
                                 }
                             ],
                             "required": true
@@ -3013,6 +3049,18 @@
                                 {
                                     "label": "Any course",
                                     "value": "any"
+                                },
+                                {
+                                    "label": "course 3",
+                                    "value": 78
+                                },
+                                {
+                                    "label": "course 2",
+                                    "value": 72
+                                },
+                                {
+                                    "label": "course 1",
+                                    "value": 55
                                 },
                                 {
                                     "label": "asdfasdf",
@@ -3039,6 +3087,22 @@
                                 {
                                     "label": "Any Quiz",
                                     "value": "any"
+                                },
+                                {
+                                    "label": "ghdfg",
+                                    "value": 79
+                                },
+                                {
+                                    "label": "Quiz 2",
+                                    "value": 58
+                                },
+                                {
+                                    "label": "fsfasf",
+                                    "value": 54
+                                },
+                                {
+                                    "label": "dsfas",
+                                    "value": 53
                                 },
                                 {
                                     "label": "xdfzvxvzxc",
