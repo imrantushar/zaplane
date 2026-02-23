@@ -1,4 +1,4 @@
-import { useMemo, useCallback } from "react";
+import { useMemo, useCallback, useState } from "react";
 import { __ } from "@wordpress/i18n";
 import { Text, Box, Icon, HStack } from "@chakra-ui/react";
 import Select from "react-select";
@@ -22,10 +22,17 @@ import { FaRegEdit } from "react-icons/fa";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { LiaEditSolid } from "react-icons/lia";
 import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
+import ZAPDrawer from "@ZAPComponents/Drawer";
+import LogDetails from "@ZAPComponents/LogDetails";
+import { nodeLogsRunDetails } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlowLogs";
+import { HistoryIcon } from "@ZAPUtils/icons";
 
 const WorkflowTable = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [activeRunId, setActiveRunId] = useState(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const { data = [] } = useSelector((state) => state.logs || {});
 
   const { allWorkFlows = [], isLoading } = useSelector(
     (state) => state.workflows
@@ -67,8 +74,8 @@ const WorkflowTable = () => {
         const { date, time } = formatDateTime(row.created_at);
 
         return (
-         <Box>
-            <ZAPLabel label={date} type={"simple"}/>
+          <Box>
+            <ZAPLabel label={date} type={"simple"} />
             <Text className="zaplane-sub-title" ml='-63px' color="var(--zaplane-text-muted)">
               {__(time, 'zaplane')}
             </Text>
@@ -88,8 +95,8 @@ const WorkflowTable = () => {
         const { date, time } = formatDateTime(row.updated_at);
 
         return (
-         <Box >
-            <ZAPLabel label={date} type={"simple"}/>
+          <Box >
+            <ZAPLabel label={date} type={"simple"} />
             <Text className="zaplane-sub-title" ml='-63px' color="var(--zaplane-text-muted)">
               {__(time, 'zaplane')}
             </Text>
@@ -133,6 +140,25 @@ const WorkflowTable = () => {
       cell: (row) => (
 
         <HStack justify="flex-end" spacing="1" justifyContent={"center"}>
+          <ZAPTooltip content={__(" Log Details", 'zaplane')}>
+            <Box
+              display="flex"
+              p={"5px 6px"}
+              justifyContent="center"
+              alignItems="center"
+              borderRadius="2.917px"
+              border="1px solid var(--zaplane-border-color)"
+              onClick={() => {
+                setActiveRunId(row.id);
+                setDrawerOpen(true);
+                dispatch(nodeLogsRunDetails(row.id));
+              }}
+            >
+              <Icon
+                as={HistoryIcon}
+              />
+            </Box>
+          </ZAPTooltip>
           <ZAPTooltip content={__("Edit", 'zaplane')}>
             <Box
               display="flex"
@@ -148,8 +174,8 @@ const WorkflowTable = () => {
               }}
             >
               <Icon
-                height="20px"
-                width="20px"
+                height="15px"
+                width="15px"
                 as={LiaEditSolid}
               />
             </Box>
@@ -173,8 +199,8 @@ const WorkflowTable = () => {
               }}
             >
               <Icon
-                height="20px"
-                width="20px"
+                height="15px"
+                width="15px"
                 as={RiDeleteBin6Line}
 
               />
@@ -191,18 +217,43 @@ const WorkflowTable = () => {
 
 
   return (
-    <ListTable
-      columns={columns}
-      data={Array.isArray(allWorkFlows) ? allWorkFlows : []}
-      isRowSelectable={true}
-      showSubHeader={false}
-      showColumnFilter={false}
-      showPagination={false}
-      noDataText={__("No workflows found", "zaplane")}
-      totalItems={allWorkFlows?.length || 0}
-      dataFetchingStatus={isLoading}
-      suffix="workflow-table"
-    />
+    <>
+      <ListTable
+        columns={columns}
+        data={Array.isArray(allWorkFlows) ? allWorkFlows : []}
+        isRowSelectable={true}
+        showSubHeader={false}
+        showColumnFilter={false}
+        showPagination={false}
+        noDataText={__("No workflows found", "zaplane")}
+        totalItems={allWorkFlows?.length || 0}
+        dataFetchingStatus={isLoading}
+        suffix="workflow-table"
+      />
+
+      <ZAPDrawer
+        open={drawerOpen}
+        arrowClose
+        onClose={() => {
+          setDrawerOpen(false);
+          setActiveRunId(null);
+        }}
+        closeOnOverlayClick
+        title={__("Log Details", "zaplane")}
+        placement="end"
+        size="md"
+      >
+        {activeRunId && (
+          <LogDetails
+            runId={activeRunId}
+            onBack={() => {
+              setDrawerOpen(false);
+              setActiveRunId(null);
+            }}
+          />
+        )}
+      </ZAPDrawer></>
+
   );
 };
 

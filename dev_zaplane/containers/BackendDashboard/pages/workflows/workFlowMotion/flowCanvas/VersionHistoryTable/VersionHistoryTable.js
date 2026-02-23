@@ -24,7 +24,7 @@ const VersionHistoryTable = ({
     {
       name: __('ID', 'zaplane'),
       cell: (row) => (
-        <Text className="zaplane-label">{__(row.id, "zaplane")}</Text>
+        <Text className="zaplane-sub-title">{__(row.id, "zaplane")}</Text>
       ),
       // columnWidth: "180px",
       textAlign: "center",

@@ -33,7 +33,7 @@ const RunsTable = ({ runs = [] }) => {
     {
       name: __('Run ID', 'zaplane'),
       cell: (row) => (
-        <Text className="zaplane-label">{__(row.id, "zaplane")}</Text>
+        <Text className="zaplane-sub-title">{__(row.id, "zaplane")}</Text>
       ),
       // columnWidth: "180px",
       textAlign: "center",
@@ -57,7 +57,7 @@ const RunsTable = ({ runs = [] }) => {
     {
       name: __('DURATION', 'zaplane'),
       cell: (row) => (
-        <Text className="zaplane-label">
+        <Text className="zaplane-sub-title">
           {getDuration(row.started_at, row.finished_at)}
         </Text>
       ),
