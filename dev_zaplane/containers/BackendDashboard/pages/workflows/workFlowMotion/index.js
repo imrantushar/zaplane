@@ -1,7 +1,7 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { ReactFlowProvider, useEdgesState, useNodesState } from "@xyflow/react";
 import FlowCanvas from "./flowCanvas/FlowCanvas";
-import {Formik } from "formik";
+import { Formik } from "formik";
 import { mapEdgesForBackend, mapNodesForBackend } from "./helper";
 import { useDispatch, useSelector } from "react-redux";
 import { createNodeIdGenerator } from "./flowCanvas/helper";
@@ -11,7 +11,7 @@ import { updateWorkFlow, updateWorkFlowStatus } from "@ZAPRedux/Slices/workFlowS
 export default function Workflows({ id }) {
   const nodeIdRef = useRef(createNodeIdGenerator());
   const getNewNodeId = nodeIdRef.current;
-   const { workFlow} = useSelector((state) => state.workflows);
+  const { workFlow } = useSelector((state) => state.workflows);
   const [nodes, setNodes, onNodesChange] = useNodesState([
     {
       id: getNewNodeId(),
@@ -26,6 +26,25 @@ export default function Workflows({ id }) {
   ]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const dispatch = useDispatch();
+
+
+  useEffect(() => {
+    setNodes([
+      {
+        id: getNewNodeId(),
+        type: "custom",
+        data: {
+          app: "Select an app",
+          action: "trigger",
+          config: {},
+        },
+        position: { x: 125, y: 300 },
+      },
+    ]);
+
+    setEdges([]);
+  }, [id]);
+
   const onSubmitHandler = async (values) => {
     const payload = {
       nodes: mapNodesForBackend(nodes)
@@ -51,10 +70,10 @@ export default function Workflows({ id }) {
             }}
           onSubmit={onSubmitHandler}
         >
-          {({}) => (
+          {({ }) => (
             <Box flex="1" >
               <FlowCanvas setNodes={setNodes} setEdges={setEdges} onEdgesChange={onEdgesChange}
-                onNodesChange={onNodesChange} nodes={nodes} edges={edges} getNewNodeId={getNewNodeId} 
+                onNodesChange={onNodesChange} nodes={nodes} edges={edges} getNewNodeId={getNewNodeId}
                 workFlow={workFlow} id={id} />
             </Box>
           )}

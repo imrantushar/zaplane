@@ -3,11 +3,12 @@
 return [
     // tool
     'condition' => ['file' => 'condition.php', 'class' => \Zaplane\Integrations\Condition::class],
+    'filter' => ['file' => 'filter.php', 'class' => \Zaplane\Integrations\Filter::class],
     'delay' => ['file' => 'delay.php', 'class' => \Zaplane\Integrations\Delay::class],
     'iterator' => ['file' => 'iterator.php', 'class' => \Zaplane\Integrations\Iterator::class],
     // apps
     'wordpress' => ['file' => 'wordpress.php', 'class' => \Zaplane\Integrations\Wordpress::class],
-    'woo'       => ['file' => 'woo.php', 'class' => \Zaplane\Integrations\Woo::class],
+    'surecart'       => ['file' => 'surecart.php', 'class' => \Zaplane\Integrations\Surecart::class],
     'slack'     => ['file' => 'slack.php', 'class' => \Zaplane\Integrations\Slack::class],
     'trello'    => ['file' => 'trello.php', 'class' => \Zaplane\Integrations\Trello::class],
     'stripe'    => ['file' => 'stripe.php', 'class' => \Zaplane\Integrations\Stripe::class],
@@ -16,5 +17,6 @@ return [
     'webhook' => ['file' => 'webhook.php', 'class' => \Zaplane\Integrations\Webhook::class],
     'storeengine' => ['file' => 'storeengine.php', 'class' => \Zaplane\Integrations\Storeengine::class],
     'beaverbuilder' => ['file' => 'beaverbuilder.php', 'class' => \Zaplane\Integrations\Beaverbuilder::class],
-
+    'metform' => ['file' => 'metform.php', 'class' => \Zaplane\Integrations\Metform::class],
+    'easydigitaldownload' => ['file' => 'easydigitaldownload.php', 'class' => \Zaplane\Integrations\Easydigitaldownload::class],
 ];
