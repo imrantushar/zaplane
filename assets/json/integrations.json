@@ -2872,25 +2872,106 @@
                 }
             }
         },
-        "woo": {
-            "slug": "woo",
-            "name": "Woocommerce",
+        "surecart": {
+            "slug": "surecart",
+            "name": "Surecart",
             "icon": "",
             "category": "app",
             "triggers": {
-                "new_order": {
-                    "key": "new_order",
-                    "label": "New Order",
-                    "hook": "woocommerce_new_order",
+                "purchase_created": {
+                    "key": "purchase_created",
+                    "label": "Purchase Created",
+                    "hook": "surecart/purchase_created",
                     "schema": [],
                     "outputs": [
                         "main"
                     ]
                 },
-                "order_status_changed": {
-                    "key": "order_status_changed",
-                    "label": "Order Status Changed",
-                    "hook": "woocommerce_order_status_changed",
+                "purchase_invoked": {
+                    "key": "purchase_invoked",
+                    "label": "Purchase Invoked",
+                    "hook": "surecart/purchase_invoked",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "purchase_revoked": {
+                    "key": "purchase_revoked",
+                    "label": "Purchase Revoked",
+                    "hook": "surecart/purchase_revoked",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "checkout_confirmed": {
+                    "key": "checkout_confirmed",
+                    "label": "Checkout Confirmed",
+                    "hook": "surecart/checkout_confirmed",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "product_sync_created": {
+                    "key": "product_sync_created",
+                    "label": "Product Synced (Created)",
+                    "hook": "surecart/product/sync/created",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "product_sync_updated": {
+                    "key": "product_sync_updated",
+                    "label": "Product Synced (Updated)",
+                    "hook": "surecart/product/sync/updated",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "integrations_created": {
+                    "key": "integrations_created",
+                    "label": "Integrations Created",
+                    "hook": "surecart/integrations/create",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "integrations_deleted": {
+                    "key": "integrations_deleted",
+                    "label": "Integrations Deleted",
+                    "hook": "surecart/integrations/delete",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "help_widget_loaded": {
+                    "key": "help_widget_loaded",
+                    "label": "Help Widget Loaded",
+                    "hook": "surecart/help_widget/loaded",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "admin_coupons_edit": {
+                    "key": "admin_coupons_edit",
+                    "label": "Admin Coupons Edit",
+                    "hook": "surecart/admin/coupons/edit",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "post_created": {
+                    "key": "post_created",
+                    "label": "Post Created (PageService)",
+                    "hook": "surecart/post_created",
                     "schema": [],
                     "outputs": [
                         "main"
@@ -2901,7 +2982,33 @@
                 "create_order": {
                     "key": "create_order",
                     "label": "Create Order",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "data",
+                            "label": "Order Data (JSON)",
+                            "type": "textarea"
+                        },
+                        {
+                            "key": "mode",
+                            "label": "Mode",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Live",
+                                    "value": "live"
+                                },
+                                {
+                                    "label": "Test",
+                                    "value": "test"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "expand",
+                            "label": "Expand (CSV/JSON)",
+                            "type": "textarea"
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -2909,7 +3016,900 @@
                 "update_order": {
                     "key": "update_order",
                     "label": "Update Order",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "order_id",
+                            "label": "Order ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "data",
+                            "label": "Order Data (JSON)",
+                            "type": "textarea"
+                        },
+                        {
+                            "key": "mode",
+                            "label": "Mode",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Live",
+                                    "value": "live"
+                                },
+                                {
+                                    "label": "Test",
+                                    "value": "test"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "expand",
+                            "label": "Expand (CSV/JSON)",
+                            "type": "textarea"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_orders_all": {
+                    "key": "get_orders_all",
+                    "label": "Get Orders (All)",
+                    "schema": [
+                        {
+                            "key": "limit",
+                            "label": "Limit",
+                            "type": "number",
+                            "default": 20
+                        },
+                        {
+                            "key": "page",
+                            "label": "Page",
+                            "type": "number",
+                            "default": 1
+                        },
+                        {
+                            "key": "query",
+                            "label": "Query (JSON)",
+                            "type": "textarea"
+                        },
+                        {
+                            "key": "mode",
+                            "label": "Mode",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Live",
+                                    "value": "live"
+                                },
+                                {
+                                    "label": "Test",
+                                    "value": "test"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "expand",
+                            "label": "Expand (CSV/JSON)",
+                            "type": "textarea"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_order_single": {
+                    "key": "get_order_single",
+                    "label": "Get Order (Single)",
+                    "schema": [
+                        {
+                            "key": "order_id",
+                            "label": "Order ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "mode",
+                            "label": "Mode",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Live",
+                                    "value": "live"
+                                },
+                                {
+                                    "label": "Test",
+                                    "value": "test"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "expand",
+                            "label": "Expand (CSV/JSON)",
+                            "type": "textarea"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_customer": {
+                    "key": "create_customer",
+                    "label": "Create Customer",
+                    "schema": [
+                        {
+                            "key": "data",
+                            "label": "Customer Data (JSON)",
+                            "type": "textarea"
+                        },
+                        {
+                            "key": "mode",
+                            "label": "Mode",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Live",
+                                    "value": "live"
+                                },
+                                {
+                                    "label": "Test",
+                                    "value": "test"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "expand",
+                            "label": "Expand (CSV/JSON)",
+                            "type": "textarea"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_customer": {
+                    "key": "update_customer",
+                    "label": "Update Customer",
+                    "schema": [
+                        {
+                            "key": "customer_id",
+                            "label": "Customer ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "data",
+                            "label": "Customer Data (JSON)",
+                            "type": "textarea"
+                        },
+                        {
+                            "key": "mode",
+                            "label": "Mode",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Live",
+                                    "value": "live"
+                                },
+                                {
+                                    "label": "Test",
+                                    "value": "test"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "expand",
+                            "label": "Expand (CSV/JSON)",
+                            "type": "textarea"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_customers_all": {
+                    "key": "get_customers_all",
+                    "label": "Get Customers (All)",
+                    "schema": [
+                        {
+                            "key": "limit",
+                            "label": "Limit",
+                            "type": "number",
+                            "default": 20
+                        },
+                        {
+                            "key": "page",
+                            "label": "Page",
+                            "type": "number",
+                            "default": 1
+                        },
+                        {
+                            "key": "query",
+                            "label": "Query (JSON)",
+                            "type": "textarea"
+                        },
+                        {
+                            "key": "mode",
+                            "label": "Mode",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Live",
+                                    "value": "live"
+                                },
+                                {
+                                    "label": "Test",
+                                    "value": "test"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "expand",
+                            "label": "Expand (CSV/JSON)",
+                            "type": "textarea"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_customer_single": {
+                    "key": "get_customer_single",
+                    "label": "Get Customer (Single)",
+                    "schema": [
+                        {
+                            "key": "customer_id",
+                            "label": "Customer ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "mode",
+                            "label": "Mode",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Live",
+                                    "value": "live"
+                                },
+                                {
+                                    "label": "Test",
+                                    "value": "test"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "expand",
+                            "label": "Expand (CSV/JSON)",
+                            "type": "textarea"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_product_manual": {
+                    "key": "create_product_manual",
+                    "label": "Create Product (Manual)",
+                    "schema": [
+                        {
+                            "key": "name",
+                            "label": "Product Name",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "description",
+                            "label": "Description",
+                            "type": "textarea"
+                        },
+                        {
+                            "key": "status",
+                            "label": "Status",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Published",
+                                    "value": "published"
+                                },
+                                {
+                                    "label": "Draft",
+                                    "value": "draft"
+                                },
+                                {
+                                    "label": "Archived",
+                                    "value": "archived"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "price_amount",
+                            "label": "Price Amount (minor unit)",
+                            "type": "number",
+                            "required": true
+                        },
+                        {
+                            "key": "currency",
+                            "label": "Currency (ISO)",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "recurring_interval",
+                            "label": "Recurring Interval",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Day",
+                                    "value": "day"
+                                },
+                                {
+                                    "label": "Week",
+                                    "value": "week"
+                                },
+                                {
+                                    "label": "Month",
+                                    "value": "month"
+                                },
+                                {
+                                    "label": "Year",
+                                    "value": "year"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "recurring_interval_count",
+                            "label": "Recurring Interval Count",
+                            "type": "number",
+                            "default": 1
+                        },
+                        {
+                            "key": "mode",
+                            "label": "Mode",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Live",
+                                    "value": "live"
+                                },
+                                {
+                                    "label": "Test",
+                                    "value": "test"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "expand",
+                            "label": "Expand (CSV/JSON)",
+                            "type": "textarea"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_product": {
+                    "key": "create_product",
+                    "label": "Create Product (JSON)",
+                    "schema": [
+                        {
+                            "key": "data",
+                            "label": "Product Data (JSON)",
+                            "type": "textarea"
+                        },
+                        {
+                            "key": "mode",
+                            "label": "Mode",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Live",
+                                    "value": "live"
+                                },
+                                {
+                                    "label": "Test",
+                                    "value": "test"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "expand",
+                            "label": "Expand (CSV/JSON)",
+                            "type": "textarea"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_product": {
+                    "key": "update_product",
+                    "label": "Update Product",
+                    "schema": [
+                        {
+                            "key": "product_id",
+                            "label": "Product ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "data",
+                            "label": "Product Data (JSON)",
+                            "type": "textarea"
+                        },
+                        {
+                            "key": "mode",
+                            "label": "Mode",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Live",
+                                    "value": "live"
+                                },
+                                {
+                                    "label": "Test",
+                                    "value": "test"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "expand",
+                            "label": "Expand (CSV/JSON)",
+                            "type": "textarea"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_product": {
+                    "key": "delete_product",
+                    "label": "Delete Product",
+                    "schema": [
+                        {
+                            "key": "product_id",
+                            "label": "Product ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "mode",
+                            "label": "Mode",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Live",
+                                    "value": "live"
+                                },
+                                {
+                                    "label": "Test",
+                                    "value": "test"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_products_all": {
+                    "key": "get_products_all",
+                    "label": "Get Products (All)",
+                    "schema": [
+                        {
+                            "key": "limit",
+                            "label": "Limit",
+                            "type": "number",
+                            "default": 20
+                        },
+                        {
+                            "key": "page",
+                            "label": "Page",
+                            "type": "number",
+                            "default": 1
+                        },
+                        {
+                            "key": "query",
+                            "label": "Query (JSON)",
+                            "type": "textarea"
+                        },
+                        {
+                            "key": "mode",
+                            "label": "Mode",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Live",
+                                    "value": "live"
+                                },
+                                {
+                                    "label": "Test",
+                                    "value": "test"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "expand",
+                            "label": "Expand (CSV/JSON)",
+                            "type": "textarea"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_product_single": {
+                    "key": "get_product_single",
+                    "label": "Get Product (Single)",
+                    "schema": [
+                        {
+                            "key": "product_id",
+                            "label": "Product ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "mode",
+                            "label": "Mode",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Live",
+                                    "value": "live"
+                                },
+                                {
+                                    "label": "Test",
+                                    "value": "test"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "expand",
+                            "label": "Expand (CSV/JSON)",
+                            "type": "textarea"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_coupon": {
+                    "key": "create_coupon",
+                    "label": "Create Coupon",
+                    "schema": [
+                        {
+                            "key": "data",
+                            "label": "Coupon Data (JSON)",
+                            "type": "textarea"
+                        },
+                        {
+                            "key": "mode",
+                            "label": "Mode",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Live",
+                                    "value": "live"
+                                },
+                                {
+                                    "label": "Test",
+                                    "value": "test"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "expand",
+                            "label": "Expand (CSV/JSON)",
+                            "type": "textarea"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_coupon": {
+                    "key": "update_coupon",
+                    "label": "Update Coupon",
+                    "schema": [
+                        {
+                            "key": "coupon_id",
+                            "label": "Coupon ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "data",
+                            "label": "Coupon Data (JSON)",
+                            "type": "textarea"
+                        },
+                        {
+                            "key": "mode",
+                            "label": "Mode",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Live",
+                                    "value": "live"
+                                },
+                                {
+                                    "label": "Test",
+                                    "value": "test"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "expand",
+                            "label": "Expand (CSV/JSON)",
+                            "type": "textarea"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_coupon": {
+                    "key": "delete_coupon",
+                    "label": "Delete Coupon",
+                    "schema": [
+                        {
+                            "key": "coupon_id",
+                            "label": "Coupon ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "mode",
+                            "label": "Mode",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Live",
+                                    "value": "live"
+                                },
+                                {
+                                    "label": "Test",
+                                    "value": "test"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_coupons_all": {
+                    "key": "get_coupons_all",
+                    "label": "Get Coupons (All)",
+                    "schema": [
+                        {
+                            "key": "limit",
+                            "label": "Limit",
+                            "type": "number",
+                            "default": 20
+                        },
+                        {
+                            "key": "page",
+                            "label": "Page",
+                            "type": "number",
+                            "default": 1
+                        },
+                        {
+                            "key": "query",
+                            "label": "Query (JSON)",
+                            "type": "textarea"
+                        },
+                        {
+                            "key": "mode",
+                            "label": "Mode",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Live",
+                                    "value": "live"
+                                },
+                                {
+                                    "label": "Test",
+                                    "value": "test"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "expand",
+                            "label": "Expand (CSV/JSON)",
+                            "type": "textarea"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_coupon_single": {
+                    "key": "get_coupon_single",
+                    "label": "Get Coupon (Single)",
+                    "schema": [
+                        {
+                            "key": "coupon_id",
+                            "label": "Coupon ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "mode",
+                            "label": "Mode",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Live",
+                                    "value": "live"
+                                },
+                                {
+                                    "label": "Test",
+                                    "value": "test"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "expand",
+                            "label": "Expand (CSV/JSON)",
+                            "type": "textarea"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_subscription": {
+                    "key": "create_subscription",
+                    "label": "Create Subscription",
+                    "schema": [
+                        {
+                            "key": "data",
+                            "label": "Subscription Data (JSON)",
+                            "type": "textarea"
+                        },
+                        {
+                            "key": "mode",
+                            "label": "Mode",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Live",
+                                    "value": "live"
+                                },
+                                {
+                                    "label": "Test",
+                                    "value": "test"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "expand",
+                            "label": "Expand (CSV/JSON)",
+                            "type": "textarea"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_subscription": {
+                    "key": "update_subscription",
+                    "label": "Update Subscription",
+                    "schema": [
+                        {
+                            "key": "subscription_id",
+                            "label": "Subscription ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "data",
+                            "label": "Subscription Data (JSON)",
+                            "type": "textarea"
+                        },
+                        {
+                            "key": "mode",
+                            "label": "Mode",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Live",
+                                    "value": "live"
+                                },
+                                {
+                                    "label": "Test",
+                                    "value": "test"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "expand",
+                            "label": "Expand (CSV/JSON)",
+                            "type": "textarea"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_subscriptions_all": {
+                    "key": "get_subscriptions_all",
+                    "label": "Get Subscriptions (All)",
+                    "schema": [
+                        {
+                            "key": "limit",
+                            "label": "Limit",
+                            "type": "number",
+                            "default": 20
+                        },
+                        {
+                            "key": "page",
+                            "label": "Page",
+                            "type": "number",
+                            "default": 1
+                        },
+                        {
+                            "key": "query",
+                            "label": "Query (JSON)",
+                            "type": "textarea"
+                        },
+                        {
+                            "key": "mode",
+                            "label": "Mode",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Live",
+                                    "value": "live"
+                                },
+                                {
+                                    "label": "Test",
+                                    "value": "test"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "expand",
+                            "label": "Expand (CSV/JSON)",
+                            "type": "textarea"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_subscription_single": {
+                    "key": "get_subscription_single",
+                    "label": "Get Subscription (Single)",
+                    "schema": [
+                        {
+                            "key": "subscription_id",
+                            "label": "Subscription ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "mode",
+                            "label": "Mode",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Live",
+                                    "value": "live"
+                                },
+                                {
+                                    "label": "Test",
+                                    "value": "test"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "expand",
+                            "label": "Expand (CSV/JSON)",
+                            "type": "textarea"
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
