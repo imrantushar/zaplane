@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-02-05 10:26:45",
+    "generated_at": "2026-02-24 04:30:25",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -3238,6 +3238,24 @@
                     ]
                 }
             }
+        },
+        "metabox": {
+            "slug": "metabox",
+            "name": "Metabox",
+            "icon": "",
+            "category": "app",
+            "triggers": {
+                "rwmb_frontend_after_save_post": {
+                    "key": "rwmb_frontend_after_save_post",
+                    "label": "Form Submission",
+                    "hook": "rwmb_frontend_after_save_post",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": []
         }
     },
     "tools": {
@@ -3271,28 +3289,52 @@
                                     "type": "select",
                                     "options": [
                                         {
-                                            "label": "==",
+                                            "label": "Equals",
                                             "value": "=="
                                         },
                                         {
-                                            "label": "!=",
+                                            "label": "Not Equals",
                                             "value": "!="
                                         },
                                         {
-                                            "label": "<",
-                                            "value": "<"
-                                        },
-                                        {
-                                            "label": ">",
+                                            "label": "Greater Than",
                                             "value": ">"
                                         },
                                         {
-                                            "label": "<=",
+                                            "label": "Less Than",
+                                            "value": "<"
+                                        },
+                                        {
+                                            "label": "Greater or Equal",
+                                            "value": ">="
+                                        },
+                                        {
+                                            "label": "Less or Equal",
                                             "value": "<="
                                         },
                                         {
-                                            "label": ">=",
-                                            "value": ">="
+                                            "label": "Contains",
+                                            "value": "contains"
+                                        },
+                                        {
+                                            "label": "Not Contains",
+                                            "value": "not_contains"
+                                        },
+                                        {
+                                            "label": "Starts With",
+                                            "value": "starts_with"
+                                        },
+                                        {
+                                            "label": "Ends With",
+                                            "value": "ends_with"
+                                        },
+                                        {
+                                            "label": "Is Empty",
+                                            "value": "is_empty"
+                                        },
+                                        {
+                                            "label": "Is Not Empty",
+                                            "value": "is_not_empty"
                                         }
                                     ],
                                     "required": true
