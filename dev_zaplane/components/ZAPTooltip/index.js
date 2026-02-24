@@ -5,17 +5,16 @@ const ZAPTooltip = ({
     content,
     children,
     placement = "top",
+    positioning
 
 }) => {
     return (
         <Tooltip
+            contentProps={{bg:"var(--zaplane-primary)"}}
             content={content}
             positioning={{
-                placement,
-                offset: {
-                    mainAxis: 8,
-                    crossAxis: 25,
-                }
+                placement :placement,
+                ...positioning
             }}
 
         >

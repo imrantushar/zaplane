@@ -1,43 +1,33 @@
 import { useEffect, useState } from "react";
-import { __, sprintf } from "@wordpress/i18n";
-import {
-  Box,
-  Flex,
-  Heading,
-  Text,
-  Button,
-  Icon,
-} from "@chakra-ui/react";
-import { useNavigate } from "react-router-dom";
-import { route_path } from "@ZAPUtils/helper";
+import { __ } from "@wordpress/i18n";
+import { Box, Flex, Heading, Button } from "@chakra-ui/react";
 import { useDispatch, useSelector } from "react-redux";
-import ZAPInput from "@ZAPComponents/ZAPInput";
-import WPModal from "@ZAPComponents/Modal/WPModal";
-import Select from "react-select";
-import ZAPTable from "@ZAPComponents/Table";
 import ZAPMenu from "@ZAPComponents/ZapMenu";
 import TopBar from "@ZAPComponents/TopBar";
-import OptionMenu from "@ZAPComponents/OptionMenu";
-import { FiEdit, FiTrash2 } from "react-icons/fi";
+import ZAPInput from "@ZAPComponents/ZAPInput";
+import WPModal from "@ZAPComponents/Modal/WPModal";
 import { primaryBtn } from "../../../../../assets/scss/chakra/recipe";
-import { statusOptions } from "./helper";
-import { createWorkflows, deleteWorkFlow, getWorkFlow, updateWorkFlowStatus } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow";
+
+import {
+  createWorkflows,
+  getWorkFlow,
+} from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow";
+import WorkflowTable from "./WorkflowTable";
+import { useNavigate } from "react-router-dom";
+import { route_path } from "@ZAPUtils/helper";
 
 
 const CreateWorkflows = () => {
+  const dispatch = useDispatch();
+  const navigate =useNavigate()
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [workflowName, setWorkflowName] = useState("");
-
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-
-  const { allWorkFlows, isLoading } = useSelector((state) => state.workflows);
 
   useEffect(() => {
     dispatch(getWorkFlow());
   }, [dispatch]);
 
-  const handleCreate = async () => {
+   const handleCreate = async () => {
     if (!workflowName.trim()) return;
     const res = await dispatch(
       createWorkflows({
@@ -53,33 +43,7 @@ const CreateWorkflows = () => {
     setWorkflowName("");
     setIsModalOpen(false);
   };
-  const workflowDeleteHandler = (id) => {
-    if (
-      window.confirm(
-        __(
-          'Are you sure you want to permanently delete ?',
-          'zaplane'
-        )
-      )
-    ) {
-      dispatch(deleteWorkFlow(id));
-    }
-  };
 
-  const onSubmitHandler = async (item, status) => {
-    if (!item?.id || !status) return;
-
-    const payload = {
-      status: status,
-      id: item.id,
-    };
-
-    try {
-      await dispatch(updateWorkFlowStatus(payload));
-    } catch (error) {
-      console.log(error);
-    }
-  };
 
 
   return (
@@ -87,9 +51,7 @@ const CreateWorkflows = () => {
       <TopBar
         render={() => (
           <Box>
-            <Heading className="zaplane-heading">
-              {__("Flows", "zaplane")}
-            </Heading>
+            <Heading>{__("Flows", "zaplane")}</Heading>
           </Box>
         )}
         rightContent={() => (
@@ -100,118 +62,16 @@ const CreateWorkflows = () => {
                 label: "Create from Scratch",
                 onClick: () => setIsModalOpen(true),
               },
-              // {
-              //   label: "Create with AI",
-              //   onClick: () => console.log("AI workflow clicked"),
-              // },
             ]}
           />
         )}
       />
+
       <div className="zaplane-page-content">
-        <ZAPTable
-          data={allWorkFlows}
-          rowKey="id"
-          size="sm"
-          variant="outline"
-          columns={[
-            {
-              label: __("Title", "zaplane"),
-              key: "title",
-              textAlign: "center",
-              render: (row) => (
-                <Text
-                  onClick={() => navigate(
-                    `${route_path}admin.php?page=zaplane-workflows&action=edit&id=${row.id}`
-                  )} fontWeight="500" className="zaplane-label"
-                >
-                  {__(row.title, "zaplane")}
-                </Text>
-              ),
-            },
-            {
-              label: __("Created At", "zaplane"),
-              key: "created_at",
-              textAlign: "center",
-              render: (row) => (
-                <Text fontSize="sm" className="zaplane-label">
-                  {sprintf(
-                    __('%s', 'zaplane'),
-                    row.created_at
-                  )}
-                </Text>
-              ),
-            },
-
-            {
-              label: __("Updated At", "zaplane"),
-              key: "updated_at",
-              textAlign: "center",
-              render: (row) => (
-                <Text fontSize="sm" className="zaplane-label">
-                  {sprintf(
-                    __('%s', 'zaplane'),
-                    row.updated_at
-                  )}
-
-                </Text>
-              ),
-            },
-            {
-              label: __("Status", "zaplane"),
-              key: "status",
-              textAlign: "center",
-              render: (row) => (
-                <Box w="120px" mx="auto">
-                  <Select
-                    options={statusOptions}
-                    value={statusOptions.find(
-                      (opt) => opt.value === row.status
-                    )}
-                    onChange={(selected) =>
-                      onSubmitHandler(row, selected.value)
-                    }
-                    isClearable={false}
-                    menuPortalTarget={document.body}
-                    menuPosition="fixed"
-                    styles={{
-                      menuPortal: (base) => ({
-                        ...base,
-                        zIndex: 9999,
-                      }),
-                    }}
-                  />
-                </Box>
-              ),
-            },
-          ]}
-          actionsRenderer={(row) => (
-            <OptionMenu
-              options={[
-                {
-                  label: __('Edit', 'zaplane'),
-                  icon: <Icon as={FiEdit} />,
-                  type: 'button',
-                  onClick: () =>
-                    navigate(
-                      `${route_path}admin.php?page=zaplane-workflows&action=edit&id=${row.id}`
-                    ),
-                },
-                {
-                  label: __('Delete', 'zaplane'),
-                  suffix: 'trash',
-                  icon: <Icon as={FiTrash2} />,
-                  type: 'button',
-                  onClick: () => workflowDeleteHandler(row.id),
-                  hasBorder: false,
-                },
-              ]}
-
-            />
-          )}
-          isLoading={isLoading}
+        <WorkflowTable
         />
       </div>
+
       <WPModal
         title={__("Create Workflow", "zaplane")}
         isOpen={isModalOpen}
@@ -229,7 +89,9 @@ const CreateWorkflows = () => {
           <Flex justify="flex-end" mt={5}>
             <Button
               variant="ghost"
-              mr={3} onClick={() => setIsModalOpen(false)}>
+              mr={3}
+              onClick={() => setIsModalOpen(false)}
+            >
               {__("Cancel", "zaplane")}
             </Button>
             <Button

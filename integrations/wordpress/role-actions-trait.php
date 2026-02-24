@@ -5,8 +5,6 @@ use Zaplane\Traits\ActionResponseTrait;
 
 trait RoleActionsTrait
 {
-    use ActionResponseTrait;
-
     protected static function action_create_role(array $config): array
     {
         $role_key = sanitize_key($config['role'] ?? '');

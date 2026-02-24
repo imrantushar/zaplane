@@ -7,8 +7,6 @@ use Zaplane\Traits\ActionResponseTrait;
 
 trait CommentActionsTrait
 {
-    use ActionResponseTrait; // include success/error helpers
-
     protected static function action_create_comment(array $config): array
     {
         $comment_id = wp_insert_comment([

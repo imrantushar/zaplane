@@ -4,6 +4,12 @@ export const primaryBtn = {
     fontWeight: "600",
 
 }
+export const secondPrimaryBtn = {
+    bg: "var(--zaplane-second-primary)",
+    color: "var(--zaplane-primary)",
+    fontWeight: "600",
+
+}
 
 export const primaryClearBtn = {
     fontSize: "14px",
