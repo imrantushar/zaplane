@@ -6,6 +6,7 @@ import { getAllVersion, getPreviewOldVersion, versionActive } from './actions/wo
 import { nodeLogsRunDetails, getNodeLogDetails } from './actions/workFlowLogs';
 import { workFLowSingeNodeExction } from './actions/workflowExctions';
 import { workflowNodeListiner, workflowNodeListinerStop } from './actions/workFlowListiner';
+import { conditionVariables } from './actions/conditonVariales';
 
 
 const workflowsSlice = createSlice({
@@ -20,6 +21,7 @@ const workflowsSlice = createSlice({
 		singleNodeExecution: null,
 		apiCountdown: 0,
 		apiRequestRunning: false,
+		workflowVariables: []
 
 
 	},
@@ -79,14 +81,16 @@ const workflowsSlice = createSlice({
 				state.isLoading = false
 			})
 			.addCase(getPreviewOldVersion.fulfilled, (state, action) => {
-				if (!state.allWorkFlows.length) return;
-				state.allWorkFlows[0] = {
-					...state.allWorkFlows[0],
-					graph: action.payload.graph,
-					is_preview: true,
-					preview_version_id: action.payload.version?.id,
+				if (!state.workFlow || Object.keys(state.workFlow).length === 0) return;
+
+				state.workFlow = {
+					...state.workFlow,
+					graph: action.payload.graph || state.workFlow.graph,
+					// is_preview: true,
+					// preview_version_id: action.payload.version?.id || null,
 				};
 			})
+
 			.addCase(getAllVersion.fulfilled, (state, action) => {
 				state.versions = action.payload;
 				state.isLoading = false
@@ -125,6 +129,10 @@ const workflowsSlice = createSlice({
 				state.isLoading = false;
 				state.apiRequestRunning = false;
 				state.apiCountdown = 0;
+			})
+			.addCase(conditionVariables.fulfilled, (state, action) => {
+				if (!action.payload) return;
+				state.workflowVariables = action.payload;
 			})
 	},
 });
