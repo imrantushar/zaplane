@@ -24,7 +24,7 @@ class IntegrationLoader {
             return;
         }
 
-        self::$registry = require ZAPLANE_INCLUDES_DIR_PATH . 'framework/core/integration-registry.php';
+        self::$registry = zaplane_config('integrations.registry', []);
         self::$registry = apply_filters('zaplane_integrations', self::$registry);
         self::$initialized = true;
     }
