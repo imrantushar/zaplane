@@ -68,7 +68,7 @@ const VersionHistoryTable = ({
             </ZAPTooltip>
 
           )}
-          <ZAPTooltip content={__("Preview Version", 'zaplane')}>
+          {/* <ZAPTooltip content={__("Preview Version", 'zaplane')}> */}
             <Button
               size="xs"
               variant="ghost"
@@ -76,7 +76,7 @@ const VersionHistoryTable = ({
             >
               <Eye size={14} />
             </Button>
-          </ZAPTooltip>
+          {/* </ZAPTooltip> */}
 
         </HStack>
       ),
