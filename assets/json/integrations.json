@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-02-05 10:26:45",
+    "generated_at": "2026-02-16 06:27:42",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -3238,6 +3238,24 @@
                     ]
                 }
             }
+        },
+        "diviformbuilder": {
+            "slug": "diviformbuilder",
+            "name": "Diviformbuilder",
+            "icon": "",
+            "category": "app",
+            "triggers": {
+                "df_after_process": {
+                    "key": "df_after_process",
+                    "label": "Form Submission",
+                    "hook": "df_after_process",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": []
         }
     },
     "tools": {
