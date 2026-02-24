@@ -1,4 +1,4 @@
-import { useMemo, useCallback, useState } from "react";
+import { useMemo, useCallback, useState, useEffect } from "react";
 import { __ } from "@wordpress/i18n";
 import { Text, Box, Icon, HStack, Flex } from "@chakra-ui/react";
 import Select from "react-select";
@@ -14,6 +14,7 @@ import { statusOptions } from "./helper";
 
 import {
   deleteWorkFlow,
+  getWorkFlow,
   updateWorkFlowStatus,
 } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow";
 import StatusOptions from "@ZAPComponents/StatusOptions";
@@ -32,12 +33,32 @@ const WorkflowTable = () => {
   const dispatch = useDispatch();
   const [activeRunId, setActiveRunId] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const { data = [] } = useSelector((state) => state.logs || {});
 
-  const { allWorkFlows = [], isLoading } = useSelector(
-    (state) => state.workflows
-  );
 
+  const {
+    allWorkFlows,
+    totalItems,
+    currentPage,
+    perPage,
+  } = useSelector((state) => state.workflows);
+  const [loading, setLoading] = useState(allWorkFlows.length === 0);
+  const handleRefresh = async (page = 1, per_page = 10) => {
+    setLoading(true)
+    await dispatch(getWorkFlow({ page, per_page }));
+    setLoading(false)
+  };
+
+  useEffect(() => {
+    handleRefresh()
+  }, []);
+
+  const handlePageChange = (newPage) => {
+    handleRefresh(newPage, perPage)
+  };
+
+  const handlePerPageChange = (itemsPerPage) => {
+    handleRefresh(currentPage, itemsPerPage)
+  };
   const columns = [
     {
       name: (
@@ -78,7 +99,6 @@ const WorkflowTable = () => {
       ),
       cell: (row) => {
         const { date, time } = formatDateTime(row.created_at);
-
         return (
           <Box>
             <ZAPLabel label={date} type={"simple"} />
@@ -91,27 +111,34 @@ const WorkflowTable = () => {
       // columnWidth: "160px",
       textAlign: "center",
     },
+
     {
       name: (
-        <Flex gap="2px" alignItems='center' justifyContent="center" ml='-32px'>
+        <Flex gap="2px" alignItems='center' justifyContent="center">
           <Text className="zaplane-label">
-            {__("Updated At", "zaplane")}
+            {__("Sucess Run", "zaplane")}
           </Text>
           <Icon as={TableArrow} />
         </Flex>
       ),
-      cell: (row) => {
-        const { date, time } = formatDateTime(row.updated_at);
-
-        return (
-          <Box >
-            <ZAPLabel label={date} type={"simple"} />
-            <Text className="zaplane-sub-title" ml='-63px' color="var(--zaplane-text-muted)">
-              {__(time, 'zaplane')}
-            </Text>
-          </Box>
-        );
-      },
+      cell: (row) => (
+        <ZAPLabel label={row?.success_runs} type={"simple"} />
+      ),
+      // columnWidth: "160px",
+      textAlign: "center",
+    },
+    {
+      name: (
+        <Flex gap="2px" alignItems='center' justifyContent="center" >
+          <Text className="zaplane-label">
+            {__("Failed Runs", "zaplane")}
+          </Text>
+          <Icon as={TableArrow} />
+        </Flex>
+      ),
+      cell: (row) => (
+        <ZAPLabel label={row?.failed_runs} type={"simple"} />
+      ),
       // columnWidth: "160px",
       textAlign: "center",
     },
@@ -236,11 +263,15 @@ const WorkflowTable = () => {
         isRowSelectable={true}
         showSubHeader={false}
         showColumnFilter={false}
-        showPagination={false}
+        showPagination={true}
         noDataText={__("No workflows found", "zaplane")}
-        totalItems={allWorkFlows?.length || 0}
-        dataFetchingStatus={isLoading}
+        dataFetchingStatus={loading}
         suffix="workflow-table"
+        totalItems={allWorkFlows?.length}
+        currentPageNumber={currentPage}
+        perPage={perPage}
+        onChangePage={handlePageChange}
+        onChangeItemsPerPage={handlePerPageChange}
       />
 
       <ZAPDrawer

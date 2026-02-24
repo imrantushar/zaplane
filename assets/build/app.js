@@ -3461,8 +3461,28 @@ const ConnectionTable = () => {
   const {
     allConnection = [],
     isLoading,
-    connection
+    connection,
+    currentPage,
+    perPage
   } = (0,react_redux__WEBPACK_IMPORTED_MODULE_5__.useSelector)(state => state.connections);
+  const [loading, setLoading] = (0,react__WEBPACK_IMPORTED_MODULE_6__.useState)(allConnection.length === 0);
+  const handleRefresh = async (page = 1, per_page = 10) => {
+    setLoading(true);
+    await dispatch((0,_ZAPRedux_Slices_connectionsSlice_connectionsSlice__WEBPACK_IMPORTED_MODULE_11__.fetchConnections)({
+      page,
+      per_page
+    }));
+    setLoading(false);
+  };
+  (0,react__WEBPACK_IMPORTED_MODULE_6__.useEffect)(() => {
+    handleRefresh();
+  }, []);
+  const handlePageChange = newPage => {
+    handleRefresh(newPage, perPage);
+  };
+  const handlePerPageChange = itemsPerPage => {
+    handleRefresh(currentPage, itemsPerPage);
+  };
   const handleStatusChange = (row, newStatus) => {
     if (!row?.id || !newStatus) return;
     dispatch((0,_ZAPRedux_Slices_connectionsSlice_connectionsSlice__WEBPACK_IMPORTED_MODULE_11__.updateConnection)({
@@ -3652,11 +3672,15 @@ const ConnectionTable = () => {
       isRowSelectable: true,
       showSubHeader: false,
       showColumnFilter: false,
-      showPagination: false,
+      showPagination: true,
       noDataText: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("No connections found", "zaplane"),
       totalItems: allConnection?.length || 0,
-      dataFetchingStatus: isLoading,
-      suffix: "connection-table"
+      dataFetchingStatus: loading,
+      suffix: "connection-table",
+      currentPageNumber: currentPage,
+      perPage: perPage,
+      onChangePage: handlePageChange,
+      onChangeItemsPerPage: handlePerPageChange
     }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_ConnectionDetails_ConnectionDetails__WEBPACK_IMPORTED_MODULE_12__["default"], {
       isOpen: detailsOpen,
       onClose: () => setDetailsOpen(false),
@@ -3724,9 +3748,6 @@ const Connections = () => {
   const [selectedAuthType, setSelectedAuthType] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(null);
   const [credentials, setCredentials] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)({});
   const [loadingOAuth, setLoadingOAuth] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
-  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
-    dispatch((0,_ZAPRedux_Slices_connectionsSlice_connectionsSlice__WEBPACK_IMPORTED_MODULE_11__.fetchConnections)());
-  }, [dispatch]);
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
     if (!selectedApp) return;
     dispatch((0,_ZAPRedux_Slices_connectionsSlice_connectionsSlice__WEBPACK_IMPORTED_MODULE_11__.fetchAuthFields)({
@@ -4807,12 +4828,29 @@ const WorkflowTable = () => {
   const [activeRunId, setActiveRunId] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(null);
   const [drawerOpen, setDrawerOpen] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
   const {
-    data = []
-  } = (0,react_redux__WEBPACK_IMPORTED_MODULE_8__.useSelector)(state => state.logs || {});
-  const {
-    allWorkFlows = [],
-    isLoading
+    allWorkFlows,
+    totalItems,
+    currentPage,
+    perPage
   } = (0,react_redux__WEBPACK_IMPORTED_MODULE_8__.useSelector)(state => state.workflows);
+  const [loading, setLoading] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(allWorkFlows.length === 0);
+  const handleRefresh = async (page = 1, per_page = 10) => {
+    setLoading(true);
+    await dispatch((0,_ZAPRedux_Slices_workFlowSlice_actions_workFlow__WEBPACK_IMPORTED_MODULE_13__.getWorkFlow)({
+      page,
+      per_page
+    }));
+    setLoading(false);
+  };
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    handleRefresh();
+  }, []);
+  const handlePageChange = newPage => {
+    handleRefresh(newPage, perPage);
+  };
+  const handlePerPageChange = itemsPerPage => {
+    handleRefresh(currentPage, itemsPerPage);
+  };
   const columns = [{
     name: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Flex, {
       gap: "2px",
@@ -4872,31 +4910,35 @@ const WorkflowTable = () => {
       gap: "2px",
       alignItems: "center",
       justifyContent: "center",
-      ml: "-32px",
       children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Text, {
         className: "zaplane-label",
-        children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)("Updated At", "zaplane")
+        children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)("Sucess Run", "zaplane")
       }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.Icon, {
         as: _ZAPUtils_icons__WEBPACK_IMPORTED_MODULE_22__.TableArrow
       })]
     }),
-    cell: row => {
-      const {
-        date,
-        time
-      } = (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_11__.formatDateTime)(row.updated_at);
-      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Box, {
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_ZAPComponents_Labels_ZAPLabel__WEBPACK_IMPORTED_MODULE_18__["default"], {
-          label: date,
-          type: "simple"
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Text, {
-          className: "zaplane-sub-title",
-          ml: "-63px",
-          color: "var(--zaplane-text-muted)",
-          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)(time, 'zaplane')
-        })]
-      });
-    },
+    cell: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_ZAPComponents_Labels_ZAPLabel__WEBPACK_IMPORTED_MODULE_18__["default"], {
+      label: row?.success_runs,
+      type: "simple"
+    }),
+    // columnWidth: "160px",
+    textAlign: "center"
+  }, {
+    name: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Flex, {
+      gap: "2px",
+      alignItems: "center",
+      justifyContent: "center",
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Text, {
+        className: "zaplane-label",
+        children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)("Failed Runs", "zaplane")
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.Icon, {
+        as: _ZAPUtils_icons__WEBPACK_IMPORTED_MODULE_22__.TableArrow
+      })]
+    }),
+    cell: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_ZAPComponents_Labels_ZAPLabel__WEBPACK_IMPORTED_MODULE_18__["default"], {
+      label: row?.failed_runs,
+      type: "simple"
+    }),
     // columnWidth: "160px",
     textAlign: "center"
   }, {
@@ -5007,11 +5049,15 @@ const WorkflowTable = () => {
       isRowSelectable: true,
       showSubHeader: false,
       showColumnFilter: false,
-      showPagination: false,
+      showPagination: true,
       noDataText: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)("No workflows found", "zaplane"),
-      totalItems: allWorkFlows?.length || 0,
-      dataFetchingStatus: isLoading,
-      suffix: "workflow-table"
+      dataFetchingStatus: loading,
+      suffix: "workflow-table",
+      totalItems: allWorkFlows?.length,
+      currentPageNumber: currentPage,
+      perPage: perPage,
+      onChangePage: handlePageChange,
+      onChangeItemsPerPage: handlePerPageChange
     }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_ZAPComponents_Drawer__WEBPACK_IMPORTED_MODULE_19__["default"], {
       open: drawerOpen,
       arrowClose: true,
@@ -5137,9 +5183,7 @@ const CreateWorkflows = () => {
   const navigate = (0,react_router_dom__WEBPACK_IMPORTED_MODULE_13__.useNavigate)();
   const [isModalOpen, setIsModalOpen] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
   const [workflowName, setWorkflowName] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)("");
-  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
-    dispatch((0,_ZAPRedux_Slices_workFlowSlice_actions_workFlow__WEBPACK_IMPORTED_MODULE_11__.getWorkFlow)());
-  }, [dispatch]);
+  ;
   const handleCreate = async () => {
     if (!workflowName.trim()) return;
     const res = await dispatch((0,_ZAPRedux_Slices_workFlowSlice_actions_workFlow__WEBPACK_IMPORTED_MODULE_11__.createWorkflows)({
@@ -7331,7 +7375,6 @@ function FlowTopBar({
 }) {
   const {
     runs,
-    versions,
     apiCountdown,
     apiRequestRunning
   } = (0,react_redux__WEBPACK_IMPORTED_MODULE_16__.useSelector)(state => state.workflows);
@@ -7389,7 +7432,6 @@ function FlowTopBar({
           size: "sm",
           variant: "outline",
           onClick: () => {
-            dispatch((0,_ZAPRedux_Slices_workFlowSlice_actions_workFlowRuns__WEBPACK_IMPORTED_MODULE_15__.getRunWorkFlow)(id));
             setActiveDrawer("logs");
           },
           children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_10__.__)("Logs", "zaplane")
@@ -7402,7 +7444,9 @@ function FlowTopBar({
             color: "#454F59",
             fontWeight: "500",
             border: "none",
-            onClick: () => dispatch((0,_ZAPRedux_Slices_workFlowSlice_actions_workFlowRuns__WEBPACK_IMPORTED_MODULE_15__.getRunWorkFlow)(id)),
+            onClick: () => dispatch((0,_ZAPRedux_Slices_workFlowSlice_actions_workFlowRuns__WEBPACK_IMPORTED_MODULE_15__.getRunWorkFlow)({
+              id
+            })),
             children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_28__.jsx)(react_icons_tfi__WEBPACK_IMPORTED_MODULE_6__.TfiReload, {}), (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_10__.__)("Refresh", "zaplane")]
           }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_28__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Button, {
             size: "sm",
@@ -7416,7 +7460,7 @@ function FlowTopBar({
             children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_28__.jsx)(react_icons_lu__WEBPACK_IMPORTED_MODULE_7__.LuSquarePlay, {}), " ", (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_10__.__)("Replay", "zaplane")]
           })]
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_28__.jsx)(_RunsTable_RunsTable__WEBPACK_IMPORTED_MODULE_12__["default"], {
-          runs: runs
+          id: id
         })]
       }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_28__.jsx)(_ZAPComponents_Drawer__WEBPACK_IMPORTED_MODULE_11__["default"], {
         title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_10__.__)("Version History", "zaplane"),
@@ -7428,12 +7472,10 @@ function FlowTopBar({
           cursor: "pointer",
           onClick: () => {
             setActiveDrawer("history");
-            dispatch((0,_ZAPRedux_Slices_workFlowSlice_actions_workFlowVersion__WEBPACK_IMPORTED_MODULE_17__.getAllVersion)(id));
           },
           children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_28__.jsx)(lucide_react__WEBPACK_IMPORTED_MODULE_8__["default"], {})
         }),
         children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_28__.jsx)(_VersionHistoryTable_VersionHistoryTable__WEBPACK_IMPORTED_MODULE_13__["default"], {
-          versions: versions,
           id: id
         })
       }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_28__.jsx)(react_select__WEBPACK_IMPORTED_MODULE_9__["default"], {
@@ -7506,14 +7548,35 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const RunsTable = ({
-  runs = []
+  id
 }) => {
   const dispatch = (0,react_redux__WEBPACK_IMPORTED_MODULE_5__.useDispatch)();
   const [activeRunId, setActiveRunId] = (0,react__WEBPACK_IMPORTED_MODULE_6__.useState)(null);
   const {
-    isLoading
+    runs = [],
+    currentPage,
+    perPage
   } = (0,react_redux__WEBPACK_IMPORTED_MODULE_5__.useSelector)(state => state.workflows);
   const [drawerOpen, setDrawerOpen] = (0,react__WEBPACK_IMPORTED_MODULE_6__.useState)(false);
+  const [loading, setLoading] = (0,react__WEBPACK_IMPORTED_MODULE_6__.useState)(runs.length === 0);
+  const handleRefresh = async (page = 1, per_page = 10) => {
+    setLoading(true);
+    await dispatch((0,_ZAPRedux_Slices_workFlowSlice_actions_workFlowRuns__WEBPACK_IMPORTED_MODULE_15__.getRunWorkFlow)({
+      id,
+      page,
+      per_page
+    }));
+    setLoading(false);
+  };
+  (0,react__WEBPACK_IMPORTED_MODULE_6__.useEffect)(() => {
+    handleRefresh();
+  }, []);
+  const handlePageChange = newPage => {
+    handleRefresh(newPage, perPage);
+  };
+  const handlePerPageChange = itemsPerPage => {
+    handleRefresh(currentPage, itemsPerPage);
+  };
   const columns = [{
     name: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_11__.__)('Run ID', 'zaplane'),
     cell: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
@@ -7595,11 +7658,15 @@ const RunsTable = ({
       data: runs,
       showSubHeader: false,
       showColumnFilter: false,
-      showPagination: false,
+      showPagination: true,
       noDataText: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_11__.__)("No history found", "zaplane"),
       totalItems: runs.length,
-      dataFetchingStatus: isLoading,
-      suffix: "history-table"
+      dataFetchingStatus: loading,
+      suffix: "history-table",
+      currentPageNumber: currentPage,
+      perPage: perPage,
+      onChangePage: handlePageChange,
+      onChangeItemsPerPage: handlePerPageChange
     }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_ZAPComponents_Drawer__WEBPACK_IMPORTED_MODULE_12__["default"], {
       open: drawerOpen,
       arrowClose: true,
@@ -7649,9 +7716,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @ZAPUtils/helper */ "./dev_zaplane/utils/helper.js");
 /* harmony import */ var lucide_react__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! lucide-react */ "./node_modules/lucide-react/dist/esm/icons/circle-check-big.js");
 /* harmony import */ var lucide_react__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! lucide-react */ "./node_modules/lucide-react/dist/esm/icons/eye.js");
-/* harmony import */ var react_redux__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/dist/react-redux.mjs");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__);
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_13___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_13__);
+/* harmony import */ var react_redux__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/dist/react-redux.mjs");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__);
+
 
 
 
@@ -7663,16 +7733,39 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const VersionHistoryTable = ({
-  versions = [],
   id
 }) => {
-  const dispatch = (0,react_redux__WEBPACK_IMPORTED_MODULE_13__.useDispatch)();
+  const dispatch = (0,react_redux__WEBPACK_IMPORTED_MODULE_14__.useDispatch)();
   const {
-    isLoading
-  } = (0,react_redux__WEBPACK_IMPORTED_MODULE_13__.useSelector)(state => state.workflows);
+    versions
+  } = (0,react_redux__WEBPACK_IMPORTED_MODULE_14__.useSelector)(state => state.workflows);
+  const {
+    isLoading,
+    currentPage,
+    perPage
+  } = (0,react_redux__WEBPACK_IMPORTED_MODULE_14__.useSelector)(state => state.workflows);
+  const [loading, setLoading] = (0,react__WEBPACK_IMPORTED_MODULE_13__.useState)(versions.length === 0);
+  const handleRefresh = async (page = 1, per_page = 10) => {
+    setLoading(true);
+    await dispatch((0,_ZAPRedux_Slices_workFlowSlice_actions_workFlowVersion__WEBPACK_IMPORTED_MODULE_9__.getAllVersion)({
+      id,
+      page,
+      per_page
+    }));
+    setLoading(false);
+  };
+  (0,react__WEBPACK_IMPORTED_MODULE_13__.useEffect)(() => {
+    handleRefresh();
+  }, []);
+  const handlePageChange = newPage => {
+    handleRefresh(newPage, perPage);
+  };
+  const handlePerPageChange = itemsPerPage => {
+    handleRefresh(currentPage, itemsPerPage);
+  };
   const columns = [{
     name: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_5__.__)('ID', 'zaplane'),
-    cell: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
+    cell: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
       className: "zaplane-sub-title",
       children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_5__.__)(row.id, "zaplane")
     }),
@@ -7685,11 +7778,11 @@ const VersionHistoryTable = ({
         date,
         time
       } = (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_10__.formatDateTime)(row.created_at);
-      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsx)(_ZAPComponents_Labels_ZAPLabel__WEBPACK_IMPORTED_MODULE_6__["default"], {
+      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_ZAPComponents_Labels_ZAPLabel__WEBPACK_IMPORTED_MODULE_6__["default"], {
           label: date,
           type: "simple"
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
           className: "zaplane-sub-title",
           ml: "-63px",
           color: "var(--zaplane-text-muted)",
@@ -7701,7 +7794,7 @@ const VersionHistoryTable = ({
     textAlign: "center"
   }, {
     name: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_5__.__)('Status', 'zaplane'),
-    cell: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Badge, {
+    cell: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Badge, {
       px: "2",
       py: "0.5",
       rounded: "md",
@@ -7713,32 +7806,32 @@ const VersionHistoryTable = ({
     columnWidth: "120px"
   }, {
     name: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_5__.__)('Action', 'zaplane'),
-    cell: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.HStack, {
+    cell: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.HStack, {
       justify: "flex-end",
       spacing: 1,
-      children: [!row.is_active && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsx)(_ZAPComponents_ZAPTooltip__WEBPACK_IMPORTED_MODULE_8__["default"], {
+      children: [!row.is_active && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_ZAPComponents_ZAPTooltip__WEBPACK_IMPORTED_MODULE_8__["default"], {
         content: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_5__.__)("Active version", 'zaplane'),
-        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Button, {
+        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Button, {
           size: "xs",
           variant: "outline",
           onClick: () => dispatch((0,_ZAPRedux_Slices_workFlowSlice_actions_workFlowVersion__WEBPACK_IMPORTED_MODULE_9__.versionActive)({
             id,
             versionID: row.id
           })),
-          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsx)(lucide_react__WEBPACK_IMPORTED_MODULE_11__["default"], {
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(lucide_react__WEBPACK_IMPORTED_MODULE_11__["default"], {
             size: 14
           })
         })
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsx)(_ZAPComponents_ZAPTooltip__WEBPACK_IMPORTED_MODULE_8__["default"], {
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_ZAPComponents_ZAPTooltip__WEBPACK_IMPORTED_MODULE_8__["default"], {
         content: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_5__.__)("Prevew Version", 'zaplane'),
-        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Button, {
+        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Button, {
           size: "xs",
           variant: "ghost",
           onClick: () => dispatch((0,_ZAPRedux_Slices_workFlowSlice_actions_workFlowVersion__WEBPACK_IMPORTED_MODULE_9__.getPreviewOldVersion)({
             id,
             versionID: row.id
           })),
-          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsx)(lucide_react__WEBPACK_IMPORTED_MODULE_12__["default"], {
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(lucide_react__WEBPACK_IMPORTED_MODULE_12__["default"], {
             size: 14
           })
         })
@@ -7747,17 +7840,21 @@ const VersionHistoryTable = ({
     // columnWidth: "100px",
     textAlign: "center"
   }];
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsx)(_ZAPComponents_ListTable__WEBPACK_IMPORTED_MODULE_7__["default"], {
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_ZAPComponents_ListTable__WEBPACK_IMPORTED_MODULE_7__["default"], {
     columns: columns,
     isRowSelectable: false,
     data: versions,
     showSubHeader: false,
     showColumnFilter: false,
-    showPagination: false,
+    showPagination: true,
     noDataText: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_5__.__)("No history found", "zaplane"),
     totalItems: versions?.length,
-    dataFetchingStatus: isLoading,
-    suffix: "version-table"
+    dataFetchingStatus: loading,
+    suffix: "version-table",
+    currentPageNumber: currentPage,
+    perPage: perPage,
+    onChangePage: handlePageChange,
+    onChangeItemsPerPage: handlePerPageChange
   });
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (VersionHistoryTable);
@@ -8547,10 +8644,30 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-const fetchConnections = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyncThunk)('connections/fetchConnections', async (_, thunkAPI) => {
+const fetchConnections = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyncThunk)('connections/fetchConnections', async ({
+  app,
+  page = 1,
+  per_page = 20
+} = {}, thunkAPI) => {
   try {
-    const res = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.get(_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.namespace + 'connections');
-    return res.data.connections || [];
+    const res = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.get(_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.namespace + 'connections', {
+      params: {
+        app,
+        page,
+        per_page
+      }
+    });
+    const {
+      data,
+      pagination
+    } = res.data;
+    return {
+      data: data || [],
+      currentPage: pagination.page,
+      itemPerPage: pagination.per_page,
+      totalItems: pagination.total,
+      totalPages: pagination.total_pages
+    };
   } catch (e) {
     return (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.handleSliceError)(thunkAPI, e);
   }
@@ -8668,7 +8785,11 @@ const connectionsSlice = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.create
     oauthData: null,
     loading: false,
     error: null,
-    connection: {}
+    connection: {},
+    itemPerPage: 10,
+    currentPage: 1,
+    totalItems: 0,
+    totalPages: 0
   },
   reducers: {
     resetAuthFields: state => {
@@ -8680,8 +8801,19 @@ const connectionsSlice = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.create
   },
   extraReducers: builder => {
     builder.addCase(fetchConnections.fulfilled, (state, action) => {
+      const {
+        data,
+        currentPage,
+        itemPerPage,
+        totalItems,
+        totalPages
+      } = action.payload;
+      state.allConnection = data;
+      state.currentPage = currentPage;
+      state.itemPerPage = itemPerPage;
+      state.totalItems = totalItems;
+      state.totalPages = totalPages;
       state.loading = false;
-      state.allConnection = action.payload;
     }).addCase(fetchAuthFields.fulfilled, (state, action) => {
       state.authFields = action.payload || {};
     }).addCase(initOAuth.fulfilled, (state, action) => {
@@ -9019,12 +9151,31 @@ const createWorkflows = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createA
     return (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.handleSliceError)(thunkAPI, "Data fetching failed");
   });
 });
-const getWorkFlow = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyncThunk)('zaplane/getWorkFlow', async thunkAPI => {
+const getWorkFlow = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyncThunk)('zaplane/getWorkFlow', async (args = {}, thunkAPI) => {
   try {
-    const res = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.get(_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.namespace + "workflows");
-    return res.data;
+    const {
+      page = 1,
+      per_page = 20
+    } = args;
+    const res = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.get(_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.namespace + "workflows", {
+      params: {
+        page,
+        per_page
+      }
+    });
+    const {
+      data,
+      pagination
+    } = res.data;
+    return {
+      data,
+      currentPage: pagination.page,
+      itemPerPage: pagination.per_page,
+      totalItems: pagination.total,
+      totalPages: pagination.total_pages
+    };
   } catch (e) {
-    return (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.handleSliceError)(thunkAPI, e);
+    return thunkAPI.rejectWithValue(e.response?.data || e.message);
   }
 });
 const updateWorkFlow = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyncThunk)('zaplane/updateWorkFlow', async ({
@@ -9185,10 +9336,29 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-const getRunWorkFlow = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyncThunk)('zaplane/getRunWorkFlow', async (id, thunkAPI) => {
+const getRunWorkFlow = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyncThunk)('zaplane/getRunWorkFlow', async ({
+  id,
+  page = 1,
+  per_page = 20
+} = {}, thunkAPI) => {
   try {
-    const res = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.get(_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.namespace + `workflows/${id}/runs`);
-    return res.data;
+    const res = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.get(_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.namespace + `workflows/${id}/runs`, {
+      params: {
+        page,
+        per_page
+      }
+    });
+    const {
+      data,
+      pagination
+    } = res.data;
+    return {
+      data: data || [],
+      currentPage: pagination.page || 1,
+      itemPerPage: pagination.per_page || 20,
+      totalItems: pagination.total || 0,
+      totalPages: pagination.total_pages || 0
+    };
   } catch (e) {
     return (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.handleSliceError)(thunkAPI, e);
   }
@@ -9227,10 +9397,33 @@ __webpack_require__.r(__webpack_exports__);
 
 
 // version releted api
-const getAllVersion = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyncThunk)('zaplane/getAllVersion', async (runId, thunkAPI) => {
+const getAllVersion = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyncThunk)('zaplane/getAllVersion', async (args = {}, thunkAPI) => {
   try {
-    const res = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.get(_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.namespace + `workflows/${parseInt(runId)}/versions`);
-    return res.data;
+    const {
+      page = 1,
+      per_page = 20,
+      id
+    } = args;
+    if (!id) {
+      return thunkAPI.rejectWithValue("runId (id) missing");
+    }
+    const res = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.get(_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.namespace + `workflows/${id}/versions`, {
+      params: {
+        page,
+        per_page
+      }
+    });
+    const {
+      data,
+      pagination
+    } = res.data;
+    return {
+      data,
+      currentPage: pagination.page,
+      itemPerPage: pagination.per_page,
+      totalItems: pagination.total,
+      totalPages: pagination.total_pages
+    };
   } catch (e) {
     return (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.handleSliceError)(thunkAPI, e);
   }
@@ -9384,7 +9577,10 @@ const workflowsSlice = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createSl
     singleNodeExecution: null,
     apiCountdown: 0,
     apiRequestRunning: false,
-    workflowVariables: []
+    workflowVariables: [],
+    itemPerPage: 10,
+    currentPage: 1,
+    totalItems: 0
   },
   reducers: {
     resetSingleNodeExecution(state) {
@@ -9405,7 +9601,16 @@ const workflowsSlice = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createSl
     builder.addCase(_actions_workFlow__WEBPACK_IMPORTED_MODULE_1__.createWorkflows.fulfilled, (state, action) => {
       state.allWorkFlows = action.payload;
     }).addCase(_actions_workFlow__WEBPACK_IMPORTED_MODULE_1__.getWorkFlow.fulfilled, (state, action) => {
-      state.allWorkFlows = [...action.payload].reverse();
+      const {
+        data,
+        totalItems,
+        currentPage,
+        itemPerPage
+      } = action.payload;
+      state.allWorkFlows = data;
+      state.totalItems = totalItems;
+      state.currentPage = currentPage;
+      state.itemPerPage = itemPerPage;
       state.isLoading = false;
     }).addCase(_actions_workFlow__WEBPACK_IMPORTED_MODULE_1__.getSingleWorkFlow.fulfilled, (state, action) => {
       if (!action.payload) return;
@@ -9427,7 +9632,19 @@ const workflowsSlice = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createSl
         status
       } : item) : [];
     }).addCase(_actions_workFlowRuns__WEBPACK_IMPORTED_MODULE_2__.getRunWorkFlow.fulfilled, (state, action) => {
-      state.runs = action.payload;
+      // action.payload now has { data, currentPage, itemPerPage, totalItems, totalPages }
+      const {
+        data,
+        currentPage,
+        itemPerPage,
+        totalItems,
+        totalPages
+      } = action.payload;
+      state.runs = data || [];
+      state.currentPage = currentPage;
+      state.itemPerPage = itemPerPage;
+      state.totalItems = totalItems;
+      state.totalPages = totalPages;
       state.isLoading = false;
     }).addCase(_actions_workFlowVersion__WEBPACK_IMPORTED_MODULE_3__.getPreviewOldVersion.fulfilled, (state, action) => {
       if (!state.workFlow || Object.keys(state.workFlow).length === 0) return;
@@ -9438,7 +9655,18 @@ const workflowsSlice = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createSl
         // preview_version_id: action.payload.version?.id || null,
       };
     }).addCase(_actions_workFlowVersion__WEBPACK_IMPORTED_MODULE_3__.getAllVersion.fulfilled, (state, action) => {
-      state.versions = action.payload;
+      const {
+        data,
+        totalItems,
+        currentPage,
+        itemPerPage,
+        totalPages
+      } = action.payload;
+      state.versions = data || [];
+      state.totalItems = totalItems;
+      state.currentPage = currentPage;
+      state.itemPerPage = itemPerPage;
+      state.totalPages = totalPages;
       state.isLoading = false;
     }).addCase(_actions_workFlowVersion__WEBPACK_IMPORTED_MODULE_3__.versionActive.fulfilled, (state, action) => {
       const activeVersionId = action.meta.arg.versionID;

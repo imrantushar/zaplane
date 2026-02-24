@@ -21,7 +21,10 @@ const workflowsSlice = createSlice({
 		singleNodeExecution: null,
 		apiCountdown: 0,
 		apiRequestRunning: false,
-		workflowVariables: []
+		workflowVariables: [],
+		itemPerPage: 10,
+		currentPage: 1,
+		totalItems: 0,
 
 
 	},
@@ -47,7 +50,13 @@ const workflowsSlice = createSlice({
 				state.allWorkFlows = action.payload;
 			})
 			.addCase(getWorkFlow.fulfilled, (state, action) => {
-				state.allWorkFlows = [...action.payload].reverse();
+				const { data, totalItems, currentPage, itemPerPage } =
+					action.payload;
+				state.allWorkFlows = data;
+				state.totalItems = totalItems;
+				state.currentPage = currentPage;
+				state.itemPerPage = itemPerPage;
+
 				state.isLoading = false
 			})
 
@@ -77,8 +86,14 @@ const workflowsSlice = createSlice({
 					: [];
 			})
 			.addCase(getRunWorkFlow.fulfilled, (state, action) => {
-				state.runs = action.payload;
-				state.isLoading = false
+				// action.payload now has { data, currentPage, itemPerPage, totalItems, totalPages }
+				const { data, currentPage, itemPerPage, totalItems, totalPages } = action.payload;
+				state.runs = data || [];
+				state.currentPage = currentPage ;
+				state.itemPerPage = itemPerPage ;
+				state.totalItems = totalItems ;
+				state.totalPages = totalPages ;
+				state.isLoading = false;
 			})
 			.addCase(getPreviewOldVersion.fulfilled, (state, action) => {
 				if (!state.workFlow || Object.keys(state.workFlow).length === 0) return;
@@ -92,8 +107,14 @@ const workflowsSlice = createSlice({
 			})
 
 			.addCase(getAllVersion.fulfilled, (state, action) => {
-				state.versions = action.payload;
-				state.isLoading = false
+				const { data, totalItems, currentPage, itemPerPage, totalPages } =
+					action.payload;
+				state.versions = data || [];
+				state.totalItems = totalItems ;
+				state.currentPage = currentPage ;
+				state.itemPerPage = itemPerPage ;
+				state.totalPages = totalPages ;
+				state.isLoading = false;
 			})
 			.addCase(versionActive.fulfilled, (state, action) => {
 				const activeVersionId = action.meta.arg.versionID;

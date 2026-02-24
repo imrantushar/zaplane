@@ -41,9 +41,6 @@ const Connections = () => {
     const [credentials, setCredentials] = useState({});
     const [loadingOAuth, setLoadingOAuth] = useState(false);
 
-    useEffect(() => {
-        dispatch(fetchConnections());
-    }, [dispatch]);
 
     useEffect(() => {
         if (!selectedApp) return;

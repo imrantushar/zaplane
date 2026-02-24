@@ -1,7 +1,7 @@
 import { Text, Icon, Box, Flex } from "@chakra-ui/react";
 import { __ } from "@wordpress/i18n";
 import { useDispatch, useSelector } from "react-redux";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import ListTable from "@ZAPComponents/ListTable";
 import OptionMenu from "@ZAPComponents/OptionMenu";
@@ -14,6 +14,7 @@ import {
     testConnection,
     fetchSingleConnection,
     updateConnection,
+    fetchConnections,
 } from "@ZAPRedux/Slices/connectionsSlice/connectionsSlice";
 
 import ConnectionDetails from "./ConnectionDetails/ConnectionDetails";
@@ -25,9 +26,27 @@ const ConnectionTable = () => {
     const dispatch = useDispatch();
     const [detailsOpen, setDetailsOpen] = useState(false);
 
-    const { allConnection = [], isLoading, connection } = useSelector(
+    const { allConnection = [], isLoading, connection, currentPage, perPage } = useSelector(
         (state) => state.connections
     );
+    const [loading, setLoading] = useState(allConnection.length === 0);
+    const handleRefresh = async (page = 1, per_page = 10) => {
+        setLoading(true)
+        await dispatch(fetchConnections({ page, per_page }));
+        setLoading(false)
+    };
+
+    useEffect(() => {
+        handleRefresh()
+    }, []);
+
+    const handlePageChange = (newPage) => {
+        handleRefresh(newPage, perPage)
+    };
+
+    const handlePerPageChange = (itemsPerPage) => {
+        handleRefresh(currentPage, itemsPerPage)
+    };
     const handleStatusChange = (row, newStatus) => {
         if (!row?.id || !newStatus) return;
 
@@ -127,7 +146,7 @@ const ConnectionTable = () => {
         },
         {
             name: (
-                 <Flex gap="2px" alignItems='center' justifyContent="center" ml='-32px'>
+                <Flex gap="2px" alignItems='center' justifyContent="center" ml='-32px'>
                     <Text className="zaplane-label">
                         {__("Status", "zaplane")}
                     </Text>
@@ -204,11 +223,15 @@ const ConnectionTable = () => {
                 isRowSelectable={true}
                 showSubHeader={false}
                 showColumnFilter={false}
-                showPagination={false}
+                showPagination={true}
                 noDataText={__("No connections found", "zaplane")}
                 totalItems={allConnection?.length || 0}
-                dataFetchingStatus={isLoading}
+                dataFetchingStatus={loading}
                 suffix="connection-table"
+                currentPageNumber={currentPage}
+                perPage={perPage}
+                onChangePage={handlePageChange}
+                onChangeItemsPerPage={handlePerPageChange}
             />
 
             <ConnectionDetails

@@ -55,6 +55,7 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
         edge: null,
     });
     const activeVersionId = versions?.find(v => v.is_active)?.id;
+
     useEffect(() => {
         setLoading(true);
         dispatch(getSingleWorkFlow(id)).finally(() => setLoading(false));

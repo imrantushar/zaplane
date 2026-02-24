@@ -24,9 +24,7 @@ const CreateWorkflows = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [workflowName, setWorkflowName] = useState("");
 
-  useEffect(() => {
-    dispatch(getWorkFlow());
-  }, [dispatch]);
+;
 
   const handleCreate = async () => {
     if (!workflowName.trim()) return;

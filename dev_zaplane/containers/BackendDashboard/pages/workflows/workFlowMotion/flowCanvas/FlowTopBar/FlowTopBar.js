@@ -37,7 +37,7 @@ export default function FlowTopBar({
   activeDrawer,
   setActiveDrawer,
 }) {
-  const { runs, versions, apiCountdown, apiRequestRunning } = useSelector((state) => state.workflows);
+  const { runs,  apiCountdown, apiRequestRunning } = useSelector((state) => state.workflows);
   const dispatch = useDispatch()
   useApiCountdown()
   return (
@@ -94,7 +94,6 @@ export default function FlowTopBar({
                 size="sm"
                 variant="outline"
                 onClick={() => {
-                  dispatch(getRunWorkFlow(id))
                   setActiveDrawer("logs");
                 }}
               >
@@ -109,7 +108,7 @@ export default function FlowTopBar({
                 color='#454F59'
                 fontWeight="500"
                 border={"none"}
-                onClick={() => dispatch(getRunWorkFlow(id))}
+                onClick={() => dispatch(getRunWorkFlow({id}))}
               >
                 <TfiReload />{__("Refresh", "zaplane")}
               </Button>
@@ -129,7 +128,7 @@ export default function FlowTopBar({
               </Button>
             </Flex>
 
-            <RunsTable runs={runs} />
+            <RunsTable id={id} />
           </ZAPDrawer>
 
           {/* Version Drawer */}
@@ -144,14 +143,13 @@ export default function FlowTopBar({
                 cursor="pointer"
                 onClick={() => {
                   setActiveDrawer("history");
-                  dispatch(getAllVersion(id))
                 }}
               >
                 <LucideHistory />
               </Text>
             }
           >
-            <VersionHistoryTable versions={versions} id={id} />
+            <VersionHistoryTable id={id} />
           </ZAPDrawer>
 
           {/* Status Select */}

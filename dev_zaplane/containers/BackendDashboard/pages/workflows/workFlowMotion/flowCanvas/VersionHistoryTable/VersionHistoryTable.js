@@ -9,17 +9,37 @@ import { __ } from "@wordpress/i18n";
 import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
 import ListTable from "@ZAPComponents/ListTable";
 import ZAPTooltip from "@ZAPComponents/ZAPTooltip";
-import { getPreviewOldVersion, versionActive } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlowVersion";
+import { getAllVersion, getPreviewOldVersion, versionActive } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlowVersion";
 import { formatDateTime } from "@ZAPUtils/helper";
 import { CheckCircle, Eye } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 const VersionHistoryTable = ({
-  versions = [],
   id,
 }) => {
   const dispatch = useDispatch()
-  const { isLoading } = useSelector((state) => state.workflows);
+  const { versions } = useSelector((state) => state.workflows);
+  const { isLoading, currentPage,
+    perPage, } = useSelector((state) => state.workflows);
+  const [loading, setLoading] = useState(versions.length === 0);
+  const handleRefresh = async (page = 1, per_page = 10) => {
+    setLoading(true)
+    await dispatch(getAllVersion({ id, page, per_page }));
+    setLoading(false)
+  };
+
+  useEffect(() => {
+    handleRefresh()
+  }, []);
+
+  const handlePageChange = (newPage) => {
+    handleRefresh(newPage, perPage)
+  };
+
+  const handlePerPageChange = (itemsPerPage) => {
+    handleRefresh(currentPage, itemsPerPage)
+  };
   const columns = [
     {
       name: __('ID', 'zaplane'),
@@ -32,17 +52,17 @@ const VersionHistoryTable = ({
     {
       name: __('Created At', 'zaplane'),
       cell: (row) => {
-              const { date, time } = formatDateTime(row.created_at);
-      
-              return (
-               <Box >
-                  <ZAPLabel label={date} type={"simple"}/>
-                  <Text className="zaplane-sub-title" ml='-63px' color="var(--zaplane-text-muted)">
-                    {__(time, 'zaplane')}
-                  </Text>
-                </Box>
-              );
-            },
+        const { date, time } = formatDateTime(row.created_at);
+
+        return (
+          <Box >
+            <ZAPLabel label={date} type={"simple"} />
+            <Text className="zaplane-sub-title" ml='-63px' color="var(--zaplane-text-muted)">
+              {__(time, 'zaplane')}
+            </Text>
+          </Box>
+        );
+      },
       // columnWidth: "180px",
       textAlign: "center",
     },
@@ -104,11 +124,15 @@ const VersionHistoryTable = ({
       data={versions}
       showSubHeader={false}
       showColumnFilter={false}
-      showPagination={false}
+      showPagination={true}
       noDataText={__("No history found", "zaplane")}
       totalItems={versions?.length}
-      dataFetchingStatus={isLoading}
+      dataFetchingStatus={loading}
       suffix="version-table"
+      currentPageNumber={currentPage}
+      perPage={perPage}
+      onChangePage={handlePageChange}
+      onChangeItemsPerPage={handlePerPageChange}
     />
 
   );
