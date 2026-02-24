@@ -2,6 +2,7 @@
 namespace Zaplane\Integrations;
 
 use Zaplane\Framework\Classes\IntegrationBase;
+use Zaplane\Integrations\Easydigitaldownload\ActionsResponseTrait;
 use Zaplane\Integrations\Easydigitaldownload\CustomerActionsTrait;
 use Zaplane\Integrations\Easydigitaldownload\DiscountActionsTrait;
 use Zaplane\Integrations\Easydigitaldownload\PaymentActionsTrait;
@@ -11,6 +12,7 @@ use Zaplane\Integrations\Easydigitaldownload\HelperTrait;
 if (!defined('ABSPATH')) exit;
 
 class Easydigitaldownload extends IntegrationBase {
+    use ActionsResponseTrait;
     use CustomerActionsTrait;
     use DiscountActionsTrait;
     use PaymentActionsTrait;

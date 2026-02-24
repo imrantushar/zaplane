@@ -3,8 +3,6 @@ namespace Zaplane\Integrations\Easydigitaldownload;
 
 trait PaymentActionsTrait
 {
-    use ActionsResponseTrait;
-
     protected static function action_update_payment_status(array $config, array $input): array
     {
         if (!function_exists('edd_update_payment_status') || !function_exists('edd_get_payment')) {

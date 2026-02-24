@@ -3,8 +3,6 @@ namespace Zaplane\Integrations\Easydigitaldownload;
 
 trait CustomerActionsTrait
 {
-    use ActionsResponseTrait;
-
     protected static function action_create_customer(array $config, array $input): array
     {
         if (!function_exists('edd_add_customer')) {

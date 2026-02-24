@@ -3,8 +3,6 @@ namespace Zaplane\Integrations\Easydigitaldownload;
 
 trait DownloadActionsTrait
 {
-    use ActionsResponseTrait;
-
     protected static function action_create_download(array $config, array $input): array
     {
         if (!class_exists('EDD_Download')) {

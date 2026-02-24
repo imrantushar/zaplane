@@ -3,8 +3,6 @@ namespace Zaplane\Integrations\Easydigitaldownload;
 
 trait DiscountActionsTrait
 {
-    use ActionsResponseTrait;
-
     protected static function action_create_discount(array $config, array $input): array
     {
         if (!function_exists('edd_add_discount')) {
