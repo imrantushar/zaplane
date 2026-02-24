@@ -1,69 +1,93 @@
-import { Box, HStack, Text } from '@chakra-ui/react';
-import { __, sprintf } from '@wordpress/i18n';
-import ZAPTable from '@ZAPComponents/Table';
-import { getDuration } from '@ZAPUtils/helper';
+import { useMemo } from "react";
+import { Box, HStack, Text } from "@chakra-ui/react";
+import { __, sprintf } from "@wordpress/i18n";
+import ListTable from "@ZAPComponents/ListTable";
+import { getDuration } from "@ZAPUtils/helper";
 
+const RecentLogs = ({ data = [] }) => {
+  const isSuccess = (status) => status === "completed";
 
-const RecentLogs = ({ data }) => {
-
-    const isSuccess = (status) => status === "completed";
-    return (
-        <Box width='100%'>
-            <Text className="zaplane-heading" marginBottom="16px">{__('Recent Logs', 'zaplane')}</Text>
-            <ZAPTable
-                data={data.slice(0, 5)}
-                rowKey="id"
-                variant="outline"
-                size="sm"
-                columns={[
-                    {
-                        label: "CREATED AT",
-                        key: "started_at",
-                        render: (row) => (
-                            <Text fontSize="sm">{sprintf(
-                                __('%s', 'zapplane'),
-                                row.started_at
-                            )}</Text>
-                        ),
-                    },
-                    {
-                        label: "DURATION / SIZE",
-                        key: "duration",
-
-                        render: (row) => (
-                            <Text fontSize="sm"> {sprintf(
-                                __('%s', 'zaplane'),
-                                getDuration(row.started_at, row.finished_at)
-                            )}</Text>
-                        ),
-                    },
-                    {
-                        label: "STATUS",
-                        key: "status",
-                        render: (row) => (
-                            <HStack spacing={2}>
-                                <Box
-                                    w="8px"
-                                    h="8px"
-                                    borderRadius="full"
-                                    bg={isSuccess(row.status) ? "green.500" : "red.500"}
-                                />
-                                <Text fontSize="sm">
-                                    {sprintf(
-                                        __('Status: %s', 'zapplane'),
-                                        isSuccess(row.status)
-                                            ? __('Success', 'zapplane')
-                                            : __('Failed', 'zapplane')
-                                    )}
-
-                                </Text>
-                            </HStack>
-                        ),
-                    },
-                ]}
+  const columns = useMemo(
+    () => [
+      {
+        name: (
+          <Text className="zaplane-label">
+            {__("CREATED AT", "zaplane")}
+          </Text>
+        ),
+        cell: (row) => (
+          <Text className="zaplane-label">
+            {sprintf(__("%s", "zaplane"), row.started_at)}
+          </Text>
+        ),
+        columnWidth: "180px",
+      },
+      {
+        name: (
+          <Text className="zaplane-label">
+            {__("DURATION / SIZE", "zaplane")}
+          </Text>
+        ),
+        cell: (row) => (
+          <Text className="zaplane-label">
+            {sprintf(
+              __("%s", "zaplane"),
+              getDuration(row.started_at, row.finished_at)
+            )}
+          </Text>
+        ),
+        columnWidth: "180px",
+      },
+      {
+        name: (
+          <Text className="zaplane-label">
+            {__("STATUS", "zaplane")}
+          </Text>
+        ),
+        cell: (row) => (
+          <HStack spacing={2} justifyContent={"center"}>
+            <Box
+              w="8px"
+              h="8px"
+              borderRadius="full"
+              bg={isSuccess(row.status) ? "green.500" : "red.500"}
             />
-        </Box>
-    );
+            <Text className="zaplane-label">
+              {sprintf(
+                __("%s", "zaplane"),
+                isSuccess(row.status)
+                  ? __("Success", "zaplane")
+                  : __("Failed", "zaplane")
+              )}
+            </Text>
+          </HStack>
+        ),
+        columnWidth: "160px",
+      },
+    ],
+    []
+  );
+
+  return (
+    <Box width="100%">
+      <Text className="zaplane-heading" mb="16px">
+        {__("Recent Logs", "zaplane")}
+      </Text>
+
+      <ListTable
+        columns={columns}
+        data={Array.isArray(data) ? data.slice(0, 5) : []}
+        isRowSelectable={false}
+        showSubHeader={false}
+        showColumnFilter={false}
+        showPagination={false}
+        noDataText={__("No logs found", "zaplane")}
+        totalItems={data?.length || 0}
+        dataFetchingStatus={false}
+        suffix="recent-logs-table"
+      />
+    </Box>
+  );
 };
 
 export default RecentLogs;

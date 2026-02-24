@@ -75,7 +75,7 @@ export const toggleFullscreenMode = (containerRef, isFullscreen, setIsFullscreen
   // Adjust zaplane-topbar
   if (topBar) {
     applyStyles(topBar, {
-      position: isEnter ? "fixed" : "",
+      // position: isEnter ? "fixed" : "",
       top: isEnter ? "0" : "",
       left: isEnter ? "0" : "",
       width: isEnter ? "100%" : "",
