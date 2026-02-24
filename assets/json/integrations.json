@@ -3736,6 +3736,105 @@
                 }
             }
         },
+        "filter": {
+            "slug": "filter",
+            "name": "Filter",
+            "icon": "",
+            "category": "tool",
+            "triggers": [],
+            "actions": {
+                "filter": {
+                    "key": "filter",
+                    "label": "Filter",
+                    "schema": [
+                        {
+                            "key": "conditions",
+                            "label": "Conditions",
+                            "type": "condition_group",
+                            "required": true,
+                            "help": "Only continue if these conditions are met",
+                            "fields": [
+                                {
+                                    "key": "left",
+                                    "label": "Left Value",
+                                    "type": "expression",
+                                    "required": true
+                                },
+                                {
+                                    "key": "operator",
+                                    "label": "Operator",
+                                    "type": "select",
+                                    "options": [
+                                        {
+                                            "label": "Equals",
+                                            "value": "=="
+                                        },
+                                        {
+                                            "label": "Not Equals",
+                                            "value": "!="
+                                        },
+                                        {
+                                            "label": "Greater Than",
+                                            "value": ">"
+                                        },
+                                        {
+                                            "label": "Less Than",
+                                            "value": "<"
+                                        },
+                                        {
+                                            "label": "Greater or Equal",
+                                            "value": ">="
+                                        },
+                                        {
+                                            "label": "Less or Equal",
+                                            "value": "<="
+                                        },
+                                        {
+                                            "label": "Contains",
+                                            "value": "contains"
+                                        },
+                                        {
+                                            "label": "Not Contains",
+                                            "value": "not_contains"
+                                        },
+                                        {
+                                            "label": "Starts With",
+                                            "value": "starts_with"
+                                        },
+                                        {
+                                            "label": "Ends With",
+                                            "value": "ends_with"
+                                        },
+                                        {
+                                            "label": "Is Empty",
+                                            "value": "is_empty"
+                                        },
+                                        {
+                                            "label": "Is Not Empty",
+                                            "value": "is_not_empty"
+                                        }
+                                    ],
+                                    "required": true
+                                },
+                                {
+                                    "key": "right",
+                                    "label": "Right Value",
+                                    "type": "expression",
+                                    "required": true
+                                }
+                            ],
+                            "logic_options": [
+                                "AND",
+                                "OR"
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
+        },
         "delay": {
             "slug": "delay",
             "name": "Delay",

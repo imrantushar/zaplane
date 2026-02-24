@@ -28,6 +28,7 @@ const TopBar = ({
 				px={6}
 				py={4}
 				top="32px"
+				mb="32px"
 				borderBottomWidth="1px"
 				borderColor="var(--zaplane-border-color)"
 				boxShadowColor={'var(--zaplane-shadow)'}

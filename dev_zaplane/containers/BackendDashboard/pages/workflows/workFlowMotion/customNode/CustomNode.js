@@ -20,6 +20,8 @@ export default function CustomNode({ id, data, canvasLayout }) {
   const hasOutgoingEdge = edges.some((e) => e.source === id);
   const isLR = canvasLayout === "LR"
   const isSelectApp = data.app === "Select an app";
+  const formattedAction = data?.action.charAt(0).toUpperCase() + data.action.slice(1);
+
 
   return (
     <Box
@@ -41,7 +43,7 @@ export default function CustomNode({ id, data, canvasLayout }) {
             className="zaplane-label"
             margin={0}
           >
-            {data.action || "Action"}
+            {formattedAction || "Action"}
           </Text>
         </HStack>
       </NodeToolbar>
@@ -98,8 +100,8 @@ export default function CustomNode({ id, data, canvasLayout }) {
               width: 10,
               height: 10,
               borderRadius: "50%",
-              background: "var(--zaplane-secondary)",
-              border: "2px solid var(--zaplane-body-background)",
+              background: "var(--zaplane-primary)",
+              border: "2px solid var(--zaplane-background)",
             }}
           />
         )}
@@ -132,8 +134,8 @@ export default function CustomNode({ id, data, canvasLayout }) {
               width: 10,
               height: 10,
               borderRadius: "50%",
-              background: "var(--zaplane-secondary)",
-              border: "2px solid var(--zaplane-body-background)",
+              background: "var(--zaplane-primary)",
+              border: "2px solid var(--zaplane-background)",
             }}
           />
         )}

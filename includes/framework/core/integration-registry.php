@@ -3,6 +3,7 @@
 return [
     // tool
     'condition' => ['file' => 'condition.php', 'class' => \Zaplane\Integrations\Condition::class],
+    'filter' => ['file' => 'filter.php', 'class' => \Zaplane\Integrations\Filter::class],
     'delay' => ['file' => 'delay.php', 'class' => \Zaplane\Integrations\Delay::class],
     'iterator' => ['file' => 'iterator.php', 'class' => \Zaplane\Integrations\Iterator::class],
     // apps

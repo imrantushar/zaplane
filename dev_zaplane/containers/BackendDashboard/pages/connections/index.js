@@ -35,6 +35,7 @@ import ZAPTable from "@ZAPComponents/Table";
 import ConnectionDetails from "./ConnectionDetails/ConnectionDetails";
 import TopBar from "@ZAPComponents/TopBar";
 import { primaryBtn, removeBtn } from "../../../../../assets/scss/chakra/recipe";
+import ConnectionTable from "./ConnectionTable";
 
 const statusOptions = [
     { value: "active", label: "Active" },
@@ -70,18 +71,8 @@ const Connections = () => {
         );
     }, [selectedApp, selectedAuthType, dispatch]);
 
-    const handleStatusChange = (row, selected) => {
-        dispatch(
-            updateConnection({
-                id: row.id,
-                payload: { status: selected.value },
-            })
-        );
-    };
-    const openDetails = (row) => {
-        dispatch(fetchSingleConnection(row.id));
-        setDetailsOpen(true);
-    };
+    
+    
     const handleConnect = async () => {
         if (!selectedApp || !selectedAuthType) return;
 
@@ -161,100 +152,9 @@ const Connections = () => {
                 )}
             />
             <div className="zaplane-page-content">
-                <ZAPTable
-                    data={allConnection}
-                    rowKey="id"
-                    size="sm"
-                    columns={[
-                        {
-                            label: "APP / NAME",
-                            key: "name",
-                            textAlign: "center",
-                            render: (row) => (
-                                <HStack justifyContent="center">
-                                    {row.app === "slack" && <FaSlack />}
-                                    <Text>{__(row.name, 'zaplane')}</Text>
-                                </HStack>
-                            ),
-                        },
-                        {
-                            label: "AUTH TYPE",
-                            key: "auth_type",
-                            render: (row) => row.auth_type,
-                            textAlign: "center",
-                        },
-                        {
-                            label: "CREATED AT",
-                            key: "created_at",
-                            render: (row) => row.created_at || "--",
-                            textAlign: "center",
-                        },
-                        {
-                            label: "STATUS",
-                            key: "status",
-                            render: (row) => (
-                                <Box w="140px">
-                                    <Select
-                                        className="zaplane-select"
-                                        options={statusOptions}
-                                        value={statusOptions.find(
-                                            (o) => o.value === row.status
-                                        )}
-                                        onChange={(s) =>
-                                            handleStatusChange(row, s)
-                                        }
-                                        isSearchable={false}
-                                        menuPortalTarget={document.body}
-                                        menuPosition="fixed"
-                                        styles={{
-                                            menuPortal: (base) => ({
-                                                ...base,
-                                                zIndex: 9999,
-                                            }),
-                                        }}
-                                    />
-
-                                </Box>
-                            ),
-                        },
-                    ]}
-                    actionsRenderer={(row) => (
-                        <> <Button
-                            size="xs"
-                            onClick={() => dispatch(testConnection(row.id))}
-                            leftIcon={<FiRefreshCw />}
-                        >
-                            {__('Test', 'zaplane')}
-                        </Button>
-                            <Button
-                                size="xs"
-                                onClick={() => openDetails(row)}
-                                leftIcon={<FiEye />}
-                            >
-                                {__('Details', 'zaplane')}
-                            </Button>
-                            <Button
-                                // {...removeBtn}
-                                leftIcon={<FiTrash2 />}
-                                onClick={() => {
-                                    const confirmed = window.confirm("Are you sure you want to delete this connection?");
-                                    if (confirmed) {
-                                        dispatch(deleteConnection(row.id));
-                                    }
-                                }}
-
-                            >
-                                {__('Delete', 'zaplane')}
-                            </Button>
-                        </>
-                    )}
-                />
+                <ConnectionTable/>
             </div>
-            <ConnectionDetails
-                isOpen={detailsOpen}
-                onClose={() => setDetailsOpen(false)}
-                connection={connection}
-            />
+           
             <WPModal
                 title={__("Create credential", "zaplane")}
                 isOpen={isModalOpen}
