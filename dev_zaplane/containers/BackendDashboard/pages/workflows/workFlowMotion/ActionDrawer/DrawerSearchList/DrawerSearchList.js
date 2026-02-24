@@ -1,7 +1,8 @@
-import { VStack, Button, Text } from "@chakra-ui/react";
+import { VStack, Button, Text, Flex, Icon } from "@chakra-ui/react";
 import { sprintf, __ } from "@wordpress/i18n";
+import { ReactComponent as SlackIcon } from "./slack.svg";
 
-const DrawerSearchList=({ searchList, setMode, setSelectedItem, setSearch })=> {
+const DrawerSearchList = ({ searchList, setMode, setSelectedItem, setSearch }) => {
   if (!searchList?.length) return null;
 
   return (
@@ -16,9 +17,20 @@ const DrawerSearchList=({ searchList, setMode, setSelectedItem, setSearch })=> {
             setSearch("");
           }}
           background="var(--zaplane-background)"
-          _hover={{ bg: "var(--zaplane-body-background)" }}
+          // _hover={{ bg: "var(--zaplane-body-background)" }}
         >
-          <Text className="zaplane-label">{sprintf(__("%s", "zaplane"), item.name)}</Text>
+          <Flex gap='12px'>
+            <Flex w="40px"
+              h="40px"
+              bg='var(--zaplane-background)'
+              p="10px"
+              borderRadius='4px'
+              border="1px solid var(--zaplane-border-color)">
+              <Icon as={SlackIcon} boxSize="20px" />
+            </Flex>
+            <Text className="zaplane-label" >{sprintf(__("%s", "zaplane"), item.name)}</Text>
+          </Flex>
+
           <Text fontSize="xs" className="zaplane-label">
             {item.type === 'tools' ? __('Tool', 'zaplane') : __('App', 'zaplane')}
           </Text>
