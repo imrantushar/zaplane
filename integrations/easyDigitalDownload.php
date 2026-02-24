@@ -6,7 +6,6 @@ use Zaplane\Integrations\Easydigitaldownload\CustomerActionsTrait;
 use Zaplane\Integrations\Easydigitaldownload\DiscountActionsTrait;
 use Zaplane\Integrations\Easydigitaldownload\PaymentActionsTrait;
 use Zaplane\Integrations\Easydigitaldownload\DownloadActionsTrait;
-use Zaplane\Integrations\Easydigitaldownload\TriggersTrait;
 use Zaplane\Integrations\Easydigitaldownload\HelperTrait;
 
 if (!defined('ABSPATH')) exit;
@@ -16,7 +15,6 @@ class Easydigitaldownload extends IntegrationBase {
     use DiscountActionsTrait;
     use PaymentActionsTrait;
     use DownloadActionsTrait;
-    use TriggersTrait;
     use HelperTrait;
 
     public static function get_slug(): string
