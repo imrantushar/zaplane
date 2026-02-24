@@ -81,6 +81,7 @@ class Autoload {
 
         // Default namespace mappings
         $this->add_namespace_directory('Zaplane', ZAPLANE_ROOT_DIR_PATH . 'includes/');
+        $this->add_namespace_directory('Zaplane\\Integrations', ZAPLANE_ROOT_DIR_PATH . 'integrations/');
         $this->add_namespace_directory('Zaplane\\Integration', ZAPLANE_ROOT_DIR_PATH . 'integrations/');
         $this->add_namespace_directory('Zaplane\\Integration', ZAPLANE_ROOT_DIR_PATH . 'integration/');
     }
