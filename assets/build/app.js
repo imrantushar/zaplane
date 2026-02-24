@@ -7010,25 +7010,22 @@ const RunsTable = ({
       justify: "flex-end",
       spacing: "1",
       justifyContent: "center",
-      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_ZAPComponents_ZAPTooltip__WEBPACK_IMPORTED_MODULE_18__["default"], {
-        content: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_11__.__)("Details", 'zaplane'),
-        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
-          display: "flex",
-          p: "5px 6px",
-          justifyContent: "center",
-          alignItems: "center",
-          borderRadius: "2.917px",
-          border: "1px solid var(--zaplane-border-color)",
-          onClick: () => {
-            setActiveRunId(row.id);
-            setDrawerOpen(true);
-            dispatch((0,_ZAPRedux_Slices_workFlowSlice_actions_workFlowLogs__WEBPACK_IMPORTED_MODULE_14__.nodeLogsRunDetails)(row.id));
-          },
-          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Icon, {
-            height: "20px",
-            width: "20px",
-            as: _ZAPUtils_icons__WEBPACK_IMPORTED_MODULE_17__.HistoryIcon
-          })
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
+        display: "flex",
+        p: "5px 6px",
+        justifyContent: "center",
+        alignItems: "center",
+        borderRadius: "2.917px",
+        border: "1px solid var(--zaplane-border-color)",
+        onClick: () => {
+          setActiveRunId(row.id);
+          setDrawerOpen(true);
+          dispatch((0,_ZAPRedux_Slices_workFlowSlice_actions_workFlowLogs__WEBPACK_IMPORTED_MODULE_14__.nodeLogsRunDetails)(row.id));
+        },
+        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Icon, {
+          height: "20px",
+          width: "20px",
+          as: _ZAPUtils_icons__WEBPACK_IMPORTED_MODULE_17__.HistoryIcon
         })
       }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_ZAPComponents_ZAPTooltip__WEBPACK_IMPORTED_MODULE_18__["default"], {
         content: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_11__.__)("Re-Excute", 'zaplane'),
