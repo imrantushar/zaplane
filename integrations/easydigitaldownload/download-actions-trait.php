@@ -24,9 +24,14 @@ trait DownloadActionsTrait
         ];
 
         $download = new \EDD_Download(0);
-        $download_id = $download->create($data);
+        $created = $download->create($data);
 
-        if (empty($download_id)) {
+        if (is_wp_error($created)) {
+            return self::action_error($created->get_error_message(), $input);
+        }
+
+        $download_id = (int) ($download->ID ?? 0);
+        if (!$download_id) {
             return self::action_error('Failed to create product', $input);
         }
 

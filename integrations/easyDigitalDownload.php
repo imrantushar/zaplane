@@ -19,6 +19,10 @@ class Easydigitaldownload extends IntegrationBase {
     use TriggersTrait;
     use HelperTrait;
 
+    public static function get_slug(): string
+    {
+        return 'easydigitaldownload';
+    }
 
     public static function get_triggers(): array
     {
@@ -217,4 +221,3 @@ public static function resolve_trigger(array $node, array $args) {
 
     // helpers moved to HelperTrait (used by TriggersTrait)
 }
-
