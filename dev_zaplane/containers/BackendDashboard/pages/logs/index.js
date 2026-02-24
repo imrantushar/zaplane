@@ -6,6 +6,7 @@ import {
     Badge,
     HStack,
     Icon,
+    Flex,
 } from "@chakra-ui/react";
 import { useDispatch, useSelector } from "react-redux";
 import { __, sprintf } from "@wordpress/i18n";
@@ -23,7 +24,7 @@ import ZAPDrawer from "@ZAPComponents/Drawer";
 import ListTable from "@ZAPComponents/ListTable";
 import { formatDateTime, formatLabel, getDuration } from "@ZAPUtils/helper";
 import { statusStyle } from "../workflows/helper";
-import { HistoryIcon } from "@ZAPUtils/icons";
+import { HistoryIcon, TableArrow } from "@ZAPUtils/icons";
 import ZAPTooltip from "@ZAPComponents/ZAPTooltip";
 import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
 
@@ -40,9 +41,13 @@ const Logs = () => {
     const columns = [
         {
             name: (
-                <Text className="zaplane-label">
-                    {__("App Name", "zaplane")}
-                </Text>
+                <Flex gap="2px" alignItems='center' >
+                    <Text className="zaplane-label">
+                        {__("App Name", "zaplane")}
+                    </Text>
+                    <Icon as={TableArrow} />
+                </Flex>
+
             ),
             cell: (row) => {
                 return (
@@ -59,9 +64,12 @@ const Logs = () => {
         },
         {
             name: (
-                <Text className="zaplane-label">
-                    {__("Created At", "zaplane")}
-                </Text>
+                <Flex gap="2px" alignItems='center' justifyContent="center" ml='-32px'>
+                    <Text className="zaplane-label">
+                        {__("Created At", "zaplane")}
+                    </Text>
+                    <Icon as={TableArrow} />
+                </Flex>
             ),
             cell: (row) => {
                 const { date, time } = formatDateTime(row.started_at);
@@ -80,15 +88,18 @@ const Logs = () => {
         },
         {
             name: (
-                <Text className="zaplane-label">
-                    {__("Updated At", "zaplane")}
-                </Text>
+                <Flex gap="2px" alignItems='center' justifyContent="center" ml='-32px'>
+                    <Text className="zaplane-label">
+                        {__("Updated At", "zaplane")}
+                    </Text>
+                    <Icon as={TableArrow} />
+                </Flex>
             ),
             cell: (row) => {
                 const { date, time } = formatDateTime(row.finished_at);
 
                 return (
-                    <Box >
+                    <Box>
                         <ZAPLabel label={date} type={"simple"} />
                         <Text className="zaplane-sub-title" ml='-63px' color="var(--zaplane-text-muted)">
                             {__(time, 'zaplane')}
@@ -96,18 +107,30 @@ const Logs = () => {
                     </Box>
                 );
             },
-            columnWidth: "160px",
+            // columnWidth: "160px",
             textAlign: "center",
         },
         {
-            name: __('DURATION', 'zaplane'),
+            name: (
+                <Flex gap="2px" justifyContent="center" alignItems='center'>
+                    <Text className="zaplane-label">
+                        {__("DURATION", "zaplane")}
+                    </Text>
+                    <Icon as={TableArrow} />
+                </Flex>
+            ),
             cell: (row) => (
                 <ZAPLabel label={getDuration(row.started_at, row.finished_at)} type={"simple"} />
             ),
             // columnWidth: "150px",
         },
         {
-            name: __('Status', 'zaplane'),
+            name: (<Flex gap="2px" justifyContent="center" alignItems='center'>
+                <Text className="zaplane-label">
+                    {__("Status", "zaplane")}
+                </Text>
+                <Icon as={TableArrow} />
+            </Flex>),
             cell: (row) => (
                 <HStack spacing={2} justifyContent={"center"}>
                     <Box
@@ -124,7 +147,10 @@ const Logs = () => {
             // columnWidth: "120px",
         },
         {
-            name: __('Action', 'zaplane'),
+            name: (
+                <Text className="zaplane-label">
+                    {__("Action", "zaplane")}
+                </Text>),
             cell: (row) => (
                 <HStack justify="flex-end" spacing="1" justifyContent={"center"}>
                     <ZAPTooltip content={__("Details", 'zaplane')}>

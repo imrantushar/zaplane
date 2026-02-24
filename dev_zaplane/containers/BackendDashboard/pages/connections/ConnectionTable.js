@@ -1,4 +1,4 @@
-import { Text, Icon, Box } from "@chakra-ui/react";
+import { Text, Icon, Box, Flex } from "@chakra-ui/react";
 import { __ } from "@wordpress/i18n";
 import { useDispatch, useSelector } from "react-redux";
 import { useState } from "react";
@@ -19,6 +19,7 @@ import {
 import ConnectionDetails from "./ConnectionDetails/ConnectionDetails";
 import { formatDateTime } from "@ZAPUtils/helper";
 import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
+import { TableArrow } from "@ZAPUtils/icons";
 
 const ConnectionTable = () => {
     const dispatch = useDispatch();
@@ -46,9 +47,12 @@ const ConnectionTable = () => {
     const columns = [
         {
             name: (
-                <Text className="zaplane-label">
-                    {__("App / Name", "zaplane")}
-                </Text>
+                <Flex gap="2px" alignItems='center' >
+                    <Text className="zaplane-label">
+                        {__("App / Name", "zaplane")}
+                    </Text>
+                    <Icon as={TableArrow} />
+                </Flex>
             ),
             cell: (row) => (
                 <Text className="zaplane-label" fontWeight="400" textOverflow="ellipsis">
@@ -60,21 +64,27 @@ const ConnectionTable = () => {
         },
         {
             name: (
-                <Text className="zaplane-label">
-                    {__("Auth Type", "zaplane")}
-                </Text>
+                <Flex gap="2px" alignItems='center' justifyContent="center" >
+                    <Text className="zaplane-label">
+                        {__("Auth Type", "zaplane")}
+                    </Text>
+                    <Icon as={TableArrow} />
+                </Flex>
             ),
             cell: (row) => (
-                 <ZAPLabel label={row.auth_type} type={"simple"}/>
+                <ZAPLabel label={row.auth_type} type={"simple"} />
             ),
             // columnWidth: "120px",
             textAlign: "center",
         },
         {
             name: (
-                <Text className="zaplane-label">
-                    {__("Created At", "zaplane")}
-                </Text>
+                <Flex gap="2px" alignItems='center' justifyContent="center" ml='-32px'>
+                    <Text className="zaplane-label">
+                        {__("Created At", "zaplane")}
+                    </Text>
+                    <Icon as={TableArrow} />
+                </Flex>
             ),
             cell: (row) => {
                 const { date, time } = formatDateTime(row.created_at);
@@ -93,9 +103,12 @@ const ConnectionTable = () => {
         },
         {
             name: (
-                <Text className="zaplane-label">
-                    {__("updated_at", "zaplane")}
-                </Text>
+                <Flex gap="2px" alignItems='center' justifyContent="center" ml='-32px'>
+                    <Text className="zaplane-label">
+                        {__("Updated At", "zaplane")}
+                    </Text>
+                    <Icon as={TableArrow} />
+                </Flex>
             ),
             cell: (row) => {
                 const { date, time } = formatDateTime(row.updated_at);
@@ -114,9 +127,12 @@ const ConnectionTable = () => {
         },
         {
             name: (
-                <Text className="zaplane-label">
-                    {__("Status", "zaplane")}
-                </Text>
+                 <Flex gap="2px" alignItems='center' justifyContent="center" ml='-32px'>
+                    <Text className="zaplane-label">
+                        {__("Status", "zaplane")}
+                    </Text>
+                    <Icon as={TableArrow} />
+                </Flex>
             ),
             cell: (row) => (
                 <StatusOptions

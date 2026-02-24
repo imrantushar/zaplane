@@ -1,6 +1,6 @@
 import { useMemo, useCallback, useState } from "react";
 import { __ } from "@wordpress/i18n";
-import { Text, Box, Icon, HStack } from "@chakra-ui/react";
+import { Text, Box, Icon, HStack, Flex } from "@chakra-ui/react";
 import Select from "react-select";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -25,7 +25,7 @@ import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
 import ZAPDrawer from "@ZAPComponents/Drawer";
 import LogDetails from "@ZAPComponents/LogDetails";
 import { nodeLogsRunDetails } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlowLogs";
-import { HistoryIcon } from "@ZAPUtils/icons";
+import { HistoryIcon, TableArrow } from "@ZAPUtils/icons";
 
 const WorkflowTable = () => {
   const navigate = useNavigate();
@@ -41,9 +41,12 @@ const WorkflowTable = () => {
   const columns = [
     {
       name: (
-        <Text className="zaplane-label">
-          {__("Title", "zaplane")}
-        </Text>
+        <Flex gap="2px" alignItems='center'>
+          <Text className="zaplane-label">
+            {__("Title", "zaplane")}
+          </Text>
+          <Icon as={TableArrow} />
+        </Flex>
       ),
       cell: (row) => (
         <Text
@@ -61,14 +64,17 @@ const WorkflowTable = () => {
           {row.title}
         </Text>
       ),
-      columnWidth: "100px",
+      // columnWidth: "100px",
       textAlign: 'start'
     },
     {
       name: (
-        <Text className="zaplane-label">
-          {__("Created At", "zaplane")}
-        </Text>
+        <Flex gap="2px" alignItems='center' justifyContent="center" ml='-32px'>
+          <Text className="zaplane-label">
+            {__("Created At", "zaplane")}
+          </Text>
+          <Icon as={TableArrow} />
+        </Flex>
       ),
       cell: (row) => {
         const { date, time } = formatDateTime(row.created_at);
@@ -82,14 +88,17 @@ const WorkflowTable = () => {
           </Box>
         );
       },
-      columnWidth: "160px",
+      // columnWidth: "160px",
       textAlign: "center",
     },
     {
       name: (
-        <Text className="zaplane-label">
-          {__("Updated At", "zaplane")}
-        </Text>
+        <Flex gap="2px" alignItems='center' justifyContent="center" ml='-32px'>
+          <Text className="zaplane-label">
+            {__("Updated At", "zaplane")}
+          </Text>
+          <Icon as={TableArrow} />
+        </Flex>
       ),
       cell: (row) => {
         const { date, time } = formatDateTime(row.updated_at);
@@ -103,14 +112,17 @@ const WorkflowTable = () => {
           </Box>
         );
       },
-      columnWidth: "160px",
+      // columnWidth: "160px",
       textAlign: "center",
     },
     {
       name: (
-        <Text className="zaplane-label">
-          {__("Status", "zaplane")}
-        </Text>
+        <Flex gap="2px" alignItems='center' justifyContent="center" ml='-32px'>
+          <Text className="zaplane-label">
+            {__("Status", "zaplane")}
+          </Text>
+          <Icon as={TableArrow} />
+        </Flex>
       ),
       cell: (row) => {
         const handleStatusChange = (row, newStatus) => {
@@ -128,7 +140,7 @@ const WorkflowTable = () => {
           />
         )
       },
-      columnWidth: "170px",
+      // columnWidth: "170px",
       textAlign: "center",
     },
     {
@@ -210,7 +222,7 @@ const WorkflowTable = () => {
 
         </HStack>
       ),
-      columnWidth: "90px",
+      // columnWidth: "90px",
       textAlign: "center",
     },
   ]

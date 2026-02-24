@@ -51,7 +51,7 @@ const ZAPDrawer = ({
             <Portal>
                 <Drawer.Positioner marginTop={isFullscreen ? '0' : "32px"} height={isFullscreen ? '100%' : 'calc(100vh - 32px)'} zIndex={"9999"}
                     pointerEvents="none">
-                    <Drawer.Content pointerEvents="auto">
+                    <Drawer.Content pointerEvents="auto" mr="15px">
                         {title && (
                             <Drawer.Header>
                                 {

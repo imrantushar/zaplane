@@ -45,7 +45,7 @@ export default function FlowTopBar({
       leftContent={() => (
         <>
           {!isFullscreen && (
-            <Button variant="outline" onClick={() => navigate(-1)}>
+            <Button variant="outline" height="36px" width="36px" onClick={() => navigate(-1)}>
               <FiArrowLeft />
             </Button>
           )}

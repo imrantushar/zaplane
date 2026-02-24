@@ -96,7 +96,7 @@ const CreateWorkflows = () => {
 
           <Flex justify="flex-end" mt={5}>
             <Button
-              variant="ghost"
+              variant="outline"
               mr={3}
               onClick={() => setIsModalOpen(false)}
             >

@@ -1079,6 +1079,7 @@
 .zaplane-table {
   background: #fff;
   padding: 24px;
+  border-radius: 4px;
 }
 
 .zaplane-table__sub-header {

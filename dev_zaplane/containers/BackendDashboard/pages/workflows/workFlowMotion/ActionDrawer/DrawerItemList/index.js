@@ -1,31 +1,22 @@
-import { VStack, Button, Box, Flex } from "@chakra-ui/react";
+import { VStack, Button, Box, Flex, Image, Icon } from "@chakra-ui/react";
 import DrawerItemButton from "./DrawerItemButton";
 import { __ } from "@wordpress/i18n";
 import { FaWordpress } from "react-icons/fa6";
 import { secondPrimaryBtn } from "../../../../../../../../assets/scss/chakra/recipe";
+import { plugin_root_url } from "@ZAPUtils/helper";
+import { ReactComponent as SlackIcon } from "./slack.svg";
 
 const DrawerItemList = ({ list, setSelectedItem, setMode }) => {
+  // app list item 
   return (
-    <VStack alignItems="left" overflow="hidden" pt='16px'>
+    <VStack alignItems="left" overflow="hidden"  gap='16px'>
       {list.map(item => (
-        <Flex>
-          <Box
-            w="40px"
-            h="40px"
-            p="10px"
-            justifyContent="center"
-            alignItems="center"
-            gap="10px"
-            bg='var(--zaplane-body-background)'>
-            <FaWordpress />
-          </Box>
           <DrawerItemButton
+           icon={SlackIcon}
             key={item.id}
             item={item}
             onClick={() => setSelectedItem(item)}
           />
-        </Flex>
-
       ))}
     </VStack>
   );
