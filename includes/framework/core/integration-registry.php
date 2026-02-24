@@ -16,6 +16,7 @@ return [
     'variable' => ['file' => 'variable.php', 'class' => \Zaplane\Integrations\Variable::class],
     'webhook' => ['file' => 'webhook.php', 'class' => \Zaplane\Integrations\Webhook::class],
     'storeengine' => ['file' => 'storeengine.php', 'class' => \Zaplane\Integrations\Storeengine::class],
+    'essentialblocks' => ['file' => 'essentialblocks.php', 'class' => \Zaplane\Integrations\Essentialblocks::class],    
     'coblocks' => ['file' => 'coblocks.php', 'class' => \Zaplane\Integrations\Coblocks::class],
     'spectra' => ['file' => 'spectra.php', 'class' => \Zaplane\Integrations\Spectra::class],
     'beaverbuilder' => ['file' => 'beaverbuilder.php', 'class' => \Zaplane\Integrations\Beaverbuilder::class],

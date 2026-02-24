@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-02-24 06:19:16",
+    "generated_at": "2026-02-22 11:30:53",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -4668,6 +4668,23 @@
                     "key": "metform_after_store_form_data",
                     "label": "Form Submitted",
                     "hook": "metform_after_store_form_data",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
+        },
+        "essentialblocks": {
+            "slug": "essentialblocks",
+            "name": "Essentialblocks",
+            "icon": "",
+            "category": "app",
+            "triggers": {
+                "eb_form_submit_before_email": {
+                    "key": "eb_form_submit_before_email",
+                    "label": "Form Submission",
+                    "hook": "eb_form_submit_before_email",
                     "schema": [],
                     "outputs": [
                         "main"
