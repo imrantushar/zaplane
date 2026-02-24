@@ -67,7 +67,7 @@ class Wpforms extends IntegrationBase {
                 $fields     = $args[0] ?? [];
                 $entry      = $args[1] ?? [];
                 $form_data  = $args[2] ?? [];
-                $entry_id   = $args[3] ?? 0;
+                $entry_id = $entry['id'] ?? 0;
 
                 if ( empty( $form_data['id'] ) )  return false;
 
