@@ -182,13 +182,16 @@ class ConnectionsController extends WP_REST_Controller {
 	public function get_items( $request ) {
 		$user_id = get_current_user_id();
 		$app = $request->get_param( 'app' );
+		$page = max( 1, (int) ( $request->get_param( 'page' ) ?? 1 ) );
+		$per_page = max( 1, min( 100, (int) ( $request->get_param( 'per_page' ) ?? 20 ) ) );
 
 		$manager = $this->get_connection_manager();
-		$connections = $manager->get_user_connections( $user_id, $app );
+		$result = $manager->get_user_connections( $user_id, $app, $page, $per_page );
 
 		return rest_ensure_response(
 			array(
-				'connections' => $connections,
+				'data'       => $result['data'],
+				'pagination' => $result['pagination'],
 			)
 		);
 	}

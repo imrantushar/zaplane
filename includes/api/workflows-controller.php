@@ -9,6 +9,7 @@ use Zaplane\Framework\Classes\Container;
 use Zaplane\Models\Workflow;
 use Zaplane\Models\WorkflowVersion;
 use Zaplane\Models\Run;
+use Zaplane\Models\NodeRun;
 use Zaplane\Utils\VariableExtractor;
 
 if (!defined('ABSPATH')) exit;
@@ -111,10 +112,47 @@ class WorkflowsController extends WP_REST_Controller
         return current_user_can('manage_options');
     }
 
-    public function get_workflow_items()
+    public function get_workflow_items($request)
     {
-        $workflows = Workflow::orderBy('id', 'desc')->get();
-        return rest_ensure_response($workflows->toArray());
+        $page = max(1, (int) ($request->get_param('page') ?? 1));
+        $perPage = max(1, min(100, (int) ($request->get_param('per_page') ?? 20)));
+
+        $total = Workflow::count();
+        $workflows = Workflow::orderBy('id', 'desc')
+            ->forPage($page, $perPage)
+            ->get();
+
+        $data = [];
+        foreach ($workflows as $workflow) {
+            $item = $workflow->toArray();
+
+            $version = $workflow->activeVersion();
+            if ($version) {
+                $successRuns = Run::where('workflow_version_hash', $version->graph_hash)
+                    ->where('status', 'completed')
+                    ->count();
+                $failedRuns = Run::where('workflow_version_hash', $version->graph_hash)
+                    ->where('status', 'failed')
+                    ->count();
+            } else {
+                $successRuns = 0;
+                $failedRuns = 0;
+            }
+
+            $item['success_runs'] = $successRuns;
+            $item['failed_runs'] = $failedRuns;
+            $data[] = $item;
+        }
+
+        return rest_ensure_response([
+            'data' => $data,
+            'pagination' => [
+                'page' => $page,
+                'per_page' => $perPage,
+                'total' => $total,
+                'total_pages' => (int) ceil($total / $perPage),
+            ],
+        ]);
     }
 
     public function get_workflow_item($request)
@@ -228,18 +266,32 @@ class WorkflowsController extends WP_REST_Controller
 
     public function list_versions($request)
     {
-        return rest_ensure_response(
-            WorkflowVersion::where('workflow_id', (int) $request['id'])
-                ->orderBy('id', 'desc')
-                ->get()
-                ->map(fn($v) => [
-                    'id' => $v->id,
-                    'graph_hash' => $v->graph_hash,
-                    'is_active' => $v->is_active,
-                    'created_at' => $v->created_at,
-                ])
-                ->toArray()
-        );
+        $page = max(1, (int) ($request->get_param('page') ?? 1));
+        $perPage = max(1, min(100, (int) ($request->get_param('per_page') ?? 20)));
+        $workflowId = (int) $request['id'];
+
+        $total = WorkflowVersion::where('workflow_id', $workflowId)->count();
+        $versions = WorkflowVersion::where('workflow_id', $workflowId)
+            ->orderBy('id', 'desc')
+            ->forPage($page, $perPage)
+            ->get()
+            ->map(fn($v) => [
+                'id' => $v->id,
+                'graph_hash' => $v->graph_hash,
+                'is_active' => $v->is_active,
+                'created_at' => $v->created_at,
+            ])
+            ->toArray();
+
+        return rest_ensure_response([
+            'data' => $versions,
+            'pagination' => [
+                'page' => $page,
+                'per_page' => $perPage,
+                'total' => $total,
+                'total_pages' => (int) ceil($total / $perPage),
+            ],
+        ]);
     }
 
     public function get_version($request)
@@ -291,29 +343,48 @@ class WorkflowsController extends WP_REST_Controller
         $workflow = Workflow::find((int) $request['id']);
 
         if (!$workflow) {
-            return rest_ensure_response([]);
+            return rest_ensure_response([
+                'data' => [],
+                'pagination' => ['page' => 1, 'per_page' => 20, 'total' => 0, 'total_pages' => 0],
+            ]);
         }
 
         $version = $workflow->activeVersion();
 
         if (!$version) {
-            return rest_ensure_response([]);
+            return rest_ensure_response([
+                'data' => [],
+                'pagination' => ['page' => 1, 'per_page' => 20, 'total' => 0, 'total_pages' => 0],
+            ]);
         }
 
-        return rest_ensure_response(
-            Run::where('workflow_version_hash', $version->graph_hash)
-                ->orderBy('id', 'desc')
-                ->limit(100)
-                ->get()
-                ->map(fn($r) => [
-                    'id' => $r->id,
-                    'status' => $r->status,
-                    'started_at' => $r->started_at,
-                    'finished_at' => $r->finished_at,
-                    'last_error' => $r->last_error,
-                ])
-                ->toArray()
-        );
+        $page = max(1, (int) ($request->get_param('page') ?? 1));
+        $perPage = max(1, min(100, (int) ($request->get_param('per_page') ?? 20)));
+
+        $total = Run::where('workflow_version_hash', $version->graph_hash)->count();
+        $runs = Run::where('workflow_version_hash', $version->graph_hash)
+            ->orderBy('id', 'desc')
+            ->forPage($page, $perPage)
+            ->get()
+            ->map(fn($r) => [
+                'id' => $r->id,
+                'status' => $r->status,
+                'started_at' => $r->started_at,
+                'finished_at' => $r->finished_at,
+                'last_error' => $r->last_error,
+                'node_runs_count' => NodeRun::where('run_id', $r->id)->count(),
+            ])
+            ->toArray();
+
+        return rest_ensure_response([
+            'data' => $runs,
+            'pagination' => [
+                'page' => $page,
+                'per_page' => $perPage,
+                'total' => $total,
+                'total_pages' => (int) ceil($total / $perPage),
+            ],
+        ]);
     }
 
     public function get_condition_variables($request)

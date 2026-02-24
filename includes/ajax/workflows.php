@@ -54,6 +54,26 @@ class Workflows extends AbstractAjaxHandler
                 ],
             ],
 
+            // Update workflow name
+            'update_workflow_name' => [
+                'callback' => [$this, 'updateName'],
+                'capability' => 'manage_options',
+                'fields' => [
+                    'id' => 'absint',
+                    'title' => 'string',
+                ],
+            ],
+
+            // Update workflow layout
+            'update_workflow_layout' => [
+                'callback' => [$this, 'updateLayout'],
+                'capability' => 'manage_options',
+                'fields' => [
+                    'id' => 'absint',
+                    'layout' => 'string',
+                ],
+            ],
+
             // Get workflow stats (public endpoint)
             'get_workflow_stats' => [
                 'callback' => [$this, 'getStats'],
@@ -199,6 +219,68 @@ class Workflows extends AbstractAjaxHandler
         return [
             'id' => $workflow->id,
             'message' => __('Settings updated successfully', 'zaplane'),
+        ];
+    }
+
+    /**
+     * Update workflow name.
+     */
+    public function updateName(array $payload)
+    {
+        $id = $payload['id'] ?? 0;
+        $title = $payload['title'] ?? '';
+
+        if (!$id || empty($title)) {
+            return new \WP_Error('missing_params', __('ID and title are required', 'zaplane'), ['code' => 400]);
+        }
+
+        $workflow = Workflow::find($id);
+
+        if (!$workflow) {
+            return new \WP_Error('not_found', __('Workflow not found', 'zaplane'), ['code' => 404]);
+        }
+
+        $workflow->title = sanitize_text_field($title);
+        $workflow->name = sanitize_title($title);
+        $workflow->save();
+
+        return [
+            'id' => $workflow->id,
+            'title' => $workflow->title,
+            'name' => $workflow->name,
+            'message' => __('Name updated successfully', 'zaplane'),
+        ];
+    }
+
+    /**
+     * Update workflow layout.
+     */
+    public function updateLayout(array $payload)
+    {
+        $id = $payload['id'] ?? 0;
+        $layout = $payload['layout'] ?? '';
+
+        if (!$id || empty($layout)) {
+            return new \WP_Error('missing_params', __('ID and layout are required', 'zaplane'), ['code' => 400]);
+        }
+
+        if (!in_array($layout, ['horizontal', 'vertical'])) {
+            return new \WP_Error('invalid_layout', __('Layout must be horizontal or vertical', 'zaplane'), ['code' => 400]);
+        }
+
+        $workflow = Workflow::find($id);
+
+        if (!$workflow) {
+            return new \WP_Error('not_found', __('Workflow not found', 'zaplane'), ['code' => 404]);
+        }
+
+        $workflow->layout = $layout;
+        $workflow->save();
+
+        return [
+            'id' => $workflow->id,
+            'layout' => $workflow->layout,
+            'message' => __('Layout updated successfully', 'zaplane'),
         ];
     }
 

@@ -149,6 +149,12 @@ class Automation
         $args = func_get_args();
 
         foreach (Query::get_active_workflows_for_event($event) as $trigger) {
+            // Skip if there's an active listener for this workflow — the listener will handle it
+            $listenerState = Option::get('zaplane_listener_state_' . $trigger['workflow_id']);
+            if (is_array($listenerState) && ($listenerState['status'] ?? '') === 'listening') {
+                continue;
+            }
+
             $integration = $this->container->get('integrations')->get(strtolower($trigger['app']));
             $payload = $integration::resolve_trigger($trigger['graph_node']['data'], $args);
             if (!$payload) continue;

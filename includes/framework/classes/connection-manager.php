@@ -66,11 +66,29 @@ class ConnectionManager
         return $data;
     }
 
-    public function get_user_connections(int $user_id, ?string $app = null): array
+    public function get_user_connections(int $user_id, ?string $app = null, int $page = 1, int $perPage = 20): array
     {
-        $connections = Connection::forUser($user_id, $app);
+        $query = Connection::where('user_id', $user_id);
 
-        return $connections->toArray();
+        if ($app !== null) {
+            $query->where('app', $app);
+        }
+
+        $total = (clone $query)->count();
+
+        $connections = $query->orderBy('name', 'asc')
+            ->forPage($page, $perPage)
+            ->get();
+
+        return [
+            'data' => $connections->toArray(),
+            'pagination' => [
+                'page' => $page,
+                'per_page' => $perPage,
+                'total' => $total,
+                'total_pages' => (int) ceil($total / $perPage),
+            ],
+        ];
     }
 
     public function update(int $id, array $data): bool
