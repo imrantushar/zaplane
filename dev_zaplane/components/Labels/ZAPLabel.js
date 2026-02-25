@@ -29,6 +29,7 @@ const ZAPLabel = ({
 	enableSlice = false,
 	sliceLength = 100,
 	sliceMore = '...',
+	textOverflow='',
 	showToggle = true,
 	seeMoreText = __('See more', 'zaplane'),
 	seeLessText = __('See less', 'zaplane'),
@@ -113,6 +114,7 @@ const ZAPLabel = ({
 		truncate: truncate,
 		lineClamp: lineClamp,
 		lineHeight: lineHeight,
+		textOverflow:textOverflow
 	};
 
 	const needsSlicing = enableSlice && label && label.length > sliceLength;

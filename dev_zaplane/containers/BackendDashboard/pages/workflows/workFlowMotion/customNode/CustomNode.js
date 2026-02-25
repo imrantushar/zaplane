@@ -88,7 +88,7 @@ export default function CustomNode({ id, data, canvasLayout }) {
         borderRadius="md"
         px={4}
         py={2}
-        minW="160px"
+        width="180px"
         textAlign="center"
         boxShadow="sm"
         onClick={data.onOpenDrawer}
@@ -118,10 +118,10 @@ export default function CustomNode({ id, data, canvasLayout }) {
           >
             <Icon as={FaWordpress} boxSize={5} color="orange.500" />
           </Box>
-          <Box textAlign="left" paddingRight="25px">
+          <Box textAlign="left">
             <ZAPLabel label=
               {isSelectApp ? __(data.app, "zaplane")
-                : sprintf(__("%s", "zaplane"), formatLabel(data.event))} type="basic" />
+                : sprintf(__("%s", "zaplane"), formatLabel(data.event))} type="basic" textOverflow="ellipsis"/>
 
             {!isSelectApp && (
               <ZAPLabel label=

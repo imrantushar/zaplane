@@ -429,6 +429,7 @@ const ZAPLabel = ({
   enableSlice = false,
   sliceLength = 100,
   sliceMore = '...',
+  textOverflow = '',
   showToggle = true,
   seeMoreText = (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('See more', 'zaplane'),
   seeLessText = (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('See less', 'zaplane')
@@ -507,7 +508,8 @@ const ZAPLabel = ({
     whiteSpace: whiteSpace,
     truncate: truncate,
     lineClamp: lineClamp,
-    lineHeight: lineHeight
+    lineHeight: lineHeight,
+    textOverflow: textOverflow
   };
   const needsSlicing = enableSlice && label && label.length > sliceLength;
   const getDisplayText = () => {
@@ -6855,7 +6857,7 @@ const FloatingEdge = ({
         cursor: "pointer",
         position: "absolute",
         top: isLR ? "13px" : "110px",
-        right: isLR ? "-80px" : "69px",
+        right: isLR ? "-80px" : "73px",
         _hover: {
           borderColor: "var(--zaplane-primary-color)",
           bg: "var(--zaplane-background)"
@@ -6992,7 +6994,7 @@ function CustomNode({
       borderRadius: "md",
       px: 4,
       py: 2,
-      minW: "160px",
+      width: "180px",
       textAlign: "center",
       boxShadow: "sm",
       onClick: data.onOpenDrawer,
@@ -7024,10 +7026,10 @@ function CustomNode({
           })
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Box, {
           textAlign: "left",
-          paddingRight: "25px",
           children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsx)(_ZAPComponents_Labels_ZAPLabel__WEBPACK_IMPORTED_MODULE_13__["default"], {
             label: isSelectApp ? (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_10__.__)(data.app, "zaplane") : (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_10__.sprintf)((0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_10__.__)("%s", "zaplane"), (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_11__.formatLabel)(data.event)),
-            type: "basic"
+            type: "basic",
+            textOverflow: "ellipsis"
           }), !isSelectApp && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsx)(_ZAPComponents_Labels_ZAPLabel__WEBPACK_IMPORTED_MODULE_13__["default"], {
             label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_10__.sprintf)((0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_10__.__)("%s", "zaplane"), data.app),
             type: "simple"
