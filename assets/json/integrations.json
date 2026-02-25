@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-02-24 09:56:49",
+    "generated_at": "2026-02-25 09:25:06",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -3738,6 +3738,50 @@
                                     "value": "0"
                                 }
                             ]
+                        },
+                        {
+                            "key": "pricing_display",
+                            "label": "Pricing Display",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Auto",
+                                    "value": "auto"
+                                },
+                                {
+                                    "label": "Custom",
+                                    "value": "custom"
+                                },
+                                {
+                                    "label": "None",
+                                    "value": "none"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "pricing_title",
+                            "label": "Pricing Title",
+                            "type": "text"
+                        },
+                        {
+                            "key": "pricing_heading_text",
+                            "label": "Pricing Heading Text",
+                            "type": "text"
+                        },
+                        {
+                            "key": "pricing_footer_text",
+                            "label": "Pricing Footer Text",
+                            "type": "text"
+                        },
+                        {
+                            "key": "pricing_button_text",
+                            "label": "Pricing Button Text",
+                            "type": "text"
+                        },
+                        {
+                            "key": "pricing_button_position",
+                            "label": "Pricing Button Position",
+                            "type": "text"
                         }
                     ],
                     "outputs": [
@@ -3907,6 +3951,50 @@
                                     "value": "0"
                                 }
                             ]
+                        },
+                        {
+                            "key": "pricing_display",
+                            "label": "Pricing Display",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Auto",
+                                    "value": "auto"
+                                },
+                                {
+                                    "label": "Custom",
+                                    "value": "custom"
+                                },
+                                {
+                                    "label": "None",
+                                    "value": "none"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "pricing_title",
+                            "label": "Pricing Title",
+                            "type": "text"
+                        },
+                        {
+                            "key": "pricing_heading_text",
+                            "label": "Pricing Heading Text",
+                            "type": "text"
+                        },
+                        {
+                            "key": "pricing_footer_text",
+                            "label": "Pricing Footer Text",
+                            "type": "text"
+                        },
+                        {
+                            "key": "pricing_button_text",
+                            "label": "Pricing Button Text",
+                            "type": "text"
+                        },
+                        {
+                            "key": "pricing_button_position",
+                            "label": "Pricing Button Position",
+                            "type": "text"
                         }
                     ],
                     "outputs": [
