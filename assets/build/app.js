@@ -8182,6 +8182,10 @@ function Workflows({
       nodes: (0,_helper__WEBPACK_IMPORTED_MODULE_4__.mapNodesForBackend)(nodes),
       edges: (0,_helper__WEBPACK_IMPORTED_MODULE_4__.mapEdgesForBackend)(edges)
     };
+    const statusPaylod = {
+      status: values?.status,
+      id: id
+    };
     if (values.status && values.status !== workFlow?.workflow.status) {
       await dispatch((0,_ZAPRedux_Slices_workFlowSlice_actions_workFlow__WEBPACK_IMPORTED_MODULE_9__.updateWorkFlowStatus)(statusPaylod));
     }

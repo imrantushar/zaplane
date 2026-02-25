@@ -51,6 +51,11 @@ export default function Workflows({ id }) {
       nodes: mapNodesForBackend(nodes)
       , edges: mapEdgesForBackend(edges),
     }
+
+    const statusPaylod = {
+      status: values?.status,
+      id: id,
+    }
     if (values.status && values.status !== workFlow?.workflow.status) {
       await dispatch(updateWorkFlowStatus(statusPaylod));
     }
