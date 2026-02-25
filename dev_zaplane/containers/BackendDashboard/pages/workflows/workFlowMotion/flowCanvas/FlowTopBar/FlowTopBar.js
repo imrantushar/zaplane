@@ -43,22 +43,22 @@ export default function FlowTopBar({
   const dispatch = useDispatch()
   useApiCountdown()
   useEffect(() => {
-  if (!workFlow?.workflow) return;
-  const updateStatusAndTitle = async () => {
-    try {
-      if (values?.status && values.status !== workFlow.workflow.status) {
-        await dispatch(updateWorkFlowStatus({ id, status: values.status }));
+    if (!workFlow?.workflow) return;
+    const updateStatusAndTitle = async () => {
+      try {
+        if (values?.status && values.status !== workFlow.workflow.status) {
+          await dispatch(updateWorkFlowStatus({ id, status: values.status }));
+        }
+        if (values?.title && values.title !== workFlow.workflow.title) {
+          await dispatch(updateWorkFlowTitle({ id, title: values.title }));
+        }
+      } catch (error) {
+        console.error("Failed to update status or title:", error);
       }
-      if (values?.title && values.title !== workFlow.workflow.title) {
-        await dispatch(updateWorkFlowTitle({ id, title: values.title }));
-      }
-    } catch (error) {
-      console.error("Failed to update status or title:", error);
-    }
-  };
+    };
 
-  updateStatusAndTitle();
-}, [values?.status, values?.title, workFlow, dispatch, id]);
+    updateStatusAndTitle();
+  }, [values?.status, values?.title, workFlow, dispatch, id]);
   return (
     <TopBar
       leftContent={() => (
@@ -87,6 +87,11 @@ export default function FlowTopBar({
             />
           </Box>
 
+
+        </>
+      )}
+      rightContent={() => (
+        <Flex gap='12px'>
           {!apiRequestRunning ? (
             <Button {...secondPrimaryBtn} h="36px" onClick={() => {
               dispatch(startApiCountdown(120));
@@ -101,7 +106,7 @@ export default function FlowTopBar({
           )}
 
           {apiRequestRunning && (
-            <Flex gap='4px'>
+            <Flex gap='4px' alignItems='center'>
               <Text className="zaplane-label">
                 {__("Listening...", "zaplane")}
               </Text>
@@ -110,10 +115,6 @@ export default function FlowTopBar({
               </Text>
             </Flex>
           )}
-        </>
-      )}
-      rightContent={() => (
-        <>
           <Button size="sm" variant="outline"
             className={`${isFullscreen && "zaplane-button-actve"}`} onClick={toggleFullscreen}>
             {isFullscreen ? <LuMinimize /> : <LuFullscreen />}
@@ -222,7 +223,7 @@ export default function FlowTopBar({
           <Button {...primaryBtn} size="sm" onClick={handleSubmit}>
             {__("Update", "zaplane")}
           </Button>
-        </>
+        </Flex>
       )}
     />
   );

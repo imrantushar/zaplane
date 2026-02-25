@@ -67,7 +67,7 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
 
             updateLayout();
         }
-    }, [canvasLayout, id]);
+    }, [canvasLayout]);
 
     const activeVersionId = versions?.find(v => v.is_active)?.id;
 

@@ -50,26 +50,6 @@ export default function Workflows({ id }) {
       nodes: mapNodesForBackend(nodes)
       , edges: mapEdgesForBackend(edges),
     }
-
-    const statusPaylod = {
-      status: values?.status,
-      id: id,
-    }
-    if (values.status && values.status !== workFlow?.workflow.status) {
-      await dispatch(updateWorkFlowStatus(statusPaylod));
-    }
-    if (values.title) {
-      await dispatch(updateWorkFlowTitle({
-        id: id,
-        title: values?.title
-      }))
-    }
-    await dispatch(updateWorkFlowLayout(
-      {
-        id: id,
-        layout: canvasLayout
-      }
-    ))
     await dispatch(
       updateWorkFlow({ id, payload })
     );
