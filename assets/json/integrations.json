@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-02-24 05:18:56",
+    "generated_at": "2026-02-24 13:07:16",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -3245,10 +3245,28 @@
             "icon": "",
             "category": "app",
             "triggers": {
-                "metform_after_store_form_data": {
-                    "key": "metform_after_store_form_data",
-                    "label": "Form Submitted",
-                    "hook": "metform_after_store_form_data",
+                "acf/save_post": {
+                    "key": "acf/save_post",
+                    "label": "Options Page Field is Updated",
+                    "hook": "acf/save_post",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "updated_post_meta": {
+                    "key": "updated_post_meta",
+                    "label": "Post Custom Field is Updated",
+                    "hook": "updated_post_meta",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "updated_user_meta": {
+                    "key": "updated_user_meta",
+                    "label": "User Custom Field is Updated",
+                    "hook": "updated_user_meta",
                     "schema": [],
                     "outputs": [
                         "main"
