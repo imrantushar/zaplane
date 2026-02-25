@@ -1,11 +1,13 @@
 
 
 import {
+    Button,
     CloseButton,
     Drawer,
     Portal,
     Text,
 } from "@chakra-ui/react";
+import { FiArrowLeft } from "react-icons/fi";
 
 
 const ZAPDrawer = ({
@@ -19,6 +21,8 @@ const ZAPDrawer = ({
     zIndex = 9999,
     onClose,
     open,
+    arrowClose,
+    isFullscreen=false
 }) => {
     return (
         <Drawer.Root
@@ -41,11 +45,16 @@ const ZAPDrawer = ({
             </Drawer.Trigger>
 
             <Portal>
-                <Drawer.Positioner marginTop='32px' zIndex={"99999999"}
+                <Drawer.Positioner marginTop={isFullscreen?'0':"32px"} height={isFullscreen?'100%':'calc(100vh - 32px)'} zIndex={"9999"}
                     pointerEvents="none">
                     <Drawer.Content pointerEvents="auto">
                         {title && (
                             <Drawer.Header>
+                                {
+                                    arrowClose && <Button height="30px" width="20px" variant="outline" onClick={onClose} >
+                                        <FiArrowLeft />
+                                    </Button>
+                                }
                                 <Drawer.Title margin='0' >{title}</Drawer.Title>
                                 <Drawer.CloseTrigger asChild>
                                     <CloseButton size="sm" />
@@ -61,8 +70,6 @@ const ZAPDrawer = ({
                                             ? children(store)
                                             : children}
                                     </Drawer.Body>
-
-                                    {/* 👉 Footer Section */}
                                     {footer && (
                                         <Drawer.Footer>
                                             {typeof footer === "function"

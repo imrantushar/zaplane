@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-01-16 13:42:41",
+    "generated_at": "2026-02-05 10:26:45",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -140,6 +140,123 @@
                         "main"
                     ]
                 },
+                "deleted_post": {
+                    "key": "deleted_post",
+                    "label": "Before Deleted Post",
+                    "hook": "before_delete_post",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "save_post": {
+                    "key": "save_post",
+                    "label": "Save Post",
+                    "hook": "save_post",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "post_revision": {
+                    "key": "post_revision",
+                    "label": "Revision Creation",
+                    "hook": "_wp_put_post_revision",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add_attachment": {
+                    "key": "add_attachment",
+                    "label": "Add Attachment",
+                    "hook": "add_attachment",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "edit_attachment": {
+                    "key": "edit_attachment",
+                    "label": "Attachment Edit",
+                    "hook": "edit_attachment",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "save_attachment": {
+                    "key": "save_attachment",
+                    "label": "Attachment Save",
+                    "hook": "attachment_fields_to_save",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "attachment_updated": {
+                    "key": "attachment_updated",
+                    "label": "Attachment Update",
+                    "hook": "attachment_updated",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "attachment_count": {
+                    "key": "attachment_count",
+                    "label": "Attachment Count",
+                    "hook": "wp_count_attachments",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "attachment_metadata": {
+                    "key": "attachment_metadata",
+                    "label": "Generate Attachment Metadata",
+                    "hook": "wp_generate_attachment_metadata",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_attachment": {
+                    "key": "delete_attachment",
+                    "label": "Media Deletion",
+                    "hook": "delete_attachment",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "media_edit": {
+                    "key": "media_edit",
+                    "label": "Media Edit",
+                    "hook": "edit_attachment",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "media_upload_tabs": {
+                    "key": "media_upload_tabs",
+                    "label": "Media Tabs",
+                    "hook": "media_upload_tabs",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "image_sizes": {
+                    "key": "image_sizes",
+                    "label": "Image Sizes",
+                    "hook": "image_size_names_choose",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
                 "user_register": {
                     "key": "user_register",
                     "label": "User Registered",
@@ -221,6 +338,42 @@
                         "main"
                     ]
                 },
+                "create_application_password": {
+                    "key": "create_application_password",
+                    "label": "Create Application Password",
+                    "hook": "wp_create_application_password",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_application_password": {
+                    "key": "update_application_password",
+                    "label": "Update Application Password",
+                    "hook": "wp_update_application_password",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_application_password": {
+                    "key": "delete_application_password",
+                    "label": "Delete Application Password",
+                    "hook": "wp_delete_application_password",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add_user_role": {
+                    "key": "add_user_role",
+                    "label": "User Added to a Role",
+                    "hook": "add_user_role",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
                 "wp_login": {
                     "key": "wp_login",
                     "label": "User Logged In",
@@ -252,6 +405,15 @@
                     "key": "wp_authenticate",
                     "label": "WP Authenticate",
                     "hook": "wp_authenticate",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "validate_reset": {
+                    "key": "validate_reset",
+                    "label": "Validate Reset",
+                    "hook": "validate_password_reset",
                     "schema": [],
                     "outputs": [
                         "main"
@@ -460,6 +622,63 @@
                         "main"
                     ]
                 },
+                "activated_plugin": {
+                    "key": "activated_plugin",
+                    "label": "Activate Plugin",
+                    "hook": "activated_plugin",
+                    "schema": [
+                        {
+                            "key": "plugin",
+                            "label": "Inactive Plugin",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "inactive_plugins",
+                                "select": [
+                                    "file",
+                                    "name"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "deactivate_plugin": {
+                    "key": "deactivate_plugin",
+                    "label": "Deactivate Plugin",
+                    "hook": "deactivate_plugin",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "switch_theme": {
+                    "key": "switch_theme",
+                    "label": "Theme Switch",
+                    "hook": "switch_theme",
+                    "schema": [
+                        {
+                            "key": "theme",
+                            "label": "Theme Switch",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "deactivate_theme",
+                                "select": [
+                                    "file",
+                                    "name"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
                 "add_option": {
                     "key": "add_option",
                     "label": "Add Option",
@@ -500,6 +719,60 @@
                     "key": "generate_rewrite_rules",
                     "label": "Rewrite Rules Generated",
                     "hook": "generate_rewrite_rules",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "switch_blog": {
+                    "key": "switch_blog",
+                    "label": "Blog Switch",
+                    "hook": "switch_blog",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "customize_register": {
+                    "key": "customize_register",
+                    "label": "Customizer Registration",
+                    "hook": "customize_register",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "rest_api_init": {
+                    "key": "rest_api_init",
+                    "label": "REST API Init",
+                    "hook": "rest_api_init",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_blog_public": {
+                    "key": "update_blog_public",
+                    "label": "Update Blog Public",
+                    "hook": "update_blog_public",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_blog_status": {
+                    "key": "update_blog_status",
+                    "label": "Update Blog Status",
+                    "hook": "update_blog_status",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "new_blog": {
+                    "key": "new_blog",
+                    "label": "New Blog",
+                    "hook": "wpmu_new_blog",
                     "schema": [],
                     "outputs": [
                         "main"
@@ -1174,7 +1447,7 @@
                     "schema": [
                         {
                             "key": "post_id",
-                            "label": "Post ID",
+                            "label": "ID",
                             "type": "expression",
                             "required": true
                         }
@@ -1204,7 +1477,7 @@
                     "schema": [
                         {
                             "key": "post_id",
-                            "label": "Post ID",
+                            "label": "ID",
                             "type": "expression",
                             "required": true
                         }
@@ -1313,7 +1586,7 @@
                     "schema": [
                         {
                             "key": "post_id",
-                            "label": "Post ID",
+                            "label": "ID",
                             "type": "expression",
                             "required": true
                         },
@@ -1479,13 +1752,1116 @@
                     "schema": [
                         {
                             "key": "post_id",
-                            "label": "Post ID",
+                            "label": "ID",
                             "type": "expression",
                             "required": true
                         },
                         {
                             "key": "attachment_id",
                             "label": "Attachment ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_title": {
+                    "key": "update_title",
+                    "label": "Update Title",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "post_title",
+                            "label": "New Title",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "post_type",
+                            "label": "Post Type",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "post_types",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_post": {
+                    "key": "update_post",
+                    "label": "Update Post",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "post_title",
+                            "label": "New Post Title",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "post_content",
+                            "label": "New Post Content",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "post_type",
+                            "label": "Post Type",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "post_types",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "post_status",
+                            "label": "Status",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Draft",
+                                    "value": "draft"
+                                },
+                                {
+                                    "label": "Publish",
+                                    "value": "publish"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_status": {
+                    "key": "update_status",
+                    "label": "Update Status",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "post_type",
+                            "label": "Post Type",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "post_types",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "post_status",
+                            "label": "Status",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Publish",
+                                    "value": "publish"
+                                },
+                                {
+                                    "label": "Pending",
+                                    "value": "pending"
+                                },
+                                {
+                                    "label": "Private",
+                                    "value": "private"
+                                },
+                                {
+                                    "label": "Draft",
+                                    "value": "draft"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "duplicate_post": {
+                    "key": "duplicate_post",
+                    "label": "Duplicate Post",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "post_title",
+                            "label": "New Title",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "post_type",
+                            "label": "Post Type",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "post_types",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "schedule_post": {
+                    "key": "schedule_post",
+                    "label": "Schedule Post",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "schedule_date",
+                            "label": "Schedule Date & Time",
+                            "type": "datetime",
+                            "required": true
+                        },
+                        {
+                            "key": "post_status",
+                            "label": "Status",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Future",
+                                    "value": "future"
+                                },
+                                {
+                                    "label": "Draft",
+                                    "value": "draft"
+                                }
+                            ],
+                            "default": "future"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "unschedule_post": {
+                    "key": "unschedule_post",
+                    "label": "Unschedule Post",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_post_feature_image": {
+                    "key": "update_post_feature_image",
+                    "label": "Update Post Featured Image",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "image_id",
+                            "label": "Featured Image ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "change_post_author": {
+                    "key": "change_post_author",
+                    "label": "Change Post Author",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "author_id",
+                            "label": "Author ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "trash_post": {
+                    "key": "trash_post",
+                    "label": "Trash Post / Page",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "post_type",
+                            "label": "Post Type",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "post_types",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "restore_post": {
+                    "key": "restore_post",
+                    "label": "Restore Post / Page from Trash",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "post_type",
+                            "label": "Post Type",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "post_types",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_trash_post": {
+                    "key": "delete_trash_post",
+                    "label": "Delete Trash Post / Page",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "post_type",
+                            "label": "Post Type",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "post_types",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_post": {
+                    "key": "delete_post",
+                    "label": "Delete Post / Page",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "post_type",
+                            "label": "Post Type",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "post_types",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_posts_all": {
+                    "key": "get_posts_all",
+                    "label": "Get Post (All)",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_post_single": {
+                    "key": "get_post_single",
+                    "label": "Get Post (Single)",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_posts_by_post_type": {
+                    "key": "get_posts_by_post_type",
+                    "label": "Get Posts by Post Type",
+                    "schema": [
+                        {
+                            "key": "post_type",
+                            "label": "Post Type",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "post_types",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_posts_by_metadata": {
+                    "key": "get_posts_by_metadata",
+                    "label": "Get Posts by Metadata",
+                    "schema": [
+                        {
+                            "key": "post_type",
+                            "label": "Post Type",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "post_types",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_posts_metadata_all": {
+                    "key": "get_posts_metadata_all",
+                    "label": "Get Post Metadata (All)",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_post_metadata_single": {
+                    "key": "get_post_metadata_single",
+                    "label": "Get Post Metadata (Single)",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "meta_kry",
+                            "label": "Post Meta Key",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_post_permalink": {
+                    "key": "get_post_permalink",
+                    "label": "Get Post Permalink",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_post_content": {
+                    "key": "get_post_content",
+                    "label": "Get Post Content",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_post_excerpt": {
+                    "key": "get_post_excerpt",
+                    "label": "Get Post Excerpt",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_post_status": {
+                    "key": "get_post_status",
+                    "label": "Get Post Status",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_post_type_all": {
+                    "key": "get_post_type_all",
+                    "label": "Get Post Type (All)",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_post_type_single": {
+                    "key": "get_post_type_single",
+                    "label": "Get Post Type (Single Post)",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "register_post_type": {
+                    "key": "register_post_type",
+                    "label": "Register Post Type",
+                    "schema": [
+                        {
+                            "key": "slug",
+                            "label": "Post Type Slug",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "label",
+                            "label": "Label",
+                            "type": "text",
+                            "required": false,
+                            "default": ""
+                        },
+                        {
+                            "key": "hierarchical",
+                            "label": "Hierarchy (Category Style)",
+                            "type": "boolean",
+                            "required": false
+                        },
+                        {
+                            "key": "public",
+                            "label": "Public",
+                            "type": "boolean",
+                            "required": false,
+                            "default": true
+                        },
+                        {
+                            "key": "show_in_rest",
+                            "label": "Show in REST API",
+                            "type": "boolean",
+                            "required": false,
+                            "default": true
+                        },
+                        {
+                            "key": "show_ui",
+                            "label": "Show UI",
+                            "type": "boolean",
+                            "required": false,
+                            "default": true
+                        },
+                        {
+                            "key": "show_in_menu",
+                            "label": "Show In Menu",
+                            "type": "boolean",
+                            "required": false,
+                            "default": true
+                        },
+                        {
+                            "key": "show_in_nav_menus",
+                            "label": "Show In Nav Menus",
+                            "type": "boolean",
+                            "required": false,
+                            "default": true
+                        },
+                        {
+                            "key": "show_in_admin_bar",
+                            "label": "Show In Admin Bar",
+                            "type": "boolean",
+                            "required": false,
+                            "default": true
+                        },
+                        {
+                            "key": "menu_icon",
+                            "label": "Menu Icon",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "menu_position",
+                            "label": "Menu Position",
+                            "type": "number",
+                            "required": false
+                        },
+                        {
+                            "key": "supports",
+                            "label": "Supports",
+                            "type": "multiselect",
+                            "options": [
+                                {
+                                    "label": "Title",
+                                    "value": "title"
+                                },
+                                {
+                                    "label": "Editor",
+                                    "value": "editor"
+                                },
+                                {
+                                    "label": "Thumbnail",
+                                    "value": "thumbnail"
+                                },
+                                {
+                                    "label": "Excerpt",
+                                    "value": "excerpt"
+                                },
+                                {
+                                    "label": "Comments",
+                                    "value": "comments"
+                                },
+                                {
+                                    "label": "Revisions",
+                                    "value": "revisions"
+                                },
+                                {
+                                    "label": "Author",
+                                    "value": "author"
+                                },
+                                {
+                                    "label": "Custom-Fields",
+                                    "value": "custom-fields"
+                                }
+                            ],
+                            "default": [
+                                "title",
+                                "editor"
+                            ],
+                            "required": false
+                        },
+                        {
+                            "key": "capability_type",
+                            "label": "Capability Type",
+                            "type": "text",
+                            "required": false,
+                            "default": "post"
+                        },
+                        {
+                            "key": "description",
+                            "label": "Description",
+                            "type": "textarea",
+                            "required": false,
+                            "default": ""
+                        },
+                        {
+                            "key": "rewrite_slug",
+                            "label": "Custom URL Slug",
+                            "type": "textarea",
+                            "required": false,
+                            "default": ""
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "unregister_post_type": {
+                    "key": "unregister_post_type",
+                    "label": "Unregister Post Type",
+                    "schema": [
+                        {
+                            "key": "post_type",
+                            "label": "Post Type",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "post_types",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add_post_type_support": {
+                    "key": "add_post_type_support",
+                    "label": "Add Post Type Features",
+                    "schema": [
+                        {
+                            "key": "post_type",
+                            "label": "Post Type",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "post_types",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "features",
+                            "label": "Features (Supports)",
+                            "type": "multiselect",
+                            "options": [
+                                {
+                                    "label": "Title",
+                                    "value": "title"
+                                },
+                                {
+                                    "label": "Editor",
+                                    "value": "editor"
+                                },
+                                {
+                                    "label": "Thumbnail",
+                                    "value": "thumbnail"
+                                },
+                                {
+                                    "label": "Excerpt",
+                                    "value": "excerpt"
+                                },
+                                {
+                                    "label": "Comments",
+                                    "value": "comments"
+                                },
+                                {
+                                    "label": "Revisions",
+                                    "value": "revisions"
+                                },
+                                {
+                                    "label": "Author",
+                                    "value": "author"
+                                },
+                                {
+                                    "label": "Custom-Fields",
+                                    "value": "custom-fields"
+                                }
+                            ],
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "approve_comment": {
+                    "key": "approve_comment",
+                    "label": "Approve Comment",
+                    "schema": [
+                        {
+                            "key": "comment_id",
+                            "label": "Comment ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "unapproved_comment": {
+                    "key": "unapproved_comment",
+                    "label": "Unapproved Comment",
+                    "schema": [
+                        {
+                            "key": "comment_id",
+                            "label": "Comment ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "mark_comment_spam": {
+                    "key": "mark_comment_spam",
+                    "label": "Mark Comment as Spam",
+                    "schema": [
+                        {
+                            "key": "comment_id",
+                            "label": "Comment ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "unmark_comment_spam": {
+                    "key": "unmark_comment_spam",
+                    "label": "Unmark Comment as Spam",
+                    "schema": [
+                        {
+                            "key": "comment_id",
+                            "label": "Comment ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "trash_comment": {
+                    "key": "trash_comment",
+                    "label": "Trash Comment",
+                    "schema": [
+                        {
+                            "key": "comment_id",
+                            "label": "Comment ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "restore_comment": {
+                    "key": "restore_comment",
+                    "label": "Restore Comment from Trash",
+                    "schema": [
+                        {
+                            "key": "comment_id",
+                            "label": "Comment ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_trash_comment": {
+                    "key": "delete_trash_comment",
+                    "label": "Delete Trash Comment",
+                    "schema": [
+                        {
+                            "key": "comment_id",
+                            "label": "Comment ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "activate_plugin": {
+                    "key": "activate_plugin",
+                    "label": "Activate Plugin",
+                    "schema": [
+                        {
+                            "key": "plugin",
+                            "label": "Inactive Plugin",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "inactive_plugins",
+                                "select": [
+                                    "file",
+                                    "name"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "deactivate_plugin": {
+                    "key": "deactivate_plugin",
+                    "label": "Deactivate Plugin",
+                    "schema": [
+                        {
+                            "key": "plugin",
+                            "label": "Active Plugin",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "active_plugins",
+                                "select": [
+                                    "file",
+                                    "name"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "switch_theme": {
+                    "key": "switch_theme",
+                    "label": "Theme Switch",
+                    "schema": [
+                        {
+                            "key": "theme",
+                            "label": "Theme Switch",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "deactivate_theme",
+                                "select": [
+                                    "file",
+                                    "name"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add_media_image": {
+                    "key": "add_media_image",
+                    "label": "Add New Image",
+                    "schema": [
+                        {
+                            "key": "image_url",
+                            "label": "Image URL",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "image_title",
+                            "label": "Image Title",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "alternative_text",
+                            "label": "Alternative Text",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "caption",
+                            "label": "Caption",
+                            "type": "textarea",
+                            "required": false
+                        },
+                        {
+                            "key": "description",
+                            "label": "Description",
+                            "type": "textarea",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_media": {
+                    "key": "delete_media",
+                    "label": "Delete Media",
+                    "schema": [
+                        {
+                            "key": "media_id",
+                            "label": "Media ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "force_delete",
+                            "label": "Force Delete",
+                            "type": "boolean",
+                            "default": false,
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "rename_media": {
+                    "key": "rename_media",
+                    "label": "Rename Media",
+                    "schema": [
+                        {
+                            "key": "media_id",
+                            "label": "Media ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "new_title",
+                            "label": "New Title",
+                            "type": "expression",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_media_all": {
+                    "key": "get_media_all",
+                    "label": "Get Media (All)",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_media_by_title": {
+                    "key": "get_media_by_title",
+                    "label": "Get Media (By Title)",
+                    "schema": [
+                        {
+                            "key": "title",
+                            "label": "Media Title",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_media_by_id": {
+                    "key": "get_media_by_id",
+                    "label": "Get Media (By ID)",
+                    "schema": [
+                        {
+                            "key": "media_id",
+                            "label": "Media ID",
                             "type": "expression",
                             "required": true
                         }
@@ -1660,26 +3036,208 @@
             "name": "Webhook",
             "icon": "",
             "category": "app",
+            "triggers": [],
+            "actions": []
+        },
+        "storeengine": {
+            "slug": "storeengine",
+            "name": "Storeengine",
+            "icon": "",
+            "category": "app",
             "triggers": {
-                "incoming": {
-                    "key": "incoming",
-                    "label": "Incoming Webhook",
-                    "hook": null,
+                "product_purchased": {
+                    "key": "product_purchased",
+                    "label": "Product Purchased",
+                    "hook": "storeengine/checkout/after_place_order",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "created_product": {
+                    "key": "created_product",
+                    "label": "Created Product",
+                    "hook": "storeengine/product/created",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "updated_product": {
+                    "key": "updated_product",
+                    "label": "Updated Product",
+                    "hook": "storeengine/product/updated",
                     "schema": [
                         {
-                            "key": "path",
-                            "label": "Webhook Path",
-                            "type": "text",
-                            "required": true,
-                            "help": "Example: order-created"
+                            "key": "product_id",
+                            "label": "ID",
+                            "type": "expression",
+                            "required": true
                         }
                     ],
                     "outputs": [
                         "main"
                     ]
+                },
+                "order_status_update": {
+                    "key": "order_status_update",
+                    "label": "Order Status Updated",
+                    "hook": "storeengine/order/status_changed",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "order_status_on_hold": {
+                    "key": "order_status_on_hold",
+                    "label": "Order Status Set To On Hold",
+                    "hook": "storeengine/order_status_on_hold",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "order_status_pending_payment": {
+                    "key": "order_status_pending_payment",
+                    "label": "Order Status Set To Pending Payment",
+                    "hook": "storeengine/order_status_pending_payment",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "order_status_processing": {
+                    "key": "order_status_processing",
+                    "label": "Order Status Set To Processing",
+                    "hook": "storeengine/order_status_processing",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "order_status_completed": {
+                    "key": "order_status_completed",
+                    "label": "Order Status Set To Completed",
+                    "hook": "storeengine/order_status_completed",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "order_status_cancelled": {
+                    "key": "order_status_cancelled",
+                    "label": "Order Status Set To Cancelled",
+                    "hook": "storeengine/order_status_cancelled",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "order_status_draft": {
+                    "key": "order_status_draft",
+                    "label": "Order Status Set To Draft",
+                    "hook": "storeengine/order_status_auto-draft",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "order_status_trash": {
+                    "key": "order_status_trash",
+                    "label": "Order Status Set To Trash",
+                    "hook": "storeengine/order_status_trash",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "order_customer_note_added": {
+                    "key": "order_customer_note_added",
+                    "label": "Customer Note Added to Order",
+                    "hook": "storeengine/order/new_customer_note",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "order_customer_note_deleted": {
+                    "key": "order_customer_note_deleted",
+                    "label": "Customer Note Deleted From Order",
+                    "hook": "storeengine/order/note_deleted",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "order_restored": {
+                    "key": "order_restored",
+                    "label": "Order Restored",
+                    "hook": "storeengine/order/status_changed",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
                 }
             },
-            "actions": []
+            "actions": {
+                "create_product": {
+                    "key": "create_product",
+                    "label": "Create Product",
+                    "schema": [
+                        {
+                            "key": "product_name",
+                            "label": "Product Name",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "price",
+                            "label": "Price",
+                            "type": "number",
+                            "required": true
+                        },
+                        {
+                            "key": "description",
+                            "label": "Description",
+                            "type": "textarea"
+                        },
+                        {
+                            "key": "status",
+                            "label": "Status",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Draft",
+                                    "value": "draft"
+                                },
+                                {
+                                    "label": "Publish",
+                                    "value": "publish"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_product": {
+                    "key": "update_product",
+                    "label": "Update Product",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_order": {
+                    "key": "create_order",
+                    "label": "Create Order",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
         }
     },
     "tools": {
@@ -1695,16 +3253,165 @@
                     "label": "If Condition",
                     "schema": [
                         {
-                            "key": "expression",
-                            "label": "Condition",
-                            "type": "expression",
+                            "key": "conditions",
+                            "label": "Conditions",
+                            "type": "condition_group",
                             "required": true,
-                            "help": "Example: {{post.status}} == \"publish\""
+                            "help": "Build complex conditions with AND/OR groups",
+                            "fields": [
+                                {
+                                    "key": "left",
+                                    "label": "Left Value",
+                                    "type": "expression",
+                                    "required": true
+                                },
+                                {
+                                    "key": "operator",
+                                    "label": "Operator",
+                                    "type": "select",
+                                    "options": [
+                                        {
+                                            "label": "==",
+                                            "value": "=="
+                                        },
+                                        {
+                                            "label": "!=",
+                                            "value": "!="
+                                        },
+                                        {
+                                            "label": "<",
+                                            "value": "<"
+                                        },
+                                        {
+                                            "label": ">",
+                                            "value": ">"
+                                        },
+                                        {
+                                            "label": "<=",
+                                            "value": "<="
+                                        },
+                                        {
+                                            "label": ">=",
+                                            "value": ">="
+                                        }
+                                    ],
+                                    "required": true
+                                },
+                                {
+                                    "key": "right",
+                                    "label": "Right Value",
+                                    "type": "expression",
+                                    "required": true
+                                }
+                            ],
+                            "logic_options": [
+                                "AND",
+                                "OR"
+                            ]
                         }
                     ],
                     "outputs": [
                         "true",
                         "false"
+                    ]
+                }
+            }
+        },
+        "filter": {
+            "slug": "filter",
+            "name": "Filter",
+            "icon": "",
+            "category": "tool",
+            "triggers": [],
+            "actions": {
+                "filter": {
+                    "key": "filter",
+                    "label": "Filter",
+                    "schema": [
+                        {
+                            "key": "conditions",
+                            "label": "Conditions",
+                            "type": "condition_group",
+                            "required": true,
+                            "help": "Only continue if these conditions are met",
+                            "fields": [
+                                {
+                                    "key": "left",
+                                    "label": "Left Value",
+                                    "type": "expression",
+                                    "required": true
+                                },
+                                {
+                                    "key": "operator",
+                                    "label": "Operator",
+                                    "type": "select",
+                                    "options": [
+                                        {
+                                            "label": "Equals",
+                                            "value": "=="
+                                        },
+                                        {
+                                            "label": "Not Equals",
+                                            "value": "!="
+                                        },
+                                        {
+                                            "label": "Greater Than",
+                                            "value": ">"
+                                        },
+                                        {
+                                            "label": "Less Than",
+                                            "value": "<"
+                                        },
+                                        {
+                                            "label": "Greater or Equal",
+                                            "value": ">="
+                                        },
+                                        {
+                                            "label": "Less or Equal",
+                                            "value": "<="
+                                        },
+                                        {
+                                            "label": "Contains",
+                                            "value": "contains"
+                                        },
+                                        {
+                                            "label": "Not Contains",
+                                            "value": "not_contains"
+                                        },
+                                        {
+                                            "label": "Starts With",
+                                            "value": "starts_with"
+                                        },
+                                        {
+                                            "label": "Ends With",
+                                            "value": "ends_with"
+                                        },
+                                        {
+                                            "label": "Is Empty",
+                                            "value": "is_empty"
+                                        },
+                                        {
+                                            "label": "Is Not Empty",
+                                            "value": "is_not_empty"
+                                        }
+                                    ],
+                                    "required": true
+                                },
+                                {
+                                    "key": "right",
+                                    "label": "Right Value",
+                                    "type": "expression",
+                                    "required": true
+                                }
+                            ],
+                            "logic_options": [
+                                "AND",
+                                "OR"
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
                     ]
                 }
             }

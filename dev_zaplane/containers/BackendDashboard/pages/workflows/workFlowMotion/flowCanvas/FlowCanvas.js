@@ -2,161 +2,80 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
     ReactFlow,
     addEdge,
-    useNodesState,
-    useEdgesState,
     Controls,
     Background,
-    useReactFlow,
+    ControlButton,
 } from "@xyflow/react";
 import "@xyflow/react/dist/base.css";
 import { __ } from '@wordpress/i18n';
-
-
-import CustomEdge from "../customEdge/CustomEdge";
-import ActionDrawer from "../actionDrawer/ActionDrawer";
+import CustomEdge from "../CustomEdge/CustomEdge";
+import ActionDrawer from "../ActionDrawer/ActionDrawer";
 import { useFormikContext } from "formik";
-import TopBar from "@ZAPComponents/TopBar";
-import { FaChevronRight } from "react-icons/fa";
 import {
     Box,
     Flex,
-    Button,
-    Checkbox,
-    Table,
-    Badge,
-    HStack,
-    Text,
-    Tabs
 } from "@chakra-ui/react";
-import {
-    FiArrowLeft,
-    FiRefreshCw,
-    FiHelpCircle,
-} from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
-import { getAllVersion, getRunWorkFlow, getSingleWorkFlow, liveMonitor, updateWorkFlow, updateWorkFlowStatus, workFLowExction, workflowNodeListiner } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { use } from "react";
-import { showNotification } from "@ZAPRedux/Slices/notificationSlice/notificationSlice";
-import CustomNode from "../customNoe/CustomNode";
-import ZAPDrawer from "@ZAPComponents/Drawer";
-import { getRunLive, getRunTimeline, replayWorkflowRun, stopRun } from "@ZAPRedux/Slices/executionSlice/executionSlice";
-import { LucideHistory } from "lucide-react";
-import RunsTable from "./RunsTable/RunsTable";
-import VersionHistoryTable from "./VersionHistoryTable/VersionHistoryTable";
-import { LuFullscreen, LuMinimize } from "react-icons/lu";
-import { mapEdgesForBackend, mapNodesForBackend, toggleFullscreenMode } from "../helper";
-import Select from "react-select";
-;
-export default function FlowCanvas({ id }) {
-    const nodeIdRef = useRef(0);
-    const getNewNodeId = () => {
-        nodeIdRef.current += 1;
-        return `${nodeIdRef.current}`;
-    };
-    const [nodes, setNodes, onNodesChange] = useNodesState([
-        {
-            id: getNewNodeId(),
-            type: 'custom',
-            data: {
-                app: "Select an app",
-                action: 'trigger',
-                config: {}
-            },
-            position: { x: 125, y: 300 },
-        }
-    ]);
+import { toggleFullscreenMode, mapGraphFromBackend, formatTime } from "./helper";
+import ZAPLoading from "@ZAPComponents/Loading";
+import { statusOptions } from "../../helper";
+import { useFlowActions } from "@ZAPHooks/useFlowActions/useFlowActions";
+import CustomNode from "../customNode/CustomNode";
+import './styles.scss'
+import { IoSwapHorizontal, IoSwapVerticalOutline } from "react-icons/io5";
+import ZAPTooltip from "@ZAPComponents/ZAPTooltip";
+import { getSingleWorkFlow } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow";
+import FlowTopBar from "./FlowTopBar/FlowTopBar";
+
+export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdgesChange, onNodesChange, getNewNodeId, workFlow }) {
     const dispatch = useDispatch();
     const navigate = useNavigate()
-    const [edges, setEdges, onEdgesChange] = useEdgesState([]);
     const [drawerOpen, setDrawerOpen] = useState(false);
-    const [selectedNode, setSelectedNode] = useState(null);
-    const [activeEdgeId, setActiveEdgeId] = useState(null);
-    const [selectedApp, setSelectedApp] = useState(null);
-    const [selectedEvent, setSelectedEvent] = useState(null);
-    const { values, setFieldValue } = useFormikContext()
+    const { values, setFieldValue, handleSubmit, } = useFormikContext()
     const [loading, setLoading] = useState(false);
-    const { data, runs, versions } = useSelector((state) => state.workflows);
-    const singleData = data[0]
-    const isFlowLoaded = useRef(false);
-    const GAP = 220;
     const containerRef = useRef(null);
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [activeDrawer, setActiveDrawer] = useState(null);
-    useEffect(() => {
-        if (!singleData?.graph?.nodes?.length) return;
-        const mappedNodes = (singleData.graph.nodes || []).map((node) => ({
-            ...node,
-            type: "custom",
-            data: {
-                ...node.data,
-                action: node.type,
-            },
-        }));
+    const { versions } = useSelector((state) => state.workflows);
+    //if we menage layout syestem then we need to save databse this value
+    const [canvasLayout, setCanvasLayout] = useState("LR")
 
-        const mappedEdges = (singleData.graph.edges || []).map((edge) => ({
-            ...edge,
-            type: "custom",
-        }));
-        setNodes(mappedNodes);
-        setEdges(mappedEdges);
-    }, [singleData?.graph]);
+    useEffect(() => {
+        if (!workFlow?.graph) return;
+        const { nodes, edges } = mapGraphFromBackend(workFlow.graph);
+        if (!nodes.length) return
+        setNodes(nodes);
+        setEdges(edges);
+    }, [workFlow?.graph]);
+
     const [drawerContext, setDrawerContext] = useState({
         source: null,
         node: null,
         edge: null,
     });
+    const activeVersionId = versions?.find(v => v.is_active)?.id;
     useEffect(() => {
         setLoading(true);
         dispatch(getSingleWorkFlow(id)).finally(() => setLoading(false));
 
-    }, [id]);
+    }, [id, activeVersionId]);
+    const {
+        updateNodeData,
+        deleteNode,
+        createActionNode,
+        openDrawerForNode,
+        openDrawerFromAdd,
+        onLayout
+    } = useFlowActions({ nodes, setNodes, edges, setEdges, drawerContext, getNewNodeId, setDrawerContext, setDrawerOpen, setCanvasLayout, canvasLayout });
 
-    const onSubmitHandler = async () => {
-        const payload = {
-            nodes: mapNodesForBackend(nodes)
-            , edges: mapEdgesForBackend(edges),
-        }
-        const statusPaylod = {
-            status: values?.status,
-            id: id,
-        }
-        if (values.status && values.status !== singleData?.workflow.status) {
-            await dispatch(updateWorkFlowStatus(statusPaylod));
-        }
-        await dispatch(
-            updateWorkFlow({ id, payload })
-        );
-
-
-
-    };
-    const { screenToFlowPosition } = useReactFlow();
-    const openDrawerForNode = (node) => {
-        setDrawerContext({
-            source: "node",
-            node,
-            edge: null,
-        });
-        setDrawerOpen(true);
-    };
     const onAddNode = (edgeId) => {
-        setActiveEdgeId(edgeId);
         const edge = edges.find((e) => e.id === edgeId);
         setDrawerContext({
             source: "edge",
             node: null,
             edge,
         })
-        setDrawerOpen(true);
-    };
-    const openDrawerFromAdd = (node) => {
-        ;
-        setDrawerContext({
-            source: "add",
-            node: node,
-            edge: null,
-        });
         setDrawerOpen(true);
     };
     const onConnect = useCallback(
@@ -174,110 +93,8 @@ export default function FlowCanvas({ id }) {
         setEdges((eds) => eds.filter((e) => e.id !== edgeId));
     };
 
-    const createActionNode = (actionData) => {
-        const { edge, node } = drawerContext;
-        let sourceNode = null;
-        let targetNode = null;
-        if (edge) {
-            sourceNode = nodes.find((n) => n.id === edge.source);
-            targetNode = nodes.find((n) => n.id === edge.target);
-            if (!sourceNode || !targetNode) return;
-        }
-
-        if (!edge && node) {
-            sourceNode = nodes.find((n) => n.id === node.id);
-            if (!sourceNode) return;
-        }
-        const newX = sourceNode.position.x + GAP;
-        const newY = sourceNode.position.y;
-
-        const newNodeId = getNewNodeId();
-        const newNode = {
-            id: newNodeId,
-            type: "custom",
-            position: { x: newX, y: newY },
-            data: {
-                action: "action",
-                // order: nodes.length + 1,
-                ...actionData,
-            },
-        };
-        const updatedNodes = nodes.map((n) => {
-            if (n.position.x >= newX) {
-                return {
-                    ...n,
-                    position: {
-                        ...n.position,
-                        x: n.position.x + GAP,
-                    },
-                };
-            }
-            return n;
-        });
-
-        let newEdges = [...edges];
-
-        if (edge) {
-            newEdges = [
-                ...edges.filter((e) => e.id !== edge.id),
-                {
-                    id: `e${edge.source}-${newNodeId}`,
-                    source: edge.source,
-                    target: newNodeId,
-                    type: "custom",
-                },
-                {
-                    id: `e${newNodeId}-${edge.target}`,
-                    source: newNodeId,
-                    target: edge.target,
-                    type: "custom",
-                },
-            ];
-        } else {
-            newEdges = [
-                ...edges,
-                {
-                    id: `e${sourceNode.id}-${newNodeId}`,
-                    source: sourceNode.id,
-                    target: newNodeId,
-                    type: "custom",
-                },
-            ];
-        }
-
-        setNodes([...updatedNodes, newNode]);
-        setEdges(newEdges);
-    };
-
-    const updateNodeData = (updatedData) => {
-        setNodes((nds) =>
-            nds.map((n) => {
-                if (n.id === drawerContext.node?.id) {
-                    return {
-                        ...n,
-                        data: {
-                            ...n.data,
-                            ...updatedData,
-                        },
-                    };
-                }
-                return n;
-            })
-        );
-    };
-    const deleteNode = useCallback((nodeId) => {
-        setNodes((nds) => nds.filter((n) => n.id !== nodeId));
-
-        setEdges((eds) =>
-            eds.filter(
-                (e) => e.source !== nodeId && e.target !== nodeId
-            )
-        );
-    }, []);
-
-    console.log(nodes, 'all nodes');
+    console.log(nodes, 'all nodes',);
     console.log(edges, 'all edges');
-
     const nodeTypes = {
         custom: (props) => (
             <CustomNode
@@ -289,6 +106,7 @@ export default function FlowCanvas({ id }) {
                     deleteNode: () => deleteNode(props.id),
 
                 }}
+                canvasLayout={canvasLayout}
             />
         ),
     };
@@ -301,6 +119,7 @@ export default function FlowCanvas({ id }) {
             />
         ),
     };
+    //listiner
 
     // useEffect(() => {
     //     const interval = setInterval(() => {
@@ -308,175 +127,113 @@ export default function FlowCanvas({ id }) {
     //     }, 5000);
 
     //     return () => clearInterval(interval);
-    // }, []);
-    const statusOptions = [
-        { value: "active", label: "Active" },
-        { value: "paused", label: "Paused" },
-        { value: "draft", label: "draft" },
-    ];
+    // }, []);  
     return (
-        <div
+        <Box
             ref={containerRef}
             className="zaplane_flowcanvas"
-            style={{
-                flex: 1, height: "100vh",
-                marginRight: activeDrawer ? "497px" : "0px",
-                transition: "margin-right 0.4s ease",
-
-            }}
+            flex="1"
+            height="100vh"
+            marginRight={activeDrawer ? "497px" : "0px"}
+            transition="margin-right 0.4s ease"
         >
 
-            <TopBar
-                leftContent={() => (
-                    <>
-                        <Button variant="outline" onClick={() => navigate(-1)}>
-                            <FiArrowLeft />
-                        </Button>
-                        <Text fontSize="md" fontWeight="medium">
-                            {singleData?.workflow?.title || __("Untitled Workflow", "zaplane")}
-                        </Text>
-                        <Button size="sm" variant="outline"
-                            onClick={() => dispatch(workflowNodeListiner(id))}>
-                            {__("Runs ", "zaplane")}
-                        </Button>
-                        <Button size="sm" variant="outline"
-                            onClick={() => dispatch(workflowNodeListiner(id))}>
-                            {__("Stop", "zaplane")}
-                        </Button>
-                    </>
-                )}
-                rightContent={() => (
-                    <>
-                        <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => toggleFullscreenMode(containerRef, isFullscreen, setIsFullscreen)}
-                        >
-                            {isFullscreen ? <LuMinimize /> : <LuFullscreen />}
-                        </Button>
-                        <ZAPDrawer
-                            title="Log History"
-                            size="md"
-                            open={activeDrawer === "logs"}
-                            onClose={() => setActiveDrawer(null)}
-                            trigger={
-                                <Button size="sm" variant="outline"
-                                    onClick={() => {
-                                        dispatch(getRunWorkFlow(id))
-                                        setActiveDrawer("logs")
-                                    }}
-
-                                >
-                                    {__("Logs ", "zaplane")}
-                                </Button>
-                            }>
-                            <Flex gap="5px">
-                                <Button size="sm" variant="outline"
-                                    onClick={() => dispatch(getRunWorkFlow(id))}>
-                                    {__("🔄 Refresh ", "zaplane")}
-                                </Button>
-                                <Button size="sm" variant="outline"
-                                    onClick={() => {
-                                        const paylod = {
-                                            workflow_hash: singleData?.version?.hash,
-                                        }
-                                        console.log(paylod, "pp");
-                                        dispatch(workFLowExction(paylod))
-                                    }}>
-                                    {__("🔄 Replay ", "zaplane")}
-                                </Button>
-                            </Flex>
-                            <RunsTable
-                                runs={runs}
-                            />
-
-
-                        </ZAPDrawer>
-                        <ZAPDrawer
-                            title="Version History "
-                            open={activeDrawer === "history"}
-                            onClose={() => setActiveDrawer(null)}
-                            trigger={
-                                <Text margin='0' cursor="pointer" onClick={() => {
-                                    setActiveDrawer("history");
-                                    dispatch(getAllVersion(id))
-                                }
-                                }> <LucideHistory /></Text>
-
-                            }>
-
-                            <VersionHistoryTable
-                                versions={versions}
-                                id={id}
-
-                            />
-
-                        </ZAPDrawer>
-                        <Select
-                            options={statusOptions}
-                            value={
-                                values?.status
-                                    ? statusOptions.find(opt => opt.value === values.status)
-                                    : statusOptions.find(opt => opt.value === singleData?.workflow?.status)
-                            }
-
-                            onChange={(selected) =>
-                                setFieldValue('status', selected.value)}
-                            isClearable={false}
-                            isSearchable={false}
-                            placeholder="Select status"
-                        />
-                        <Button
-                            size="sm"
-                            bg="black"
-                            color="white"
-                            _hover={{ bg: "gray.800" }}
-                            onClick={() => onSubmitHandler()}
-                        >
-                            {__("Update", "zaplane")}
-                        </Button>
-                    </>
-                )}
+            <FlowTopBar
+                navigate={navigate}
+                workFlow={workFlow}
+                isFullscreen={isFullscreen}
+                toggleFullscreen={() =>
+                    toggleFullscreenMode(containerRef, isFullscreen, setIsFullscreen)
+                }
+                id={id}
+                values={values}
+                setFieldValue={setFieldValue}
+                handleSubmit={handleSubmit}
+                activeDrawer={activeDrawer}
+                setActiveDrawer={setActiveDrawer}
             />
-            <Box>
 
-            </Box>
-            <ReactFlow
-                nodes={nodes}
-                edges={edges}
-                nodeTypes={nodeTypes}
-                edgeTypes={edgeTypes}
-                isValidConnection={isValidConnection}
-                onNodesChange={onNodesChange}
-                onEdgesChange={onEdgesChange}
-                onConnect={onConnect}
-                // fitView
-                // fitViewOnInit
-                panOnDrag
-                zoomOnScroll
-                zoomOnDoubleClick
-                nodesDraggable
-                nodesConnectable
-                elementsSelectable
-                minZoom={0.5}
-            >
-                <Background />
-                <Controls />
-            </ReactFlow>
+            {
+                loading ? <ZAPLoading /> : <ReactFlow
+                    nodes={nodes}
+                    edges={edges}
+                    nodeTypes={nodeTypes}
+                    edgeTypes={edgeTypes}
+                    isValidConnection={isValidConnection}
+                    onNodesChange={onNodesChange}
+                    onEdgesChange={onEdgesChange}
+                    onConnect={onConnect}
+                    fitView
+                    fitViewOnInit
+                    panOnDrag
+                    zoomOnScroll
+                    zoomOnDoubleClick
+                    nodesDraggable
+                    nodesConnectable
+                    elementsSelectable
+                    minZoom={0.5}
+                >
+
+                    <Background />
+                    <Flex className="zaplane-canvas-layout-icon">
+                        <ZAPTooltip content={__("Vertical layout", "zaplane")
+
+                        }
+                            positioning={{
+                                placement: "top",
+                                offset: {
+                                    mainAxis: 8,
+                                    crossAxis: 25,
+                                }
+                            }}>
+                            <ControlButton
+                                onClick={() => onLayout("TB")}
+                                className={`react-flow__controls-button ${canvasLayout === "TB" ? "zaplane-layout-active" : ""
+                                    }`}
+
+                            >
+                                <IoSwapVerticalOutline size={16} />
+                            </ControlButton>
+                        </ZAPTooltip>
+                        <ZAPTooltip content={__("Horizontal layout", "zaplane")}
+                         positioning={{
+                                placement: "top",
+                                offset: {
+                                    mainAxis: 8,
+                                    crossAxis: 25,
+                                }
+                            }}>
+                            <ControlButton
+                                onClick={() => onLayout("LR")}
+                                className={`react-flow__controls-button ${canvasLayout === "LR" ? "zaplane-layout-active" : ""
+                                    }`}
+                            >
+                                <IoSwapHorizontal size={16} />
+                            </ControlButton>
+                        </ZAPTooltip >
+
+                    </Flex>
+                    <Controls
+                        position="top-left"
+                        className="zaplane-canvas-controls"
+                    />
+                </ReactFlow>
+            }
+
             <ActionDrawer
                 open={drawerOpen}
+                isFullscreen={isFullscreen}
                 onClose={() => {
                     setDrawerOpen(false)
-                    setActiveEdgeId(null);
                     setDrawerContext({ source: null, node: null, edge: null });
                 }}
-                setSelectedNode={setSelectedNode}
                 context={drawerContext}
                 createActionNode={createActionNode}
                 updateNodeData={updateNodeData}
-                singleData={singleData}
+                workFlow={workFlow}
 
             />
-        </div>
+
+        </Box>
     );
 }

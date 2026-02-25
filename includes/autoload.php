@@ -13,7 +13,7 @@ class Autoload {
     private static ?self $instance = null;
 
     /**
-     * Namespace => directory map
+     * Namespace => directories map (supports multiple directories per namespace)
      */
     private array $autoload_directories = [];
 
@@ -31,14 +31,21 @@ class Autoload {
      * Add namespace directory mapping
      */
     public function add_namespace_directory(string $namespace, string $directory): void {
-        $this->autoload_directories[rtrim($namespace, '\\')] = rtrim($directory, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+        $ns = rtrim($namespace, '\\');
+        $dir = rtrim($directory, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+
+        if (!isset($this->autoload_directories[$ns])) {
+            $this->autoload_directories[$ns] = [];
+        }
+
+        $this->autoload_directories[$ns][] = $dir;
     }
 
     /**
      * Autoload callback
      */
     public function autoload(string $class): void {
-        foreach ($this->autoload_directories as $namespace => $directory) {
+        foreach ($this->autoload_directories as $namespace => $directories) {
             if (0 !== strpos($class, $namespace)) {
                 continue;
             }
@@ -47,7 +54,7 @@ class Autoload {
             $relative_class = substr($class, strlen($namespace) + 1);
 
             // Convert namespace to folder structure + kebab-case file
-            $file = $directory . strtolower(
+            $relative_path = strtolower(
                 preg_replace(
                     ['/([a-z])([A-Z])/', '/_/', '/\\\/'],
                     ['$1-$2', '-', DIRECTORY_SEPARATOR],
@@ -55,8 +62,12 @@ class Autoload {
                 )
             ) . '.php';
 
-            if (is_readable($file)) {
-                require_once $file;
+            foreach ($directories as $directory) {
+                $file = $directory . $relative_path;
+                if (is_readable($file)) {
+                    require_once $file;
+                    return;
+                }
             }
         }
     }
@@ -70,7 +81,8 @@ class Autoload {
 
         // Default namespace mappings
         $this->add_namespace_directory('Zaplane', ZAPLANE_ROOT_DIR_PATH . 'includes/');
-        $this->add_namespace_directory('Zaplane\\Integrations', ZAPLANE_ROOT_DIR_PATH . 'integrations/'); // <-- your root integrations
+        $this->add_namespace_directory('Zaplane\\Integration', ZAPLANE_ROOT_DIR_PATH . 'integrations/');
+        $this->add_namespace_directory('Zaplane\\Integration', ZAPLANE_ROOT_DIR_PATH . 'integration/');
     }
 }
 

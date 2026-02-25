@@ -151,4 +151,78 @@ trait QueryTrait {
         }
         return $items;
     }
+
+    public static function query_active_plugins( $q ) {
+        if ( ! function_exists( 'is_plugin_active' ) ) {
+            require_once ABSPATH . 'wp-admin/includes/plugin.php';
+        }
+
+        $all_plugins   = get_plugins();
+        $active_plugin = get_option( 'active_plugins', [] );
+        $result        = [];
+
+        foreach ( $active_plugin as $plugin ) {
+            if ( ! isset( $all_plugins[ $plugin ] ) ) {
+                continue;
+            }
+
+            if ( $plugin === 'zaplane/zaplane.php' ) {
+                continue;
+            }
+
+            $result[] = [
+                'file' => $plugin,
+                'name' => $all_plugins[ $plugin ][ 'Name' ],
+            ];
+        }
+
+        return $result;
+    }
+
+    public static function query_deactivate_plugins( $q ) {
+        if ( ! function_exists( 'get_plugins' ) ) {
+            require_once ABSPATH . 'wp-admin/includes/plugin.php';
+        }
+
+        $all_plugins   = get_plugins();
+        $active_plugin = get_option( 'active_plugins', [] );
+        $result        = [];
+
+        foreach ( $all_plugins as $inactive_plugin => $plugin ) {
+            if ( in_array( $inactive_plugin, $active_plugin, true  ) ) {
+                continue;
+            }
+
+            if ( $inactive_plugin === 'zaplane/zaplane.php' ) {
+                continue;
+            }
+
+            $result[] = [
+                'file' => $inactive_plugin,
+                'name' => $plugin[ 'Name' ],
+            ];
+        }
+
+        return $result;
+    }
+
+    public static function query_deactivate_theme( $q ) {
+        $all_themes   = wp_get_themes();
+        $active_theme = wp_get_theme()->get_stylesheet();
+        $result       = [];
+
+        foreach ( $all_themes as $stylesheet => $theme ) {
+        
+            if ( $stylesheet === $active_theme ) {
+                continue;
+            }
+
+            $result[] = [
+                'file' => $stylesheet,
+                'name' => $theme->get( 'Name' ),
+            ];
+        }
+
+        return $result;
+    }
 }
