@@ -27,21 +27,29 @@ class Profilebuilder extends IntegrationBase {
     public static function resolve_trigger(array $node, array $args) {
         switch ($node['event']) {
             case 'wppb_register_success':
-                $form_fields = $args[0] ?? [];
-                $form_meta = $args[2] ?? [];
-  ray($args);
-                return [
-                    'form_id' => 'hello',
-               
-                ];
-                 case 'wppb_edit_profile_success':
-                $form_fields = $args[0] ?? [];
-                $form_meta = $args[2] ?? [];
-                 ray($args);
-                return [
-                    'submitted_at' => current_time('mysql'),
-                ];
+                $form_data = $args[0] ?? [];
+            if(!$form_data){
+            return [] ;
+          }
+          $result  = [];
+          foreach($form_data as $form_field  => $value){
+            $result[$form_field]  = $value ;
+          }
+          return $result ;
+
+     case 'wppb_edit_profile_success':
+           $form_data = $args[0] ?? [];
+            if(!$form_data){
+            return [] ;
+          }
+          $result  = [];
+          foreach($form_data as $form_field  => $value){
+            $result[$form_field]  = $value ;
+          }
+          return $result ;
+
                  case 'wppb_activate_user':
+                    //need to ceck later
                 $form_fields = $args[0] ?? [];
                 $form_meta = $args[2] ?? [];
    ray($args);
@@ -50,17 +58,20 @@ class Profilebuilder extends IntegrationBase {
                     'submitted_at' => current_time('mysql'),
                 ];
                  case 'wppb_after_sending_email':
-                $form_fields = $args[0] ?? [];
-                $form_meta = $args[2] ?? [];
-ray($args);
+                $email_data = $args ?? [];
+                if(!$email_data){
+                    return [] ;
+                }
                 return [
-                
-                    'submitted_at' => current_time('mysql'),
+                    'mail_to' => $email_data[1] ?? '',
+                    'notify_message' => $email_data[2] ?? '',
+                    'message_body' => $email_data[3] ?? '',
+                    'current_time' => current_time('mysql'),
                 ];
                  case 'wppb_after_user_approval':
                 $form_fields = $args[0] ?? [];
                 $form_meta = $args[2] ?? [];
-ray($args);
+             ray($args);
                 return [
                
                     'submitted_at' => current_time('mysql'),
@@ -68,7 +79,7 @@ ray($args);
                  case 'wppb_after_user_unapproval':
                 $form_fields = $args[0] ?? [];
                 $form_meta = $args[2] ?? [];
-ray($args);
+            ray($args);
                 return [
                  
                     'submitted_at' => current_time('mysql'),
