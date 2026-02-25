@@ -22,4 +22,5 @@ return [
     'beaverbuilder' => ['file' => 'beaverbuilder.php', 'class' => \Zaplane\Integrations\Beaverbuilder::class],
     'metform' => ['file' => 'metform.php', 'class' => \Zaplane\Integrations\Metform::class],
     'easydigitaldownload' => ['file' => 'easydigitaldownload.php', 'class' => \Zaplane\Integrations\Easydigitaldownload::class],
+    'profilebuilder' => ['file' => 'profilebuilder.php', 'class' => \Zaplane\Integrations\Profilebuilder::class],
 ];
