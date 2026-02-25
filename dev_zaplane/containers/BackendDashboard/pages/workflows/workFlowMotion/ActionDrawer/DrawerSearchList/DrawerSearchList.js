@@ -16,10 +16,12 @@ const DrawerSearchList = ({ searchList, setMode, setSelectedItem, setSearch }) =
             setSelectedItem(item);
             setSearch("");
           }}
+          height='50px'
+          p="4px"
           background="var(--zaplane-background)"
-          // _hover={{ bg: "var(--zaplane-body-background)" }}
+          _hover={{ bg: "#F6F7F8" }}
         >
-          <Flex gap='12px'>
+          <Flex gap='12px' alignItems='center'>
             <Flex w="40px"
               h="40px"
               bg='var(--zaplane-background)'

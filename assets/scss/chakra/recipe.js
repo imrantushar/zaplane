@@ -8,7 +8,8 @@ export const primaryBtn = {
 export const secondPrimaryBtn = {
     bg: "var(--zaplane-second-primary)",
     color: "var(--zaplane-primary)",
-    fontWeight: "600",
+    fontWeight: "500",
+    fontSize:'14px'
 
 }
 

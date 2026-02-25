@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, Text, Flex } from "@chakra-ui/react";
+import { Button, Text, Flex, Input, Box } from "@chakra-ui/react";
 import TopBar from "@ZAPComponents/TopBar";
 import { FiArrowLeft } from "react-icons/fi";
 import { TfiReload } from "react-icons/tfi";
@@ -24,6 +24,7 @@ import '../styles.scss'
 import { LiaStopCircleSolid } from "react-icons/lia";
 import { CiPlay1 } from "react-icons/ci";
 import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
+import { useFormikContext } from "formik";
 
 export default function FlowTopBar({
   navigate,
@@ -37,7 +38,7 @@ export default function FlowTopBar({
   activeDrawer,
   setActiveDrawer,
 }) {
-  const { runs,  apiCountdown, apiRequestRunning } = useSelector((state) => state.workflows);
+  const { apiCountdown, apiRequestRunning } = useSelector((state) => state.workflows);
   const dispatch = useDispatch()
   useApiCountdown()
   return (
@@ -49,7 +50,24 @@ export default function FlowTopBar({
               <FiArrowLeft />
             </Button>
           )}
-          <ZAPLabel label={workFlow?.workflow?.title} type={"bold"} />
+          <Box w="120px">
+            <Input
+              height='36px'
+              fontSize='14px'
+              fontWeight='500'
+              value={
+                values?.title ?? workFlow?.workflow?.title ?? "Untitled Flow"
+              }
+              onChange={(e) => setFieldValue("title", e.target.value)}
+              variant="outline"
+              border="1px solid transparent"
+              _hover={{
+                borderColor: "var(--zaplane-border-color)",
+              }}
+            // maxW="250px"
+
+            />
+          </Box>
 
           {!apiRequestRunning ? (
             <Button {...secondPrimaryBtn} h="36px" onClick={() => {
@@ -78,7 +96,8 @@ export default function FlowTopBar({
       )}
       rightContent={() => (
         <>
-          <Button size="sm" variant="outline" onClick={toggleFullscreen}>
+          <Button size="sm" variant="outline"
+            className={`${isFullscreen && "zaplane-button-actve"}`} onClick={toggleFullscreen}>
             {isFullscreen ? <LuMinimize /> : <LuFullscreen />}
           </Button>
 
@@ -91,6 +110,8 @@ export default function FlowTopBar({
             onClose={() => setActiveDrawer(null)}
             trigger={
               <Button
+                className={`zaplane-label ${activeDrawer === 'logs' && 'zaplane-button-actve'}`}
+                color='#454F59'
                 size="sm"
                 variant="outline"
                 onClick={() => {
@@ -108,7 +129,7 @@ export default function FlowTopBar({
                 color='#454F59'
                 fontWeight="500"
                 border={"none"}
-                onClick={() => dispatch(getRunWorkFlow({id}))}
+                onClick={() => dispatch(getRunWorkFlow({ id }))}
               >
                 <TfiReload />{__("Refresh", "zaplane")}
               </Button>
@@ -138,15 +159,25 @@ export default function FlowTopBar({
             isFullscreen={isFullscreen}
             onClose={() => setActiveDrawer(null)}
             trigger={
-              <Text
-                m="0"
-                cursor="pointer"
+              // <Text
+              //   m="0"
+              //   cursor="pointer"
+              //   onClick={() => {
+              //     setActiveDrawer("history");
+              //   }}
+              // >
+              //   <LucideHistory />
+              // </Text>
+              <Button
+                className={`${activeDrawer === 'history' && 'zaplane-button-actve'}`}
+                size="sm"
+                variant="outline"
                 onClick={() => {
                   setActiveDrawer("history");
                 }}
               >
                 <LucideHistory />
-              </Text>
+              </Button>
             }
           >
             <VersionHistoryTable id={id} />

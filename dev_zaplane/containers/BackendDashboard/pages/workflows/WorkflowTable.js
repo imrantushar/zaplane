@@ -259,7 +259,7 @@ const WorkflowTable = () => {
     <>
       <ListTable
         columns={columns}
-        data={allWorkFlows}
+        data={Array.isArray(allWorkFlows)? allWorkFlows : []}
         isRowSelectable={true}
         showSubHeader={false}
         showColumnFilter={false}

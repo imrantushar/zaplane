@@ -5,12 +5,13 @@ const DrawerItemButton = ({ item, onClick, showType = true, arrowIcon, icon, }) 
   return (
     <Button
       w="100%"
-      p='0'
+      p='4px'
+      height='50px'
       borderRadius="4px"
       background="var(--zaplane-background)"
       color="var(--zaplane-font-color)"
       justifyContent="space-between"
-      // _hover={{ bg: "lab(98.26% 0 0)" }}
+      _hover={{ bg: "#F6F7F8" }}
       onClick={onClick}
     >
       <Flex gap="8px">
@@ -28,7 +29,7 @@ const DrawerItemButton = ({ item, onClick, showType = true, arrowIcon, icon, }) 
             </>
           )
         }
-        <Text className="zaplane-label" fontWeight="400" as="span" m='0' display='flex' alignItems="center">{sprintf(__("%s", "zaplane"), item.name)}</Text>
+        <Text className="zaplane-label" fontWeight="400" as="span"  display='flex' alignItems="center">{sprintf(__("%s", "zaplane"), item.name)}</Text>
       </Flex>
       {arrowIcon && arrowIcon}
       {showType && item.type && (

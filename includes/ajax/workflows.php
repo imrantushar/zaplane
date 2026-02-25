@@ -264,8 +264,8 @@ class Workflows extends AbstractAjaxHandler
             return new \WP_Error('missing_params', __('ID and layout are required', 'zaplane'), ['code' => 400]);
         }
 
-        if (!in_array($layout, ['horizontal', 'vertical'])) {
-            return new \WP_Error('invalid_layout', __('Layout must be horizontal or vertical', 'zaplane'), ['code' => 400]);
+        if (!in_array($layout, ['LR', 'TB'])) {
+            return new \WP_Error('invalid_layout', __('Layout must be TR or TB', 'zaplane'), ['code' => 400]);
         }
 
         $workflow = Workflow::find($id);

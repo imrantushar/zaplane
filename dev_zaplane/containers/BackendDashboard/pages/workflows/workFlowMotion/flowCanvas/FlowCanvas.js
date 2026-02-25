@@ -25,10 +25,10 @@ import CustomNode from "../customNode/CustomNode";
 import './styles.scss'
 import { IoSwapHorizontal, IoSwapVerticalOutline } from "react-icons/io5";
 import ZAPTooltip from "@ZAPComponents/ZAPTooltip";
-import { getSingleWorkFlow } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow";
+import { getSingleWorkFlow, updateWorkFlowLayout, updateWorkFlowStatus, updateWorkFlowTitle } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow";
 import FlowTopBar from "./FlowTopBar/FlowTopBar";
 
-export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdgesChange, onNodesChange, getNewNodeId, workFlow }) {
+export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdgesChange, onNodesChange, getNewNodeId, workFlow, canvasLayout, setCanvasLayout }) {
     const dispatch = useDispatch();
     const navigate = useNavigate()
     const [drawerOpen, setDrawerOpen] = useState(false);
@@ -38,8 +38,6 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [activeDrawer, setActiveDrawer] = useState(null);
     const { versions } = useSelector((state) => state.workflows);
-    //if we menage layout syestem then we need to save databse this value
-    const [canvasLayout, setCanvasLayout] = useState("LR")
 
     useEffect(() => {
         if (!workFlow?.graph) return;
@@ -54,6 +52,7 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
         node: null,
         edge: null,
     });
+   
     const activeVersionId = versions?.find(v => v.is_active)?.id;
 
     useEffect(() => {
@@ -197,7 +196,7 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
                             </ControlButton>
                         </ZAPTooltip>
                         <ZAPTooltip content={__("Horizontal layout", "zaplane")}
-                         positioning={{
+                            positioning={{
                                 placement: "top",
                                 offset: {
                                     mainAxis: 8,
