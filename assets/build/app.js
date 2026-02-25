@@ -3463,7 +3463,8 @@ const ConnectionTable = () => {
     isLoading,
     connection,
     currentPage,
-    perPage
+    perPage,
+    totalItems
   } = (0,react_redux__WEBPACK_IMPORTED_MODULE_5__.useSelector)(state => state.connections);
   const [loading, setLoading] = (0,react__WEBPACK_IMPORTED_MODULE_6__.useState)(allConnection.length === 0);
   const handleRefresh = async (page = 1, per_page = 10) => {
@@ -3665,16 +3666,17 @@ const ConnectionTable = () => {
     // columnWidth: "100px",
     textAlign: "center"
   }];
+  console.log(totalItems, 'totalItems');
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.Fragment, {
     children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_ZAPComponents_ListTable__WEBPACK_IMPORTED_MODULE_7__["default"], {
       columns: columns,
-      data: Array.isArray(allConnection) ? allConnection : [],
+      data: allConnection,
       isRowSelectable: true,
       showSubHeader: false,
       showColumnFilter: false,
-      showPagination: true,
+      showPagination: allConnection.length >= 10,
       noDataText: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("No connections found", "zaplane"),
-      totalItems: allConnection?.length || 0,
+      totalItems: totalItems,
       dataFetchingStatus: loading,
       suffix: "connection-table",
       currentPageNumber: currentPage,
@@ -4116,7 +4118,6 @@ const RecentLogs = ({
       isRowSelectable: false,
       showSubHeader: false,
       showColumnFilter: false,
-      showPagination: false,
       noDataText: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("No logs found", "zaplane"),
       totalItems: data?.length || 0,
       dataFetchingStatus: false,
@@ -4609,7 +4610,7 @@ const Logs = () => {
         data: data,
         showSubHeader: false,
         showColumnFilter: false,
-        showPagination: false,
+        showPagination: data.length >= 10,
         noDataText: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_7__.__)("No logs found", "zaplane"),
         totalItems: data.length,
         dataFetchingStatus: isLoading,
@@ -5073,15 +5074,15 @@ const WorkflowTable = () => {
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.Fragment, {
     children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_ZAPComponents_ListTable__WEBPACK_IMPORTED_MODULE_9__["default"], {
       columns: columns,
-      data: Array.isArray(allWorkFlows) ? allWorkFlows : [],
+      data: allWorkFlows,
       isRowSelectable: true,
       showSubHeader: false,
       showColumnFilter: false,
-      showPagination: true,
+      showPagination: allWorkFlows.length >= 10,
       noDataText: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)("No workflows found", "zaplane"),
       dataFetchingStatus: loading,
       suffix: "workflow-table",
-      totalItems: allWorkFlows?.length,
+      totalItems: totalItems,
       currentPageNumber: currentPage,
       perPage: perPage,
       onChangePage: handlePageChange,
@@ -7633,6 +7634,13 @@ const RunsTable = ({
     })
     // columnWidth: "150px",
   }, {
+    name: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_11__.__)('Node Run', 'zaplane'),
+    cell: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
+      className: "zaplane-sub-title",
+      children: row.node_runs_count
+    })
+    // columnWidth: "150px",
+  }, {
     name: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_11__.__)('Action', 'zaplane'),
     cell: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_19__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.HStack, {
       justify: "flex-end",
@@ -7686,7 +7694,7 @@ const RunsTable = ({
       data: runs,
       showSubHeader: false,
       showColumnFilter: false,
-      showPagination: true,
+      showPagination: runs.length >= 10,
       noDataText: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_11__.__)("No history found", "zaplane"),
       totalItems: runs.length,
       dataFetchingStatus: loading,
@@ -7874,7 +7882,7 @@ const VersionHistoryTable = ({
     data: versions,
     showSubHeader: false,
     showColumnFilter: false,
-    showPagination: true,
+    showPagination: versions.length >= 10,
     noDataText: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_5__.__)("No history found", "zaplane"),
     totalItems: versions?.length,
     dataFetchingStatus: loading,

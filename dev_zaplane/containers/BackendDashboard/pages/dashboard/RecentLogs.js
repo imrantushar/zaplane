@@ -115,7 +115,7 @@ const RecentLogs = ({ data = [] }) => {
         isRowSelectable={false}
         showSubHeader={false}
         showColumnFilter={false}
-        showPagination={false}
+        
         noDataText={__("No logs found", "zaplane")}
         totalItems={data?.length || 0}
         dataFetchingStatus={false}

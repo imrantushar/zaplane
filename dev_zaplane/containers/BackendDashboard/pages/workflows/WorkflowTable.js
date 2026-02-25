@@ -259,15 +259,15 @@ const WorkflowTable = () => {
     <>
       <ListTable
         columns={columns}
-        data={Array.isArray(allWorkFlows) ? allWorkFlows : []}
+        data={allWorkFlows}
         isRowSelectable={true}
         showSubHeader={false}
         showColumnFilter={false}
-        showPagination={true}
+       showPagination={ allWorkFlows.length >= 10 }
         noDataText={__("No workflows found", "zaplane")}
         dataFetchingStatus={loading}
         suffix="workflow-table"
-        totalItems={allWorkFlows?.length}
+        totalItems={totalItems}
         currentPageNumber={currentPage}
         perPage={perPage}
         onChangePage={handlePageChange}

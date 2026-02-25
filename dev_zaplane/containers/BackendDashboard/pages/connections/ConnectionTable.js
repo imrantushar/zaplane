@@ -26,7 +26,7 @@ const ConnectionTable = () => {
     const dispatch = useDispatch();
     const [detailsOpen, setDetailsOpen] = useState(false);
 
-    const { allConnection = [], isLoading, connection, currentPage, perPage } = useSelector(
+    const { allConnection = [], isLoading, connection, currentPage, perPage,totalItems } = useSelector(
         (state) => state.connections
     );
     const [loading, setLoading] = useState(allConnection.length === 0);
@@ -214,18 +214,18 @@ const ConnectionTable = () => {
             textAlign: "center",
         },
     ];
-
+console.log(totalItems,'totalItems');
     return (
         <>
             <ListTable
                 columns={columns}
-                data={Array.isArray(allConnection) ? allConnection : []}
+                data={allConnection}
                 isRowSelectable={true}
                 showSubHeader={false}
                 showColumnFilter={false}
-                showPagination={true}
+                showPagination={ allConnection.length >= 10 }
                 noDataText={__("No connections found", "zaplane")}
-                totalItems={allConnection?.length || 0}
+                totalItems={totalItems}
                 dataFetchingStatus={loading}
                 suffix="connection-table"
                 currentPageNumber={currentPage}

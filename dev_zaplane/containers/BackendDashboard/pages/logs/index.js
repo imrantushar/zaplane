@@ -206,7 +206,7 @@ const Logs = () => {
                     data={data}
                     showSubHeader={false}
                     showColumnFilter={false}
-                    showPagination={false}
+                    showPagination={data.length >= 10}
                     noDataText={__("No logs found", "zaplane")}
                     totalItems={data.length}
                     dataFetchingStatus={isLoading}

@@ -27,7 +27,7 @@ import ZAPTooltip from "@ZAPComponents/ZAPTooltip";
 const RunsTable = ({ id }) => {
   const dispatch = useDispatch();
   const [activeRunId, setActiveRunId] = useState(null);
-  const {  runs = [] ,currentPage,perPage } = useSelector((state) => state.workflows);
+  const { runs = [], currentPage, perPage } = useSelector((state) => state.workflows);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [loading, setLoading] = useState(runs.length === 0);
   const handleRefresh = async (page = 1, per_page = 10) => {
@@ -77,6 +77,15 @@ const RunsTable = ({ id }) => {
       cell: (row) => (
         <Text className="zaplane-sub-title">
           {getDuration(row.started_at, row.finished_at)}
+        </Text>
+      ),
+      // columnWidth: "150px",
+    },
+    {
+      name: __('Node Run', 'zaplane'),
+      cell: (row) => (
+        <Text className="zaplane-sub-title">
+          {row.node_runs_count}
         </Text>
       ),
       // columnWidth: "150px",
@@ -141,7 +150,7 @@ const RunsTable = ({ id }) => {
         data={runs}
         showSubHeader={false}
         showColumnFilter={false}
-        showPagination={true}
+        showPagination={runs.length >= 10}
         noDataText={__("No history found", "zaplane")}
         totalItems={runs.length}
         dataFetchingStatus={loading}
