@@ -127,6 +127,16 @@ export const useFlowActions = ({
 
         setNodes([...updatedNodes, newNode]);
         setEdges(newEdges);
+        setNodes([...updatedNodes, newNode]);
+        setEdges(newEdges);
+
+        setDrawerContext({
+            source: "node", 
+            node: newNode,
+            edge: null
+        });
+
+        setDrawerOpen(true);
     };
 
     const onAddNode = (edgeId) => {
@@ -160,7 +170,7 @@ export const useFlowActions = ({
                 });
 
                 fitView({ padding: 0.2, duration: 300 });
-                setFieldValue('layout',direction);
+                setFieldValue('layout', direction);
             });
         },
         [nodes, edges, fitView, updateNodeInternals]

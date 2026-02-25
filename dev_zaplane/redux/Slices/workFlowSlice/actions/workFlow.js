@@ -59,7 +59,7 @@ export const updateWorkFlow = createAsyncThunk(
 				namespace + "workflows/" + parseInt(id),
 				payload
 			);
-			handleSliceSuccess(thunkAPI, __('Updated workflow Successfully', 'workflow'));
+			// handleSliceSuccess(thunkAPI, __('Updated workflow Successfully', 'workflow'));
 			return res.data;
 		} catch (e) {
 			handleSliceError(thunkAPI, e)

@@ -5449,20 +5449,30 @@ const ActionDrawer = ({
     setShowWarning(false);
   };
   const handleContinue = () => {
-    if (step === "select") return setStep("configure");
-    if (step === "configure") return setStep("test");
-    const payload = {
-      app: selectedItem.name,
-      name: selectedItem.name,
-      event: values.actionType,
-      hook: values.hook,
-      config: selectedActionFields.reduce((acc, f) => {
-        acc[f.key] = values[f.key];
-        return acc;
-      }, {})
-    };
-    context?.source === "node" ? updateNodeData(payload) : createActionNode(payload);
-    resetAll();
+    if (step === "select") {
+      return setStep("configure");
+    }
+    if (step === "configure") {
+      const payload = {
+        app: selectedItem.name,
+        name: selectedItem.name,
+        event: values.actionType,
+        hook: values.hook,
+        config: selectedActionFields.reduce((acc, f) => {
+          acc[f.key] = values[f.key];
+          return acc;
+        }, {})
+      };
+      if (context?.source !== "node") {
+        createActionNode(payload);
+      } else {
+        updateNodeData(payload);
+      }
+      return setStep("test");
+    }
+    if (step === "test") {
+      resetAll();
+    }
   };
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsxs)(_ZAPComponents_Drawer__WEBPACK_IMPORTED_MODULE_4__["default"], {
     open: open,
@@ -8220,10 +8230,25 @@ function Workflows({
     }]);
     setEdges([]);
   }, [id]);
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    const autoSave = async () => {
+      const payload = {
+        nodes: (0,_helper__WEBPACK_IMPORTED_MODULE_4__.mapNodesForBackend)(nodes),
+        edges: (0,_helper__WEBPACK_IMPORTED_MODULE_4__.mapEdgesForBackend)(edges),
+        is_version: false
+      };
+      await dispatch((0,_ZAPRedux_Slices_workFlowSlice_actions_workFlow__WEBPACK_IMPORTED_MODULE_9__.updateWorkFlow)({
+        id,
+        payload
+      }));
+    };
+    autoSave();
+  }, [nodes.length]);
   const onSubmitHandler = async values => {
     const payload = {
       nodes: (0,_helper__WEBPACK_IMPORTED_MODULE_4__.mapNodesForBackend)(nodes),
-      edges: (0,_helper__WEBPACK_IMPORTED_MODULE_4__.mapEdgesForBackend)(edges)
+      edges: (0,_helper__WEBPACK_IMPORTED_MODULE_4__.mapEdgesForBackend)(edges),
+      is_version: true
     };
     await dispatch((0,_ZAPRedux_Slices_workFlowSlice_actions_workFlow__WEBPACK_IMPORTED_MODULE_9__.updateWorkFlow)({
       id,
@@ -8563,6 +8588,14 @@ const useFlowActions = ({
     }
     setNodes([...updatedNodes, newNode]);
     setEdges(newEdges);
+    setNodes([...updatedNodes, newNode]);
+    setEdges(newEdges);
+    setDrawerContext({
+      source: "node",
+      node: newNode,
+      edge: null
+    });
+    setDrawerOpen(true);
   };
   const onAddNode = edgeId => {
     const edge = edges.find(e => e.id === edgeId);
@@ -9347,7 +9380,7 @@ const updateWorkFlow = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAs
 }, thunkAPI) => {
   try {
     const res = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.put(_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.namespace + "workflows/" + parseInt(id), payload);
-    (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.handleSliceSuccess)(thunkAPI, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Updated workflow Successfully', 'workflow'));
+    // handleSliceSuccess(thunkAPI, __('Updated workflow Successfully', 'workflow'));
     return res.data;
   } catch (e) {
     (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.handleSliceError)(thunkAPI, e);

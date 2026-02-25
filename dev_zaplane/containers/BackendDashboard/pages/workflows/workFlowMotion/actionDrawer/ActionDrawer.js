@@ -97,21 +97,35 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
   };
 
   const handleContinue = () => {
-    if (step === "select") return setStep("configure");
-    if (step === "configure") return setStep("test");
+    if (step === "select") {
+      return setStep("configure");
+    }
 
-    const payload = {
-      app: selectedItem.name,
-      name: selectedItem.name,
-      event: values.actionType,
-      hook: values.hook,
-      config: selectedActionFields.reduce((acc, f) => {
-        acc[f.key] = values[f.key];
-        return acc;
-      }, {}),
-    };
-    context?.source === "node" ? updateNodeData(payload) : createActionNode(payload);
-    resetAll();
+    if (step === "configure") {
+
+      const payload = {
+        app: selectedItem.name,
+        name: selectedItem.name,
+        event: values.actionType,
+        hook: values.hook,
+        config: selectedActionFields.reduce((acc, f) => {
+          acc[f.key] = values[f.key];
+          return acc;
+        }, {}),
+      };
+      if (context?.source !== "node") {
+        createActionNode(payload);
+      }
+      else {
+        updateNodeData(payload);
+      }
+
+      return setStep("test");
+    }
+
+    if (step === "test") {
+      resetAll();
+    }
   };
 
   return (
@@ -205,7 +219,7 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
                       />
                     ))
                   ) : (
-                    <ZAPLabel label={__("No configuration required for this action.", "zaplane")} type="simple"/>
+                    <ZAPLabel label={__("No configuration required for this action.", "zaplane")} type="simple" />
                   )}
                 </Flex>
               </>

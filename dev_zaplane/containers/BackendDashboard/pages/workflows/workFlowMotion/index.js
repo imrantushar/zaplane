@@ -6,7 +6,7 @@ import { mapEdgesForBackend, mapNodesForBackend } from "./helper";
 import { useDispatch, useSelector } from "react-redux";
 import { createNodeIdGenerator } from "./flowCanvas/helper";
 import { Box, Flex } from "@chakra-ui/react";
-import { updateWorkFlow, updateWorkFlowLayout, updateWorkFlowStatus, updateWorkFlowTitle } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow";
+import { updateWorkFlow, } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow";
 
 export default function Workflows({ id }) {
   const nodeIdRef = useRef(createNodeIdGenerator());
@@ -44,11 +44,23 @@ export default function Workflows({ id }) {
 
     setEdges([]);
   }, [id]);
+  useEffect(() => {
+    const autoSave = async () => {
+      const payload = {
+        nodes: mapNodesForBackend(nodes),
+        edges: mapEdgesForBackend(edges),
+        is_version: false
+      };
 
+      await dispatch(updateWorkFlow({ id, payload }));
+    };
+    autoSave();
+  }, [nodes.length]);
   const onSubmitHandler = async (values) => {
     const payload = {
       nodes: mapNodesForBackend(nodes)
       , edges: mapEdgesForBackend(edges),
+      is_version: true
     }
     await dispatch(
       updateWorkFlow({ id, payload })
@@ -60,7 +72,7 @@ export default function Workflows({ id }) {
         <Formik
           initialValues={
             {
-              layout:'LR'
+              layout: 'LR'
             }}
           onSubmit={onSubmitHandler}
         >
@@ -68,7 +80,7 @@ export default function Workflows({ id }) {
             <Box flex="1" >
               <FlowCanvas setNodes={setNodes} setEdges={setEdges} onEdgesChange={onEdgesChange}
                 onNodesChange={onNodesChange} nodes={nodes} edges={edges} getNewNodeId={getNewNodeId}
-                workFlow={workFlow} id={id}  />
+                workFlow={workFlow} id={id} />
             </Box>
           )}
 
