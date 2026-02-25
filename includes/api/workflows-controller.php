@@ -95,6 +95,21 @@ class WorkflowsController extends WP_REST_Controller
                 'methods' => WP_REST_Server::READABLE,
                 'callback' => [$this, 'get_runs'],
                 'permission_callback' => [$this, 'permissions_check'],
+                'args' => [
+                    'page' => [
+                        'type' => 'integer',
+                        'default' => 1,
+                        'minimum' => 1,
+                        'sanitize_callback' => 'absint',
+                    ],
+                    'per_page' => [
+                        'type' => 'integer',
+                        'default' => 20,
+                        'minimum' => 1,
+                        'maximum' => 100,
+                        'sanitize_callback' => 'absint',
+                    ],
+                ],
             ],
         ]);
 
@@ -181,24 +196,67 @@ class WorkflowsController extends WP_REST_Controller
     public function update_item($request)
     {
         $workflowId = (int) $request['id'];
-        $graph = $request->get_json_params();
+        $body       = $request->get_json_params();
+
+        $isVersion = (bool) ($body['is_version'] ?? $request->get_param('is_version') ?? false);
+        unset($body['is_version']); 
+        $graph = $body;
 
         if (!isset($graph['nodes']) || !isset($graph['edges'])) {
             return new WP_Error('invalid_graph', 'Invalid React Flow graph', ['status' => 400]);
         }
 
-        WorkflowVersion::where('workflow_id', $workflowId)->update(['is_active' => 0]);
+        $hash    = hash('sha256', wp_json_encode($graph));
+        $current = WorkflowVersion::where('workflow_id', $workflowId)->where('is_active', 1)->first();
+
+        if ($isVersion) {
+            if ($current && $current->graph_hash === $hash) {
+                return rest_ensure_response([
+                    'workflow_id' => $workflowId,
+                    'version_id'  => $current->id,
+                    'created'     => false,
+                ]);
+            }
+
+            WorkflowVersion::where('workflow_id', $workflowId)->update(['is_active' => 0]);
+
+            $version = WorkflowVersion::create([
+                'workflow_id' => $workflowId,
+                'graph_json'  => $graph,
+                'graph_hash'  => $hash,
+                'is_active'   => 1,
+            ]);
+
+            return rest_ensure_response([
+                'workflow_id' => $workflowId,
+                'version_id'  => $version->id,
+                'created'     => true,
+            ]);
+        }
+
+        if ($current) {
+            $current->graph_json = $graph;
+            $current->graph_hash = $hash;
+            $current->save();
+
+            return rest_ensure_response([
+                'workflow_id' => $workflowId,
+                'version_id'  => $current->id,
+                'created'     => false,
+            ]);
+        }
 
         $version = WorkflowVersion::create([
             'workflow_id' => $workflowId,
-            'graph_json' => $graph,
-            'graph_hash' => hash('sha256', wp_json_encode($graph)),
-            'is_active' => 1,
+            'graph_json'  => $graph,
+            'graph_hash'  => $hash,
+            'is_active'   => 1,
         ]);
 
         return rest_ensure_response([
             'workflow_id' => $workflowId,
-            'version_id' => $version->id,
+            'version_id'  => $version->id,
+            'created'     => true,
         ]);
     }
 
@@ -260,6 +318,7 @@ class WorkflowsController extends WP_REST_Controller
                 'created_at' => $version->created_at,
             ] : null,
             'graph' => $graph,
+            'layout' => $graph['viewport'] ?? null,
             'test_outputs' => $testOutputs,
         ]);
     }
