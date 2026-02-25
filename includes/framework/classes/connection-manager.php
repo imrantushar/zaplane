@@ -18,11 +18,24 @@ class ConnectionManager
      * @throws ConnectionException
      * @throws IntegrationException
      */
-    public function create(int $user_id, string $app, string $name, string $auth_type, array $credentials)
+    public function create(int $user_id, string $app, string $name, string $auth_type, array $credentials): array
     {
         $integration = IntegrationLoader::get($app);
         if (!$integration) {
             throw IntegrationException::notFound($app);
+        }
+
+        // Test credentials before saving. OAuth2 skips this — the token exchange already validated the connection.
+        $test_result = null;
+        if ($auth_type !== 'oauth2') {
+            $class = get_class($integration);
+            $test_result = $class::test_connection($credentials);
+            if (!($test_result['success'] ?? false)) {
+                throw ConnectionException::invalidCredentials(
+                    $app,
+                    $test_result['message'] ?? 'Connection test failed'
+                );
+            }
         }
 
         try {
@@ -40,7 +53,11 @@ class ConnectionManager
             'status' => 'active',
         ]);
 
-        return $connection->id;
+        if ($test_result !== null) {
+            $connection->markAsTested(true);
+        }
+
+        return ['id' => $connection->id, 'test_result' => $test_result];
     }
 
     public function get(int $id, bool $decrypt = false): ?array
