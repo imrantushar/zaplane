@@ -26,6 +26,7 @@ import { CiPlay1 } from "react-icons/ci";
 import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
 import { useFormikContext } from "formik";
 import { updateWorkFlowStatus, updateWorkFlowTitle } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow";
+import ZAPTooltip from "@ZAPComponents/ZAPTooltip";
 
 export default function FlowTopBar({
   navigate,
@@ -63,29 +64,36 @@ export default function FlowTopBar({
     <TopBar
       leftContent={() => (
         <>
-          {!isFullscreen && (
-            <Button variant="outline" height="36px" width="36px" onClick={() => navigate(-1)}>
-              <FiArrowLeft />
-            </Button>
-          )}
-          <Box w="120px">
-            <Input
-              height='36px'
-              fontSize='14px'
-              fontWeight='500'
-              value={
-                values?.title ?? workFlow?.workflow?.title ?? "Untitled Flow"
-              }
-              onChange={(e) => setFieldValue("title", e.target.value)}
-              variant="outline"
-              border="1px solid transparent"
-              _hover={{
-                borderColor: "var(--zaplane-border-color)",
-              }}
-            // maxW="250px"
+          <Button variant="outline" height="36px" width="36px" onClick={() => {
+            if (isFullscreen) {
+              toggleFullscreen()
+            }
+            else {
+              navigate(-1)
+            }
+          }}>
+            <FiArrowLeft />
+          </Button>
+          <ZAPTooltip content={__("Rename", 'zaplane')} placement="bottom">
+            <Box w="350px">
+              <Input
+                height='36px'
+                fontSize='14px'
+                fontWeight='500'
+                value={
+                  values?.title ?? workFlow?.workflow?.title ?? "Untitled Flow"
+                }
+                onChange={(e) => setFieldValue("title", e.target.value)}
+                variant="outline"
+                border="1px solid transparent"
+                _hover={{
+                  borderColor: "var(--zaplane-border-color)",
+                }}
+              // maxW="250px"
 
-            />
-          </Box>
+              />
+            </Box>
+          </ZAPTooltip>
 
 
         </>
