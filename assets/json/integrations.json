@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-02-22 11:30:53",
+    "generated_at": "2026-02-25 08:41:29",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -4239,6 +4239,114 @@
                 }
             }
         },
+        "essentialblocks": {
+            "slug": "essentialblocks",
+            "name": "Essentialblocks",
+            "icon": "",
+            "category": "app",
+            "triggers": {
+                "eb_form_submit_before_email": {
+                    "key": "eb_form_submit_before_email",
+                    "label": "Form Submission",
+                    "hook": "eb_form_submit_before_email",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": []
+        },
+        "coblocks": {
+            "slug": "coblocks",
+            "name": "Coblocks",
+            "icon": "",
+            "category": "app",
+            "triggers": {
+                "coblocks_form_submit": {
+                    "key": "coblocks_form_submit",
+                    "label": "Form Submission",
+                    "hook": "coblocks_form_submit",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": []
+        },
+        "spectra": {
+            "slug": "spectra",
+            "name": "Spectra",
+            "icon": "",
+            "category": "app",
+            "triggers": {
+                "uagb_form_success": {
+                    "key": "uagb_form_success",
+                    "label": "Form Submission",
+                    "hook": "uagb_form_success",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": []
+        },
+        "beaverbuilder": {
+            "slug": "beaverbuilder",
+            "name": "Beaverbuilder",
+            "icon": "",
+            "category": "app",
+            "triggers": {
+                "contact_form_submission": {
+                    "key": "contact_form_submission",
+                    "label": "Contact Form Submission",
+                    "hook": "fl_module_contact_form_after_send",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "login_form_submission": {
+                    "key": "login_form_submission",
+                    "label": "Login Form Submission",
+                    "hook": "fl_builder_login_form_submission_complete",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "subscribe_form_submission": {
+                    "key": "subscribe_form_submission",
+                    "label": "Subscribe Form Submission",
+                    "hook": "fl_builder_subscribe_form_submission_complete",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": []
+        },
+        "metform": {
+            "slug": "metform",
+            "name": "Metform",
+            "icon": "",
+            "category": "app",
+            "triggers": {
+                "metform_after_store_form_data": {
+                    "key": "metform_after_store_form_data",
+                    "label": "Form Submitted",
+                    "hook": "metform_after_store_form_data",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": []
+        },
         "easydigitaldownload": {
             "slug": "easydigitaldownload",
             "name": "Easydigitaldownload",
@@ -4658,34 +4766,124 @@
                 }
             }
         },
-        "metform": {
-            "slug": "metform",
-            "name": "Metform",
+        "lifter": {
+            "slug": "lifter",
+            "name": "Lifter",
             "icon": "",
             "category": "app",
             "triggers": {
-                "metform_after_store_form_data": {
-                    "key": "metform_after_store_form_data",
-                    "label": "Form Submitted",
-                    "hook": "metform_after_store_form_data",
-                    "schema": [],
+                "user_enroll_course": {
+                    "key": "user_enroll_course",
+                    "label": "User enrolled in a course",
+                    "hook": "llms_user_enrolled_in_course",
+                    "schema": [
+                        {
+                            "key": "course_id",
+                            "label": "Course",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Any course",
+                                    "value": "any"
+                                },
+                                {
+                                    "label": "New Course",
+                                    "value": "25"
+                                }
+                            ],
+                            "required": true
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
-                }
-            }
-        },
-        "essentialblocks": {
-            "slug": "essentialblocks",
-            "name": "Essentialblocks",
-            "icon": "",
-            "category": "app",
-            "triggers": {
-                "eb_form_submit_before_email": {
-                    "key": "eb_form_submit_before_email",
-                    "label": "Form Submission",
-                    "hook": "eb_form_submit_before_email",
-                    "schema": [],
+                },
+                "lifter_quiz_course_attempt": {
+                    "key": "lifter_quiz_course_attempt",
+                    "label": "User attempted (submitted) a quiz",
+                    "hook": "lifterlms_quiz_completed",
+                    "schema": [
+                        {
+                            "key": "quiz_id",
+                            "label": "Quiz",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Any Quiz",
+                                    "value": "any"
+                                },
+                                {
+                                    "label": "New Lesson Quiz",
+                                    "value": "33"
+                                },
+                                {
+                                    "label": "New Lesson Quiz",
+                                    "value": "35"
+                                }
+                            ],
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "lesson_complete": {
+                    "key": "lesson_complete",
+                    "label": "User completed a lesson",
+                    "hook": "lifterlms_lesson_completed",
+                    "schema": [
+                        {
+                            "key": "lesson_id",
+                            "label": "Lesson",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Any lesson",
+                                    "value": "any"
+                                },
+                                {
+                                    "label": "New Lesson",
+                                    "value": "28"
+                                },
+                                {
+                                    "label": "New Lesson",
+                                    "value": "29"
+                                },
+                                {
+                                    "label": "New Lesson",
+                                    "value": "30"
+                                }
+                            ],
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "course_complete": {
+                    "key": "course_complete",
+                    "label": "User completed a course",
+                    "hook": "lifterlms_course_completed",
+                    "schema": [
+                        {
+                            "key": "course_id",
+                            "label": "Course",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Any course",
+                                    "value": "any"
+                                },
+                                {
+                                    "label": "New Course",
+                                    "value": "25"
+                                }
+                            ],
+                            "required": true
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
