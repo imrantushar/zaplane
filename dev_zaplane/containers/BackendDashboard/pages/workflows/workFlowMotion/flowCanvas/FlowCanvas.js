@@ -38,7 +38,8 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [activeDrawer, setActiveDrawer] = useState(null);
     const { versions } = useSelector((state) => state.workflows);
-    const [canvasLayout, setCanvasLayout] = useState(workFlow?.workflow?.layout || "LR")
+    //store layout 
+    const canvasLayout = values?.layout
 
     useEffect(() => {
         if (!workFlow?.graph) return;
@@ -53,24 +54,20 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
         node: null,
         edge: null,
     });
-    // // lay out update 
-    // useEffect(() => {
-    //     if (!workFlow?.workflow) return; // ensure workflow exists
+    // layout update
+    useEffect(() => {
+        if (canvasLayout !== workFlow.workflow?.layout) {
+            const updateLayout = async () => {
+                try {
+                    await dispatch(updateWorkFlowLayout({ id, layout: canvasLayout }));
+                } catch (error) {
+                    console.error("Failed to update layout:", error);
+                }
+            };
 
-    //     // Only call API if the current layout is different from the saved layout
-    //     if (canvasLayout !== workFlow.workflow.layout) {
-    //         const updateLayout = async () => {
-    //             try {
-    //                 await dispatch(updateWorkFlowLayout({ id, layout: canvasLayout }));
-    //                 console.log("Layout updated successfully!");
-    //             } catch (error) {
-    //                 console.error("Failed to update layout:", error);
-    //             }
-    //         };
-
-    //         updateLayout();
-    //     }
-    // }, [canvasLayout, workFlow, dispatch, id]);
+            updateLayout();
+        }
+    }, [canvasLayout, id]);
 
     const activeVersionId = versions?.find(v => v.is_active)?.id;
 
@@ -86,7 +83,7 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
         openDrawerForNode,
         openDrawerFromAdd,
         onLayout
-    } = useFlowActions({ nodes, setNodes, edges, setEdges, drawerContext, getNewNodeId, setDrawerContext, setDrawerOpen, setCanvasLayout, canvasLayout });
+    } = useFlowActions({ nodes, setNodes, edges, setEdges, drawerContext, getNewNodeId, setDrawerContext, setDrawerOpen, setFieldValue, canvasLayout });
 
     const onAddNode = (edgeId) => {
         const edge = edges.find((e) => e.id === edgeId);

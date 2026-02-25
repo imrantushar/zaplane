@@ -7140,7 +7140,8 @@ function FlowCanvas({
   const {
     versions
   } = (0,react_redux__WEBPACK_IMPORTED_MODULE_11__.useSelector)(state => state.workflows);
-  const [canvasLayout, setCanvasLayout] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(workFlow?.workflow?.layout || "LR");
+  //store layout 
+  const canvasLayout = values?.layout;
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
     if (!workFlow?.graph) return;
     const {
@@ -7156,25 +7157,22 @@ function FlowCanvas({
     node: null,
     edge: null
   });
-  // // lay out update 
-  // useEffect(() => {
-  //     if (!workFlow?.workflow) return; // ensure workflow exists
-
-  //     // Only call API if the current layout is different from the saved layout
-  //     if (canvasLayout !== workFlow.workflow.layout) {
-  //         const updateLayout = async () => {
-  //             try {
-  //                 await dispatch(updateWorkFlowLayout({ id, layout: canvasLayout }));
-  //                 console.log("Layout updated successfully!");
-  //             } catch (error) {
-  //                 console.error("Failed to update layout:", error);
-  //             }
-  //         };
-
-  //         updateLayout();
-  //     }
-  // }, [canvasLayout, workFlow, dispatch, id]);
-
+  // layout update
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    if (canvasLayout !== workFlow.workflow?.layout) {
+      const updateLayout = async () => {
+        try {
+          await dispatch((0,_ZAPRedux_Slices_workFlowSlice_actions_workFlow__WEBPACK_IMPORTED_MODULE_20__.updateWorkFlowLayout)({
+            id,
+            layout: canvasLayout
+          }));
+        } catch (error) {
+          console.error("Failed to update layout:", error);
+        }
+      };
+      updateLayout();
+    }
+  }, [canvasLayout, id]);
   const activeVersionId = versions?.find(v => v.is_active)?.id;
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
     setLoading(true);
@@ -7196,7 +7194,7 @@ function FlowCanvas({
     getNewNodeId,
     setDrawerContext,
     setDrawerOpen,
-    setCanvasLayout,
+    setFieldValue,
     canvasLayout
   });
   const onAddNode = edgeId => {
@@ -8479,7 +8477,7 @@ const useFlowActions = ({
   setDrawerContext,
   setDrawerOpen,
   getNewNodeId,
-  setCanvasLayout,
+  setFieldValue,
   canvasLayout
 }) => {
   const updateNodeData = updatedData => {
@@ -8619,7 +8617,7 @@ const useFlowActions = ({
         padding: 0.2,
         duration: 300
       });
-      setCanvasLayout(direction);
+      setFieldValue('layout', direction);
     });
   }, [nodes, edges, fitView, updateNodeInternals]);
   return {

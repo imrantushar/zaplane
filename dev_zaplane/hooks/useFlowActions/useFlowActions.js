@@ -45,8 +45,9 @@ export const useFlowActions = ({
     setDrawerContext,
     setDrawerOpen,
     getNewNodeId,
-    setCanvasLayout,
-    canvasLayout
+    setFieldValue,
+    canvasLayout,
+
 }) => {
 
     const updateNodeData = (updatedData) => {
@@ -159,7 +160,7 @@ export const useFlowActions = ({
                 });
 
                 fitView({ padding: 0.2, duration: 300 });
-                setCanvasLayout(direction);
+                setFieldValue('layout',direction);
             });
         },
         [nodes, edges, fitView, updateNodeInternals]
