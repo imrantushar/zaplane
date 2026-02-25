@@ -12,7 +12,6 @@ export default function Workflows({ id }) {
   const nodeIdRef = useRef(createNodeIdGenerator());
   const getNewNodeId = nodeIdRef.current;
   const { workFlow } = useSelector((state) => state.workflows);
-  const [canvasLayout, setCanvasLayout] = useState("LR")
   const [nodes, setNodes, onNodesChange] = useNodesState([
     {
       id: getNewNodeId(),
@@ -81,6 +80,7 @@ export default function Workflows({ id }) {
         <Formik
           initialValues={
             {
+              layout:'LR'
             }}
           onSubmit={onSubmitHandler}
         >
@@ -88,7 +88,7 @@ export default function Workflows({ id }) {
             <Box flex="1" >
               <FlowCanvas setNodes={setNodes} setEdges={setEdges} onEdgesChange={onEdgesChange}
                 onNodesChange={onNodesChange} nodes={nodes} edges={edges} getNewNodeId={getNewNodeId}
-                workFlow={workFlow} id={id} canvasLayout={canvasLayout} setCanvasLayout={setCanvasLayout} />
+                workFlow={workFlow} id={id}  />
             </Box>
           )}
 

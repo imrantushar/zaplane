@@ -28,7 +28,7 @@ import ZAPTooltip from "@ZAPComponents/ZAPTooltip";
 import { getSingleWorkFlow, updateWorkFlowLayout, updateWorkFlowStatus, updateWorkFlowTitle } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow";
 import FlowTopBar from "./FlowTopBar/FlowTopBar";
 
-export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdgesChange, onNodesChange, getNewNodeId, workFlow, canvasLayout, setCanvasLayout }) {
+export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdgesChange, onNodesChange, getNewNodeId, workFlow }) {
     const dispatch = useDispatch();
     const navigate = useNavigate()
     const [drawerOpen, setDrawerOpen] = useState(false);
@@ -38,6 +38,7 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [activeDrawer, setActiveDrawer] = useState(null);
     const { versions } = useSelector((state) => state.workflows);
+    const [canvasLayout, setCanvasLayout] = useState(workFlow?.workflow?.layout || "LR")
 
     useEffect(() => {
         if (!workFlow?.graph) return;
@@ -52,7 +53,25 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
         node: null,
         edge: null,
     });
-   
+    // // lay out update 
+    // useEffect(() => {
+    //     if (!workFlow?.workflow) return; // ensure workflow exists
+
+    //     // Only call API if the current layout is different from the saved layout
+    //     if (canvasLayout !== workFlow.workflow.layout) {
+    //         const updateLayout = async () => {
+    //             try {
+    //                 await dispatch(updateWorkFlowLayout({ id, layout: canvasLayout }));
+    //                 console.log("Layout updated successfully!");
+    //             } catch (error) {
+    //                 console.error("Failed to update layout:", error);
+    //             }
+    //         };
+
+    //         updateLayout();
+    //     }
+    // }, [canvasLayout, workFlow, dispatch, id]);
+
     const activeVersionId = versions?.find(v => v.is_active)?.id;
 
     useEffect(() => {

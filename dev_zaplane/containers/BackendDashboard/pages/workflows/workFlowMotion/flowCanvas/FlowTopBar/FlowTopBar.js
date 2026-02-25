@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Button, Text, Flex, Input, Box } from "@chakra-ui/react";
 import TopBar from "@ZAPComponents/TopBar";
 import { FiArrowLeft } from "react-icons/fi";
@@ -25,6 +25,7 @@ import { LiaStopCircleSolid } from "react-icons/lia";
 import { CiPlay1 } from "react-icons/ci";
 import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
 import { useFormikContext } from "formik";
+import { updateWorkFlowStatus, updateWorkFlowTitle } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow";
 
 export default function FlowTopBar({
   navigate,
@@ -41,6 +42,23 @@ export default function FlowTopBar({
   const { apiCountdown, apiRequestRunning } = useSelector((state) => state.workflows);
   const dispatch = useDispatch()
   useApiCountdown()
+  useEffect(() => {
+  if (!workFlow?.workflow) return;
+  const updateStatusAndTitle = async () => {
+    try {
+      if (values?.status && values.status !== workFlow.workflow.status) {
+        await dispatch(updateWorkFlowStatus({ id, status: values.status }));
+      }
+      if (values?.title && values.title !== workFlow.workflow.title) {
+        await dispatch(updateWorkFlowTitle({ id, title: values.title }));
+      }
+    } catch (error) {
+      console.error("Failed to update status or title:", error);
+    }
+  };
+
+  updateStatusAndTitle();
+}, [values?.status, values?.title, workFlow, dispatch, id]);
   return (
     <TopBar
       leftContent={() => (
