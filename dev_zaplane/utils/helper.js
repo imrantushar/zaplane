@@ -143,10 +143,11 @@ export const formatDateTime = (dateString) => {
     }),
   };
 };
-export function formatLabel(value = "") {
+export function formatLabel(value) {
+  if (!value) return "";
 
-  return value
+  return String(value)
     .replace(/_/g, " ")
     .toLowerCase()
-    .replace(/\b\w/g, char => char.toUpperCase());
+    .replace(/\b\w/g, (char) => char.toUpperCase());
 }
