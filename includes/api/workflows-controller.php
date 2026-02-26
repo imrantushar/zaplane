@@ -288,6 +288,7 @@ class WorkflowsController extends WP_REST_Controller
                 'name' => $workflow->name,
                 'status' => $workflow->status,
                 'user_id' => $workflow->user_id,
+                'layout' => $workflow->layout,
             ],
             'version' => $version ? [
                 'id' => $version->id,
@@ -295,7 +296,6 @@ class WorkflowsController extends WP_REST_Controller
                 'created_at' => $version->created_at,
             ] : null,
             'graph' => $graph,
-            'layout' => $workflow->layout,
             'test_outputs' => $testOutputs,
         ]);
     }
