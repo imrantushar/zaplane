@@ -14,7 +14,7 @@ import './styles.scss'
 import ZAPDivider from "@ZAPComponents/ZAPDivider";
 
 
-const TotalExecutions = ({ data }) => {
+const TotalExecutions = ({ data = [] }) => {
     const chartData = useMemo(() => {
         const months = [
             "January",
@@ -35,7 +35,7 @@ const TotalExecutions = ({ data }) => {
             value: 0,
         }));
 
-        data?.runs?.forEach((item) => {
+        data.forEach((item) => {
             if (!item.started_at) return;
 
             const date = new Date(item.started_at);

@@ -203,12 +203,12 @@ const Logs = () => {
                 <ListTable
                     columns={columns}
                     isRowSelectable={true}
-                    data={data?.runs}
+                    data={data}
                     showSubHeader={false}
                     showColumnFilter={false}
-                    showPagination={data?.runs?.length >= 10}
+                    showPagination={data.length >= 10}
                     noDataText={__("No logs found", "zaplane")}
-                    totalItems={data?.runs?.length}
+                    totalItems={data.length}
                     dataFetchingStatus={isLoading}
                     suffix="logs-table"
                 />

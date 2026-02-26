@@ -4168,7 +4168,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const TotalExecutions = ({
-  data
+  data = []
 }) => {
   const chartData = (0,react__WEBPACK_IMPORTED_MODULE_0__.useMemo)(() => {
     const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -4176,7 +4176,7 @@ const TotalExecutions = ({
       month,
       value: 0
     }));
-    data?.runs?.forEach(item => {
+    data.forEach(item => {
       if (!item.started_at) return;
       const date = new Date(item.started_at);
       const monthIndex = date.getMonth();
@@ -4610,12 +4610,12 @@ const Logs = () => {
       children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_20__.jsx)(_ZAPComponents_ListTable__WEBPACK_IMPORTED_MODULE_14__["default"], {
         columns: columns,
         isRowSelectable: true,
-        data: data?.runs,
+        data: data,
         showSubHeader: false,
         showColumnFilter: false,
-        showPagination: data?.runs?.length >= 10,
+        showPagination: data.length >= 10,
         noDataText: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_7__.__)("No logs found", "zaplane"),
-        totalItems: data?.runs?.length,
+        totalItems: data.length,
         dataFetchingStatus: isLoading,
         suffix: "logs-table"
       })
