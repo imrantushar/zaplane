@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-02-16 08:49:20",
+    "generated_at": "2026-02-26 03:22:26",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -3267,18 +3267,6 @@
                                 {
                                     "label": "Any Tag",
                                     "value": "any"
-                                },
-                                {
-                                    "value": "3",
-                                    "label": "DB"
-                                },
-                                {
-                                    "value": "2",
-                                    "label": "this"
-                                },
-                                {
-                                    "value": "1",
-                                    "label": "fun"
                                 }
                             ],
                             "required": true
@@ -3301,18 +3289,6 @@
                                 {
                                     "label": "Any Tag",
                                     "value": "any"
-                                },
-                                {
-                                    "value": "3",
-                                    "label": "DB"
-                                },
-                                {
-                                    "value": "2",
-                                    "label": "this"
-                                },
-                                {
-                                    "value": "1",
-                                    "label": "fun"
                                 }
                             ],
                             "required": true
