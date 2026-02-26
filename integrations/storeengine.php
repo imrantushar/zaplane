@@ -68,10 +68,6 @@ class Storeengine extends IntegrationBase {
         ]; 
     }
 
-    public static function get_trigger_config_schema( string $trigger ): array {
-        return [];
-    }
-    
     private static function resolve_order_payload( $order , array $extra= [] ) {
         if ( is_object( $order ) && method_exists( $order, 'get_id' ) ) {
             $order_id = (int) $order->get_id();
@@ -192,72 +188,5 @@ class Storeengine extends IntegrationBase {
                 ]);
         }
         return false;
-    }
-
-    public static function get_actions(): array {
-        return [
-            //example
-           // 'create_product'   => ['label'=>'Create Product'],
-        ];
-    }
-
-    public static function get_action_config_schema( string $action ): array {
-
-        $schemas = [
-
-        //example
-            // 'create_product' => [
-            //     ['key'=>'product_name','label'=>'Product Name','type'=>'text','required'=>true],
-            //     ['key'=>'price','label'=>'Price','type'=>'number','required'=>true],
-            //     ['key'=>'description','label'=>'Description','type'=>'textarea',],
-            //     ['key'=>'status','label'=>'Status','type'=>'select','options'=>[
-            //         ['label'=>'Draft','value'=>'draft'],
-            //         ['label'=>'Publish','value'=>'publish'],
-            //     ]],
-            //],
-        ];
-
-        return $schemas[$action] ?? [];
-    }
-
-    public static function execute_node( array $node, array $input ): array {
-
-        $config = $node['data']['config'] ?? [];
-
-        switch ( $node['data']['event'] ?? '' ) {
-
-        //example
-            // case 'create_product':
-
-            //     $name        = $config['product_name'] ?? '';
-            //     $price       = $config['price'] ?? '';
-            //     $description = $config['description'] ?? '';
-            //     $status      = $config['status'] ?? 'publish';
-
-            //     if ( ! $name || $price === '' ) {
-            //         return ['success' => false, 'message' => 'Product name and price required'];
-            //     }
-
-            //     $product_id = storeengine_create_product([
-            //         'name'        => $name,
-            //         'price'       => $price,
-            //         'description' => $description,
-            //         'status'      => $status,
-            //     ]);
-
-            //     if ( ! $product_id ) {
-            //         return ['success' => false];
-            //     }
-
-            //     return [
-            //         'success'    => true,
-            //         'product_id' => $product_id,
-            //         'product_name' =>$name,
-            //         'price'      => $price,
-            //         'status'     => $status,
-            //     ];
-
-        }
-        return ['port'=>'main','data'=>$input];
     }
 }
