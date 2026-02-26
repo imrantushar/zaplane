@@ -2993,7 +2993,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-const Tooltip = (props, ref) => {
+const Tooltip = react__WEBPACK_IMPORTED_MODULE_2__.forwardRef((props, ref) => {
   const {
     showArrow,
     children,
@@ -3025,7 +3025,7 @@ const Tooltip = (props, ref) => {
       })
     })]
   });
-};
+});
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Tooltip);
 
 /***/ },
