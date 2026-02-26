@@ -8242,7 +8242,7 @@ function Workflows({
       }));
     };
     autoSave();
-  }, [nodes.length]);
+  }, [nodes]);
   const onSubmitHandler = async values => {
     const payload = {
       nodes: (0,_helper__WEBPACK_IMPORTED_MODULE_4__.mapNodesForBackend)(nodes),

@@ -55,7 +55,7 @@ export default function Workflows({ id }) {
       await dispatch(updateWorkFlow({ id, payload }));
     };
     autoSave();
-  }, [nodes.length]);
+  }, [nodes]);
   const onSubmitHandler = async (values) => {
     const payload = {
       nodes: mapNodesForBackend(nodes)
