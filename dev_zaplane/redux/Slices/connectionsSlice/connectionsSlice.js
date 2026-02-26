@@ -182,7 +182,7 @@ const connectionsSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(fetchConnections.fulfilled, (state, action) => {
-       const { data, currentPage, itemPerPage, totalItems, totalPages } = action.payload;
+       const { data, currentPage, itemPerPage, totalItems, totalPages, } = action.payload;
         state.allConnection = data;
         state.currentPage = currentPage;
         state.itemPerPage = itemPerPage;

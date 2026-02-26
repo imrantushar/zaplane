@@ -28,6 +28,7 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
   const [loadingFields, setLoadingFields] = useState({});
   const isTrigger = node?.data?.action === "trigger" && source === "node";
   const [showWarning, setShowWarning] = useState(false);
+  console.log(context);
 
   const { mode, setMode, selectedItem, setSelectedItem, search, setSearch, list, searchList } =
     useActionDrawer(open, node, source, setFieldValue, isTrigger);

@@ -37,42 +37,51 @@ export const getSingleRunDetails = createAsyncThunk(
 );
 export const getRunsList = createAsyncThunk(
 	'zaplane/getRunsList',
-	async ({ limit = 50, offset = 0 } = {}, thunkAPI) => {
+	async ({ page = 1, per_page = 20 } = {}, thunkAPI) => {
 		try {
 			const res = await API.get(
-				namespace + `runs`
+				namespace + `runs`, {
+				params: { page, per_page },
+			}
 			);
-			return res.data; 
+			const { runs, pagination } = res.data;
+			return {
+				data: runs || [],
+				currentPage: pagination.page,
+				itemPerPage: pagination.per_page,
+				totalItems: pagination.total,
+				totalPages: pagination.total_pages,
+			};
 		} catch (e) {
 			return handleSliceError(thunkAPI, e);
 		}
 	}
 );
 export const retryNodeRun = createAsyncThunk(
-  'zaplane/retryNodeRun',
-  async (nodeRunId, thunkAPI) => {
-    try {
-      const res = await API.post(
-        namespace + `node-runs/${parseInt(nodeRunId)}/retry`,
-        {}
-      );
+	'zaplane/retryNodeRun',
+	async (nodeRunId, thunkAPI) => {
+		try {
+			const res = await API.post(
+				namespace + `node-runs/${parseInt(nodeRunId)}/retry`,
+				{}
+			);
 
-      thunkAPI.dispatch(
-        showNotification({
-          message: __('Node retried and queued successfully', 'workflow'),
-          isShow: true,
-          type: 'success',
-        })
-      );
+			thunkAPI.dispatch(
+				showNotification({
+					message: __('Node retried and queued successfully', 'workflow'),
+					isShow: true,
+					type: 'success',
+				})
+			);
 
-      return {
-        nodeRunId,
-        status: res?.data?.status || 'queued',
-      };
-    } catch (e) {
-      return handleSliceError(thunkAPI, e);
-    }
-  }
+			return {
+				nodeRunId,
+				status: res?.data?.status || 'queued',
+			};
+		} catch (e) {
+			return handleSliceError(thunkAPI, e);
+		}
+	}
 );
 
 
@@ -80,7 +89,12 @@ const logSlice = createSlice({
 	name: 'logs',
 	initialState: {
 		data: [],
-		isLoading:true
+		isLoading: true,
+		itemPerPage: 20,
+		currentPage: 1,
+		totalItems: 0,
+		totalPages: 0,
+
 
 	},
 	reducers: {
@@ -89,10 +103,15 @@ const logSlice = createSlice({
 	extraReducers: (builder) => {
 		builder
 			.addCase(getRunsList.fulfilled, (state, action) => {
-				state.data = action.payload;
-				state.isLoading =false
+				const { data, currentPage, itemPerPage, totalItems, totalPages } = action.payload;
+				state.data = data;
+				state.currentPage = currentPage;
+				state.itemPerPage = itemPerPage;
+				state.totalItems = totalItems;
+				state.totalPages = totalPages;
+				state.isLoading = false;
 			})
-			
+
 
 
 

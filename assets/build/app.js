@@ -4420,11 +4420,28 @@ const Logs = () => {
   const [drawerOpen, setDrawerOpen] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
   const {
     data = [],
-    isLoading
+    currentPage,
+    perPage,
+    totalItems
   } = (0,react_redux__WEBPACK_IMPORTED_MODULE_6__.useSelector)(state => state.logs || {});
+  const [loading, setLoading] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(data.length === 0);
+  const handleRefresh = async (page = 1, per_page = 10) => {
+    setLoading(true);
+    await dispatch((0,_ZAPRedux_Slices_logsSlice_logsSlice__WEBPACK_IMPORTED_MODULE_8__.getRunsList)({
+      page,
+      per_page
+    }));
+    setLoading(false);
+  };
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
-    dispatch((0,_ZAPRedux_Slices_logsSlice_logsSlice__WEBPACK_IMPORTED_MODULE_8__.getRunsList)());
-  }, [dispatch]);
+    handleRefresh();
+  }, []);
+  const handlePageChange = newPage => {
+    handleRefresh(newPage, perPage);
+  };
+  const handlePerPageChange = itemsPerPage => {
+    handleRefresh(currentPage, itemsPerPage);
+  };
   const columns = [{
     name: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_20__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Flex, {
       gap: "2px",
@@ -4614,9 +4631,13 @@ const Logs = () => {
         showColumnFilter: false,
         showPagination: data?.runs?.length >= 10,
         noDataText: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_7__.__)("No logs found", "zaplane"),
-        totalItems: data.length,
-        dataFetchingStatus: isLoading,
-        suffix: "logs-table"
+        totalItems: totalItems,
+        dataFetchingStatus: loading,
+        suffix: "logs-table",
+        currentPageNumber: currentPage,
+        perPage: perPage,
+        onChangePage: handlePageChange,
+        onChangeItemsPerPage: handlePerPageChange
       })
     }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_20__.jsx)(_ZAPComponents_Drawer__WEBPACK_IMPORTED_MODULE_13__["default"], {
       open: drawerOpen,
@@ -5371,6 +5392,7 @@ const ActionDrawer = ({
   const [loadingFields, setLoadingFields] = (0,react__WEBPACK_IMPORTED_MODULE_7__.useState)({});
   const isTrigger = node?.data?.action === "trigger" && source === "node";
   const [showWarning, setShowWarning] = (0,react__WEBPACK_IMPORTED_MODULE_7__.useState)(false);
+  console.log(context);
   const {
     mode,
     setMode,
@@ -9082,12 +9104,27 @@ const getSingleRunDetails = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.cre
   }
 });
 const getRunsList = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyncThunk)('zaplane/getRunsList', async ({
-  limit = 50,
-  offset = 0
+  page = 1,
+  per_page = 20
 } = {}, thunkAPI) => {
   try {
-    const res = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.get(_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.namespace + `runs`);
-    return res.data;
+    const res = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.get(_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.namespace + `runs`, {
+      params: {
+        page,
+        per_page
+      }
+    });
+    const {
+      runs,
+      pagination
+    } = res.data;
+    return {
+      data: runs || [],
+      currentPage: pagination.page,
+      itemPerPage: pagination.per_page,
+      totalItems: pagination.total,
+      totalPages: pagination.total_pages
+    };
   } catch (e) {
     return (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.handleSliceError)(thunkAPI, e);
   }
@@ -9112,12 +9149,27 @@ const logSlice = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createSlice)({
   name: 'logs',
   initialState: {
     data: [],
-    isLoading: true
+    isLoading: true,
+    itemPerPage: 20,
+    currentPage: 1,
+    totalItems: 0,
+    totalPages: 0
   },
   reducers: {},
   extraReducers: builder => {
     builder.addCase(getRunsList.fulfilled, (state, action) => {
-      state.data = action.payload;
+      const {
+        data,
+        currentPage,
+        itemPerPage,
+        totalItems,
+        totalPages
+      } = action.payload;
+      state.data = data;
+      state.currentPage = currentPage;
+      state.itemPerPage = itemPerPage;
+      state.totalItems = totalItems;
+      state.totalPages = totalPages;
       state.isLoading = false;
     });
   }
