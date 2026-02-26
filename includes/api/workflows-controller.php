@@ -115,7 +115,7 @@ class WorkflowsController extends WP_REST_Controller
 
         register_rest_route($namespace, '/condition-variables', [
             [
-                'methods' => WP_REST_Server::READABLE,
+                'methods' => WP_REST_Server::CREATABLE,
                 'callback' => [$this, 'get_condition_variables'],
                 'permission_callback' => [$this, 'permissions_check'],
             ],
@@ -223,7 +223,6 @@ class WorkflowsController extends WP_REST_Controller
             ]);
         }
 
-        // No active version yet — first save for this workflow
         $version = WorkflowVersion::create([
             'workflow_id' => $workflowId,
             'graph_json'  => $graph,
@@ -425,16 +424,15 @@ class WorkflowsController extends WP_REST_Controller
 
     public function get_condition_variables($request)
     {
-        $targetNodeKey = (int) $request->get_param('target_node_key');
-        $workflowId    = (int) $request->get_param('workflow_id');
-        $workflowHash  = $request->get_param('workflow_hash');
+        $body          = $request->get_json_params() ?? [];
+        $targetNodeKey = (int) ($body['target_node_key'] ?? 0);
+        $workflowId    = (int) ($body['workflow_id'] ?? 0);
+        $workflowHash  = $body['workflow_hash'] ?? null;
+        $inlineGraph   = !empty($body['nodes']) ? $body : null;
 
         if (!$targetNodeKey) {
             return new WP_Error('invalid_params', 'target_node_key is required', ['status' => 400]);
         }
-
-        // Resolve graph structure — prefer inline graph from request body
-        $inlineGraph = $request->get_json_params();
 
         if ($workflowId && $inlineGraph && isset($inlineGraph['nodes'])) {
             $graph = $inlineGraph;
