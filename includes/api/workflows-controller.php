@@ -210,17 +210,13 @@ class WorkflowsController extends WP_REST_Controller
                 return rest_ensure_response([
                     'workflow_id' => $workflowId,
                     'version_id'  => $current->id,
+                    'hash'        => $hash,
                 ]);
             }
 
-            $current->graph_json = $graph;
-            $current->graph_hash = $hash;
+            // Graph changed — deactivate old version and create a new one
+            $current->is_active = 0;
             $current->save();
-
-            return rest_ensure_response([
-                'workflow_id' => $workflowId,
-                'version_id'  => $current->id,
-            ]);
         }
 
         $version = WorkflowVersion::create([
@@ -233,6 +229,7 @@ class WorkflowsController extends WP_REST_Controller
         return rest_ensure_response([
             'workflow_id' => $workflowId,
             'version_id'  => $version->id,
+            'hash'        => $hash,
         ]);
     }
 
