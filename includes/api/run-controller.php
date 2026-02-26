@@ -304,17 +304,30 @@ class RunController extends WP_REST_Controller
 
     public function execute_single_node($req)
     {
-        $workflowHash = $req['workflow_hash'];
-        $targetKey = (int) $req['node_key'];
-        $input = $req['input'] ?? [];
+        $targetKey   = (int) $req['node_key'];
+        $workflowId  = (int) ($req['workflow_id'] ?? 0) ?: null;
+        $input       = $req['input'] ?? [];
+        $inlineGraph = $req['graph'] ?? null;
 
-        $version = WorkflowVersion::where('graph_hash', $workflowHash)->first();
+        // Prefer inline graph from the request (works before the workflow is saved).
+        // Fall back to workflow_hash DB lookup for saved workflows.
+        if ($inlineGraph && isset($inlineGraph['nodes'])) {
+            $graph        = $inlineGraph;
+            $workflowHash = hash('sha256', wp_json_encode($graph));
+        } else {
+            $workflowHash = $req['workflow_hash'] ?? null;
+            if (!$workflowHash) {
+                return new WP_Error('missing_params', 'Provide either graph or workflow_hash', ['status' => 400]);
+            }
 
-        if (!$version) {
-            return new WP_Error('not_found', 'Workflow version not found', ['status' => 404]);
+            $version = WorkflowVersion::where('graph_hash', $workflowHash)->first();
+            if (!$version) {
+                return new WP_Error('not_found', 'Workflow version not found', ['status' => 404]);
+            }
+
+            $graph = $version->getGraph();
         }
 
-        $graph = $version->getGraph();
         $targetNode = null;
 
         foreach ($graph['nodes'] as $node) {
@@ -330,6 +343,7 @@ class RunController extends WP_REST_Controller
 
         $run = Run::create([
             'workflow_version_hash' => $workflowHash,
+            'workflow_id' => $workflowId,
             'status' => 'running',
             'is_test' => true,
             'trigger_data' => $input,

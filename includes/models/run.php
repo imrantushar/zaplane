@@ -13,6 +13,7 @@ class Run extends Model
 
     protected static array $fillable = [
         'workflow_version_hash',
+        'workflow_id',
         'target_node_key',
         'start_node_key',
         'status',
@@ -26,6 +27,7 @@ class Run extends Model
 
     protected static array $casts = [
         'id' => 'integer',
+        'workflow_id' => 'integer',
         'start_node_key' => 'integer',
         'target_node_key' => 'integer',
         'attempts' => 'integer',
@@ -108,6 +110,28 @@ class Run extends Model
     public static function latestTestNodeRuns(string $hash): array
     {
         $testRuns = static::where('workflow_version_hash', $hash)
+            ->where('is_test', 1)
+            ->orderBy('id', 'desc')
+            ->get();
+
+        $nodeOutputs = [];
+
+        foreach ($testRuns as $run) {
+            $nodeRuns = $run->nodeRuns();
+            foreach ($nodeRuns as $nodeRun) {
+                $key = $nodeRun->node_key;
+                if (!isset($nodeOutputs[$key]) && $nodeRun->isCompleted()) {
+                    $nodeOutputs[$key] = $nodeRun;
+                }
+            }
+        }
+
+        return $nodeOutputs;
+    }
+
+    public static function latestTestNodeRunsByWorkflow(int $workflowId): array
+    {
+        $testRuns = static::where('workflow_id', $workflowId)
             ->where('is_test', 1)
             ->orderBy('id', 'desc')
             ->get();

@@ -98,6 +98,10 @@ final class Zaplane {
 
     public function activate_plugin() {
         \Zaplane\Installer::init()->run();
+
+        if (!wp_next_scheduled('zaplane_cleanup_orphan_runs')) {
+            wp_schedule_event(time(), 'daily', 'zaplane_cleanup_orphan_runs');
+        }
     }
 
     public function on_plugins_loaded(): void {
@@ -112,10 +116,49 @@ final class Zaplane {
         $automation = $this->container->get('automation');
         $automation->boot();
 
+        add_action('zaplane_cleanup_orphan_runs', [$this, 'cleanup_orphan_runs']);
+
         do_action('zaplane_init');
     }
 
-    public function deactivate_plugin(): void {}
+    public function cleanup_orphan_runs(): void {
+        global $wpdb;
+
+        $runs_table      = \Zaplane\Framework\Database\ORM\Schema::getTable('runs');
+        $node_runs_table = \Zaplane\Framework\Database\ORM\Schema::getTable('node_runs');
+        $cutoff          = gmdate('Y-m-d H:i:s', strtotime('-7 days'));
+
+        $orphan_ids = $wpdb->get_col(
+            $wpdb->prepare(
+                "SELECT id FROM `{$runs_table}` WHERE is_test = 1 AND started_at < %s",
+                $cutoff
+            )
+        );
+
+        if (empty($orphan_ids)) {
+            return;
+        }
+
+        $placeholders = implode(',', array_fill(0, count($orphan_ids), '%d'));
+
+        $wpdb->query(
+            $wpdb->prepare(
+                "DELETE FROM `{$node_runs_table}` WHERE run_id IN ({$placeholders})",
+                ...$orphan_ids
+            )
+        );
+
+        $wpdb->query(
+            $wpdb->prepare(
+                "DELETE FROM `{$runs_table}` WHERE id IN ({$placeholders})",
+                ...$orphan_ids
+            )
+        );
+    }
+
+    public function deactivate_plugin(): void {
+        wp_clear_scheduled_hook('zaplane_cleanup_orphan_runs');
+    }
 }
 
 // Bootstrap plugin
