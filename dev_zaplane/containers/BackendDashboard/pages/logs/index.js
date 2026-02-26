@@ -54,7 +54,7 @@ const Logs = () => {
                     <Box >
                         <ZAPLabel label={row?.node?.app} type={"simple"} />
                         <Text className="zaplane-sub-title" color="var(--zaplane-text-muted)">
-                            {__(formatLabel(row?.node?.event), 'zaplane')}
+                            {/* {__(formatLabel(row?.node?.event), 'zaplane')} */}
                         </Text>
                     </Box>
                 );
@@ -203,10 +203,10 @@ const Logs = () => {
                 <ListTable
                     columns={columns}
                     isRowSelectable={true}
-                    data={data}
+                    data={data?.runs||[]}
                     showSubHeader={false}
                     showColumnFilter={false}
-                    showPagination={data.length >= 10}
+                    showPagination={data?.runs?.length >= 10}
                     noDataText={__("No logs found", "zaplane")}
                     totalItems={data.length}
                     dataFetchingStatus={isLoading}

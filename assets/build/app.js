@@ -4168,7 +4168,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const TotalExecutions = ({
-  data = []
+  data
 }) => {
   const chartData = (0,react__WEBPACK_IMPORTED_MODULE_0__.useMemo)(() => {
     const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -4176,7 +4176,7 @@ const TotalExecutions = ({
       month,
       value: 0
     }));
-    data.forEach(item => {
+    data?.runs?.forEach(item => {
       if (!item.started_at) return;
       const date = new Date(item.started_at);
       const monthIndex = date.getMonth();
@@ -4277,7 +4277,7 @@ __webpack_require__.r(__webpack_exports__);
 function Dashboard() {
   const dispatch = (0,react_redux__WEBPACK_IMPORTED_MODULE_9__.useDispatch)();
   const {
-    data
+    data = []
   } = (0,react_redux__WEBPACK_IMPORTED_MODULE_9__.useSelector)(state => state.logs || {});
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
     dispatch((0,_ZAPRedux_Slices_logsSlice_logsSlice__WEBPACK_IMPORTED_MODULE_12__.getRunsList)());
@@ -4443,8 +4443,7 @@ const Logs = () => {
           type: "simple"
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_20__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
           className: "zaplane-sub-title",
-          color: "var(--zaplane-text-muted)",
-          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_7__.__)((0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_15__.formatLabel)(row?.node?.event), 'zaplane')
+          color: "var(--zaplane-text-muted)"
         })]
       });
     },
@@ -4610,10 +4609,10 @@ const Logs = () => {
       children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_20__.jsx)(_ZAPComponents_ListTable__WEBPACK_IMPORTED_MODULE_14__["default"], {
         columns: columns,
         isRowSelectable: true,
-        data: data,
+        data: data?.runs || [],
         showSubHeader: false,
         showColumnFilter: false,
-        showPagination: data.length >= 10,
+        showPagination: data?.runs?.length >= 10,
         noDataText: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_7__.__)("No logs found", "zaplane"),
         totalItems: data.length,
         dataFetchingStatus: isLoading,

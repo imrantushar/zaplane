@@ -14,7 +14,7 @@ import { topExecutedFlows } from '@ZAPRedux/Slices/dashboardSlice/dashboardSlice
 
 export default function Dashboard() {
     const dispatch = useDispatch();
-    const { data } = useSelector((state) => state.logs || {});
+    const { data=[] } = useSelector((state) => state.logs || {});
     useEffect(() => {
         dispatch(getRunsList());
         dispatch(topExecutedFlows());
