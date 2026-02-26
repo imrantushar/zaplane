@@ -144,6 +144,7 @@ export const formatDateTime = (dateString) => {
   };
 };
 export function formatLabel(value = "") {
+  if(!value) return "..."
 
   return value
     .replace(/_/g, " ")

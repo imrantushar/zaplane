@@ -6,8 +6,9 @@ import { workFLowSingeNodeExction } from "@ZAPRedux/Slices/workFlowSlice/actions
 import TestDetails from "../TestDetails/TestDetails";
 import ZAPAlert from "@ZAPComponents/ZAPAlert";
 import { primaryBtn } from "../../../../../../../../assets/scss/chakra/recipe";
+import { mapEdgesForBackend, mapNodesForBackend } from "../../helper";
 
-const TestRun = ({ source, node, workFlow, values }) => {
+const TestRun = ({ source, node, workFlow, values, nodes, edges }) => {
   const dispatch = useDispatch();
   const [showWarning, setShowWarning] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -22,18 +23,23 @@ const TestRun = ({ source, node, workFlow, values }) => {
     setShowWarning(false);
     setIsLoading(true);
     try {
+      const payload = {
+        workflow_id: workFlow?.id,      
+        node_key: node?.id,             
+        input: values,                  
+        graph: {
+          nodes: mapNodesForBackend(nodes),  
+          edges: mapEdgesForBackend(edges) 
+        }
+      };
       await dispatch(
-        workFLowSingeNodeExction({
-          workflow_hash: workFlow?.version?.hash,
-          node_key: node?.id,
-          input: values,
-        })
+        workFLowSingeNodeExction(payload)
       );
     } finally {
-        setIsLoading(false);
+      setIsLoading(false);
     }
 
-   
+
   };
 
   return (

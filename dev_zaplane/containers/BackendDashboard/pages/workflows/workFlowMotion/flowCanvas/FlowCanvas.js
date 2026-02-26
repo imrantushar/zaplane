@@ -247,6 +247,8 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
                 createActionNode={createActionNode}
                 updateNodeData={updateNodeData}
                 workFlow={workFlow}
+                nodes={nodes}
+                edges={edges}
 
             />
 

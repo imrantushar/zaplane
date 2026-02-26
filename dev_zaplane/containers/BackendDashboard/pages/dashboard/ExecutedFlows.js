@@ -10,8 +10,7 @@ const ExecutedFlows = () => {
   const { topExecutedFlows: flows } = useSelector((state) => state.dashboard);
 
   // fetch top executed flows on mount
-  ;
-  console.log(flows, 'topExecutedFlows');
+
 
   return (
     <Box

@@ -214,7 +214,6 @@ const ConnectionTable = () => {
             textAlign: "center",
         },
     ];
-console.log(totalItems,'totalItems');
     return (
         <>
             <ListTable

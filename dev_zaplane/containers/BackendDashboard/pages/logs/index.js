@@ -54,7 +54,7 @@ const Logs = () => {
                     <Box >
                         <ZAPLabel label={row?.node?.app} type={"simple"} />
                         <Text className="zaplane-sub-title" color="var(--zaplane-text-muted)">
-                            {/* {__(formatLabel(row?.node?.event), 'zaplane')} */}
+                            {__(formatLabel(row?.node?.event), 'zaplane')}
                         </Text>
                     </Box>
                 );

@@ -27,7 +27,6 @@ export default function Workflows({ id }) {
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const dispatch = useDispatch();
 
-
   useEffect(() => {
     setNodes([
       {
@@ -44,18 +43,7 @@ export default function Workflows({ id }) {
 
     setEdges([]);
   }, [id]);
-  useEffect(() => {
-    const autoSave = async () => {
-      const payload = {
-        nodes: mapNodesForBackend(nodes),
-        edges: mapEdgesForBackend(edges),
-        is_version: false
-      };
 
-      await dispatch(updateWorkFlow({ id, payload }));
-    };
-    autoSave();
-  }, [nodes]);
   const onSubmitHandler = async (values) => {
     const payload = {
       nodes: mapNodesForBackend(nodes)
@@ -70,9 +58,10 @@ export default function Workflows({ id }) {
     <ReactFlowProvider>
       <Flex hight='100vh'>
         <Formik
+         enableReinitialize
           initialValues={
             {
-              layout: 'LR'
+              layout: workFlow?.workflow?.layout
             }}
           onSubmit={onSubmitHandler}
         >

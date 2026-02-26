@@ -19,7 +19,7 @@ import DrawerItemList from "./DrawerItemList";
 import ActionFieldRenderer from "./ActionFieldRenderer/ActionFieldRenderer";
 import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
 
-const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode, workFlow, isFullscreen }) => {
+const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode, workFlow, isFullscreen,nodes,edges }) => {
   const { source, node } = context;
   const dispatch = useDispatch();
   const { values, setFieldValue, resetForm } = useFormikContext();
@@ -216,6 +216,8 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
                         fetchDynamicOptions={fetchDynamicOptions}
                         nodeId={node?.id}
                         workFlow={workFlow}
+                        nodes={nodes}
+                        edges={edges}
                       />
                     ))
                   ) : (
@@ -229,6 +231,8 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
               label: "Test",
               content: (
                 <TestRun
+                 nodes={nodes}
+                 edges={edges}
                   source={source}
                   node={node}
                   workFlow={workFlow}
