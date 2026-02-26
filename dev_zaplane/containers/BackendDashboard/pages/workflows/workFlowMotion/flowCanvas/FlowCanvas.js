@@ -28,7 +28,7 @@ import ZAPTooltip from "@ZAPComponents/ZAPTooltip";
 import { getSingleWorkFlow, updateWorkFlowLayout, updateWorkFlowStatus, updateWorkFlowTitle } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow";
 import FlowTopBar from "./FlowTopBar/FlowTopBar";
 
-export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdgesChange, onNodesChange, getNewNodeId, workFlow }) {
+export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdgesChange, onNodesChange, getNewNodeId, workFlow,isFlowDirty}) {
     const dispatch = useDispatch();
     const navigate = useNavigate()
     const [drawerOpen, setDrawerOpen] = useState(false);
@@ -167,6 +167,7 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
                 handleSubmit={handleSubmit}
                 activeDrawer={activeDrawer}
                 setActiveDrawer={setActiveDrawer}
+                isFlowDirty={isFlowDirty}
             />
 
             {

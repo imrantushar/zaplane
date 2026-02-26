@@ -38,6 +38,7 @@ export default function FlowTopBar({
   handleSubmit,
   activeDrawer,
   setActiveDrawer,
+  isFlowDirty
 }) {
   const { apiCountdown, apiRequestRunning } = useSelector((state) => state.workflows);
   const dispatch = useDispatch()
@@ -220,7 +221,7 @@ export default function FlowTopBar({
             placeholder="Select status"
           />
 
-          <Button {...primaryBtn} size="sm" onClick={handleSubmit}>
+          <Button {...primaryBtn} disabled={!isFlowDirty} size="sm" onClick={handleSubmit}>
             {__("Update", "zaplane")}
           </Button>
         </Flex>
