@@ -6585,7 +6585,10 @@ const TestDetails = ({
     values
   } = (0,formik__WEBPACK_IMPORTED_MODULE_6__.useFormikContext)();
   const selectedOutput = workFlow?.test_outputs?.[id]?.output || {};
-  const inputData = singleNodeExecution?.input || values;
+  const {
+    layout,
+    ...inputData
+  } = singleNodeExecution?.input || values || {};
   const outputData = singleNodeExecution?.output?.data || selectedOutput;
   const isNode = source === "node";
   (0,react__WEBPACK_IMPORTED_MODULE_7__.useEffect)(() => {
