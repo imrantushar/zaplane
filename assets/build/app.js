@@ -1537,65 +1537,6 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ },
 
-/***/ "./dev_zaplane/components/NavigationBlocker/index.js"
-/*!***********************************************************!*\
-  !*** ./dev_zaplane/components/NavigationBlocker/index.js ***!
-  \***********************************************************/
-(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-
-const NavigationBlocker = ({
-  when,
-  redirectURL = ''
-}) => {
-  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
-    if (!when) return;
-    const url = redirectURL !== null && redirectURL !== void 0 ? redirectURL : window.location.pathname;
-    const handleBeforeUnload = event => {
-      event.preventDefault();
-      event.returnValue = '';
-    };
-    const handlePopState = () => {
-      const confirmLeave = window.confirm('You have unsaved changes. Are you sure you want to leave?');
-      if (!confirmLeave) {
-        window.history.pushState(null, '', url);
-      }
-    };
-    const handleClick = event => {
-      const anchor = event.target.closest('a');
-      if (anchor && anchor.href && anchor.target !== '_blank') {
-        const url = new URL(anchor.href);
-        if (url.origin === window.location.origin) {
-          const confirmLeave = window.confirm('You have unsaved changes. Are you sure you want to leave?');
-          if (!confirmLeave) {
-            event.preventDefault();
-          }
-        }
-      }
-    };
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    window.addEventListener('popstate', handlePopState);
-    document.addEventListener('click', handleClick, true);
-    window.history.pushState(null, '', url);
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-      window.removeEventListener('popstate', handlePopState);
-      document.removeEventListener('click', handleClick, true);
-    };
-  }, [when]);
-  return null;
-};
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (NavigationBlocker);
-
-/***/ },
-
 /***/ "./dev_zaplane/components/Notification/index.js"
 /*!******************************************************!*\
   !*** ./dev_zaplane/components/Notification/index.js ***!
@@ -3052,7 +2993,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-const Tooltip = (props, ref) => {
+const Tooltip = react__WEBPACK_IMPORTED_MODULE_2__.forwardRef((props, ref) => {
   const {
     showArrow,
     children,
@@ -3084,7 +3025,7 @@ const Tooltip = (props, ref) => {
       })
     })]
   });
-};
+});
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Tooltip);
 
 /***/ },
@@ -8280,7 +8221,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/box/index.js");
 /* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/flex/flex.js");
 /* harmony import */ var _ZAPRedux_Slices_workFlowSlice_actions_workFlow__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @ZAPRedux/Slices/workFlowSlice/actions/workFlow */ "./dev_zaplane/redux/Slices/workFlowSlice/actions/workFlow.js");
-/* harmony import */ var _ZAPComponents_NavigationBlocker__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @ZAPComponents/NavigationBlocker */ "./dev_zaplane/components/NavigationBlocker/index.js");
+Object(function webpackMissingModule() { var e = new Error("Cannot find module '@ZAPComponents/NavigationBlocker'"); e.code = 'MODULE_NOT_FOUND'; throw e; }());
 /* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
 /* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__);
 
@@ -8371,7 +8312,7 @@ function Workflows({
         onSubmit: onSubmitHandler,
         children: ({}) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_7__.Box, {
           flex: "1",
-          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_ZAPComponents_NavigationBlocker__WEBPACK_IMPORTED_MODULE_10__["default"], {
+          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(Object(function webpackMissingModule() { var e = new Error("Cannot find module '@ZAPComponents/NavigationBlocker'"); e.code = 'MODULE_NOT_FOUND'; throw e; }()), {
             when: isFlowDirty
           }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_flowCanvas_FlowCanvas__WEBPACK_IMPORTED_MODULE_2__["default"], {
             setNodes: setNodes,
