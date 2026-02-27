@@ -185,9 +185,19 @@ class WorkflowsController extends WP_REST_Controller
     {
         $workflow = Workflow::create([
             'user_id' => get_current_user_id(),
-            'title' => sanitize_text_field($request['title']),
-            'name' => sanitize_text_field($request['name']),
-            'status' => 'draft',
+            'title'   => sanitize_text_field($request['title']),
+            'name'    => sanitize_text_field($request['name']),
+            'status'  => 'draft',
+        ]);
+
+        $emptyGraph = ['nodes' => [], 'edges' => []];
+
+        WorkflowVersion::create([
+            'workflow_id'    => $workflow->id,
+            'graph_json'     => $emptyGraph,
+            'graph_hash'     => hash('sha256', wp_json_encode($emptyGraph)),
+            'is_active'      => 1,
+            'version_number' => null,
         ]);
 
         return rest_ensure_response(['id' => $workflow->id]);
@@ -202,11 +212,30 @@ class WorkflowsController extends WP_REST_Controller
             return new WP_Error('invalid_graph', 'Invalid React Flow graph', ['status' => 400]);
         }
 
+        $workflow = Workflow::find($workflowId);
+
+        if (!$workflow) {
+            return new WP_Error('not_found', 'Workflow not found', ['status' => 404]);
+        }
+
         $hash    = hash('sha256', wp_json_encode($graph));
         $current = WorkflowVersion::where('workflow_id', $workflowId)->where('is_active', 1)->first();
 
-        if ($current) {
-            if ($current->graph_hash === $hash) {
+        // Draft mode: always update the single draft version in-place, no new rows
+        if ($workflow->status === 'draft') {
+            if ($current) {
+                if ($current->graph_hash === $hash) {
+                    return rest_ensure_response([
+                        'workflow_id' => $workflowId,
+                        'version_id'  => $current->id,
+                        'hash'        => $hash,
+                    ]);
+                }
+
+                $current->graph_json = $graph;
+                $current->graph_hash = $hash;
+                $current->save();
+
                 return rest_ensure_response([
                     'workflow_id' => $workflowId,
                     'version_id'  => $current->id,
@@ -214,22 +243,56 @@ class WorkflowsController extends WP_REST_Controller
                 ]);
             }
 
-            // Graph changed — deactivate old version and create a new one
+            // No version exists yet — create the draft version
+            $version = WorkflowVersion::create([
+                'workflow_id'    => $workflowId,
+                'graph_json'     => $graph,
+                'graph_hash'     => $hash,
+                'is_active'      => 1,
+                'version_number' => null,
+            ]);
+
+            return rest_ensure_response([
+                'workflow_id' => $workflowId,
+                'version_id'  => $version->id,
+                'hash'        => $hash,
+            ]);
+        }
+
+        // Active / paused mode: create a new version row on each change
+        if ($current && $current->graph_hash === $hash) {
+            return rest_ensure_response([
+                'workflow_id'    => $workflowId,
+                'version_id'     => $current->id,
+                'version_number' => $current->version_number,
+                'hash'           => $hash,
+            ]);
+        }
+
+        // Resolve next version number
+        $latest     = WorkflowVersion::where('workflow_id', $workflowId)
+            ->orderBy('version_number', 'desc')
+            ->first();
+        $nextNumber = ($latest && $latest->version_number) ? $latest->version_number + 1 : 1;
+
+        if ($current) {
             $current->is_active = 0;
             $current->save();
         }
 
         $version = WorkflowVersion::create([
-            'workflow_id' => $workflowId,
-            'graph_json'  => $graph,
-            'graph_hash'  => $hash,
-            'is_active'   => 1,
+            'workflow_id'    => $workflowId,
+            'graph_json'     => $graph,
+            'graph_hash'     => $hash,
+            'is_active'      => 1,
+            'version_number' => $nextNumber,
         ]);
 
         return rest_ensure_response([
-            'workflow_id' => $workflowId,
-            'version_id'  => $version->id,
-            'hash'        => $hash,
+            'workflow_id'    => $workflowId,
+            'version_id'     => $version->id,
+            'version_number' => $nextNumber,
+            'hash'           => $hash,
         ]);
     }
 
