@@ -7,11 +7,20 @@ const ZAPTab = ({ value, tabs, onChange }) => {
             onValueChange={(e) => onChange?.(e.value)}
         >
             <Tabs.List mb={4}>
+
                 {tabs.map(tab => (
-                    <Tabs.Trigger key={tab.value} value={tab.value}>
+                    <Tabs.Trigger key={tab.value} value={tab.value}
+                        _selected={{
+                            _before: {
+                                bg: "var(--zaplane-primary)",   
+                            },
+                        }}
+                    >
                         {tab.label}
                     </Tabs.Trigger>
                 ))}
+
+
             </Tabs.List>
 
             {tabs.map(tab => (

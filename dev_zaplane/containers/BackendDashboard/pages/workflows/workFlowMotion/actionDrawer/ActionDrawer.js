@@ -1,4 +1,4 @@
-import {Button,HStack, Input,} from "@chakra-ui/react";
+import { Button, Flex, HStack, Input, } from "@chakra-ui/react";
 import ZAPDrawer from "@ZAPComponents/Drawer";
 import { integrations } from "@ZAPUtils/helper";
 import { useFormikContext } from "formik";
@@ -12,12 +12,14 @@ import { TOOLS } from "@ZAPHooks/useActionDrawer/helper";
 import { getIntegration } from "./helper";
 import { fetchDynamic } from "@ZAPRedux/Slices/workFlowSlice/helper";
 import SelectTab from "./SelectTab/SelectTab";
-import TestTab from "./TestTab/TestTab";
+import TestRun from "./TestRun/TestRun";
 import DrawerSearchList from "./DrawerSearchList/DrawerSearchList";
 import DrawerModeList from "./DrawerItemList/DrawerModeList";
 import DrawerItemList from "./DrawerItemList";
+import ActionFieldRenderer from "./ActionFieldRenderer/ActionFieldRenderer";
+import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
 
- const  ActionDrawer=({ open, context, onClose, updateNodeData, createActionNode, workFlow, isFullscreen }) =>{
+const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode, workFlow, isFullscreen,nodes,edges }) => {
   const { source, node } = context;
   const dispatch = useDispatch();
   const { values, setFieldValue, resetForm } = useFormikContext();
@@ -95,21 +97,35 @@ import DrawerItemList from "./DrawerItemList";
   };
 
   const handleContinue = () => {
-    if (step === "select") return setStep("test");
-    // if (step === "configure") return setStep("test");
+    if (step === "select") {
+      return setStep("configure");
+    }
 
-    const payload = {
-      app: selectedItem.name,
-      name: selectedItem.name,
-      event: values.actionType,
-      hook: values.hook,
-      config: selectedActionFields.reduce((acc, f) => {
-        acc[f.key] = values[f.key];
-        return acc;
-      }, {}),
-    };
-    context?.source === "node" ? updateNodeData(payload) : createActionNode(payload);
-    resetAll();
+    if (step === "configure") {
+
+      const payload = {
+        app: selectedItem.name,
+        name: selectedItem.name,
+        event: values.actionType,
+        hook: values.hook,
+        config: selectedActionFields.reduce((acc, f) => {
+          acc[f.key] = values[f.key];
+          return acc;
+        }, {}),
+      };
+      if (context?.source !== "node") {
+        createActionNode(payload);
+      }
+      else {
+        updateNodeData(payload);
+      }
+
+      return setStep("test");
+    }
+
+    if (step === "test") {
+      resetAll();
+    }
   };
   return (
     <ZAPDrawer
@@ -181,12 +197,39 @@ import DrawerItemList from "./DrawerItemList";
                 />
               )
             },
-            // { value: "configure", label: "Configure", content: <Text fontSize="sm">{__("Configure step", "zaplane")}</Text> },
+            {
+              value: "configure", label: "Configure", content: <>
+                <Flex direction="column" gap={4}>
+                  {selectedActionFields?.length > 0 ? (
+                    selectedActionFields.map((field) => (
+                      <ActionFieldRenderer
+                        key={field.key}
+                        field={field}
+                        value={values?.[field.key]}
+                        setFieldValue={setFieldValue}
+                        getKey={getKey}
+                        dynamicOptions={dynamicOptions}
+                        loadingFields={loadingFields}
+                        fetchDynamicOptions={fetchDynamicOptions}
+                        nodeId={node?.id}
+                        workFlow={workFlow}
+                        nodes={nodes}
+                        edges={edges}
+                      />
+                    ))
+                  ) : (
+                    <ZAPLabel label={__("No configuration required for this action.", "zaplane")} type="simple" />
+                  )}
+                </Flex>
+              </>
+            },
             {
               value: "test",
               label: "Test",
               content: (
-                <TestTab
+                <TestRun
+                 nodes={nodes}
+                 edges={edges}
                   source={source}
                   node={node}
                   workFlow={workFlow}

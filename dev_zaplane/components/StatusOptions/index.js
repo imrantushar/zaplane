@@ -6,12 +6,7 @@ import './styles.scss';
 import { Icon } from '@chakra-ui/react';
 import { FaAngleDown } from 'react-icons/fa6';
 
-const propTypes = {
-	children: PropTypes.object,
-	value: PropTypes.string,
-	options: PropTypes.object,
-	onChangeHandler: PropTypes.func,
-};
+
 
 const StatusOptions = ( props ) => {
 	const {
@@ -123,5 +118,5 @@ const StatusOptions = ( props ) => {
 	);
 };
 
-StatusOptions.propTypes = propTypes;
+
 export default StatusOptions;

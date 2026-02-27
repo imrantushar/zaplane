@@ -28,7 +28,22 @@ class RunController extends WP_REST_Controller
         register_rest_route($ns, '/runs', [
             'methods' => 'GET',
             'callback' => [$this, 'list_runs'],
-            'permission_callback' => [$this, 'permissions']
+            'permission_callback' => [$this, 'permissions'],
+            'args' => [
+                'page' => [
+                    'type' => 'integer',
+                    'default' => 1,
+                    'minimum' => 1,
+                    'sanitize_callback' => 'absint',
+                ],
+                'per_page' => [
+                    'type' => 'integer',
+                    'default' => 20,
+                    'minimum' => 1,
+                    'maximum' => 100,
+                    'sanitize_callback' => 'absint',
+                ],
+            ],
         ]);
 
         register_rest_route($ns, '/runs/(?P<id>\d+)', [
@@ -79,35 +94,49 @@ class RunController extends WP_REST_Controller
         return current_user_can('manage_options');
     }
 
-    public function list_runs()
+    public function list_runs($request)
     {
-        return Run::recent(100)
-            ->map(function ($run) {
-                $node = null;
-                $version = $run->workflowVersion();
+        $page    = max(1, (int) ($request->get_param('page') ?? 1));
+        $perPage = min(100, max(1, (int) ($request->get_param('per_page') ?? 20)));
 
-                if ($version) {
-                    $graph = $version->getGraph();
-                    foreach ($graph['nodes'] ?? [] as $n) {
-                        if ((int) $n['id'] === $run->start_node_key) {
-                            $node = $n;
-                            break;
-                        }
+        $total = Run::query()->count();
+        $runs  = Run::query()->orderBy('id', 'desc')->forPage($page, $perPage)->get();
+
+        $data = $runs->map(function ($run) {
+            $node       = null;
+            $version    = $run->workflowVersion();
+            $node_count = NodeRun::where('run_id', $run->id)->count();
+
+            if ($version) {
+                $graph = $version->getGraph();
+                foreach ($graph['nodes'] ?? [] as $n) {
+                    if ((int) $n['id'] === $run->start_node_key) {
+                        $node = $n;
+                        break;
                     }
                 }
+            }
 
-                return [
-                    'id' => $run->id,
-                    'status' => $run->status,
-                    'started_at' => $run->started_at,
-                    'finished_at' => $run->finished_at,
-                    'node' => $node ? [
-                        'app' => $node['data']['app'] ?? null,
-                        'event' => $node['data']['event'] ?? null,
-                    ] : null,
-                ];
-            })
-            ->toArray();
+            return [
+                'id'          => $run->id,
+                'status'      => $run->status,
+                'started_at'  => $run->started_at,
+                'finished_at' => $run->finished_at,
+                'node_count'  => $node_count,
+                'node'        => $node ? [
+                    'app'   => $node['data']['app'] ?? null,
+                    'event' => $node['data']['event'] ?? null,
+                ] : null,
+            ];
+        })->toArray();
+
+        return rest_ensure_response([
+            'runs'     => $data,
+            'total'    => $total,
+            'page'     => $page,
+            'per_page' => $perPage,
+            'pages'    => $perPage > 0 ? (int) ceil($total / $perPage) : 1,
+        ]);
     }
 
     public function get_run($req)
@@ -275,17 +304,30 @@ class RunController extends WP_REST_Controller
 
     public function execute_single_node($req)
     {
-        $workflowHash = $req['workflow_hash'];
-        $targetKey = (int) $req['node_key'];
-        $input = $req['input'] ?? [];
+        $targetKey   = (int) $req['node_key'];
+        $workflowId  = (int) ($req['workflow_id'] ?? 0) ?: null;
+        $input       = $req['input'] ?? [];
+        $inlineGraph = $req['graph'] ?? null;
 
-        $version = WorkflowVersion::where('graph_hash', $workflowHash)->first();
+        // Prefer inline graph from the request (works before the workflow is saved).
+        // Fall back to workflow_hash DB lookup for saved workflows.
+        if ($inlineGraph && isset($inlineGraph['nodes'])) {
+            $graph        = $inlineGraph;
+            $workflowHash = hash('sha256', wp_json_encode($graph));
+        } else {
+            $workflowHash = $req['workflow_hash'] ?? null;
+            if (!$workflowHash) {
+                return new WP_Error('missing_params', 'Provide either graph or workflow_hash', ['status' => 400]);
+            }
 
-        if (!$version) {
-            return new WP_Error('not_found', 'Workflow version not found', ['status' => 404]);
+            $version = WorkflowVersion::where('graph_hash', $workflowHash)->first();
+            if (!$version) {
+                return new WP_Error('not_found', 'Workflow version not found', ['status' => 404]);
+            }
+
+            $graph = $version->getGraph();
         }
 
-        $graph = $version->getGraph();
         $targetNode = null;
 
         foreach ($graph['nodes'] as $node) {
@@ -301,6 +343,7 @@ class RunController extends WP_REST_Controller
 
         $run = Run::create([
             'workflow_version_hash' => $workflowHash,
+            'workflow_id' => $workflowId,
             'status' => 'running',
             'is_test' => true,
             'trigger_data' => $input,
