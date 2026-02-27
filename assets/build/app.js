@@ -6694,7 +6694,7 @@ const TestRun = ({
     setIsLoading(true);
     try {
       const payload = {
-        workflow_id: workFlow?.id,
+        workflow_id: workFlow?.workflow?.id,
         node_key: node?.id,
         input: values,
         graph: {

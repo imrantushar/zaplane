@@ -13,6 +13,7 @@ const TestRun = ({ source, node, workFlow, values, nodes, edges }) => {
   const [showWarning, setShowWarning] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
+
   const handleTest = async () => {
     if (isLoading) return;
     if (source !== "node") {
@@ -24,7 +25,7 @@ const TestRun = ({ source, node, workFlow, values, nodes, edges }) => {
     setIsLoading(true);
     try {
       const payload = {
-        workflow_id: workFlow?.id,      
+        workflow_id: workFlow?.workflow?.id,      
         node_key: node?.id,             
         input: values,                  
         graph: {
