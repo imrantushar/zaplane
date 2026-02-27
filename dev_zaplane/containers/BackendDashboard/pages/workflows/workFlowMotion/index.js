@@ -6,7 +6,7 @@ import { generateFlowHash, mapEdgesForBackend, mapNodesForBackend } from "./help
 import { useDispatch, useSelector } from "react-redux";
 import { createNodeIdGenerator } from "./flowCanvas/helper";
 import { Box, Flex } from "@chakra-ui/react";
-import { updateWorkFlow, } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow";
+import { updateWorkFlow, updateWorkFlowLayout, } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow";
 import NavigationBlocker from "@ZAPComponents/NavigationBlocker";
 
 export default function Workflows({ id }) {
@@ -63,27 +63,30 @@ export default function Workflows({ id }) {
     await dispatch(
       updateWorkFlow({ id, payload })
     );
+    if (values?.layout) {
+      await dispatch(updateWorkFlowLayout({ id, layout: values?.layout}));
+    }
     // Reset dirty state after successful save
     setInitialHash(currentHash);
   };
-  
+
   return (
     <ReactFlowProvider>
       <Flex hight='100vh'>
         <Formik
-         enableReinitialize
+          enableReinitialize
           initialValues={
             {
               layout: workFlow?.workflow?.layout
             }}
           onSubmit={onSubmitHandler}
         >
-          {({  }) => (
+          {({ }) => (
             <Box flex="1" >
               <NavigationBlocker when={isFlowDirty} />
               <FlowCanvas setNodes={setNodes} setEdges={setEdges} onEdgesChange={onEdgesChange}
                 onNodesChange={onNodesChange} nodes={nodes} edges={edges} getNewNodeId={getNewNodeId}
-                workFlow={workFlow} id={id} isFlowDirty={isFlowDirty}/>
+                workFlow={workFlow} id={id} isFlowDirty={isFlowDirty} />
             </Box>
           )}
 

@@ -17,15 +17,14 @@ import {
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { toggleFullscreenMode, mapGraphFromBackend, formatTime } from "./helper";
+import { toggleFullscreenMode, mapGraphFromBackend } from "./helper";
 import ZAPLoading from "@ZAPComponents/Loading";
-import { statusOptions } from "../../helper";
 import { useFlowActions } from "@ZAPHooks/useFlowActions/useFlowActions";
 import CustomNode from "../customNode/CustomNode";
 import './styles.scss'
 import { IoSwapHorizontal, IoSwapVerticalOutline } from "react-icons/io5";
 import ZAPTooltip from "@ZAPComponents/ZAPTooltip";
-import { getSingleWorkFlow, updateWorkFlowLayout, updateWorkFlowStatus, updateWorkFlowTitle } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow";
+import { getSingleWorkFlow} from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow";
 import FlowTopBar from "./FlowTopBar/FlowTopBar";
 
 export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdgesChange, onNodesChange, getNewNodeId, workFlow,isFlowDirty}) {
@@ -55,19 +54,19 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
         edge: null,
     });
     // layout update
-    useEffect(() => {
-        if (canvasLayout !== workFlow.workflow?.layout) {
-            const updateLayout = async () => {
-                try {
-                    await dispatch(updateWorkFlowLayout({ id, layout: canvasLayout }));
-                } catch (error) {
-                    console.error("Failed to update layout:", error);
-                }
-            };
+    // useEffect(() => {
+    //     if (canvasLayout !== workFlow.workflow?.layout) {
+    //         const updateLayout = async () => {
+    //             try {
+    //                 await dispatch(updateWorkFlowLayout({ id, layout: canvasLayout }));
+    //             } catch (error) {
+    //                 console.error("Failed to update layout:", error);
+    //             }
+    //         };
 
-            updateLayout();
-        }
-    }, [canvasLayout]);
+    //         updateLayout();
+    //     }
+    // }, [canvasLayout]);
 
     const activeVersionId = versions?.find(v => v.is_active)?.id;
 
