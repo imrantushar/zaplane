@@ -1,14 +1,18 @@
 
 import { __ } from "@wordpress/i18n";
 import ZAPSelect from "@ZAPComponents/ZAPSelect";
+import ConnectionSelector from "./ConnectionSelector/ConnectionSelector";
 
 const SelectTab = ({
   isTrigger,
   actionOptions,
   values,
   setFieldValue,
+  selectedIntegration,
+  appSlug,
 }) => {
   return (
+    
     <>
       <ZAPSelect
         label={
@@ -26,6 +30,14 @@ const SelectTab = ({
         isClearable
         containerStyle={{ marginBottom: "8px" }}
       />
+      {selectedIntegration?.requires_connection === true && (
+        <ConnectionSelector
+          appSlug={appSlug}
+          values={values}
+          setFieldValue={setFieldValue}
+          selectedIntegration={selectedIntegration}
+        />
+      )}
     </>
   );
 };

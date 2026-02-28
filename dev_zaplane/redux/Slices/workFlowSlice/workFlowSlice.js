@@ -7,11 +7,13 @@ import { nodeLogsRunDetails, getNodeLogDetails } from './actions/workFlowLogs';
 import { workFLowSingeNodeExction } from './actions/workflowExctions';
 import { workflowNodeListiner, workflowNodeListinerStop } from './actions/workFlowListiner';
 import { conditionVariables } from './actions/conditonVariales';
+import { fetchConnectionsByApp } from './actions/connectionsSlice';
 
 
 const workflowsSlice = createSlice({
 	name: 'workflows',
 	initialState: {
+		appConnections: [],
 		allWorkFlows: [],
 		workFlow: {},
 		runs: [],
@@ -89,10 +91,10 @@ const workflowsSlice = createSlice({
 				// action.payload now has { data, currentPage, itemPerPage, totalItems, totalPages }
 				const { data, currentPage, itemPerPage, totalItems, totalPages } = action.payload;
 				state.runs = data || [];
-				state.currentPage = currentPage ;
-				state.itemPerPage = itemPerPage ;
-				state.totalItems = totalItems ;
-				state.totalPages = totalPages ;
+				state.currentPage = currentPage;
+				state.itemPerPage = itemPerPage;
+				state.totalItems = totalItems;
+				state.totalPages = totalPages;
 				state.isLoading = false;
 			})
 			.addCase(getPreviewOldVersion.fulfilled, (state, action) => {
@@ -110,10 +112,10 @@ const workflowsSlice = createSlice({
 				const { data, totalItems, currentPage, itemPerPage, totalPages } =
 					action.payload;
 				state.versions = data || [];
-				state.totalItems = totalItems ;
-				state.currentPage = currentPage ;
-				state.itemPerPage = itemPerPage ;
-				state.totalPages = totalPages ;
+				state.totalItems = totalItems;
+				state.currentPage = currentPage;
+				state.itemPerPage = itemPerPage;
+				state.totalPages = totalPages;
 				state.isLoading = false;
 			})
 			.addCase(versionActive.fulfilled, (state, action) => {
@@ -154,6 +156,10 @@ const workflowsSlice = createSlice({
 			.addCase(conditionVariables.fulfilled, (state, action) => {
 				if (!action.payload) return;
 				state.workflowVariables = action.payload;
+			})
+			.addCase(fetchConnectionsByApp.fulfilled, (state, action) => {
+				state.isLoading = false;
+				state.appConnections = action.payload;
 			})
 	},
 });

@@ -19,7 +19,7 @@ import DrawerItemList from "./DrawerItemList";
 import ActionFieldRenderer from "./ActionFieldRenderer/ActionFieldRenderer";
 import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
 
-const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode, workFlow, isFullscreen,nodes,edges }) => {
+const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode, workFlow, isFullscreen, nodes, edges }) => {
   const { source, node } = context;
   const dispatch = useDispatch();
   const { values, setFieldValue, resetForm } = useFormikContext();
@@ -85,7 +85,10 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
     }));
     setLoadingFields(p => ({ ...p, [key]: false }));
   };
-
+  // seleted intregation
+  const selectedIntegration = useMemo(() => {
+    return getIntegration(mode, selectedItem);
+  }, [mode, selectedItem]);
   const resetAll = () => {
     setMode(null);
     setStep("select");
@@ -95,7 +98,6 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
     onClose();
     setShowWarning(false)
   };
-
   const handleContinue = () => {
     if (step === "select") {
       return setStep("configure");
@@ -108,7 +110,8 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
         name: selectedItem.name,
         event: values.actionType,
         hook: values.hook,
-        config: selectedActionFields.reduce((acc, f) => {
+        connection_id: values.connection_id ?? null,
+        config: selectedActionFields?.reduce((acc, f) => {
           acc[f.key] = values[f.key];
           return acc;
         }, {}),
@@ -194,6 +197,8 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
                   getKey={getKey}
                   node={node}
                   workFlow={workFlow}
+                  selectedIntegration={selectedIntegration}   
+                  appSlug={selectedItem?.id}
                 />
               )
             },
@@ -228,8 +233,8 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
               label: "Test",
               content: (
                 <TestRun
-                 nodes={nodes}
-                 edges={edges}
+                  nodes={nodes}
+                  edges={edges}
                   source={source}
                   node={node}
                   workFlow={workFlow}

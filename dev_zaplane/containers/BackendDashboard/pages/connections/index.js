@@ -78,7 +78,7 @@ const Connections = () => {
 
                 const handler = (event) => {
                     if (event.data?.type === "zaplane_oauth_callback") {
-                        window.removeEventallConnectionener("message", handler);
+                        window.removeEventListener("message", handler);
                         popup?.close();
 
                         if (event.data.data?.success) {
@@ -88,7 +88,7 @@ const Connections = () => {
                     }
                 };
 
-                window.addEventallConnectionener("message", handler);
+                window.addEventListener("message", handler);
             } catch (e) {
                 console.error(e);
             } finally {
@@ -159,8 +159,9 @@ const Connections = () => {
 
                         />
                         {Object.keys(authTypes).map((key) => (
-                            <Button 
+                            <Button
                                 key={key}
+                                className={`${selectedAuthType === key && 'zaplane-button-actve'}`}
                                 variant={selectedAuthType === key ? "solid" : "outline"}
                                 onClick={() => {
                                     setSelectedAuthType(key);
@@ -209,11 +210,9 @@ const Connections = () => {
                                 width="220px"
                                 onClick={handleConnect}
                                 isLoading={loadingOAuth}
-                                isDisabled={!selectedApp || !selectedAuthType}
+                                isDisabled={!selectedAuthType}
                             >
-                                {selectedAuthType === "oauth2"
-                                    ? __("Connect with OAuth", "zaplane")
-                                    : __("Save Connection", "zaplane")}
+                                {__("Save Connection", "zaplane")}
                             </Button>
                         }
 
