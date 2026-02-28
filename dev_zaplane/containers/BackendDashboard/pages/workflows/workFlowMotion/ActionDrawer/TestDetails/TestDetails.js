@@ -7,16 +7,16 @@ import React, { useEffect } from 'react';
 import ReactJson from 'react-json-view';
 import { useDispatch, useSelector } from 'react-redux';
 
-const TestDetails = ({ id, workFlow, source,isLoading }) => {
+const TestDetails = ({ id, workFlow, source, isLoading }) => {
     const dispatch = useDispatch()
     const { singleNodeExecution } = useSelector(
         (state) => state.workflows
     );
     const { values } = useFormikContext();
     const selectedOutput = workFlow?.test_outputs?.[id]?.output || {};
-   const { layout, ...inputData } = singleNodeExecution?.input || values || {};
-    
-    const outputData = singleNodeExecution?.output?.data || selectedOutput;
+    const { layout, ...inputData } = singleNodeExecution?.input || values || {};
+
+    const outputData = singleNodeExecution?.output || selectedOutput;
     const isNode = source === "node"
 
     useEffect(() => {
@@ -24,7 +24,7 @@ const TestDetails = ({ id, workFlow, source,isLoading }) => {
     }, [id, dispatch]);
 
     if (isLoading) return <ZAPLoading />
-    if (!outputData || Object.keys(outputData).length === 0  && isNode) return null;
+    if (!outputData || Object.keys(outputData).length === 0 && isNode) return null;
 
 
     return (
