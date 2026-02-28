@@ -6710,10 +6710,14 @@ const TestRun = ({
     setShowWarning(false);
     setIsLoading(true);
     try {
+      const {
+        layout,
+        ...inputData
+      } = values || {};
       const payload = {
         workflow_id: workFlow?.workflow?.id,
         node_key: node?.id,
-        input: values,
+        input: inputData,
         graph: {
           nodes: (0,_helper__WEBPACK_IMPORTED_MODULE_8__.mapNodesForBackend)(nodes),
           edges: (0,_helper__WEBPACK_IMPORTED_MODULE_8__.mapEdgesForBackend)(edges)
