@@ -65,126 +65,53 @@ class Slack extends IntegrationBase {
 	public static function get_action_config_schema( string $action ): array {
 		if ( $action === 'send_message' ) {
 			return array(
-				'channel' => array(
-					'type'        => 'text',
-					'label'       => 'Channel',
-					'placeholder' => '#general or channel ID',
-					'required'    => true,
-				),
-				'text'    => array(
-					'type'        => 'textarea',
-					'label'       => 'Message',
-					'placeholder' => 'Enter your message... Use {{variable}} for dynamic values',
-					'required'    => true,
-				),
+				array( 'key' => 'channel', 'type' => 'text',     'label' => 'Channel', 'placeholder' => '#general or channel ID',                                    'required' => true ),
+				array( 'key' => 'text',    'type' => 'textarea', 'label' => 'Message', 'placeholder' => 'Enter your message... Use {{variable}} for dynamic values', 'required' => true ),
 			);
 		}
 
 		if ( $action === 'send_dm' ) {
 			return array(
-				'user_id' => array(
-					'type'        => 'text',
-					'label'       => 'User ID',
-					'placeholder' => 'Slack user ID (e.g. U012AB3CD)',
-					'required'    => true,
-				),
-				'text'    => array(
-					'type'        => 'textarea',
-					'label'       => 'Message',
-					'placeholder' => 'Enter your message... Use {{variable}} for dynamic values',
-					'required'    => true,
-				),
+				array( 'key' => 'user_id', 'type' => 'text',     'label' => 'User ID', 'placeholder' => 'Slack user ID (e.g. U012AB3CD)',                            'required' => true ),
+				array( 'key' => 'text',    'type' => 'textarea', 'label' => 'Message', 'placeholder' => 'Enter your message... Use {{variable}} for dynamic values', 'required' => true ),
 			);
 		}
 
 		if ( $action === 'create_channel' ) {
 			return array(
-				'name'    => array(
-					'type'        => 'text',
-					'label'       => 'Channel Name',
-					'placeholder' => 'my-new-channel',
-					'required'    => true,
-					'help'        => 'Lowercase letters, numbers and hyphens only.',
-				),
-				'is_private' => array(
-					'type'    => 'select',
-					'label'   => 'Visibility',
-					'options' => array(
-						array( 'value' => 'false', 'label' => 'Public' ),
-						array( 'value' => 'true',  'label' => 'Private' ),
-					),
-				),
+				array( 'key' => 'name',       'type' => 'text',   'label' => 'Channel Name', 'placeholder' => 'my-new-channel', 'required' => true, 'help' => 'Lowercase letters, numbers and hyphens only.' ),
+				array( 'key' => 'is_private', 'type' => 'select', 'label' => 'Visibility',   'options' => array(
+					array( 'value' => 'false', 'label' => 'Public' ),
+					array( 'value' => 'true',  'label' => 'Private' ),
+				) ),
 			);
 		}
 
 		if ( $action === 'invite_to_channel' ) {
 			return array(
-				'channel'  => array(
-					'type'        => 'text',
-					'label'       => 'Channel ID',
-					'placeholder' => 'C012AB3CD',
-					'required'    => true,
-				),
-				'user_ids' => array(
-					'type'        => 'text',
-					'label'       => 'User IDs',
-					'placeholder' => 'U012AB3CD,U012AB3CE',
-					'required'    => true,
-					'help'        => 'Comma-separated Slack user IDs.',
-				),
+				array( 'key' => 'channel',  'type' => 'text', 'label' => 'Channel ID', 'placeholder' => 'C012AB3CD',              'required' => true ),
+				array( 'key' => 'user_ids', 'type' => 'text', 'label' => 'User IDs',   'placeholder' => 'U012AB3CD,U012AB3CE',    'required' => true, 'help' => 'Comma-separated Slack user IDs.' ),
 			);
 		}
 
 		if ( $action === 'set_topic' ) {
 			return array(
-				'channel' => array(
-					'type'        => 'text',
-					'label'       => 'Channel ID',
-					'placeholder' => 'C012AB3CD',
-					'required'    => true,
-				),
-				'topic'   => array(
-					'type'        => 'text',
-					'label'       => 'Topic',
-					'placeholder' => 'New channel topic...',
-					'required'    => true,
-				),
+				array( 'key' => 'channel', 'type' => 'text', 'label' => 'Channel ID', 'placeholder' => 'C012AB3CD',          'required' => true ),
+				array( 'key' => 'topic',   'type' => 'text', 'label' => 'Topic',      'placeholder' => 'New channel topic...', 'required' => true ),
 			);
 		}
 
 		if ( $action === 'add_reaction' ) {
 			return array(
-				'channel'   => array(
-					'type'        => 'text',
-					'label'       => 'Channel ID',
-					'placeholder' => 'C012AB3CD',
-					'required'    => true,
-				),
-				'timestamp' => array(
-					'type'        => 'text',
-					'label'       => 'Message Timestamp',
-					'placeholder' => '{{slack_message_ts}}',
-					'required'    => true,
-					'help'        => 'The ts of the message to react to.',
-				),
-				'emoji'     => array(
-					'type'        => 'text',
-					'label'       => 'Emoji Name',
-					'placeholder' => 'thumbsup',
-					'required'    => true,
-					'help'        => 'Emoji name without colons (e.g. thumbsup).',
-				),
+				array( 'key' => 'channel',   'type' => 'text', 'label' => 'Channel ID',        'placeholder' => 'C012AB3CD',             'required' => true ),
+				array( 'key' => 'timestamp', 'type' => 'text', 'label' => 'Message Timestamp', 'placeholder' => '{{slack_message_ts}}',  'required' => true, 'help' => 'The ts of the message to react to.' ),
+				array( 'key' => 'emoji',     'type' => 'text', 'label' => 'Emoji Name',        'placeholder' => 'thumbsup',              'required' => true, 'help' => 'Emoji name without colons (e.g. thumbsup).' ),
 			);
 		}
 
 		if ( $action === 'get_user_info' ) {
 			return array(
-				'user_id' => array(
-					'type'        => 'text',
-					'label'       => 'User ID',
-					'placeholder' => 'U012AB3CD or {{user_id}}',
-					'required'    => true,
-				),
+				array( 'key' => 'user_id', 'type' => 'text', 'label' => 'User ID', 'placeholder' => 'U012AB3CD or {{user_id}}', 'required' => true ),
 			);
 		}
 
