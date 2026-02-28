@@ -116,7 +116,7 @@ class ListenerController extends WP_REST_Controller
 
         $hook = $targetNode['data']['hook'] ?? null;
         if (!$hook) {
-            return new WP_Error('no_hook', 'Trigger node has no hook defined', ['status' => 400]);
+            return new WP_Error('no_hook', 'Trigger hasn’t been added yet. Please set it to continue', ['status' => 400]);
         }
 
         $optionName = $this->get_option_name($workflowId);

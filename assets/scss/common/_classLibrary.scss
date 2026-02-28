@@ -17,6 +17,10 @@
     min-height: 100vh;
 
 }
+.zaplane-button-actve{
+    background: var(--zaplane-second-primary);
+    color: var(--zaplane-primary) !important;
+}
 .react-flow {
     position: fixed !important;
 }
@@ -168,8 +172,9 @@
     }
     &-label {
         color: var(--zaplane-font-color);
+        font-size: 14px;
         font-weight: 500;
-        line-height: 28px;
+        line-height: 20px;
         margin: 0;
     }
     &-border {
@@ -201,7 +206,7 @@
         color: var(--zaplane-font-color);
         font-size: 12px;
         font-weight: 400;
-        line-height: 18px;
+        line-height: 16px;
         margin: 0;
     }
     &-sub-title-muted {
