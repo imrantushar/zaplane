@@ -4595,6 +4595,23 @@ const Logs = () => {
       alignItems: "center",
       children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_20__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
         className: "zaplane-label",
+        children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_7__.__)("Node Count", "zaplane")
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_20__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Icon, {
+        as: _ZAPUtils_icons__WEBPACK_IMPORTED_MODULE_17__.TableArrow
+      })]
+    }),
+    cell: row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_20__.jsx)(_ZAPComponents_Labels_ZAPLabel__WEBPACK_IMPORTED_MODULE_19__["default"], {
+      label: row.node_count,
+      type: "simple"
+    })
+    // columnWidth: "150px",
+  }, {
+    name: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_20__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Flex, {
+      gap: "2px",
+      justifyContent: "center",
+      alignItems: "center",
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_20__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
+        className: "zaplane-label",
         children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_7__.__)("Status", "zaplane")
       }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_20__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Icon, {
         as: _ZAPUtils_icons__WEBPACK_IMPORTED_MODULE_17__.TableArrow
