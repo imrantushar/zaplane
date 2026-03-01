@@ -4174,12 +4174,12 @@ const RecentLogs = ({
       children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("Recent Logs", "zaplane")
     }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_ZAPComponents_ListTable__WEBPACK_IMPORTED_MODULE_5__["default"], {
       columns: columns,
-      data: Array.isArray(data) ? data.slice(0, 5) : [],
+      data: Array.isArray(data.runs) ? data.runs.slice(0, 5) : [],
       isRowSelectable: false,
       showSubHeader: false,
       showColumnFilter: false,
       noDataText: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("No logs found", "zaplane"),
-      totalItems: data?.length || 0,
+      totalItems: data?.runs?.length || 0,
       dataFetchingStatus: false,
       suffix: "recent-logs-table"
     })]
