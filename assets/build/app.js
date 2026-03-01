@@ -5088,7 +5088,7 @@ const WorkflowTable = () => {
       spacing: "1",
       justifyContent: "center",
       children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_ZAPComponents_ZAPTooltip__WEBPACK_IMPORTED_MODULE_15__["default"], {
-        content: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)(" Log Details", 'zaplane'),
+        content: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)("Details", 'zaplane'),
         children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Box, {
           display: "flex",
           p: "5px 6px",
