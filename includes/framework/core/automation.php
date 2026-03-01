@@ -3,6 +3,7 @@
 namespace Zaplane\Framework\Core;
 
 use Zaplane\Framework\Classes\Container;
+use Zaplane\Framework\Classes\ConnectionManager;
 use Zaplane\Framework\Classes\Query;
 use Zaplane\Framework\Exceptions\WorkflowException;
 use Zaplane\Framework\Exceptions\IntegrationException;
@@ -240,6 +241,7 @@ class Automation
                 if (!$integration) {
                     throw IntegrationException::notFound($node['data']['app']);
                 }
+                $node = $this->inject_credentials($node);
                 $context = $this->buildNodeContext($run->id);
                 $output = $integration::execute_node($node, $context);
             } else {
@@ -247,6 +249,7 @@ class Automation
                 if (!$integration) {
                     throw IntegrationException::notFound($node['data']['app']);
                 }
+                $node = $this->inject_credentials($node);
                 $output = $integration::execute_node($node, $input);
             }
 
@@ -352,6 +355,24 @@ class Automation
         }
 
         return $context;
+    }
+
+    private function inject_credentials(array $node): array
+    {
+        $connection_id = $node['data']['connection_id'] ?? null;
+
+        if (!$connection_id) {
+            return $node;
+        }
+
+        try {
+            $manager = $this->container->get('connections');
+            $node['_connection_credentials'] = $manager->get_execution_credentials((int) $connection_id);
+        } catch (\Throwable $e) {
+            error_log('Zaplane: failed to load credentials for connection ' . $connection_id . ': ' . $e->getMessage());
+        }
+
+        return $node;
     }
 
     private function load_graph(string $hash): array

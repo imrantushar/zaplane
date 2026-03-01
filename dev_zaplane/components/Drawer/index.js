@@ -25,8 +25,7 @@ const ZAPDrawer = ({
     onClose,
     open,
     arrowClose,
-    isFullscreen = false,
-    arrowOnClick
+    isFullscreen = false
 }) => {
     return (
         <Drawer.Root

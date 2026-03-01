@@ -29,7 +29,7 @@ const TestDetails = ({ id, workFlow, source, isLoading }) => {
 
     return (
 
-        <VStack spacing="4" align="stretch">
+        <VStack spacing="4" align="stretch" overflow='hidden'>
             <Box
                 p="3"
                 border="1px solid var(--zaplane-border-color)"

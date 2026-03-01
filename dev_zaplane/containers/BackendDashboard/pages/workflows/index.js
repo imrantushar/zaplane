@@ -20,13 +20,13 @@ import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
 
 const CreateWorkflows = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate()
+  const navigate =useNavigate()
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [workflowName, setWorkflowName] = useState("");
 
 ;
 
-  const handleCreate = async () => {
+   const handleCreate = async () => {
     if (!workflowName.trim()) return;
     const res = await dispatch(
       createWorkflows({

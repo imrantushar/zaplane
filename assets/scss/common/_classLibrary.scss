@@ -17,6 +17,10 @@
     // min-height: 100vh;
 
 }
+.zaplane-button-actve{
+    background: var(--zaplane-second-primary);
+    color: var(--zaplane-primary) !important;
+}
 .react-flow {
     position: fixed !important;
 }
