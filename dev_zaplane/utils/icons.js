@@ -14,3 +14,11 @@ export const ReExcutionIcon = () => (
   <path d="M1.82422 11.2416L11.5464 11.2414C12.2176 11.2414 12.7617 10.6973 12.7617 10.0262V7.89941" stroke="#141A24" stroke-width="0.911458" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>
 );
+export const TableArrow = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+  <path d="M6.96781 4.47998L4.48779 2L2.00781 4.47998" stroke="#738496" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M4.48828 14V2" stroke="#738496" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M9.03516 11.5195L11.5152 13.9995L13.9952 11.5195" stroke="#738496" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M11.5156 2V14" stroke="#738496" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+);

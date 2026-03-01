@@ -10,8 +10,9 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { conditionVariables } from "@ZAPRedux/Slices/workFlowSlice/actions/conditonVariales";
 import VariablePopover from "./VariablePopover";
+import { mapEdgesForBackend, mapNodesForBackend } from "../../helper";
 
-export default function ConditionGroupField({ value, field, nodeId, workFlow }) {
+export default function ConditionGroupField({ value, field, nodeId, workFlow, nodes, edges }) {
     const ruleFields = field?.fields;
     const EMPTY_RULE = buildEmptyRule(ruleFields);
 
@@ -24,12 +25,15 @@ export default function ConditionGroupField({ value, field, nodeId, workFlow }) 
 
     useEffect(() => {
         if (!nodeId || !workFlow?.version?.hash) return;
+        const payload = {
+            workflow_id: workFlow.workflow.id,
+            target_node_key: nodeId,
+            nodes: mapNodesForBackend(nodes),
+            edges: mapEdgesForBackend(edges),
+        }
 
         dispatch(
-            conditionVariables({
-                targetNodeKey: nodeId,
-                workflowHash: workFlow.version.hash,
-            })
+            conditionVariables(payload)
         );
     }, [dispatch, nodeId, workFlow?.version?.hash]);
 
@@ -133,7 +137,7 @@ export default function ConditionGroupField({ value, field, nodeId, workFlow }) 
                         ))}
 
                         <Button bg={"var(--zaplane-secondary)"} color="var(--zaplane-font-color)" size="sm" width="140px" fontWeight="500"
-                         onClick={() => groupHelpers.push([{ ...EMPTY_RULE }])}>
+                            onClick={() => groupHelpers.push([{ ...EMPTY_RULE }])}>
                             {__("OR Group", "zaplane")}
                         </Button>
 

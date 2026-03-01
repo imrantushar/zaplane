@@ -30,3 +30,8 @@
 .zaplane-table--history-table,.zaplane-table--version-table{
     padding: 0;
 }
+.zaplane-button-actve{
+    background: var(--zaplane-second-primary);
+    color: var(--zaplane-primary) !important;
+  
+}

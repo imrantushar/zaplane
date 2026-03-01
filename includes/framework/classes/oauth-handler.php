@@ -100,13 +100,14 @@ class OAuthHandler {
 			throw OAuthException::noAccessToken( $app );
 		}
 
-        $connection_id = $this->connections->create(
+        $create_result = $this->connections->create(
 			$user_id,
 			$app,
 			$name,
 			'oauth2',
             $credentials
 		);
+		$connection_id = $create_result['id'];
 
 		if ( isset( $tokens['expires_in'] ) ) {
 			$this->connections->set_oauth_expiry( $connection_id, (int) $tokens['expires_in'] );
