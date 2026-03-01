@@ -42,8 +42,7 @@ const dashboardSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
-            .addCase(topExecutedFlows.fulfilled, (state, action) => {
-                console.log(action.payload);
+            .addCase(topExecutedFlows.fulfilled, (state, action) => { 
                 state.topExecutedFlows = action.payload;
                 state.isLoading =false
             })

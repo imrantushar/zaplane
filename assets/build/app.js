@@ -9164,7 +9164,6 @@ const dashboardSlice = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createSl
   reducers: {},
   extraReducers: builder => {
     builder.addCase(topExecutedFlows.fulfilled, (state, action) => {
-      console.log(action.payload);
       state.topExecutedFlows = action.payload;
       state.isLoading = false;
     });
