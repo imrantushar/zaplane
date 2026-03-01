@@ -125,20 +125,6 @@ const Logs = () => {
             // columnWidth: "150px",
         },
         {
-            name: (
-                <Flex gap="2px" justifyContent="center" alignItems='center'>
-                    <Text className="zaplane-label">
-                        {__("Node Count", "zaplane")}
-                    </Text>
-                    <Icon as={TableArrow} />
-                </Flex>
-            ),
-            cell: (row) => (
-                <ZAPLabel label={row.node_count} type={"simple"} />
-            ),
-            // columnWidth: "150px",
-        },
-        {
             name: (<Flex gap="2px" justifyContent="center" alignItems='center'>
                 <Text className="zaplane-label">
                     {__("Status", "zaplane")}
