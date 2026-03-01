@@ -111,13 +111,13 @@ const RecentLogs = ({ data = [] }) => {
 
       <ListTable
         columns={columns}
-        data={Array.isArray(data.runs) ? data.runs.slice(0, 5) : []}
+        data={Array.isArray(data) ? data.slice(0, 5) : []}
         isRowSelectable={false}
         showSubHeader={false}
         showColumnFilter={false}
         
         noDataText={__("No logs found", "zaplane")}
-        totalItems={data?.runs?.length || 0}
+        totalItems={data?.length || 0}
         dataFetchingStatus={false}
         suffix="recent-logs-table"
       />

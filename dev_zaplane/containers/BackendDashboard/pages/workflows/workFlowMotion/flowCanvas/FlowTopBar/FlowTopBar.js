@@ -64,13 +64,11 @@ export default function FlowTopBar({
     <TopBar
       leftContent={() => (
         <>
-
-          <Button variant="outline" height="36px" width="36px" onClick={() => {
-            isFullscreen ? toggleFullscreen() : navigate(-1)
-          }}>
-            <FiArrowLeft />
-          </Button>
-
+          {!isFullscreen && (
+            <Button variant="outline" height="36px" width="36px" onClick={() => navigate(-1)}>
+              <FiArrowLeft />
+            </Button>
+          )}
           <Box w="120px">
             <Input
               height='36px'
