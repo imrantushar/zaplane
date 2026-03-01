@@ -25,7 +25,8 @@ const ZAPDrawer = ({
     onClose,
     open,
     arrowClose,
-    isFullscreen = false
+    isFullscreen = false,
+    arrowOnClick,
 }) => {
     return (
         <Drawer.Root
@@ -55,7 +56,7 @@ const ZAPDrawer = ({
                             <Drawer.Header>
                                 {
                                     arrowClose && <Icon as={IoIosArrowBack} height='24px' width="24px" onClick={() => {
-                                        arrowOnClick ? arrowOnClick() : onClose?.();
+                                        arrowOnClick ? arrowOnClick() : onClose();
                                     }}
                                     >
 

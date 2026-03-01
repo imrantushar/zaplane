@@ -310,7 +310,8 @@ const ZAPDrawer = ({
   onClose,
   open,
   arrowClose,
-  isFullscreen = false
+  isFullscreen = false,
+  arrowOnClick
 }) => {
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.DrawerRoot, {
     placement: placement,
@@ -342,7 +343,7 @@ const ZAPDrawer = ({
               height: "24px",
               width: "24px",
               onClick: () => {
-                arrowOnClick ? arrowOnClick() : onClose?.();
+                arrowOnClick ? arrowOnClick() : onClose();
               }
             }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.DrawerTitle, {
               margin: "0",
