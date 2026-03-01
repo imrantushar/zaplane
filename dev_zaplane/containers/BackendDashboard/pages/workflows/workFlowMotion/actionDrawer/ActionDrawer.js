@@ -64,7 +64,7 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
     return integration.actions?.[values.actionType]?.schema || [];
   }, [mode, selectedItem, values?.actionType, isTrigger]);
 
-  // 3️⃣ NOW call dynamic hook
+  // NOW call dynamic hook
   const {
     dynamicOptions,
     loadingFields,
@@ -117,6 +117,10 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
       resetAll();
     }
   };
+  // seleted intregation
+  const selectedIntegration = useMemo(() => {
+    return getIntegration(mode, selectedItem);
+  }, [mode, selectedItem]);
   return (
     <ZAPDrawer
       open={open}
@@ -186,6 +190,8 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
                   getKey={getKey}
                   node={node}
                   workFlow={workFlow}
+                  selectedIntegration={selectedIntegration}
+                  appSlug={selectedItem?.id}
                 />
               )
             },
