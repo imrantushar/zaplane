@@ -22,7 +22,7 @@ import ZAPLoading from "@ZAPComponents/Loading";
 import TopBar from "@ZAPComponents/TopBar";
 import ZAPDrawer from "@ZAPComponents/Drawer";
 import ListTable from "@ZAPComponents/ListTable";
-import { getDuration } from "@ZAPUtils/helper";
+import { formatDateTime, formatLabel, getDuration } from "@ZAPUtils/helper";
 import { statusStyle } from "../workflows/helper";
 import { HistoryIcon, TableArrow } from "@ZAPUtils/icons";
 import ZAPTooltip from "@ZAPComponents/ZAPTooltip";
