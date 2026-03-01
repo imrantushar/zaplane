@@ -18,14 +18,13 @@ import DrawerModeList from "./DrawerItemList/DrawerModeList";
 import DrawerItemList from "./DrawerItemList";
 import ActionFieldRenderer from "./ActionFieldRenderer/ActionFieldRenderer";
 import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
+import { useDynamicFields } from "@ZAPHooks/useActionDrawer/useDynamicFields";
 
-const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode, workFlow, isFullscreen,nodes,edges }) => {
+const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode, workFlow, isFullscreen, nodes, edges }) => {
   const { source, node } = context;
   const dispatch = useDispatch();
   const { values, setFieldValue, resetForm } = useFormikContext();
   const [step, setStep] = useState("select");
-  const [dynamicOptions, setDynamicOptions] = useState({});
-  const [loadingFields, setLoadingFields] = useState({});
   const isTrigger = node?.data?.action === "trigger" && source === "node";
   const [showWarning, setShowWarning] = useState(false);
 
@@ -65,26 +64,18 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
     return integration.actions?.[values.actionType]?.schema || [];
   }, [mode, selectedItem, values?.actionType, isTrigger]);
 
-  const getKey = (field) => `${mode}:${selectedItem?.id}:${field.key}`;
-
-  //Generate dynamic keys and fetch dynamic options
-
-  const fetchDynamicOptions = async (field) => {
-    if (!field.dynamic) return;
-    const key = getKey(field);
-    if (dynamicOptions[key]) return;
-
-    setLoadingFields(p => ({ ...p, [key]: true }));
-    const res = await fetchDynamic(field.dynamic);
-    setDynamicOptions(p => ({
-      ...p,
-      [key]: Object.values(res).map(i => ({
-        value: i[field.dynamic.select[0]],
-        label: i[field.dynamic.select[1]],
-      })),
-    }));
-    setLoadingFields(p => ({ ...p, [key]: false }));
-  };
+  // 3️⃣ NOW call dynamic hook
+  const {
+    dynamicOptions,
+    loadingFields,
+    fetchDynamicOptions,
+    getKey,
+  } = useDynamicFields({
+    selectedItem,
+    mode,
+    selectedActionFields,
+    values,
+  });
 
   const resetAll = () => {
     setMode(null);
@@ -100,7 +91,6 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
     if (step === "select") {
       return setStep("configure");
     }
-
     if (step === "configure") {
 
       const payload = {
@@ -127,7 +117,6 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
       resetAll();
     }
   };
-
   return (
     <ZAPDrawer
       open={open}
@@ -231,8 +220,8 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
               label: "Test",
               content: (
                 <TestRun
-                 nodes={nodes}
-                 edges={edges}
+                  nodes={nodes}
+                  edges={edges}
                   source={source}
                   node={node}
                   workFlow={workFlow}
