@@ -6561,9 +6561,9 @@ const ConnectionPopaver = props => {
   }, [selectedAuthType, dispatch]);
   const handleConnect = async () => {
     if (!selectedAuthType) return;
+    setLoadingOAuth(true);
     if (selectedAuthType === "oauth2") {
       try {
-        setLoadingOAuth(true);
         const res = await dispatch((0,_ZAPRedux_Slices_connectionsSlice_connectionsSlice__WEBPACK_IMPORTED_MODULE_4__.initOAuth)({
           app: appSlug,
           name: appSlug,
@@ -6576,7 +6576,7 @@ const ConnectionPopaver = props => {
             popup?.close();
             if (event.data.data?.success) {
               dispatch((0,_ZAPRedux_Slices_connectionsSlice_connectionsSlice__WEBPACK_IMPORTED_MODULE_4__.fetchConnections)());
-              setIsModalOpen(false);
+              onclose();
             }
           }
         };
@@ -6587,12 +6587,18 @@ const ConnectionPopaver = props => {
         setLoadingOAuth(false);
       }
     } else {
-      await dispatch((0,_ZAPRedux_Slices_connectionsSlice_connectionsSlice__WEBPACK_IMPORTED_MODULE_4__.createTokenConnection)({
+      dispatch((0,_ZAPRedux_Slices_connectionsSlice_connectionsSlice__WEBPACK_IMPORTED_MODULE_4__.createTokenConnection)({
         app: appSlug,
         name: appSlug,
         authType: selectedAuthType,
         credentials
-      }));
+      })).then(action => {
+        if (action.type === "connections/createTokenConnection/fulfilled") {
+          setCredentials({});
+          onClose();
+        }
+        setLoadingOAuth(false);
+      });
     }
   };
   const authTypes = authFields?.available_auth_types || {};
@@ -6646,7 +6652,9 @@ const ConnectionPopaver = props => {
       ..._assets_scss_chakra_recipe__WEBPACK_IMPORTED_MODULE_10__.primaryBtn,
       width: "220px",
       onClick: handleConnect,
-      isLoading: loadingOAuth,
+      loading: loadingOAuth // ✅ text এর পরিবর্তে spinner দেখাবে
+      ,
+      loadingText: selectedAuthType === "oauth2" ? (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)("Connecting...", "zaplane") : (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)("Saving...", "zaplane"),
       children: selectedAuthType === "oauth2" ? (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)("Connect with OAuth", "zaplane") : (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)("Save Connection", "zaplane")
     })]
   });

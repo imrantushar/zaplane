@@ -28,11 +28,9 @@ const ConnectionPopaver = (props) => {
     }, [selectedAuthType, dispatch]);
     const handleConnect = async () => {
         if (!selectedAuthType) return;
-
+        setLoadingOAuth(true);
         if (selectedAuthType === "oauth2") {
             try {
-                setLoadingOAuth(true);
-
                 const res = await dispatch(
                     initOAuth({
                         app: appSlug,
@@ -54,7 +52,7 @@ const ConnectionPopaver = (props) => {
 
                         if (event.data.data?.success) {
                             dispatch(fetchConnections());
-                            setIsModalOpen(false);
+                            onclose()
                         }
                     }
                 };
@@ -66,14 +64,23 @@ const ConnectionPopaver = (props) => {
                 setLoadingOAuth(false);
             }
         } else {
-            await dispatch(
+
+            dispatch(
                 createTokenConnection({
                     app: appSlug,
                     name: appSlug,
                     authType: selectedAuthType,
                     credentials,
                 })
-            );
+            )
+                .then((action) => {
+                    if (action.type === "connections/createTokenConnection/fulfilled") {
+                        setCredentials({});
+                        onClose();
+                    }
+                    setLoadingOAuth(false);
+
+                })
         }
     };
 
@@ -84,14 +91,14 @@ const ConnectionPopaver = (props) => {
             <Flex gap='24px'>
                 {Object.keys(authTypes).map((key) => (
                     <Button
-                       width='45%'
+                        width='45%'
                         key={key}
                         className={`${selectedAuthType === key && 'zaplane-button-actve'}`}
                         variant={selectedAuthType === key ? "solid" : "outline"}
                         onClick={() => {
                             setSelectedAuthType(key);
                             setCredentials({});
-                            
+
                         }}
                     >
                         {formatLabel(key)}
@@ -131,19 +138,21 @@ const ConnectionPopaver = (props) => {
                 </VStack>
             )}
 
-            {selectedAuthType &&
+            {selectedAuthType && (
                 <Button
                     {...primaryBtn}
                     width="220px"
                     onClick={handleConnect}
-                    isLoading={loadingOAuth}
-
+                    loading={loadingOAuth}        // ✅ text এর পরিবর্তে spinner দেখাবে
+                    loadingText={selectedAuthType === "oauth2"
+                        ? __("Connecting...", "zaplane")
+                        : __("Saving...", "zaplane")}
                 >
                     {selectedAuthType === "oauth2"
                         ? __("Connect with OAuth", "zaplane")
                         : __("Save Connection", "zaplane")}
                 </Button>
-            }
+            )}
         </WPPopover>
     );
 };
