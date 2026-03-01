@@ -179,7 +179,7 @@ const WorkflowTable = () => {
       cell: (row) => (
 
         <HStack justify="flex-end" spacing="1" justifyContent={"center"}>
-          <ZAPTooltip content={__("Details", 'zaplane')}>
+          <ZAPTooltip content={__(" Log Details", 'zaplane')}>
             <Box
               display="flex"
               p={"5px 6px"}
