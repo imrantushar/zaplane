@@ -139,10 +139,10 @@ class Lifter extends IntegrationBase {
     public static function resolve_trigger( array $node, array $args ) {
         switch ( $node['event'] ) {
             case 'user_enroll_course':
-                $course_id = $args[0] ?? null;
-                $enroll_id = $args[1] ?? null;
+                $user_id   = $args[0] ?? null;
+                $course_id = $args[1] ?? null;
 
-                if ( ! $course_id || ! $enroll_id ) return false;
+                if ( ! $course_id || ! $user_id ) return false;
 
                 $selected_course = $node['data']['config']['course_id'] ?? 'any';
 
@@ -150,10 +150,20 @@ class Lifter extends IntegrationBase {
                     return false;
                 }
 
+                $course = get_post( $course_id );
+                $user   = get_userdata( $user_id );
+
+                if ( ! $course || ! $user ) return false;
+
                 return [
-                    'success'   => true,
-                    'course_id' => $course_id,
-                    'enroll_id' => $enroll_id,
+                    'success'      => true,
+                    'course_id'    => $course->ID,
+                    'course_title' => $course->post_title,
+                    'course_url'   => get_permalink( $course->ID ),
+                    'user_id'      => $user_id,
+                    'user_email'   => $user->user_email,
+                    'first_name'   => $user->first_name,
+                    'last_name'    => $user->last_name,
                 ];
                                 
             case 'course_complete':
