@@ -24,10 +24,11 @@ const TestRun = ({ source, node, workFlow, values, nodes, edges }) => {
     setShowWarning(false);
     setIsLoading(true);
     try {
+      const { layout, ...inputData } = values || {};
       const payload = {
         workflow_id: workFlow?.workflow?.id,      
         node_key: node?.id,             
-        input: values,                  
+        input: inputData,                  
         graph: {
           nodes: mapNodesForBackend(nodes),  
           edges: mapEdgesForBackend(edges) 
