@@ -25,6 +25,7 @@ import TopBar from "@ZAPComponents/TopBar";
 import { primaryBtn } from "../../../../../assets/scss/chakra/recipe";
 import ConnectionTable from "./ConnectionTable";
 import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
+import { formatLabel } from "@ZAPUtils/helper";
 
 
 const Connections = () => {
@@ -168,7 +169,7 @@ const Connections = () => {
                                     setCredentials({});
                                 }}
                             >
-                                {key}
+                                {formatLabel(key)}
                             </Button>
                         ))}
                         {authFields?.auth_fields && selectedAuthType && (

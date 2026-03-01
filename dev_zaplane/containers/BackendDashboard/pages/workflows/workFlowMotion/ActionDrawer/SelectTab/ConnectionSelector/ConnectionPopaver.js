@@ -7,6 +7,7 @@ import { Button, Flex, Input, Text, VStack } from '@chakra-ui/react';
 import { primaryBtn } from '../../../../../../../../../assets/scss/chakra/recipe';
 import ZAPLabel from '@ZAPComponents/Labels/ZAPLabel';
 import './styles.scss'
+import { formatLabel } from '@ZAPUtils/helper';
 
 const ConnectionPopaver = (props) => {
     const { isOpen, onClose, appSlug, selectedIntegration } = props
@@ -93,7 +94,7 @@ const ConnectionPopaver = (props) => {
                             
                         }}
                     >
-                        {key}
+                        {formatLabel(key)}
                     </Button>
                 ))}
             </Flex>
