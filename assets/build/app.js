@@ -6669,15 +6669,18 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var react_redux__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/dist/react-redux.mjs");
-/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/button/button.js");
-/* harmony import */ var _ZAPComponents_ZAPSelect__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @ZAPComponents/ZAPSelect */ "./dev_zaplane/components/ZAPSelect/index.js");
-/* harmony import */ var _ZAPRedux_Slices_workFlowSlice_actions_connectionsSlice__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @ZAPRedux/Slices/workFlowSlice/actions/connectionsSlice */ "./dev_zaplane/redux/Slices/workFlowSlice/actions/connectionsSlice.js");
-/* harmony import */ var _ConnectionPopaver__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./ConnectionPopaver */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/ConnectionSelector/ConnectionPopaver.js");
-/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
-/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_6__);
-/* harmony import */ var _assets_scss_chakra_recipe__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../../../../../../../../assets/scss/chakra/recipe */ "./assets/scss/chakra/recipe.js");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__);
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/text/index.js");
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/button/button.js");
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/flex/flex.js");
+/* harmony import */ var react_select__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! react-select */ "./node_modules/react-select/dist/react-select.esm.js");
+/* harmony import */ var react_select__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! react-select */ "./node_modules/react-select/dist/index-641ee5b8.esm.js");
+/* harmony import */ var _ZAPRedux_Slices_workFlowSlice_actions_connectionsSlice__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @ZAPRedux/Slices/workFlowSlice/actions/connectionsSlice */ "./dev_zaplane/redux/Slices/workFlowSlice/actions/connectionsSlice.js");
+/* harmony import */ var _ConnectionPopaver__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./ConnectionPopaver */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/ConnectionSelector/ConnectionPopaver.js");
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_9___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_9__);
+/* harmony import */ var _assets_scss_chakra_recipe__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../../../../../../../../../assets/scss/chakra/recipe */ "./assets/scss/chakra/recipe.js");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__);
 
 
 
@@ -6699,35 +6702,51 @@ const ConnectionSelector = ({
   const [isPopoverOpen, setPopoverOpen] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
     if (appSlug) {
-      dispatch((0,_ZAPRedux_Slices_workFlowSlice_actions_connectionsSlice__WEBPACK_IMPORTED_MODULE_4__.fetchConnectionsByApp)(appSlug));
+      dispatch((0,_ZAPRedux_Slices_workFlowSlice_actions_connectionsSlice__WEBPACK_IMPORTED_MODULE_7__.fetchConnectionsByApp)(appSlug));
     }
-  }, [appSlug]);
+  }, [appSlug, dispatch]);
   const options = appConnections?.filter(c => c.app === appSlug)?.map(c => ({
     label: c.name,
     value: String(c.id)
   }));
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.Fragment, {
-    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_ZAPComponents_ZAPSelect__WEBPACK_IMPORTED_MODULE_3__["default"], {
-      label: "Select Connection",
-      options: options,
-      value: values?.connection_id,
-      onChange: val => {
-        setFieldValue("connection_id", val.value);
-      },
-      placeholder: "Select a connection"
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Button, {
-      ..._assets_scss_chakra_recipe__WEBPACK_IMPORTED_MODULE_7__.secondPrimaryBtn,
-      size: "sm",
-      mt: "24px",
-      width: "100%",
-      onClick: () => setPopoverOpen(true),
-      children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_6__.__)('Create New Connection', 'zaplane')
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_ConnectionPopaver__WEBPACK_IMPORTED_MODULE_5__["default"], {
+
+  // Custom MenuList to add "Create New Connection" button inside dropdown
+  const CustomMenuList = props => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsxs)(react_select__WEBPACK_IMPORTED_MODULE_6__.c.MenuList, {
+    ...props,
+    children: [props.children, /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Flex, {
+      p: 2,
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Button, {
+        ..._assets_scss_chakra_recipe__WEBPACK_IMPORTED_MODULE_10__.secondPrimaryBtn,
+        size: "sm",
+        width: "100%",
+        onClick: () => setPopoverOpen(true),
+        children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_9__.__)("Create New Connection", "zaplane")
+      })
+    })]
+  });
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.Fragment, {
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Flex, {
+      direction: "column",
+      gap: 2,
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
+        className: "zaplane-label",
+        children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_9__.__)("Select Connection", "zaplane")
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(react_select__WEBPACK_IMPORTED_MODULE_5__["default"], {
+        className: "zaplane-select",
+        classNamePrefix: "zaplane-select",
+        options: options,
+        value: options?.find(o => o.value === values?.connection_id) || null,
+        onChange: val => setFieldValue("connection_id", val.value),
+        placeholder: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_9__.__)("Select a connection", "zaplane"),
+        isClearable: true,
+        components: {
+          MenuList: CustomMenuList
+        }
+      })]
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_ConnectionPopaver__WEBPACK_IMPORTED_MODULE_8__["default"], {
       appSlug: appSlug,
       isOpen: isPopoverOpen,
-      onClose: () => {
-        setPopoverOpen(false);
-      }
+      onClose: () => setPopoverOpen(false)
     })]
   });
 };
