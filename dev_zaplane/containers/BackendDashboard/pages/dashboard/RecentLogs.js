@@ -40,7 +40,7 @@ const RecentLogs = ({ data = [] }) => {
         return (
           <Box >
             <ZAPLabel label={date} type={"simple"}/>
-            <Text className="zaplane-sub-title" ml='-63px' color="var(--zaplane-text-muted)">
+            <Text className="zaplane-sub-title" ml='-50px' color="var(--zaplane-text-muted)">
               {__(time, 'zaplane')}
             </Text>
           </Box>
@@ -60,7 +60,7 @@ const RecentLogs = ({ data = [] }) => {
         return (
           <Box textAlign="center">
             <ZAPLabel label={date} type={"simple"}/>
-            <Text className="zaplane-sub-title" ml='-63px' color="var(--zaplane-text-muted)">
+            <Text className="zaplane-sub-title" ml='-50px' color="var(--zaplane-text-muted)">
               {__(time, 'zaplane')}
             </Text>
           </Box>
