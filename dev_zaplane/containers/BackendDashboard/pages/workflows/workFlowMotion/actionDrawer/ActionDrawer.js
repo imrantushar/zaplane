@@ -98,6 +98,7 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
         name: selectedItem.name,
         event: values.actionType,
         hook: values.hook,
+        connection_id: values.connection_id ?? null,
         config: selectedActionFields.reduce((acc, f) => {
           acc[f.key] = values[f.key];
           return acc;
