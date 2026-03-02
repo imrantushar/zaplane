@@ -5556,7 +5556,12 @@ const ActionDrawer = ({
     isFullscreen: isFullscreen,
     onClose: resetAll,
     arrowClose: mode === 'app',
-    arrowOnClick: () => setMode(null)
+    arrowOnClick: () => {
+      setSelectedItem(null);
+      setMode(null);
+      setStep("select");
+      setFieldValue("actionType", "");
+    }
     // closeOnOverlayClick
     ,
     title: !mode ? "Add Action" : selectedItem?.name || (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_10__.__)('App', 'zaplane'),

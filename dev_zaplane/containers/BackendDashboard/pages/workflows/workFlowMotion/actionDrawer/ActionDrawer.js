@@ -128,7 +128,12 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
       isFullscreen={isFullscreen}
       onClose={resetAll}
       arrowClose={mode === 'app'}
-      arrowOnClick={() => setMode(null)}
+      arrowOnClick={() => {
+        setSelectedItem(null);
+        setMode(null);
+        setStep("select");
+        setFieldValue("actionType", "");
+      }}
       // closeOnOverlayClick
       title={!mode ? "Add Action" : selectedItem?.name || __('App', 'zaplane')}
       placement="end"
