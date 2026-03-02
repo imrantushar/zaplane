@@ -109,7 +109,7 @@ class ListenerController extends WP_REST_Controller
         }
 
         if (!$targetNode) {
-            return new WP_Error('no_trigger', 'No trigger node found in workflow', ['status' => 404]);
+            return new WP_Error('no_trigger', 'Please save the workflow and try testing again.', ['status' => 404]);
         }
 
         $nodeKey = (int) $targetNode['id'];
