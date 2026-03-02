@@ -464,7 +464,7 @@ const ZAPLabel = ({
     simple: {
       fontSize: "14px",
       fontWeight: "400",
-      color: "var(--zaplane-font-colo)",
+      color: "var(--zaplane-font-color)",
       lineHeight: '20px'
     },
     simpleLight: {
@@ -5521,17 +5521,20 @@ const ActionDrawer = ({
       return setStep("configure");
     }
     if (step === "configure") {
-      var _values$connection_id;
       const payload = {
         app: selectedItem.name,
         name: selectedItem.name,
         event: values.actionType,
-        hook: values.hook,
-        connection_id: (_values$connection_id = values.connection_id) !== null && _values$connection_id !== void 0 ? _values$connection_id : null,
         config: selectedActionFields.reduce((acc, f) => {
           acc[f.key] = values[f.key];
           return acc;
-        }, {})
+        }, {}),
+        ...(values.hook && {
+          hook: values.hook
+        }),
+        ...(values.connection_id && {
+          connection_id: values.connection_id
+        })
       };
       if (context?.source !== "node") {
         createActionNode(payload);
@@ -7429,13 +7432,21 @@ function CustomNode({
           })
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Box, {
           textAlign: "left",
-          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsx)(_ZAPComponents_Labels_ZAPLabel__WEBPACK_IMPORTED_MODULE_13__["default"], {
-            label: isSelectApp ? (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_10__.__)(data.app, "zaplane") : (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_10__.sprintf)((0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_10__.__)("%s", "zaplane"), (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_11__.formatLabel)(data.event)),
-            type: "basic",
-            textOverflow: "ellipsis"
-          }), !isSelectApp && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsx)(_ZAPComponents_Labels_ZAPLabel__WEBPACK_IMPORTED_MODULE_13__["default"], {
-            label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_10__.sprintf)((0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_10__.__)("%s", "zaplane"), data.app),
-            type: "simple"
+          flex: "1",
+          minW: "0",
+          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Text, {
+            className: "zaplane-label",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+            children: isSelectApp ? (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_10__.__)(data.app, "zaplane") : (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_10__.sprintf)((0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_10__.__)("%s", "zaplane"), (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_11__.formatLabel)(data.event))
+          }), !isSelectApp && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Text, {
+            className: "zaplane-sub-title",
+            fontSize: "14px",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+            children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_10__.sprintf)((0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_10__.__)("%s", "zaplane"), data.app)
           })]
         })]
       }), !data.conditions && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.Handle, {

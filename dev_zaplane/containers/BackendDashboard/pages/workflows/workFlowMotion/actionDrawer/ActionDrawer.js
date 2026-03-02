@@ -97,12 +97,12 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
         app: selectedItem.name,
         name: selectedItem.name,
         event: values.actionType,
-        hook: values.hook,
-        connection_id: values.connection_id ?? null,
         config: selectedActionFields.reduce((acc, f) => {
           acc[f.key] = values[f.key];
           return acc;
         }, {}),
+        ...(values.hook && { hook: values.hook }),
+        ...(values.connection_id && { connection_id: values.connection_id }),
       };
       if (context?.source !== "node") {
         createActionNode(payload);
