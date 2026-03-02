@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-02-28 10:25:14",
+    "generated_at": "2026-03-02 08:42:39",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -3160,6 +3160,228 @@
                     "key": "charge_customer",
                     "label": "Charge Customer",
                     "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
+        },
+        "mailchimp": {
+            "slug": "mailchimp",
+            "name": "Mailchimp",
+            "icon": "mailchimp",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": [],
+            "actions": {
+                "upsert_subscriber": {
+                    "key": "upsert_subscriber",
+                    "label": "Add/Update Subscriber",
+                    "schema": [
+                        {
+                            "key": "list_id",
+                            "label": "Audience/List ID",
+                            "type": "text",
+                            "placeholder": "a1b2c3d4e5",
+                            "required": true,
+                            "help": "Find it in Mailchimp \u2192 Audience \u2192 Settings \u2192 Audience name and defaults."
+                        },
+                        {
+                            "key": "email",
+                            "label": "Email Address",
+                            "type": "text",
+                            "placeholder": "name@example.com or {{email}}",
+                            "required": true
+                        },
+                        {
+                            "key": "status",
+                            "label": "Status (Existing)",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "value": "",
+                                    "label": "Leave Unchanged"
+                                },
+                                {
+                                    "value": "subscribed",
+                                    "label": "Subscribed"
+                                },
+                                {
+                                    "value": "pending",
+                                    "label": "Pending (double opt-in)"
+                                },
+                                {
+                                    "value": "unsubscribed",
+                                    "label": "Unsubscribed"
+                                },
+                                {
+                                    "value": "cleaned",
+                                    "label": "Cleaned"
+                                },
+                                {
+                                    "value": "transactional",
+                                    "label": "Transactional"
+                                }
+                            ],
+                            "help": "Applied when the subscriber already exists. Leave blank to keep current status."
+                        },
+                        {
+                            "key": "status_if_new",
+                            "label": "Status If New",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "value": "subscribed",
+                                    "label": "Subscribed"
+                                },
+                                {
+                                    "value": "pending",
+                                    "label": "Pending (double opt-in)"
+                                },
+                                {
+                                    "value": "unsubscribed",
+                                    "label": "Unsubscribed"
+                                },
+                                {
+                                    "value": "cleaned",
+                                    "label": "Cleaned"
+                                },
+                                {
+                                    "value": "transactional",
+                                    "label": "Transactional"
+                                }
+                            ],
+                            "help": "Applied when creating a new subscriber (default: subscribed)."
+                        },
+                        {
+                            "key": "merge_fields",
+                            "label": "Merge Fields (JSON)",
+                            "type": "textarea",
+                            "placeholder": "{\"FNAME\":\"John\",\"LNAME\":\"Doe\"}",
+                            "help": "Optional JSON object. Use merge tag keys from Mailchimp (e.g., FNAME, LNAME)."
+                        },
+                        {
+                            "key": "tags",
+                            "label": "Tags",
+                            "type": "text",
+                            "placeholder": "vip, newsletter, webinar",
+                            "help": "Optional comma-separated tags to apply."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "unsubscribe_subscriber": {
+                    "key": "unsubscribe_subscriber",
+                    "label": "Unsubscribe Subscriber",
+                    "schema": [
+                        {
+                            "key": "list_id",
+                            "label": "Audience/List ID",
+                            "type": "text",
+                            "placeholder": "a1b2c3d4e5",
+                            "required": true,
+                            "help": "Find it in Mailchimp \u2192 Audience \u2192 Settings \u2192 Audience name and defaults."
+                        },
+                        {
+                            "key": "email",
+                            "label": "Email Address",
+                            "type": "text",
+                            "placeholder": "name@example.com or {{email}}",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add_tags": {
+                    "key": "add_tags",
+                    "label": "Add Tags to Subscriber",
+                    "schema": [
+                        {
+                            "key": "list_id",
+                            "label": "Audience/List ID",
+                            "type": "text",
+                            "placeholder": "a1b2c3d4e5",
+                            "required": true,
+                            "help": "Find it in Mailchimp \u2192 Audience \u2192 Settings \u2192 Audience name and defaults."
+                        },
+                        {
+                            "key": "email",
+                            "label": "Email Address",
+                            "type": "text",
+                            "placeholder": "name@example.com or {{email}}",
+                            "required": true
+                        },
+                        {
+                            "key": "tags",
+                            "label": "Tags",
+                            "type": "text",
+                            "placeholder": "vip, newsletter, webinar",
+                            "required": true,
+                            "help": "Comma-separated tags. Existing tags will be added or removed."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "remove_tags": {
+                    "key": "remove_tags",
+                    "label": "Remove Tags from Subscriber",
+                    "schema": [
+                        {
+                            "key": "list_id",
+                            "label": "Audience/List ID",
+                            "type": "text",
+                            "placeholder": "a1b2c3d4e5",
+                            "required": true,
+                            "help": "Find it in Mailchimp \u2192 Audience \u2192 Settings \u2192 Audience name and defaults."
+                        },
+                        {
+                            "key": "email",
+                            "label": "Email Address",
+                            "type": "text",
+                            "placeholder": "name@example.com or {{email}}",
+                            "required": true
+                        },
+                        {
+                            "key": "tags",
+                            "label": "Tags",
+                            "type": "text",
+                            "placeholder": "vip, newsletter, webinar",
+                            "required": true,
+                            "help": "Comma-separated tags. Existing tags will be added or removed."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "archive_subscriber": {
+                    "key": "archive_subscriber",
+                    "label": "Archive Subscriber",
+                    "schema": [
+                        {
+                            "key": "list_id",
+                            "label": "Audience/List ID",
+                            "type": "text",
+                            "placeholder": "a1b2c3d4e5",
+                            "required": true,
+                            "help": "Find it in Mailchimp \u2192 Audience \u2192 Settings \u2192 Audience name and defaults."
+                        },
+                        {
+                            "key": "email",
+                            "label": "Email Address",
+                            "type": "text",
+                            "placeholder": "name@example.com or {{email}}",
+                            "required": true
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
