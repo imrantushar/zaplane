@@ -102,7 +102,7 @@ export default function ConditionGroupField({ value, field, nodeId, workFlow, no
                                                         );
                                                     })}
 
-                                                    <Flex gap={2} mt="34px" align="center" minH="30px">
+                                                    <Flex gap={2} mt="27px" align="center" minH="30px">
                                                         <Button
                                                             type="button"
                                                             height="34px"
