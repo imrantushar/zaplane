@@ -6038,8 +6038,7 @@ function VariablePopover(props) {
             w: "100%",
             children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
               flex: "1",
-              fontSize: "sm",
-              fontWeight: "500",
+              className: "zaplane-label",
               children: item.node_name
             }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.AccordionItemIndicator, {})]
           })
