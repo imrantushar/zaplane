@@ -3622,7 +3622,7 @@ const ConnectionTable = () => {
           type: "simple"
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
           className: "zaplane-sub-title",
-          ml: "-50px",
+          ml: "-45px",
           color: "var(--zaplane-text-muted)",
           children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)(time, 'zaplane')
         })]
@@ -3655,7 +3655,7 @@ const ConnectionTable = () => {
           type: "simple"
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
           className: "zaplane-sub-title",
-          ml: "-50px",
+          ml: "-45px",
           color: "var(--zaplane-text-muted)",
           children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)(time, 'zaplane')
         })]
@@ -4108,7 +4108,7 @@ const RecentLogs = ({
           type: "simple"
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
           className: "zaplane-sub-title",
-          ml: "-50px",
+          ml: "-45px",
           color: "var(--zaplane-text-muted)",
           children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)(time, 'zaplane')
         })]
@@ -4132,7 +4132,7 @@ const RecentLogs = ({
           type: "simple"
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
           className: "zaplane-sub-title",
-          ml: "-50px",
+          ml: "-45px",
           color: "var(--zaplane-text-muted)",
           children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)(time, 'zaplane')
         })]
@@ -4535,7 +4535,7 @@ const Logs = () => {
           type: "simple"
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_20__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
           className: "zaplane-sub-title",
-          ml: "-50px",
+          ml: "-45px",
           color: "var(--zaplane-text-muted)",
           children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_7__.__)(time, 'zaplane')
         })]
@@ -4567,7 +4567,7 @@ const Logs = () => {
           type: "simple"
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_20__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
           className: "zaplane-sub-title",
-          ml: "-50px",
+          ml: "-45px",
           color: "var(--zaplane-text-muted)",
           children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_7__.__)(time, 'zaplane')
         })]
@@ -5007,7 +5007,7 @@ const WorkflowTable = () => {
           type: "simple"
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Text, {
           className: "zaplane-sub-title",
-          ml: "-50px",
+          ml: "-45px",
           color: "var(--zaplane-text-muted)",
           children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)(time, 'zaplane')
         })]
