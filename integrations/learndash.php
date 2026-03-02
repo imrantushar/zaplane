@@ -17,10 +17,6 @@ class Learndash extends IntegrationBase {
                 'label' => 'User Is Enrolled In A Course',
                 'hook'  => 'learndash_update_course_access'
             ],
-            'user_unroll_course' => [
-                'label' => 'User Is Unrolled In A Course',
-                'hook'  => 'learndash_update_course_access'
-            ],
             'course_complete' => [
                 'label' => 'User Completed A Course', 
                 'hook'  => 'learndash_course_completed'
@@ -103,7 +99,7 @@ class Learndash extends IntegrationBase {
     }
 
     public static function get_trigger_config_schema( string $trigger ): array {
-        if ( in_array( $trigger, ['user_enroll_course','user_unroll_course','course_complete'], true ) ) {
+        if ( in_array( $trigger, ['user_enroll_course','course_complete'], true ) ) {
             return [
                 [
                     'key'      => 'course_id',
@@ -237,8 +233,8 @@ class Learndash extends IntegrationBase {
             }
             return [
                 [
-                    'key'      => 'course_id',
-                    'label'    => 'Course',
+                    'key'      => 'group_id',
+                    'label'    => 'Group',
                     'type'     => 'select',
                     'options'  => $all_group,
                     'required' => true,
@@ -249,7 +245,7 @@ class Learndash extends IntegrationBase {
         return [];
     }
 
-    private static function resolve_course_payload( int $user_id ,$course_id,) {
+    private static function resolve_course_payload( int $user_id ,$course_id ) {
         $user = get_user_by('id', $user_id);
         if ( ! $user) return false;
         return [
@@ -270,27 +266,26 @@ class Learndash extends IntegrationBase {
     }
 
     public static function resolve_trigger( array $node, array $args ) {
-
         switch ( $node['event'] ) {
 
             case 'user_enroll_course':
-            case 'user_unroll_course':
-                $user_id   = $args[0] ?? null;
-                $course_id = $args[1] ?? null;
-                $remove    = ! empty( $args[3] );
+                $user_id   = $args[0] ?? 0;
+                $course_id = $args[1] ?? 0;
+                $assess_list = $args[2] ?? 0;
+                $remove    = $args[3] ?? null; 
 
-                if ( ! $user_id || ! $course_id ) return false;
-                if ( $node['event'] === 'user_enroll_course' && $remove ) return false;
-                if ( $node['event'] === 'user_unroll_course' && ! $remove ) return false;
+                if (!$user_id || !$course_id) return false;
 
-                $selected_course = $node['course_id'] ?? 'any';
+                if (!empty($remove)) return false;
 
-                if ( $selected_course !== 'any' && (int) $selected_course !== (int) $course_id ) return false;
+                $selected_course = $node['data']['config']['course_id'] ?? 'any';
+
+                if ($selected_course !== 'any' && (int)$selected_course !== (int)$course_id) return false;
 
                 return [
                     'success'   => true,
                     'timestamp' => current_time('mysql'),
-                    'data' => self::resolve_course_payload( $user_id, $course_id ),
+                    'data'      => self::resolve_course_payload($user_id, $course_id),
                 ];
 
             case 'course_complete':
@@ -300,7 +295,7 @@ class Learndash extends IntegrationBase {
 
                 $user_id   = $data['user']->ID;
                 $course_id = $data['course']->ID;
-                $selected_course = $node['course_id'] ?? 'any';
+                $selected_course = $node['data']['config']['course_id'] ?? 'any';
 
                 if ( $selected_course !== 'any' && (int) $selected_course !== (int) $course_id ) return false;
 
@@ -316,14 +311,21 @@ class Learndash extends IntegrationBase {
 
                 if ( ! $lesson_id || ! $user_id ) return false;
 
-                $selected_lesson = $node['lesson_id'] ?? 'any';
+                $selected_lesson = $node['data']['config']['lesson_id'] ?? 'any';
 
                 if ( $selected_lesson !== 'any' && (int) $selected_lesson !== (int) $lesson_id ) return false;
 
+                $lesson = get_post($lesson_id);
+
                 return [
-                    'success'   => true,
-                    'lesson_id' => $lesson_id,
-                    'user_id'   => $user_id,
+                    'success' => true,
+                    'timestamp' => current_time('mysql'),
+                    'data' => [
+                        'lesson_id' => $lesson->ID,
+                        'lesson_title' => $lesson->post_title,
+                        'lesson_url' => get_permalink($lesson->ID),
+                        'user_id' => $user_id,
+                    ]
                 ];
 
             case 'topic_complete':
@@ -337,7 +339,7 @@ class Learndash extends IntegrationBase {
                 $course = $data['course'];
                 $lesson = $data['lesson'];
                 $topic  = $data['topic'];
-                $selected_topic = $node['topic_id'] ?? 'any';
+                $selected_topic = $node['data']['config']['topic_id'] ?? 'any';
 
                 if ( $selected_topic !== 'any' && (int) $selected_topic !== (int) $topic->ID) return false;
 
@@ -375,12 +377,12 @@ class Learndash extends IntegrationBase {
                 $course = $course_id ? get_post( (int) $course_id ) : null;
                 $lesson = $lesson_id ? get_post( (int) $lesson_id ) : null;
                 $quiz   = get_post( (int) $quiz_id );
-                $selected_quiz = $node['quiz_id'] ?? 'any';
+                $selected_quiz = $node['data']['config']['quiz_id'] ?? 'any';
 
                 if ( $selected_quiz !== 'any' && (int) $selected_quiz !== (int) $quiz->ID) return false;
 
                 $score        = $data['score'] ?? 0;
-                $pass         = (bool) $data['pass'] ?? false ;
+                $pass         = ( (bool) $data['pass'] ) ?? false ;
                 $total_points = $data['total_points'] ?? 0;
                 $points       = $data['points'] ?? 0;
                 $percentage   = $data['percentage'] ?? 0;
@@ -416,7 +418,7 @@ class Learndash extends IntegrationBase {
 
                 if ( ! $user_id || ! $group_id ) return false;
 
-                $selected_group = $node['group_id'] ?? 'any';
+                $selected_group = $node['data']['config']['group_id'] ?? 'any';
 
                 if ( $selected_group !== 'any' && (int) $selected_group !== (int) $group_id) return false;
 
