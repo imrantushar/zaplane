@@ -8,6 +8,7 @@ import {
 
 } from "@chakra-ui/react";
 import { __, sprintf } from "@wordpress/i18n";
+import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
 import ZAPLoading from "@ZAPComponents/Loading";
 import ReactJson from "react-json-view";
 
@@ -22,11 +23,7 @@ const LogDetails = ({ runId, onBack }) => {
   //after the  response I’ll add translation support.
   return (
     <Box>
-      <Text mb="4" fontWeight="bold"
-        className="zaplane-label">
-
-        {__(`Run ID: ${runId}`, 'zaplane')}
-      </Text>
+      <ZAPLabel label={__(`Run ID: ${runId}`, 'zaplane')} type={"inputLabel"}/> 
       <Accordion.Root collapsible>
         {nodeDetails?.nodes?.map((log) => {
           const input = log?.input_json || {};
@@ -34,7 +31,7 @@ const LogDetails = ({ runId, onBack }) => {
 
           return (
             <Accordion.Item key={log.id} value={log.id} border='1px solid var(--zaplane-border-color)'
-            p='10px' borderRadius='8px' mb='10px'>
+            p='10px' borderRadius='8px' m='10px 0'>
               <Accordion.ItemTrigger p='0' >
                 <HStack flex="1" justify="space-between">
                   <VStack gap={0}>

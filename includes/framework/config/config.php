@@ -117,11 +117,7 @@ class Config implements ArrayAccess
                 'prefix' => 'zaplane_cache_',
                 'ttl' => 3600,
             ],
-            'queue' => [
-                'driver' => 'action_scheduler',
-                'retry_attempts' => 3,
-                'retry_delay' => 60,
-            ],
+
             'integrations' => [
                 'auto_discover' => true,
                 'cache_enabled' => true,

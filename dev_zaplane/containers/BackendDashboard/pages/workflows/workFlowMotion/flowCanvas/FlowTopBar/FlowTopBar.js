@@ -1,5 +1,5 @@
-import React from "react";
-import { Button, Text, Flex } from "@chakra-ui/react";
+import React, { useEffect } from "react";
+import { Button, Text, Flex, Input, Box } from "@chakra-ui/react";
 import TopBar from "@ZAPComponents/TopBar";
 import { FiArrowLeft } from "react-icons/fi";
 import { TfiReload } from "react-icons/tfi";
@@ -10,7 +10,7 @@ import { __ } from "@wordpress/i18n";
 import ZAPDrawer from "@ZAPComponents/Drawer";
 import RunsTable from "../RunsTable/RunsTable";
 import VersionHistoryTable from "../VersionHistoryTable/VersionHistoryTable";
-import { primaryBtn } from "../../../../../../../../assets/scss/chakra/recipe";
+import { primaryBtn, secondPrimaryBtn } from "../../../../../../../../assets/scss/chakra/recipe";
 import { getRunWorkFlow } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlowRuns";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllVersion } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlowVersion";
@@ -21,6 +21,11 @@ import { startApiCountdown } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice"
 import { workFLowExction } from "@ZAPRedux/Slices/workFlowSlice/actions/workflowExctions";
 import { useApiCountdown } from "@ZAPHooks/useApiCountdown/useApiCountdown";
 import '../styles.scss'
+import { LiaStopCircleSolid } from "react-icons/lia";
+import { CiPlay1 } from "react-icons/ci";
+import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
+import { useFormikContext } from "formik";
+import { updateWorkFlowStatus, updateWorkFlowTitle } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow";
 
 export default function FlowTopBar({
   navigate,
@@ -33,48 +38,88 @@ export default function FlowTopBar({
   handleSubmit,
   activeDrawer,
   setActiveDrawer,
+  isFlowDirty
 }) {
-  const { runs, versions, apiCountdown, apiRequestRunning } = useSelector((state) => state.workflows);
+  const { apiCountdown, apiRequestRunning } = useSelector((state) => state.workflows);
   const dispatch = useDispatch()
-      useApiCountdown()
+  useApiCountdown()
+  useEffect(() => {
+    if (!workFlow?.workflow) return;
+    const updateStatusAndTitle = async () => {
+      try {
+        if (values?.status && values.status !== workFlow.workflow.status) {
+          await dispatch(updateWorkFlowStatus({ id, status: values.status }));
+        }
+        if (values?.title && values.title !== workFlow.workflow.title) {
+          await dispatch(updateWorkFlowTitle({ id, title: values.title }));
+        }
+      } catch (error) {
+        console.error("Failed to update status or title:", error);
+      }
+    };
+
+    updateStatusAndTitle();
+  }, [values?.status, values?.title, workFlow, dispatch, id]);
   return (
     <TopBar
       leftContent={() => (
         <>
-          {!isFullscreen && (
-            <Button variant="outline" onClick={() => navigate(-1)}>
-              <FiArrowLeft />
-            </Button>
-          )}
 
-          <Text fontSize="md" fontWeight="medium">
-            {workFlow?.workflow?.title ||
-              __("Untitled Workflow", "zaplane")}
-          </Text>
+          <Button variant="outline" height="36px" width="36px" onClick={() => {
+            isFullscreen ? toggleFullscreen() : navigate(-1)
+          }}>
+            <FiArrowLeft />
+          </Button>
 
+          <Box w="120px">
+            <Input
+              height='36px'
+              fontSize='14px'
+              fontWeight='500'
+              value={
+                values?.title ?? workFlow?.workflow?.title ?? "Untitled Flow"
+              }
+              onChange={(e) => setFieldValue("title", e.target.value)}
+              variant="outline"
+              border="1px solid transparent"
+              _hover={{
+                borderColor: "var(--zaplane-border-color)",
+              }}
+            // maxW="250px"
+
+            />
+          </Box>
+
+
+        </>
+      )}
+      rightContent={() => (
+        <Flex gap='12px'>
           {!apiRequestRunning ? (
-            <Button {...primaryBtn} onClick={() => {
+            <Button {...secondPrimaryBtn} h="36px" onClick={() => {
               dispatch(startApiCountdown(120));
               dispatch(workflowNodeListiner(id));
             }}>
-              {__("Test Flow Once", "zaplane")}
+              <CiPlay1 />{__("Test Flow Once", "zaplane")}
             </Button>
           ) : (
-            <Button {...primaryBtn} onClick={() => dispatch(workflowNodeListinerStop(id))}>
-              {__("Stop", "zaplane")}
+            <Button {...secondPrimaryBtn} h='36px' onClick={() => dispatch(workflowNodeListinerStop(id))}>
+              <LiaStopCircleSolid />{__("Stop", "zaplane")}
             </Button>
           )}
 
           {apiRequestRunning && (
-            <Text m="0" fontSize="18px">
-              {__("Listening...", "zaplane")} {formatTime(apiCountdown)}
-            </Text>
+            <Flex gap='4px' alignItems='center'>
+              <Text className="zaplane-label">
+                {__("Listening...", "zaplane")}
+              </Text>
+              <Text className="zaplane-label" color="var(--zaplane-text-muted)">
+                {formatTime(apiCountdown)}
+              </Text>
+            </Flex>
           )}
-        </>
-      )}
-      rightContent={() => (
-        <>
-          <Button size="sm" variant="outline" onClick={toggleFullscreen}>
+          <Button size="sm" variant="outline"
+            className={`${isFullscreen && "zaplane-button-actve"}`} onClick={toggleFullscreen}>
             {isFullscreen ? <LuMinimize /> : <LuFullscreen />}
           </Button>
 
@@ -87,10 +132,11 @@ export default function FlowTopBar({
             onClose={() => setActiveDrawer(null)}
             trigger={
               <Button
+                className={`zaplane-label ${activeDrawer === 'logs' && 'zaplane-button-actve'}`}
+                color='#454F59'
                 size="sm"
                 variant="outline"
                 onClick={() => {
-                  dispatch(getRunWorkFlow(id))
                   setActiveDrawer("logs");
                 }}
               >
@@ -105,7 +151,7 @@ export default function FlowTopBar({
                 color='#454F59'
                 fontWeight="500"
                 border={"none"}
-                onClick={() =>  dispatch(getRunWorkFlow(id))}
+                onClick={() => dispatch(getRunWorkFlow({ id }))}
               >
                 <TfiReload />{__("Refresh", "zaplane")}
               </Button>
@@ -121,11 +167,11 @@ export default function FlowTopBar({
                   }))
                 }
               >
-               <LuSquarePlay /> {__("Replay", "zaplane")}
+                <LuSquarePlay /> {__("Replay", "zaplane")}
               </Button>
             </Flex>
 
-            <RunsTable runs={runs} />
+            <RunsTable id={id} />
           </ZAPDrawer>
 
           {/* Version Drawer */}
@@ -135,19 +181,28 @@ export default function FlowTopBar({
             isFullscreen={isFullscreen}
             onClose={() => setActiveDrawer(null)}
             trigger={
-              <Text
-                m="0"
-                cursor="pointer"
+              // <Text
+              //   m="0"
+              //   cursor="pointer"
+              //   onClick={() => {
+              //     setActiveDrawer("history");
+              //   }}
+              // >
+              //   <LucideHistory />
+              // </Text>
+              <Button
+                className={`${activeDrawer === 'history' && 'zaplane-button-actve'}`}
+                size="sm"
+                variant="outline"
                 onClick={() => {
                   setActiveDrawer("history");
-                  dispatch(getAllVersion(id))
                 }}
               >
                 <LucideHistory />
-              </Text>
+              </Button>
             }
           >
-            <VersionHistoryTable versions={versions} id={id} />
+            <VersionHistoryTable id={id} />
           </ZAPDrawer>
 
           {/* Status Select */}
@@ -168,10 +223,10 @@ export default function FlowTopBar({
             placeholder="Select status"
           />
 
-          <Button {...primaryBtn} size="sm" onClick={handleSubmit}>
+          <Button {...primaryBtn} disabled={!isFlowDirty} size="sm" onClick={handleSubmit}>
             {__("Update", "zaplane")}
           </Button>
-        </>
+        </Flex>
       )}
     />
   );

@@ -2,6 +2,7 @@
 
 namespace Zaplane\Models;
 
+use Zaplane\Framework\Database\ORM\Collection;
 use Zaplane\Framework\Database\ORM\Model;
 
 if (!defined('ABSPATH')) exit;
@@ -15,6 +16,7 @@ class WorkflowVersion extends Model
         'graph_json',
         'graph_hash',
         'is_active',
+        'version_number',
     ];
 
     protected static array $casts = [
@@ -22,6 +24,7 @@ class WorkflowVersion extends Model
         'workflow_id' => 'integer',
         'is_active' => 'boolean',
         'graph_json' => 'json',
+        'version_number' => 'integer',
     ];
 
     protected static bool $timestamps = false;
@@ -32,9 +35,9 @@ class WorkflowVersion extends Model
         return Workflow::find($this->workflow_id);
     }
 
-    public function runs(): array
+    public function runs(): Collection
     {
-        return Run::where('workflow_version_hash', $this->graph_hash)
+        return Run::where('workflow_version_id', $this->id)
             ->orderBy('id', 'desc')
             ->get();
     }

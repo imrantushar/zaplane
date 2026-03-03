@@ -43,6 +43,7 @@ export const useActionDrawer = (open, node, source, setFieldValue, isTrigger) =>
     }
 
     if (node.data.event) setFieldValue("actionType", node.data.event);
+    if (node.data.connection_id) setFieldValue("connection_id", node.data.connection_id);
     if (node.data.config) {
       Object.entries(node.data.config).forEach(([k, v]) => setFieldValue(k, v));
     }

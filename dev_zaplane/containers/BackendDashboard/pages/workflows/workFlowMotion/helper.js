@@ -20,3 +20,15 @@ export const mapNodesForBackend = (nodes) => {
 export const mapEdgesForBackend = (edges) => {
   return edges.map(({ type, ...edge }) => edge);
 };
+
+/**
+ * Generate comparable flow hash
+ */
+export const generateFlowHash = (nodes, edges) => {
+  const mapped = {
+    nodes: mapNodesForBackend(nodes),
+    edges: mapEdgesForBackend(edges),
+  };
+
+  return JSON.stringify(mapped);
+};

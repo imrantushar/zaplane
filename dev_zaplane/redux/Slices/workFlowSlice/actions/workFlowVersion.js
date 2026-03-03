@@ -18,12 +18,30 @@ import {
 // version releted api
 export const getAllVersion = createAsyncThunk(
 	'zaplane/getAllVersion',
-	async (runId, thunkAPI) => {
+	async (args = {}, thunkAPI) => {
 		try {
+			const { page = 1, per_page = 20, id } = args;
+
+			if (!id) {
+				return thunkAPI.rejectWithValue("runId (id) missing");
+			}
+
 			const res = await API.get(
-				namespace + `workflows/${parseInt(runId)}/versions`
+				namespace + `workflows/${id}/versions`,
+				{
+					params: { page, per_page }
+				}
 			);
-			return res.data;
+
+			const { data, pagination } = res.data;
+
+			return {
+				data,
+				currentPage: pagination.page,
+				itemPerPage: pagination.per_page,
+				totalItems: pagination.total,
+				totalPages: pagination.total_pages,
+			};
 
 		} catch (e) {
 			return handleSliceError(thunkAPI, e);

@@ -1,7 +1,15 @@
 export const primaryBtn = {
     bg: "var(--zaplane-primary)",
     color: "#fff",
-    fontWeight: "600",
+    fontWeight: "500",
+    fontSize:'14px'
+
+}
+export const secondPrimaryBtn = {
+    bg: "var(--zaplane-second-primary)",
+    color: "var(--zaplane-primary)",
+    fontWeight: "500",
+    fontSize:'14px'
 
 }
 
