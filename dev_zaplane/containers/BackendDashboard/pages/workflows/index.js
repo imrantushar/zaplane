@@ -15,6 +15,7 @@ import {
 import WorkflowTable from "./WorkflowTable";
 import { useNavigate } from "react-router-dom";
 import { route_path } from "@ZAPUtils/helper";
+import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
 
 
 const CreateWorkflows = () => {
@@ -23,9 +24,7 @@ const CreateWorkflows = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [workflowName, setWorkflowName] = useState("");
 
-  useEffect(() => {
-    dispatch(getWorkFlow());
-  }, [dispatch]);
+;
 
    const handleCreate = async () => {
     if (!workflowName.trim()) return;
@@ -51,19 +50,26 @@ const CreateWorkflows = () => {
       <TopBar
         render={() => (
           <Box>
-            <Heading>{__("Flows", "zaplane")}</Heading>
+            <ZAPLabel
+              label={__('Flows', 'zaplane')}
+              variant="bold"
+            />
+
           </Box>
         )}
         rightContent={() => (
-          <ZAPMenu
-            triggerLabel="Create Workflow"
-            items={[
-              {
-                label: "Create from Scratch",
-                onClick: () => setIsModalOpen(true),
-              },
-            ]}
-          />
+          // <ZAPMenu
+          //   triggerLabel="Create Workflow"
+          //   items={[
+          //     {
+          //       label: "Create from Scratch",
+          //       onClick: () => setIsModalOpen(true),
+          //     },
+          //   ]}
+          // />
+          <Button {...primaryBtn} onClick={() => setIsModalOpen(true)}>
+            {__('Create Workflow', 'zaplane')}
+          </Button>
         )}
       />
 
@@ -88,7 +94,7 @@ const CreateWorkflows = () => {
 
           <Flex justify="flex-end" mt={5}>
             <Button
-              variant="ghost"
+              variant="outline"
               mr={3}
               onClick={() => setIsModalOpen(false)}
             >

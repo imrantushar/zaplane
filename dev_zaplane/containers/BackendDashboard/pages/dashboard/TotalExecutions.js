@@ -14,7 +14,7 @@ import './styles.scss'
 import ZAPDivider from "@ZAPComponents/ZAPDivider";
 
 
-const TotalExecutions = ({ data = [] }) => {
+const TotalExecutions = ({ data }) => {
     const chartData = useMemo(() => {
         const months = [
             "January",
@@ -35,7 +35,7 @@ const TotalExecutions = ({ data = [] }) => {
             value: 0,
         }));
 
-        data.forEach((item) => {
+        data?.runs?.forEach((item) => {
             if (!item.started_at) return;
 
             const date = new Date(item.started_at);
@@ -55,7 +55,7 @@ const TotalExecutions = ({ data = [] }) => {
             w="100%"
             h="388px"
         >
-            <Text className="zaplane-label" p="24px">
+            <Text className="zaplane-label" fontSize='14px' p="24px">
                 {__("Total Executions", "zaplane")}
             </Text>
             <ZAPDivider />
