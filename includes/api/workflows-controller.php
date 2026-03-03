@@ -9,6 +9,7 @@ use Zaplane\Framework\Classes\Container;
 use Zaplane\Models\Workflow;
 use Zaplane\Models\WorkflowVersion;
 use Zaplane\Models\Run;
+use Zaplane\Models\NodeRun;
 use Zaplane\Utils\VariableExtractor;
 
 if (!defined('ABSPATH')) exit;
@@ -94,12 +95,27 @@ class WorkflowsController extends WP_REST_Controller
                 'methods' => WP_REST_Server::READABLE,
                 'callback' => [$this, 'get_runs'],
                 'permission_callback' => [$this, 'permissions_check'],
+                'args' => [
+                    'page' => [
+                        'type' => 'integer',
+                        'default' => 1,
+                        'minimum' => 1,
+                        'sanitize_callback' => 'absint',
+                    ],
+                    'per_page' => [
+                        'type' => 'integer',
+                        'default' => 20,
+                        'minimum' => 1,
+                        'maximum' => 100,
+                        'sanitize_callback' => 'absint',
+                    ],
+                ],
             ],
         ]);
 
         register_rest_route($namespace, '/condition-variables', [
             [
-                'methods' => WP_REST_Server::READABLE,
+                'methods' => WP_REST_Server::CREATABLE,
                 'callback' => [$this, 'get_condition_variables'],
                 'permission_callback' => [$this, 'permissions_check'],
             ],
@@ -111,10 +127,47 @@ class WorkflowsController extends WP_REST_Controller
         return current_user_can('manage_options');
     }
 
-    public function get_workflow_items()
+    public function get_workflow_items($request)
     {
-        $workflows = Workflow::orderBy('id', 'desc')->get();
-        return rest_ensure_response($workflows->toArray());
+        $page = max(1, (int) ($request->get_param('page') ?? 1));
+        $perPage = max(1, min(100, (int) ($request->get_param('per_page') ?? 20)));
+
+        $total = Workflow::count();
+        $workflows = Workflow::orderBy('id', 'desc')
+            ->forPage($page, $perPage)
+            ->get();
+
+        $data = [];
+        foreach ($workflows as $workflow) {
+            $item = $workflow->toArray();
+
+            $version = $workflow->activeVersion();
+            if ($version) {
+                $successRuns = Run::where('workflow_version_hash', $version->graph_hash)
+                    ->where('status', 'completed')
+                    ->count();
+                $failedRuns = Run::where('workflow_version_hash', $version->graph_hash)
+                    ->where('status', 'failed')
+                    ->count();
+            } else {
+                $successRuns = 0;
+                $failedRuns = 0;
+            }
+
+            $item['success_runs'] = $successRuns;
+            $item['failed_runs'] = $failedRuns;
+            $data[] = $item;
+        }
+
+        return rest_ensure_response([
+            'data' => $data,
+            'pagination' => [
+                'page' => $page,
+                'per_page' => $perPage,
+                'total' => $total,
+                'total_pages' => (int) ceil($total / $perPage),
+            ],
+        ]);
     }
 
     public function get_workflow_item($request)
@@ -132,9 +185,19 @@ class WorkflowsController extends WP_REST_Controller
     {
         $workflow = Workflow::create([
             'user_id' => get_current_user_id(),
-            'title' => sanitize_text_field($request['title']),
-            'name' => sanitize_text_field($request['name']),
-            'status' => 'draft',
+            'title'   => sanitize_text_field($request['title']),
+            'name'    => sanitize_text_field($request['name']),
+            'status'  => 'draft',
+        ]);
+
+        $emptyGraph = ['nodes' => [], 'edges' => []];
+
+        WorkflowVersion::create([
+            'workflow_id'    => $workflow->id,
+            'graph_json'     => $emptyGraph,
+            'graph_hash'     => hash('sha256', wp_json_encode($emptyGraph)),
+            'is_active'      => 1,
+            'version_number' => null,
         ]);
 
         return rest_ensure_response(['id' => $workflow->id]);
@@ -143,24 +206,93 @@ class WorkflowsController extends WP_REST_Controller
     public function update_item($request)
     {
         $workflowId = (int) $request['id'];
-        $graph = $request->get_json_params();
+        $graph      = $request->get_json_params();
 
         if (!isset($graph['nodes']) || !isset($graph['edges'])) {
             return new WP_Error('invalid_graph', 'Invalid React Flow graph', ['status' => 400]);
         }
 
-        WorkflowVersion::where('workflow_id', $workflowId)->update(['is_active' => 0]);
+        $workflow = Workflow::find($workflowId);
+
+        if (!$workflow) {
+            return new WP_Error('not_found', 'Workflow not found', ['status' => 404]);
+        }
+
+        $hash    = hash('sha256', wp_json_encode($graph));
+        $current = WorkflowVersion::where('workflow_id', $workflowId)->where('is_active', 1)->first();
+
+        // Draft mode: always update the single draft version in-place, no new rows
+        if ($workflow->status === 'draft') {
+            if ($current) {
+                if ($current->graph_hash === $hash) {
+                    return rest_ensure_response([
+                        'workflow_id' => $workflowId,
+                        'version_id'  => $current->id,
+                        'hash'        => $hash,
+                    ]);
+                }
+
+                $current->graph_json = $graph;
+                $current->graph_hash = $hash;
+                $current->save();
+
+                return rest_ensure_response([
+                    'workflow_id' => $workflowId,
+                    'version_id'  => $current->id,
+                    'hash'        => $hash,
+                ]);
+            }
+
+            // No version exists yet — create the draft version
+            $version = WorkflowVersion::create([
+                'workflow_id'    => $workflowId,
+                'graph_json'     => $graph,
+                'graph_hash'     => $hash,
+                'is_active'      => 1,
+                'version_number' => null,
+            ]);
+
+            return rest_ensure_response([
+                'workflow_id' => $workflowId,
+                'version_id'  => $version->id,
+                'hash'        => $hash,
+            ]);
+        }
+
+        // Active / paused mode: create a new version row on each change
+        if ($current && $current->graph_hash === $hash) {
+            return rest_ensure_response([
+                'workflow_id'    => $workflowId,
+                'version_id'     => $current->id,
+                'version_number' => $current->version_number,
+                'hash'           => $hash,
+            ]);
+        }
+
+        // Resolve next version number
+        $latest     = WorkflowVersion::where('workflow_id', $workflowId)
+            ->orderBy('version_number', 'desc')
+            ->first();
+        $nextNumber = ($latest && $latest->version_number) ? $latest->version_number + 1 : 1;
+
+        if ($current) {
+            $current->is_active = 0;
+            $current->save();
+        }
 
         $version = WorkflowVersion::create([
-            'workflow_id' => $workflowId,
-            'graph_json' => $graph,
-            'graph_hash' => hash('sha256', wp_json_encode($graph)),
-            'is_active' => 1,
+            'workflow_id'    => $workflowId,
+            'graph_json'     => $graph,
+            'graph_hash'     => $hash,
+            'is_active'      => 1,
+            'version_number' => $nextNumber,
         ]);
 
         return rest_ensure_response([
-            'workflow_id' => $workflowId,
-            'version_id' => $version->id,
+            'workflow_id'    => $workflowId,
+            'version_id'     => $version->id,
+            'version_number' => $nextNumber,
+            'hash'           => $hash,
         ]);
     }
 
@@ -215,6 +347,7 @@ class WorkflowsController extends WP_REST_Controller
                 'name' => $workflow->name,
                 'status' => $workflow->status,
                 'user_id' => $workflow->user_id,
+                'layout' => $workflow->layout,
             ],
             'version' => $version ? [
                 'id' => $version->id,
@@ -228,18 +361,32 @@ class WorkflowsController extends WP_REST_Controller
 
     public function list_versions($request)
     {
-        return rest_ensure_response(
-            WorkflowVersion::where('workflow_id', (int) $request['id'])
-                ->orderBy('id', 'desc')
-                ->get()
-                ->map(fn($v) => [
-                    'id' => $v->id,
-                    'graph_hash' => $v->graph_hash,
-                    'is_active' => $v->is_active,
-                    'created_at' => $v->created_at,
-                ])
-                ->toArray()
-        );
+        $page = max(1, (int) ($request->get_param('page') ?? 1));
+        $perPage = max(1, min(100, (int) ($request->get_param('per_page') ?? 20)));
+        $workflowId = (int) $request['id'];
+
+        $total = WorkflowVersion::where('workflow_id', $workflowId)->count();
+        $versions = WorkflowVersion::where('workflow_id', $workflowId)
+            ->orderBy('id', 'desc')
+            ->forPage($page, $perPage)
+            ->get()
+            ->map(fn($v) => [
+                'id' => $v->id,
+                'graph_hash' => $v->graph_hash,
+                'is_active' => $v->is_active,
+                'created_at' => $v->created_at,
+            ])
+            ->toArray();
+
+        return rest_ensure_response([
+            'data' => $versions,
+            'pagination' => [
+                'page' => $page,
+                'per_page' => $perPage,
+                'total' => $total,
+                'total_pages' => (int) ceil($total / $perPage),
+            ],
+        ]);
     }
 
     public function get_version($request)
@@ -291,47 +438,80 @@ class WorkflowsController extends WP_REST_Controller
         $workflow = Workflow::find((int) $request['id']);
 
         if (!$workflow) {
-            return rest_ensure_response([]);
+            return rest_ensure_response([
+                'data' => [],
+                'pagination' => ['page' => 1, 'per_page' => 20, 'total' => 0, 'total_pages' => 0],
+            ]);
         }
 
         $version = $workflow->activeVersion();
 
         if (!$version) {
-            return rest_ensure_response([]);
+            return rest_ensure_response([
+                'data' => [],
+                'pagination' => ['page' => 1, 'per_page' => 20, 'total' => 0, 'total_pages' => 0],
+            ]);
         }
 
-        return rest_ensure_response(
-            Run::where('workflow_version_hash', $version->graph_hash)
-                ->orderBy('id', 'desc')
-                ->limit(100)
-                ->get()
-                ->map(fn($r) => [
-                    'id' => $r->id,
-                    'status' => $r->status,
-                    'started_at' => $r->started_at,
-                    'finished_at' => $r->finished_at,
-                    'last_error' => $r->last_error,
-                ])
-                ->toArray()
-        );
+        $page = max(1, (int) ($request->get_param('page') ?? 1));
+        $perPage = max(1, min(100, (int) ($request->get_param('per_page') ?? 20)));
+
+        $total = Run::where('workflow_version_hash', $version->graph_hash)->count();
+        $runs = Run::where('workflow_version_hash', $version->graph_hash)
+            ->orderBy('id', 'desc')
+            ->forPage($page, $perPage)
+            ->get()
+            ->map(fn($r) => [
+                'id' => $r->id,
+                'status' => $r->status,
+                'started_at' => $r->started_at,
+                'finished_at' => $r->finished_at,
+                'last_error' => $r->last_error,
+                'node_runs_count' => NodeRun::where('run_id', $r->id)->count(),
+            ])
+            ->toArray();
+
+        return rest_ensure_response([
+            'data' => $runs,
+            'pagination' => [
+                'page' => $page,
+                'per_page' => $perPage,
+                'total' => $total,
+                'total_pages' => (int) ceil($total / $perPage),
+            ],
+        ]);
     }
 
     public function get_condition_variables($request)
     {
-        $workflowHash = $request->get_param('workflow_hash');
-        $targetNodeKey = (int) $request->get_param('target_node_key');
+        $body          = $request->get_json_params() ?? [];
+        $targetNodeKey = (int) ($body['target_node_key'] ?? 0);
+        $workflowId    = (int) ($body['workflow_id'] ?? 0);
+        $workflowHash  = $body['workflow_hash'] ?? null;
+        $inlineGraph   = !empty($body['nodes']) ? $body : null;
 
-        if (empty($workflowHash) || empty($targetNodeKey)) {
-            return new WP_Error('invalid_params', 'workflow_hash and target_node_key are required', ['status' => 400]);
+        if (!$targetNodeKey) {
+            return new WP_Error('invalid_params', 'target_node_key is required', ['status' => 400]);
         }
 
-        $version = WorkflowVersion::where('graph_hash', $workflowHash)->first();
-
-        if (!$version) {
-            return new WP_Error('not_found', 'Workflow version not found', ['status' => 404]);
+        if ($workflowId && $inlineGraph && isset($inlineGraph['nodes'])) {
+            $graph = $inlineGraph;
+        } elseif ($workflowId) {
+            $version = WorkflowVersion::where('workflow_id', $workflowId)->where('is_active', 1)->first();
+            if (!$version) {
+                return rest_ensure_response(['status' => 'success', 'code' => 'SUCCESS', 'data' => []]);
+            }
+            $graph = $version->getGraph();
+        } elseif ($workflowHash) {
+            $version = WorkflowVersion::where('graph_hash', $workflowHash)->first();
+            if (!$version) {
+                return new WP_Error('not_found', 'Workflow version not found', ['status' => 404]);
+            }
+            $graph = $version->getGraph();
+        } else {
+            return new WP_Error('invalid_params', 'workflow_id or workflow_hash is required', ['status' => 400]);
         }
 
-        $graph = $version->getGraph();
         $nodes = $graph['nodes'] ?? [];
         $edges = $graph['edges'] ?? [];
 
@@ -341,7 +521,11 @@ class WorkflowsController extends WP_REST_Controller
         }
 
         $previousNodeIds = $this->findPreviousNodes($targetNodeKey, $edges);
-        $nodeOutputs = Run::latestNodeOutputs($workflowHash);
+
+        // Resolve node outputs — prefer workflow_id lookup for unsaved workflows
+        $nodeOutputs = $workflowId
+            ? Run::latestTestNodeRunsByWorkflow($workflowId)
+            : Run::latestNodeOutputs($workflowHash);
 
         $data = [];
         foreach ($previousNodeIds as $nodeId) {

@@ -28,10 +28,9 @@ const ZAPInput = ({
 
   return (
     <Flex as="label" direction="column" gap={2} style={{ ...containerStyle }}>
-      <Text className="zaplane-label" fontWeight="600" fontSize="0.875rem">
+      <Text className="zaplane-label">
         {__(label, "zaplane")}
       </Text>
-
       {isTextarea ? (
         <Textarea
           ref={textareaRef}

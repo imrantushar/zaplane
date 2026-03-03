@@ -6,6 +6,7 @@ import {
     Badge,
     HStack,
     Icon,
+    Flex,
 } from "@chakra-ui/react";
 import { useDispatch, useSelector } from "react-redux";
 import { __, sprintf } from "@wordpress/i18n";
@@ -21,10 +22,11 @@ import ZAPLoading from "@ZAPComponents/Loading";
 import TopBar from "@ZAPComponents/TopBar";
 import ZAPDrawer from "@ZAPComponents/Drawer";
 import ListTable from "@ZAPComponents/ListTable";
-import { getDuration } from "@ZAPUtils/helper";
+import { formatDateTime, formatLabel, getDuration } from "@ZAPUtils/helper";
 import { statusStyle } from "../workflows/helper";
-import { HistoryIcon } from "@ZAPUtils/icons";
+import { HistoryIcon, TableArrow } from "@ZAPUtils/icons";
 import ZAPTooltip from "@ZAPComponents/ZAPTooltip";
+import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
 
 const Logs = () => {
     const dispatch = useDispatch();
@@ -38,44 +40,131 @@ const Logs = () => {
 
     const columns = [
         {
-            name: __('CREATED AT', 'zaplane'),
-            cell: (row) => (
-                <div className="zaplane-table-flex-col">
-                    <span style={{ fontWeight: 600 }}>
-                        {row.started_at || "--"}
-                    </span>
-                    <span style={{ fontSize: '12px', color: '#666' }}>
-                        ID: {row.id}
-                    </span>
-                </div>
+            name: (
+                <Flex gap="2px" alignItems='center' >
+                    <Text className="zaplane-label">
+                        {__("App Name", "zaplane")}
+                    </Text>
+                    <Icon as={TableArrow} />
+                </Flex>
+
             ),
-            columnWidth: "180px",
+            cell: (row) => {
+                return (
+                    <Box >
+                        <ZAPLabel label={row?.node?.app} type={"simple"} />
+                        <Text className="zaplane-sub-title" color="var(--zaplane-text-muted)">
+                            {__(formatLabel(row?.node?.event), 'zaplane')}
+                        </Text>
+                    </Box>
+                );
+            },
+            // columnWidth: "180px",
             textAlign: "start",
         },
         {
-            name: __('DURATION', 'zaplane'),
+            name: (
+                <Flex gap="2px" alignItems='center' justifyContent="center" ml='-32px'>
+                    <Text className="zaplane-label">
+                        {__("Created At", "zaplane")}
+                    </Text>
+                    <Icon as={TableArrow} />
+                </Flex>
+            ),
+            cell: (row) => {
+                const { date, time } = formatDateTime(row.started_at);
+
+                return (
+                    <Box >
+                        <ZAPLabel label={date} type={"simple"} />
+                        <Text className="zaplane-sub-title" ml='-45px' color="var(--zaplane-text-muted)">
+                            {__(time, 'zaplane')}
+                        </Text>
+                    </Box>
+                );
+            },
+            // columnWidth: "180px",
+            textAlign: "center",
+        },
+        {
+            name: (
+                <Flex gap="2px" alignItems='center' justifyContent="center" ml='-32px'>
+                    <Text className="zaplane-label">
+                        {__("Updated At", "zaplane")}
+                    </Text>
+                    <Icon as={TableArrow} />
+                </Flex>
+            ),
+            cell: (row) => {
+                const { date, time } = formatDateTime(row.finished_at);
+
+                return (
+                    <Box>
+                        <ZAPLabel label={date} type={"simple"} />
+                        <Text className="zaplane-sub-title" ml='-45px' color="var(--zaplane-text-muted)">
+                            {__(time, 'zaplane')}
+                        </Text>
+                    </Box>
+                );
+            },
+            // columnWidth: "160px",
+            textAlign: "center",
+        },
+        {
+            name: (
+                <Flex gap="2px" justifyContent="center" alignItems='center'>
+                    <Text className="zaplane-label">
+                        {__("DURATION", "zaplane")}
+                    </Text>
+                    <Icon as={TableArrow} />
+                </Flex>
+            ),
             cell: (row) => (
-                <Text fontSize="sm">
-                    {getDuration(row.started_at, row.finished_at)}
+                <ZAPLabel label={getDuration(row.started_at, row.finished_at)} type={"simple"} />
+            ),
+            // columnWidth: "150px",
+        },
+        {
+            name: (
+                <Flex gap="2px" justifyContent="center" alignItems='center'>
+                    <Text className="zaplane-label">
+                        {__("Node Count", "zaplane")}
+                    </Text>
+                    <Icon as={TableArrow} />
+                </Flex>
+            ),
+            cell: (row) => (
+                <ZAPLabel label={row.node_count} type={"simple"} />
+            ),
+            // columnWidth: "150px",
+        },
+        {
+            name: (<Flex gap="2px" justifyContent="center" alignItems='center'>
+                <Text className="zaplane-label">
+                    {__("Status", "zaplane")}
                 </Text>
-            ),
-            columnWidth: "150px",
-        },
-        {
-            name: __('Status', 'zaplane'),
+                <Icon as={TableArrow} />
+            </Flex>),
             cell: (row) => (
-                <Badge
-                    {...statusStyle(row.status)}
-                    borderRadius="full"
-                    px={3}
-                >
-                    {row.status}
-                </Badge>
+                <HStack spacing={2} justifyContent={"center"}>
+                    <Box
+                        w="8px"
+                        h="8px"
+                        borderRadius="full"
+                        bg={row.status === 'completed' ? "green.500" : "red.500"}
+                    />
+                    <ZAPLabel label={row.status === 'completed'
+                        ? __("Success", "zaplane")
+                        : __("Failed", "zaplane")} type={"simple"} />
+                </HStack>
             ),
-            columnWidth: "120px",
+            // columnWidth: "120px",
         },
         {
-            name: __('Action', 'zaplane'),
+            name: (
+                <Text className="zaplane-label">
+                    {__("Action", "zaplane")}
+                </Text>),
             cell: (row) => (
                 <HStack justify="flex-end" spacing="1" justifyContent={"center"}>
                     <ZAPTooltip content={__("Details", 'zaplane')}>
@@ -103,7 +192,7 @@ const Logs = () => {
 
 
             ),
-            columnWidth: "100px",
+            // columnWidth: "100px",
             textAlign: "center",
         },
     ];
@@ -128,10 +217,10 @@ const Logs = () => {
                 <ListTable
                     columns={columns}
                     isRowSelectable={true}
-                    data={data}
+                    data={data?.runs||[]}
                     showSubHeader={false}
                     showColumnFilter={false}
-                    showPagination={false}
+                    showPagination={data?.runs?.length >= 10}
                     noDataText={__("No logs found", "zaplane")}
                     totalItems={data.length}
                     dataFetchingStatus={isLoading}
