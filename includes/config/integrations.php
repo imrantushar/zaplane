@@ -28,6 +28,7 @@ return [
         'metform'              => [ 'file' => 'metform.php',              'class' => \Zaplane\Integrations\Metform::class ],
         'easydigitaldownload'  => [ 'file' => 'easy-digital-download.php','class' => \Zaplane\Integrations\EasyDigitalDownload::class ],
         'academy'              => ['file' => 'academy.php',                'class' => \Zaplane\Integrations\Academy::class],
-        'bricks'              => ['file' => 'bricks.php',                'class' => \Zaplane\Integrations\Bricks::class],
+        'bricks'               => ['file' => 'bricks.php',                 'class' => \Zaplane\Integrations\Bricks::class],
+        'elementor'            => ['file' => 'elementor.php',              'class' => \Zaplane\Integrations\Elementor::class],
     ],
 ];
