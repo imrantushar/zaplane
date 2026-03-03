@@ -35,7 +35,6 @@ class Query
                 }
             }
         }
-
         return array_unique($events);
     }
 
