@@ -27,15 +27,29 @@ export const createWorkflows = createAsyncThunk(
 );
 
 export const getWorkFlow = createAsyncThunk(
-	'zaplane/getWorkFlow',
-	async (thunkAPI) => {
-		try {
-			const res = await API.get(namespace + "workflows");
-			return res.data
-		} catch (e) {
-			return handleSliceError(thunkAPI, e)
-		}
-	}
+  'zaplane/getWorkFlow',
+  async (args = {}, thunkAPI) => {
+    try {
+      const { page = 1, per_page = 20 } = args;
+      const res = await API.get(namespace + "workflows", {
+        params: { page, per_page },
+      });
+
+      const { data, pagination } = res.data;
+
+      return {
+        data,
+        currentPage: pagination.page,
+        itemPerPage: pagination.per_page,
+        totalItems: pagination.total,
+        totalPages: pagination.total_pages,
+      };
+    } catch (e) {
+      return thunkAPI.rejectWithValue(
+        e.response?.data || e.message
+      );
+    }
+  }
 );
 export const updateWorkFlow = createAsyncThunk(
 	'zaplane/updateWorkFlow',
@@ -98,6 +112,26 @@ export const updateWorkFlowStatus = createAsyncThunk(
 	async (payload, thunkAPI) => {
 		try {
 			await makeRequest('update_workflow_status', {
+				id: payload.id,
+				...payload,
+			});
+			return payload;
+		} catch (e) {
+			thunkAPI.dispatch(
+				showNotification({
+					message: e,
+					isShow: true,
+					type: 'error',
+				})
+			);
+		}
+	}
+)
+export const updateWorkFlowTitle = createAsyncThunk(
+	'zaplane/updateWorkFlowTitle',
+	async (payload, thunkAPI) => {
+		try {
+			await makeRequest('update_workflow_title', {
 				id: payload.id,
 				...payload,
 			});
