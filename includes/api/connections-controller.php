@@ -182,13 +182,16 @@ class ConnectionsController extends WP_REST_Controller {
 	public function get_items( $request ) {
 		$user_id = get_current_user_id();
 		$app = $request->get_param( 'app' );
+		$page = max( 1, (int) ( $request->get_param( 'page' ) ?? 1 ) );
+		$per_page = max( 1, min( 100, (int) ( $request->get_param( 'per_page' ) ?? 20 ) ) );
 
 		$manager = $this->get_connection_manager();
-		$connections = $manager->get_user_connections( $user_id, $app );
+		$result = $manager->get_user_connections( $user_id, $app, $page, $per_page );
 
 		return rest_ensure_response(
 			array(
-				'connections' => $connections,
+				'data'       => $result['data'],
+				'pagination' => $result['pagination'],
 			)
 		);
 	}
@@ -209,15 +212,24 @@ class ConnectionsController extends WP_REST_Controller {
 		}
 
 		$manager = $this->get_connection_manager();
-		$connection_id = $manager->create( $user_id, $app, $name, $auth_type, $credentials );
 
-		if ( is_wp_error( $connection_id ) ) {
-			return $connection_id;
+		try {
+			$result = $manager->create( $user_id, $app, $name, $auth_type, $credentials );
+		} catch ( \Zaplane\Framework\Exceptions\ConnectionException $e ) {
+			return new WP_Error(
+				'connection_test_failed',
+				$e->getMessage(),
+				array( 'status' => 400 )
+			);
+		} catch ( \Zaplane\Framework\Exceptions\IntegrationException $e ) {
+			return new WP_Error(
+				'integration_not_found',
+				$e->getMessage(),
+				array( 'status' => 404 )
+			);
 		}
 
-		// Auto-test the connection
-		$test_result = $manager->test( $connection_id );
-
+		$connection_id = $result['id'];
 		$connection = $manager->get( $connection_id );
 
 		return rest_ensure_response(
@@ -226,7 +238,7 @@ class ConnectionsController extends WP_REST_Controller {
 				'app'         => $connection['app'],
 				'name'        => $connection['name'],
 				'status'      => $connection['status'],
-				'test_result' => $test_result,
+				'test_result' => $result['test_result'],
 			)
 		);
 	}

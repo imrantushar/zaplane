@@ -1,39 +1,32 @@
-import {
-  Button,
-  VStack,
-  Text,
-  HStack,
-  Input,
-  Flex,
-  Code
-} from "@chakra-ui/react";
+import { Button, Flex, HStack, Input, } from "@chakra-ui/react";
 import ZAPDrawer from "@ZAPComponents/Drawer";
-import ZAPSelect from "@ZAPComponents/ZAPSelect";
 import { integrations } from "@ZAPUtils/helper";
 import { useFormikContext } from "formik";
 import { useEffect, useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
 import ZAPTab from "@ZAPComponents/Tab";
-import { IoIosArrowForward } from "react-icons/io";
 import { __, sprintf } from "@wordpress/i18n";
 import { primaryBtn } from "../../../../../../../assets/scss/chakra/recipe";
 import { useActionDrawer } from "@ZAPHooks/useActionDrawer/useActionDrawer";
 import { TOOLS } from "@ZAPHooks/useActionDrawer/helper";
-import { getIntegration, getActionHook } from "./helper";
-import TestDetails from "./TestDetails/TestDetails";
-import ActionFieldRenderer from "./ActionFieldRenderer/ActionFieldRenderer";
-import { workFLowSingeNodeExction } from "@ZAPRedux/Slices/workFlowSlice/actions/workflowExctions";
+import { getIntegration } from "./helper";
 import { fetchDynamic } from "@ZAPRedux/Slices/workFlowSlice/helper";
+import SelectTab from "./SelectTab/SelectTab";
+import TestRun from "./TestRun/TestRun";
+import DrawerSearchList from "./DrawerSearchList/DrawerSearchList";
+import DrawerModeList from "./DrawerItemList/DrawerModeList";
+import DrawerItemList from "./DrawerItemList";
+import ActionFieldRenderer from "./ActionFieldRenderer/ActionFieldRenderer";
+import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
+import { useDynamicFields } from "@ZAPHooks/useActionDrawer/useDynamicFields";
 
-
-export default function ActionDrawer({ open, context, onClose, updateNodeData, createActionNode, workFlow, isFullscreen }) {
+const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode, workFlow, isFullscreen, nodes, edges }) => {
   const { source, node } = context;
   const dispatch = useDispatch();
   const { values, setFieldValue, resetForm } = useFormikContext();
   const [step, setStep] = useState("select");
-  const [dynamicOptions, setDynamicOptions] = useState({});
-  const [loadingFields, setLoadingFields] = useState({});
   const isTrigger = node?.data?.action === "trigger" && source === "node";
+  const [showWarning, setShowWarning] = useState(false);
 
   const { mode, setMode, selectedItem, setSelectedItem, search, setSearch, list, searchList } =
     useActionDrawer(open, node, source, setFieldValue, isTrigger);
@@ -60,7 +53,6 @@ export default function ActionDrawer({ open, context, onClose, updateNodeData, c
         : Object.values(integration.actions || {});
     return list.map(i => ({ label: i.label, value: i.key, hook: i.hook }));
   }, [mode, selectedItem, isTrigger]);
-
   //Get schema fields for the selected action
 
   const selectedActionFields = useMemo(() => {
@@ -71,26 +63,18 @@ export default function ActionDrawer({ open, context, onClose, updateNodeData, c
     return integration.actions?.[values.actionType]?.schema || [];
   }, [mode, selectedItem, values?.actionType, isTrigger]);
 
-  const getKey = (field) => `${mode}:${selectedItem?.id}:${field.key}`;
-
-  //Generate dynamic keys and fetch dynamic options
-
-  const fetchDynamicOptions = async (field) => {
-    if (!field.dynamic) return;
-    const key = getKey(field);
-    if (dynamicOptions[key]) return;
-
-    setLoadingFields(p => ({ ...p, [key]: true }));
-    const res = await fetchDynamic(field.dynamic);
-    setDynamicOptions(p => ({
-      ...p,
-      [key]: Object.values(res).map(i => ({
-        value: i[field.dynamic.select[0]],
-        label: i[field.dynamic.select[1]],
-      })),
-    }));
-    setLoadingFields(p => ({ ...p, [key]: false }));
-  };
+  // NOW call dynamic hook
+  const {
+    dynamicOptions,
+    loadingFields,
+    fetchDynamicOptions,
+    getKey,
+  } = useDynamicFields({
+    selectedItem,
+    mode,
+    selectedActionFields,
+    values,
+  });
 
   const resetAll = () => {
     setMode(null);
@@ -99,30 +83,56 @@ export default function ActionDrawer({ open, context, onClose, updateNodeData, c
     setSearch("");
     resetForm();
     onClose();
+    setShowWarning(false)
   };
 
   const handleContinue = () => {
-    if (step === "select") return setStep("test");
-    // if (step === "configure") return setStep("test");
+    if (step === "select") {
+      return setStep("configure");
+    }
+    if (step === "configure") {
 
-    const payload = {
-      app: selectedItem.name,
-      name: selectedItem.name,
-      event: values.actionType,
-      hook: values.hook,
-      config: selectedActionFields.reduce((acc, f) => {
-        acc[f.key] = values[f.key];
-        return acc;
-      }, {}),
-    };
-    context?.source === "node" ? updateNodeData(payload) : createActionNode(payload);
-    resetAll();
+      const payload = {
+        app: selectedItem.name,
+        name: selectedItem.name,
+        event: values.actionType,
+        config: selectedActionFields.reduce((acc, f) => {
+          acc[f.key] = values[f.key];
+          return acc;
+        }, {}),
+        ...(values.hook && { hook: values.hook }),
+        ...(values.connection_id && { connection_id: values.connection_id }),
+      };
+      if (context?.source !== "node") {
+        createActionNode(payload);
+      }
+      else {
+        updateNodeData(payload);
+      }
+
+      return setStep("test");
+    }
+
+    if (step === "test") {
+      resetAll();
+    }
   };
+  // seleted intregation
+  const selectedIntegration = useMemo(() => {
+    return getIntegration(mode, selectedItem);
+  }, [mode, selectedItem]);
   return (
     <ZAPDrawer
       open={open}
       isFullscreen={isFullscreen}
       onClose={resetAll}
+      arrowClose={mode === 'app'}
+      arrowOnClick={() => {
+        setSelectedItem(null);
+        setMode(null);
+        setStep("select");
+        setFieldValue("actionType", "");
+      }}
       // closeOnOverlayClick
       title={!mode ? "Add Action" : selectedItem?.name || __('App', 'zaplane')}
       placement="end"
@@ -138,63 +148,30 @@ export default function ActionDrawer({ open, context, onClose, updateNodeData, c
       }
     >
       <Input placeholder={__("Search apps or tools...", "zaplane")} value={search} onChange={e => setSearch(e.target.value)} />
-
-      {search && (
-        <VStack spacing={2} align="stretch">
-          {searchList.map(item => (
-            <Button
-              key={`${item.type}-${item.id}`}
-              justifyContent="space-between"
-              onClick={() => {
-                setMode(item.type);
-                setSelectedItem(item);
-                setSearch("");
-              }}
-              background="var(--zaplane-background)"
-              _hover={{ bg: "var(--zaplane-body-background)" }}
-            >
-              <Text className="zaplane-label">{sprintf(__("%s", "zaplane"), item.name)}</Text>
-              <Text fontSize="xs" className="zaplane-label"> {item.type === 'tools' ? __('Tool', 'zaplane') : __('App', 'zaplane')}</Text>
-            </Button>
-          ))}
-        </VStack>
-      )}
+      {search &&
+        <DrawerSearchList
+          searchList={searchList}
+          setMode={setMode}
+          setSelectedItem={setSelectedItem}
+          setSearch={setSearch}
+        />}
 
       {!mode && !search && !selectedItem && (
-        <VStack spacing={4}>
-          <Button w="100%" background="var(--zaplane-background)" color="var(--zaplane-font-color)"
-            justifyContent="space-between" _hover={{ bg: "var(--zaplane-body-background)", "& svg": { transform: "translateX(4px)" } }}
-            onClick={() => setMode("app")}
-          >
-            <span>{__("Apps", "zaplane")}</span>
-            <IoIosArrowForward />
-          </Button>
-          {(!isTrigger || source === "add") && TOOLS.map(tool => (
-            <Button key={tool.id} background="var(--zaplane-background)" color="var(--zaplane-font-color)"
-              justifyContent="left" w="100%" _hover={{ bg: "var(--zaplane-body-background)" }}
-              onClick={() => {
-                setMode("tools");
-                setSelectedItem(tool);
-              }}
-            >
-              {sprintf(__("%s", "zaplane"), tool.name)}
-            </Button>
-          ))}
-        </VStack>
+        <DrawerModeList
+          setMode={setMode}
+          setSelectedItem={setSelectedItem}
+          isTrigger={isTrigger}
+          source={source}
+          TOOLS={TOOLS}
+        />
       )}
 
       {mode && !selectedItem && !search && (
-        <VStack>
-          {list.map(item => (
-            <Button key={item.id} w="100%" background="var(--zaplane-background)" color="var(--zaplane-font-color)"
-              justifyContent="left" _hover={{ bg: "var(--zaplane-body-background)" }}
-              onClick={() => setSelectedItem(item)}
-            >
-              {sprintf(__("%s", "zaplane"), item.name)}
-            </Button>
-          ))}
-          <Button size="sm" variant="ghost" onClick={() => setMode(null)}>{__('Back', 'zaplane')}</Button>
-        </VStack>
+        <DrawerItemList
+          list={list}
+          setSelectedItem={setSelectedItem}
+          setMode={setMode}
+        />
       )}
 
       {selectedItem && (
@@ -206,32 +183,32 @@ export default function ActionDrawer({ open, context, onClose, updateNodeData, c
               value: "select",
               label: "Select",
               content: (
-                <>
-                  <ZAPSelect
-                    label={
-                      isTrigger
-                        ? __('Trigger Type', 'zaplane')
-                        : __('Action Type', 'zaplane')
-                    }
-                    options={actionOptions}
-                    value={values.actionType}
-                    onChange={val => {
-                      setFieldValue("actionType", val?.value)
-                      setFieldValue(
-                        "hook",
-                        val?.hook
-                      );
-                    }}
-                    placeholder="Select Action Type"
-                    isClearable
-                    mb={4}
-                  />
-                  <Flex direction="column" gap={4}>
-                    {selectedActionFields.map(field => (
+                <SelectTab
+                  isTrigger={isTrigger}
+                  actionOptions={actionOptions}
+                  selectedActionFields={selectedActionFields}
+                  values={values}
+                  setFieldValue={setFieldValue}
+                  dynamicOptions={dynamicOptions}
+                  loadingFields={loadingFields}
+                  fetchDynamicOptions={fetchDynamicOptions}
+                  getKey={getKey}
+                  node={node}
+                  workFlow={workFlow}
+                  selectedIntegration={selectedIntegration}
+                  appSlug={selectedItem?.id}
+                />
+              )
+            },
+            {
+              value: "configure", label: "Configure", content: <>
+                <Flex direction="column" gap={4}>
+                  {selectedActionFields?.length > 0 ? (
+                    selectedActionFields.map((field) => (
                       <ActionFieldRenderer
                         key={field.key}
                         field={field}
-                        value={values[field.key]}
+                        value={values?.[field.key]}
                         setFieldValue={setFieldValue}
                         getKey={getKey}
                         dynamicOptions={dynamicOptions}
@@ -239,31 +216,28 @@ export default function ActionDrawer({ open, context, onClose, updateNodeData, c
                         fetchDynamicOptions={fetchDynamicOptions}
                         nodeId={node?.id}
                         workFlow={workFlow}
+                        nodes={nodes}
+                        edges={edges}
                       />
-                    ))}
-                  </Flex>
-                </>
-              )
+                    ))
+                  ) : (
+                    <ZAPLabel label={__("No configuration required for this action.", "zaplane")} type="simple" />
+                  )}
+                </Flex>
+              </>
             },
-            // { value: "configure", label: "Configure", content: <Text fontSize="sm">{__("Configure step", "zaplane")}</Text> },
             {
               value: "test",
               label: "Test",
               content: (
-                <>
-                  <Button mb={4} 
-                  {...primaryBtn}
-                  onClick={() =>
-                    dispatch(workFLowSingeNodeExction({
-                      workflow_hash: workFlow?.version?.hash,
-                      node_key: node?.id,
-                      input: values,
-                    }))
-                  }>
-                    {__("Test Action", "zaplane")}
-                  </Button>
-                  <TestDetails id={node?.id} workFlow={workFlow} />
-                </>
+                <TestRun
+                  nodes={nodes}
+                  edges={edges}
+                  source={source}
+                  node={node}
+                  workFlow={workFlow}
+                  values={values}
+                />
               )
             }
           ]}
@@ -272,3 +246,4 @@ export default function ActionDrawer({ open, context, onClose, updateNodeData, c
     </ZAPDrawer>
   );
 }
+export default ActionDrawer
