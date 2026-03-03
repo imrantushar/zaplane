@@ -108,9 +108,10 @@ class RunController extends WP_REST_Controller
             $node_count = NodeRun::where('run_id', $run->id)->count();
 
             if ($version) {
-                $graph = $version->getGraph();
+                $nodeKey = $run->start_node_key ?? $run->target_node_key;
+                $graph   = $version->getGraph();
                 foreach ($graph['nodes'] ?? [] as $n) {
-                    if ((int) $n['id'] === $run->start_node_key) {
+                    if ((int) $n['id'] === (int) $nodeKey) {
                         $node = $n;
                         break;
                     }

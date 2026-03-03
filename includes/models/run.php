@@ -45,11 +45,6 @@ class Run extends Model
         return NodeRun::where('run_id', $this->id)->orderBy('id', 'asc')->get();
     }
 
-    public function executionEdges(): Collection
-    {
-        return ExecutionEdge::where('run_id', $this->id)->get();
-    }
-
     public function workflowVersion(): ?WorkflowVersion
     {
         return WorkflowVersion::find($this->workflow_version_id);
