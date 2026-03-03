@@ -36,8 +36,8 @@ const FloatingEdge = ({  openDrawerFromAdd, canvasLayout }) => {
           border="2px dashed var(--zaplane-border-color)"
           cursor="pointer"
           position="absolute"
-          top={isLR ? "6px" : "98px"}
-          right={isLR ? "-80px" : "64px"}
+          top={isLR ? "13px" : "110px"}
+          right={isLR ? "-80px" : "73px"}
           _hover={{
             borderColor: "var(--zaplane-primary-color)",
             bg: "var(--zaplane-background)",
@@ -45,8 +45,8 @@ const FloatingEdge = ({  openDrawerFromAdd, canvasLayout }) => {
         >
           <Box as={FaPlus} fontSize="12px" color="var(--zaplane-primary-color)" />
           <Box as="span"
-            top={isLR ? "13px" : "-49px"}
-            left={isLR ? "-45px" : "12px"}
+            top={isLR ? "11px" : "-49px"}
+            left={isLR ? "-45px" : "11px"}
             border="2px dashed var(--zaplane-border-color)"
             width={isLR ? "42px" : "1px"}
             height={isLR ? "0" : "49px"}

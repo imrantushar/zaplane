@@ -10,7 +10,6 @@ use Zaplane\Framework\Models\User;
 use Zaplane\Framework\Models\Post;
 
 Trait Helper {
-    use QueryTrait;
 
     public static function get_user_payload( $user_ref, array $extra_data = [] ): ?array {
         $user = null;

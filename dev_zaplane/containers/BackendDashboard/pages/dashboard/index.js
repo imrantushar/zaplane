@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { __ } from '@wordpress/i18n';
 import TopBar from '@ZAPComponents/TopBar';
 import ZAPLabel from '@ZAPComponents/Labels/ZAPLabel';
-import { Box, Button, Flex, Text } from '@chakra-ui/react';
+import { Box, Button, Flex, Text, VStack } from '@chakra-ui/react';
 import { outlineBtn } from '../../../../../assets/scss/chakra/recipe';
 import { FiHelpCircle } from 'react-icons/fi';
 import { useDispatch, useSelector } from 'react-redux';
@@ -10,20 +10,23 @@ import RecentLogs from './RecentLogs';
 import ExecutedFlows from './ExecutedFlows';
 import { getRunsList } from '@ZAPRedux/Slices/logsSlice/logsSlice';
 import TotalExecutions from './TotalExecutions';
+import { topExecutedFlows } from '@ZAPRedux/Slices/dashboardSlice/dashboardSlice';
 
 export default function Dashboard() {
-      const dispatch = useDispatch();
-     const { data } = useSelector((state) => state.logs || {});
-      useEffect(() => {
-             dispatch(getRunsList());
-         }, [dispatch]);
+    const dispatch = useDispatch();
+    const { data=[] } = useSelector((state) => state.logs || {});
+    useEffect(() => {
+        dispatch(getRunsList());
+        dispatch(topExecutedFlows());
+    }, [dispatch]);
+
     return (
         <React.Fragment>
             <TopBar
                 leftContent={() => (
                     <ZAPLabel
                         label={__('Dashboard', 'zaplane')}
-                        variant="primary"
+                        variant="bold"
                     />
                 )}
                 rightContent={() => (
@@ -47,12 +50,12 @@ export default function Dashboard() {
                 )}
             />
             <Box className="zaplane-page-content">
-                <Flex>
+                <Flex gap="24px" mb="24px">
                     <Box width="40%">
                         <ExecutedFlows />
                     </Box>
                     <Box width="60%">
-                       <TotalExecutions data={data} />
+                        <TotalExecutions data={data} />
                     </Box>
                 </Flex>
                 <RecentLogs data={data} />
