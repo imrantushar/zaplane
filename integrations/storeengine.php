@@ -49,29 +49,9 @@ class Storeengine extends IntegrationBase {
                 'label' => 'Order Status Set To Trash',           
                 'hook'  => 'storeengine/order_status_trash'
             ],
-            'payment_complete' => [
-                'label' => 'Completed Payment',       
-                'hook'  => 'storeengine/payment_complete'
-            ],
-            'payment_processing' => [
-                'label' => 'Processing Payment',       
-                'hook'  => 'storeengine/payment_processing'
-            ],
-            'payment_pending' => [
-                'label' => 'Pending Payment',       
-                'hook'  => 'storeengine/payment_pending'
-            ],
-            'payment_confirmed' => [
-                'label' => 'Pending Payment',       
-                'hook'  => 'storeengine/payment_confirmed'
-            ],
-            'customer_created' => [
-                'label' => 'Customer Created',        
-                'hook'  => 'storeengine/checkout/customer_created'
-            ],
-            'update_customer' => [
-                'label' => 'Customer Updated',        
-                'hook'  => 'storeengine/stripe/update_customer'
+            'order_restored' => [
+                'label' => 'Order Restored',       
+                'hook'  => 'storeengine/order/status_changed'
             ],
             'order_customer_note_added' => [
                 'label' => 'Customer Note Added to Order',        
@@ -117,8 +97,6 @@ class Storeengine extends IntegrationBase {
                     $order->get_billing_first_name() . ' ' .
                     $order->get_billing_last_name()
                 ) : '',
-
-            'items'          => $order->get_items(),
         ], $extra);
 
     }
@@ -142,13 +120,15 @@ class Storeengine extends IntegrationBase {
             case 'order_status_cancelled':
             case 'order_status_draft':
             case 'order_status_trash':
-                $order_id   = $args[0] ?? 0;
-                $old_status = $args[1] ?? '';
-                $new_status = $args[2] ?? '';
+                $order   = $args[1] ?? null;
+                $transition = $args[2] ?? [];
 
-                if ( ! $order_id || ! $new_status ) return false;
+                if ( ! $order || ! is_array($transition) ) return false;
 
-                return self::resolve_order_payload( $order_id, [
+                $old_status = $transition['from'] ?? '';
+                $new_status = $transition['to'] ?? '';
+
+                return self::resolve_order_payload( $order, [
                     'old_status' => $old_status, 
                     'new_status' => $new_status,
                 ]);
@@ -163,18 +143,6 @@ class Storeengine extends IntegrationBase {
                 return self::resolve_order_payload( $order_id, [
                     'old_status'        => $old_status,
                     'restored_status'   => $restored_status,
-                ]);
-
-            case 'payment_refunded':
-                $order_id        = $args[0] ?? 0;
-                $refunded_amount = $args[1] ?? 0;
-                $refunded_reason = $args[2] ?? '';
-
-                if ( ! $order_id ) return false;
-
-                return self::resolve_order_payload( $order_id, [
-                    'refunded_amount' => $refunded_amount,
-                    'refunded_reason' => $refunded_reason,
                 ]);
 
             case 'order_customer_note_added':
