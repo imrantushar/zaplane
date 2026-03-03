@@ -17,6 +17,7 @@ return [
         'slack'                => [ 'file' => 'slack.php',                'class' => \Zaplane\Integrations\Slack::class ],
         'trello'               => [ 'file' => 'trello.php',               'class' => \Zaplane\Integrations\Trello::class ],
         'stripe'               => [ 'file' => 'stripe.php',               'class' => \Zaplane\Integrations\Stripe::class ],
+        'mailchimp'            => [ 'file' => 'mailchimp.php',            'class' => \Zaplane\Integrations\Mailchimp::class ],
         'surecart'             => [ 'file' => 'surecart.php',             'class' => \Zaplane\Integrations\Surecart::class ],
         'storeengine'          => [ 'file' => 'storeengine.php',          'class' => \Zaplane\Integrations\Storeengine::class ],
         'Http'                 => [ 'file' => 'http.php',                 'class' => \Zaplane\Integrations\Http::class ],
