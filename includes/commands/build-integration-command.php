@@ -34,12 +34,15 @@ class BuildIntegrationCommand extends Command
                 : 'app';
 
             $integration = [
-                'slug'     => $slug,
-                'name'     => $class::get_name(),
-                'icon'     => $class::get_icon(),
-                'category' => $category,
-                'triggers' => [],
-                'actions'  => [],
+                'slug'               => $slug,
+                'name'               => $class::get_name(),
+                'icon'               => $class::get_icon(),
+                'category'           => $category,
+                'requires_connection' => $class::requires_connection(),
+                'auth_type'          => $class::get_auth_type(),
+                'supports_webhook'   => $class::supports_webhook(),
+                'triggers'           => [],
+                'actions'            => [],
             ];
 
             foreach ($class::get_triggers() as $key => $trigger) {

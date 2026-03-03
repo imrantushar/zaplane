@@ -1,0 +1,48 @@
+.zaplane-search-component {
+	position: relative;
+	display: inline-block;
+	input.zaplane-search-component__input {
+		height: 38px;
+		padding-left: 40px;
+		padding-right: 20px;
+		max-width: 300px;
+		width: 100%;
+		border: 1px solid var(--zaplane-border-color);
+		&:hover, &:focus {
+			border-color: var(--zaplane-primary);
+		}
+	}
+	&__search {
+		position: absolute;
+		top: 8px;
+		left: 14px;
+		bottom: 0;
+		cursor: pointer;
+		font-size: 20px; 
+		color: #0A2540;
+		padding: 0;
+		background: transparent;
+		border: 0;
+		margin: 0 !important;
+	}
+	&__control {
+		width: 40px;
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		cursor: pointer;
+		font-size: 15px;
+		color: #999;
+		padding: 0;
+		background: transparent;
+		border: 0;
+		margin-bottom: 8px;
+		font-size: 20px;
+		&:hover, &:focus {
+			background: none;
+			color: #f94d4d;
+			border: 0;
+		}
+	}
+}

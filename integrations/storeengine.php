@@ -49,13 +49,29 @@ class Storeengine extends IntegrationBase {
                 'label' => 'Order Status Set To Trash',           
                 'hook'  => 'storeengine/order_status_trash'
             ],
-            'order_restored' => [
-                'label' => 'Order Restored',                      
-                'hook'  => 'storeengine/order/status_changed'
+            'payment_complete' => [
+                'label' => 'Completed Payment',       
+                'hook'  => 'storeengine/payment_complete'
             ],
-            'payment_refunded' => [
-                'label' => 'Payment Refunded',
-                'hook'  => 'storeengine/subscription/payment_refunded'
+            'payment_processing' => [
+                'label' => 'Processing Payment',       
+                'hook'  => 'storeengine/payment_processing'
+            ],
+            'payment_pending' => [
+                'label' => 'Pending Payment',       
+                'hook'  => 'storeengine/payment_pending'
+            ],
+            'payment_confirmed' => [
+                'label' => 'Pending Payment',       
+                'hook'  => 'storeengine/payment_confirmed'
+            ],
+            'customer_created' => [
+                'label' => 'Customer Created',        
+                'hook'  => 'storeengine/checkout/customer_created'
+            ],
+            'update_customer' => [
+                'label' => 'Customer Updated',        
+                'hook'  => 'storeengine/stripe/update_customer'
             ],
             'order_customer_note_added' => [
                 'label' => 'Customer Note Added to Order',        
