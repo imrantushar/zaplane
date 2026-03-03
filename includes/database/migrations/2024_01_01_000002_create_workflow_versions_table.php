@@ -18,6 +18,7 @@ class CreateWorkflowVersionsTable extends Migration
             $table->longText('graph_json');
             $table->char('graph_hash', 64);
             $table->boolean('is_active')->default(true);
+            $table->unsignedInteger('version_number')->nullable();
             $table->datetime('created_at')->nullable()->useCurrent();
 
             $table->index('workflow_id');

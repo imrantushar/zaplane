@@ -1,69 +1,128 @@
-import { Box, HStack, Text } from '@chakra-ui/react';
-import { __, sprintf } from '@wordpress/i18n';
-import ZAPTable from '@ZAPComponents/Table';
-import { getDuration } from '@ZAPUtils/helper';
+import { useMemo } from "react";
+import { Box, HStack, Text } from "@chakra-ui/react";
+import { __, sprintf } from "@wordpress/i18n";
+import ListTable from "@ZAPComponents/ListTable";
+import { formatDateTime, formatLabel, getDuration } from "@ZAPUtils/helper";
+import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
 
+const RecentLogs = ({ data = [] }) => {
+  const isSuccess = (status) => status === "completed";
 
-const RecentLogs = ({ data }) => {
+  const columns = [
+    {
+      name: (
+        <Text className="zaplane-label">
+          {__("App Name", "zaplane")}
+        </Text>
+      ),
+      cell: (row) => {
+        return (
+          <Box >
+            <ZAPLabel label={row?.node?.app} type={"simple"}/>
+            <Text className="zaplane-sub-title" color="var(--zaplane-text-muted)">
+              {__(formatLabel(row?.node?.event), 'zaplane')}
+            </Text>
+          </Box>
+        );
+      },
+      // columnWidth: "180px",
+      textAlign: "start",
+    },
+    {
+      name: (
+        <Text className="zaplane-label">
+          {__("CREATED AT", "zaplane")}
+        </Text>
+      ),
+      cell: (row) => {
+        const { date, time } = formatDateTime(row.started_at);
 
-    const isSuccess = (status) => status === "completed";
-    return (
-        <Box width='100%'>
-            <Text className="zaplane-heading" marginBottom="16px">{__('Recent Logs', 'zaplane')}</Text>
-            <ZAPTable
-                data={data.slice(0, 5)}
-                rowKey="id"
-                variant="outline"
-                size="sm"
-                columns={[
-                    {
-                        label: "CREATED AT",
-                        key: "started_at",
-                        render: (row) => (
-                            <Text fontSize="sm">{sprintf(
-                                __('%s', 'zapplane'),
-                                row.started_at
-                            )}</Text>
-                        ),
-                    },
-                    {
-                        label: "DURATION / SIZE",
-                        key: "duration",
+        return (
+          <Box >
+            <ZAPLabel label={date} type={"simple"}/>
+            <Text className="zaplane-sub-title" ml='-45px' color="var(--zaplane-text-muted)">
+              {__(time, 'zaplane')}
+            </Text>
+          </Box>
+        );
+      },
+      // columnWidth: "180px",
+    },
+    {
+      name: (
+        <Text className="zaplane-label">
+          {__("Updated At", "zaplane")}
+        </Text>
+      ),
+      cell: (row) => {
+        const { date, time } = formatDateTime(row.finished_at);
 
-                        render: (row) => (
-                            <Text fontSize="sm"> {sprintf(
-                                __('%s', 'zaplane'),
-                                getDuration(row.started_at, row.finished_at)
-                            )}</Text>
-                        ),
-                    },
-                    {
-                        label: "STATUS",
-                        key: "status",
-                        render: (row) => (
-                            <HStack spacing={2}>
-                                <Box
-                                    w="8px"
-                                    h="8px"
-                                    borderRadius="full"
-                                    bg={isSuccess(row.status) ? "green.500" : "red.500"}
-                                />
-                                <Text fontSize="sm">
-                                    {sprintf(
-                                        __('Status: %s', 'zapplane'),
-                                        isSuccess(row.status)
-                                            ? __('Success', 'zapplane')
-                                            : __('Failed', 'zapplane')
-                                    )}
+        return (
+          <Box textAlign="center">
+            <ZAPLabel label={date} type={"simple"}/>
+            <Text className="zaplane-sub-title" ml='-45px' color="var(--zaplane-text-muted)">
+              {__(time, 'zaplane')}
+            </Text>
+          </Box>
+        );
+      },
+      columnWidth: "160px",
+      textAlign: "center",
+    },
+    {
+      name: (
+        <Text className="zaplane-label">
+          {__("DURATION / SIZE", "zaplane")}
+        </Text>
+      ),
+      cell: (row) => (
+        <ZAPLabel label={getDuration(row.started_at, row.finished_at)} type={"simple"}/>
+      ),
+      // columnWidth: "180px",
+    },
+    {
+      name: (
+        <Text className="zaplane-label">
+          {__("STATUS", "zaplane")}
+        </Text>
+      ),
+      cell: (row) => (
+        <HStack spacing={2} justifyContent={"center"}>
+          <Box
+            w="8px"
+            h="8px"
+            borderRadius="full"
+            bg={isSuccess(row.status) ? "green.500" : "red.500"}
+          />
+          <ZAPLabel label={isSuccess(row.status)
+                ? __("Success", "zaplane")
+                : __("Failed", "zaplane")} type={"simple"}/>
+        </HStack>
+      ),
+      // columnWidth: "160px",
+    },
+  ]
 
-                                </Text>
-                            </HStack>
-                        ),
-                    },
-                ]}
-            />
-        </Box>
-    );
+  return (
+    <Box width="100%">
+      <Text className="zaplane-heading" mb="16px">
+        {__("Recent Logs", "zaplane")}
+      </Text>
+
+      <ListTable
+        columns={columns}
+        data={Array.isArray(data.runs) ? data.runs.slice(0, 5) : []}
+        isRowSelectable={false}
+        showSubHeader={false}
+        showColumnFilter={false}
+        
+        noDataText={__("No logs found", "zaplane")}
+        totalItems={data?.runs?.length || 0}
+        dataFetchingStatus={false}
+        suffix="recent-logs-table"
+      />
+    </Box>
+  );
 };
 
 export default RecentLogs;

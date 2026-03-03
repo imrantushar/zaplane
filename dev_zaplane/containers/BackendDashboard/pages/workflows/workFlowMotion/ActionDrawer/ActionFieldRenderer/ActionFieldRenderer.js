@@ -1,6 +1,7 @@
 import ZAPInput from "@ZAPComponents/ZAPInput";
 import ZAPSelect from "@ZAPComponents/ZAPSelect";
 import ConditionGroupField from "../ConditionGroupField/ConditionGroupField";
+import ZAPDatePicker from "@ZAPComponents/ZAPDatePicker";
 
 const ActionFieldRenderer = ({
   field,
@@ -11,7 +12,9 @@ const ActionFieldRenderer = ({
   loadingFields,
   fetchDynamicOptions,
   nodeId,
-  workFlow
+  workFlow,
+  nodes,
+  edges
 }) => {
   const handleChange = (val) => setFieldValue(field.key, val);
   const commonProps = {
@@ -25,6 +28,8 @@ const ActionFieldRenderer = ({
     case "text":
     case "expression":
     case "number":
+    case "email":
+    case "url":
     case "textarea":
       return (
         <ZAPInput
@@ -32,7 +37,16 @@ const ActionFieldRenderer = ({
           type={field.type === "expression" ? "text" : field.type}
         />
       );
-
+    case "date":
+      return (
+        <ZAPDatePicker
+          label={field.label}
+          value={value}
+          onChange={(date) =>
+            setFieldValue(field.key, date?.toISOString().split("T")[0])
+          }
+          placeholder={field.placeholder}
+        />);
     case "select": {
       const key = getKey?.(field);
       const options = field.options
@@ -54,7 +68,7 @@ const ActionFieldRenderer = ({
     }
 
     case "condition_group":
-      return <ConditionGroupField value={value} field={field} nodeId={nodeId} workFlow={workFlow}/>;
+      return <ConditionGroupField value={value} field={field} nodeId={nodeId} workFlow={workFlow} nodes={nodes} edges={edges}/>;
 
     default:
       return null;

@@ -5,8 +5,6 @@ use Zaplane\Traits\ActionResponseTrait;
 
 trait PostActionsTrait
 {
-    use ActionResponseTrait;
-
     protected static function action_create_post(array $config): array
     {
         $id = wp_insert_post([
