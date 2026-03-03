@@ -27,5 +27,6 @@ return [
         'beaverbuilder'        => [ 'file' => 'beaverbuilder.php',        'class' => \Zaplane\Integrations\Beaverbuilder::class ],
         'metform'              => [ 'file' => 'metform.php',              'class' => \Zaplane\Integrations\Metform::class ],
         'easydigitaldownload'  => [ 'file' => 'easy-digital-download.php','class' => \Zaplane\Integrations\EasyDigitalDownload::class ],
+        'masterstudy'  => [ 'file' => 'masterstudy.php','class' => \Zaplane\Integrations\Masterstudy::class ],
     ],
 ];

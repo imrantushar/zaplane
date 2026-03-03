@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-02-28 10:25:14",
+    "generated_at": "2026-03-03 03:24:10",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -4971,6 +4971,86 @@
                     ]
                 }
             }
+        },
+        "masterstudy": {
+            "slug": "masterstudy",
+            "name": "Masterstudy",
+            "icon": "",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": {
+                "user_enroll_course": {
+                    "key": "user_enroll_course",
+                    "label": "User Is Enrolled In A Course",
+                    "hook": "add_user_course",
+                    "schema": [
+                        {
+                            "key": "course_id",
+                            "label": "Course",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Any course",
+                                    "value": "any"
+                                },
+                                {
+                                    "label": "course 1",
+                                    "value": 18
+                                },
+                                {
+                                    "label": "course 2",
+                                    "value": 25
+                                },
+                                {
+                                    "label": "course 3",
+                                    "value": 28
+                                }
+                            ],
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "course_complete": {
+                    "key": "course_complete",
+                    "label": "User Completed A Course",
+                    "hook": "stm_lms_progress_updated",
+                    "schema": [
+                        {
+                            "key": "course_id",
+                            "label": "Course",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Any course",
+                                    "value": "any"
+                                },
+                                {
+                                    "label": "course 1",
+                                    "value": 18
+                                },
+                                {
+                                    "label": "course 2",
+                                    "value": 25
+                                },
+                                {
+                                    "label": "course 3",
+                                    "value": 28
+                                }
+                            ],
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": []
         }
     },
     "tools": {
