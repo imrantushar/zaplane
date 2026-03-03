@@ -9967,7 +9967,7 @@ const updateWorkFlowStatus = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.cr
 });
 const updateWorkFlowTitle = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyncThunk)('zaplane/updateWorkFlowTitle', async (payload, thunkAPI) => {
   try {
-    await (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.makeRequest)('update_workflow_name', {
+    await (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.makeRequest)('update_workflow_title', {
       id: payload.id,
       ...payload
     });
