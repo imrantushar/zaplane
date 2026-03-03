@@ -271,7 +271,8 @@ class ListenerController extends WP_REST_Controller
     private function execute_triggered_workflow(WorkflowVersion $version, array $triggerNode, array $payload): array
     {
         $run = Run::create([
-            'workflow_version_hash' => $version->graph_hash,
+            'workflow_version_id' => $version->id,
+            'workflow_id' => $version->workflow_id,
             'status' => 'running',
             'trigger_data' => $payload,
             'start_node_key' => (int) $triggerNode['id'],
