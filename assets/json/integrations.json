@@ -1,15 +1,12 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-02-28 10:25:14",
+    "generated_at": "2026-02-25 10:02:22",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
             "name": "Wordpress",
             "icon": "",
             "category": "app",
-            "requires_connection": false,
-            "auth_type": "none",
-            "supports_webhook": false,
             "triggers": {
                 "publish_post": {
                     "key": "publish_post",
@@ -2875,305 +2872,11 @@
                 }
             }
         },
-        "slack": {
-            "slug": "slack",
-            "name": "Slack",
-            "icon": "slack",
-            "category": "app",
-            "requires_connection": true,
-            "auth_type": "both",
-            "supports_webhook": true,
-            "triggers": {
-                "message_received": {
-                    "key": "message_received",
-                    "label": "Message Received",
-                    "hook": "slack_webhook_message",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "app_mention": {
-                    "key": "app_mention",
-                    "label": "App Mentioned",
-                    "hook": "slack_webhook_app_mention",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "reaction_added": {
-                    "key": "reaction_added",
-                    "label": "Reaction Added",
-                    "hook": "slack_webhook_reaction_added",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "channel_created": {
-                    "key": "channel_created",
-                    "label": "Channel Created",
-                    "hook": "slack_webhook_channel_created",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "file_shared": {
-                    "key": "file_shared",
-                    "label": "File Shared",
-                    "hook": "slack_webhook_file_shared",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                }
-            },
-            "actions": {
-                "send_message": {
-                    "key": "send_message",
-                    "label": "Send Message",
-                    "schema": [
-                        {
-                            "key": "channel",
-                            "type": "text",
-                            "label": "Channel",
-                            "placeholder": "#general or channel ID",
-                            "required": true
-                        },
-                        {
-                            "key": "text",
-                            "type": "textarea",
-                            "label": "Message",
-                            "placeholder": "Enter your message... Use {{variable}} for dynamic values",
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "send_dm": {
-                    "key": "send_dm",
-                    "label": "Send Direct Message",
-                    "schema": [
-                        {
-                            "key": "user_id",
-                            "type": "text",
-                            "label": "User ID",
-                            "placeholder": "Slack user ID (e.g. U012AB3CD)",
-                            "required": true
-                        },
-                        {
-                            "key": "text",
-                            "type": "textarea",
-                            "label": "Message",
-                            "placeholder": "Enter your message... Use {{variable}} for dynamic values",
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "create_channel": {
-                    "key": "create_channel",
-                    "label": "Create Channel",
-                    "schema": [
-                        {
-                            "key": "name",
-                            "type": "text",
-                            "label": "Channel Name",
-                            "placeholder": "my-new-channel",
-                            "required": true,
-                            "help": "Lowercase letters, numbers and hyphens only."
-                        },
-                        {
-                            "key": "is_private",
-                            "type": "select",
-                            "label": "Visibility",
-                            "options": [
-                                {
-                                    "value": "false",
-                                    "label": "Public"
-                                },
-                                {
-                                    "value": "true",
-                                    "label": "Private"
-                                }
-                            ]
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "invite_to_channel": {
-                    "key": "invite_to_channel",
-                    "label": "Invite User to Channel",
-                    "schema": [
-                        {
-                            "key": "channel",
-                            "type": "text",
-                            "label": "Channel ID",
-                            "placeholder": "C012AB3CD",
-                            "required": true
-                        },
-                        {
-                            "key": "user_ids",
-                            "type": "text",
-                            "label": "User IDs",
-                            "placeholder": "U012AB3CD,U012AB3CE",
-                            "required": true,
-                            "help": "Comma-separated Slack user IDs."
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "set_topic": {
-                    "key": "set_topic",
-                    "label": "Set Channel Topic",
-                    "schema": [
-                        {
-                            "key": "channel",
-                            "type": "text",
-                            "label": "Channel ID",
-                            "placeholder": "C012AB3CD",
-                            "required": true
-                        },
-                        {
-                            "key": "topic",
-                            "type": "text",
-                            "label": "Topic",
-                            "placeholder": "New channel topic...",
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "add_reaction": {
-                    "key": "add_reaction",
-                    "label": "Add Reaction",
-                    "schema": [
-                        {
-                            "key": "channel",
-                            "type": "text",
-                            "label": "Channel ID",
-                            "placeholder": "C012AB3CD",
-                            "required": true
-                        },
-                        {
-                            "key": "timestamp",
-                            "type": "text",
-                            "label": "Message Timestamp",
-                            "placeholder": "{{slack_message_ts}}",
-                            "required": true,
-                            "help": "The ts of the message to react to."
-                        },
-                        {
-                            "key": "emoji",
-                            "type": "text",
-                            "label": "Emoji Name",
-                            "placeholder": "thumbsup",
-                            "required": true,
-                            "help": "Emoji name without colons (e.g. thumbsup)."
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "get_user_info": {
-                    "key": "get_user_info",
-                    "label": "Get User Info",
-                    "schema": [
-                        {
-                            "key": "user_id",
-                            "type": "text",
-                            "label": "User ID",
-                            "placeholder": "U012AB3CD or {{user_id}}",
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                }
-            }
-        },
-        "trello": {
-            "slug": "trello",
-            "name": "Trello",
-            "icon": "",
-            "category": "app",
-            "requires_connection": false,
-            "auth_type": "none",
-            "supports_webhook": false,
-            "triggers": {
-                "card_created": {
-                    "key": "card_created",
-                    "label": "Card Created",
-                    "hook": "trello_webhook",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                }
-            },
-            "actions": {
-                "create_card": {
-                    "key": "create_card",
-                    "label": "Create Card",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                }
-            }
-        },
-        "stripe": {
-            "slug": "stripe",
-            "name": "Stripe",
-            "icon": "",
-            "category": "app",
-            "requires_connection": false,
-            "auth_type": "none",
-            "supports_webhook": false,
-            "triggers": {
-                "payment_succeeded": {
-                    "key": "payment_succeeded",
-                    "label": "Payment Succeeded",
-                    "hook": "stripe_webhook",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                }
-            },
-            "actions": {
-                "charge_customer": {
-                    "key": "charge_customer",
-                    "label": "Charge Customer",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                }
-            }
-        },
         "surecart": {
             "slug": "surecart",
             "name": "Surecart",
             "icon": "",
             "category": "app",
-            "requires_connection": false,
-            "auth_type": "none",
-            "supports_webhook": false,
             "triggers": {
                 "purchase_created": {
                     "key": "purchase_created",
@@ -4213,14 +3916,134 @@
                 }
             }
         },
+        "slack": {
+            "slug": "slack",
+            "name": "Slack",
+            "icon": "slack",
+            "category": "app",
+            "triggers": {
+                "message_received": {
+                    "key": "message_received",
+                    "label": "Message Received",
+                    "hook": "slack_webhook_message",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": {
+                "send_message": {
+                    "key": "send_message",
+                    "label": "Send Message",
+                    "schema": {
+                        "channel": {
+                            "type": "text",
+                            "label": "Channel",
+                            "placeholder": "#general or channel ID",
+                            "required": true
+                        },
+                        "text": {
+                            "type": "textarea",
+                            "label": "Message",
+                            "placeholder": "Enter your message...",
+                            "required": true
+                        }
+                    },
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "send_dm": {
+                    "key": "send_dm",
+                    "label": "Send Direct Message",
+                    "schema": {
+                        "user_id": {
+                            "type": "text",
+                            "label": "User ID",
+                            "placeholder": "Slack user ID",
+                            "required": true
+                        },
+                        "text": {
+                            "type": "textarea",
+                            "label": "Message",
+                            "placeholder": "Enter your message...",
+                            "required": true
+                        }
+                    },
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
+        },
+        "trello": {
+            "slug": "trello",
+            "name": "Trello",
+            "icon": "",
+            "category": "app",
+            "triggers": {
+                "card_created": {
+                    "key": "card_created",
+                    "label": "Card Created",
+                    "hook": "trello_webhook",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": {
+                "create_card": {
+                    "key": "create_card",
+                    "label": "Create Card",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
+        },
+        "stripe": {
+            "slug": "stripe",
+            "name": "Stripe",
+            "icon": "",
+            "category": "app",
+            "triggers": {
+                "payment_succeeded": {
+                    "key": "payment_succeeded",
+                    "label": "Payment Succeeded",
+                    "hook": "stripe_webhook",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": {
+                "charge_customer": {
+                    "key": "charge_customer",
+                    "label": "Charge Customer",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
+        },
+        "webhook": {
+            "slug": "webhook",
+            "name": "Webhook",
+            "icon": "",
+            "category": "app",
+            "triggers": [],
+            "actions": []
+        },
         "storeengine": {
             "slug": "storeengine",
             "name": "Storeengine",
             "icon": "",
             "category": "app",
-            "requires_connection": false,
-            "auth_type": "none",
-            "supports_webhook": false,
             "triggers": {
                 "product_purchased": {
                     "key": "product_purchased",
@@ -4416,25 +4239,11 @@
                 }
             }
         },
-        "webhook": {
-            "slug": "webhook",
-            "name": "Webhook",
-            "icon": "",
-            "category": "app",
-            "requires_connection": false,
-            "auth_type": "none",
-            "supports_webhook": true,
-            "triggers": [],
-            "actions": []
-        },
         "essentialblocks": {
             "slug": "essentialblocks",
             "name": "Essentialblocks",
             "icon": "",
             "category": "app",
-            "requires_connection": false,
-            "auth_type": "none",
-            "supports_webhook": false,
             "triggers": {
                 "eb_form_submit_before_email": {
                     "key": "eb_form_submit_before_email",
@@ -4453,9 +4262,6 @@
             "name": "Coblocks",
             "icon": "",
             "category": "app",
-            "requires_connection": false,
-            "auth_type": "none",
-            "supports_webhook": false,
             "triggers": {
                 "coblocks_form_submit": {
                     "key": "coblocks_form_submit",
@@ -4474,9 +4280,6 @@
             "name": "Spectra",
             "icon": "",
             "category": "app",
-            "requires_connection": false,
-            "auth_type": "none",
-            "supports_webhook": false,
             "triggers": {
                 "uagb_form_success": {
                     "key": "uagb_form_success",
@@ -4495,9 +4298,6 @@
             "name": "Beaverbuilder",
             "icon": "",
             "category": "app",
-            "requires_connection": false,
-            "auth_type": "none",
-            "supports_webhook": false,
             "triggers": {
                 "contact_form_submission": {
                     "key": "contact_form_submission",
@@ -4534,9 +4334,6 @@
             "name": "Metform",
             "icon": "",
             "category": "app",
-            "requires_connection": false,
-            "auth_type": "none",
-            "supports_webhook": false,
             "triggers": {
                 "metform_after_store_form_data": {
                     "key": "metform_after_store_form_data",
@@ -4555,9 +4352,6 @@
             "name": "Easydigitaldownload",
             "icon": "",
             "category": "app",
-            "requires_connection": false,
-            "auth_type": "none",
-            "supports_webhook": false,
             "triggers": {
                 "purchase_product": {
                     "key": "purchase_product",
@@ -4971,6 +4765,24 @@
                     ]
                 }
             }
+        },
+        "divi": {
+            "slug": "divi",
+            "name": "Divi",
+            "icon": "",
+            "category": "app",
+            "triggers": {
+                "divi_contact_form_submitted": {
+                    "key": "divi_contact_form_submitted",
+                    "label": "Divi Contact Form Submitted",
+                    "hook": "et_pb_contact_form_submit",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": []
         }
     },
     "tools": {
@@ -4979,9 +4791,6 @@
             "name": "Condition",
             "icon": "",
             "category": "tool",
-            "requires_connection": false,
-            "auth_type": "none",
-            "supports_webhook": false,
             "triggers": [],
             "actions": {
                 "if": {
@@ -5082,9 +4891,6 @@
             "name": "Filter",
             "icon": "",
             "category": "tool",
-            "requires_connection": false,
-            "auth_type": "none",
-            "supports_webhook": false,
             "triggers": [],
             "actions": {
                 "filter": {
@@ -5184,9 +4990,6 @@
             "name": "Delay",
             "icon": "",
             "category": "tool",
-            "requires_connection": false,
-            "auth_type": "none",
-            "supports_webhook": false,
             "triggers": [],
             "actions": {
                 "wait": {
@@ -5211,52 +5014,14 @@
             "name": "Iterator",
             "icon": "",
             "category": "tool",
-            "requires_connection": false,
-            "auth_type": "none",
-            "supports_webhook": false,
             "triggers": [],
             "actions": []
-        },
-        "variable": {
-            "slug": "variable",
-            "name": "Set Variable",
-            "icon": "",
-            "category": "tool",
-            "requires_connection": false,
-            "auth_type": "none",
-            "supports_webhook": false,
-            "triggers": [],
-            "actions": {
-                "set": {
-                    "key": "set",
-                    "label": "Set Variable",
-                    "schema": [
-                        {
-                            "key": "name",
-                            "label": "Variable Name",
-                            "type": "text",
-                            "required": true
-                        },
-                        {
-                            "key": "value",
-                            "label": "Value",
-                            "type": "expression"
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                }
-            }
         },
         "Http": {
             "slug": "Http",
             "name": "HTTP Request",
             "icon": "",
             "category": "tool",
-            "requires_connection": false,
-            "auth_type": "none",
-            "supports_webhook": false,
             "triggers": [],
             "actions": {
                 "request": {
@@ -5300,6 +5065,35 @@
                         {
                             "key": "body",
                             "label": "Body",
+                            "type": "expression"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
+        },
+        "variable": {
+            "slug": "variable",
+            "name": "Set Variable",
+            "icon": "",
+            "category": "tool",
+            "triggers": [],
+            "actions": {
+                "set": {
+                    "key": "set",
+                    "label": "Set Variable",
+                    "schema": [
+                        {
+                            "key": "name",
+                            "label": "Variable Name",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "value",
+                            "label": "Value",
                             "type": "expression"
                         }
                     ],
