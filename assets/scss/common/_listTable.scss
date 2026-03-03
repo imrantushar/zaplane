@@ -1,0 +1,63 @@
+.zaplane-table {
+    background: #fff;
+    padding: 24px;
+    border-radius: 4px;
+    &__sub-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid var(--zaplane-border-color);
+    }
+
+    .zaplane-table-flex-col {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    &__footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        margin-top: 12px;
+    }
+
+    &__footer-right {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    &__footer-pagination-per-page {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    &__footer-label {
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 14px;
+        margin: 0;
+    }
+}
+
+// suffix
+.zaplane-table {
+    &--logs-table {
+        .zaplane-table__sub-header-left {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            .zaplane-table__sub-header-left-items {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+        }
+    }
+}

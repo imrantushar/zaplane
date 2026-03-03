@@ -6,10 +6,21 @@ import { showNotification } from '../notificationSlice/notificationSlice';
 
 export const fetchConnections = createAsyncThunk(
   'connections/fetchConnections',
-  async (_, thunkAPI) => {
+  async ({ app, page = 1, per_page = 20 } = {}, thunkAPI) => {
     try {
-      const res = await API.get(namespace + 'connections');
-      return res.data.connections || [];
+      const res = await API.get(namespace + 'connections', {
+        params: { app, page, per_page },
+      });
+
+      const { data, pagination } = res.data;
+
+      return {
+        data: data || [],
+        currentPage: pagination.page ,
+        itemPerPage: pagination.per_page ,
+        totalItems: pagination.total ,
+        totalPages: pagination.total_pages ,
+      };
     } catch (e) {
       return handleSliceError(thunkAPI, e);
     }
@@ -154,7 +165,11 @@ const connectionsSlice = createSlice({
     oauthData: null,
     loading: false,
     error: null,
-    connection:{},
+    connection: {},
+    itemPerPage: 10,
+    currentPage: 1,
+    totalItems: 0,
+    totalPages: 0,
   },
   reducers: {
     resetAuthFields: (state) => {
@@ -167,8 +182,13 @@ const connectionsSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(fetchConnections.fulfilled, (state, action) => {
+       const { data, currentPage, itemPerPage, totalItems, totalPages } = action.payload;
+        state.allConnection = data;
+        state.currentPage = currentPage;
+        state.itemPerPage = itemPerPage;
+        state.totalItems = totalItems;
+        state.totalPages = totalPages;
         state.loading = false;
-        state.allConnection = action.payload;
       })
       .addCase(fetchAuthFields.fulfilled, (state, action) => {
         state.authFields = action.payload || {};
@@ -192,20 +212,20 @@ const connectionsSlice = createSlice({
         state.allConnection = state.allConnection.filter(c => c.id !== action.payload);
       })
       .addCase(fetchSingleConnection.fulfilled, (state, action) => {
-      state.loading = false;
-      state.connection = action.payload;
-    })
-    .addCase(updateConnection.fulfilled, (state, action) => {
-      const index = state.allConnection.findIndex(
-        (c) => c.id === action.payload.id
-      );
-      if (index !== -1) {
-        state.allConnection[index] = action.payload;
-      }
-      if (state.connection?.id === action.payload.id) {
+        state.loading = false;
         state.connection = action.payload;
-      }
-    })
+      })
+      .addCase(updateConnection.fulfilled, (state, action) => {
+        const index = state.allConnection.findIndex(
+          (c) => c.id === action.payload.id
+        );
+        if (index !== -1) {
+          state.allConnection[index] = action.payload;
+        }
+        if (state.connection?.id === action.payload.id) {
+          state.connection = action.payload;
+        }
+      })
   },
 });
 
