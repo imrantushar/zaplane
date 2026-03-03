@@ -1,46 +1,19 @@
-import { Box, Button, Flex, Text, Accordion } from "@chakra-ui/react";
+import { Box, Button, Flex, Text } from "@chakra-ui/react";
 import { FieldArray } from "formik";
 import { FiTrash2 } from "react-icons/fi";
 import ZAPInput from "@ZAPComponents/ZAPInput";
 import ZAPSelect from "@ZAPComponents/ZAPSelect";
 import { __ } from "@wordpress/i18n";
-import { buildEmptyRule, insertVariableIntoGroup } from "./helper";
-import WPPopover from "@ZAPComponents/Popaver/WPPopover";
-import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { conditionVariables } from "@ZAPRedux/Slices/workFlowSlice/actions/conditonVariales";
+import { buildEmptyRule } from "./helper";
+import {  useState } from "react";
 import VariablePopover from "./VariablePopover";
-import { mapEdgesForBackend, mapNodesForBackend } from "../../helper";
 
-export default function ConditionGroupField({ value, field, nodeId, workFlow, nodes, edges }) {
+
+export default function ConditionGroupField({ value, field,variables}) {
     const ruleFields = field?.fields;
     const EMPTY_RULE = buildEmptyRule(ruleFields);
-
     const [isPopoverOpen, setPopoverOpen] = useState(false);
     const [activeInput, setActiveInput] = useState(null);
-
-    const { data } = useSelector((state) => state.workflows?.workflowVariables);
-
-    const dispatch = useDispatch();
-
-    useEffect(() => {
-        if (!nodeId || !workFlow?.version?.hash) return;
-        const payload = {
-            workflow_id: workFlow.workflow.id,
-            workflow_hash: workFlow.version.hash,
-            workflow_version_id: workFlow.version.id,
-            target_node_key: nodeId,
-            graph: {
-                nodes: mapNodesForBackend(nodes),
-                edges: mapEdgesForBackend(edges),
-            }
-        }
-
-        dispatch(
-            conditionVariables(payload)
-        );
-    }, [dispatch, nodeId, workFlow?.version?.hash]);
-
     return (
         <FieldArray name={field.key}>
             {(groupHelpers) => {
@@ -151,7 +124,7 @@ export default function ConditionGroupField({ value, field, nodeId, workFlow, no
                                 setPopoverOpen(false);
                                 setActiveInput(null);
                             }}
-                            data={data}
+                            data={variables}
                             activeInput={activeInput}
                             groups={groups}
                             groupHelpers={groupHelpers}

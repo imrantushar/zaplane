@@ -9,6 +9,7 @@ const ZAPInput = ({
   onChange,
   type = "text",
   containerStyle,
+  onKeyDown,
   inputStyle,
 }) => {
   const textareaRef = useRef(null);
@@ -39,6 +40,7 @@ useEffect(() => {
           onChange={onChange}
           resize="none"
           overflow="hidden"
+           onKeyDown={onKeyDown}
           {...inputStyle}
         />
       ) : (
@@ -47,6 +49,7 @@ useEffect(() => {
           type={type} 
           placeholder={__(placeholder, "zaplane")}
           value={value}
+           onKeyDown={onKeyDown}
           onChange={onChange}
           {...(type === "number" && {
             inputMode: "numeric",
