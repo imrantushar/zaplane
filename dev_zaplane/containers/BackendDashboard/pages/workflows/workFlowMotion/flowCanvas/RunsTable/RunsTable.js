@@ -95,6 +95,7 @@ const RunsTable = ({ id }) => {
       name: __('Action', 'zaplane'),
       cell: (row) => (
         <HStack justify="flex-end" spacing="1" justifyContent={"center"}>
+          {<ZAPTooltip content={__("Details", 'zaplane')}>}
             <Box
               display="flex"
               p={"5px 6px"}
@@ -114,6 +115,7 @@ const RunsTable = ({ id }) => {
                 as={HistoryIcon}
               />
             </Box>
+          {</ZAPTooltip>}
           <ZAPTooltip content={__("Re-Excute", 'zaplane')}>
             <Box
               display="flex"
