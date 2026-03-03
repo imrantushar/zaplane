@@ -344,6 +344,26 @@ class RunController extends WP_REST_Controller
             'started_at' => current_time('mysql'),
         ]);
 
+        // Inject connection credentials so integrations that require auth can execute.
+        $connectionId = $targetNode['data']['connection_id'] ?? null;
+        if ($connectionId) {
+            try {
+                $targetNode['_connection_credentials'] = $this->container
+                    ->get('connections')
+                    ->get_execution_credentials((int) $connectionId);
+            } catch (\Throwable $e) {
+                // credentials unavailable — let execute_node throw the proper error
+            }
+        }
+
+        // Build context from previous test node runs so {{nodeId.path}} expressions resolve.
+        $testContext = [];
+        foreach (Run::latestTestNodeRunsByWorkflow($version->workflow_id) as $nodeKey => $nodeRun) {
+            $out = $nodeRun->getOutput();
+            $testContext[$nodeKey] = is_array($out) ? $out : ['value' => $out];
+        }
+        $effectiveInput = array_merge($input, $testContext);
+
         try {
             if ($targetNode['type'] === 'trigger') {
                 $output = $input;
@@ -354,7 +374,7 @@ class RunController extends WP_REST_Controller
                     throw new \Exception("Integration not found: " . ($targetNode['data']['app'] ?? 'unknown'));
                 }
 
-                $output = $integration::execute_node($targetNode, $input);
+                $output = $integration::execute_node($targetNode, $effectiveInput);
             }
 
             $nodeRun->setOutput($output);

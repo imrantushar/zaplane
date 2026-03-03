@@ -123,7 +123,7 @@ class Slack extends IntegrationBase {
 	}
 
 	public static function execute_node( array $node, array $input ): array {
-		$action = $node['config']['action'] ?? '';
+		$action = $node['data']['event'] ?? '';
 		$credentials = $node['_connection_credentials'] ?? null;
 
 		if ( ! $credentials ) {
@@ -172,8 +172,8 @@ class Slack extends IntegrationBase {
 	}
 
 	private static function action_send_message( array $node, array $input, string $token ): array {
-		$channel = $node['config']['data']['channel'] ?? '';
-		$text = $node['config']['data']['text'] ?? '';
+		$channel = $node['data']['config']['channel'] ?? '';
+		$text    = $node['data']['config']['text'] ?? '';
 
 		// Variable substitution from input
 		$text = self::substitute_variables( $text, $input );
@@ -217,8 +217,8 @@ class Slack extends IntegrationBase {
 	}
 
 	private static function action_send_dm( array $node, array $input, string $token ): array {
-		$user_id = $node['config']['data']['user_id'] ?? '';
-		$text = $node['config']['data']['text'] ?? '';
+		$user_id = $node['data']['config']['user_id'] ?? '';
+		$text    = $node['data']['config']['text'] ?? '';
 
 		$text = self::substitute_variables( $text, $input );
 
@@ -483,8 +483,8 @@ class Slack extends IntegrationBase {
 	}
 
 	private static function action_create_channel( array $node, array $input, string $token ): array {
-		$name       = self::substitute_variables( $node['config']['data']['name'] ?? '', $input );
-		$is_private = ( $node['config']['data']['is_private'] ?? 'false' ) === 'true';
+		$name       = self::substitute_variables( $node['data']['config']['name'] ?? '', $input );
+		$is_private = ( $node['data']['config']['is_private'] ?? 'false' ) === 'true';
 
 		[ $body, $status ] = self::http_post(
 			self::API_BASE_URL . '/conversations.create',
@@ -509,8 +509,8 @@ class Slack extends IntegrationBase {
 	}
 
 	private static function action_invite_to_channel( array $node, array $input, string $token ): array {
-		$channel  = self::substitute_variables( $node['config']['data']['channel'] ?? '', $input );
-		$user_ids = self::substitute_variables( $node['config']['data']['user_ids'] ?? '', $input );
+		$channel  = self::substitute_variables( $node['data']['config']['channel'] ?? '', $input );
+		$user_ids = self::substitute_variables( $node['data']['config']['user_ids'] ?? '', $input );
 
 		[ $body ] = self::http_post(
 			self::API_BASE_URL . '/conversations.invite',
@@ -534,8 +534,8 @@ class Slack extends IntegrationBase {
 	}
 
 	private static function action_set_topic( array $node, array $input, string $token ): array {
-		$channel = self::substitute_variables( $node['config']['data']['channel'] ?? '', $input );
-		$topic   = self::substitute_variables( $node['config']['data']['topic']   ?? '', $input );
+		$channel = self::substitute_variables( $node['data']['config']['channel'] ?? '', $input );
+		$topic   = self::substitute_variables( $node['data']['config']['topic']   ?? '', $input );
 
 		[ $body ] = self::http_post(
 			self::API_BASE_URL . '/conversations.setTopic',
@@ -559,9 +559,9 @@ class Slack extends IntegrationBase {
 	}
 
 	private static function action_add_reaction( array $node, array $input, string $token ): array {
-		$channel   = self::substitute_variables( $node['config']['data']['channel']   ?? '', $input );
-		$timestamp = self::substitute_variables( $node['config']['data']['timestamp'] ?? '', $input );
-		$emoji     = trim( $node['config']['data']['emoji'] ?? '', ':' );
+		$channel   = self::substitute_variables( $node['data']['config']['channel']   ?? '', $input );
+		$timestamp = self::substitute_variables( $node['data']['config']['timestamp'] ?? '', $input );
+		$emoji     = trim( $node['data']['config']['emoji'] ?? '', ':' );
 
 		[ $body ] = self::http_post(
 			self::API_BASE_URL . '/reactions.add',
@@ -586,7 +586,7 @@ class Slack extends IntegrationBase {
 	}
 
 	private static function action_get_user_info( array $node, array $input, string $token ): array {
-		$user_id = self::substitute_variables( $node['config']['data']['user_id'] ?? '', $input );
+		$user_id = self::substitute_variables( $node['data']['config']['user_id'] ?? '', $input );
 
 		[ $body ] = self::http_get(
 			self::API_BASE_URL . '/users.info?user=' . rawurlencode( $user_id ),
