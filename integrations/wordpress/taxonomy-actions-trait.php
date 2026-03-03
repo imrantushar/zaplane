@@ -5,8 +5,6 @@ use Zaplane\Traits\ActionResponseTrait;
 
 trait TaxonomyActionsTrait
 {
-    use ActionResponseTrait;
-
     protected static function action_get_term(array $config): array
     {
         return static::success(get_term($config['term_id'] ?? 0, $config['taxonomy'] ?? ''));

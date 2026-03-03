@@ -24,8 +24,8 @@ class IntegrationLoader {
             return;
         }
 
-        self::$registry = require ZAPLANE_INCLUDES_DIR_PATH . 'framework/core/integration-registry.php';
-        do_action('zaplane_register_integrations_registry', self::$registry);
+        self::$registry = zaplane_config('integrations.registry', []);
+        self::$registry = apply_filters('zaplane_integrations', self::$registry);
         self::$initialized = true;
     }
 
@@ -50,8 +50,11 @@ class IntegrationLoader {
         }
 
         // Load integration file
-        $file = ZAPLANE_INTEGRATION_DIR_PATH . '/' . basename(self::$registry[$slug]['file']);
-        $class = self::$registry[$slug]['class'];
+        $meta  = self::$registry[$slug];
+        $file  = (!empty($meta['path']))
+            ? $meta['path']
+            : ZAPLANE_INTEGRATION_DIR_PATH . '/' . basename($meta['file']);
+        $class = $meta['class'];
 
         if (!class_exists($class) && file_exists($file)) {
             require_once $file;

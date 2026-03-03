@@ -1,0 +1,54 @@
+.zaplane-pagination {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    
+    .zaplane-pagination-list {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 4px;
+        margin: 0;
+        &__item {
+            width: 30px;
+            height: 30px;
+            border-radius: 4px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            margin: 0;
+            font-weight: 500;
+            font-size: 14px;
+            line-height: 36px;
+            color: var(--zaplane-font-color);
+            border: 1px solid var(--zaplane-border-color);
+            &:hover {
+                background:  var(--zaplane-secondary-color);
+            }
+        }
+        &__item-dots {
+            letter-spacing: 4px;
+            font-weight: 500;
+            padding-left: 4px;
+            color: none;
+            pointer-events: none;
+            &:hover {
+                background: none;
+                color: none;
+                border-radius: unset;
+            }
+        }
+        &__item-active {
+            background: var(--zaplane-primary);
+            color: #fff;
+            cursor: default;
+            &:hover {
+                background: var(--zaplane-primary);            
+                color: #fff;
+            }
+        }
+    }
+}
