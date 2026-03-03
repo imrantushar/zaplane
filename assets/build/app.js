@@ -7009,12 +7009,9 @@ const TestRun = ({
       } = values || {};
       const payload = {
         workflow_id: workFlow?.workflow?.id,
-        node_key: node?.id,
-        input: inputData,
-        graph: {
-          nodes: (0,_helper__WEBPACK_IMPORTED_MODULE_8__.mapNodesForBackend)(nodes),
-          edges: (0,_helper__WEBPACK_IMPORTED_MODULE_8__.mapEdgesForBackend)(edges)
-        }
+        workflow_hash: workFlow?.version?.hash,
+        target_node: node?.id,
+        input: inputData
       };
       await dispatch((0,_ZAPRedux_Slices_workFlowSlice_actions_workflowExctions__WEBPACK_IMPORTED_MODULE_4__.workFLowSingeNodeExction)(payload));
     } finally {

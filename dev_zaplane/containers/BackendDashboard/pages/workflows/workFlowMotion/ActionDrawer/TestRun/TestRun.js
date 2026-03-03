@@ -26,13 +26,10 @@ const TestRun = ({ source, node, workFlow, values, nodes, edges }) => {
     try {
       const { layout, ...inputData } = values || {};
       const payload = {
-        workflow_id: workFlow?.workflow?.id,      
-        node_key: node?.id,             
+        workflow_id: workFlow?.workflow?.id,
+        workflow_hash:workFlow?.version?.hash,   
+        target_node: node?.id,             
         input: inputData,                  
-        graph: {
-          nodes: mapNodesForBackend(nodes),  
-          edges: mapEdgesForBackend(edges) 
-        }
       };
       await dispatch(
         workFLowSingeNodeExction(payload)
