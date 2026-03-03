@@ -5826,8 +5826,10 @@ function ConditionGroupField({
       workflow_id: workFlow.workflow.id,
       workflow_hash: workFlow.version.hash,
       target_node_key: nodeId,
-      nodes: (0,_helper__WEBPACK_IMPORTED_MODULE_15__.mapNodesForBackend)(nodes),
-      edges: (0,_helper__WEBPACK_IMPORTED_MODULE_15__.mapEdgesForBackend)(edges)
+      graph: {
+        nodes: (0,_helper__WEBPACK_IMPORTED_MODULE_15__.mapNodesForBackend)(nodes),
+        edges: (0,_helper__WEBPACK_IMPORTED_MODULE_15__.mapEdgesForBackend)(edges)
+      }
     };
     dispatch((0,_ZAPRedux_Slices_workFlowSlice_actions_conditonVariales__WEBPACK_IMPORTED_MODULE_13__.conditionVariables)(payload));
   }, [dispatch, nodeId, workFlow?.version?.hash]);
