@@ -12,7 +12,7 @@ class Run extends Model
     protected static string $table = 'runs';
 
     protected static array $fillable = [
-        'workflow_version_hash',
+        'workflow_version_id',
         'workflow_id',
         'target_node_key',
         'start_node_key',
@@ -27,6 +27,7 @@ class Run extends Model
 
     protected static array $casts = [
         'id' => 'integer',
+        'workflow_version_id' => 'integer',
         'workflow_id' => 'integer',
         'start_node_key' => 'integer',
         'target_node_key' => 'integer',
@@ -51,7 +52,7 @@ class Run extends Model
 
     public function workflowVersion(): ?WorkflowVersion
     {
-        return WorkflowVersion::where('graph_hash', $this->workflow_version_hash)->first();
+        return WorkflowVersion::find($this->workflow_version_id);
     }
 
     public function markAsCompleted(): bool
@@ -95,9 +96,9 @@ class Run extends Model
         return static::where('status', 'running')->get();
     }
 
-    public static function forWorkflowVersion(string $hash): Collection
+    public static function forWorkflowVersion(int $versionId): Collection
     {
-        return static::where('workflow_version_hash', $hash)
+        return static::where('workflow_version_id', $versionId)
             ->orderBy('id', 'desc')
             ->get();
     }
@@ -107,9 +108,9 @@ class Run extends Model
         return static::orderBy('id', 'desc')->limit($limit)->get();
     }
 
-    public static function latestTestNodeRuns(string $hash): array
+    public static function latestTestNodeRuns(int $versionId): array
     {
-        $testRuns = static::where('workflow_version_hash', $hash)
+        $testRuns = static::where('workflow_version_id', $versionId)
             ->where('is_test', 1)
             ->orderBy('id', 'desc')
             ->get();
@@ -151,9 +152,9 @@ class Run extends Model
         return $nodeOutputs;
     }
 
-    public static function latestNodeOutputs(string $hash): array
+    public static function latestNodeOutputs(int $versionId): array
     {
-        $runs = static::where('workflow_version_hash', $hash)
+        $runs = static::where('workflow_version_id', $versionId)
             ->whereIn('status', ['completed', 'failed', 'running'])
             ->orderBy('id', 'desc')
             ->get();

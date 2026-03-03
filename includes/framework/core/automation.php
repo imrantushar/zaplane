@@ -169,7 +169,8 @@ class Automation
         $nodeKey = (int) $trigger['id'];
 
         $run = Run::create([
-            'workflow_version_hash' => $trigger['workflow_version_hash'],
+            'workflow_version_id' => $trigger['workflow_version_id'],
+            'workflow_id' => $trigger['workflow_id'],
             'trigger_data' => $payload,
             'status' => 'running',
             'start_node_key' => $nodeKey,
@@ -229,7 +230,7 @@ class Automation
             return;
         }
 
-        $graph = $this->load_graph($run->workflow_version_hash);
+        $graph = $this->load_graph($run->workflow_version_id);
         $node = $this->find_node($graph, $nodeRun->node_key, $run->id);
         $input = $nodeRun->getInput();
 
@@ -375,9 +376,9 @@ class Automation
         return $node;
     }
 
-    private function load_graph(string $hash): array
+    private function load_graph(int $versionId): array
     {
-        $version = WorkflowVersion::where('graph_hash', $hash)->first();
+        $version = WorkflowVersion::find($versionId);
         return $version ? $version->getGraph() : ['nodes' => [], 'edges' => []];
     }
 

@@ -143,10 +143,10 @@ class WorkflowsController extends WP_REST_Controller
 
             $version = $workflow->activeVersion();
             if ($version) {
-                $successRuns = Run::where('workflow_version_hash', $version->graph_hash)
+                $successRuns = Run::where('workflow_version_id', $version->id)
                     ->where('status', 'completed')
                     ->count();
-                $failedRuns = Run::where('workflow_version_hash', $version->graph_hash)
+                $failedRuns = Run::where('workflow_version_id', $version->id)
                     ->where('status', 'failed')
                     ->count();
             } else {
@@ -186,7 +186,6 @@ class WorkflowsController extends WP_REST_Controller
         $workflow = Workflow::create([
             'user_id' => get_current_user_id(),
             'title'   => sanitize_text_field($request['title']),
-            'name'    => sanitize_text_field($request['name']),
             'status'  => 'draft',
         ]);
 
@@ -207,6 +206,7 @@ class WorkflowsController extends WP_REST_Controller
     {
         $workflowId = (int) $request['id'];
         $graph      = $request->get_json_params();
+        $layout     = sanitize_text_field($request['layout'] ?? 'LR');
 
         if (!isset($graph['nodes']) || !isset($graph['edges'])) {
             return new WP_Error('invalid_graph', 'Invalid React Flow graph', ['status' => 400]);
@@ -218,10 +218,12 @@ class WorkflowsController extends WP_REST_Controller
             return new WP_Error('not_found', 'Workflow not found', ['status' => 404]);
         }
 
+        $workflow->layout = $layout;
+        $workflow->save();
+
         $hash    = hash('sha256', wp_json_encode($graph));
         $current = WorkflowVersion::where('workflow_id', $workflowId)->where('is_active', 1)->first();
 
-        // Draft mode: always update the single draft version in-place, no new rows
         if ($workflow->status === 'draft') {
             if ($current) {
                 if ($current->graph_hash === $hash) {
@@ -243,7 +245,6 @@ class WorkflowsController extends WP_REST_Controller
                 ]);
             }
 
-            // No version exists yet — create the draft version
             $version = WorkflowVersion::create([
                 'workflow_id'    => $workflowId,
                 'graph_json'     => $graph,
@@ -259,7 +260,6 @@ class WorkflowsController extends WP_REST_Controller
             ]);
         }
 
-        // Active / paused mode: create a new version row on each change
         if ($current && $current->graph_hash === $hash) {
             return rest_ensure_response([
                 'workflow_id'    => $workflowId,
@@ -269,11 +269,31 @@ class WorkflowsController extends WP_REST_Controller
             ]);
         }
 
-        // Resolve next version number
-        $latest     = WorkflowVersion::where('workflow_id', $workflowId)
-            ->orderBy('version_number', 'desc')
-            ->first();
-        $nextNumber = ($latest && $latest->version_number) ? $latest->version_number + 1 : 1;
+        $currentNodeIds = [];
+        if ($current) {
+            $currentGraph   = $current->getGraph();
+            $currentNodeIds = array_map(fn($n) => (string) $n['id'], $currentGraph['nodes'] ?? []);
+            sort($currentNodeIds);
+        }
+
+        $newNodeIds = array_map(fn($n) => (string) $n['id'], $graph['nodes']);
+        sort($newNodeIds);
+
+        $structuralChange = $currentNodeIds !== $newNodeIds;
+
+        if (!$structuralChange && $current) {
+            $current->graph_json     = $graph;
+            $current->graph_hash     = $hash;
+            $current->version_number = ($current->version_number ?? 0) + 1;
+            $current->save();
+
+            return rest_ensure_response([
+                'workflow_id'    => $workflowId,
+                'version_id'     => $current->id,
+                'version_number' => $current->version_number,
+                'hash'           => $hash,
+            ]);
+        }
 
         if ($current) {
             $current->is_active = 0;
@@ -285,26 +305,37 @@ class WorkflowsController extends WP_REST_Controller
             'graph_json'     => $graph,
             'graph_hash'     => $hash,
             'is_active'      => 1,
-            'version_number' => $nextNumber,
+            'version_number' => 1,
         ]);
 
         return rest_ensure_response([
             'workflow_id'    => $workflowId,
             'version_id'     => $version->id,
-            'version_number' => $nextNumber,
+            'version_number' => 1,
             'hash'           => $hash,
         ]);
     }
 
     public function delete_item($request)
     {
-        $workflow = Workflow::find((int) $request['id']);
+        $workflowId = (int) $request['id'];
+        $workflow   = Workflow::find($workflowId);
 
-        if ($workflow) {
-            $workflow->delete();
+        if (!$workflow) {
+            return new WP_Error('not_found', 'Workflow not found', ['status' => 404]);
         }
 
-        return rest_ensure_response(['deleted' => true]);
+        $workflow->delete();
+
+        WorkflowVersion::where('workflow_id', $workflowId)->delete();
+
+        $runIds = Run::where('workflow_id', $workflowId)->get()->map(fn($r) => $r->id)->toArray();
+        if (!empty($runIds)) {
+            NodeRun::whereIn('run_id', $runIds)->delete();
+            Run::where('workflow_id', $workflowId)->delete();
+        }
+
+        return rest_ensure_response(['deleted' => true, 'id' => $workflowId]);
     }
 
     public function get_graph($request)
@@ -318,10 +349,9 @@ class WorkflowsController extends WP_REST_Controller
         $version = $workflow->activeVersion();
         $graph = $version ? $version->getGraph() : ['nodes' => [], 'edges' => []];
 
-        // Get test outputs for each node
         $testOutputs = [];
         if ($version) {
-            $nodeRuns = Run::latestTestNodeRuns($version->graph_hash);
+            $nodeRuns = Run::latestTestNodeRunsByWorkflow($workflow->id);
 
             foreach ($nodeRuns as $nodeKey => $nodeRun) {
                 $output = $nodeRun->getOutput();
@@ -456,8 +486,8 @@ class WorkflowsController extends WP_REST_Controller
         $page = max(1, (int) ($request->get_param('page') ?? 1));
         $perPage = max(1, min(100, (int) ($request->get_param('per_page') ?? 20)));
 
-        $total = Run::where('workflow_version_hash', $version->graph_hash)->count();
-        $runs = Run::where('workflow_version_hash', $version->graph_hash)
+        $total = Run::where('workflow_version_id', $version->id)->count();
+        $runs = Run::where('workflow_version_id', $version->id)
             ->orderBy('id', 'desc')
             ->forPage($page, $perPage)
             ->get()
@@ -484,32 +514,13 @@ class WorkflowsController extends WP_REST_Controller
 
     public function get_condition_variables($request)
     {
-        $body          = $request->get_json_params() ?? [];
-        $targetNodeKey = (int) ($body['target_node_key'] ?? 0);
-        $workflowId    = (int) ($body['workflow_id'] ?? 0);
-        $workflowHash  = $body['workflow_hash'] ?? null;
-        $inlineGraph   = !empty($body['nodes']) ? $body : null;
+        $targetNodeKey  = (int) ($request['target_node_key'] ?? 0);
+        $workflowId     = (int) ($request['workflow_id'] ?? 0);
+        $workflowVersionId = (int) ($request['workflow_version_id'] ?? 0);
+        $graph          = !empty($request['graph']) ? $request['graph'] : null;
 
         if (!$targetNodeKey) {
             return new WP_Error('invalid_params', 'target_node_key is required', ['status' => 400]);
-        }
-
-        if ($workflowId && $inlineGraph && isset($inlineGraph['nodes'])) {
-            $graph = $inlineGraph;
-        } elseif ($workflowId) {
-            $version = WorkflowVersion::where('workflow_id', $workflowId)->where('is_active', 1)->first();
-            if (!$version) {
-                return rest_ensure_response(['status' => 'success', 'code' => 'SUCCESS', 'data' => []]);
-            }
-            $graph = $version->getGraph();
-        } elseif ($workflowHash) {
-            $version = WorkflowVersion::where('graph_hash', $workflowHash)->first();
-            if (!$version) {
-                return new WP_Error('not_found', 'Workflow version not found', ['status' => 404]);
-            }
-            $graph = $version->getGraph();
-        } else {
-            return new WP_Error('invalid_params', 'workflow_id or workflow_hash is required', ['status' => 400]);
         }
 
         $nodes = $graph['nodes'] ?? [];
@@ -522,10 +533,9 @@ class WorkflowsController extends WP_REST_Controller
 
         $previousNodeIds = $this->findPreviousNodes($targetNodeKey, $edges);
 
-        // Resolve node outputs — prefer workflow_id lookup for unsaved workflows
         $nodeOutputs = $workflowId
             ? Run::latestTestNodeRunsByWorkflow($workflowId)
-            : Run::latestNodeOutputs($workflowHash);
+            : Run::latestNodeOutputs($workflowVersionId);
 
         $data = [];
         foreach ($previousNodeIds as $nodeId) {
@@ -569,7 +579,7 @@ class WorkflowsController extends WP_REST_Controller
 
     private function findPreviousNodes(int $targetNodeId, array $edges): array
     {
-        $previousNodes = [];
+        $previousNodes = [$targetNodeId];
         $queue = [$targetNodeId];
         $visited = [$targetNodeId => true];
 

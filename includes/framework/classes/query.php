@@ -60,7 +60,7 @@ class Query
             foreach ($graph['nodes'] ?? [] as $node) {
                 if (($node['type'] ?? '') === 'trigger' && ($node['data']['hook'] ?? '') === $event) {
                     $out[] = [
-                        'workflow_version_hash' => $version->graph_hash,
+                        'workflow_version_id' => $version->id,
                         'workflow_id' => $workflow->id,
                         'id' => $node['id'],
                         'app' => $node['data']['app'] ?? '',

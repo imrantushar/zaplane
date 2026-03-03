@@ -42,7 +42,7 @@ class Workflow extends Model
         if (!$version) {
             return collect([]);
         }
-        return Run::where('workflow_version_hash', $version->graph_hash)
+        return Run::where('workflow_version_id', $version->id)
             ->orderBy('id', 'desc')
             ->get();
     }
