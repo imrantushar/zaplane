@@ -27,7 +27,7 @@ export default function VariablePopover(props) {
                         >
 
                             <Flex align="center" w="100%">
-                                <Text flex="1" fontSize="sm" fontWeight="500">{item.node_name}</Text>
+                                <Text flex='1' className="zaplane-label">{item.node_name}</Text>
                                 <Accordion.ItemIndicator />
                             </Flex>
                         </Accordion.ItemTrigger>

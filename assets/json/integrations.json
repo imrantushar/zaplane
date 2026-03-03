@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-02-25 09:47:37",
+    "generated_at": "2026-02-25 10:02:22",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -4766,42 +4766,16 @@
                 }
             }
         },
-        "gravityforms": {
-            "slug": "gravityforms",
-            "name": "Gravityforms",
+        "divi": {
+            "slug": "divi",
+            "name": "Divi",
             "icon": "",
             "category": "app",
             "triggers": {
-                "form_submitted": {
-                    "key": "form_submitted",
-                    "label": "Form Submitted",
-                    "hook": "gform_after_submission",
-                    "schema": [
-                        {
-                            "key": "form_id",
-                            "label": "Forms",
-                            "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any From",
-                                    "value": "any"
-                                },
-                                {
-                                    "label": "simple",
-                                    "value": "1"
-                                }
-                            ],
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "form_submit": {
-                    "key": "form_submit",
-                    "label": "Form Submit",
-                    "hook": "gform_after_submissiondsgggggggg",
+                "divi_contact_form_submitted": {
+                    "key": "divi_contact_form_submitted",
+                    "label": "Divi Contact Form Submitted",
+                    "hook": "et_pb_contact_form_submit",
                     "schema": [],
                     "outputs": [
                         "main"

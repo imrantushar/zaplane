@@ -1,16 +1,18 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { ReactFlowProvider, useEdgesState, useNodesState } from "@xyflow/react";
 import FlowCanvas from "./flowCanvas/FlowCanvas";
 import { Formik } from "formik";
-import { mapEdgesForBackend, mapNodesForBackend } from "./helper";
+import { generateFlowHash, mapEdgesForBackend, mapNodesForBackend } from "./helper";
 import { useDispatch, useSelector } from "react-redux";
 import { createNodeIdGenerator } from "./flowCanvas/helper";
 import { Box, Flex } from "@chakra-ui/react";
-import { updateWorkFlow, updateWorkFlowStatus } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow";
+import { updateWorkFlow } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow";
+import NavigationBlocker from "@ZAPComponents/NavigationBlocker";
 
 export default function Workflows({ id }) {
   const nodeIdRef = useRef(createNodeIdGenerator());
   const getNewNodeId = nodeIdRef.current;
+  const [initialHash, setInitialHash] = useState("");
   const { workFlow } = useSelector((state) => state.workflows);
   const [nodes, setNodes, onNodesChange] = useNodesState([
     {
@@ -27,9 +29,8 @@ export default function Workflows({ id }) {
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const dispatch = useDispatch();
 
-
   useEffect(() => {
-    setNodes([
+    const defaultNodes = [
       {
         id: getNewNodeId(),
         type: "custom",
@@ -40,41 +41,50 @@ export default function Workflows({ id }) {
         },
         position: { x: 125, y: 300 },
       },
-    ]);
+    ];
 
+    setNodes(defaultNodes);
     setEdges([]);
-  }, [id]);
 
+    const hash = generateFlowHash(defaultNodes, []);
+    setInitialHash(hash);
+
+  }, [id]);
+  const currentHash = useMemo(() => {
+    return generateFlowHash(nodes, edges);
+  }, [nodes, edges]);
+  const isFlowDirty = currentHash !== initialHash;
   const onSubmitHandler = async (values) => {
     const payload = {
-      nodes: mapNodesForBackend(nodes)
-      , edges: mapEdgesForBackend(edges),
-    }
-    const statusPaylod = {
-      status: values?.status,
-      id: id,
-    }
-    if (values.status && values.status !== workFlow?.workflow.status) {
-      await dispatch(updateWorkFlowStatus(statusPaylod));
+      nodes: mapNodesForBackend(nodes), 
+      edges: mapEdgesForBackend(edges),
+      layout: values?.layout
     }
     await dispatch(
       updateWorkFlow({ id, payload })
     );
+
+    // Reset dirty state after successful save
+    setInitialHash(currentHash);
   };
+
   return (
     <ReactFlowProvider>
       <Flex hight='100vh'>
         <Formik
+          enableReinitialize
           initialValues={
             {
+              layout: workFlow?.workflow?.layout
             }}
           onSubmit={onSubmitHandler}
         >
           {({ }) => (
             <Box flex="1" >
+              <NavigationBlocker when={isFlowDirty} />
               <FlowCanvas setNodes={setNodes} setEdges={setEdges} onEdgesChange={onEdgesChange}
                 onNodesChange={onNodesChange} nodes={nodes} edges={edges} getNewNodeId={getNewNodeId}
-                workFlow={workFlow} id={id} />
+                workFlow={workFlow} id={id} isFlowDirty={isFlowDirty} />
             </Box>
           )}
 

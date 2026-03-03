@@ -11,7 +11,7 @@ use Zaplane\Integrations\Easydigitaldownload\HelperTrait;
 
 if (!defined('ABSPATH')) exit;
 
-class Easydigitaldownload extends IntegrationBase {
+class EasyDigitalDownload extends IntegrationBase {
     use ActionsResponseTrait;
     use CustomerActionsTrait;
     use DiscountActionsTrait;

@@ -5,11 +5,7 @@ import './styles.scss';
 import { CiSearch } from "react-icons/ci";
 import { Icon } from '@chakra-ui/react';
 
-const propTypes = {
-	placeholder: PropTypes.string,
-	onSearchHandler: PropTypes.func,
-	defaultValue: PropTypes.string,
-};
+
 
 export default function Search( {
 	placeholder = 'Search...',
@@ -69,4 +65,4 @@ export default function Search( {
 	);
 }
 
-Search.propTypes = propTypes;
+

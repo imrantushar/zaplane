@@ -1,7 +1,7 @@
-import { Text, Icon } from "@chakra-ui/react";
+import { Text, Icon, Box, Flex } from "@chakra-ui/react";
 import { __ } from "@wordpress/i18n";
 import { useDispatch, useSelector } from "react-redux";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import ListTable from "@ZAPComponents/ListTable";
 import OptionMenu from "@ZAPComponents/OptionMenu";
@@ -14,17 +14,39 @@ import {
     testConnection,
     fetchSingleConnection,
     updateConnection,
+    fetchConnections,
 } from "@ZAPRedux/Slices/connectionsSlice/connectionsSlice";
 
 import ConnectionDetails from "./ConnectionDetails/ConnectionDetails";
+import { formatDateTime } from "@ZAPUtils/helper";
+import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
+import { TableArrow } from "@ZAPUtils/icons";
 
 const ConnectionTable = () => {
     const dispatch = useDispatch();
     const [detailsOpen, setDetailsOpen] = useState(false);
 
-    const { allConnection = [], isLoading, connection } = useSelector(
+    const { allConnection = [], isLoading, connection, currentPage, perPage,totalItems } = useSelector(
         (state) => state.connections
     );
+    const [loading, setLoading] = useState(allConnection.length === 0);
+    const handleRefresh = async (page = 1, per_page = 10) => {
+        setLoading(true)
+        await dispatch(fetchConnections({ page, per_page }));
+        setLoading(false)
+    };
+
+    useEffect(() => {
+        handleRefresh()
+    }, []);
+
+    const handlePageChange = (newPage) => {
+        handleRefresh(newPage, perPage)
+    };
+
+    const handlePerPageChange = (itemsPerPage) => {
+        handleRefresh(currentPage, itemsPerPage)
+    };
     const handleStatusChange = (row, newStatus) => {
         if (!row?.id || !newStatus) return;
 
@@ -44,47 +66,92 @@ const ConnectionTable = () => {
     const columns = [
         {
             name: (
-                <Text className="zaplane-label">
-                    {__("App / Name", "zaplane")}
-                </Text>
+                <Flex gap="2px" alignItems='center' >
+                    <Text className="zaplane-label">
+                        {__("App / Name", "zaplane")}
+                    </Text>
+                    <Icon as={TableArrow} />
+                </Flex>
             ),
             cell: (row) => (
-                <Text className="zaplane-label" fontWeight="500">
+                <Text className="zaplane-label" fontWeight="400" textOverflow="ellipsis">
                     {row.name}
                 </Text>
             ),
-            columnWidth: "150px",
+            // columnWidth: "150px",
             textAlign: "start",
         },
         {
             name: (
-                <Text className="zaplane-label">
-                    {__("Auth Type", "zaplane")}
-                </Text>
+                <Flex gap="2px" alignItems='center' justifyContent="center" >
+                    <Text className="zaplane-label">
+                        {__("Auth Type", "zaplane")}
+                    </Text>
+                    <Icon as={TableArrow} />
+                </Flex>
             ),
             cell: (row) => (
-                <Text fontSize="sm">{row.auth_type}</Text>
+                <ZAPLabel label={row.auth_type} type={"simple"} />
             ),
-            columnWidth: "120px",
+            // columnWidth: "120px",
             textAlign: "center",
         },
         {
             name: (
-                <Text className="zaplane-label">
-                    {__("Created At", "zaplane")}
-                </Text>
+                <Flex gap="2px" alignItems='center' justifyContent="center" ml='-32px'>
+                    <Text className="zaplane-label">
+                        {__("Created At", "zaplane")}
+                    </Text>
+                    <Icon as={TableArrow} />
+                </Flex>
             ),
-            cell: (row) => (
-                <Text fontSize="sm">{row.created_at || "--"}</Text>
-            ),
-            columnWidth: "160px",
+            cell: (row) => {
+                const { date, time } = formatDateTime(row.created_at);
+
+                return (
+                    <Box textAlign="center">
+                        <ZAPLabel label={date} type={"simple"} />
+                        <Text className="zaplane-sub-title" ml='-45px' color="var(--zaplane-text-muted)">
+                            {__(time, 'zaplane')}
+                        </Text>
+                    </Box>
+                );
+            },
+            // columnWidth: "160px",
             textAlign: "center",
         },
         {
             name: (
-                <Text className="zaplane-label">
-                    {__("Status", "zaplane")}
-                </Text>
+                <Flex gap="2px" alignItems='center' justifyContent="center" ml='-32px'>
+                    <Text className="zaplane-label">
+                        {__("Updated At", "zaplane")}
+                    </Text>
+                    <Icon as={TableArrow} />
+                </Flex>
+            ),
+            cell: (row) => {
+                const { date, time } = formatDateTime(row.updated_at);
+
+                return (
+                    <Box textAlign="center">
+                        <ZAPLabel label={date} type={"simple"} />
+                        <Text className="zaplane-sub-title" ml='-45px' color="var(--zaplane-text-muted)">
+                            {__(time, 'zaplane')}
+                        </Text>
+                    </Box>
+                );
+            },
+            // columnWidth: "160px",
+            textAlign: "center",
+        },
+        {
+            name: (
+                <Flex gap="2px" alignItems='center' justifyContent="center" ml='-32px'>
+                    <Text className="zaplane-label">
+                        {__("Status", "zaplane")}
+                    </Text>
+                    <Icon as={TableArrow} />
+                </Flex>
             ),
             cell: (row) => (
                 <StatusOptions
@@ -100,7 +167,7 @@ const ConnectionTable = () => {
                     }
                 />
             ),
-            columnWidth: "170px",
+            // columnWidth: "170px",
             textAlign: "center",
         },
         {
@@ -143,24 +210,27 @@ const ConnectionTable = () => {
                     ]}
                 />
             ),
-            columnWidth: "100px",
+            // columnWidth: "100px",
             textAlign: "center",
         },
     ];
-
     return (
         <>
             <ListTable
                 columns={columns}
-                data={Array.isArray(allConnection) ? allConnection : []}
+                data={allConnection}
                 isRowSelectable={true}
                 showSubHeader={false}
                 showColumnFilter={false}
-                showPagination={false}
+                showPagination={ allConnection.length >= 10 }
                 noDataText={__("No connections found", "zaplane")}
-                totalItems={allConnection?.length || 0}
-                dataFetchingStatus={isLoading}
+                totalItems={totalItems}
+                dataFetchingStatus={loading}
                 suffix="connection-table"
+                currentPageNumber={currentPage}
+                perPage={perPage}
+                onChangePage={handlePageChange}
+                onChangeItemsPerPage={handlePerPageChange}
             />
 
             <ConnectionDetails
