@@ -33,5 +33,7 @@ return [
         'academy'              => ['file' => 'academy.php',                'class' => \Zaplane\Integrations\Academy::class],
         'bricks'               => ['file' => 'bricks.php',                 'class' => \Zaplane\Integrations\Bricks::class],
         'elementor'            => ['file' => 'elementor.php',              'class' => \Zaplane\Integrations\Elementor::class],
+        'woocommerce'          => ['file' => 'woocommerce.php',            'class' => \Zaplane\Integrations\woocommerce::class],
+        'memberpress'          => ['file' => 'memberpress.php',            'class' => \Zaplane\Integrations\Memberpress::class],
     ],
 ];
