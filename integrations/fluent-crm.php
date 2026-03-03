@@ -8,7 +8,7 @@ use Zaplane\Framework\Classes\IntegrationBase;
 class FluentCrm extends IntegrationBase {
 
     public static function get_slug(): string {
-        return 'FluentCRM';
+        return 'fluent-crm';
     }
 
     public static function get_triggers(): array {
