@@ -11,15 +11,15 @@ class Mailchimp extends IntegrationBase {
 
 	private const API_VERSION = '3.0';
 
-	public static function get_slug():  {
+	public static function get_slug(): string {
 		return 'mailchimp';
 	}
 
-	public static function get_name():  {
+	public static function get_name(): string {
 		return 'Mailchimp';
 	}
 
-	public static function get_icon():  {
+	public static function get_icon(): string {
 		return 'mailchimp';
 	}
 
@@ -151,15 +151,15 @@ class Mailchimp extends IntegrationBase {
 		);
 	}
 
-	public static function requires_connection():  {
+	public static function requires_connection(): bool {
 		return false;
 	}
 
-	public static function get_auth_type():  {
+	public static function get_auth_type(): string{
 		return 'none';
 	}
 
-	public static function get_auth_fields( ? $auth_type = null ): array {
+	public static function get_auth_fields( $auth_type = null ): array {
 		return array(
 			'api_key' => array(
 				'type'        => 'password',
@@ -172,7 +172,7 @@ class Mailchimp extends IntegrationBase {
 	}
 
 	public static function test_connection( array $credentials ): array {
-		$api_key = trim( () ( $credentials['api_key'] ?? '' ) );
+		$api_key = trim( $credentials['api_key'] ?? '' );
 		if ( $api_key === '' ) {
 			return array(
 				'success' => false,
@@ -203,8 +203,8 @@ class Mailchimp extends IntegrationBase {
 	private static function action_upsert_subscriber( array $node, array $input,  $api_key ): array {
 		$data = self::get_node_config_data( $node );
 
-		$list_id = self::substitute_variables( () ( $data['list_id'] ?? '' ), $input );
-		$email   = self::substitute_variables( () ( $data['email'] ?? '' ), $input );
+		$list_id = self::substitute_variables( $data['list_id'] ?? '', $input );
+		$email   = self::substitute_variables( $data['email'] ?? '', $input );
 
 		if ( $list_id === '' ) {
 			throw new \Exception( 'Mailchimp list ID is required' );
@@ -214,8 +214,8 @@ class Mailchimp extends IntegrationBase {
 			throw new \Exception( 'A valid email address is required' );
 		}
 
-		$status = self::substitute_variables( () ( $data['status'] ?? '' ), $input );
-		$status_if_new = self::substitute_variables( () ( $data['status_if_new'] ?? '' ), $input );
+		$status = self::substitute_variables( $data['status'] ?? '', $input );
+		$status_if_new = self::substitute_variables( $data['status_if_new'] ?? '', $input );
 		$merge_fields_raw = $data['merge_fields'] ?? '';
 		$tags_raw = $data['tags'] ?? '';
 
@@ -383,7 +383,7 @@ class Mailchimp extends IntegrationBase {
 		return array( $response_body, $status );
 	}
 
-	private static function get_api_base(  $api_key ):  {
+	private static function get_api_base(  $api_key )  {
 		$parts = explode( '-', $api_key );
 		if ( count( $parts ) < 2 ) {
 			throw new \Exception( 'Invalid Mailchimp API key format (missing data center)' );
@@ -419,7 +419,7 @@ private static function get_status_options(  $allow_empty = true ): array {
 			return $raw;
 		}
 
-		$raw = self::substitute_variables( trim( () $raw ), $input );
+		$raw = self::substitute_variables( trim( $raw ), $input );
 		if ( $raw === '' ) {
 			return array();
 		}
@@ -437,7 +437,7 @@ private static function get_status_options(  $allow_empty = true ): array {
 			return self::normalize_tags( $raw );
 		}
 
-		$raw = self::substitute_variables( trim( () $raw ), $input );
+		$raw = self::substitute_variables( trim( $raw ), $input );
 		if ( $raw === '' ) {
 			return array();
 		}
@@ -458,8 +458,8 @@ private static function get_status_options(  $allow_empty = true ): array {
 	}
 
 	private static function extract_list_and_email( array $data, array $input ): array {
-		$list_id = self::substitute_variables( () ( $data['list_id'] ?? '' ), $input );
-		$email   = self::substitute_variables( () ( $data['email'] ?? '' ), $input );
+		$list_id = self::substitute_variables( $data['list_id'] ?? '', $input );
+		$email   = self::substitute_variables( $data['email'] ?? '', $input );
 
 		if ( $list_id === '' ) {
 			throw new \Exception( 'Mailchimp list ID is required' );
@@ -472,15 +472,15 @@ private static function get_status_options(  $allow_empty = true ): array {
 		return array( $list_id, $email );
 	}
 
-	private static function resolve_api_key( ?array $credentials ):  {
+	private static function resolve_api_key( ?array $credentials ) {
 		$api_key = '';
 
 		if ( is_array( $credentials ) ) {
-			$api_key = trim( () ( $credentials['api_key'] ?? '' ) );
+			$api_key = trim( $credentials['api_key'] ?? '' );
 		}
 
 		if ( $api_key === '' && function_exists( 'mc4wp_get_api_key' ) ) {
-			$api_key = trim( () mc4wp_get_api_key() );
+			$api_key = trim( mc4wp_get_api_key() );
 		}
 
 		if ( $api_key === '' ) {
@@ -490,7 +490,7 @@ private static function get_status_options(  $allow_empty = true ): array {
 		return $api_key;
 	}
 
-	private static function resolve_action( array $node ):  {
+	private static function resolve_action( array $node ) {
 		if ( isset( $node['config']['action'] ) && is_string( $node['config']['action'] ) ) {
 			return $node['config']['action'];
 		}
@@ -538,7 +538,7 @@ private static function get_status_options(  $allow_empty = true ): array {
 			}
 
 			if ( is_array( $tag ) ) {
-				$name = trim( () ( $tag['name'] ?? '' ) );
+				$name = trim( $tag['name'] ?? '' );
 				if ( $name === '' ) {
 					continue;
 				}
@@ -550,7 +550,7 @@ private static function get_status_options(  $allow_empty = true ): array {
 		return $normalized;
 	}
 
-	private static function substitute_variables(  $text, array $data ):  {
+	private static function substitute_variables(  $text, array $data )  {
 		return preg_replace_callback(
 			'/\{\{([^}]+)\}\}/',
 			function ( $matches ) use ( $data ) {
@@ -566,7 +566,7 @@ private static function get_status_options(  $allow_empty = true ): array {
 					}
 				}
 
-				return is_scalar( $value ) ? () $value : wp_json_encode( $value );
+				return is_scalar( $value ) ? (string) $value : wp_json_encode( $value );
 			},
 			$text
 		);
