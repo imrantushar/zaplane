@@ -27,52 +27,91 @@ class Slack extends IntegrationBase {
 
 	public static function get_triggers(): array {
 		return array(
-			'message_received' => array(
+			'message_received'  => array(
 				'label' => 'Message Received',
 				'hook'  => 'slack_webhook_message',
+			),
+			'app_mention'       => array(
+				'label' => 'App Mentioned',
+				'hook'  => 'slack_webhook_app_mention',
+			),
+			'reaction_added'    => array(
+				'label' => 'Reaction Added',
+				'hook'  => 'slack_webhook_reaction_added',
+			),
+			'channel_created'   => array(
+				'label' => 'Channel Created',
+				'hook'  => 'slack_webhook_channel_created',
+			),
+			'file_shared'       => array(
+				'label' => 'File Shared',
+				'hook'  => 'slack_webhook_file_shared',
 			),
 		);
 	}
 
 	public static function get_actions(): array {
 		return array(
-			'send_message' => array( 'label' => 'Send Message' ),
-			'send_dm'      => array( 'label' => 'Send Direct Message' ),
+			'send_message'      => array( 'label' => 'Send Message' ),
+			'send_dm'           => array( 'label' => 'Send Direct Message' ),
+			'create_channel'    => array( 'label' => 'Create Channel' ),
+			'invite_to_channel' => array( 'label' => 'Invite User to Channel' ),
+			'set_topic'         => array( 'label' => 'Set Channel Topic' ),
+			'add_reaction'      => array( 'label' => 'Add Reaction' ),
+			'get_user_info'     => array( 'label' => 'Get User Info' ),
 		);
 	}
 
 	public static function get_action_config_schema( string $action ): array {
 		if ( $action === 'send_message' ) {
 			return array(
-				'channel' => array(
-					'type'        => 'text',
-					'label'       => 'Channel',
-					'placeholder' => '#general or channel ID',
-					'required'    => true,
-				),
-				'text'    => array(
-					'type'        => 'textarea',
-					'label'       => 'Message',
-					'placeholder' => 'Enter your message...',
-					'required'    => true,
-				),
+				array( 'key' => 'channel', 'type' => 'text',     'label' => 'Channel', 'placeholder' => '#general or channel ID',                                    'required' => true ),
+				array( 'key' => 'text',    'type' => 'textarea', 'label' => 'Message', 'placeholder' => 'Enter your message... Use {{variable}} for dynamic values', 'required' => true ),
 			);
 		}
 
 		if ( $action === 'send_dm' ) {
 			return array(
-				'user_id' => array(
-					'type'        => 'text',
-					'label'       => 'User ID',
-					'placeholder' => 'Slack user ID',
-					'required'    => true,
-				),
-				'text'    => array(
-					'type'        => 'textarea',
-					'label'       => 'Message',
-					'placeholder' => 'Enter your message...',
-					'required'    => true,
-				),
+				array( 'key' => 'user_id', 'type' => 'text',     'label' => 'User ID', 'placeholder' => 'Slack user ID (e.g. U012AB3CD)',                            'required' => true ),
+				array( 'key' => 'text',    'type' => 'textarea', 'label' => 'Message', 'placeholder' => 'Enter your message... Use {{variable}} for dynamic values', 'required' => true ),
+			);
+		}
+
+		if ( $action === 'create_channel' ) {
+			return array(
+				array( 'key' => 'name',       'type' => 'text',   'label' => 'Channel Name', 'placeholder' => 'my-new-channel', 'required' => true, 'help' => 'Lowercase letters, numbers and hyphens only.' ),
+				array( 'key' => 'is_private', 'type' => 'select', 'label' => 'Visibility',   'options' => array(
+					array( 'value' => 'false', 'label' => 'Public' ),
+					array( 'value' => 'true',  'label' => 'Private' ),
+				) ),
+			);
+		}
+
+		if ( $action === 'invite_to_channel' ) {
+			return array(
+				array( 'key' => 'channel',  'type' => 'text', 'label' => 'Channel ID', 'placeholder' => 'C012AB3CD',              'required' => true ),
+				array( 'key' => 'user_ids', 'type' => 'text', 'label' => 'User IDs',   'placeholder' => 'U012AB3CD,U012AB3CE',    'required' => true, 'help' => 'Comma-separated Slack user IDs.' ),
+			);
+		}
+
+		if ( $action === 'set_topic' ) {
+			return array(
+				array( 'key' => 'channel', 'type' => 'text', 'label' => 'Channel ID', 'placeholder' => 'C012AB3CD',          'required' => true ),
+				array( 'key' => 'topic',   'type' => 'text', 'label' => 'Topic',      'placeholder' => 'New channel topic...', 'required' => true ),
+			);
+		}
+
+		if ( $action === 'add_reaction' ) {
+			return array(
+				array( 'key' => 'channel',   'type' => 'text', 'label' => 'Channel ID',        'placeholder' => 'C012AB3CD',             'required' => true ),
+				array( 'key' => 'timestamp', 'type' => 'text', 'label' => 'Message Timestamp', 'placeholder' => '{{slack_message_ts}}',  'required' => true, 'help' => 'The ts of the message to react to.' ),
+				array( 'key' => 'emoji',     'type' => 'text', 'label' => 'Emoji Name',        'placeholder' => 'thumbsup',              'required' => true, 'help' => 'Emoji name without colons (e.g. thumbsup).' ),
+			);
+		}
+
+		if ( $action === 'get_user_info' ) {
+			return array(
+				array( 'key' => 'user_id', 'type' => 'text', 'label' => 'User ID', 'placeholder' => 'U012AB3CD or {{user_id}}', 'required' => true ),
 			);
 		}
 
@@ -104,6 +143,26 @@ class Slack extends IntegrationBase {
 
 		if ( $action === 'send_dm' ) {
 			return self::action_send_dm( $node, $input, $token );
+		}
+
+		if ( $action === 'create_channel' ) {
+			return self::action_create_channel( $node, $input, $token );
+		}
+
+		if ( $action === 'invite_to_channel' ) {
+			return self::action_invite_to_channel( $node, $input, $token );
+		}
+
+		if ( $action === 'set_topic' ) {
+			return self::action_set_topic( $node, $input, $token );
+		}
+
+		if ( $action === 'add_reaction' ) {
+			return self::action_add_reaction( $node, $input, $token );
+		}
+
+		if ( $action === 'get_user_info' ) {
+			return self::action_get_user_info( $node, $input, $token );
 		}
 
 		return array(
@@ -420,6 +479,214 @@ class Slack extends IntegrationBase {
 			// Slack bot tokens don't expire, but we track this for consistency
 			'expires_in'    => null,
 			'refresh_token' => null,
+		);
+	}
+
+	private static function action_create_channel( array $node, array $input, string $token ): array {
+		$name       = self::substitute_variables( $node['config']['data']['name'] ?? '', $input );
+		$is_private = ( $node['config']['data']['is_private'] ?? 'false' ) === 'true';
+
+		[ $body, $status ] = self::http_post(
+			self::API_BASE_URL . '/conversations.create',
+			array(
+				'name'       => $name,
+				'is_private' => $is_private,
+			),
+			array( 'Authorization' => 'Bearer ' . $token )
+		);
+
+		if ( empty( $body['ok'] ) ) {
+			throw new \Exception( 'Slack API error: ' . ( $body['error'] ?? 'Unknown error' ) );
+		}
+
+		return array(
+			'port' => 'main',
+			'data' => array_merge( $input, array(
+				'channel_id'   => $body['channel']['id']   ?? '',
+				'channel_name' => $body['channel']['name'] ?? '',
+			) ),
+		);
+	}
+
+	private static function action_invite_to_channel( array $node, array $input, string $token ): array {
+		$channel  = self::substitute_variables( $node['config']['data']['channel'] ?? '', $input );
+		$user_ids = self::substitute_variables( $node['config']['data']['user_ids'] ?? '', $input );
+
+		[ $body ] = self::http_post(
+			self::API_BASE_URL . '/conversations.invite',
+			array(
+				'channel' => $channel,
+				'users'   => $user_ids,
+			),
+			array( 'Authorization' => 'Bearer ' . $token )
+		);
+
+		if ( empty( $body['ok'] ) ) {
+			throw new \Exception( 'Slack API error: ' . ( $body['error'] ?? 'Unknown error' ) );
+		}
+
+		return array(
+			'port' => 'main',
+			'data' => array_merge( $input, array(
+				'channel_id' => $body['channel']['id'] ?? '',
+			) ),
+		);
+	}
+
+	private static function action_set_topic( array $node, array $input, string $token ): array {
+		$channel = self::substitute_variables( $node['config']['data']['channel'] ?? '', $input );
+		$topic   = self::substitute_variables( $node['config']['data']['topic']   ?? '', $input );
+
+		[ $body ] = self::http_post(
+			self::API_BASE_URL . '/conversations.setTopic',
+			array(
+				'channel' => $channel,
+				'topic'   => $topic,
+			),
+			array( 'Authorization' => 'Bearer ' . $token )
+		);
+
+		if ( empty( $body['ok'] ) ) {
+			throw new \Exception( 'Slack API error: ' . ( $body['error'] ?? 'Unknown error' ) );
+		}
+
+		return array(
+			'port' => 'main',
+			'data' => array_merge( $input, array(
+				'topic' => $body['topic'] ?? $topic,
+			) ),
+		);
+	}
+
+	private static function action_add_reaction( array $node, array $input, string $token ): array {
+		$channel   = self::substitute_variables( $node['config']['data']['channel']   ?? '', $input );
+		$timestamp = self::substitute_variables( $node['config']['data']['timestamp'] ?? '', $input );
+		$emoji     = trim( $node['config']['data']['emoji'] ?? '', ':' );
+
+		[ $body ] = self::http_post(
+			self::API_BASE_URL . '/reactions.add',
+			array(
+				'channel'   => $channel,
+				'timestamp' => $timestamp,
+				'name'      => $emoji,
+			),
+			array( 'Authorization' => 'Bearer ' . $token )
+		);
+
+		if ( empty( $body['ok'] ) && ( $body['error'] ?? '' ) !== 'already_reacted' ) {
+			throw new \Exception( 'Slack API error: ' . ( $body['error'] ?? 'Unknown error' ) );
+		}
+
+		return array(
+			'port' => 'main',
+			'data' => array_merge( $input, array(
+				'reaction_added' => true,
+			) ),
+		);
+	}
+
+	private static function action_get_user_info( array $node, array $input, string $token ): array {
+		$user_id = self::substitute_variables( $node['config']['data']['user_id'] ?? '', $input );
+
+		[ $body ] = self::http_get(
+			self::API_BASE_URL . '/users.info?user=' . rawurlencode( $user_id ),
+			array( 'Authorization' => 'Bearer ' . $token )
+		);
+
+		if ( empty( $body['ok'] ) ) {
+			throw new \Exception( 'Slack API error: ' . ( $body['error'] ?? 'Unknown error' ) );
+		}
+
+		$user = $body['user'] ?? array();
+
+		return array(
+			'port' => 'main',
+			'data' => array_merge( $input, array(
+				'user_id'      => $user['id']                         ?? '',
+				'user_name'    => $user['name']                       ?? '',
+				'display_name' => $user['profile']['display_name']    ?? '',
+				'email'        => $user['profile']['email']           ?? '',
+				'is_admin'     => $user['is_admin']                   ?? false,
+			) ),
+		);
+	}
+
+	// ── Incoming webhook support ───────────────────────────────────────────────
+
+	public static function supports_webhook(): bool {
+		return true;
+	}
+
+	/**
+	 * Verify Slack's request signature.
+	 * Slack signs every request with HMAC-SHA256 using the app's Signing Secret.
+	 * The signing secret is stored as the WordPress option 'zaplane_slack_signing_secret'.
+	 */
+	public static function verify_webhook_signature( \WP_REST_Request $request ): bool {
+		$signing_secret = get_option( 'zaplane_slack_signing_secret', '' );
+
+		// If no secret configured, accept all (dev/testing mode).
+		if ( empty( $signing_secret ) ) {
+			return true;
+		}
+
+		$timestamp = $request->get_header( 'x-slack-request-timestamp' );
+		$signature = $request->get_header( 'x-slack-signature' );
+
+		if ( ! $timestamp || ! $signature ) {
+			return false;
+		}
+
+		// Reject requests older than 5 minutes to prevent replay attacks.
+		if ( abs( time() - (int) $timestamp ) > 300 ) {
+			return false;
+		}
+
+		$base_string    = 'v0:' . $timestamp . ':' . $request->get_body();
+		$expected       = 'v0=' . hash_hmac( 'sha256', $base_string, $signing_secret );
+
+		return hash_equals( $expected, $signature );
+	}
+
+	/**
+	 * Parse a Slack Event API payload into a normalized [event, payload] pair.
+	 * Returns null for url_verification challenges and unknown event types.
+	 */
+	public static function parse_webhook_event( \WP_REST_Request $request ): ?array {
+		$body = $request->get_json_params();
+		$type = $body['type'] ?? '';
+
+		// Slack URL verification challenge — respond with challenge, no workflow.
+		if ( $type === 'url_verification' ) {
+			return null;
+		}
+
+		if ( $type !== 'event_callback' ) {
+			return null;
+		}
+
+		$event      = $body['event'] ?? array();
+		$event_type = $event['type'] ?? '';
+
+		$map = array(
+			'message'         => 'message_received',
+			'app_mention'     => 'app_mention',
+			'reaction_added'  => 'reaction_added',
+			'channel_created' => 'channel_created',
+			'file_shared'     => 'file_shared',
+		);
+
+		$normalized = $map[ $event_type ] ?? null;
+		if ( ! $normalized ) {
+			return null; // Unknown event — accept HTTP, skip workflow.
+		}
+
+		return array(
+			'event'   => $normalized,
+			'payload' => array_merge( $event, array(
+				'team_id'    => $body['team_id']    ?? '',
+				'api_app_id' => $body['api_app_id'] ?? '',
+			) ),
 		);
 	}
 
