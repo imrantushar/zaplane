@@ -5824,6 +5824,7 @@ function ConditionGroupField({
     if (!nodeId || !workFlow?.version?.hash) return;
     const payload = {
       workflow_id: workFlow.workflow.id,
+      workflow_hash: workFlow.version.hash,
       target_node_key: nodeId,
       nodes: (0,_helper__WEBPACK_IMPORTED_MODULE_15__.mapNodesForBackend)(nodes),
       edges: (0,_helper__WEBPACK_IMPORTED_MODULE_15__.mapEdgesForBackend)(edges)

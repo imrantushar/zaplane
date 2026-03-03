@@ -27,6 +27,7 @@ export default function ConditionGroupField({ value, field, nodeId, workFlow, no
         if (!nodeId || !workFlow?.version?.hash) return;
         const payload = {
             workflow_id: workFlow.workflow.id,
+            workflow_hash:workFlow.version.hash,
             target_node_key: nodeId,
             nodes: mapNodesForBackend(nodes),
             edges: mapEdgesForBackend(edges),
