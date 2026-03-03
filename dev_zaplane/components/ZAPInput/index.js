@@ -13,16 +13,15 @@ const ZAPInput = ({
 }) => {
   const textareaRef = useRef(null);
 
-  useEffect(() => {
-    if (type === "textarea" && textareaRef.current) {
-      const el = textareaRef.current;
-      const minHeight = 35;
-      el.style.height = minHeight + "px";
-      if (value) {
-        el.style.height = el.scrollHeight + "px";
-      }
-    }
-  }, [value, type]);
+useEffect(() => {
+  if (type === "textarea" && textareaRef.current) {
+    const el = textareaRef.current;
+    const minHeight = 35;
+    el.style.height = "0px";
+    const newHeight = Math.max(el.scrollHeight, minHeight);
+    el.style.height = newHeight + "px";
+  }
+}, [value, type]);
 
   const isTextarea = type === "textarea";
 
