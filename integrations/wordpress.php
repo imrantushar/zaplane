@@ -19,7 +19,6 @@ use Zaplane\Integrations\Wordpress\CommentActionsTrait;
 use Zaplane\Integrations\Wordpress\QueryTrait;
 use Zaplane\Integrations\Wordpress\Helper;
 
-
 class Wordpress extends IntegrationBase {
     use ActionResponseTrait;
     use PostActionsTrait;
