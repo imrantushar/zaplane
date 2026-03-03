@@ -5,6 +5,7 @@ namespace Zaplane\API;
 use WP_REST_Controller;
 use WP_Error;
 use Zaplane\Framework\Classes\Container;
+use Zaplane\Framework\Core\Automation;
 use Zaplane\Models\Run;
 use Zaplane\Models\NodeRun;
 use Zaplane\Models\WorkflowVersion;
@@ -27,7 +28,22 @@ class RunController extends WP_REST_Controller
         register_rest_route($ns, '/runs', [
             'methods' => 'GET',
             'callback' => [$this, 'list_runs'],
-            'permission_callback' => [$this, 'permissions']
+            'permission_callback' => [$this, 'permissions'],
+            'args' => [
+                'page' => [
+                    'type' => 'integer',
+                    'default' => 1,
+                    'minimum' => 1,
+                    'sanitize_callback' => 'absint',
+                ],
+                'per_page' => [
+                    'type' => 'integer',
+                    'default' => 20,
+                    'minimum' => 1,
+                    'maximum' => 100,
+                    'sanitize_callback' => 'absint',
+                ],
+            ],
         ]);
 
         register_rest_route($ns, '/runs/(?P<id>\d+)', [
@@ -78,21 +94,51 @@ class RunController extends WP_REST_Controller
         return current_user_can('manage_options');
     }
 
-    /* ================= RUN LIST ================= */
-
-    public function list_runs()
+    public function list_runs($request)
     {
-        return Run::recent(100)
-            ->map(fn($run) => [
-                'id' => $run->id,
-                'status' => $run->status,
-                'started_at' => $run->started_at,
-                'finished_at' => $run->finished_at,
-            ])
-            ->toArray();
-    }
+        $page    = max(1, (int) ($request->get_param('page') ?? 1));
+        $perPage = min(100, max(1, (int) ($request->get_param('per_page') ?? 20)));
 
-    /* ================= RUN VIEW ================= */
+        $total = Run::query()->count();
+        $runs  = Run::query()->orderBy('id', 'desc')->forPage($page, $perPage)->get();
+
+        $data = $runs->map(function ($run) {
+            $node       = null;
+            $version    = $run->workflowVersion();
+            $node_count = NodeRun::where('run_id', $run->id)->count();
+
+            if ($version) {
+                $nodeKey = $run->start_node_key ?? $run->target_node_key;
+                $graph   = $version->getGraph();
+                foreach ($graph['nodes'] ?? [] as $n) {
+                    if ((int) $n['id'] === (int) $nodeKey) {
+                        $node = $n;
+                        break;
+                    }
+                }
+            }
+
+            return [
+                'id'          => $run->id,
+                'status'      => $run->status,
+                'started_at'  => $run->started_at,
+                'finished_at' => $run->finished_at,
+                'node_count'  => $node_count,
+                'node'        => $node ? [
+                    'app'   => $node['data']['app'] ?? null,
+                    'event' => $node['data']['event'] ?? null,
+                ] : null,
+            ];
+        })->toArray();
+
+        return rest_ensure_response([
+            'runs'     => $data,
+            'total'    => $total,
+            'page'     => $page,
+            'per_page' => $perPage,
+            'pages'    => $perPage > 0 ? (int) ceil($total / $perPage) : 1,
+        ]);
+    }
 
     public function get_run($req)
     {
@@ -103,13 +149,32 @@ class RunController extends WP_REST_Controller
             return new WP_Error('not_found', 'Run not found', ['status' => 404]);
         }
 
+        $version = $run->workflowVersion();
+        $graph = $version ? $version->getGraph() : ['nodes' => [], 'edges' => []];
+
+        $graphNodes = [];
+        foreach ($graph['nodes'] ?? [] as $node) {
+            $graphNodes[(int) $node['id']] = $node;
+        }
+
+        $nodeRuns = NodeRun::forRun($id)->map(function ($nodeRun) use ($graphNodes) {
+            $data = $nodeRun->toArray();
+            $graphNode = $graphNodes[$nodeRun->node_key] ?? null;
+
+            $data['node'] = $graphNode ? [
+                'app' => $graphNode['data']['app'] ?? null,
+                'event' => $graphNode['data']['event'] ?? null,
+                'label' => $graphNode['data']['label'] ?? null,
+            ] : null;
+
+            return $data;
+        })->toArray();
+
         return [
             'run' => $run->toArray(),
-            'nodes' => NodeRun::forRun($id)->toArray(),
+            'nodes' => $nodeRuns,
         ];
     }
-
-    /* ================= REPLAY ================= */
 
     public function replay_run($req)
     {
@@ -121,7 +186,8 @@ class RunController extends WP_REST_Controller
         }
 
         $newRun = Run::create([
-            'workflow_version_hash' => $oldRun->workflow_version_hash,
+            'workflow_version_id' => $oldRun->workflow_version_id,
+            'workflow_id' => $oldRun->workflow_id,
             'trigger_data' => $oldRun->trigger_data,
             'status' => 'running',
             'start_node_key' => $oldRun->start_node_key,
@@ -138,8 +204,6 @@ class RunController extends WP_REST_Controller
 
         return ['run_id' => $newRun->id];
     }
-
-    /* ================= STOP ================= */
 
     public function stop_run($req)
     {
@@ -162,8 +226,6 @@ class RunController extends WP_REST_Controller
 
         return ['stopped' => true];
     }
-
-    /* ================= NODE ================= */
 
     public function get_node_run($req)
     {
@@ -191,12 +253,10 @@ class RunController extends WP_REST_Controller
         $nodeRun->output_json = null;
         $nodeRun->save();
 
-        as_enqueue_async_action('zaplane_execute_node_run', ['node_run_id' => $id], 'zaplane');
+        Automation::enqueue_node_run($id);
 
         return ['requeued' => true];
     }
-
-    /* ================= EXECUTE FULL ================= */
 
     public function execute_workflow($req)
     {
@@ -223,18 +283,21 @@ class RunController extends WP_REST_Controller
             return new WP_Error('no_trigger', 'No trigger node found', ['status' => 400]);
         }
 
+        $triggerKey = (int) $trigger['id'];
+
         $run = Run::create([
-            'workflow_version_hash' => $workflowHash,
+            'workflow_version_id' => $version->id,
+            'workflow_id' => $version->workflow_id,
             'status' => 'running',
             'trigger_data' => $data,
-            'start_node_key' => $trigger['id'],
+            'start_node_key' => $triggerKey,
             'target_node_key' => null,
             'started_at' => current_time('mysql'),
         ]);
 
         $this->container->get('automation')->spawn_node_run(
             $run->id,
-            $trigger['id'],
+            $triggerKey,
             $data,
             null
         );
@@ -242,53 +305,118 @@ class RunController extends WP_REST_Controller
         return ['run_id' => $run->id];
     }
 
-    /* ================= EXECUTE SINGLE NODE ================= */
-
     public function execute_single_node($req)
     {
-        $workflowHash = $req['workflow_hash'];
-        $target = (string) $req['node_key'];
-        $input = $req['input'] ?? [];
+        $targetNode        = $req['target_node'] ?? null;
+        $workflowVersionId = (int) ($req['workflow_version_id'] ?? 0);
+        $input             = $req['input'] ?? [];
 
-        $version = WorkflowVersion::where('graph_hash', $workflowHash)->first();
+        if (!$workflowVersionId) {
+            return new WP_Error('missing_params', 'workflow_version_id is required', ['status' => 400]);
+        }
+
+        $version = WorkflowVersion::find($workflowVersionId);
 
         if (!$version) {
             return new WP_Error('not_found', 'Workflow version not found', ['status' => 404]);
         }
 
-        $graph = $version->getGraph();
-        $trigger = null;
-
-        foreach ($graph['nodes'] as $node) {
-            if ($node['type'] === 'trigger') {
-                $trigger = $node;
-                break;
-            }
-        }
-
-        if (!$trigger) {
-            return new WP_Error('no_trigger', 'No trigger node found', ['status' => 400]);
+        if (!$targetNode) {
+            return new WP_Error('node_not_found', 'Target node not found', ['status' => 404]);
         }
 
         $run = Run::create([
-            'workflow_version_hash' => $workflowHash,
+            'workflow_version_id' => $version->id,
+            'workflow_id' => $version->workflow_id,
             'status' => 'running',
+            'is_test' => true,
             'trigger_data' => $input,
-            'start_node_key' => $trigger['id'],
-            'target_node_key' => $target,
+            'target_node_key' => (int) $targetNode['id'],
             'started_at' => current_time('mysql'),
         ]);
 
-        $this->container->get('automation')->spawn_node_run(
-            $run->id,
-            $trigger['id'],
-            $input,
-            null
-        );
-
-        return [
+        $nodeRun = NodeRun::create([
             'run_id' => $run->id,
-            'target_node' => $target,
-        ];
+            'node_key' => (int) $targetNode['id'],
+            'parent_node_run_id' => null,
+            'status' => 'running',
+            'input_json' => $input,
+            'started_at' => current_time('mysql'),
+        ]);
+
+        try {
+            if ($targetNode['type'] === 'trigger') {
+                $output = $input;
+            } else {
+                $integration = $this->container->get('integrations')->get(strtolower($targetNode['data']['app']));
+
+                if (!$integration) {
+                    throw new \Exception("Integration not found: " . ($targetNode['data']['app'] ?? 'unknown'));
+                }
+
+                $output = $integration::execute_node($targetNode, $input);
+            }
+
+            $nodeRun->setOutput($output);
+
+            $run->status = 'completed';
+            $run->finished_at = current_time('mysql');
+            $run->save();
+
+            return [
+                'status' => 'success',
+                'code' => 'SUCCESS',
+                'data' => [
+                    'run_id' => $run->id,
+                    'node_run_id' => $nodeRun->id,
+                    'node' => [
+                        'id' => (int) $targetNode['id'],
+                        'app' => $targetNode['data']['app'] ?? null,
+                        'event' => $targetNode['data']['event'] ?? null,
+                        'label' => $targetNode['data']['label'] ?? null,
+                    ],
+                    'input' => $input,
+                    'output' => $output,
+                ],
+            ];
+
+        } catch (\Throwable $e) {
+            $errorData = [
+                'error' => $e->getMessage(),
+                'error_code' => method_exists($e, 'getErrorCode') ? $e->getErrorCode() : 'unknown',
+            ];
+
+            if (method_exists($e, 'getContext')) {
+                $errorData['context'] = $e->getContext();
+            }
+
+            $nodeRun->output_json = $errorData;
+            $nodeRun->status = 'failed';
+            $nodeRun->finished_at = current_time('mysql');
+            $nodeRun->save();
+
+            $run->status = 'failed';
+            $run->last_error = $e->getMessage();
+            $run->finished_at = current_time('mysql');
+            $run->save();
+
+            return [
+                'status' => 'error',
+                'code' => $errorData['error_code'],
+                'message' => $e->getMessage(),
+                'data' => [
+                    'run_id' => $run->id,
+                    'node_run_id' => $nodeRun->id,
+                    'node' => [
+                        'id' => (int) $targetNode['id'],
+                        'app' => $targetNode['data']['app'] ?? null,
+                        'event' => $targetNode['data']['event'] ?? null,
+                        'label' => $targetNode['data']['label'] ?? null,
+                    ],
+                    'input' => $input,
+                    'output' => $errorData,
+                ],
+            ];
+        }
     }
 }

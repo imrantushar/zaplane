@@ -1,11 +1,16 @@
 
 
 import {
+    Button,
     CloseButton,
     Drawer,
+    Icon,
     Portal,
     Text,
 } from "@chakra-ui/react";
+import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
+import { FiArrowLeft } from "react-icons/fi";
+import { IoIosArrowBack } from "react-icons/io";
 
 
 const ZAPDrawer = ({
@@ -19,6 +24,9 @@ const ZAPDrawer = ({
     zIndex = 9999,
     onClose,
     open,
+    arrowClose,
+    isFullscreen = false,
+    arrowOnClick,
 }) => {
     return (
         <Drawer.Root
@@ -41,12 +49,22 @@ const ZAPDrawer = ({
             </Drawer.Trigger>
 
             <Portal>
-                <Drawer.Positioner marginTop='32px' zIndex={"99999999"}
+                <Drawer.Positioner marginTop={isFullscreen ? '0' : "32px"} height={isFullscreen ? '100%' : 'calc(100vh - 32px)'} zIndex={"9999"}
                     pointerEvents="none">
-                    <Drawer.Content pointerEvents="auto">
+                    <Drawer.Content pointerEvents="auto" mr="15px">
                         {title && (
                             <Drawer.Header>
-                                <Drawer.Title margin='0' >{title}</Drawer.Title>
+                                {
+                                    arrowClose && <Icon as={IoIosArrowBack} height='24px' width="24px" onClick={() => {
+                                        arrowOnClick ? arrowOnClick() : onClose();
+                                    }}
+                                    >
+
+                                    </Icon>
+                                }
+                                <Drawer.Title margin='0'>
+                                    <ZAPLabel label={title} type={"bold"} />
+                                </Drawer.Title>
                                 <Drawer.CloseTrigger asChild>
                                     <CloseButton size="sm" />
                                 </Drawer.CloseTrigger>
@@ -61,8 +79,6 @@ const ZAPDrawer = ({
                                             ? children(store)
                                             : children}
                                     </Drawer.Body>
-
-                                    {/* 👉 Footer Section */}
                                     {footer && (
                                         <Drawer.Footer>
                                             {typeof footer === "function"

@@ -29,6 +29,7 @@ class NodeRun extends Model
     protected static array $casts = [
         'id' => 'integer',
         'run_id' => 'integer',
+        'node_key' => 'integer',
         'parent_node_run_id' => 'integer',
         'iteration' => 'integer',
         'attempts' => 'integer',
@@ -57,11 +58,6 @@ class NodeRun extends Model
     public function children(): array
     {
         return static::where('parent_node_run_id', $this->id)->get();
-    }
-
-    public function logs(): array
-    {
-        return NodeLog::where('node_run_id', $this->id)->orderBy('id', 'asc')->get();
     }
 
     public function getInput(): array
@@ -99,11 +95,6 @@ class NodeRun extends Model
     {
         $this->status = 'failed';
         $this->finished_at = current_time('mysql');
-
-        if ($error) {
-            $this->log('error', $error);
-        }
-
         return $this->save();
     }
 
@@ -150,15 +141,6 @@ class NodeRun extends Model
     public function isWaiting(): bool
     {
         return $this->status === 'waiting';
-    }
-
-    public function log(string $level, string $message): void
-    {
-        NodeLog::create([
-            'node_run_id' => $this->id,
-            'level' => $level,
-            'message' => $message,
-        ]);
     }
 
     public static function pending(): array

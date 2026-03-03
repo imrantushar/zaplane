@@ -18,11 +18,24 @@ class ConnectionManager
      * @throws ConnectionException
      * @throws IntegrationException
      */
-    public function create(int $user_id, string $app, string $name, string $auth_type, array $credentials)
+    public function create(int $user_id, string $app, string $name, string $auth_type, array $credentials): array
     {
         $integration = IntegrationLoader::get($app);
         if (!$integration) {
             throw IntegrationException::notFound($app);
+        }
+
+        // Test credentials before saving. OAuth2 skips this — the token exchange already validated the connection.
+        $test_result = null;
+        if ($auth_type !== 'oauth2') {
+            $class = get_class($integration);
+            $test_result = $class::test_connection($credentials);
+            if (!($test_result['success'] ?? false)) {
+                throw ConnectionException::invalidCredentials(
+                    $app,
+                    $test_result['message'] ?? 'Connection test failed'
+                );
+            }
         }
 
         try {
@@ -40,7 +53,11 @@ class ConnectionManager
             'status' => 'active',
         ]);
 
-        return $connection->id;
+        if ($test_result !== null) {
+            $connection->markAsTested(true);
+        }
+
+        return ['id' => $connection->id, 'test_result' => $test_result];
     }
 
     public function get(int $id, bool $decrypt = false): ?array
@@ -66,11 +83,29 @@ class ConnectionManager
         return $data;
     }
 
-    public function get_user_connections(int $user_id, ?string $app = null): array
+    public function get_user_connections(int $user_id, ?string $app = null, int $page = 1, int $perPage = 20): array
     {
-        $connections = Connection::forUser($user_id, $app);
+        $query = Connection::where('user_id', $user_id);
 
-        return $connections->toArray();
+        if ($app !== null) {
+            $query->where('app', $app);
+        }
+
+        $total = (clone $query)->count();
+
+        $connections = $query->orderBy('name', 'asc')
+            ->forPage($page, $perPage)
+            ->get();
+
+        return [
+            'data' => $connections->toArray(),
+            'pagination' => [
+                'page' => $page,
+                'per_page' => $perPage,
+                'total' => $total,
+                'total_pages' => (int) ceil($total / $perPage),
+            ],
+        ];
     }
 
     public function update(int $id, array $data): bool

@@ -35,7 +35,6 @@ class Query
                 }
             }
         }
-
         return array_unique($events);
     }
 
@@ -58,9 +57,10 @@ class Query
 
             $graph = $version->getGraph();
             foreach ($graph['nodes'] ?? [] as $node) {
-                if (($node['type'] ?? '') === 'trigger' && ($node['data']['event'] ?? '') === $event) {
+                if (($node['type'] ?? '') === 'trigger' && ($node['data']['hook'] ?? '') === $event) {
                     $out[] = [
-                        'workflow_version_hash' => $version->graph_hash,
+                        'workflow_version_id' => $version->id,
+                        'workflow_id' => $workflow->id,
                         'id' => $node['id'],
                         'app' => $node['data']['app'] ?? '',
                         'graph_node' => $node,

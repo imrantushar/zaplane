@@ -6,30 +6,28 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use Zaplane\Integrations\Wordpress\QueryTrait;
+use Zaplane\Framework\Models\User;
+use Zaplane\Framework\Models\Post;
 
 Trait Helper {
-    use QueryTrait;
 
     public static function get_user_payload( $user_ref, array $extra_data = [] ): ?array {
         $user = null;
         if ( is_numeric( $user_ref ) ) {
-            $user = get_userdata( (int) $user_ref );
-        } elseif ( is_object( $user_ref ) ) {
+            $user = User::find( (int) $user_ref );
+        } elseif ( is_object( $user_ref ) && $user_ref instanceof User ) {
             $user = $user_ref;
+        } elseif ( is_object( $user_ref ) ) {
+            $user = User::find( $user_ref->ID ?? 0 );
         } else {
-            $user = get_user_by( 'login', (string) $user_ref );
+            $user = User::byLogin( (string) $user_ref );
         }
 
         if ( ! $user ) {
             return null;
         }
 
-        $user_payload = self::query_users( [ 'users' => [ $user ] ] );
-        if ( ! $user_payload ) {
-            return null;
-        }
-
-        return array_merge( $user_payload[0], $extra_data );
+        return array_merge( $user->toArray(), $extra_data );
     }
 
     public static function get_term_payload( $term_id, $taxonomy, $term_taxonomy_id = 0, array $extra_data = [], $term_object = null ) {
@@ -149,48 +147,38 @@ Trait Helper {
 
      public static function get_posts(array $args = []): array {
         if (!empty($args['post_id'])) {
-            $post = get_post( $args['post_id']);
-            return $post ? self::format_post($post) : [];
+            $post = Post::find( (int) $args['post_id'] );
+            return $post ? $post->toArray() : [];
         }
 
-        $defaults = [
-            'post_type'      => 'post',
-            'post_status'    => 'any',
-            'posts_per_page' => -1,
-        ];
+        $query = Post::query();
 
-        $posts = get_posts(wp_parse_args($args, $defaults));
+        if (!empty($args['post_type'])) {
+            $query->where('post_type', $args['post_type']);
+        } else {
+            $query->where('post_type', 'post');
+        }
 
-        return array_map([self::class, 'format_post'], $posts);
+        if (!empty($args['post_status'])) {
+            $query->where('post_status', $args['post_status']);
+        }
+
+        $posts = $query->get();
+
+        return array_map(fn($post) => $post->toArray(), $posts);
     }
 
-    public static function format_post(\WP_Post $post): array {
-        return [
-            'ID'                    => $post->ID,
-            'post_author'           => $post->post_author,
-            'post_date'             => $post->post_date,
-            'post_date_gmt'         => $post->post_date_gmt,
-            'post_content'          => $post->post_content,
-            'post_title'            => $post->post_title,
-            'post_excerpt'          => $post->post_excerpt,
-            'post_status'           => $post->post_status,
-            'comment_status'        => $post->comment_status,
-            'ping_status'           => $post->ping_status,
-            'post_password'         => $post->post_password,
-            'post_name'             => $post->post_name,
-            'to_ping'               => $post->to_ping,
-            'pinged'                => $post->pinged,
-            'post_modified'         => $post->post_modified,
-            'post_modified_gmt'     => $post->post_modified_gmt,
-            'post_content_filtered' => $post->post_content_filtered,
-            'post_parent'           => $post->post_parent,
-            'guid'                  => $post->guid,
-            'menu_order'            => $post->menu_order,
-            'post_type'             => $post->post_type,
-            'post_mime_type'        => $post->post_mime_type,
-            'comment_count'         => $post->comment_count,
-            'filter'                => 'raw',
-        ];
+    public static function format_post($post): array {
+        if ($post instanceof Post) {
+            return $post->toArray();
+        }
+
+        if ($post instanceof \WP_Post) {
+            $model = Post::find($post->ID);
+            return $model ? $model->toArray() : [];
+        }
+
+        return [];
     }
 
     public static function get_post_types(): array {
@@ -315,30 +303,28 @@ Trait Helper {
 
     public static function get_media_posts(array $args = []): array
     {
-        $defaults = [
-            'post_type'      => 'attachment',
-            'post_status'    => 'inherit',
-            'posts_per_page' => -1,
-            'orderby'        => 'date',
-            'order'          => 'DESC',
-        ];
-        $query_args = array_merge($defaults, $args);
-        return get_posts($query_args);
+        $query = Post::where('post_type', 'attachment')
+            ->where('post_status', 'inherit')
+            ->orderBy('post_date', 'desc');
+
+        if (!empty($args['posts_per_page']) && $args['posts_per_page'] > 0) {
+            $query->limit($args['posts_per_page']);
+        }
+
+        return $query->get();
     }
 
     public static function format_media_items(array $media_posts): array
     {
         return array_map(function($media) {
-            return [
-                'ID'          => $media->ID,
-                'title'       => $media->post_title,
-                'url'         => wp_get_attachment_url($media->ID),
-                'type'        => $media->post_mime_type,
-                'alt_text'    => get_post_meta($media->ID, '_wp_attachment_image_alt', true),
-                'caption'     => wp_get_attachment_caption($media->ID),
-                'description' => $media->post_content,
-                'date'        => $media->post_date,
-            ];
+            $mediaArray = $media instanceof Post ? $media->toArray() : (array) $media;
+            $mediaId = $mediaArray['ID'] ?? 0;
+
+            return array_merge($mediaArray, [
+                'url'      => wp_get_attachment_url($mediaId),
+                'alt_text' => get_post_meta($mediaId, '_wp_attachment_image_alt', true),
+                'caption'  => wp_get_attachment_caption($mediaId),
+            ]);
         }, $media_posts);
     }
 }

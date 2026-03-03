@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { Text, Button, Flex } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
 
 import { clearBtn, clearPrimaryBtn } from '../../../assets/scss/chakra/recipe';
+import { sliceString } from '@ZAPUtils/helper';
 
 const ZAPLabel = ({
 	type = "title",
@@ -28,6 +29,7 @@ const ZAPLabel = ({
 	enableSlice = false,
 	sliceLength = 100,
 	sliceMore = '...',
+	textOverflow='',
 	showToggle = true,
 	seeMoreText = __('See more', 'zaplane'),
 	seeLessText = __('See less', 'zaplane'),
@@ -63,7 +65,8 @@ const ZAPLabel = ({
 		simple: {
 			fontSize: "14px",
 			fontWeight: "400",
-			color: "var(--zaplane-gray-color)",
+			color: "var(--zaplane-font-color)",
+			lineHeight:'20px'
 		},
 		simpleLight: {
 			fontSize: "12px",
@@ -71,7 +74,8 @@ const ZAPLabel = ({
 			color: "var(--zaplane-gray-color)",
 		},
 		bold: {
-			fontSize: "16px",
+			fontSize: "20px",
+			lineHeight:'30px',
 			fontWeight: "500",
 			color: "var(--zaplane-font-color)",
 		},
@@ -81,9 +85,11 @@ const ZAPLabel = ({
 			color: "var(--zaplane-gray-color)",
 		},
 		inputLabel: {
-			fontSize: "0.875rem",                 
-			fontWeight: "600",              
+			fontSize: "14px",                 
+			fontWeight: "500",              
 			color: "var(--zaplane-font-color)", 
+		    lineHeight:'20px',
+			margin:'0'
 			
 		}
 		
@@ -108,21 +114,22 @@ const ZAPLabel = ({
 		truncate: truncate,
 		lineClamp: lineClamp,
 		lineHeight: lineHeight,
+		textOverflow:textOverflow
 	};
 
 	const needsSlicing = enableSlice && label && label.length > sliceLength;
 
-	// const getDisplayText = () => {
-	// 	if (!enableSlice || !needsSlicing) {
-	// 		return label;
-	// 	}
+	const getDisplayText = () => {
+		if (!enableSlice || !needsSlicing) {
+			return label;
+		}
 
-	// 	if (isExpanded) {
-	// 		return label;
-	// 	}
+		if (isExpanded) {
+			return label;
+		}
 
-	// 	return sliceString(label, sliceLength, sliceMore);
-	// };
+		return sliceString(label, sliceLength, sliceMore);
+	};
 
 	const displayText = getDisplayText();
 

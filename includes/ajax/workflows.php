@@ -15,7 +15,6 @@ class Workflows extends AbstractAjaxHandler
     public function __construct()
     {
         $this->actions = [
-            // Update workflow status
             'update_workflow_status' => [
                 'callback' => [$this, 'updateStatus'],
                 'capability' => 'manage_options',
@@ -25,16 +24,6 @@ class Workflows extends AbstractAjaxHandler
                 ],
             ],
 
-            // Delete workflow
-            'delete_workflow' => [
-                'callback' => [$this, 'deleteWorkflow'],
-                'capability' => 'manage_options',
-                'fields' => [
-                    'id' => 'absint',
-                ],
-            ],
-
-            // Duplicate workflow
             'duplicate_workflow' => [
                 'callback' => [$this, 'duplicateWorkflow'],
                 'capability' => 'manage_options',
@@ -44,17 +33,15 @@ class Workflows extends AbstractAjaxHandler
                 ],
             ],
 
-            // Update workflow settings (editor role)
-            'update_workflow_settings' => [
-                'callback' => [$this, 'updateSettings'],
-                'capability' => 'edit_posts',
+            'update_workflow_title' => [
+                'callback' => [$this, 'updateWorkflowTitle'],
+                'capability' => 'manage_options',
                 'fields' => [
                     'id' => 'absint',
-                    'settings' => 'json',
+                    'title' => 'string',
                 ],
             ],
 
-            // Get workflow stats (public endpoint)
             'get_workflow_stats' => [
                 'callback' => [$this, 'getStats'],
                 'capability' => '',
@@ -66,19 +53,16 @@ class Workflows extends AbstractAjaxHandler
         ];
     }
 
-    /**
-     * Update workflow status.
-     */
     public function updateStatus(array $payload)
     {
-        $id = $payload['id'] ?? 0;
+        $id     = $payload['id'] ?? 0;
         $status = $payload['status'] ?? '';
 
         if (!$id || empty($status)) {
             return new \WP_Error('missing_params', __('ID and status are required', 'zaplane'), ['code' => 400]);
         }
 
-        if (!in_array($status, ['active', 'draft', 'inactive'])) {
+        if (!in_array($status, ['active', 'draft', 'paused'])) {
             return new \WP_Error('invalid_status', __('Invalid status value', 'zaplane'), ['code' => 400]);
         }
 
@@ -88,50 +72,37 @@ class Workflows extends AbstractAjaxHandler
             return new \WP_Error('not_found', __('Workflow not found', 'zaplane'), ['code' => 404]);
         }
 
+        $previousStatus  = $workflow->status;
         $workflow->status = $status;
         $workflow->save();
 
+        if ($previousStatus === 'draft' && $status === 'active') {
+            $draftVersion = WorkflowVersion::where('workflow_id', $id)->where('is_active', 1)->first();
+
+            if ($draftVersion) {
+                $graph = $draftVersion->getGraph();
+                $hash  = hash('sha256', wp_json_encode($graph));
+
+                $draftVersion->is_active = 0;
+                $draftVersion->save();
+
+                WorkflowVersion::create([
+                    'workflow_id'    => $id,
+                    'graph_json'     => $graph,
+                    'graph_hash'     => $hash,
+                    'is_active'      => 1,
+                    'version_number' => 1,
+                ]);
+            }
+        }
+
         return [
-            'id' => $workflow->id,
-            'status' => $workflow->status,
+            'id'      => $workflow->id,
+            'status'  => $workflow->status,
             'message' => __('Status updated successfully', 'zaplane'),
         ];
     }
 
-    /**
-     * Delete a workflow.
-     */
-    public function deleteWorkflow(array $payload)
-    {
-        $id = $payload['id'] ?? 0;
-
-        if (!$id) {
-            return new \WP_Error('missing_id', __('Workflow ID is required', 'zaplane'), ['code' => 400]);
-        }
-
-        $workflow = Workflow::find($id);
-
-        if (!$workflow) {
-            return new \WP_Error('not_found', __('Workflow not found', 'zaplane'), ['code' => 404]);
-        }
-
-        $workflowId = $workflow->id;
-        $workflow->delete();
-
-        // Also delete versions
-        WorkflowVersion::where('workflow_id', $workflowId)
-            ->delete();
-
-        return [
-            'deleted' => true,
-            'id' => $workflowId,
-            'message' => __('Workflow deleted successfully', 'zaplane'),
-        ];
-    }
-
-    /**
-     * Duplicate a workflow.
-     */
     public function duplicateWorkflow(array $payload)
     {
         $id = $payload['id'] ?? 0;
@@ -146,7 +117,6 @@ class Workflows extends AbstractAjaxHandler
             return new \WP_Error('not_found', __('Workflow not found', 'zaplane'), ['code' => 404]);
         }
 
-        // Create new workflow
         $newTitle = !empty($payload['new_title']) ? $payload['new_title'] : $original->title . ' (Copy)';
 
         $duplicate = Workflow::create([
@@ -156,7 +126,6 @@ class Workflows extends AbstractAjaxHandler
             'status' => 'draft',
         ]);
 
-        // Copy active version if exists
         $activeVersion = $original->activeVersion();
         if ($activeVersion) {
             WorkflowVersion::create([
@@ -174,16 +143,13 @@ class Workflows extends AbstractAjaxHandler
         ];
     }
 
-    /**
-     * Update workflow settings.
-     */
-    public function updateSettings(array $payload)
+    public function updateWorkflowTitle(array $payload)
     {
         $id = $payload['id'] ?? 0;
-        $settings = $payload['settings'] ?? [];
+        $title = $payload['title'] ?? '';
 
-        if (!$id) {
-            return new \WP_Error('missing_id', __('Workflow ID is required', 'zaplane'), ['code' => 400]);
+        if (!$id || empty($title)) {
+            return new \WP_Error('missing_params', __('ID and title are required', 'zaplane'), ['code' => 400]);
         }
 
         $workflow = Workflow::find($id);
@@ -192,19 +158,15 @@ class Workflows extends AbstractAjaxHandler
             return new \WP_Error('not_found', __('Workflow not found', 'zaplane'), ['code' => 404]);
         }
 
-        // Update settings (assuming you have a settings column)
-        // $workflow->settings = $settings;
-        // $workflow->save();
+        $workflow->title = $title;
+        $workflow->save();
 
         return [
             'id' => $workflow->id,
-            'message' => __('Settings updated successfully', 'zaplane'),
+            'title' => $workflow->title,
+            'message' => __('Title updated successfully', 'zaplane'),
         ];
     }
-
-    /**
-     * Get workflow statistics (public endpoint).
-     */
     public function getStats(array $payload)
     {
         $workflowId = $payload['workflow_id'] ?? 0;
@@ -219,7 +181,6 @@ class Workflows extends AbstractAjaxHandler
             return new \WP_Error('not_found', __('Workflow not found', 'zaplane'), ['code' => 404]);
         }
 
-        // Return basic public stats only
         return [
             'id' => $workflow->id,
             'title' => $workflow->title,

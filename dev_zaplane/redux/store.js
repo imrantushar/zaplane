@@ -5,15 +5,14 @@ import appReducer from './Slices/appSlice/appSlice';
 import menuReducer from './Slices/menuSlice/menuSlice';
 import workflowsReducer from './Slices/workFlowSlice/workFlowSlice';
 import logsReducer from './Slices/logsSlice/logsSlice';
-import queueReducer from './Slices/queueSlice/queueSlice';
-import executionReducer from './Slices/executionSlice/executionSlice';
+import dashboardReducer from './Slices/dashboardSlice/dashboardSlice';
 import connectionsReducer from './Slices/connectionsSlice/connectionsSlice';
 import settingReducer from './Slices/settingSlice/settingSlice';
 import notificationReducer from './Slices/notificationSlice/notificationSlice';
 
 import logger from 'redux-logger'
 /**
- * The main Redux store for the Gamify application.
+ * The main Redux store for the Zaplane application.
  *
  * We use configureStore from Redux Toolkit, which simplifies store setup,
  * automatically combines slice reducers, adds necessary middleware like redux-thunk,
@@ -27,10 +26,9 @@ export const store = configureStore({
         app: appReducer,
         workflows: workflowsReducer,
         logs:logsReducer,
-        queue:queueReducer,
-        execution:executionReducer,
         connections:connectionsReducer,
-        setting:settingReducer
+        setting:settingReducer,
+        dashboard:dashboardReducer
         // Future reducers will be added here (e.g., points, settings)
     },
     middleware: (getDefaultMiddleware) =>

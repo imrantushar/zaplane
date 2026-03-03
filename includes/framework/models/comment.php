@@ -1,13 +1,14 @@
 <?php
 
-namespace Zaplane\Framework\Models\WordPress;
+namespace Zaplane\Framework\Models;
 
 if (!defined('ABSPATH')) exit;
 
-class Comment extends WPModel
+class Comment extends WpModel
 {
     protected static string $table = 'comments';
     protected static string $primaryKey = 'comment_ID';
+    protected static bool $timestamps = false;
 
     protected static array $fillable = [
         'comment_post_ID',

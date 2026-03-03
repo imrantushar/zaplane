@@ -1,0 +1,13 @@
+.zaplane-custom-edge .zaplane-edge-actions {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.zaplane-custom-edge:hover .zaplane-edge-actions {
+  opacity: 1;
+  pointer-events: auto;
+}
+.react-flow__edge-path{
+  stroke: var(--zaplane-primary);
+}
