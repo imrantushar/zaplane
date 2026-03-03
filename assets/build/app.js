@@ -8670,18 +8670,13 @@ function Workflows({
     const payload = {
       nodes: (0,_helper__WEBPACK_IMPORTED_MODULE_4__.mapNodesForBackend)(nodes),
       edges: (0,_helper__WEBPACK_IMPORTED_MODULE_4__.mapEdgesForBackend)(edges),
-      is_version: true
+      layout: values?.layout
     };
     await dispatch((0,_ZAPRedux_Slices_workFlowSlice_actions_workFlow__WEBPACK_IMPORTED_MODULE_9__.updateWorkFlow)({
       id,
       payload
     }));
-    if (values?.layout) {
-      await dispatch((0,_ZAPRedux_Slices_workFlowSlice_actions_workFlow__WEBPACK_IMPORTED_MODULE_9__.updateWorkFlowLayout)({
-        id,
-        layout: values?.layout
-      }));
-    }
+
     // Reset dirty state after successful save
     setInitialHash(currentHash);
   };
@@ -9863,7 +9858,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   getSingleWorkFlow: () => (/* binding */ getSingleWorkFlow),
 /* harmony export */   getWorkFlow: () => (/* binding */ getWorkFlow),
 /* harmony export */   updateWorkFlow: () => (/* binding */ updateWorkFlow),
-/* harmony export */   updateWorkFlowLayout: () => (/* binding */ updateWorkFlowLayout),
 /* harmony export */   updateWorkFlowStatus: () => (/* binding */ updateWorkFlowStatus),
 /* harmony export */   updateWorkFlowTitle: () => (/* binding */ updateWorkFlowTitle)
 /* harmony export */ });
@@ -9968,21 +9962,6 @@ const updateWorkFlowStatus = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.cr
 const updateWorkFlowTitle = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyncThunk)('zaplane/updateWorkFlowTitle', async (payload, thunkAPI) => {
   try {
     await (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.makeRequest)('update_workflow_title', {
-      id: payload.id,
-      ...payload
-    });
-    return payload;
-  } catch (e) {
-    thunkAPI.dispatch((0,_notificationSlice_notificationSlice__WEBPACK_IMPORTED_MODULE_3__.showNotification)({
-      message: e,
-      isShow: true,
-      type: 'error'
-    }));
-  }
-});
-const updateWorkFlowLayout = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyncThunk)('zaplane/updateWorkFlowLayout', async (payload, thunkAPI) => {
-  try {
-    await (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.makeRequest)('update_workflow_layout', {
       id: payload.id,
       ...payload
     });

@@ -6,7 +6,7 @@ import { generateFlowHash, mapEdgesForBackend, mapNodesForBackend } from "./help
 import { useDispatch, useSelector } from "react-redux";
 import { createNodeIdGenerator } from "./flowCanvas/helper";
 import { Box, Flex } from "@chakra-ui/react";
-import { updateWorkFlow, updateWorkFlowLayout, } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow";
+import { updateWorkFlow } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow";
 import NavigationBlocker from "@ZAPComponents/NavigationBlocker";
 
 export default function Workflows({ id }) {
@@ -56,16 +56,14 @@ export default function Workflows({ id }) {
   const isFlowDirty = currentHash !== initialHash;
   const onSubmitHandler = async (values) => {
     const payload = {
-      nodes: mapNodesForBackend(nodes)
-      , edges: mapEdgesForBackend(edges),
-      is_version: true
+      nodes: mapNodesForBackend(nodes), 
+      edges: mapEdgesForBackend(edges),
+      layout: values?.layout
     }
     await dispatch(
       updateWorkFlow({ id, payload })
     );
-    if (values?.layout) {
-      await dispatch(updateWorkFlowLayout({ id, layout: values?.layout}));
-    }
+
     // Reset dirty state after successful save
     setInitialHash(currentHash);
   };
