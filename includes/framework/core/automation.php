@@ -3,6 +3,7 @@
 namespace Zaplane\Framework\Core;
 
 use Zaplane\Framework\Classes\Container;
+use Zaplane\Framework\Classes\ConnectionManager;
 use Zaplane\Framework\Classes\Query;
 use Zaplane\Framework\Exceptions\WorkflowException;
 use Zaplane\Framework\Exceptions\IntegrationException;
@@ -61,7 +62,7 @@ class Automation
     public function dispatch_active_triggers(): void
     {
         foreach (Query::get_active_trigger_events() as $event) {
-            if (!isset($this->registered_hooks[$event])) {
+            if (is_string($event) && !isset($this->registered_hooks[$event])) {
                 $cb = [$this, 'trigger_router'];
                 add_action($event, $cb, 10, 99);
                 $this->registered_hooks[$event] = $cb;
@@ -146,9 +147,16 @@ class Automation
     public function trigger_router()
     {
         $event = current_filter();
-        $args = func_get_args();
+        error_log(print_r('events' . $event , true ));
 
+        $args = func_get_args();
         foreach (Query::get_active_workflows_for_event($event) as $trigger) {
+            // Skip if there's an active listener for this workflow — the listener will handle it
+            $listenerState = Option::get('zaplane_listener_state_' . $trigger['workflow_id']);
+            if (is_array($listenerState) && ($listenerState['status'] ?? '') === 'listening') {
+                continue;
+            }
+
             $integration = $this->container->get('integrations')->get(strtolower($trigger['app']));
             $payload = $integration::resolve_trigger($trigger['graph_node']['data'], $args);
             if (!$payload) continue;
@@ -162,7 +170,8 @@ class Automation
         $nodeKey = (int) $trigger['id'];
 
         $run = Run::create([
-            'workflow_version_hash' => $trigger['workflow_version_hash'],
+            'workflow_version_id' => $trigger['workflow_version_id'],
+            'workflow_id' => $trigger['workflow_id'],
             'trigger_data' => $payload,
             'status' => 'running',
             'start_node_key' => $nodeKey,
@@ -222,7 +231,7 @@ class Automation
             return;
         }
 
-        $graph = $this->load_graph($run->workflow_version_hash);
+        $graph = $this->load_graph($run->workflow_version_id);
         $node = $this->find_node($graph, $nodeRun->node_key, $run->id);
         $input = $nodeRun->getInput();
 
@@ -234,6 +243,7 @@ class Automation
                 if (!$integration) {
                     throw IntegrationException::notFound($node['data']['app']);
                 }
+                $node = $this->inject_credentials($node);
                 $context = $this->buildNodeContext($run->id);
                 $output = $integration::execute_node($node, $context);
             } else {
@@ -241,6 +251,7 @@ class Automation
                 if (!$integration) {
                     throw IntegrationException::notFound($node['data']['app']);
                 }
+                $node = $this->inject_credentials($node);
                 $output = $integration::execute_node($node, $input);
             }
 
@@ -348,9 +359,27 @@ class Automation
         return $context;
     }
 
-    private function load_graph(string $hash): array
+    private function inject_credentials(array $node): array
     {
-        $version = WorkflowVersion::where('graph_hash', $hash)->first();
+        $connection_id = $node['data']['connection_id'] ?? null;
+
+        if (!$connection_id) {
+            return $node;
+        }
+
+        try {
+            $manager = $this->container->get('connections');
+            $node['_connection_credentials'] = $manager->get_execution_credentials((int) $connection_id);
+        } catch (\Throwable $e) {
+            error_log('Zaplane: failed to load credentials for connection ' . $connection_id . ': ' . $e->getMessage());
+        }
+
+        return $node;
+    }
+
+    private function load_graph(int $versionId): array
+    {
+        $version = WorkflowVersion::find($versionId);
         return $version ? $version->getGraph() : ['nodes' => [], 'edges' => []];
     }
 

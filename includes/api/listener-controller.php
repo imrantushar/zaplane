@@ -109,14 +109,14 @@ class ListenerController extends WP_REST_Controller
         }
 
         if (!$targetNode) {
-            return new WP_Error('no_trigger', 'No trigger node found in workflow', ['status' => 404]);
+            return new WP_Error('no_trigger', 'Please save the workflow and try testing again.', ['status' => 404]);
         }
 
         $nodeKey = (int) $targetNode['id'];
 
         $hook = $targetNode['data']['hook'] ?? null;
         if (!$hook) {
-            return new WP_Error('no_hook', 'Trigger node has no hook defined', ['status' => 400]);
+            return new WP_Error('no_hook', 'Trigger hasn’t been added yet. Please set it to continue', ['status' => 400]);
         }
 
         $optionName = $this->get_option_name($workflowId);
@@ -271,7 +271,8 @@ class ListenerController extends WP_REST_Controller
     private function execute_triggered_workflow(WorkflowVersion $version, array $triggerNode, array $payload): array
     {
         $run = Run::create([
-            'workflow_version_hash' => $version->graph_hash,
+            'workflow_version_id' => $version->id,
+            'workflow_id' => $version->workflow_id,
             'status' => 'running',
             'trigger_data' => $payload,
             'start_node_key' => (int) $triggerNode['id'],
