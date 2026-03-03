@@ -1,53 +1,61 @@
-import React, { useRef, useEffect } from 'react';
-import { Flex, Text, Input, Textarea } from '@chakra-ui/react';
-import { __ } from '@wordpress/i18n';
+import React, { useRef, useEffect } from "react";
+import { Flex, Text, Input, Textarea } from "@chakra-ui/react";
+import { __ } from "@wordpress/i18n";
 
 const ZAPInput = ({
   label,
   placeholder,
   value,
   onChange,
-  type = 'text',
+  type = "text",
   containerStyle,
   inputStyle,
 }) => {
   const textareaRef = useRef(null);
+
   useEffect(() => {
-    if (type === 'textarea' && textareaRef.current) {
+    if (type === "textarea" && textareaRef.current) {
       const el = textareaRef.current;
       const minHeight = 35;
-      el.style.height = minHeight + 'px';
-      if (value && value.length > 0) {
-        el.style.height = el.scrollHeight + 'px';
+      el.style.height = minHeight + "px";
+      if (value) {
+        el.style.height = el.scrollHeight + "px";
       }
     }
   }, [value, type]);
 
-
-
-
-
-  const InputComponent = type === 'textarea' ? Textarea : Input;
+  const isTextarea = type === "textarea";
 
   return (
     <Flex as="label" direction="column" gap={2} style={{ ...containerStyle }}>
-      <Text className="zaplane-label" fontWeight="600" fontSize="0.875rem">
-        {__(label, 'zaplane')}
+      <Text className="zaplane-label">
+        {__(label, "zaplane")}
       </Text>
-
-      <InputComponent
-        ref={type === 'textarea' ? textareaRef : null}
-        className={`zaplane-${type === 'textarea' ? 'textarea' : 'input'}`}
-        type={type !== 'textarea' ? type : undefined}
-        placeholder={__(placeholder, 'zaplane')}
-        value={value}
-        onChange={onChange}
-        style={{
-          ...inputStyle,
-          overflow: type === 'textarea' ? 'hidden' : undefined,
-          resize: 'none',
-        }}
-      />
+      {isTextarea ? (
+        <Textarea
+          ref={textareaRef}
+          className="zaplane-textarea"
+          placeholder={__(placeholder, "zaplane")}
+          value={value}
+          onChange={onChange}
+          resize="none"
+          overflow="hidden"
+          {...inputStyle}
+        />
+      ) : (
+        <Input
+          className="zaplane-input"
+          type={type} 
+          placeholder={__(placeholder, "zaplane")}
+          value={value}
+          onChange={onChange}
+          {...(type === "number" && {
+            inputMode: "numeric",
+            pattern: "[0-9]*",
+          })}
+          style={{ ...inputStyle }}
+        />
+      )}
     </Flex>
   );
 };

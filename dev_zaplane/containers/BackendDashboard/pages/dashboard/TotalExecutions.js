@@ -11,9 +11,10 @@ import {
 } from "recharts";
 import { __ } from "@wordpress/i18n";
 import './styles.scss'
+import ZAPDivider from "@ZAPComponents/ZAPDivider";
 
 
-const TotalExecutions = ({ data = [] }) => {
+const TotalExecutions = ({ data }) => {
     const chartData = useMemo(() => {
         const months = [
             "January",
@@ -34,7 +35,7 @@ const TotalExecutions = ({ data = [] }) => {
             value: 0,
         }));
 
-        data.forEach((item) => {
+        data?.runs?.forEach((item) => {
             if (!item.started_at) return;
 
             const date = new Date(item.started_at);
@@ -49,31 +50,32 @@ const TotalExecutions = ({ data = [] }) => {
     return (
         <Box
             bg="var(--zaplane-background)"
-            p={4}
             borderRadius="lg"
             boxShadow="md"
             w="100%"
-            h="320px"
+            h="388px"
         >
-            <Text fontWeight="semibold" mb={3}>
+            <Text className="zaplane-label" fontSize='14px' p="24px">
                 {__("Total Executions", "zaplane")}
             </Text>
-
-            <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={chartData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="month" />
-                    <YAxis allowDecimals={false} />
-                    <Tooltip />
-                    <Line
-                        type="monotone"
-                        dataKey="value"
-                        stroke="#1A202C"
-                        strokeWidth={2}
-                        dot={{ r: 5 }}
-                    />
-                </LineChart>
-            </ResponsiveContainer>
+            <ZAPDivider />
+            <Box h="315px">
+                <ResponsiveContainer style={{padding:"24px",marginLeft:'-42px'}} width="106%" height="100%">
+                    <LineChart data={chartData}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="month" />
+                        <YAxis allowDecimals={false} />
+                        <Tooltip />
+                        <Line
+                            type="monotone"
+                            dataKey="value"
+                            stroke="#1A202C"
+                            strokeWidth={2}
+                            dot={{ r: 5 }}
+                        />
+                    </LineChart>
+                </ResponsiveContainer>
+            </Box>
         </Box>
     );
 };

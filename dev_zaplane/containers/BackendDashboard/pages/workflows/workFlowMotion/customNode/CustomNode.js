@@ -10,7 +10,9 @@ import { RiDeleteBin5Line } from "react-icons/ri";
 import { FaRegCopy } from "react-icons/fa";
 import FloatingEdge from "../FloatingEdge/FloatingEdge";
 import { __, sprintf } from "@wordpress/i18n";
-import { formatLabel } from "./helper";
+import { formatLabel } from "@ZAPUtils/helper";
+import { FaWordpress } from "react-icons/fa6";
+import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
 export default function CustomNode({ id, data, canvasLayout }) {
   const [hovered, setHovered] = useState(false);
 
@@ -20,6 +22,8 @@ export default function CustomNode({ id, data, canvasLayout }) {
   const hasOutgoingEdge = edges.some((e) => e.source === id);
   const isLR = canvasLayout === "LR"
   const isSelectApp = data.app === "Select an app";
+  const formattedAction = data?.action.charAt(0).toUpperCase() + data.action.slice(1);
+
 
   return (
     <Box
@@ -39,9 +43,8 @@ export default function CustomNode({ id, data, canvasLayout }) {
             p="4px 8px"
             fontWeight="medium"
             className="zaplane-label"
-            margin={0}
           >
-            {data.action || "Action"}
+            {formattedAction || "Action"}
           </Text>
         </HStack>
       </NodeToolbar>
@@ -85,7 +88,7 @@ export default function CustomNode({ id, data, canvasLayout }) {
         borderRadius="md"
         px={4}
         py={2}
-        minW="160px"
+        width="180px"
         textAlign="center"
         boxShadow="sm"
         onClick={data.onOpenDrawer}
@@ -98,32 +101,35 @@ export default function CustomNode({ id, data, canvasLayout }) {
               width: 10,
               height: 10,
               borderRadius: "50%",
-              background: "var(--zaplane-secondary)",
-              border: "2px solid var(--zaplane-body-background)",
+              background: "var(--zaplane-primary)",
+              border: "2px solid var(--zaplane-background)",
             }}
           />
         )}
-        <Text
-          className={isSelectApp ? "zaplane-label" : "zaplane-title"}
-          fontSize="sm"
-          fontWeight={isSelectApp ? "medium" : "semibold"}
-          lineHeight={isSelectApp ? "2.2" : "1.2"}
-        >
-          {isSelectApp
-            ? __(data.app, "zaplane")
-            : sprintf(__('%s', 'zaplane'), formatLabel(data.event))
-          }
-        </Text>
-
-        {!isSelectApp && (
-          <Text
-            className="zaplane-sub-title"
-            fontSize="xs"
-            lineHeight="1.2"
+        <HStack spacing={3} align="center">
+          <Box
+            w="40px"
+            h="40px"
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+            borderRadius="8px"
+            bg="orange.50"
           >
-            {sprintf(__('%s', 'zaplane'), data.app)}
-          </Text>
-        )}
+            <Icon as={FaWordpress} boxSize={5} color="orange.500" />
+          </Box>
+          <Box textAlign="left" flex="1" minW="0">
+            <Text className="zaplane-label" overflow='hidden' textOverflow="ellipsis" whiteSpace="nowrap">{isSelectApp ? __(data.app, "zaplane")
+              : sprintf(__("%s", "zaplane"), formatLabel(data.event))}</Text>
+            {!isSelectApp && (
+              <Text className="zaplane-sub-title" fontSize='14px' overflow='hidden' textOverflow="ellipsis" whiteSpace="nowrap">
+                {sprintf(__("%s", "zaplane"), data.app)}
+              </Text>
+
+
+            )}
+          </Box>
+        </HStack>
         {!data.conditions && (
           <Handle
             type="source"
@@ -132,8 +138,8 @@ export default function CustomNode({ id, data, canvasLayout }) {
               width: 10,
               height: 10,
               borderRadius: "50%",
-              background: "var(--zaplane-secondary)",
-              border: "2px solid var(--zaplane-body-background)",
+              background: "var(--zaplane-primary)",
+              border: "2px solid var(--zaplane-background)",
             }}
           />
         )}
