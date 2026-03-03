@@ -69,12 +69,14 @@ abstract class Model implements JsonSerializable
         return static::all();
     }
 
+    /** @return static|null */
     public static function find(int $id): ?self
     {
         $result = static::query()->where(static::$primaryKey, $id)->first();
         return $result;
     }
 
+    /** @return static */
     public static function findOrFail(int $id): self
     {
         $result = static::find($id);
@@ -92,11 +94,13 @@ abstract class Model implements JsonSerializable
         return static::query()->whereIn(static::$primaryKey, $ids)->get();
     }
 
+    /** @return static|null */
     public static function first(): ?self
     {
         return static::query()->first();
     }
 
+    /** @return static */
     public static function create(array $attributes): self
     {
         $model = new static($attributes);
@@ -104,6 +108,7 @@ abstract class Model implements JsonSerializable
         return $model;
     }
 
+    /** @return static */
     public static function updateOrCreate(array $attributes, array $values = []): self
     {
         $query = static::query();
@@ -123,6 +128,7 @@ abstract class Model implements JsonSerializable
         return static::create(array_merge($attributes, $values));
     }
 
+    /** @return static */
     public static function firstOrCreate(array $attributes, array $values = []): self
     {
         $query = static::query();
@@ -140,6 +146,7 @@ abstract class Model implements JsonSerializable
         return static::create(array_merge($attributes, $values));
     }
 
+    /** @return static */
     public static function firstOrNew(array $attributes, array $values = []): self
     {
         $query = static::query();
@@ -212,6 +219,7 @@ abstract class Model implements JsonSerializable
         return static::query()->count();
     }
 
+    /** @return static */
     public static function hydrate(array $attributes): self
     {
         $model = new static();
@@ -222,6 +230,7 @@ abstract class Model implements JsonSerializable
         return $model;
     }
 
+    /** @return static */
     public function fill(array $attributes): self
     {
         foreach ($attributes as $key => $value) {
@@ -232,6 +241,7 @@ abstract class Model implements JsonSerializable
         return $this;
     }
 
+    /** @return static */
     public function forceFill(array $attributes): self
     {
         foreach ($attributes as $key => $value) {
@@ -386,6 +396,7 @@ abstract class Model implements JsonSerializable
         return true;
     }
 
+    /** @return static */
     public function refresh(): self
     {
         if (!$this->exists) {
@@ -402,6 +413,7 @@ abstract class Model implements JsonSerializable
         return $this;
     }
 
+    /** @return static */
     public function replicate(array $except = []): self
     {
         $attributes = $this->attributes;
@@ -442,6 +454,7 @@ abstract class Model implements JsonSerializable
         return $value;
     }
 
+    /** @return static */
     public function setAttribute(string $key, $value): self
     {
         $this->attributes[$key] = $value;

@@ -1,12 +1,12 @@
 import { Popover } from "@wordpress/components";
 import "./styles.scss";
 
-const WPPopover = ({ isOpen, onClose, title, children }) => {
+const WPPopover = ({ isOpen, onClose, title, children,prefix}) => {
   if (!isOpen) return null;
 
   return (
     <Popover
-      className="zaplane-popover"
+      className={`zaplane-popover ${prefix}`}
       position="bottom center"
       onFocusOutside={onClose}
     >

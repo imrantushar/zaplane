@@ -7,10 +7,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 abstract class IntegrationBase {
 
-    /* ---------------------------------------------------------
-     * Core identity
-     * --------------------------------------------------------- */
-
     abstract public static function get_slug(): string;
 
     public static function get_name(): string {
@@ -102,6 +98,28 @@ abstract class IntegrationBase {
 
     public static function supports_webhook(): bool {
         return false;
+    }
+
+    /**
+     * Verify HMAC signature / secret of the incoming webhook request.
+     * Return false to reject with 401.
+     * Default: true (accept all — override in production integrations).
+     */
+    public static function verify_webhook_signature( \WP_REST_Request $request ): bool {
+        return true;
+    }
+
+    /**
+     * Parse an incoming webhook POST into a normalized event + payload.
+     * Return null to accept the HTTP request but take no workflow action
+     * (handles Slack URL-verification challenges, Stripe test pings, etc.)
+     *
+     * Return format:
+     *   ['event' => 'subscriber_added', 'payload' => [...]]
+     * 'event' MUST match a key in get_triggers().
+     */
+    public static function parse_webhook_event( \WP_REST_Request $request ): ?array {
+        return null;
     }
 
     public static function supports_polling(): bool {
@@ -255,5 +273,42 @@ abstract class IntegrationBase {
      */
     public static function get_oauth_scopes(): array {
         return [];
+    }
+
+    /* ---------------------------------------------------------
+     * HTTP client helpers
+     * --------------------------------------------------------- */
+
+    /**
+     * GET request. Throws \Exception on WP_Error.
+     * Returns [$decoded_json_body, $http_status_code].
+     */
+    protected static function http_get( string $url, array $headers = [] ): array {
+        return static::http_request( 'GET', $url, [ 'headers' => $headers ] );
+    }
+
+    /**
+     * POST request with JSON body. Throws \Exception on WP_Error.
+     * Returns [$decoded_json_body, $http_status_code].
+     */
+    protected static function http_post( string $url, array $body = [], array $headers = [] ): array {
+        return static::http_request( 'POST', $url, [
+            'headers' => array_merge( [ 'Content-Type' => 'application/json' ], $headers ),
+            'body'    => wp_json_encode( $body ),
+        ] );
+    }
+
+    /**
+     * Any HTTP method (PUT, DELETE, PATCH …). Throws \Exception on WP_Error.
+     * Returns [$decoded_json_body, $http_status_code].
+     */
+    protected static function http_request( string $method, string $url, array $args = [] ): array {
+        $response = wp_remote_request( $url, array_merge( [ 'method' => strtoupper( $method ) ], $args ) );
+        if ( is_wp_error( $response ) ) {
+            throw new \Exception( 'HTTP request failed: ' . $response->get_error_message() );
+        }
+        $body   = json_decode( wp_remote_retrieve_body( $response ), true ) ?? [];
+        $status = (int) wp_remote_retrieve_response_code( $response );
+        return [ $body, $status ];
     }
 }

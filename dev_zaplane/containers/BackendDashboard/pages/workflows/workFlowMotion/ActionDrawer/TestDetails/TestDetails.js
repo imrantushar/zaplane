@@ -7,27 +7,29 @@ import React, { useEffect } from 'react';
 import ReactJson from 'react-json-view';
 import { useDispatch, useSelector } from 'react-redux';
 
-const TestDetails = ({ id, workFlow }) => {
+const TestDetails = ({ id, workFlow, source, isLoading }) => {
     const dispatch = useDispatch()
-    const { singleNodeExecution, isLoading } = useSelector(
+    const { singleNodeExecution } = useSelector(
         (state) => state.workflows
     );
     const { values } = useFormikContext();
     const selectedOutput = workFlow?.test_outputs?.[id]?.output || {};
-    const inputData = singleNodeExecution?.input || values;
-    const outputData = singleNodeExecution?.output?.data || selectedOutput;
-    console.log(inputData,outputData,'pp');
+    const { layout, ...inputData } = singleNodeExecution?.input || values || {};
+
+    const outputData = singleNodeExecution?.output || selectedOutput;
+    const isNode = source === "node"
+
     useEffect(() => {
         dispatch(resetSingleNodeExecution());
     }, [id, dispatch]);
 
     if (isLoading) return <ZAPLoading />
-    if (Object.keys(outputData).length === 0) return;
+    if (!outputData || Object.keys(outputData).length === 0 && isNode) return null;
 
 
     return (
 
-        <VStack spacing="4" align="stretch">
+        <VStack spacing="4" align="stretch" overflow='hidden'>
             <Box
                 p="3"
                 border="1px solid var(--zaplane-border-color)"

@@ -5,6 +5,7 @@ import appReducer from './Slices/appSlice/appSlice';
 import menuReducer from './Slices/menuSlice/menuSlice';
 import workflowsReducer from './Slices/workFlowSlice/workFlowSlice';
 import logsReducer from './Slices/logsSlice/logsSlice';
+import dashboardReducer from './Slices/dashboardSlice/dashboardSlice';
 import connectionsReducer from './Slices/connectionsSlice/connectionsSlice';
 import settingReducer from './Slices/settingSlice/settingSlice';
 import notificationReducer from './Slices/notificationSlice/notificationSlice';
@@ -26,7 +27,8 @@ export const store = configureStore({
         workflows: workflowsReducer,
         logs:logsReducer,
         connections:connectionsReducer,
-        setting:settingReducer
+        setting:settingReducer,
+        dashboard:dashboardReducer
         // Future reducers will be added here (e.g., points, settings)
     },
     middleware: (getDefaultMiddleware) =>

@@ -16,6 +16,7 @@ class Workflow extends Model
         'title',
         'name',
         'status',
+        'layout',
     ];
 
     protected static array $casts = [
