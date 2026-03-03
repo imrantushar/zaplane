@@ -7010,7 +7010,11 @@ const TestRun = ({
       const payload = {
         workflow_id: workFlow?.workflow?.id,
         workflow_hash: workFlow?.version?.hash,
-        target_node: node?.id,
+        target_node: {
+          data: node?.data,
+          type: node?.data?.action,
+          id: node?.id
+        },
         input: inputData
       };
       await dispatch((0,_ZAPRedux_Slices_workFlowSlice_actions_workflowExctions__WEBPACK_IMPORTED_MODULE_4__.workFLowSingeNodeExction)(payload));
