@@ -62,7 +62,7 @@ class Automation
     public function dispatch_active_triggers(): void
     {
         foreach (Query::get_active_trigger_events() as $event) {
-            if (!isset($this->registered_hooks[$event])) {
+            if (is_string($event) && !isset($this->registered_hooks[$event])) {
                 $cb = [$this, 'trigger_router'];
                 add_action($event, $cb, 10, 99);
                 $this->registered_hooks[$event] = $cb;
@@ -147,7 +147,10 @@ class Automation
     public function trigger_router()
     {
         $event = current_filter();
+        error_log(print_r('events' . $event , true ));
+
         $args = func_get_args();
+        error_log(print_r('args:'. $args , true ));
 
         foreach (Query::get_active_workflows_for_event($event) as $trigger) {
             // Skip if there's an active listener for this workflow — the listener will handle it
