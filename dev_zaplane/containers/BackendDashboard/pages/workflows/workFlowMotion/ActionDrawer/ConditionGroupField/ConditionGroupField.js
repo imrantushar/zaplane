@@ -5,11 +5,12 @@ import ZAPInput from "@ZAPComponents/ZAPInput";
 import ZAPSelect from "@ZAPComponents/ZAPSelect";
 import { __ } from "@wordpress/i18n";
 import { buildEmptyRule } from "./helper";
-import {  useState } from "react";
-import VariablePopover from "./VariablePopover";
+import { useState } from "react";
+import VariablePopover from "../VariablePopaver/VariablePopover";
 
 
-export default function ConditionGroupField({ value, field,variables}) {
+
+export default function ConditionGroupField({ value, field, variables }) {
     const ruleFields = field?.fields;
     const EMPTY_RULE = buildEmptyRule(ruleFields);
     const [isPopoverOpen, setPopoverOpen] = useState(false);
@@ -53,7 +54,7 @@ export default function ConditionGroupField({ value, field,variables}) {
                                                                     onChange={(val) =>
                                                                         ruleHelpers.replace(rIndex, { ...rule, [f.key]: val.value })
                                                                     }
-                                                                    containerStyle={{ width: "30%" }}
+                                                                    containerStyle={{ width: "30%"  }}
                                                                 />
                                                             );
                                                         }

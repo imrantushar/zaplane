@@ -1,36 +1,23 @@
-// helper.js
-export const insertVariableHelper = ({
+export const insertVariableAtCursor = ({
   variable,
-  value,
-  cursorPosition,
-  setFieldValue,
-  fieldKey,
   inputRef,
-  setPopoverOpen
+  fieldKey,
+  setFieldValue,
+  setPopoverOpen,
 }) => {
-  if (cursorPosition === null) return;
-
-  let before = value.slice(0, cursorPosition);
-  const after = value.slice(cursorPosition);
-
-  // check and remove last @ only
-  if (before.endsWith("@")) before = before.slice(0, -1);
-
-  // add variable + space
-  const newValue = before + variable + " " + after;
-
-  // update Formik value
-  setFieldValue(fieldKey, newValue);
-
-  // close popover
+  const el = inputRef?.current;
+  if (!el) return;
+  const currentVal = el.value || "";
+  const cursorPos = el.selectionStart ?? currentVal.length;
+  const before = currentVal.slice(0, cursorPos).replace(/@$/, "");
+  const after = currentVal.slice(cursorPos);
+  // remove space " "
+  const newVal = before + variable;
+  setFieldValue(fieldKey, newVal + after);
   setPopoverOpen(false);
-
-  // restore cursor
   setTimeout(() => {
-    if (inputRef.current) {
-      const newCursor = before.length + variable.length + 1; // +1 for space
-      inputRef.current.focus();
-      inputRef.current.setSelectionRange(newCursor, newCursor);
-    }
+    const newCursorPos = before.length + variable.length + 1;
+    el.focus();
+    el.setSelectionRange(newCursorPos, newCursorPos);
   }, 0);
 };

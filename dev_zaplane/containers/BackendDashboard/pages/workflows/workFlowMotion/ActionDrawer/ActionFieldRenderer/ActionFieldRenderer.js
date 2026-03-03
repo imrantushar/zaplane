@@ -3,11 +3,13 @@ import { useDispatch, useSelector } from "react-redux";
 import ZAPInput from "@ZAPComponents/ZAPInput";
 import ZAPSelect from "@ZAPComponents/ZAPSelect";
 import ZAPDatePicker from "@ZAPComponents/ZAPDatePicker";
-import VariablePopover from "./VariablePopover";
 import ConditionGroupField from "../ConditionGroupField/ConditionGroupField";
 import { mapEdgesForBackend, mapNodesForBackend } from "../../helper";
 import { conditionVariables } from "@ZAPRedux/Slices/workFlowSlice/actions/conditonVariales";
-import { insertVariable, insertVariableHelper } from "./helper";
+import {  insertVariableAtCursor } from "./helper";
+import VariablePopover from "../VariablePopaver/VariablePopover";
+import './styles.scss'
+import { __ } from "@wordpress/i18n";
 
 const ActionFieldRenderer = ({
   field,
@@ -59,18 +61,6 @@ const ActionFieldRenderer = ({
     }
   };
 
-  const insertVariable = (variable) => {
-    insertVariableHelper({
-      variable,
-      value,
-      cursorPosition,
-      setFieldValue,
-      fieldKey: field.key,
-      inputRef,
-      setPopoverOpen
-    });
-  };
-
   switch (field.type) {
 
     case "text":
@@ -83,19 +73,31 @@ const ActionFieldRenderer = ({
         <>
           <ZAPInput
             label={field.label}
-            placeholder={field.placeholder || ""}
+            placeholder={__('Type "@" here to add dynamic', 'zaplane')}
             value={value || ""}
-            onChange={(e) => handleChange(e.target.value)}
-            onKeyDown={handleKeyDown}
-            type={field.type === "expression" ? "text" : field.type}
             inputRef={inputRef}
+            onChange={(e) => setFieldValue(field.key, e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "@") {
+                setPopoverOpen(true);
+              }
+            }}
           />
 
           <VariablePopover
             isOpen={isPopoverOpen}
+            prefix="variables-popaver"
             onClose={() => setPopoverOpen(false)}
             data={workflowVariables?.data}
-            onSelectVariable={(val) => insertVariable(val)}
+            onSelectVariable={(variable) => {
+              insertVariableAtCursor({
+                variable,
+                inputRef,
+                fieldKey: field.key,
+                setFieldValue,
+                setPopoverOpen,
+              });
+            }}
           />
         </>
       );
