@@ -27,9 +27,13 @@ export default function ConditionGroupField({ value, field, nodeId, workFlow, no
         if (!nodeId || !workFlow?.version?.hash) return;
         const payload = {
             workflow_id: workFlow.workflow.id,
+            workflow_hash: workFlow.version.hash,
+            workflow_version_id: workFlow.version.id,
             target_node_key: nodeId,
-            nodes: mapNodesForBackend(nodes),
-            edges: mapEdgesForBackend(edges),
+            graph: {
+                nodes: mapNodesForBackend(nodes),
+                edges: mapEdgesForBackend(edges),
+            }
         }
 
         dispatch(
@@ -102,7 +106,7 @@ export default function ConditionGroupField({ value, field, nodeId, workFlow, no
                                                         );
                                                     })}
 
-                                                    <Flex gap={2} mt="34px" align="center" minH="30px">
+                                                    <Flex gap={2} mt="27px" align="center" minH="30px">
                                                         <Button
                                                             type="button"
                                                             height="34px"

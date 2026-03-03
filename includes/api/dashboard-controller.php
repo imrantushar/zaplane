@@ -38,11 +38,11 @@ class DashboardController extends WP_REST_Controller
     public function get_top_workflows()
     {
         $results = DB::table('runs')
-            ->select('workflow_version_hash')
+            ->select('workflow_version_id')
             ->selectRaw('COUNT(*) as total_runs')
             ->selectRaw("SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) as success_runs")
             ->selectRaw("SUM(CASE WHEN status = 'failed' THEN 1 ELSE 0 END) as failed_runs")
-            ->groupBy('workflow_version_hash')
+            ->groupBy('workflow_version_id')
             ->orderBy('total_runs', 'desc')
             ->limit(10)
             ->get();
@@ -50,9 +50,9 @@ class DashboardController extends WP_REST_Controller
         $topWorkflows = [];
 
         foreach ($results as $row) {
-            $hash = $row['workflow_version_hash'];
+            $versionId = (int) $row['workflow_version_id'];
 
-            $version = \Zaplane\Models\WorkflowVersion::where('graph_hash', $hash)->first();
+            $version = \Zaplane\Models\WorkflowVersion::find($versionId);
             if (!$version) {
                 continue;
             }

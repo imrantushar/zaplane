@@ -2,6 +2,7 @@
 
 namespace Zaplane\Models;
 
+use Zaplane\Framework\Database\ORM\Collection;
 use Zaplane\Framework\Database\ORM\Model;
 
 if (!defined('ABSPATH')) exit;
@@ -34,9 +35,9 @@ class WorkflowVersion extends Model
         return Workflow::find($this->workflow_id);
     }
 
-    public function runs(): array
+    public function runs(): Collection
     {
-        return Run::where('workflow_version_hash', $this->graph_hash)
+        return Run::where('workflow_version_id', $this->id)
             ->orderBy('id', 'desc')
             ->get();
     }

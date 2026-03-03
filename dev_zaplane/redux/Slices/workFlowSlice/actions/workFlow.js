@@ -131,27 +131,7 @@ export const updateWorkFlowTitle = createAsyncThunk(
 	'zaplane/updateWorkFlowTitle',
 	async (payload, thunkAPI) => {
 		try {
-			await makeRequest('update_workflow_name', {
-				id: payload.id,
-				...payload,
-			});
-			return payload;
-		} catch (e) {
-			thunkAPI.dispatch(
-				showNotification({
-					message: e,
-					isShow: true,
-					type: 'error',
-				})
-			);
-		}
-	}
-)
-export const updateWorkFlowLayout = createAsyncThunk(
-	'zaplane/updateWorkFlowLayout',
-	async (payload, thunkAPI) => {
-		try {
-			await makeRequest('update_workflow_layout', {
+			await makeRequest('update_workflow_title', {
 				id: payload.id,
 				...payload,
 			});

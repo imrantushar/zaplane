@@ -62,7 +62,7 @@ class Automation
     public function dispatch_active_triggers(): void
     {
         foreach (Query::get_active_trigger_events() as $event) {
-            if (!isset($this->registered_hooks[$event])) {
+            if (is_string($event) && !isset($this->registered_hooks[$event])) {
                 $cb = [$this, 'trigger_router'];
                 add_action($event, $cb, 10, 99);
                 $this->registered_hooks[$event] = $cb;
@@ -147,8 +147,9 @@ class Automation
     public function trigger_router()
     {
         $event = current_filter();
-        $args = func_get_args();
+        error_log(print_r('events' . $event , true ));
 
+        $args = func_get_args();
         foreach (Query::get_active_workflows_for_event($event) as $trigger) {
             // Skip if there's an active listener for this workflow — the listener will handle it
             $listenerState = Option::get('zaplane_listener_state_' . $trigger['workflow_id']);
@@ -169,7 +170,8 @@ class Automation
         $nodeKey = (int) $trigger['id'];
 
         $run = Run::create([
-            'workflow_version_hash' => $trigger['workflow_version_hash'],
+            'workflow_version_id' => $trigger['workflow_version_id'],
+            'workflow_id' => $trigger['workflow_id'],
             'trigger_data' => $payload,
             'status' => 'running',
             'start_node_key' => $nodeKey,
@@ -229,7 +231,7 @@ class Automation
             return;
         }
 
-        $graph = $this->load_graph($run->workflow_version_hash);
+        $graph = $this->load_graph($run->workflow_version_id);
         $node = $this->find_node($graph, $nodeRun->node_key, $run->id);
         $input = $nodeRun->getInput();
 
@@ -375,9 +377,9 @@ class Automation
         return $node;
     }
 
-    private function load_graph(string $hash): array
+    private function load_graph(int $versionId): array
     {
-        $version = WorkflowVersion::where('graph_hash', $hash)->first();
+        $version = WorkflowVersion::find($versionId);
         return $version ? $version->getGraph() : ['nodes' => [], 'edges' => []];
     }
 

@@ -14,7 +14,8 @@ class CreateRunsTable extends Migration
     {
         Schema::create('runs', function (Blueprint $table) {
             $table->id();
-            $table->char('workflow_version_hash', 64);
+            $table->unsignedBigInteger('workflow_version_id')->nullable();
+            $table->unsignedBigInteger('workflow_id')->nullable();
             $table->unsignedInteger('target_node_key')->nullable();
             $table->unsignedInteger('start_node_key')->nullable();
             $table->string('status', 20)->default('running');
@@ -24,9 +25,8 @@ class CreateRunsTable extends Migration
             $table->datetime('finished_at')->nullable();
             $table->text('last_error')->nullable();
             $table->boolean('is_test')->default(false);
-            $table->unsignedBigInteger('workflow_id')->nullable();
 
-            $table->index('workflow_version_hash');
+            $table->index('workflow_version_id');
             $table->index('status');
             $table->index('workflow_id');
         });

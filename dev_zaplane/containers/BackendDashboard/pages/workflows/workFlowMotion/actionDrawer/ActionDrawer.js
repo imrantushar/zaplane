@@ -53,7 +53,6 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
         : Object.values(integration.actions || {});
     return list.map(i => ({ label: i.label, value: i.key, hook: i.hook }));
   }, [mode, selectedItem, isTrigger]);
-
   //Get schema fields for the selected action
 
   const selectedActionFields = useMemo(() => {
@@ -97,12 +96,12 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
         app: selectedItem.name,
         name: selectedItem.name,
         event: values.actionType,
-        hook: values.hook,
-        connection_id: values.connection_id ?? null,
         config: selectedActionFields.reduce((acc, f) => {
           acc[f.key] = values[f.key];
           return acc;
         }, {}),
+        ...(values.hook && { hook: values.hook }),
+        ...(values.connection_id && { connection_id: values.connection_id }),
       };
       if (context?.source !== "node") {
         createActionNode(payload);
@@ -128,7 +127,12 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
       isFullscreen={isFullscreen}
       onClose={resetAll}
       arrowClose={mode === 'app'}
-      arrowOnClick={() => setMode(null)}
+      arrowOnClick={() => {
+        setSelectedItem(null);
+        setMode(null);
+        setStep("select");
+        setFieldValue("actionType", "");
+      }}
       // closeOnOverlayClick
       title={!mode ? "Add Action" : selectedItem?.name || __('App', 'zaplane')}
       placement="end"
