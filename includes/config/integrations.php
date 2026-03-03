@@ -29,5 +29,7 @@ return [
         'easydigitaldownload'  => [ 'file' => 'easy-digital-download.php','class' => \Zaplane\Integrations\EasyDigitalDownload::class ],
         'tutor'                => ['file' => 'tutor.php',                  'class' => \Zaplane\Integrations\Tutor::class],
         'groundhogg'           => ['file' => 'groundhogg.php',             'class' => \Zaplane\Integrations\Groundhogg::class],
+        'academy'              => ['file' => 'academy.php',                'class' => \Zaplane\Integrations\Academy::class],
+        'bricks'              => ['file' => 'bricks.php',                'class' => \Zaplane\Integrations\Bricks::class],
     ],
 ];

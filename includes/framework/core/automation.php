@@ -150,8 +150,6 @@ class Automation
         error_log(print_r('events' . $event , true ));
 
         $args = func_get_args();
-        error_log(print_r('args:'. $args , true ));
-
         foreach (Query::get_active_workflows_for_event($event) as $trigger) {
             // Skip if there's an active listener for this workflow — the listener will handle it
             $listenerState = Option::get('zaplane_listener_state_' . $trigger['workflow_id']);
