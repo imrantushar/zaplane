@@ -53,7 +53,6 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
         : Object.values(integration.actions || {});
     return list.map(i => ({ label: i.label, value: i.key, hook: i.hook }));
   }, [mode, selectedItem, isTrigger]);
-
   //Get schema fields for the selected action
 
   const selectedActionFields = useMemo(() => {
