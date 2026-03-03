@@ -102,7 +102,7 @@ const WorkflowTable = () => {
         return (
           <Box>
             <ZAPLabel label={date} type={"simple"} />
-            <Text className="zaplane-sub-title" ml='-63px' color="var(--zaplane-text-muted)">
+            <Text className="zaplane-sub-title" ml='-45px' color="var(--zaplane-text-muted)">
               {__(time, 'zaplane')}
             </Text>
           </Box>
