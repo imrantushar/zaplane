@@ -28,6 +28,7 @@ const TestRun = ({ source, node, workFlow, values, nodes, edges }) => {
       const payload = {
         workflow_id: workFlow?.workflow?.id,
         workflow_hash: workFlow?.version?.hash,
+        workflow_version_id: workFlow.version.id,
         target_node: 
           {
             data: node?.data,
