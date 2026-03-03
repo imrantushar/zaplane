@@ -3,30 +3,7 @@ import PropTypes from 'prop-types';
 import { Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-const propTypes = {
-	label: PropTypes.oneOfType( [ PropTypes.object, PropTypes.string ] ),
-	size: PropTypes.string,
-	className: PropTypes.string,
-	preset: PropTypes.string,
-	bg: PropTypes.string,
-	onClick: PropTypes.func,
-	type: PropTypes.string,
-	link: PropTypes.string,
-	isLoading: PropTypes.bool,
-	loadingLabel: PropTypes.string,
-	loadingStatus: PropTypes.string,
-	icon: PropTypes.any,
-	iconPosition: PropTypes.string,
-	border: PropTypes.string,
-	borderRadius: PropTypes.string,
-	isCircle: PropTypes.bool,
-	isDisabled: PropTypes.bool,
-	style: PropTypes.object,
-	suffix: PropTypes.string,
-	prefix: PropTypes.string,
-	target: PropTypes.string,
-	isPro: PropTypes.bool,
-};
+
 
 const Button = ( {
 	label = '',
@@ -159,5 +136,5 @@ const Button = ( {
 	);
 };
 
-Button.propTypes = propTypes;
+
 export default Button;
