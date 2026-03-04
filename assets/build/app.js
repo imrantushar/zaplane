@@ -8330,7 +8330,7 @@ const VersionHistoryTable = ({
           type: "simple"
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
           className: "zaplane-sub-title",
-          ml: "-63px",
+          ml: "-47px",
           color: "var(--zaplane-text-muted)",
           children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_5__.__)(time, 'zaplane')
         })]
