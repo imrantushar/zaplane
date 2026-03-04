@@ -39,7 +39,6 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
     const { versions } = useSelector((state) => state.workflows);
     //store layout 
     const canvasLayout = values?.layout
-
     useEffect(() => {
         if (!workFlow?.graph) return;
         const { nodes, edges } = mapGraphFromBackend(workFlow.graph);
@@ -154,7 +153,6 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
         >
 
             <FlowTopBar
-                navigate={navigate}
                 workFlow={workFlow}
                 isFullscreen={isFullscreen}
                 toggleFullscreen={() =>
