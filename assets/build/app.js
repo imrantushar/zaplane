@@ -2900,7 +2900,7 @@ const ZAPSelect = ({
         }),
         menuList: base => ({
           ...base,
-          maxHeight: 200,
+          maxHeight: 500,
           overflowY: "auto"
         })
       }
