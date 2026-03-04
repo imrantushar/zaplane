@@ -6911,7 +6911,7 @@ const TestRun = ({
   const [isLoading, setIsLoading] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(false);
   const handleTest = async () => {
     if (isLoading) return;
-    if (source !== "node") {
+    if (node.data.action === "trigger") {
       setShowWarning(true);
       return;
     }
@@ -6946,8 +6946,8 @@ const TestRun = ({
       children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)("Test Action", "zaplane")
     }), showWarning && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_ZAPComponents_ZAPAlert__WEBPACK_IMPORTED_MODULE_6__["default"], {
       status: "warning",
-      title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)("Action Submit Required", "zaplane"),
-      description: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)("Submit node first, then test again.", "zaplane"),
+      title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)("Trigger Node Cannot Be Tested", "zaplane"),
+      description: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)("This is a trigger node. Trigger nodes cannot be tested individually.", "zaplane"),
       mt: 4
     }), source === "node" && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_TestDetails_TestDetails__WEBPACK_IMPORTED_MODULE_5__["default"], {
       id: node?.id,

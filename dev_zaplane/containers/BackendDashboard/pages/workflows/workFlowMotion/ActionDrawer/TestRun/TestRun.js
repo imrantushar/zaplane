@@ -16,7 +16,8 @@ const TestRun = ({ source, node, workFlow, values, nodes, edges }) => {
 
   const handleTest = async () => {
     if (isLoading) return;
-    if (source !== "node") {
+
+    if (node.data.action === "trigger") {
       setShowWarning(true);
       return;
     }
@@ -29,13 +30,13 @@ const TestRun = ({ source, node, workFlow, values, nodes, edges }) => {
         workflow_id: workFlow?.workflow?.id,
         workflow_hash: workFlow?.version?.hash,
         workflow_version_id: workFlow.version.id,
-        target_node: 
-          {
-            data: node?.data,
-            type: node?.data?.action,
-            id: node?.id
-          },
-                   
+        target_node:
+        {
+          data: node?.data,
+          type: node?.data?.action,
+          id: node?.id
+        },
+
         input: inputData,
       };
       await dispatch(
@@ -61,9 +62,9 @@ const TestRun = ({ source, node, workFlow, values, nodes, edges }) => {
       {showWarning && (
         <ZAPAlert
           status="warning"
-          title={__("Action Submit Required", "zaplane")}
+          title={__("Trigger Node Cannot Be Tested", "zaplane")}
           description={__(
-            "Submit node first, then test again.",
+            "This is a trigger node. Trigger nodes cannot be tested individually.",
             "zaplane"
           )}
           mt={4}
