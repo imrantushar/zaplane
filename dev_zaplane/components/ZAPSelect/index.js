@@ -30,6 +30,14 @@ const ZAPSelect = ({
         value={options.find(o => o.value === value) || null}
         onMenuOpen={onMenuOpen}
         onChange={(opt) => onChange?.(opt)}
+        styles={{
+          menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+          menuList: (base) => ({
+            ...base,
+            maxHeight: 200,
+            overflowY: "auto",
+          }),
+        }}
       />
     </Flex>
   );

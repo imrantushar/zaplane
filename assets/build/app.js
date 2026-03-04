@@ -361,6 +361,7 @@ const ZAPDrawer = ({
             children: store => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.Fragment, {
               children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.DrawerBody, {
                 spaceY: "3",
+                overflowX: "hidden",
                 children: typeof children === "function" ? children(store) : children
               }), footer && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.DrawerFooter, {
                 children: typeof footer === "function" ? footer(store) : footer
@@ -2891,7 +2892,18 @@ const ZAPSelect = ({
       isClearable: isClearable,
       value: options.find(o => o.value === value) || null,
       onMenuOpen: onMenuOpen,
-      onChange: opt => onChange?.(opt)
+      onChange: opt => onChange?.(opt),
+      styles: {
+        menuPortal: base => ({
+          ...base,
+          zIndex: 9999
+        }),
+        menuList: base => ({
+          ...base,
+          maxHeight: 200,
+          overflowY: "auto"
+        })
+      }
     })]
   });
 };
@@ -5568,7 +5580,7 @@ const ActionDrawer = ({
     footer: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_24__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.HStack, {
       justify: "space-between",
       children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_24__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Button, {
-        variant: "ghost",
+        variant: "outline",
         onClick: resetAll,
         children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_10__.__)("Cancel", "zaplane")
       }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_24__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Button, {
@@ -8329,7 +8341,7 @@ const VersionHistoryTable = ({
           type: "simple"
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
           className: "zaplane-sub-title",
-          ml: "-63px",
+          ml: "-47px",
           color: "var(--zaplane-text-muted)",
           children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_5__.__)(time, 'zaplane')
         })]
