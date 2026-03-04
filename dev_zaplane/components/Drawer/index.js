@@ -74,7 +74,7 @@ const ZAPDrawer = ({
                         <Drawer.Context>
                             {(store) => (
                                 <>
-                                    <Drawer.Body spaceY="3" overflow='hidden'>
+                                    <Drawer.Body spaceY="3" overflowX='hidden'>
                                         {typeof children === "function"
                                             ? children(store)
                                             : children}

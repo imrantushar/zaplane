@@ -361,7 +361,7 @@ const ZAPDrawer = ({
             children: store => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.Fragment, {
               children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.DrawerBody, {
                 spaceY: "3",
-                overflow: "hidden",
+                overflowX: "hidden",
                 children: typeof children === "function" ? children(store) : children
               }), footer && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.DrawerFooter, {
                 children: typeof footer === "function" ? footer(store) : footer
