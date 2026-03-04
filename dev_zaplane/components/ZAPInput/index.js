@@ -11,18 +11,18 @@ const ZAPInput = ({
   containerStyle,
   onKeyDown,
   inputStyle,
+  inputRef,
 }) => {
   const textareaRef = useRef(null);
-
-useEffect(() => {
-  if (type === "textarea" && textareaRef.current) {
-    const el = textareaRef.current;
-    const minHeight = 35;
-    el.style.height = "0px";
-    const newHeight = Math.max(el.scrollHeight, minHeight);
-    el.style.height = newHeight + "px";
-  }
-}, [value, type]);
+  useEffect(() => {
+    if (type === "textarea" && textareaRef.current) {
+      const el = inputRef?.current || textareaRef.current;
+      const minHeight = 35;
+      el.style.height = "0px";
+      const newHeight = Math.max(el.scrollHeight, minHeight);
+      el.style.height = newHeight + "px";
+    }
+  }, [value, type]);
 
   const isTextarea = type === "textarea";
 
@@ -33,23 +33,24 @@ useEffect(() => {
       </Text>
       {isTextarea ? (
         <Textarea
-          ref={textareaRef}
+          ref={inputRef || textareaRef}
           className="zaplane-textarea"
           placeholder={__(placeholder, "zaplane")}
           value={value}
           onChange={onChange}
           resize="none"
           overflow="hidden"
-           onKeyDown={onKeyDown}
+          onKeyDown={onKeyDown}
           {...inputStyle}
         />
       ) : (
         <Input
+          ref={inputRef}
           className="zaplane-input"
-          type={type} 
+          type={type}
           placeholder={__(placeholder, "zaplane")}
           value={value}
-           onKeyDown={onKeyDown}
+          onKeyDown={onKeyDown}
           onChange={onChange}
           {...(type === "number" && {
             inputMode: "numeric",

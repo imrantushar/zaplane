@@ -50,16 +50,7 @@ const ActionFieldRenderer = ({
     dispatch(conditionVariables(payload));
 
   }, [dispatch, nodeId, workFlow?.version?.hash]);
-  const handleChange = (val) => {
-    setFieldValue(field.key, val);
-  };
-
-  const handleKeyDown = (e) => {
-    if (e.key === "@") {
-      setCursorPosition(e.target.selectionStart);
-      setPopoverOpen(true);
-    }
-  };
+ 
 
   switch (field.type) {
 

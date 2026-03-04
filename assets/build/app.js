@@ -2791,12 +2791,13 @@ const ZAPInput = ({
   type = "text",
   containerStyle,
   onKeyDown,
-  inputStyle
+  inputStyle,
+  inputRef
 }) => {
   const textareaRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
     if (type === "textarea" && textareaRef.current) {
-      const el = textareaRef.current;
+      const el = inputRef?.current || textareaRef.current;
       const minHeight = 35;
       el.style.height = "0px";
       const newHeight = Math.max(el.scrollHeight, minHeight);
@@ -2815,7 +2816,7 @@ const ZAPInput = ({
       className: "zaplane-label",
       children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_5__.__)(label, "zaplane")
     }), isTextarea ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Textarea, {
-      ref: textareaRef,
+      ref: inputRef || textareaRef,
       className: "zaplane-textarea",
       placeholder: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_5__.__)(placeholder, "zaplane"),
       value: value,
@@ -2825,6 +2826,7 @@ const ZAPInput = ({
       onKeyDown: onKeyDown,
       ...inputStyle
     }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Input, {
+      ref: inputRef,
       className: "zaplane-input",
       type: type,
       placeholder: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_5__.__)(placeholder, "zaplane"),
@@ -5739,15 +5741,6 @@ const ActionFieldRenderer = ({
     };
     dispatch((0,_ZAPRedux_Slices_workFlowSlice_actions_conditonVariales__WEBPACK_IMPORTED_MODULE_7__.conditionVariables)(payload));
   }, [dispatch, nodeId, workFlow?.version?.hash]);
-  const handleChange = val => {
-    setFieldValue(field.key, val);
-  };
-  const handleKeyDown = e => {
-    if (e.key === "@") {
-      setCursorPosition(e.target.selectionStart);
-      setPopoverOpen(true);
-    }
-  };
   switch (field.type) {
     case "text":
     case "expression":
