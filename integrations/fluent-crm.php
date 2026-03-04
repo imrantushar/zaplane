@@ -365,7 +365,7 @@ class FluentCrm extends IntegrationBase {
     }
 
     private static function contact_status(): array {
-        return [['key'=>'status', 'label'=>'Status', 'type'=>'select','options'  => [
+        return [['key'=>'fluent_status', 'label'=>'Status', 'type'=>'select','options'  => [
                     ['label' => 'Subscribed', 'value' => 'subscribed' ],
                     ['label' => 'Pending', 'value' => 'pending' ],
                     ['label' => 'Unsubscribed', 'value' => 'unsubscribed' ],
@@ -709,7 +709,7 @@ class FluentCrm extends IntegrationBase {
                 return ['port' => 'main','data' => ['success' => true,'count' => count($contacts),'contacts'=> $contacts,],];
             
             case 'get_contact_by_status':
-                $status = sanitize_text_field( $config['status'] ?? '');
+                $status = sanitize_text_field( $config['fluent_status'] ?? '');
                 if ( empty( $status ) ) {
                     return ['port'=>'main','data'=>['success' => false, 'message' => 'Status is required',],];
                 }
@@ -721,14 +721,14 @@ class FluentCrm extends IntegrationBase {
                 } else {
                     $subscribers = \FluentCrm\App\Models\Subscriber::where('status', $status)->get();
                 }
-                if ($subscribers->isEmpty()) {
+                if ( $subscribers->isEmpty() ) {
                     return ['port' => 'main','data' => ['success' => false,'message' => 'No contacts found for given status',],];
                 }
                 $contacts = [];
-                foreach ($subscribers as $sub) {
-                    $contacts[] = self::resolve_contact_payload($sub);
+                foreach ( $subscribers as $sub ) {
+                    $contacts[] = self::resolve_contact_payload( $sub );
                 }
-                return ['port' => 'main','data' => ['success' => true,'status' => $status, 'count' => count($contacts),'contacts'=> $contacts,],];
+                return ['port' => 'main','data' => ['success' => true,'status' => $status, 'count' => count( $contacts),'contacts'=> $contacts,],];
                  
             case 'delete_contact':
                 $contact_id = $config['contact_id'] ?? 0;
@@ -750,12 +750,12 @@ class FluentCrm extends IntegrationBase {
                     return ['port'=>'main','data'=>['success' => false, 'message' => 'FluentCRM Tag Not Found',],];
                 }
                 $tags = \FluentCrm\App\Models\Tag::all();
-                if ($tags->isEmpty()) {
+                if ( $tags->isEmpty() ) {
                     return ['port' => 'main','data' => ['success' => true,'count' => 0,'tags' => [],],];
                 }
                 $tag_list = [];
-                foreach ($tags as $tag) {
-                    $tag_list[] = self::resolve_tag_payload($tag);
+                foreach ( $tags as $tag ) {
+                    $tag_list[] = self::resolve_tag_payload( $tag );
                 }
                 return ['port' => 'main','data' => ['success' => true,'count' => count($tag_list),'tags'=> $tag_list,],];
             
