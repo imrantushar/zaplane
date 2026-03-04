@@ -154,7 +154,7 @@ class Academy extends IntegrationBase {
 
                 foreach ( $lessons as $lesson ) {
                     $options[] = [
-                        'label' => $lesson->lesson_title,  // lesson_title use করতে হবে
+                        'label' => $lesson->lesson_title,
                         'value' => $lesson->ID,
                     ];
                 }
