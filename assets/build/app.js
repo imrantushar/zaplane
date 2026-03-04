@@ -5569,7 +5569,7 @@ const ActionDrawer = ({
     footer: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_24__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.HStack, {
       justify: "space-between",
       children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_24__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Button, {
-        variant: "ghost",
+        variant: "outline",
         onClick: resetAll,
         children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_10__.__)("Cancel", "zaplane")
       }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_24__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Button, {
