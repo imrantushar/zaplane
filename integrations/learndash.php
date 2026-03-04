@@ -269,23 +269,23 @@ class Learndash extends IntegrationBase {
         switch ( $node['event'] ) {
 
             case 'user_enroll_course':
-                $user_id   = $args[0] ?? 0;
-                $course_id = $args[1] ?? 0;
+                $user_id     = $args[0] ?? 0;
+                $course_id   = $args[1] ?? 0;
                 $assess_list = $args[2] ?? 0;
-                $remove    = $args[3] ?? null; 
+                $remove      = $args[3] ?? null; 
 
-                if (!$user_id || !$course_id) return false;
+                if ( ! $user_id || !$course_id ) return false;
 
-                if (!empty($remove)) return false;
+                if ( (int) $remove === 1 ) return false;
 
                 $selected_course = $node['data']['config']['course_id'] ?? 'any';
 
-                if ($selected_course !== 'any' && (int)$selected_course !== (int)$course_id) return false;
+                if ( $selected_course !== 'any' && (int) $selected_course !== (int) $course_id ) return false;
 
                 return [
                     'success'   => true,
                     'timestamp' => current_time('mysql'),
-                    'data'      => self::resolve_course_payload($user_id, $course_id),
+                    'data'      => self::resolve_course_payload( $user_id, $course_id ),
                 ];
 
             case 'course_complete':
