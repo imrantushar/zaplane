@@ -2,7 +2,7 @@ import { Button, Flex, HStack, Input, } from "@chakra-ui/react";
 import ZAPDrawer from "@ZAPComponents/Drawer";
 import { integrations } from "@ZAPUtils/helper";
 import { useFormikContext } from "formik";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import ZAPTab from "@ZAPComponents/Tab";
 import { __, sprintf } from "@wordpress/i18n";
@@ -19,6 +19,8 @@ import DrawerItemList from "./DrawerItemList";
 import ActionFieldRenderer from "./ActionFieldRenderer/ActionFieldRenderer";
 import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
 import { useDynamicFields } from "@ZAPHooks/useActionDrawer/useDynamicFields";
+import { mapEdgesForBackend, mapNodesForBackend } from "../helper";
+import { conditionVariables } from "@ZAPRedux/Slices/workFlowSlice/actions/conditonVariales";
 
 const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode, workFlow, isFullscreen, nodes, edges }) => {
   const { source, node } = context;
@@ -121,6 +123,23 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
   const selectedIntegration = useMemo(() => {
     return getIntegration(mode, selectedItem);
   }, [mode, selectedItem]);
+
+// get global variable
+useEffect(() => {
+ if (!node?.id || !workFlow?.version?.hash) return;
+  const payload = {
+    workflow_id: workFlow.workflow?.id,
+    workflow_hash: workFlow.version?.hash,
+    workflow_version_id: workFlow.version?.id,
+    target_node_key: node?.id,
+    graph: {
+      nodes: mapNodesForBackend(nodes),
+      edges: mapEdgesForBackend(edges),
+    },
+  };
+
+  dispatch(conditionVariables(payload));
+}, [node?.id]);
   return (
     <ZAPDrawer
       open={open}

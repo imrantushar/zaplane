@@ -24,34 +24,11 @@ const ActionFieldRenderer = ({
   nodes,
   edges
 }) => {
-  const dispatch = useDispatch()
   const [isPopoverOpen, setPopoverOpen] = useState(false);
-  const [cursorPosition, setCursorPosition] = useState(null);
-
   const inputRef = useRef(null);
-
   const { workflowVariables } = useSelector(
     (state) => state.workflows
   );
-  useEffect(() => {
-    if (!nodeId || !workFlow?.version?.hash) return;
-
-    const payload = {
-      workflow_id: workFlow.workflow.id,
-      workflow_hash: workFlow.version.hash,
-      workflow_version_id: workFlow.version.id,
-      target_node_key: nodeId,
-      graph: {
-        nodes: mapNodesForBackend(nodes),
-        edges: mapEdgesForBackend(edges),
-      },
-    };
-
-    dispatch(conditionVariables(payload));
-
-  }, [dispatch, nodeId, workFlow?.version?.hash]);
- 
-
   switch (field.type) {
 
     case "text":
