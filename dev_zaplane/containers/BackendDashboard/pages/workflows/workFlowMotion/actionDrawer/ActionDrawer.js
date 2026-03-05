@@ -83,7 +83,11 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
     setStep("select");
     setSelectedItem(null);
     setSearch("");
-    resetForm();
+    resetForm({
+      values: {
+        layout: values.layout
+      }
+    })
     onClose();
     setShowWarning(false)
   };
@@ -124,22 +128,22 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
     return getIntegration(mode, selectedItem);
   }, [mode, selectedItem]);
 
-// get global variable
-useEffect(() => {
- if (!node?.id || !workFlow?.version?.hash) return;
-  const payload = {
-    workflow_id: workFlow.workflow?.id,
-    workflow_hash: workFlow.version?.hash,
-    workflow_version_id: workFlow.version?.id,
-    target_node_key: node?.id,
-    graph: {
-      nodes: mapNodesForBackend(nodes),
-      edges: mapEdgesForBackend(edges),
-    },
-  };
+  // get global variable
+  useEffect(() => {
+    if (!node?.id || !workFlow?.version?.hash) return;
+    const payload = {
+      workflow_id: workFlow.workflow?.id,
+      workflow_hash: workFlow.version?.hash,
+      workflow_version_id: workFlow.version?.id,
+      target_node_key: node?.id,
+      graph: {
+        nodes: mapNodesForBackend(nodes),
+        edges: mapEdgesForBackend(edges),
+      },
+    };
 
-  dispatch(conditionVariables(payload));
-}, [node?.id]);
+    dispatch(conditionVariables(payload));
+  }, [node?.id]);
   return (
     <ZAPDrawer
       open={open}

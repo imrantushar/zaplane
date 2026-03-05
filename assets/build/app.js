@@ -5408,7 +5408,11 @@ const ActionDrawer = ({
     setStep("select");
     setSelectedItem(null);
     setSearch("");
-    resetForm();
+    resetForm({
+      values: {
+        layout: values.layout
+      }
+    });
     onClose();
     setShowWarning(false);
   };
