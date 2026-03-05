@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-03-01 06:58:20",
+    "generated_at": "2026-03-04 09:17:16",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -4787,8 +4787,8 @@
                                     "value": "any"
                                 },
                                 {
-                                    "label": "course",
-                                    "value": "19"
+                                    "label": "fdgsdfg",
+                                    "value": "21"
                                 }
                             ],
                             "required": true
@@ -4813,8 +4813,8 @@
                                     "value": "any"
                                 },
                                 {
-                                    "label": "quiz",
-                                    "value": "24"
+                                    "label": "sdfasdf Quiz",
+                                    "value": "26"
                                 }
                             ],
                             "required": true
@@ -4839,8 +4839,8 @@
                                     "value": "any"
                                 },
                                 {
-                                    "label": "lesson",
-                                    "value": "23"
+                                    "label": "sdfasdf",
+                                    "value": "25"
                                 }
                             ],
                             "required": true
@@ -4865,8 +4865,8 @@
                                     "value": "any"
                                 },
                                 {
-                                    "label": "course",
-                                    "value": "19"
+                                    "label": "fdgsdfg",
+                                    "value": "21"
                                 }
                             ],
                             "required": true

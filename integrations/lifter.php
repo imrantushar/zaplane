@@ -139,10 +139,10 @@ class Lifter extends IntegrationBase {
     public static function resolve_trigger( array $node, array $args ) {
         switch ( $node['event'] ) {
             case 'user_enroll_course':
-                $user_id   = $args[0] ?? null;
-                $course_id = $args[1] ?? null;
+                $course_id = $args[0] ?? null;
+                $enroll_id = $args[1] ?? null;
 
-                if ( ! $course_id || ! $user_id ) return false;
+                if ( ! $course_id || ! $enroll_id ) return false;
 
                 $selected_course = $node['data']['config']['course_id'] ?? 'any';
 
@@ -150,25 +150,15 @@ class Lifter extends IntegrationBase {
                     return false;
                 }
 
-                $course = get_post( $course_id );
-                $user   = get_userdata( $user_id );
-
-                if ( ! $course || ! $user ) return false;
-
                 return [
-                    'success'      => true,
-                    'course_id'    => $course->ID,
-                    'course_title' => $course->post_title,
-                    'course_url'   => get_permalink( $course->ID ),
-                    'user_id'      => $user_id,
-                    'user_email'   => $user->user_email,
-                    'first_name'   => $user->first_name,
-                    'last_name'    => $user->last_name,
+                    'success'   => true,
+                    'course_id' => $course_id,
+                    'enroll_id' => $enroll_id,
                 ];
                                 
             case 'course_complete':
-                $course_id = $args[0] ?? null;
                 $user_id   = $args[1] ?? get_current_user_id();
+                $course_id = $args[0] ?? null;
 
                 if ( ! $course_id || ! $user_id ) return false;
 
@@ -214,28 +204,30 @@ class Lifter extends IntegrationBase {
 
            case 'lifter_quiz_course_attempt':
 
-                $attempt = $args[0] ?? null;
-                if ( ! $attempt ) return false;
+                $user_id = $args[0] ?? null;
+                $quiz_id = $args[1] ?? null;
+                $attempt = $args[2] ?? null;
 
-                if ( $attempt->attempt_status === 'pending' ) return false;
+                if ( ! $user_id || ! $quiz_id || ! is_object( $attempt ) ) {
+                    return false;
+                }
 
-                $quiz_id = $attempt->quiz_id ?? null;
-                $user_id = $attempt->user_id ?? null;
-
-                if ( ! $quiz_id || ! $user_id ) return false;
+                // (optional) attempt status filter
+                if ( isset($attempt->attempt_status) && $attempt->attempt_status === 'pending' ) {
+                    return false;
+                }
 
                 $selected_quiz = $node['data']['config']['quiz_id'] ?? 'any';
-
-                if ( $selected_quiz !== 'any' && (int)$selected_quiz !== (int)$quiz_id ) {
+                if ( $selected_quiz !== 'any' && (int) $selected_quiz !== (int) $quiz_id ) {
                     return false;
                 }
 
                 return [
-                    'success'  => true,
-                    'quiz_id'  => $quiz_id,
-                    'user_id'  => $user_id,
-                    'score'    => $attempt->earned_marks ?? 0,
-                    'total'    => $attempt->total_marks ?? 0,
+                    'success' => true,
+                    'quiz_id' => (int) $quiz_id,
+                    'user_id' => (int) $user_id,
+                    'score'   => $attempt->earned_marks ?? 0,
+                    'total'   => $attempt->total_marks ?? 0,
                 ];
         }
         return false;
