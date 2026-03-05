@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-03-03 04:57:29",
+    "generated_at": "2026-03-05 05:36:15",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -4726,6 +4726,27 @@
                     "key": "metform_after_store_form_data",
                     "label": "Form Submitted",
                     "hook": "metform_after_store_form_data",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": []
+        },
+        "divi": {
+            "slug": "divi",
+            "name": "Divi",
+            "icon": "",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": {
+                "divi_contact_form_submitted": {
+                    "key": "divi_contact_form_submitted",
+                    "label": "Divi Contact Form Submitted",
+                    "hook": "et_pb_contact_form_submit",
                     "schema": [],
                     "outputs": [
                         "main"

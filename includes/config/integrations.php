@@ -27,6 +27,7 @@ return [
         'spectra'              => [ 'file' => 'spectra.php',              'class' => \Zaplane\Integrations\Spectra::class ],
         'beaverbuilder'        => [ 'file' => 'beaverbuilder.php',        'class' => \Zaplane\Integrations\Beaverbuilder::class ],
         'metform'              => [ 'file' => 'metform.php',              'class' => \Zaplane\Integrations\Metform::class ],
+        'divi'                 => [ 'file' => 'divi.php',                 'class' => \Zaplane\Integrations\Divi::class ],
         'easydigitaldownload'  => [ 'file' => 'easy-digital-download.php','class' => \Zaplane\Integrations\EasyDigitalDownload::class ],
         'tutor'                => ['file' => 'tutor.php',                  'class' => \Zaplane\Integrations\Tutor::class],
         'groundhogg'           => ['file' => 'groundhogg.php',             'class' => \Zaplane\Integrations\Groundhogg::class],
