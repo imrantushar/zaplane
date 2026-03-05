@@ -19,7 +19,6 @@ use Zaplane\Integrations\Wordpress\CommentActionsTrait;
 use Zaplane\Integrations\Wordpress\QueryTrait;
 use Zaplane\Integrations\Wordpress\Helper;
 
-
 class Wordpress extends IntegrationBase {
     use ActionResponseTrait;
     use PostActionsTrait;
@@ -122,9 +121,9 @@ class Wordpress extends IntegrationBase {
             'switch_blog'            => ['label' => 'Blog Switch', 'hook' => 'switch_blog'],
             'customize_register'     => ['label' => 'Customizer Registration', 'hook' => 'customize_register'],
             'rest_api_init'          => ['label' => 'REST API Init', 'hook' => 'rest_api_init'],
-            'update_blog_public'          => ['label' => 'Update Blog Public',           'hook' => 'update_blog_public'],
-            'update_blog_status'          => ['label' => 'Update Blog Status',           'hook' => 'update_blog_status'],
-            'new_blog'                    => ['label' => 'New Blog',                     'hook' => 'wpmu_new_blog'],
+            'update_blog_public'  => ['label' => 'Update Blog Public', 'hook' => 'update_blog_public'],
+            'update_blog_status' => ['label' => 'Update Blog Status', 'hook' => 'update_blog_status'],
+            'wpmu_new_blog' => ['label' => 'New Blog','hook' => 'wpmu_new_blog'],
         ];
     }
 

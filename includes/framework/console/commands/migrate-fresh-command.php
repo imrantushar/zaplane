@@ -19,9 +19,6 @@ class MigrateFreshCommand extends Command
         'workflow_versions',
         'runs',
         'node_runs',
-        'execution_edges',
-        'queue',
-        'node_logs',
         'connections',
     ];
 

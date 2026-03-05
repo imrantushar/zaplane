@@ -116,7 +116,7 @@ const RunsTable = ({ id }) => {
               />
             </Box>
           </ZAPTooltip>
-          <ZAPTooltip content={__("Re-Excute", 'zaplane')}>
+          <ZAPTooltip content={__("Re-Try", 'zaplane')}>
             <Box
               display="flex"
               p={"5px 6px"}

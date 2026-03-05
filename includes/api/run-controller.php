@@ -108,9 +108,10 @@ class RunController extends WP_REST_Controller
             $node_count = NodeRun::where('run_id', $run->id)->count();
 
             if ($version) {
-                $graph = $version->getGraph();
+                $nodeKey = $run->start_node_key ?? $run->target_node_key;
+                $graph   = $version->getGraph();
                 foreach ($graph['nodes'] ?? [] as $n) {
-                    if ((int) $n['id'] === $run->start_node_key) {
+                    if ((int) $n['id'] === (int) $nodeKey) {
                         $node = $n;
                         break;
                     }
@@ -185,7 +186,8 @@ class RunController extends WP_REST_Controller
         }
 
         $newRun = Run::create([
-            'workflow_version_hash' => $oldRun->workflow_version_hash,
+            'workflow_version_id' => $oldRun->workflow_version_id,
+            'workflow_id' => $oldRun->workflow_id,
             'trigger_data' => $oldRun->trigger_data,
             'status' => 'running',
             'start_node_key' => $oldRun->start_node_key,
@@ -284,7 +286,8 @@ class RunController extends WP_REST_Controller
         $triggerKey = (int) $trigger['id'];
 
         $run = Run::create([
-            'workflow_version_hash' => $workflowHash,
+            'workflow_version_id' => $version->id,
+            'workflow_id' => $version->workflow_id,
             'status' => 'running',
             'trigger_data' => $data,
             'start_node_key' => $triggerKey,
@@ -304,37 +307,18 @@ class RunController extends WP_REST_Controller
 
     public function execute_single_node($req)
     {
-        $targetKey   = (int) $req['node_key'];
-        $workflowId  = (int) ($req['workflow_id'] ?? 0) ?: null;
-        $input       = $req['input'] ?? [];
-        $inlineGraph = $req['graph'] ?? null;
+        $targetNode        = $req['target_node'] ?? null;
+        $workflowVersionId = (int) ($req['workflow_version_id'] ?? 0);
+        $input             = $req['input'] ?? [];
 
-        // Prefer inline graph from the request (works before the workflow is saved).
-        // Fall back to workflow_hash DB lookup for saved workflows.
-        if ($inlineGraph && isset($inlineGraph['nodes'])) {
-            $graph        = $inlineGraph;
-            $workflowHash = hash('sha256', wp_json_encode($graph));
-        } else {
-            $workflowHash = $req['workflow_hash'] ?? null;
-            if (!$workflowHash) {
-                return new WP_Error('missing_params', 'Provide either graph or workflow_hash', ['status' => 400]);
-            }
-
-            $version = WorkflowVersion::where('graph_hash', $workflowHash)->first();
-            if (!$version) {
-                return new WP_Error('not_found', 'Workflow version not found', ['status' => 404]);
-            }
-
-            $graph = $version->getGraph();
+        if (!$workflowVersionId) {
+            return new WP_Error('missing_params', 'workflow_version_id is required', ['status' => 400]);
         }
 
-        $targetNode = null;
+        $version = WorkflowVersion::find($workflowVersionId);
 
-        foreach ($graph['nodes'] as $node) {
-            if ((int) $node['id'] === $targetKey) {
-                $targetNode = $node;
-                break;
-            }
+        if (!$version) {
+            return new WP_Error('not_found', 'Workflow version not found', ['status' => 404]);
         }
 
         if (!$targetNode) {
@@ -342,24 +326,43 @@ class RunController extends WP_REST_Controller
         }
 
         $run = Run::create([
-            'workflow_version_hash' => $workflowHash,
-            'workflow_id' => $workflowId,
+            'workflow_version_id' => $version->id,
+            'workflow_id' => $version->workflow_id,
             'status' => 'running',
             'is_test' => true,
             'trigger_data' => $input,
-            'start_node_key' => $targetKey,
-            'target_node_key' => $targetKey,
+            'target_node_key' => (int) $targetNode['id'],
             'started_at' => current_time('mysql'),
         ]);
 
         $nodeRun = NodeRun::create([
             'run_id' => $run->id,
-            'node_key' => $targetKey,
+            'node_key' => (int) $targetNode['id'],
             'parent_node_run_id' => null,
             'status' => 'running',
             'input_json' => $input,
             'started_at' => current_time('mysql'),
         ]);
+
+        // Inject connection credentials so integrations that require auth can execute.
+        $connectionId = $targetNode['data']['connection_id'] ?? null;
+        if ($connectionId) {
+            try {
+                $targetNode['_connection_credentials'] = $this->container
+                    ->get('connections')
+                    ->get_execution_credentials((int) $connectionId);
+            } catch (\Throwable $e) {
+                // credentials unavailable — let execute_node throw the proper error
+            }
+        }
+
+        // Build context from previous test node runs so {{nodeId.path}} expressions resolve.
+        $testContext = [];
+        foreach (Run::latestTestNodeRunsByWorkflow($version->workflow_id) as $nodeKey => $nodeRun) {
+            $out = $nodeRun->getOutput();
+            $testContext[$nodeKey] = is_array($out) ? $out : ['value' => $out];
+        }
+        $effectiveInput = array_merge($input, $testContext);
 
         try {
             if ($targetNode['type'] === 'trigger') {
@@ -371,7 +374,7 @@ class RunController extends WP_REST_Controller
                     throw new \Exception("Integration not found: " . ($targetNode['data']['app'] ?? 'unknown'));
                 }
 
-                $output = $integration::execute_node($targetNode, $input);
+                $output = $integration::execute_node($targetNode, $effectiveInput);
             }
 
             $nodeRun->setOutput($output);
@@ -387,7 +390,7 @@ class RunController extends WP_REST_Controller
                     'run_id' => $run->id,
                     'node_run_id' => $nodeRun->id,
                     'node' => [
-                        'id' => $targetKey,
+                        'id' => (int) $targetNode['id'],
                         'app' => $targetNode['data']['app'] ?? null,
                         'event' => $targetNode['data']['event'] ?? null,
                         'label' => $targetNode['data']['label'] ?? null,
@@ -425,7 +428,7 @@ class RunController extends WP_REST_Controller
                     'run_id' => $run->id,
                     'node_run_id' => $nodeRun->id,
                     'node' => [
-                        'id' => $targetKey,
+                        'id' => (int) $targetNode['id'],
                         'app' => $targetNode['data']['app'] ?? null,
                         'event' => $targetNode['data']['event'] ?? null,
                         'label' => $targetNode['data']['label'] ?? null,

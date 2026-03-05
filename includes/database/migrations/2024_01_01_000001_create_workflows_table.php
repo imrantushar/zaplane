@@ -16,7 +16,6 @@ class CreateWorkflowsTable extends Migration
             $table->id();
             $table->unsignedBigInteger('user_id');
             $table->string('title');
-            $table->string('name');
             $table->enum('status', ['active', 'paused', 'draft'])->default('draft');
             $table->string('layout', 20)->default('LR');
             $table->timestamps();

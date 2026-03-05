@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-03-03 03:24:10",
+    "generated_at": "2026-03-03 04:57:29",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -772,8 +772,8 @@
                         "main"
                     ]
                 },
-                "new_blog": {
-                    "key": "new_blog",
+                "wpmu_new_blog": {
+                    "key": "wpmu_new_blog",
                     "label": "New Blog",
                     "hook": "wpmu_new_blog",
                     "schema": [],
@@ -3166,6 +3166,228 @@
                 }
             }
         },
+        "mailchimp": {
+            "slug": "mailchimp",
+            "name": "Mailchimp",
+            "icon": "mailchimp",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": [],
+            "actions": {
+                "upsert_subscriber": {
+                    "key": "upsert_subscriber",
+                    "label": "Add/Update Subscriber",
+                    "schema": [
+                        {
+                            "key": "list_id",
+                            "label": "Audience/List ID",
+                            "type": "text",
+                            "placeholder": "a1b2c3d4e5",
+                            "required": true,
+                            "help": "Find it in Mailchimp \u2192 Audience \u2192 Settings \u2192 Audience name and defaults."
+                        },
+                        {
+                            "key": "email",
+                            "label": "Email Address",
+                            "type": "text",
+                            "placeholder": "name@example.com or {{email}}",
+                            "required": true
+                        },
+                        {
+                            "key": "status",
+                            "label": "Status (Existing)",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "value": "",
+                                    "label": "Leave Unchanged"
+                                },
+                                {
+                                    "value": "subscribed",
+                                    "label": "Subscribed"
+                                },
+                                {
+                                    "value": "pending",
+                                    "label": "Pending (double opt-in)"
+                                },
+                                {
+                                    "value": "unsubscribed",
+                                    "label": "Unsubscribed"
+                                },
+                                {
+                                    "value": "cleaned",
+                                    "label": "Cleaned"
+                                },
+                                {
+                                    "value": "transactional",
+                                    "label": "Transactional"
+                                }
+                            ],
+                            "help": "Applied when the subscriber already exists. Leave blank to keep current status."
+                        },
+                        {
+                            "key": "status_if_new",
+                            "label": "Status If New",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "value": "subscribed",
+                                    "label": "Subscribed"
+                                },
+                                {
+                                    "value": "pending",
+                                    "label": "Pending (double opt-in)"
+                                },
+                                {
+                                    "value": "unsubscribed",
+                                    "label": "Unsubscribed"
+                                },
+                                {
+                                    "value": "cleaned",
+                                    "label": "Cleaned"
+                                },
+                                {
+                                    "value": "transactional",
+                                    "label": "Transactional"
+                                }
+                            ],
+                            "help": "Applied when creating a new subscriber (default: subscribed)."
+                        },
+                        {
+                            "key": "merge_fields",
+                            "label": "Merge Fields (JSON)",
+                            "type": "textarea",
+                            "placeholder": "{\"FNAME\":\"John\",\"LNAME\":\"Doe\"}",
+                            "help": "Optional JSON object. Use merge tag keys from Mailchimp (e.g., FNAME, LNAME)."
+                        },
+                        {
+                            "key": "tags",
+                            "label": "Tags",
+                            "type": "text",
+                            "placeholder": "vip, newsletter, webinar",
+                            "help": "Optional comma-separated tags to apply."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "unsubscribe_subscriber": {
+                    "key": "unsubscribe_subscriber",
+                    "label": "Unsubscribe Subscriber",
+                    "schema": [
+                        {
+                            "key": "list_id",
+                            "label": "Audience/List ID",
+                            "type": "text",
+                            "placeholder": "a1b2c3d4e5",
+                            "required": true,
+                            "help": "Find it in Mailchimp \u2192 Audience \u2192 Settings \u2192 Audience name and defaults."
+                        },
+                        {
+                            "key": "email",
+                            "label": "Email Address",
+                            "type": "text",
+                            "placeholder": "name@example.com or {{email}}",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add_tags": {
+                    "key": "add_tags",
+                    "label": "Add Tags to Subscriber",
+                    "schema": [
+                        {
+                            "key": "list_id",
+                            "label": "Audience/List ID",
+                            "type": "text",
+                            "placeholder": "a1b2c3d4e5",
+                            "required": true,
+                            "help": "Find it in Mailchimp \u2192 Audience \u2192 Settings \u2192 Audience name and defaults."
+                        },
+                        {
+                            "key": "email",
+                            "label": "Email Address",
+                            "type": "text",
+                            "placeholder": "name@example.com or {{email}}",
+                            "required": true
+                        },
+                        {
+                            "key": "tags",
+                            "label": "Tags",
+                            "type": "text",
+                            "placeholder": "vip, newsletter, webinar",
+                            "required": true,
+                            "help": "Comma-separated tags. Existing tags will be added or removed."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "remove_tags": {
+                    "key": "remove_tags",
+                    "label": "Remove Tags from Subscriber",
+                    "schema": [
+                        {
+                            "key": "list_id",
+                            "label": "Audience/List ID",
+                            "type": "text",
+                            "placeholder": "a1b2c3d4e5",
+                            "required": true,
+                            "help": "Find it in Mailchimp \u2192 Audience \u2192 Settings \u2192 Audience name and defaults."
+                        },
+                        {
+                            "key": "email",
+                            "label": "Email Address",
+                            "type": "text",
+                            "placeholder": "name@example.com or {{email}}",
+                            "required": true
+                        },
+                        {
+                            "key": "tags",
+                            "label": "Tags",
+                            "type": "text",
+                            "placeholder": "vip, newsletter, webinar",
+                            "required": true,
+                            "help": "Comma-separated tags. Existing tags will be added or removed."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "archive_subscriber": {
+                    "key": "archive_subscriber",
+                    "label": "Archive Subscriber",
+                    "schema": [
+                        {
+                            "key": "list_id",
+                            "label": "Audience/List ID",
+                            "type": "text",
+                            "placeholder": "a1b2c3d4e5",
+                            "required": true,
+                            "help": "Find it in Mailchimp \u2192 Audience \u2192 Settings \u2192 Audience name and defaults."
+                        },
+                        {
+                            "key": "email",
+                            "label": "Email Address",
+                            "type": "text",
+                            "placeholder": "name@example.com or {{email}}",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
+        },
         "surecart": {
             "slug": "surecart",
             "name": "Surecart",
@@ -4231,31 +4453,6 @@
                         "main"
                     ]
                 },
-                "created_product": {
-                    "key": "created_product",
-                    "label": "Created Product",
-                    "hook": "storeengine/product/created",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "updated_product": {
-                    "key": "updated_product",
-                    "label": "Updated Product",
-                    "hook": "storeengine/product/updated",
-                    "schema": [
-                        {
-                            "key": "product_id",
-                            "label": "ID",
-                            "type": "expression",
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
                 "order_status_update": {
                     "key": "order_status_update",
                     "label": "Order Status Updated",
@@ -4328,6 +4525,60 @@
                         "main"
                     ]
                 },
+                "payment_complete": {
+                    "key": "payment_complete",
+                    "label": "Completed Payment",
+                    "hook": "storeengine/payment_complete",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "payment_processing": {
+                    "key": "payment_processing",
+                    "label": "Processing Payment",
+                    "hook": "storeengine/payment_processing",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "payment_pending": {
+                    "key": "payment_pending",
+                    "label": "Pending Payment",
+                    "hook": "storeengine/payment_pending",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "payment_confirmed": {
+                    "key": "payment_confirmed",
+                    "label": "Pending Payment",
+                    "hook": "storeengine/payment_confirmed",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "customer_created": {
+                    "key": "customer_created",
+                    "label": "Customer Created",
+                    "hook": "storeengine/checkout/customer_created",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_customer": {
+                    "key": "update_customer",
+                    "label": "Customer Updated",
+                    "hook": "storeengine/stripe/update_customer",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
                 "order_customer_note_added": {
                     "key": "order_customer_note_added",
                     "label": "Customer Note Added to Order",
@@ -4345,76 +4596,9 @@
                     "outputs": [
                         "main"
                     ]
-                },
-                "order_restored": {
-                    "key": "order_restored",
-                    "label": "Order Restored",
-                    "hook": "storeengine/order/status_changed",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
                 }
             },
-            "actions": {
-                "create_product": {
-                    "key": "create_product",
-                    "label": "Create Product",
-                    "schema": [
-                        {
-                            "key": "product_name",
-                            "label": "Product Name",
-                            "type": "text",
-                            "required": true
-                        },
-                        {
-                            "key": "price",
-                            "label": "Price",
-                            "type": "number",
-                            "required": true
-                        },
-                        {
-                            "key": "description",
-                            "label": "Description",
-                            "type": "textarea"
-                        },
-                        {
-                            "key": "status",
-                            "label": "Status",
-                            "type": "select",
-                            "options": [
-                                {
-                                    "label": "Draft",
-                                    "value": "draft"
-                                },
-                                {
-                                    "label": "Publish",
-                                    "value": "publish"
-                                }
-                            ]
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "update_product": {
-                    "key": "update_product",
-                    "label": "Update Product",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "create_order": {
-                    "key": "create_order",
-                    "label": "Create Order",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                }
-            }
+            "actions": []
         },
         "webhook": {
             "slug": "webhook",
@@ -4972,9 +5156,9 @@
                 }
             }
         },
-        "masterstudy": {
-            "slug": "masterstudy",
-            "name": "Masterstudy",
+        "tutor": {
+            "slug": "tutor",
+            "name": "Tutor",
             "icon": "",
             "category": "app",
             "requires_connection": false,
@@ -4983,29 +5167,17 @@
             "triggers": {
                 "user_enroll_course": {
                     "key": "user_enroll_course",
-                    "label": "User Is Enrolled In A Course",
-                    "hook": "add_user_course",
+                    "label": "User enrolled in a course",
+                    "hook": "tutor_after_enroll",
                     "schema": [
                         {
                             "key": "course_id",
-                            "label": "Course",
+                            "label": "course",
                             "type": "select",
                             "options": [
                                 {
                                     "label": "Any course",
                                     "value": "any"
-                                },
-                                {
-                                    "label": "course 1",
-                                    "value": 18
-                                },
-                                {
-                                    "label": "course 2",
-                                    "value": 25
-                                },
-                                {
-                                    "label": "course 3",
-                                    "value": 28
                                 }
                             ],
                             "required": true
@@ -5017,34 +5189,208 @@
                 },
                 "course_complete": {
                     "key": "course_complete",
-                    "label": "User Completed A Course",
-                    "hook": "stm_lms_progress_updated",
+                    "label": "User completed a course",
+                    "hook": "tutor_course_complete_after",
                     "schema": [
                         {
                             "key": "course_id",
-                            "label": "Course",
+                            "label": "course",
                             "type": "select",
                             "options": [
                                 {
                                     "label": "Any course",
                                     "value": "any"
-                                },
-                                {
-                                    "label": "course 1",
-                                    "value": 18
-                                },
-                                {
-                                    "label": "course 2",
-                                    "value": 25
-                                },
-                                {
-                                    "label": "course 3",
-                                    "value": 28
                                 }
                             ],
                             "required": true
                         }
                     ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "tutor_quiz_course_attempt": {
+                    "key": "tutor_quiz_course_attempt",
+                    "label": "User attempted (submitted) a quiz",
+                    "hook": "tutor_quiz/attempt_ended",
+                    "schema": [
+                        {
+                            "key": "quiz_id",
+                            "label": "Quiz",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Any Quiz",
+                                    "value": "any"
+                                }
+                            ],
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "lesson_complete": {
+                    "key": "lesson_complete",
+                    "label": "User completed a lesson",
+                    "hook": "tutor_lesson_completed_after",
+                    "schema": [
+                        {
+                            "key": "lesson_id",
+                            "label": "Lesson",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Any lesson",
+                                    "value": "any"
+                                }
+                            ],
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "quiz_target": {
+                    "key": "quiz_target",
+                    "label": "User achieved target percentage on a quiz",
+                    "hook": "tutor_quiz/attempt_ended",
+                    "schema": [
+                        {
+                            "key": "quiz_id",
+                            "label": "Quiz",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Any Quiz",
+                                    "value": "any"
+                                }
+                            ],
+                            "required": true
+                        },
+                        {
+                            "key": "target_percentage",
+                            "label": "Target Percentage (%)",
+                            "type": "number",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": []
+        },
+        "groundhogg": {
+            "slug": "groundhogg",
+            "name": "Groundhogg",
+            "icon": "",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": {
+                "created_contact": {
+                    "key": "created_contact",
+                    "label": "Created Contact",
+                    "hook": "groundhogg/contact/post_create",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "added_tag": {
+                    "key": "added_tag",
+                    "label": "Tag Added To Contact",
+                    "hook": "groundhogg/contact/tag_applied",
+                    "schema": [
+                        {
+                            "key": "tag_id",
+                            "label": "Tags",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Any Tag",
+                                    "value": "any"
+                                }
+                            ],
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "removed_tag": {
+                    "key": "removed_tag",
+                    "label": "Tag Remove From Contact",
+                    "hook": "groundhogg/contact/tag_removed",
+                    "schema": [
+                        {
+                            "key": "tag_id",
+                            "label": "Tags",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Any Tag",
+                                    "value": "any"
+                                }
+                            ],
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": []
+        },
+        "bricks": {
+            "slug": "bricks",
+            "name": "Bricks",
+            "icon": "",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": {
+                "bricks_form_submit": {
+                    "key": "bricks_form_submit",
+                    "label": "Bricks Form Submitted",
+                    "hook": "bricks/form/custom_action",
+                    "schema": [
+                        {
+                            "key": "form_action",
+                            "label": "Form action",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": []
+        },
+        "elementor": {
+            "slug": "elementor",
+            "name": "Elementor",
+            "icon": "",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": {
+                "elementor_pro/forms/new_record": {
+                    "key": "elementor_pro/forms/new_record",
+                    "label": "Form New Record",
+                    "hook": "elementor_pro/forms/new_record",
+                    "schema": [],
                     "outputs": [
                         "main"
                     ]
