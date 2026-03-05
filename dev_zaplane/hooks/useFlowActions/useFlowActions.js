@@ -61,12 +61,15 @@ export const useFlowActions = ({
             ? sourceNode.position.y
             : sourceNode.position.y + TBGap;
 
+        const isTools= actionData?.mode === 'tools'
+        console.log(isTools,actionData,'a');
+
         const newNode = {
             id: newNodeId,
             type: "custom",
             position: { x: newX, y: newY },
             data: {
-                action: "action",
+                action: isTools ? actionData.app : "action",
                 ...actionData,
             },
         };

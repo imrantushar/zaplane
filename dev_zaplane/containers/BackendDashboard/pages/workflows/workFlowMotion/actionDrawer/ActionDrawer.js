@@ -77,6 +77,7 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
     selectedActionFields,
     values,
   });
+  console.log(selectedItem,'selted item');
 
   const resetAll = () => {
     setMode(null);
@@ -95,6 +96,7 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
     if (step === "configure") {
 
       const payload = {
+        mode:selectedItem.mode,
         app: selectedItem.name,
         name: selectedItem.name,
         event: values.actionType,

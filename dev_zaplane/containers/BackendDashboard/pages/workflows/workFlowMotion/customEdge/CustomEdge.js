@@ -35,6 +35,7 @@ const CustomEdge = ({
 
   if (sourceHandleId === "true") label = "Yes";
   if (sourceHandleId === "false") label = "No";
+  const isFalse = label === "No"
 
   return (
     <g className="zaplane-custom-edge">
@@ -49,21 +50,21 @@ const CustomEdge = ({
       {/* YES / NO LABEL */}
       {label && (
         <foreignObject
-          width={60}
-          height={30}
-          x={centerX - 30}
-          y={centerY - 40}
+          width={30}
+          height={20}
+          x={centerX - -15}
+          y={centerY - 20}
           style={{ overflow: "visible" }}
         >
           <Text
             fontSize="12px"
-            fontWeight="bold"
             textAlign="center"
-            bg="white"
-            borderRadius="md"
-            px="6px"
-            py="2px"
+            bg={isFalse ? "#FEF2F2" : "#defce9"}
+            color={isFalse ? "#ef4444":"#22c55e"}
+            border={`1px solid ${isFalse? '#ef4444': '#22c55e'}`}
+            margin='10px 0 0 0'
             boxShadow="sm"
+            borderRadius='10px'
           >
             {label}
           </Text>

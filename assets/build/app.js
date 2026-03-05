@@ -5403,6 +5403,7 @@ const ActionDrawer = ({
     selectedActionFields,
     values
   });
+  console.log(selectedItem, 'selted item');
   const resetAll = () => {
     setMode(null);
     setStep("select");
@@ -5418,6 +5419,7 @@ const ActionDrawer = ({
     }
     if (step === "configure") {
       const payload = {
+        mode: selectedItem.mode,
         app: selectedItem.name,
         name: selectedItem.name,
         event: values.actionType,
@@ -6085,7 +6087,10 @@ const DrawerModeList = ({
       },
       onClick: () => {
         setMode("tools");
-        setSelectedItem(tool);
+        setSelectedItem({
+          ...tool,
+          mode: "tools"
+        });
       },
       icon: _slack_svg__WEBPACK_IMPORTED_MODULE_3__.ReactComponent
     }, tool.id))]
@@ -7125,6 +7130,7 @@ const CustomEdge = ({
   let label = null;
   if (sourceHandleId === "true") label = "Yes";
   if (sourceHandleId === "false") label = "No";
+  const isFalse = label === "No";
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)("g", {
     className: "zaplane-custom-edge",
     children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("path", {
@@ -7137,22 +7143,22 @@ const CustomEdge = ({
       d: edgePath,
       markerEnd: markerEnd
     }), label && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("foreignObject", {
-      width: 60,
-      height: 30,
-      x: centerX - 30,
-      y: centerY - 40,
+      width: 30,
+      height: 20,
+      x: centerX - -15,
+      y: centerY - 20,
       style: {
         overflow: "visible"
       },
       children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
         fontSize: "12px",
-        fontWeight: "bold",
         textAlign: "center",
-        bg: "white",
-        borderRadius: "md",
-        px: "6px",
-        py: "2px",
+        bg: isFalse ? "#FEF2F2" : "#defce9",
+        color: isFalse ? "#ef4444" : "#22c55e",
+        border: `1px solid ${isFalse ? '#ef4444' : '#22c55e'}`,
+        margin: "10px 0 0 0",
         boxShadow: "sm",
+        borderRadius: "10px",
         children: label
       })
     }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("foreignObject", {
@@ -8824,8 +8830,10 @@ const useActionDrawer = (open, node, source, setFieldValue, isTrigger) => {
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
     if (!open || !node?.data || source === "add") return;
     const detectedItem = _helper__WEBPACK_IMPORTED_MODULE_1__.APPS.concat(_helper__WEBPACK_IMPORTED_MODULE_1__.TOOLS).find(i => i.name === node.data.app || i.id === node.data.app);
+    console.log(detectedItem, 'detectedItem');
     if (detectedItem) {
       setMode(_helper__WEBPACK_IMPORTED_MODULE_1__.TOOLS.includes(detectedItem) ? "tools" : "app");
+      console.log(detectedItem, 'detectedItem');
       setSelectedItem(detectedItem);
     }
     if (node.data.event) setFieldValue("actionType", node.data.event);
@@ -9027,6 +9035,8 @@ const useFlowActions = ({
     const newNodeId = getNewNodeId();
     const newX = layoutLR ? sourceNode.position.x + LRGap : sourceNode.position.x;
     const newY = layoutLR ? sourceNode.position.y : sourceNode.position.y + TBGap;
+    const isTools = actionData?.mode === 'tools';
+    console.log(isTools, actionData, 'a');
     const newNode = {
       id: newNodeId,
       type: "custom",
@@ -9035,7 +9045,7 @@ const useFlowActions = ({
         y: newY
       },
       data: {
-        action: "action",
+        action: isTools ? actionData.app : "action",
         ...actionData
       }
     };
