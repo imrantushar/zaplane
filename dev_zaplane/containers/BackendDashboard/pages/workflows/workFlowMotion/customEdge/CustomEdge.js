@@ -1,10 +1,9 @@
 import React from "react";
-import { getBezierPath, getEdgeCenter, Position } from "@xyflow/react";
-import { HStack, Icon } from "@chakra-ui/react";
+import { getBezierPath, getEdgeCenter } from "@xyflow/react";
+import { HStack, Icon, Text } from "@chakra-ui/react";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import { IoAddSharp } from "react-icons/io5";
 import "./styles.scss";
-
 
 const CustomEdge = ({
   id,
@@ -12,6 +11,7 @@ const CustomEdge = ({
   sourceY,
   targetX,
   targetY,
+  sourceHandleId,
   style = {},
   markerEnd,
   onEdgeDelete,
@@ -30,7 +30,12 @@ const CustomEdge = ({
     targetX,
     targetY,
   });
- 
+
+  let label = null;
+
+  if (sourceHandleId === "true") label = "Yes";
+  if (sourceHandleId === "false") label = "No";
+
   return (
     <g className="zaplane-custom-edge">
       <path
@@ -40,6 +45,30 @@ const CustomEdge = ({
         d={edgePath}
         markerEnd={markerEnd}
       />
+
+      {/* YES / NO LABEL */}
+      {label && (
+        <foreignObject
+          width={60}
+          height={30}
+          x={centerX - 30}
+          y={centerY - 40}
+          style={{ overflow: "visible" }}
+        >
+          <Text
+            fontSize="12px"
+            fontWeight="bold"
+            textAlign="center"
+            bg="white"
+            borderRadius="md"
+            px="6px"
+            py="2px"
+            boxShadow="sm"
+          >
+            {label}
+          </Text>
+        </foreignObject>
+      )}
 
       {/* Delete icon */}
       <foreignObject
@@ -53,7 +82,7 @@ const CustomEdge = ({
         <HStack
           bg="var(--zaplane-background)"
           color="var(--zaplane-font-color)"
-          p='7px'
+          p="7px"
           marginLeft="-20px"
           marginTop="4px"
           borderRadius="full"
@@ -64,47 +93,38 @@ const CustomEdge = ({
           width="30px"
           onClick={() => onEdgeDelete(id)}
         >
-          <Icon
-            height='7px'
-            as={RiDeleteBin5Line}
-            boxSize={4}
-            cursor="pointer"
-
-          />
+          <Icon as={RiDeleteBin5Line} boxSize={4} cursor="pointer" />
         </HStack>
       </foreignObject>
+      {
+        !label && (<>
+          {/* Add node icon */}
+          <foreignObject
+            width={24}
+            height={24}
+            x={centerX - 12}
+            y={centerY + 4}
+            className="zaplane-edge-actions"
+            style={{ overflow: "visible" }}
+          >
+            <HStack
+              bg="var(--zaplane-background)"
+              color="var(--zaplane-font-color)"
+              p="7px"
+              m="-20px 0 0 13px"
+              borderRadius="full"
+              boxShadow="lg"
+              cursor="pointer"
+              pointerEvents="auto"
+              height="30px"
+              width="30px"
+              onClick={() => onAddNode(id)}
+            >
+              <Icon as={IoAddSharp} boxSize={4} cursor="pointer" />
+            </HStack>
+          </foreignObject></>)
+      }
 
-      {/* Add node icon */}
-      <foreignObject
-        width={24}
-        height={24}
-        x={centerX - 12}
-        y={centerY + 4}
-        className="zaplane-edge-actions"
-        style={{ overflow: "visible" }}
-      >
-        <HStack
-          bg="var(--zaplane-background)"
-          color="var(--zaplane-font-color)"
-          p='7px'
-          m='-20px 0 0 13px'
-          borderRadius="full"
-          boxShadow="lg"
-          cursor="pointer"
-          pointerEvents="auto"
-          height="30px"
-          width="30px"
-          onClick={() => onAddNode(id)}
-        >
-          <Icon
-            height='7px'
-            as={IoAddSharp}
-            boxSize={4}
-            cursor="pointer"
-
-          />
-        </HStack>
-      </foreignObject>
     </g>
   );
 };
