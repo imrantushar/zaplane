@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-03-03 04:57:29",
+    "generated_at": "2026-03-05 10:06:11",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -5391,6 +5391,204 @@
                     "label": "Form New Record",
                     "hook": "elementor_pro/forms/new_record",
                     "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": []
+        },
+        "masterstudy": {
+            "slug": "masterstudy",
+            "name": "Masterstudy",
+            "icon": "",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": {
+                "user_enroll_course": {
+                    "key": "user_enroll_course",
+                    "label": "User Is Enrolled In A Course",
+                    "hook": "add_user_course",
+                    "schema": [
+                        {
+                            "key": "course_id",
+                            "label": "Course",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Any course",
+                                    "value": "any"
+                                },
+                                {
+                                    "label": "course 9",
+                                    "value": 51
+                                },
+                                {
+                                    "label": "course 2",
+                                    "value": 61
+                                },
+                                {
+                                    "label": "course 23",
+                                    "value": 65
+                                },
+                                {
+                                    "label": "course 10",
+                                    "value": 69
+                                },
+                                {
+                                    "label": "course 11",
+                                    "value": 73
+                                },
+                                {
+                                    "label": "course 12",
+                                    "value": 77
+                                },
+                                {
+                                    "label": "course 13",
+                                    "value": 80
+                                }
+                            ],
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "course_complete": {
+                    "key": "course_complete",
+                    "label": "User Completed A Course",
+                    "hook": "stm_lms_progress_updated",
+                    "schema": [
+                        {
+                            "key": "course_id",
+                            "label": "Course",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Any course",
+                                    "value": "any"
+                                },
+                                {
+                                    "label": "course 9",
+                                    "value": 51
+                                },
+                                {
+                                    "label": "course 2",
+                                    "value": 61
+                                },
+                                {
+                                    "label": "course 23",
+                                    "value": 65
+                                },
+                                {
+                                    "label": "course 10",
+                                    "value": 69
+                                },
+                                {
+                                    "label": "course 11",
+                                    "value": 73
+                                },
+                                {
+                                    "label": "course 12",
+                                    "value": 77
+                                },
+                                {
+                                    "label": "course 13",
+                                    "value": 80
+                                }
+                            ],
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "lesson_complete": {
+                    "key": "lesson_complete",
+                    "label": "User Completed A Lesson",
+                    "hook": "stm_lms_lesson_passed",
+                    "schema": [
+                        {
+                            "key": "course_id",
+                            "label": "Course",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Any course",
+                                    "value": "any"
+                                },
+                                {
+                                    "label": "course 9",
+                                    "value": 51
+                                },
+                                {
+                                    "label": "course 2",
+                                    "value": 61
+                                },
+                                {
+                                    "label": "course 23",
+                                    "value": 65
+                                },
+                                {
+                                    "label": "course 10",
+                                    "value": 69
+                                },
+                                {
+                                    "label": "course 11",
+                                    "value": 73
+                                },
+                                {
+                                    "label": "course 12",
+                                    "value": 77
+                                },
+                                {
+                                    "label": "course 13",
+                                    "value": 80
+                                }
+                            ],
+                            "required": true
+                        },
+                        {
+                            "key": "lesson_id",
+                            "label": "Lesson",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Any lesson",
+                                    "value": "any"
+                                },
+                                {
+                                    "label": "lesson  2",
+                                    "value": 62
+                                },
+                                {
+                                    "label": "lesson 3",
+                                    "value": 66
+                                },
+                                {
+                                    "label": "lesson 10",
+                                    "value": 70
+                                },
+                                {
+                                    "label": "lesson 11",
+                                    "value": 74
+                                },
+                                {
+                                    "label": "lesson 12",
+                                    "value": 78
+                                },
+                                {
+                                    "label": "lesson 13",
+                                    "value": 81
+                                }
+                            ],
+                            "required": true
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]

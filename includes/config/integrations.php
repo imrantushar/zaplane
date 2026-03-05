@@ -32,6 +32,8 @@ return [
         'groundhogg'           => ['file' => 'groundhogg.php',             'class' => \Zaplane\Integrations\Groundhogg::class],
         'academy'              => ['file' => 'academy.php',                'class' => \Zaplane\Integrations\Academy::class],
         'bricks'               => ['file' => 'bricks.php',                 'class' => \Zaplane\Integrations\Bricks::class],
+        'bricks'               => ['file' => 'bricks.php',                 'class' => \Zaplane\Integrations\Bricks::class],
         'elementor'            => ['file' => 'elementor.php',              'class' => \Zaplane\Integrations\Elementor::class],
+        'masterstudy'            => ['file' => 'masterstudy.php',              'class' => \Zaplane\Integrations\Masterstudy::class],
     ],
 ];
