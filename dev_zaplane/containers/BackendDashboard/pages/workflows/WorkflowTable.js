@@ -62,12 +62,9 @@ const WorkflowTable = () => {
   const columns = [
     {
       name: (
-        <Flex gap="2px" alignItems='center'>
           <Text className="zaplane-label">
             {__("Title", "zaplane")}
           </Text>
-          <Icon as={TableArrow} />
-        </Flex>
       ),
       cell: (row) => (
         <Text
@@ -90,12 +87,10 @@ const WorkflowTable = () => {
     },
     {
       name: (
-        <Flex gap="2px" alignItems='center' justifyContent="center" ml='-32px'>
-          <Text className="zaplane-label">
+          <Text className="zaplane-label" ml='-33px'>
             {__("Created At", "zaplane")}
           </Text>
-          <Icon as={TableArrow} />
-        </Flex>
+         
       ),
       cell: (row) => {
         const { date, time } = formatDateTime(row.created_at);
@@ -114,12 +109,10 @@ const WorkflowTable = () => {
 
     {
       name: (
-        <Flex gap="2px" alignItems='center' justifyContent="center">
           <Text className="zaplane-label">
             {__("Sucess Run", "zaplane")}
           </Text>
-          <Icon as={TableArrow} />
-        </Flex>
+         
       ),
       cell: (row) => (
         <ZAPLabel label={row?.success_runs} type={"simple"} />
@@ -129,12 +122,9 @@ const WorkflowTable = () => {
     },
     {
       name: (
-        <Flex gap="2px" alignItems='center' justifyContent="center" >
           <Text className="zaplane-label">
             {__("Failed Runs", "zaplane")}
           </Text>
-          <Icon as={TableArrow} />
-        </Flex>
       ),
       cell: (row) => (
         <ZAPLabel label={row?.failed_runs} type={"simple"} />
@@ -144,12 +134,10 @@ const WorkflowTable = () => {
     },
     {
       name: (
-        <Flex gap="2px" alignItems='center' justifyContent="center" ml='-32px'>
           <Text className="zaplane-label">
             {__("Status", "zaplane")}
           </Text>
-          <Icon as={TableArrow} />
-        </Flex>
+        
       ),
       cell: (row) => {
         const handleStatusChange = (row, newStatus) => {
