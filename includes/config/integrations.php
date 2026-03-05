@@ -34,6 +34,6 @@ return [
         'bricks'               => ['file' => 'bricks.php',                 'class' => \Zaplane\Integrations\Bricks::class],
         'bricks'               => ['file' => 'bricks.php',                 'class' => \Zaplane\Integrations\Bricks::class],
         'elementor'            => ['file' => 'elementor.php',              'class' => \Zaplane\Integrations\Elementor::class],
-        'masterstudy'            => ['file' => 'masterstudy.php',              'class' => \Zaplane\Integrations\Masterstudy::class],
+        'masterstudy'          => [ 'file' => 'masterstudy.php',          'class' => \Zaplane\Integrations\Masterstudy::class ],
     ],
 ];
