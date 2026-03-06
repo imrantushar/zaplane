@@ -91,7 +91,7 @@ class Masterstudy extends IntegrationBase {
             ];
         }
 
-        if ( in_array( $trigger, ['lesson_complete','lesson_assignment'], true ) ) {
+        if ( $trigger === 'lesson_complete' ) {
             return [
                 [
                     'key'      => 'course_id',
@@ -137,44 +137,24 @@ class Masterstudy extends IntegrationBase {
     }
 
     public static function resolve_trigger( array $node, array $args ) {
+
         switch ( $node['event'] ) {
 
             case 'user_enroll_course':
+                $user_id   = $args[0] ?? 0;
+                $course_id = $args[1] ?? 0; 
 
-    $user_id   = $args[0] ?? 0;
-    $course_id = $args[1] ?? 0;
+                if ( ! $user_id || ! $course_id ) return false;
 
-    if ( ! $user_id || ! $course_id ) return false;
+                $selected_course = $node['data']['config']['course_id'] ?? 'any';
 
-    $selected_course = $node['data']['config']['course_id'] ?? 'any';
+                if ( $selected_course !== 'any' && (int) $selected_course !== (int) $course_id ) return false;
 
-    if ( $selected_course !== 'any' && (int)$selected_course !== (int)$course_id ) {
-        return false;
-    }
-
-    return [
-        'success'   => true,
-        'timestamp' => current_time('mysql'),
-        'data'      => self::resolve_course_payload($user_id, $course_id),
-    ];
-                // $user_id   = $args[0] ?? 0;
-                // $course_id = $args[1] ?? 0;
-                // $assess_list = $args[2] ?? 0;
-                // $remove    = $args[3] ?? null; 
-
-                // if (!$user_id || !$course_id) return false;
-
-                // if (!empty($remove)) return false;
-
-                // $selected_course = $node['data']['config']['course_id'] ?? 'any';
-
-                // if ($selected_course !== 'any' && (int)$selected_course !== (int)$course_id) return false;
-
-                // return [
-                //     'success'   => true,
-                //     'timestamp' => current_time('mysql'),
-                //     'data'      => self::resolve_course_payload($user_id, $course_id),
-                // ];
+                return [
+                    'success'   => true,
+                    'timestamp' => current_time('mysql'),
+                    'data'      => self::resolve_course_payload( $user_id, $course_id ),
+                ];
 
             case 'course_complete':
                 $course_id = $args[0] ?? 0;
@@ -193,8 +173,8 @@ class Masterstudy extends IntegrationBase {
                 ];
 
             case 'lesson_complete':
-                $lesson_id = $args[0] ?? null;
-                $user_id   = $args[1] ?? get_current_user_id();
+                $user_id   = $args[0] ?? 0;
+                $lesson_id = $args[1] ?? 0;
 
                 if ( ! $lesson_id || ! $user_id ) return false;
 
@@ -213,8 +193,8 @@ class Masterstudy extends IntegrationBase {
                     'data' => [
                         'lesson_id'          => $lesson->ID,
                         'lesson_title'       => $lesson->post_title,
-                        'lesson_description' => $lesson->description,
-                        'lesson_url'         => get_permalink($lesson->ID),
+                        'lesson_description' => $lesson->post_content,
+                        'lesson_url'         => get_permalink( $lesson->ID ),
                         'user_id'            => $user_id,
                         'first_name'         => $user->first_name,
                         'last_name'          => $user->last_name,
