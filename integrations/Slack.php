@@ -175,9 +175,6 @@ class Slack extends IntegrationBase {
 		$channel = $node['data']['config']['channel'] ?? '';
 		$text    = $node['data']['config']['text'] ?? '';
 
-		// Variable substitution from input
-		$text = self::substitute_variables( $text, $input );
-
 		$response = wp_remote_post(
 			self::API_BASE_URL . '/chat.postMessage',
 			array(
@@ -219,8 +216,6 @@ class Slack extends IntegrationBase {
 	private static function action_send_dm( array $node, array $input, string $token ): array {
 		$user_id = $node['data']['config']['user_id'] ?? '';
 		$text    = $node['data']['config']['text'] ?? '';
-
-		$text = self::substitute_variables( $text, $input );
 
 		// First, open a DM conversation
 		$dm_response = wp_remote_post(
@@ -483,7 +478,7 @@ class Slack extends IntegrationBase {
 	}
 
 	private static function action_create_channel( array $node, array $input, string $token ): array {
-		$name       = self::substitute_variables( $node['data']['config']['name'] ?? '', $input );
+		$name       = $node['data']['config']['name'] ?? '';
 		$is_private = ( $node['data']['config']['is_private'] ?? 'false' ) === 'true';
 
 		[ $body, $status ] = self::http_post(
@@ -509,8 +504,8 @@ class Slack extends IntegrationBase {
 	}
 
 	private static function action_invite_to_channel( array $node, array $input, string $token ): array {
-		$channel  = self::substitute_variables( $node['data']['config']['channel'] ?? '', $input );
-		$user_ids = self::substitute_variables( $node['data']['config']['user_ids'] ?? '', $input );
+		$channel  = $node['data']['config']['channel'] ?? '';
+		$user_ids = $node['data']['config']['user_ids'] ?? '';
 
 		[ $body ] = self::http_post(
 			self::API_BASE_URL . '/conversations.invite',
@@ -534,8 +529,8 @@ class Slack extends IntegrationBase {
 	}
 
 	private static function action_set_topic( array $node, array $input, string $token ): array {
-		$channel = self::substitute_variables( $node['data']['config']['channel'] ?? '', $input );
-		$topic   = self::substitute_variables( $node['data']['config']['topic']   ?? '', $input );
+		$channel = $node['data']['config']['channel'] ?? '';
+		$topic   = $node['data']['config']['topic']   ?? '';
 
 		[ $body ] = self::http_post(
 			self::API_BASE_URL . '/conversations.setTopic',
@@ -559,8 +554,8 @@ class Slack extends IntegrationBase {
 	}
 
 	private static function action_add_reaction( array $node, array $input, string $token ): array {
-		$channel   = self::substitute_variables( $node['data']['config']['channel']   ?? '', $input );
-		$timestamp = self::substitute_variables( $node['data']['config']['timestamp'] ?? '', $input );
+		$channel   = $node['data']['config']['channel']   ?? '';
+		$timestamp = $node['data']['config']['timestamp'] ?? '';
 		$emoji     = trim( $node['data']['config']['emoji'] ?? '', ':' );
 
 		[ $body ] = self::http_post(
@@ -586,7 +581,7 @@ class Slack extends IntegrationBase {
 	}
 
 	private static function action_get_user_info( array $node, array $input, string $token ): array {
-		$user_id = self::substitute_variables( $node['data']['config']['user_id'] ?? '', $input );
+		$user_id = $node['data']['config']['user_id'] ?? '';
 
 		[ $body ] = self::http_get(
 			self::API_BASE_URL . '/users.info?user=' . rawurlencode( $user_id ),
@@ -690,25 +685,5 @@ class Slack extends IntegrationBase {
 		);
 	}
 
-	private static function substitute_variables( string $text, array $data ): string {
-		return preg_replace_callback(
-			'/\{\{([^}]+)\}\}/',
-			function ( $matches ) use ( $data ) {
-				$key = trim( $matches[1] );
-				$keys = explode( '.', $key );
-				$value = $data;
 
-				foreach ( $keys as $k ) {
-					if ( is_array( $value ) && isset( $value[ $k ] ) ) {
-						$value = $value[ $k ];
-					} else {
-						return $matches[0]; // Return original if not found
-					}
-				}
-
-				return is_scalar( $value ) ? (string) $value : wp_json_encode( $value );
-			},
-			$text
-		);
-	}
 }

@@ -14,13 +14,20 @@ class Expression {
             return null;
         }
 
-        // If not expression, return raw
         if (!str_contains($expr, '{{')) {
             return $expr;
         }
 
-        return preg_replace_callback('/{{(.*?)}}/', function($m) use ($data) {
+        if (preg_match('/^\{\{([^}]+)\}\}$/', trim($expr), $m)) {
             return self::compute(trim($m[1]), $data);
+        }
+
+        return preg_replace_callback('/\{\{(.*?)\}\}/', function($m) use ($data) {
+            $val = self::compute(trim($m[1]), $data);
+            if (is_array($val)) {
+                return implode(', ', array_filter($val, 'is_scalar'));
+            }
+            return $val !== null ? (string) $val : '';
         }, $expr);
     }
 
@@ -28,19 +35,14 @@ class Expression {
      * Compute inside {{ }}
      */
     private static function compute(string $code, array $data) {
-
-        // Replace dot syntax with PHP array access
-        // user.email → $data["user"]["email"]
         $php = preg_replace_callback('/[a-zA-Z0-9_][a-zA-Z0-9_.]*/', function($m) use ($data) {
 
             $key = $m[0];
 
-            // allow true, false, null, numbers
             if (in_array($key, ['true','false','null']) || is_numeric($key)) {
                 return $key;
             }
 
-            // Convert foo.bar.baz → $data["foo"]["bar"]["baz"]
             $parts = explode('.', $key);
             $php = '$data';
 
@@ -53,7 +55,6 @@ class Expression {
         }, $code);
 
         try {
-            // Evaluate safely
             return eval("return {$php};");
         } catch (\Throwable $e) {
             return null;

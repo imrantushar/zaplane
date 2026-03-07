@@ -5,6 +5,7 @@ namespace Zaplane\API;
 use WP_REST_Controller;
 use WP_Error;
 use Zaplane\Framework\Classes\Container;
+use Zaplane\Framework\Classes\Expression;
 use Zaplane\Framework\Core\Automation;
 use Zaplane\Models\Run;
 use Zaplane\Models\NodeRun;
@@ -372,6 +373,8 @@ class RunController extends WP_REST_Controller
                     throw new \Exception("Integration not found: " . ($targetNode['data']['app'] ?? 'unknown'));
                 }
 
+                $targetNode = $this->resolveNodeConfig($targetNode, $effectiveInput);
+
                 $output = $integration::execute_node($targetNode, $effectiveInput);
             }
 
@@ -436,5 +439,32 @@ class RunController extends WP_REST_Controller
                 ],
             ];
         }
+    }
+
+    private function resolveNodeConfig(array $node, array $data): array
+    {
+        if (!isset($node['data']['config']) || !is_array($node['data']['config'])) {
+            return $node;
+        }
+
+        $node['data']['config'] = $this->resolveConfigValues($node['data']['config'], $data);
+
+        return $node;
+    }
+
+    private function resolveConfigValues($value, array $data)
+    {
+        if (is_string($value)) {
+            return Expression::evaluate($value, $data);
+        }
+
+        if (is_array($value)) {
+            foreach ($value as $k => $v) {
+                $value[$k] = $this->resolveConfigValues($v, $data);
+            }
+            return $value;
+        }
+
+        return $value;
     }
 }
