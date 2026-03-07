@@ -317,6 +317,7 @@ const ZAPDrawer = ({
     placement: placement,
     size: size,
     open: open,
+    width: "700px",
     modal: false,
     closeOnInteractOutside: closeOnOverlayClick,
     closeOnOverlayClick: closeOnOverlayClick,
@@ -337,6 +338,7 @@ const ZAPDrawer = ({
         children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.DrawerContent, {
           pointerEvents: "auto",
           mr: "15px",
+          maxWidth: "700px",
           children: [title && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.DrawerHeader, {
             children: [arrowClose && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Icon, {
               as: react_icons_io__WEBPACK_IMPORTED_MODULE_5__.IoIosArrowBack,
@@ -5478,8 +5480,9 @@ const ActionDrawer = ({
     // closeOnOverlayClick
     ,
     title: !mode ? "Add Action" : selectedItem?.name || (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_10__.__)('App', 'zaplane'),
-    placement: "end",
-    size: ["filter", "condition"].includes(values?.actionType) ? "xl" : "md",
+    placement: "end"
+    // size={["filter", "condition"].includes(values?.actionType) ? "xl" : "md"}
+    ,
     footer: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_26__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.HStack, {
       justify: "space-between",
       children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_26__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Button, {

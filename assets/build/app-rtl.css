@@ -1979,12 +1979,14 @@ svg.react-flow__connectionline {
   right: -506px !important;
   position: fixed !important;
   top: 100px;
-  transform: translateX(-1005px) translateY(240px) !important;
+  transform: translateX(-1021px) translateY(145px) !important;
   z-index: 9999;
 }
 .zaplane-popover .components-popover__content {
   padding: 24px;
   width: 100%;
+  max-height: -moz-fit-content !important;
+  max-height: fit-content !important;
 }
 .zaplane-popover .zaplane-popover-inner {
   width: 100%;
@@ -1998,6 +2000,8 @@ svg.react-flow__connectionline {
 .zaplane-popover .zaplane-popover-content {
   font-size: 14px;
   color: var(--zaplane-font-color);
+  max-height: 400px;
+  overflow-y: auto;
 }
 /*!*************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/@wordpress/scripts/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/ConnectionSelector/styles.scss ***!
@@ -2782,9 +2786,7 @@ h2.react-datepicker__current-month {
 /*!****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/@wordpress/scripts/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/ActionFieldRenderer/styles.scss ***!
   \****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
-.variables-popaver {
-  transform: translateX(-1388px) translateY(197px) !important;
-}
+
 /*!******************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/@wordpress/scripts/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/styles.scss ***!
   \******************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
