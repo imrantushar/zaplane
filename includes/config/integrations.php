@@ -33,5 +33,7 @@ return [
         'academy'              => ['file' => 'academy.php',                'class' => \Zaplane\Integrations\Academy::class],
         'bricks'               => ['file' => 'bricks.php',                 'class' => \Zaplane\Integrations\Bricks::class],
         'elementor'            => ['file' => 'elementor.php',              'class' => \Zaplane\Integrations\Elementor::class],
+        'ninjaform'            => ['file' => 'ninjaform.php',              'class' => \Zaplane\Integrations\Ninjaform::class],
+        'fluentform'           => ['file' => 'fluent-form.php',              'class' => \Zaplane\Integrations\FluentForm::class],
     ],
 ];
