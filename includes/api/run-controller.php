@@ -5,6 +5,7 @@ namespace Zaplane\API;
 use WP_REST_Controller;
 use WP_Error;
 use Zaplane\Framework\Classes\Container;
+use Zaplane\Framework\Classes\Expression;
 use Zaplane\Framework\Core\Automation;
 use Zaplane\Models\Run;
 use Zaplane\Models\NodeRun;
@@ -344,7 +345,6 @@ class RunController extends WP_REST_Controller
             'started_at' => current_time('mysql'),
         ]);
 
-        // Inject connection credentials so integrations that require auth can execute.
         $connectionId = $targetNode['data']['connection_id'] ?? null;
         if ($connectionId) {
             try {
@@ -356,13 +356,12 @@ class RunController extends WP_REST_Controller
             }
         }
 
-        // Build context from previous test node runs so {{nodeId.path}} expressions resolve.
         $testContext = [];
         foreach (Run::latestTestNodeRunsByWorkflow($version->workflow_id) as $nodeKey => $nodeRun) {
             $out = $nodeRun->getOutput();
-            $testContext[$nodeKey] = is_array($out) ? $out : ['value' => $out];
+            $testContext[(string) $nodeKey] = is_array($out) ? $out : ['value' => $out];
         }
-        $effectiveInput = array_merge($input, $testContext);
+        $effectiveInput = $input + $testContext;
 
         try {
             if ($targetNode['type'] === 'trigger') {
@@ -373,6 +372,8 @@ class RunController extends WP_REST_Controller
                 if (!$integration) {
                     throw new \Exception("Integration not found: " . ($targetNode['data']['app'] ?? 'unknown'));
                 }
+
+                $targetNode = $this->resolveNodeConfig($targetNode, $effectiveInput);
 
                 $output = $integration::execute_node($targetNode, $effectiveInput);
             }
@@ -438,5 +439,32 @@ class RunController extends WP_REST_Controller
                 ],
             ];
         }
+    }
+
+    private function resolveNodeConfig(array $node, array $data): array
+    {
+        if (!isset($node['data']['config']) || !is_array($node['data']['config'])) {
+            return $node;
+        }
+
+        $node['data']['config'] = $this->resolveConfigValues($node['data']['config'], $data);
+
+        return $node;
+    }
+
+    private function resolveConfigValues($value, array $data)
+    {
+        if (is_string($value)) {
+            return Expression::evaluate($value, $data);
+        }
+
+        if (is_array($value)) {
+            foreach ($value as $k => $v) {
+                $value[$k] = $this->resolveConfigValues($v, $data);
+            }
+            return $value;
+        }
+
+        return $value;
     }
 }

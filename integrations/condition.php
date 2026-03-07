@@ -87,9 +87,11 @@ class Condition extends IntegrationBase {
         $conditions = self::normalizeConditions($rawConditions);
         $result = self::evaluate_condition_group($conditions, $input);
 
+        $directInput = array_filter($input, fn($k) => !ctype_digit((string) $k), ARRAY_FILTER_USE_KEY);
+
         return [
             'port' => $result ? 'true' : 'false',
-            'data' => $input,
+            'data' => $directInput,
         ];
     }
 

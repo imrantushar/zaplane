@@ -4,6 +4,7 @@ namespace Zaplane\Framework\Core;
 
 use Zaplane\Framework\Classes\Container;
 use Zaplane\Framework\Classes\ConnectionManager;
+use Zaplane\Framework\Classes\Expression;
 use Zaplane\Framework\Classes\Query;
 use Zaplane\Framework\Exceptions\WorkflowException;
 use Zaplane\Framework\Exceptions\IntegrationException;
@@ -235,23 +236,30 @@ class Automation
         $node = $this->find_node($graph, $nodeRun->node_key, $run->id);
         $input = $nodeRun->getInput();
 
+        $app = strtolower($node['data']['app'] ?? '');
+
+        // Build full context once — keyed by node_key (string-cast to prevent array_merge renumbering).
+        // Used both for expression resolution in config and for condition/filter evaluation.
+        $context = $this->buildNodeContext($run->id);
+        $resolveData = $input + $context;
+
         try {
             if ($node['type'] === 'trigger') {
                 $output = $input;
-            } elseif ($node['type'] === 'condition' || $node['type'] === 'filter') {
-                $integration = $this->container->get('integrations')->get(strtolower($node['data']['app']));
+            } elseif (in_array($app, ['condition', 'filter'])) {
+                $integration = $this->container->get('integrations')->get($app);
                 if (!$integration) {
                     throw IntegrationException::notFound($node['data']['app']);
                 }
                 $node = $this->inject_credentials($node);
-                $context = $this->buildNodeContext($run->id);
-                $output = $integration::execute_node($node, $context);
+                $output = $integration::execute_node($node, $resolveData);
             } else {
-                $integration = $this->container->get('integrations')->get(strtolower($node['data']['app']));
+                $integration = $this->container->get('integrations')->get($app);
                 if (!$integration) {
                     throw IntegrationException::notFound($node['data']['app']);
                 }
                 $node = $this->inject_credentials($node);
+                $node = $this->resolveNodeConfig($node, $resolveData);
                 $output = $integration::execute_node($node, $input);
             }
 
@@ -323,11 +331,13 @@ class Automation
     {
         $pendingCount = NodeRun::where('run_id', $run_id)
             ->whereIn('status', ['pending', 'running'])
+            ->fresh()
             ->count();
 
         if ($pendingCount == 0) {
             $failedCount = NodeRun::where('run_id', $run_id)
                 ->where('status', 'failed')
+                ->fresh()
                 ->count();
 
             $run = Run::find($run_id);
@@ -348,12 +358,14 @@ class Automation
         $nodeRuns = NodeRun::where('run_id', $run_id)
             ->where('status', 'completed')
             ->orderBy('id', 'asc')
+            ->fresh()
             ->get();
 
         $context = [];
         foreach ($nodeRuns as $nr) {
             $output = $nr->getOutput();
-            $context[$nr->node_key] = is_array($output) ? $output : ['value' => $output];
+            // Cast to string so array_merge() won't renumber integer node keys.
+            $context[(string) $nr->node_key] = is_array($output) ? $output : ['value' => $output];
         }
 
         return $context;
@@ -375,6 +387,37 @@ class Automation
         }
 
         return $node;
+    }
+
+    /**
+     * Recursively resolve all {{expression}} placeholders in a node's config
+     * using the combined input + context data so both {{field}} and {{nodeKey.field}} work.
+     */
+    private function resolveNodeConfig(array $node, array $data): array
+    {
+        if (!isset($node['data']['config']) || !is_array($node['data']['config'])) {
+            return $node;
+        }
+
+        $node['data']['config'] = $this->resolveConfigValues($node['data']['config'], $data);
+
+        return $node;
+    }
+
+    private function resolveConfigValues($value, array $data)
+    {
+        if (is_string($value)) {
+            return Expression::evaluate($value, $data);
+        }
+
+        if (is_array($value)) {
+            foreach ($value as $k => $v) {
+                $value[$k] = $this->resolveConfigValues($v, $data);
+            }
+            return $value;
+        }
+
+        return $value;
     }
 
     private function load_graph(int $versionId): array

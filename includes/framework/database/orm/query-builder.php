@@ -21,6 +21,7 @@ class QueryBuilder
     protected ?string $modelClass = null;
     protected static array $queryCache = [];
     protected static int $maxCacheSize = 100;
+    protected bool $skipCache = false;
 
     public function __construct(string $table)
     {
@@ -303,6 +304,16 @@ class QueryBuilder
         return $this;
     }
 
+    /**
+     * Skip the query cache for this query and always hit the database.
+     * Use for queries on data that changes within a single request (e.g. node run status).
+     */
+    public function fresh(): self
+    {
+        $this->skipCache = true;
+        return $this;
+    }
+
     public function get(): Collection
     {
         global $wpdb;
@@ -313,8 +324,8 @@ class QueryBuilder
         // Create cache key
         $cacheKey = md5($sql . serialize($bindings));
 
-        // Check cache
-        if (isset(self::$queryCache[$cacheKey])) {
+        // Check cache (skip if fresh() was called)
+        if (!$this->skipCache && isset(self::$queryCache[$cacheKey])) {
             return clone self::$queryCache[$cacheKey];
         }
 
@@ -330,12 +341,13 @@ class QueryBuilder
             $collection = new Collection($results ?: []);
         }
 
-        // Store in cache (with size limit)
-        if (count(self::$queryCache) >= self::$maxCacheSize) {
-            // Remove oldest entry (first element)
-            array_shift(self::$queryCache);
+        // Store in cache (skip if fresh() was called — result may change again)
+        if (!$this->skipCache) {
+            if (count(self::$queryCache) >= self::$maxCacheSize) {
+                array_shift(self::$queryCache);
+            }
+            self::$queryCache[$cacheKey] = clone $collection;
         }
-        self::$queryCache[$cacheKey] = clone $collection;
 
         return $collection;
     }
