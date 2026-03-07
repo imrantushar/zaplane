@@ -31,7 +31,7 @@ class Expression {
 
         // Replace dot syntax with PHP array access
         // user.email → $data["user"]["email"]
-        $php = preg_replace_callback('/[a-zA-Z_][a-zA-Z0-9_.]*/', function($m) use ($data) {
+        $php = preg_replace_callback('/[a-zA-Z0-9_][a-zA-Z0-9_.]*/', function($m) use ($data) {
 
             $key = $m[0];
 

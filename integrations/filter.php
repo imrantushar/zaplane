@@ -84,18 +84,205 @@ class Filter extends IntegrationBase {
     /**
      * Execute filter node.
      * Returns 'pass' => true/false. If false, automation engine stops execution.
+     *
+     * Supports array filter mode when any condition uses {{path[].field}} notation.
+     * In that mode, the referenced array is filtered element-by-element and the
+     * filtered result replaces the array in the downstream data.
      */
     public static function execute_node(array $node, array $input): array {
         $config = $node['data']['config'] ?? [];
         $rawConditions = $config['conditions'] ?? $input['conditions'] ?? [];
+
+        // Strip context keys (numeric node IDs) — only original data flows downstream.
+        $directInput = array_filter($input, fn($k) => !ctype_digit((string) $k), ARRAY_FILTER_USE_KEY);
+
+        // Check if any condition uses [] array filter notation.
+        $arrayFilter = self::detectArrayFilter($rawConditions);
+        if ($arrayFilter !== null) {
+            return self::runArrayFilter($arrayFilter, $rawConditions, $input, $directInput);
+        }
+
         $conditions = self::normalizeConditions($rawConditions);
         $result = self::evaluate_condition_group($conditions, $input);
 
         return [
-            'data' => [
-                'pass' => $result
-            ],
+            'pass' => $result,
+            'data' => $directInput,
         ];
+    }
+
+    /**
+     * Detect whether any flat condition uses {{path[].field}} notation.
+     * Returns info array on match, or null if not an array filter.
+     *
+     * Info array:
+     *   'array_path'  => string[]   — segments to reach the array (e.g. ['11','data','users'])
+     *   'field'       => string     — field inside each element (e.g. 'ID')
+     *   'local_key'   => string     — top-level key of directInput that holds the array (e.g. '11')
+     *   'nested_path' => string[]   — path within local_key to the array (e.g. ['data','users'])
+     *   'left_expr'   => string     — original left expression (for non-[] fallback per element)
+     */
+    protected static function detectArrayFilter(array $rawConditions): ?array {
+        // Flatten all leaf conditions from the raw (potentially nested) structure.
+        $leaves = self::flattenConditions($rawConditions);
+
+        foreach ($leaves as $cond) {
+            $left = $cond['left'] ?? '';
+            // Match {{some.path[].field}} — captures everything before [] and the field after.
+            if (preg_match('/\{\{([^}]*)\[\]\.([^}]+)\}\}/', $left, $m)) {
+                $arrayPath  = explode('.', $m[1]);   // e.g. ['11','data','users']
+                $field      = $m[2];                 // e.g. 'ID'
+                $localKey   = $arrayPath[0];         // top-level key in $input
+                $nestedPath = array_slice($arrayPath, 1); // path within that key
+
+                return [
+                    'array_path'  => $arrayPath,
+                    'field'       => $field,
+                    'local_key'   => $localKey,
+                    'nested_path' => $nestedPath,
+                    'left_expr'   => $left,
+                ];
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Recursively flatten nested condition groups to leaf condition objects.
+     */
+    protected static function flattenConditions(array $conditions): array {
+        $leaves = [];
+
+        // Normalized group: has 'logic' and 'conditions' keys.
+        if (isset($conditions['logic']) && isset($conditions['conditions'])) {
+            foreach ($conditions['conditions'] as $cond) {
+                foreach (self::flattenConditions($cond) as $leaf) {
+                    $leaves[] = $leaf;
+                }
+            }
+            return $leaves;
+        }
+
+        // Array of groups (frontend raw format).
+        if (isset($conditions[0]) && is_array($conditions[0])) {
+            foreach ($conditions as $group) {
+                foreach (self::flattenConditions($group) as $leaf) {
+                    $leaves[] = $leaf;
+                }
+            }
+            return $leaves;
+        }
+
+        // Single leaf condition (has 'left' key).
+        if (isset($conditions['left'])) {
+            return [$conditions];
+        }
+
+        return $leaves;
+    }
+
+    /**
+     * Execute array filter mode.
+     * Resolves the array from $input, filters each element by the conditions,
+     * and returns the filtered array as data downstream.
+     */
+    protected static function runArrayFilter(array $info, array $rawConditions, array $input, array $directInput): array {
+        // Resolve the array from the input context.
+        $arr = $input[$info['local_key']] ?? null;
+        foreach ($info['nested_path'] as $seg) {
+            if (!is_array($arr) || !array_key_exists($seg, $arr)) {
+                $arr = null;
+                break;
+            }
+            $arr = $arr[$seg];
+        }
+
+        if (!is_array($arr)) {
+            return ['pass' => false, 'data' => $directInput];
+        }
+
+        $conditions = self::normalizeConditions($rawConditions);
+
+        // Filter each element: replace [] with the element itself for evaluation.
+        $filtered = [];
+        foreach ($arr as $element) {
+            // Build a temporary input where the array slot is replaced by the element,
+            // so {{path[].field}} effectively becomes {{path.field}} for this element.
+            $elementInput = $input;
+            $target = &$elementInput[$info['local_key']];
+            foreach ($info['nested_path'] as $seg) {
+                $target = &$target[$seg];
+            }
+            $target = $element;
+            unset($target);
+
+            // Rewrite conditions: replace {{x[].field}} → {{x.field}} so Expression::evaluate works.
+            $rewritten = self::rewriteArrayExpressions($conditions);
+
+            if (self::evaluate_condition_group($rewritten, $elementInput)) {
+                $filtered[] = $element;
+            }
+        }
+
+        if (empty($filtered)) {
+            return ['pass' => false, 'data' => $directInput];
+        }
+
+        // Write the filtered array back into directInput at the correct nested path.
+        $localKey   = $info['local_key'];
+        $nestedPath = $info['nested_path'];
+
+        // If local_key is a numeric context key (e.g. "11"), the array was pulled from
+        // another node's output. The last segment of nested_path (e.g. "users") is the
+        // key that exists in directInput — replace it with the filtered result.
+        if (ctype_digit((string) $localKey)) {
+            $outputKey = !empty($nestedPath) ? end($nestedPath) : 'items';
+            $data = $directInput;
+            $data[$outputKey] = $filtered;
+        } else {
+            $data = $directInput;
+            if (empty($nestedPath)) {
+                $data[$localKey] = $filtered;
+            } else {
+                if (!isset($data[$localKey]) || !is_array($data[$localKey])) {
+                    $data[$localKey] = [];
+                }
+                $ref = &$data[$localKey];
+                foreach (array_slice($nestedPath, 0, -1) as $seg) {
+                    if (!isset($ref[$seg]) || !is_array($ref[$seg])) {
+                        $ref[$seg] = [];
+                    }
+                    $ref = &$ref[$seg];
+                }
+                $ref[end($nestedPath)] = $filtered;
+                unset($ref);
+            }
+        }
+
+        return ['pass' => true, 'data' => $data];
+    }
+
+    /**
+     * Rewrite {{path[].field}} → {{path.field}} in all condition left/right expressions
+     * so that Expression::evaluate() can resolve them against the per-element input.
+     */
+    protected static function rewriteArrayExpressions(array $group): array {
+        if (isset($group['conditions'])) {
+            $group['conditions'] = array_map(
+                [self::class, 'rewriteArrayExpressions'],
+                $group['conditions']
+            );
+            return $group;
+        }
+
+        // Leaf condition.
+        if (isset($group['left'])) {
+            $group['left']  = preg_replace('/\[\]\./', '.', $group['left']  ?? '');
+            $group['right'] = preg_replace('/\[\]\./', '.', $group['right'] ?? '');
+        }
+
+        return $group;
     }
 
     /**

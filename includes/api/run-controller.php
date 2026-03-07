@@ -344,7 +344,6 @@ class RunController extends WP_REST_Controller
             'started_at' => current_time('mysql'),
         ]);
 
-        // Inject connection credentials so integrations that require auth can execute.
         $connectionId = $targetNode['data']['connection_id'] ?? null;
         if ($connectionId) {
             try {
@@ -356,13 +355,12 @@ class RunController extends WP_REST_Controller
             }
         }
 
-        // Build context from previous test node runs so {{nodeId.path}} expressions resolve.
         $testContext = [];
         foreach (Run::latestTestNodeRunsByWorkflow($version->workflow_id) as $nodeKey => $nodeRun) {
             $out = $nodeRun->getOutput();
-            $testContext[$nodeKey] = is_array($out) ? $out : ['value' => $out];
+            $testContext[(string) $nodeKey] = is_array($out) ? $out : ['value' => $out];
         }
-        $effectiveInput = array_merge($input, $testContext);
+        $effectiveInput = $input + $testContext;
 
         try {
             if ($targetNode['type'] === 'trigger') {

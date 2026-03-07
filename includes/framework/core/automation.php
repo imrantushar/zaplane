@@ -235,19 +235,23 @@ class Automation
         $node = $this->find_node($graph, $nodeRun->node_key, $run->id);
         $input = $nodeRun->getInput();
 
+        $app = strtolower($node['data']['app'] ?? '');
+
         try {
             if ($node['type'] === 'trigger') {
                 $output = $input;
-            } elseif ($node['type'] === 'condition' || $node['type'] === 'filter') {
-                $integration = $this->container->get('integrations')->get(strtolower($node['data']['app']));
+            } elseif (in_array($app, ['condition', 'filter'])) {
+                $integration = $this->container->get('integrations')->get($app);
                 if (!$integration) {
                     throw IntegrationException::notFound($node['data']['app']);
                 }
                 $node = $this->inject_credentials($node);
+                // Merge direct parent input with full run context so both
+                // relative ({{email}}) and absolute ({{nodeKey.field}}) expressions resolve.
                 $context = $this->buildNodeContext($run->id);
-                $output = $integration::execute_node($node, $context);
+                $output = $integration::execute_node($node, $input + $context);
             } else {
-                $integration = $this->container->get('integrations')->get(strtolower($node['data']['app']));
+                $integration = $this->container->get('integrations')->get($app);
                 if (!$integration) {
                     throw IntegrationException::notFound($node['data']['app']);
                 }
@@ -353,7 +357,8 @@ class Automation
         $context = [];
         foreach ($nodeRuns as $nr) {
             $output = $nr->getOutput();
-            $context[$nr->node_key] = is_array($output) ? $output : ['value' => $output];
+            // Cast to string so array_merge() won't renumber integer node keys.
+            $context[(string) $nr->node_key] = is_array($output) ? $output : ['value' => $output];
         }
 
         return $context;
