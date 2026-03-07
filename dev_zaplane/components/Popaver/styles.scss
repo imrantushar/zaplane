@@ -8,13 +8,14 @@
   z-index: 9999;
   left: -506px !important;
   position: fixed !important;
-  top: 100px;  
-  transform: translateX(1005px) translateY(240px) !important;
+  top: 100px;
+  transform: translateX(1021px) translateY(145px) !important;
   z-index: 9999;
 
   .components-popover__content {
     padding: 24px;
     width: 100%;
+    max-height: fit-content !important;
   }
 
   .zaplane-popover-inner {
@@ -32,6 +33,8 @@
   .zaplane-popover-content {
     font-size: 14px;
     color: var(--zaplane-font-color);
+    max-height: 400px;
+    overflow-y: auto;
 
     // p {
     //   margin: 0;
