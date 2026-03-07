@@ -13,43 +13,43 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Workflows extends AbstractAjaxHandler {
 
 	public function __construct() {
-		 $this->actions = [
-			 'update_workflow_status' => [
-				 'callback' => [ $this, 'updateStatus' ],
-				 'capability' => 'manage_options',
-				 'fields' => [
-					 'id' => 'absint',
-					 'status' => 'string',
-				 ],
-			 ],
+		$this->actions = [
+			'update_workflow_status' => [
+				'callback' => [ $this, 'updateStatus' ],
+				'capability' => 'manage_options',
+				'fields' => [
+					'id' => 'absint',
+					'status' => 'string',
+				],
+			],
 
-			 'duplicate_workflow' => [
-				 'callback' => [ $this, 'duplicateWorkflow' ],
-				 'capability' => 'manage_options',
-				 'fields' => [
-					 'id' => 'absint',
-					 'new_title' => 'string',
-				 ],
-			 ],
+			'duplicate_workflow' => [
+				'callback' => [ $this, 'duplicateWorkflow' ],
+				'capability' => 'manage_options',
+				'fields' => [
+					'id' => 'absint',
+					'new_title' => 'string',
+				],
+			],
 
-			 'update_workflow_title' => [
-				 'callback' => [ $this, 'updateWorkflowTitle' ],
-				 'capability' => 'manage_options',
-				 'fields' => [
-					 'id' => 'absint',
-					 'title' => 'string',
-				 ],
-			 ],
+			'update_workflow_title' => [
+				'callback' => [ $this, 'updateWorkflowTitle' ],
+				'capability' => 'manage_options',
+				'fields' => [
+					'id' => 'absint',
+					'title' => 'string',
+				],
+			],
 
-			 'get_workflow_stats' => [
-				 'callback' => [ $this, 'getStats' ],
-				 'capability' => '',
-				 'allow_visitor_action' => true,
-				 'fields' => [
-					 'workflow_id' => 'absint',
-				 ],
-			 ],
-		 ];
+			'get_workflow_stats' => [
+				'callback' => [ $this, 'getStats' ],
+				'capability' => '',
+				'allow_visitor_action' => true,
+				'fields' => [
+					'workflow_id' => 'absint',
+				],
+			],
+		];
 	}
 
 	public function updateStatus( array $payload ) {
@@ -60,7 +60,7 @@ class Workflows extends AbstractAjaxHandler {
 			return new \WP_Error( 'missing_params', __( 'ID and status are required', 'zaplane' ), [ 'code' => 400 ] );
 		}
 
-		if ( ! in_array( $status, [ 'active', 'draft', 'paused' ] ) ) {
+		if ( ! in_array( $status, [ 'active', 'draft', 'paused' ], true ) ) {
 			return new \WP_Error( 'invalid_status', __( 'Invalid status value', 'zaplane' ), [ 'code' => 400 ] );
 		}
 
@@ -74,7 +74,7 @@ class Workflows extends AbstractAjaxHandler {
 		$workflow->status = $status;
 		$workflow->save();
 
-		if ( $previousStatus === 'draft' && $status === 'active' ) {
+		if ( 'draft' === $previousStatus && 'active' === $status ) {
 			$draftVersion = WorkflowVersion::where( 'workflow_id', $id )->where( 'is_active', 1 )->first();
 
 			if ( $draftVersion ) {

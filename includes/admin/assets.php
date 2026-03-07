@@ -37,7 +37,7 @@ class Assets {
 				'route_path'            => wp_parse_url( admin_url(), PHP_URL_PATH ),
 				'plugin_root_url'       => ZAPLANE_PLUGIN_ROOT_URI,
 				'menu'                  => wp_json_encode( Helper::get_admin_menu_list() ),
-				'integrations' => json_decode( file_get_contents( ZAPLANE_ROOT_DIR_PATH . 'assets/json/integrations.json' ), true )
+				'integrations'          => json_decode( file_get_contents( ZAPLANE_ROOT_DIR_PATH . 'assets/json/integrations.json' ), true ) // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
 			]);
 			wp_set_script_translations( 'zaplane-app-scripts', 'zaplane', ZAPLANE_ROOT_DIR_PATH . 'languages/' );
 		}//end if
