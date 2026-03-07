@@ -1,143 +1,145 @@
 <?php
 namespace Zaplane\Integrations;
 
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 use Zaplane\Framework\Classes\IntegrationBase;
 
 class Ninjaform extends IntegrationBase {
 
-    public static function get_slug(): string {
-        return 'ninjaform';
-    }
 
-    public static function get_triggers(): array {
-        return [
-            'process_ninja_form' => [
-                'label' => 'Form Submit', 
-                'hook'  => 'ninja_forms_after_submission'
-            ],
-           
-        ]; 
-    }
+	public static function get_slug(): string {
+		return 'ninjaform';
+	}
 
-    public static function get_trigger_config_schema( string $trigger ): array {
-       if ($trigger !== 'process_ninja_form') {
-            return [];
-            }
+	public static function get_triggers(): array {
+		return [
+			'process_ninja_form' => [
+				'label' => 'Form Submit',
+				'hook'  => 'ninja_forms_after_submission'
+			],
 
-        $options = [
-            [
-                'label' => 'Any Form',
-                'value' => 'any',
-            ],
-        ];
+		];
+	}
 
-        if (function_exists('Ninja_Forms')) {
+	public static function get_trigger_config_schema( string $trigger ): array {
+		if ( $trigger !== 'process_ninja_form' ) {
+			return [];
+		}
 
-            $forms = Ninja_Forms()->form()->get_forms();
+		$options = [
+			[
+				'label' => 'Any Form',
+				'value' => 'any',
+			],
+		];
 
-            if (!empty($forms)) {
-                foreach ($forms as $form) {
-                    $options[] = [
-                        'label' => $form->get_setting('title'),
-                        'value' => $form->get_id(),
-                    ];
-                }
-            }
-        }
+		if ( function_exists( 'Ninja_Forms' ) ) {
+			$forms = Ninja_Forms()->form()->get_forms();
 
-        return [
-            [
-                'key'      => 'form_id',
-                'label'    => 'Form',
-                'type'     => 'select',
-                'options'  => $options,
-                'required' => true,
-            ],
-        ];
-    }
+			if ( ! empty( $forms ) ) {
+				foreach ( $forms as $form ) {
+					$options[] = [
+						'label' => $form->get_setting( 'title' ),
+						'value' => $form->get_id(),
+					];
+				}
+			}
+		}
 
-    private static function resolve_form_payload( $form ): array{
-        if ( ! $form ) {
-            return [];
-        }
+		return [
+			[
+				'key'      => 'form_id',
+				'label'    => 'Form',
+				'type'     => 'select',
+				'options'  => $options,
+				'required' => true,
+			],
+		];
+	}
 
-        $id    = method_exists($form, 'get_id') ? (int) $form->get_id() : 0;
-        $title = method_exists($form, 'get_setting') ? (string) $form->get_setting('title') : '';
+	private static function resolve_form_payload( $form ): array {
+		if ( ! $form ) {
+			return [];
+		}
 
-        return [
-            'id'    => $id,
-            'title' => $title,
-        ];
-    }
+		$id    = method_exists( $form, 'get_id' ) ? (int) $form->get_id() : 0;
+		$title = method_exists( $form, 'get_setting' ) ? (string) $form->get_setting( 'title' ) : '';
 
-    public static function resolve_trigger( array $node, array $args ) {
+		return [
+			'id'    => $id,
+			'title' => $title,
+		];
+	}
 
-        switch ( $node['event'] ) {
+	public static function resolve_trigger( array $node, array $args ) {
 
-            case 'process_ninja_form':
-                $formData = $args[0] ?? null;
-                if ( empty($formData) || !is_array($formData) ) return false;
+		switch ( $node['event'] ) {
+			case 'process_ninja_form':
+				$formData = $args[0] ?? null;
+				if ( empty( $formData ) || ! is_array( $formData ) ) {
+					return false;
+				}
 
-                // Ninja Forms form_id can appear under different keys depending on version/flow.
-                $currentFormId = $formData['form_id']
-                    ?? $formData['id']
-                    ?? ($formData['form']['id'] ?? null)
-                    ?? null;
+				$currentFormId = $formData['form_id']
+					?? $formData['id']
+					?? ( $formData['form']['id'] ?? null )
+					?? null;
 
-                if ( empty($currentFormId) ) return false;
+				if ( empty( $currentFormId ) ) {
+					return false;
+				}
 
-                $config       = $node['data']['config'] ?? [];
-                $requiredForm = $config['form_id'] ?? 'any';
+				$config       = $node['data']['config'] ?? [];
+				$requiredForm = $config['form_id'] ?? 'any';
 
-                if ( $requiredForm !== 'any' && (int) $requiredForm !== (int) $currentFormId ) {
-                    return false;
-                }
+				if ( $requiredForm !== 'any' && (int) $requiredForm !== (int) $currentFormId ) {
+					return false;
+				}
 
-                // Resolve form model (safe)
-                $form = null;
-                if ( function_exists('Ninja_Forms') ) {
-                    $form = Ninja_Forms()->form( (int) $currentFormId );
-                }
+				$form = null;
+				if ( function_exists( 'Ninja_Forms' ) ) {
+					$form = Ninja_Forms()->form( (int) $currentFormId );
+				}
 
-                // Best-effort submission/entry id (varies by setup)
-                $entryId =
-                    $formData['sub_id']
-                    ?? ($formData['extra']['sub_id'] ?? null)
-                    ?? ($formData['submission']['id'] ?? null)
-                    ?? null;
+				$entryId =
+					$formData['sub_id']
+					?? ( $formData['extra']['sub_id'] ?? null )
+					?? ( $formData['submission']['id'] ?? null )
+					?? null;
 
-                return [
-                    'success'   => true,
-                    'entry_id'  => $entryId,
-                    'form_data' => $formData,
-                    'form'      => $form ? self::resolve_form_payload( $form ) : null,
-                ];
-        }
-        return false;
-    }
+				return [
+					'success'   => true,
+					'entry_id'  => $entryId,
+					'form_data' => $formData,
+					'form'      => $form ? self::resolve_form_payload( $form ) : null,
+				];
+		}//end switch
+		return false;
+	}
 
-    public static function get_actions(): array {
-        return [];
-    }
+	public static function get_actions(): array {
+		return [];
+	}
 
-    public static function get_action_config_schema( string $action ): array {
+	public static function get_action_config_schema( string $action ): array {
 
-        $schemas = [];
+		$schemas = [];
 
-        return $schemas[$action] ?? [];
-    }
+		return $schemas[ $action ] ?? [];
+	}
 
-    public static function execute_node( array $node, array $input ): array {
+	public static function execute_node( array $node, array $input ): array {
 
-        $config = $node['data']['config'] ?? [];
+		$config = $node['data']['config'] ?? [];
 
-        switch ( $node['data']['event'] ?? '' ) {
-        }
-        return [
-            'port'=>'main',
-            'data'=>$input
-        ];
-    }
+		switch ( $node['data']['event'] ?? '' ) {
+		}
+		return [
+			'port' => 'main',
+			'data' => $input
+		];
+	}
 }

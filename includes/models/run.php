@@ -5,167 +5,155 @@ namespace Zaplane\Models;
 use Zaplane\Framework\Database\ORM\Model;
 use Zaplane\Framework\Database\ORM\Collection;
 
-if (!defined('ABSPATH')) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
-class Run extends Model
-{
-    protected static string $table = 'runs';
+class Run extends Model {
 
-    protected static array $fillable = [
-        'workflow_version_id',
-        'workflow_id',
-        'target_node_key',
-        'start_node_key',
-        'status',
-        'is_test',
-        'trigger_data',
-        'attempts',
-        'started_at',
-        'finished_at',
-        'last_error',
-    ];
+	protected static string $table = 'runs';
 
-    protected static array $casts = [
-        'id' => 'integer',
-        'workflow_version_id' => 'integer',
-        'workflow_id' => 'integer',
-        'start_node_key' => 'integer',
-        'target_node_key' => 'integer',
-        'attempts' => 'integer',
-        'is_test' => 'boolean',
-        'trigger_data' => 'json',
-    ];
+	protected static array $fillable = [
+		'workflow_version_id',
+		'workflow_id',
+		'target_node_key',
+		'start_node_key',
+		'status',
+		'is_test',
+		'trigger_data',
+		'attempts',
+		'started_at',
+		'finished_at',
+		'last_error',
+	];
 
-    protected static bool $timestamps = false;
-    protected static string $createdAt = 'started_at';
-    protected static string $updatedAt = 'finished_at';
+	protected static array $casts = [
+		'id' => 'integer',
+		'workflow_version_id' => 'integer',
+		'workflow_id' => 'integer',
+		'start_node_key' => 'integer',
+		'target_node_key' => 'integer',
+		'attempts' => 'integer',
+		'is_test' => 'boolean',
+		'trigger_data' => 'json',
+	];
 
-    public function nodeRuns(): Collection
-    {
-        return NodeRun::where('run_id', $this->id)->orderBy('id', 'asc')->get();
-    }
+	protected static bool $timestamps = false;
+	protected static string $createdAt = 'started_at';
+	protected static string $updatedAt = 'finished_at';
 
-    public function workflowVersion(): ?WorkflowVersion
-    {
-        return WorkflowVersion::find($this->workflow_version_id);
-    }
+	public function nodeRuns(): Collection {
+		return NodeRun::where( 'run_id', $this->id )->orderBy( 'id', 'asc' )->get();
+	}
 
-    public function markAsCompleted(): bool
-    {
-        $this->status = 'completed';
-        $this->finished_at = current_time('mysql');
-        return $this->save();
-    }
+	public function workflowVersion(): ?WorkflowVersion {
+		return WorkflowVersion::find( $this->workflow_version_id );
+	}
 
-    public function markAsFailed(string $error): bool
-    {
-        $this->status = 'failed';
-        $this->last_error = $error;
-        $this->finished_at = current_time('mysql');
-        return $this->save();
-    }
+	public function markAsCompleted(): bool {
+		$this->status = 'completed';
+		$this->finished_at = current_time( 'mysql' );
+		return $this->save();
+	}
 
-    public function incrementAttempts(): bool
-    {
-        $this->attempts = ($this->attempts ?? 0) + 1;
-        return $this->save();
-    }
+	public function markAsFailed( string $error ): bool {
+		$this->status = 'failed';
+		$this->last_error = $error;
+		$this->finished_at = current_time( 'mysql' );
+		return $this->save();
+	}
 
-    public function isRunning(): bool
-    {
-        return $this->status === 'running';
-    }
+	public function incrementAttempts(): bool {
+		$this->attempts = ( $this->attempts ?? 0 ) + 1;
+		return $this->save();
+	}
 
-    public function isCompleted(): bool
-    {
-        return $this->status === 'completed';
-    }
+	public function isRunning(): bool {
+		return $this->status === 'running';
+	}
 
-    public function isFailed(): bool
-    {
-        return $this->status === 'failed';
-    }
+	public function isCompleted(): bool {
+		return $this->status === 'completed';
+	}
 
-    public static function running(): Collection
-    {
-        return static::where('status', 'running')->get();
-    }
+	public function isFailed(): bool {
+		return $this->status === 'failed';
+	}
 
-    public static function forWorkflowVersion(int $versionId): Collection
-    {
-        return static::where('workflow_version_id', $versionId)
-            ->orderBy('id', 'desc')
-            ->get();
-    }
+	public static function running(): Collection {
+		return static::where( 'status', 'running' )->get();
+	}
 
-    public static function recent(int $limit = 100): Collection
-    {
-        return static::orderBy('id', 'desc')->limit($limit)->get();
-    }
+	public static function forWorkflowVersion( int $versionId ): Collection {
+		return static::where( 'workflow_version_id', $versionId )
+			->orderBy( 'id', 'desc' )
+			->get();
+	}
 
-    public static function latestTestNodeRuns(int $versionId): array
-    {
-        $testRuns = static::where('workflow_version_id', $versionId)
-            ->where('is_test', 1)
-            ->orderBy('id', 'desc')
-            ->get();
+	public static function recent( int $limit = 100 ): Collection {
+		return static::orderBy( 'id', 'desc' )->limit( $limit )->get();
+	}
 
-        $nodeOutputs = [];
+	public static function latestTestNodeRuns( int $versionId ): array {
+		$testRuns = static::where( 'workflow_version_id', $versionId )
+			->where( 'is_test', 1 )
+			->orderBy( 'id', 'desc' )
+			->get();
 
-        foreach ($testRuns as $run) {
-            $nodeRuns = $run->nodeRuns();
-            foreach ($nodeRuns as $nodeRun) {
-                $key = $nodeRun->node_key;
-                if (!isset($nodeOutputs[$key]) && $nodeRun->isCompleted()) {
-                    $nodeOutputs[$key] = $nodeRun;
-                }
-            }
-        }
+		$nodeOutputs = [];
 
-        return $nodeOutputs;
-    }
+		foreach ( $testRuns as $run ) {
+			$nodeRuns = $run->nodeRuns();
+			foreach ( $nodeRuns as $nodeRun ) {
+				$key = $nodeRun->node_key;
+				if ( ! isset( $nodeOutputs[ $key ] ) && $nodeRun->isCompleted() ) {
+					$nodeOutputs[ $key ] = $nodeRun;
+				}
+			}
+		}
 
-    public static function latestTestNodeRunsByWorkflow(int $workflowId): array
-    {
-        $testRuns = static::where('workflow_id', $workflowId)
-            ->where('is_test', 1)
-            ->orderBy('id', 'desc')
-            ->get();
+		return $nodeOutputs;
+	}
 
-        $nodeOutputs = [];
+	public static function latestTestNodeRunsByWorkflow( int $workflowId ): array {
+		$testRuns = static::where( 'workflow_id', $workflowId )
+			->where( 'is_test', 1 )
+			->orderBy( 'id', 'desc' )
+			->get();
 
-        foreach ($testRuns as $run) {
-            $nodeRuns = $run->nodeRuns();
-            foreach ($nodeRuns as $nodeRun) {
-                $key = $nodeRun->node_key;
-                if (!isset($nodeOutputs[$key]) && $nodeRun->isCompleted()) {
-                    $nodeOutputs[$key] = $nodeRun;
-                }
-            }
-        }
+		$nodeOutputs = [];
 
-        return $nodeOutputs;
-    }
+		foreach ( $testRuns as $run ) {
+			$nodeRuns = $run->nodeRuns();
+			foreach ( $nodeRuns as $nodeRun ) {
+				$key = $nodeRun->node_key;
+				if ( ! isset( $nodeOutputs[ $key ] ) && $nodeRun->isCompleted() ) {
+					$nodeOutputs[ $key ] = $nodeRun;
+				}
+			}
+		}
 
-    public static function latestNodeOutputs(int $versionId): array
-    {
-        $runs = static::where('workflow_version_id', $versionId)
-            ->whereIn('status', ['completed', 'failed', 'running'])
-            ->orderBy('id', 'desc')
-            ->get();
+		return $nodeOutputs;
+	}
 
-        $nodeOutputs = [];
+	public static function latestNodeOutputs( int $versionId ): array {
+		$runs = static::where( 'workflow_version_id', $versionId )
+			->whereIn( 'status', [ 'completed', 'failed', 'running' ] )
+			->orderBy( 'id', 'desc' )
+			->get();
 
-        foreach ($runs as $run) {
-            $nodeRuns = $run->nodeRuns();
-            foreach ($nodeRuns as $nodeRun) {
-                $key = $nodeRun->node_key;
-                if (!isset($nodeOutputs[$key]) && $nodeRun->isCompleted()) {
-                    $nodeOutputs[$key] = $nodeRun;
-                }
-            }
-        }
+		$nodeOutputs = [];
 
-        return $nodeOutputs;
-    }
+		foreach ( $runs as $run ) {
+			$nodeRuns = $run->nodeRuns();
+			foreach ( $nodeRuns as $nodeRun ) {
+				$key = $nodeRun->node_key;
+				if ( ! isset( $nodeOutputs[ $key ] ) && $nodeRun->isCompleted() ) {
+					$nodeOutputs[ $key ] = $nodeRun;
+				}
+			}
+		}
+
+		return $nodeOutputs;
+	}
 }

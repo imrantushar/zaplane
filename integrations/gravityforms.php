@@ -1,90 +1,99 @@
 <?php
 namespace Zaplane\Integrations;
 
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 use Zaplane\Framework\Classes\IntegrationBase;
 use GFFormsModel;
 
 class Gravityforms extends IntegrationBase {
 
-    public static function get_slug(): string {
-        return 'gravityforms';
-    }
 
-    public static function get_triggers(): array {
-        return [
-            'form_submitted' => [
-                'label' => 'Form Submitted',
-                'hook'  => 'gform_after_submission'
-            ],
-        ]; 
-    }
+	public static function get_slug(): string {
+		return 'gravityforms';
+	}
 
-    public static function get_trigger_config_schema( string $trigger ): array {
-        if ( $trigger === 'form_submitted' ) {
-            $options = [
-                [ 'label'=>'Any From','value'=>'any' ],
-            ];
+	public static function get_triggers(): array {
+		return [
+			'form_submitted' => [
+				'label' => 'Form Submitted',
+				'hook'  => 'gform_after_submission'
+			],
+		];
+	}
 
-            if ( class_exists('GFFormsModel') && is_callable( ['GFFormsModel','get_forms'] ) ) {
-                $forms = GFFormsModel::get_forms(1);
-                foreach ( $forms as $form ) {
-                    $options[] = (object) [
-                        'label' => $form->title ?? $form->post_title ?? '',
-                        'value' => $form->id,
-                    ];
-                }
-            }
+	public static function get_trigger_config_schema( string $trigger ): array {
+		if ( $trigger === 'form_submitted' ) {
+			$options = [
+				[
+					'label' => 'Any From',
+					'value' => 'any'
+				],
+			];
 
-            return [
-                [
-                    'key'      => 'form_id',
-                    'label'    => 'Forms',
-                    'type'     => 'select',
-                    'options'  => $options,
-                    'required' => true,
-                ],
-            ];
-        }
-        return [];
-    }
+			if ( class_exists( 'GFFormsModel' ) && is_callable( [ 'GFFormsModel', 'get_forms' ] ) ) {
+				$forms = GFFormsModel::get_forms( 1 );
+				foreach ( $forms as $form ) {
+					$options[] = (object) [
+						'label' => $form->title ?? $form->post_title ?? '',
+						'value' => $form->id,
+					];
+				}
+			}
 
-    protected static function convertkey( array $entry ): array {
-        $result = [];
-        foreach ( $entry  as $key => $value ) {
-            $new_key = str_replace( '.', ':', $key );
-            $result[ $new_key ] = $value;
-        }
-        return $result;
-    }
+			return [
+				[
+					'key'      => 'form_id',
+					'label'    => 'Forms',
+					'type'     => 'select',
+					'options'  => $options,
+					'required' => true,
+				],
+			];
+		}//end if
+		return [];
+	}
 
-    public static function resolve_trigger( array $node, array $args ) {
+	protected static function convertkey( array $entry ): array {
+		$result = [];
+		foreach ( $entry as $key => $value ) {
+			$new_key = str_replace( '.', ':', $key );
+			$result[ $new_key ] = $value;
+		}
+		return $result;
+	}
 
-        switch ( $node['event'] ) {
+	public static function resolve_trigger( array $node, array $args ) {
 
-            case 'form_submitted':
-                $entry = $args[0] ?? null;
-                $form  = $args[1] ?? null;
-                
-                if ( ! $entry || ! $form ) return false;
+		switch ( $node['event'] ) {
+			case 'form_submitted':
+				$entry = $args[0] ?? null;
+				$form  = $args[1] ?? null;
 
-                $form_id = $form['id'] ?? 0;
+				if ( ! $entry || ! $form ) {
+					return false;
+				}
 
-                if ( ! empty( $node['form_id'] ) && $node['form_id'] !== 'any' ) {
-                    if ( (int) $form_id !== (int) $node['form_id'] ) return false;
-                }
+				$form_id = $form['id'] ?? 0;
 
-                $enter_entry = self::convertkey( $entry );
-                $enter_entry['title'] = $form['title'] ?? '';
+				if ( ! empty( $node['form_id'] ) && $node['form_id'] !== 'any' ) {
+					if ( (int) $form_id !== (int) $node['form_id'] ) {
+						return false;
+					}
+				}
 
-                return [
-                    'success'  => true,     
-                    'form_id'  => $form_id,     
-                    'entry_id' => $entry['id'] ?? 0,     
-                    'data'     => $enter_entry,     
-                ];
-        }
-        return false;
-    }
+				$enter_entry = self::convertkey( $entry );
+				$enter_entry['title'] = $form['title'] ?? '';
+
+				return [
+					'success'  => true,
+					'form_id'  => $form_id,
+					'entry_id' => $entry['id'] ?? 0,
+					'data'     => $enter_entry,
+				];
+		}//end switch
+		return false;
+	}
 }

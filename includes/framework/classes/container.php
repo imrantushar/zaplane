@@ -1,34 +1,37 @@
 <?php
 namespace Zaplane\Framework\Classes;
 
-if (!defined('ABSPATH')) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 use Zaplane\Framework\Exceptions\ZaplaneException;
 
 class Container {
 
-    protected array $services = [];
-    protected array $instances = [];
 
-    public function set(string $name, callable $factory): void {
-        $this->services[$name] = $factory;
-    }
+	protected array $services = [];
+	protected array $instances = [];
 
-    public function get(string $name) {
-        if (isset($this->instances[$name])) {
-            return $this->instances[$name];
-        }
+	public function set( string $name, callable $factory ): void {
+		$this->services[ $name ] = $factory;
+	}
 
-        if (!isset($this->services[$name])) {
-            throw new ZaplaneException("Service {$name} not registered.", ['service' => $name]);
-        }
+	public function get( string $name ) {
+		if ( isset( $this->instances[ $name ] ) ) {
+			return $this->instances[ $name ];
+		}
 
-        $this->instances[$name] = ($this->services[$name])($this);
+		if ( ! isset( $this->services[ $name ] ) ) {
+			throw new ZaplaneException( "Service {$name} not registered.", [ 'service' => $name ] );
+		}
 
-        return $this->instances[$name];
-    }
+		$this->instances[ $name ] = ( $this->services[ $name ] )( $this );
 
-    public function has(string $name): bool {
-        return isset($this->services[$name]);
-    }
+		return $this->instances[ $name ];
+	}
+
+	public function has( string $name ): bool {
+		return isset( $this->services[ $name ] );
+	}
 }

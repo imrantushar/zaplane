@@ -5,8 +5,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class Helper { 
-    public static function get_admin_menu_list() {
+class Helper {
+
+	public static function get_admin_menu_list() {
 		$menu                                     = [];
 		$menu[ ZAPLANE_PLUGIN_SLUG ]              = [
 			'parent_slug' => ZAPLANE_PLUGIN_SLUG,
@@ -23,11 +24,7 @@ class Helper {
 			'title'       => __( 'Connections', 'zaplane' ),
 			'capability'  => 'manage_options',
 		];
-		// $menu[ ZAPLANE_PLUGIN_SLUG . '-queue' ] = [
-		// 	'parent_slug' => ZAPLANE_PLUGIN_SLUG,
-		// 	'title'       => __( 'Queue', 'zaplane' ),
-		// 	'capability'  => 'manage_options',
-		// ];
+
 		$menu[ ZAPLANE_PLUGIN_SLUG . '-logs' ] = [
 			'parent_slug' => ZAPLANE_PLUGIN_SLUG,
 			'title'       => __( 'Logs', 'zaplane' ),

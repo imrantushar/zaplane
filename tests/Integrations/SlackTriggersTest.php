@@ -7,12 +7,11 @@ use Zaplane\Integrations\Slack;
 /**
  * Slack Integration - Trigger Tests
  */
-class SlackTriggersTest extends IntegrationTestCase
-{
-    protected function getIntegrationClass(): string
-    {
-        return Slack::class;
-    }
+class SlackTriggersTest extends IntegrationTestCase {
 
-    // Slack has no triggers
+	protected function getIntegrationClass(): string {
+		return Slack::class;
+	}
+
+	// Slack has no triggers
 }

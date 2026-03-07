@@ -7,97 +7,106 @@ use Zaplane\Integrations\Condition;
 /**
  * Condition Tool - Action Tests
  */
-class ConditionActionsTest extends IntegrationTestCase
-{
-    protected function getIntegrationClass(): string
-    {
-        return Condition::class;
-    }
+class ConditionActionsTest extends IntegrationTestCase {
 
-    protected function getActionTests(): array
-    {
-        return [
-            'if' => [
-                'conditions' => [
-                    'logic' => 'AND',
-                    'conditions' => [
-                        ['left' => '{{value}}', 'operator' => '==', 'right' => 'true'],
-                    ],
-                ],
-            ],
-        ];
-    }
+	protected function getIntegrationClass(): string {
+		return Condition::class;
+	}
 
-    protected function setupMockData(): void
-    {
-        // No mock data needed for condition
-    }
+	protected function getActionTests(): array {
+		return [
+			'if' => [
+				'conditions' => [
+					'logic' => 'AND',
+					'conditions' => [
+						[
+							'left' => '{{value}}',
+							'operator' => '==',
+							'right' => 'true'
+						],
+					],
+				],
+			],
+		];
+	}
 
-    /**
-     * @test
-     */
-    public function condition_true_returns_true_port(): void
-    {
-        $node = $this->makeActionNode('if', [
-            'conditions' => [
-                'logic' => 'AND',
-                'conditions' => [
-                    ['left' => '{{value}}', 'operator' => '==', 'right' => 'yes'],
-                ],
-            ],
-        ]);
-        $result = Condition::execute_node($node, ['value' => 'yes']);
+	protected function setupMockData(): void {
+		// No mock data needed for condition
+	}
 
-        $this->assertEquals('true', $result['port']);
-    }
+	/**
+	 * @test
+	 */
+	public function condition_true_returns_true_port(): void {
+		$node = $this->makeActionNode('if', [
+			'conditions' => [
+				'logic' => 'AND',
+				'conditions' => [
+					[
+						'left' => '{{value}}',
+						'operator' => '==',
+						'right' => 'yes'
+					],
+				],
+			],
+		]);
+		$result = Condition::execute_node( $node, [ 'value' => 'yes' ] );
 
-    /**
-     * @test
-     */
-    public function condition_false_returns_false_port(): void
-    {
-        $node = $this->makeActionNode('if', [
-            'conditions' => [
-                'logic' => 'AND',
-                'conditions' => [
-                    ['left' => '{{value}}', 'operator' => '==', 'right' => 'yes'],
-                ],
-            ],
-        ]);
-        $result = Condition::execute_node($node, ['value' => 'no']);
+		$this->assertEquals( 'true', $result['port'] );
+	}
 
-        $this->assertEquals('false', $result['port']);
-    }
+	/**
+	 * @test
+	 */
+	public function condition_false_returns_false_port(): void {
+		$node = $this->makeActionNode('if', [
+			'conditions' => [
+				'logic' => 'AND',
+				'conditions' => [
+					[
+						'left' => '{{value}}',
+						'operator' => '==',
+						'right' => 'yes'
+					],
+				],
+			],
+		]);
+		$result = Condition::execute_node( $node, [ 'value' => 'no' ] );
 
-    /**
-     * @test
-     */
-    public function condition_with_comparison(): void
-    {
-        $node = $this->makeActionNode('if', [
-            'conditions' => [
-                'logic' => 'AND',
-                'conditions' => [
-                    ['left' => '{{count}}', 'operator' => '>', 'right' => '5'],
-                ],
-            ],
-        ]);
+		$this->assertEquals( 'false', $result['port'] );
+	}
 
-        $resultTrue = Condition::execute_node($node, ['count' => 10]);
-        $this->assertEquals('true', $resultTrue['port']);
+	/**
+	 * @test
+	 */
+	public function condition_with_comparison(): void {
+		$node = $this->makeActionNode('if', [
+			'conditions' => [
+				'logic' => 'AND',
+				'conditions' => [
+					[
+						'left' => '{{count}}',
+						'operator' => '>',
+						'right' => '5'
+					],
+				],
+			],
+		]);
 
-        $resultFalse = Condition::execute_node($node, ['count' => 3]);
-        $this->assertEquals('false', $resultFalse['port']);
-    }
+		$resultTrue = Condition::execute_node( $node, [ 'count' => 10 ] );
+		$this->assertEquals( 'true', $resultTrue['port'] );
 
-    /**
-     * @test
-     */
-    public function output_ports_include_true_and_false(): void
-    {
-        $ports = Condition::get_output_ports();
+		$resultFalse = Condition::execute_node( $node, [ 'count' => 3 ] );
+		$this->assertEquals( 'false', $resultFalse['port'] );
+	}
 
-        $this->assertContains('true', $ports);
-        $this->assertContains('false', $ports);
-    }
+	/**
+	 * @test
+	 */
+	public function output_ports_include_true_and_false(): void {
+		$ports = Condition::get_output_ports();
+
+		$this->assertContains( 'true', $ports );
+		$this->assertContains( 'false', $ports );
+	}
 }
