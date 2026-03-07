@@ -77,7 +77,7 @@ class WorkflowVersion extends Model {
 	}
 
 	public static function createFromGraph( int $workflowId, array $graph ): self {
-		$json = json_encode( $graph );
+		$json = wp_json_encode( $graph );
 		$hash = hash( 'sha256', $json );
 
 		return static::create([

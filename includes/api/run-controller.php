@@ -24,7 +24,7 @@ class RunController extends WP_REST_Controller {
 	}
 
 	public function register_routes() {
-		 $ns = 'zaplane/v1';
+		$ns = 'zaplane/v1';
 
 		register_rest_route($ns, '/runs', [
 			'methods' => 'GET',
@@ -91,7 +91,7 @@ class RunController extends WP_REST_Controller {
 	}
 
 	public function permissions() {
-		 return current_user_can( 'manage_options' );
+		return current_user_can( 'manage_options' );
 	}
 
 	public function list_runs( $request ) {
@@ -268,7 +268,7 @@ class RunController extends WP_REST_Controller {
 		$trigger = null;
 
 		foreach ( $graph['nodes'] as $node ) {
-			if ( $node['type'] === 'trigger' ) {
+			if ( 'trigger' === $node['type'] ) {
 				$trigger = $node;
 				break;
 			}
@@ -345,6 +345,7 @@ class RunController extends WP_REST_Controller {
 					->get( 'connections' )
 					->get_execution_credentials( (int) $connectionId );
 			} catch ( \Throwable $e ) {
+				$e->getMessage();
 			}
 		}
 
@@ -356,7 +357,7 @@ class RunController extends WP_REST_Controller {
 		$effectiveInput = $input + $testContext;
 
 		try {
-			if ( $targetNode['type'] === 'trigger' ) {
+			if ( 'trigger' === $targetNode['type'] ) {
 				$output = $input;
 			} else {
 				$integration = $this->container->get( 'integrations' )->get( strtolower( $targetNode['data']['app'] ) );

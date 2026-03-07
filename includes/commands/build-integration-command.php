@@ -47,7 +47,7 @@ class BuildIntegrationCommand extends Command {
 			];
 
 			foreach ( $class::get_triggers() as $key => $trigger ) {
-				if ( $category === 'tool' ) {
+				if ( 'tool' === $category ) {
 					continue;
 				}
 
@@ -78,7 +78,7 @@ class BuildIntegrationCommand extends Command {
 				];
 			}
 
-			if ( $category === 'tool' ) {
+			if ( 'tool' === $category ) {
 				$manifest['tools'][ $slug ] = $integration;
 				$toolCount++;
 				$this->line( "  ✓ {$slug} (tool) - " . count( $integration['actions'] ) . ' actions' );
@@ -108,11 +108,12 @@ class BuildIntegrationCommand extends Command {
 
 		$json = wp_json_encode( $manifest, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES );
 
-		if ( $json === false ) {
+		if ( false === $json ) {
 			$this->error( 'Failed to encode JSON' );
 			return;
 		}
 
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_file_put_contents
 		if ( file_put_contents( $file, $json ) === false ) {
 			$this->error( 'Failed to write integrations.json file' );
 			return;

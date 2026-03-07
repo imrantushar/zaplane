@@ -88,7 +88,7 @@ class IncomingWebhookController extends WP_REST_Controller {
 
 		$parsed = $integration::parse_webhook_event( $request );
 
-		if ( $parsed === null ) {
+		if ( null === $parsed ) {
 			return rest_ensure_response([
 				'received' => true,
 				'action'   => 'skipped',

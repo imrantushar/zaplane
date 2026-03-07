@@ -27,7 +27,7 @@ class ListenerController extends WP_REST_Controller {
 	}
 
 	public function register_routes() {
-		 $ns = 'zaplane/v1';
+		$ns = 'zaplane/v1';
 
 		register_rest_route($ns, '/node-listener/(?P<workflow_id>\d+)', [
 			'methods' => 'GET',
@@ -79,7 +79,7 @@ class ListenerController extends WP_REST_Controller {
 	}
 
 	public function permissions() {
-		 return current_user_can( 'manage_options' );
+		return current_user_can( 'manage_options' );
 	}
 
 	public function start_listener( $req ) {
@@ -119,7 +119,7 @@ class ListenerController extends WP_REST_Controller {
 		$optionName = $this->get_option_name( $workflowId );
 
 		$existingState = $this->get_state_fresh( $optionName );
-		if ( $existingState && $existingState['status'] === 'listening' ) {
+		if ( $existingState && 'listening' === $existingState['status'] ) {
 			$startedAt = strtotime( $existingState['started_at'] ?? '' );
 			if ( $startedAt && ( time() - $startedAt ) < self::LISTENER_TIMEOUT ) {
 				return new WP_Error( 'already_listening', 'Listener is already active for this workflow', [ 'status' => 409 ] );
@@ -155,7 +155,7 @@ class ListenerController extends WP_REST_Controller {
 				];
 			}
 
-			if ( $state['status'] === 'stopped' ) {
+			if ( 'stopped' === $state['status'] ) {
 				$this->cleanup( $optionName, $workflowId );
 				return [
 					'status' => 'stopped',
@@ -165,7 +165,7 @@ class ListenerController extends WP_REST_Controller {
 				];
 			}
 
-			if ( $state['status'] === 'triggered' && $state['data'] !== null ) {
+			if ( 'triggered' === $state['status'] && null !== $state['data'] ) {
 				$triggerData = $state['data'];
 				$this->cleanup( $optionName, $workflowId );
 
@@ -239,7 +239,7 @@ class ListenerController extends WP_REST_Controller {
 
 		return [
 			'status' => $state['status'],
-			'listening' => $state['status'] === 'listening',
+			'listening' => 'listening' === $state['status'],
 			'started_at' => $state['started_at'] ?? null,
 			'hook' => $state['hook'] ?? null,
 			'node_key' => $state['node_key'] ?? null,
@@ -322,7 +322,7 @@ class ListenerController extends WP_REST_Controller {
 			)
 		);
 
-		if ( $value === null ) {
+		if ( null === $value ) {
 			return null;
 		}
 

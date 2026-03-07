@@ -13,12 +13,12 @@ class VariableExtractor {
 	public static function extract( $data, string $prefix = '' ): array {
 
 		if ( ! is_array( $data ) ) {
-			if ( $data === null ) {
+			if ( null === $data ) {
 				return [];
 			}
 			return [
 				[
-					'key' => $prefix ?: 'value',
+					'key' => $prefix ? $prefix : 'value',
 					'type' => self::detectType( $data ),
 					'sample' => self::getSample( $data ),
 				]
@@ -166,7 +166,7 @@ class VariableExtractor {
 
 
 	private static function isHtmlString( string $value ): bool {
-		return $value !== strip_tags( $value );
+		return wp_strip_all_tags( $value ) !== $value;
 	}
 
 

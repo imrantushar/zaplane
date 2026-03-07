@@ -40,6 +40,12 @@
 		</properties>
 	</rule>
 
+	<rule ref="WordPress.NamingConventions.ValidVariableName">
+        <properties>
+            <property name="allowCamelCase" value="true"/>
+        </properties>
+    </rule>
+
 	<rule ref="Generic.Arrays.DisallowShortArraySyntax.Found">
 		<severity>0</severity>
 	</rule>
@@ -83,6 +89,9 @@
 		<exclude name="WordPress.NamingConventions.ValidHookName.NotLowercase" />
 		<exclude name="WordPress.WP.DiscouragedFunctions.wp_reset_query_wp_reset_query" />
 		<exclude name="WordPress.Arrays.CommaAfterArrayItem.NoComma" />
+		<exclude name="WordPress.NamingConventions.ValidVariableName.InterpolatedVariableNotSnakeCase" />
+		<exclude name="WordPress.NamingConventions.ValidVariableName.PropertyNotSnakeCase" />
+		<exclude name="WordPress.NamingConventions.ValidFunctionName.MethodNameInvalid" />
 	</rule>
 
 	<rule ref="WordPress.WP.DeprecatedFunctions">

@@ -68,7 +68,7 @@ class DemoCommand extends Command {
 		$version = WorkflowVersion::create([
 			'workflow_id' => $workflow->id,
 			'graph_json' => $graph,
-			'graph_hash' => hash( 'sha256', json_encode( $graph ) ),
+			'graph_hash' => hash( 'sha256', wp_json_encode( $graph ) ),
 			'is_active' => 1,
 		]);
 

@@ -68,7 +68,7 @@ class IntegrationsController extends WP_REST_Controller {
 	}
 
 	public function get_trigger_schema( $request ) {
-		 $integrationLoader = $this->container->get( 'integrations' );
+		$integrationLoader = $this->container->get( 'integrations' );
 		$integration = $integrationLoader->get( $request['slug'] );
 		if ( ! $integration || ! method_exists( $integration, 'get_trigger_config_schema' ) ) {
 			return [];

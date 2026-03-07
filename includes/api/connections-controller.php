@@ -268,12 +268,12 @@ class ConnectionsController extends WP_REST_Controller {
 		$update_data = [];
 
 		$name = $request->get_param( 'name' );
-		if ( $name !== null ) {
+		if ( null !== $name ) {
 			$update_data['name'] = $name;
 		}
 
 		$status = $request->get_param( 'status' );
-		if ( $status !== null ) {
+		if ( null !== $status ) {
 			$update_data['status'] = $status;
 		}
 
@@ -388,7 +388,7 @@ class ConnectionsController extends WP_REST_Controller {
 			'requires_connection' => $integration::requires_connection(),
 		];
 
-		if ( $main_auth_type === 'both' ) {
+		if ( 'both' === $main_auth_type ) {
 			$response['available_auth_types'] = $integration::get_available_auth_types();
 			$response['auth_fields'] = $integration::get_auth_fields( $auth_type );
 		} else {

@@ -65,7 +65,7 @@ class Connection extends Model {
 	}
 
 	public function setOAuthExpiry( int $expiresIn ): bool {
-		$this->oauth_expires_at = date( 'Y-m-d H:i:s', time() + $expiresIn );
+		$this->oauth_expires_at = gmdate( 'Y-m-d H:i:s', time() + $expiresIn );
 		return $this->save();
 	}
 
@@ -84,7 +84,7 @@ class Connection extends Model {
 	}
 
 	public function isActive(): bool {
-		return $this->status === 'active';
+		return 'active' === $this->status;
 	}
 
 	public function activate(): bool {
@@ -104,7 +104,7 @@ class Connection extends Model {
 	public static function forUser( int $userId, ?string $app = null ): Collection {
 		$query = static::where( 'user_id', $userId );
 
-		if ( $app !== null ) {
+		if ( null !== $app ) {
 			$query->where( 'app', $app );
 		}
 

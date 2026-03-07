@@ -57,15 +57,15 @@ class Workflow extends Model {
 	}
 
 	public function isActive(): bool {
-		return $this->status === 'active';
+		return 'active' === $this->status;
 	}
 
 	public function isPaused(): bool {
-		return $this->status === 'paused';
+		return 'paused' === $this->status;
 	}
 
 	public function isDraft(): bool {
-		return $this->status === 'draft';
+		return 'draft' === $this->status;
 	}
 
 	public static function forUser( int $userId ): Collection {

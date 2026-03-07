@@ -109,26 +109,26 @@ class NodeRun extends Model {
 	}
 
 	public function isPending(): bool {
-		return $this->status === 'pending';
+		return 'pending' === $this->status;
 	}
 
 	public function isRunning(): bool {
-		return $this->status === 'running';
+		return 'running' === $this->status;
 	}
 
 	public function isCompleted(): bool {
-		return $this->status === 'completed';
+		return 'completed' === $this->status;
 	}
 
 	public function isFailed(): bool {
-		return $this->status === 'failed';
+		return 'failed' === $this->status;
 	}
 
 	public function isWaiting(): bool {
-		return $this->status === 'waiting';
+		return 'waiting' === $this->status;
 	}
 
-	public static function pending(): array {
+	public static function pending(): Collection {
 		return static::where( 'status', 'pending' )->get();
 	}
 

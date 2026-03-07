@@ -69,15 +69,15 @@ class Run extends Model {
 	}
 
 	public function isRunning(): bool {
-		return $this->status === 'running';
+		return 'running' === $this->status;
 	}
 
 	public function isCompleted(): bool {
-		return $this->status === 'completed';
+		return 'completed' === $this->status;
 	}
 
 	public function isFailed(): bool {
-		return $this->status === 'failed';
+		return 'failed' === $this->status;
 	}
 
 	public static function running(): Collection {

@@ -25,7 +25,7 @@ class WorkflowsController extends WP_REST_Controller {
 	}
 
 	public function register_routes() {
-		 $namespace = 'zaplane/v1';
+		$namespace = 'zaplane/v1';
 		$rest_base = 'workflows';
 
 		register_rest_route($namespace, '/' . $rest_base, [
@@ -223,7 +223,7 @@ class WorkflowsController extends WP_REST_Controller {
 		$hash    = hash( 'sha256', wp_json_encode( $graph ) );
 		$current = WorkflowVersion::where( 'workflow_id', $workflowId )->where( 'is_active', 1 )->first();
 
-		if ( $workflow->status === 'draft' ) {
+		if ( 'draft' === $workflow->status ) {
 			if ( $current ) {
 				if ( $current->graph_hash === $hash ) {
 					return rest_ensure_response([
@@ -553,7 +553,7 @@ class WorkflowsController extends WP_REST_Controller {
 			}
 
 			$nodeType = $node['type'] ?? '';
-			if ( ! in_array( $nodeType, [ 'action', 'trigger', 'condition', 'filter' ] ) ) {
+			if ( ! in_array( $nodeType, [ 'action', 'trigger', 'condition', 'filter' ], true ) ) {
 				continue;
 			}
 
