@@ -17,7 +17,6 @@ export default function VariablePopover({
   prefix,
 }) {
   const handleClick = (item, variable) => {
-    console.log('iam click');
     const formattedValue = `{{${item.node_id}.${variable.key}}}`;
     if (onSelectVariable) {
       onSelectVariable(formattedValue);

@@ -25,7 +25,7 @@ import { conditionVariables } from "@ZAPRedux/Slices/workFlowSlice/actions/condi
 const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode, workFlow, isFullscreen, nodes, edges }) => {
   const { source, node } = context;
   const dispatch = useDispatch();
-  const { values, setFieldValue, resetForm } = useFormikContext();
+  const { values, setFieldValue, resetForm ,initialValues} = useFormikContext();
   const [step, setStep] = useState("select");
   const isTrigger = node?.data?.action === "trigger" && source === "node";
   const [showWarning, setShowWarning] = useState(false);
@@ -77,17 +77,12 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
     selectedActionFields,
     values,
   });
-
   const resetAll = () => {
     setMode(null);
     setStep("select");
     setSelectedItem(null);
     setSearch("");
-    resetForm({
-      values: {
-        layout: values.layout
-      }
-    })
+    resetForm();
     onClose();
     setShowWarning(false)
   };
