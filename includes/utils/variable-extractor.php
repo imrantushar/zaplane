@@ -129,7 +129,7 @@ class VariableExtractor
     /**
      * Get a sample value for display
      */
-    private static function getSample($value): mixed
+    private static function getSample($value)
     {
         if (is_array($value)) {
             if (empty($value)) {

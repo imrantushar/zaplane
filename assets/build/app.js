@@ -311,13 +311,13 @@ const ZAPDrawer = ({
   open,
   arrowClose,
   isFullscreen = false,
-  arrowOnClick
+  arrowOnClick,
+  maxWidth
 }) => {
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.DrawerRoot, {
     placement: placement,
     size: size,
     open: open,
-    width: "700px",
     modal: false,
     closeOnInteractOutside: closeOnOverlayClick,
     closeOnOverlayClick: closeOnOverlayClick,
@@ -338,7 +338,7 @@ const ZAPDrawer = ({
         children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.DrawerContent, {
           pointerEvents: "auto",
           mr: "15px",
-          maxWidth: "700px",
+          maxWidth: maxWidth,
           children: [title && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.DrawerHeader, {
             children: [arrowClose && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Icon, {
               as: react_icons_io__WEBPACK_IMPORTED_MODULE_5__.IoIosArrowBack,
@@ -2797,17 +2797,19 @@ const ZAPInput = ({
   inputStyle,
   inputRef
 }) => {
-  const textareaRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
-  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
-    if (type === "textarea" && textareaRef.current) {
-      const el = inputRef?.current || textareaRef.current;
-      const minHeight = 35;
-      el.style.height = "0px";
-      const newHeight = Math.max(el.scrollHeight, minHeight);
-      el.style.height = newHeight + "px";
-    }
-  }, [value, type]);
+  // const textareaRef = useRef(null);
+  // useEffect(() => {
+  //   if (type === "textarea" && textareaRef.current) {
+  //     const el = inputRef?.current || textareaRef.current;
+  //     const minHeight = 35;
+  //     el.style.height = "0px";
+  //     const newHeight = Math.max(el.scrollHeight, minHeight);
+  //     el.style.height = newHeight + "px";
+  //   }
+  // }, [value, type]);
+
   const isTextarea = type === "textarea";
+  console.log(isTextarea, 'is');
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Flex, {
     as: "label",
     direction: "column",
@@ -2824,8 +2826,7 @@ const ZAPInput = ({
       placeholder: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_5__.__)(placeholder, "zaplane"),
       value: value,
       onChange: onChange,
-      resize: "none",
-      overflow: "hidden",
+      autoresize: true,
       onKeyDown: onKeyDown,
       ...inputStyle
     }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Input, {
@@ -5485,6 +5486,7 @@ const ActionDrawer = ({
     isFullscreen: isFullscreen,
     onClose: resetAll,
     arrowClose: mode === 'app',
+    maxWidth: "700px",
     arrowOnClick: () => {
       setSelectedItem(null);
       setMode(null);
@@ -5661,6 +5663,7 @@ const ActionFieldRenderer = ({
     case "textarea":
       return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.Fragment, {
         children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_ZAPComponents_ZAPInput__WEBPACK_IMPORTED_MODULE_2__["default"], {
+          type: field.type,
           label: field.label,
           placeholder: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_11__.__)('Type "@" here to add dynamic', 'zaplane'),
           value: value || "",
@@ -6371,8 +6374,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _styles_scss__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./styles.scss */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/ConnectionSelector/styles.scss");
 /* harmony import */ var _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @ZAPUtils/helper */ "./dev_zaplane/utils/helper.js");
 /* harmony import */ var _ZAPComponents_ZAPInput__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! @ZAPComponents/ZAPInput */ "./dev_zaplane/components/ZAPInput/index.js");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__);
+/* harmony import */ var _ZAPRedux_Slices_workFlowSlice_actions_connectionsSlice__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! @ZAPRedux/Slices/workFlowSlice/actions/connectionsSlice */ "./dev_zaplane/redux/Slices/workFlowSlice/actions/connectionsSlice.js");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__);
+
 
 
 
@@ -6390,7 +6395,7 @@ const ConnectionPopaver = props => {
     isOpen,
     onClose,
     appSlug,
-    selectedIntegration
+    onConnected
   } = props;
   const dispatch = (0,react_redux__WEBPACK_IMPORTED_MODULE_3__.useDispatch)();
   const {
@@ -6421,7 +6426,7 @@ const ConnectionPopaver = props => {
             window.removeEventallConnectionener("message", handler);
             popup?.close();
             if (event.data.data?.success) {
-              dispatch((0,_ZAPRedux_Slices_connectionsSlice_connectionsSlice__WEBPACK_IMPORTED_MODULE_4__.fetchConnections)());
+              onConnected?.(res);
               onclose();
             }
           }
@@ -6442,20 +6447,21 @@ const ConnectionPopaver = props => {
         if (action.type === "connections/createTokenConnection/fulfilled") {
           setCredentials({});
           onClose();
+          onConnected?.(action);
         }
         setLoadingOAuth(false);
       });
     }
   };
   const authTypes = authFields?.available_auth_types || {};
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsxs)(_ZAPComponents_Popaver_WPPopover__WEBPACK_IMPORTED_MODULE_1__["default"], {
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)(_ZAPComponents_Popaver_WPPopover__WEBPACK_IMPORTED_MODULE_1__["default"], {
     isOpen: isOpen,
     onClose: onClose,
     title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)("Create New Connection", 'zaplane'),
     prefix: "connection-popaver",
-    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_7__.Flex, {
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_7__.Flex, {
       gap: "24px",
-      children: Object.keys(authTypes).map(key => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_6__.Button, {
+      children: Object.keys(authTypes).map(key => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_6__.Button, {
         width: "45%",
         className: `${selectedAuthType === key && 'zaplane-button-actve'}`,
         variant: selectedAuthType === key ? "solid" : "outline",
@@ -6465,16 +6471,16 @@ const ConnectionPopaver = props => {
         },
         children: (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_12__.formatLabel)(key)
       }, key))
-    }), authFields?.auth_fields && selectedAuthType && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_8__.VStack, {
+    }), authFields?.auth_fields && selectedAuthType && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_8__.VStack, {
       spacing: 3,
       align: "stretch",
       pt: 3,
       children: Object.entries(authFields.auth_fields).map(([fieldKey, field]) => {
         const value = credentials[fieldKey] || "";
-        return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_7__.Flex, {
+        return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_7__.Flex, {
           flexDirection: "column",
           gap: "4px",
-          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsx)(_ZAPComponents_ZAPInput__WEBPACK_IMPORTED_MODULE_13__["default"], {
+          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_ZAPComponents_ZAPInput__WEBPACK_IMPORTED_MODULE_13__["default"], {
             label: field.label,
             type: field.type === "password" ? "password" : "text",
             placeholder: field.placeholder || "",
@@ -6483,7 +6489,7 @@ const ConnectionPopaver = props => {
               ...prev,
               [fieldKey]: e.target.value
             }))
-          }), field.help && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.Text, {
+          }), field.help && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.Text, {
             fontSize: "sm",
             mt: "7px",
             className: "zaplane-sub-title",
@@ -6492,7 +6498,7 @@ const ConnectionPopaver = props => {
           })]
         }, fieldKey);
       })
-    }), selectedAuthType && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_6__.Button, {
+    }), selectedAuthType && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_6__.Button, {
       ..._assets_scss_chakra_recipe__WEBPACK_IMPORTED_MODULE_9__.primaryBtn,
       mt: "16px",
       width: "220px",
@@ -6557,6 +6563,10 @@ const ConnectionSelector = ({
       dispatch((0,_ZAPRedux_Slices_workFlowSlice_actions_connectionsSlice__WEBPACK_IMPORTED_MODULE_7__.fetchConnectionsByApp)(appSlug));
     }
   }, [appSlug, dispatch]);
+  const handleConnected = connection => {
+    dispatch((0,_ZAPRedux_Slices_workFlowSlice_actions_connectionsSlice__WEBPACK_IMPORTED_MODULE_7__.fetchConnectionsByApp)(appSlug));
+    setFieldValue("connection_id", String(connection?.payload?.id));
+  };
   const options = appConnections?.filter(c => c.app === appSlug)?.map(c => ({
     label: c.name,
     value: String(c.id)
@@ -6588,7 +6598,7 @@ const ConnectionSelector = ({
         classNamePrefix: "zaplane-select",
         options: options,
         value: options?.find(o => o.value === values?.connection_id) || null,
-        onChange: val => setFieldValue("connection_id", val.value),
+        onChange: val => setFieldValue("connection_id", val?.value),
         placeholder: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_9__.__)("Select a connection", "zaplane"),
         isClearable: true,
         components: {
@@ -6598,7 +6608,8 @@ const ConnectionSelector = ({
     }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_ConnectionPopaver__WEBPACK_IMPORTED_MODULE_8__["default"], {
       appSlug: appSlug,
       isOpen: isPopoverOpen,
-      onClose: () => setPopoverOpen(false)
+      onClose: () => setPopoverOpen(false),
+      onConnected: handleConnected
     })]
   });
 };
@@ -7893,18 +7904,17 @@ function FlowTopBar({
     updateStatusAndTitle();
   }, [values?.status, values?.title, workFlow, dispatch, id]);
   //listiner
-
-  // useEffect(() => {
-  //   const interval = setInterval(async () => {
-  //     setRefreshing(true);
-
-  //     await dispatch(getRunWorkFlow({ id }));
-
-  //     setRefreshing(false);
-  //   }, 3000);
-
-  //   return () => clearInterval(interval);
-  // }, [dispatch, id]);
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    if (activeDrawer !== "logs") return;
+    const interval = setInterval(async () => {
+      setRefreshing(true);
+      await dispatch((0,_ZAPRedux_Slices_workFlowSlice_actions_workFlowRuns__WEBPACK_IMPORTED_MODULE_17__.getRunWorkFlow)({
+        id
+      }));
+      setRefreshing(false);
+    }, 2000);
+    return () => clearInterval(interval);
+  }, [activeDrawer, dispatch, id]);
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsx)(_ZAPComponents_TopBar__WEBPACK_IMPORTED_MODULE_6__["default"], {
     leftContent: () => {
       var _ref, _values$title;

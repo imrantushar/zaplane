@@ -7,12 +7,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 return [
     'registry' => [
         // tools
-        'condition'            => [ 'file' => 'condition.php',            'class' => \Zaplane\Integrations\Condition::class ],
-        'filter'               => [ 'file' => 'filter.php',               'class' => \Zaplane\Integrations\Filter::class ],
-        'delay'                => [ 'file' => 'delay.php',                'class' => \Zaplane\Integrations\Delay::class ],
-        'pause'                => [ 'file' => 'pause.php',                'class' => \Zaplane\Integrations\Pause::class ],
-        'iterator'             => [ 'file' => 'iterator.php',             'class' => \Zaplane\Integrations\Iterator::class ],
-        'variable'             => [ 'file' => 'variable.php',             'class' => \Zaplane\Integrations\Variable::class ],
+        // 'condition'            => [ 'file' => 'condition.php',            'class' => \Zaplane\Integrations\Condition::class ],
+        // 'filter'               => [ 'file' => 'filter.php',               'class' => \Zaplane\Integrations\Filter::class ],
+        // 'delay'                => [ 'file' => 'delay.php',                'class' => \Zaplane\Integrations\Delay::class ],
+        // 'pause'                => [ 'file' => 'pause.php',                'class' => \Zaplane\Integrations\Pause::class ],
+        // 'iterator'             => [ 'file' => 'iterator.php',             'class' => \Zaplane\Integrations\Iterator::class ],
+        // 'variable'             => [ 'file' => 'variable.php',             'class' => \Zaplane\Integrations\Variable::class ],
+        // 'Http'                 => [ 'file' => 'http.php',                 'class' => \Zaplane\Integrations\Http::class ],
         // apps
         'wordpress'            => [ 'file' => 'wordpress.php',            'class' => \Zaplane\Integrations\Wordpress::class ],
         'woocommerce'          => [ 'file' => 'woocommerce.php',          'class' => \Zaplane\Integrations\woocommerce::class ],
@@ -22,7 +23,6 @@ return [
         'mailchimp'            => [ 'file' => 'mailchimp.php',            'class' => \Zaplane\Integrations\Mailchimp::class ],
         'surecart'             => [ 'file' => 'surecart.php',             'class' => \Zaplane\Integrations\Surecart::class ],
         'storeengine'          => [ 'file' => 'storeengine.php',          'class' => \Zaplane\Integrations\Storeengine::class ],
-        'Http'                 => [ 'file' => 'http.php',                 'class' => \Zaplane\Integrations\Http::class ],
         'webhook'              => [ 'file' => 'webhook.php',              'class' => \Zaplane\Integrations\Webhook::class ],
         'learndash'            => [ 'file' => 'learndash.php',            'class' => \Zaplane\Integrations\Learndash::class ],
         'memberpress'          => [ 'file' => 'memberpress.php',          'class' => \Zaplane\Integrations\Memberpress::class ],
