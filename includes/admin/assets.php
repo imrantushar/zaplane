@@ -15,6 +15,13 @@ class Assets {
         if ( strpos( $hook, '_page_' . ZAPLANE_PLUGIN_SLUG ) !== false ) {
 			remove_all_actions( 'admin_notices' ); 
             $dependencies = include_once ZAPLANE_ASSETS_DIR_PATH  . 'build/app.asset.php';
+            wp_enqueue_style(
+                'zaplane-icon-font',
+                ZAPLANE_ASSETS_URI . 'library/zaplane-icon/style.css',
+                array(),
+                filemtime(ZAPLANE_ASSETS_DIR_PATH . 'library/zaplane-icon/style.css'),
+                'all'
+            );
             wp_enqueue_style('zaplane-app-style', ZAPLANE_ASSETS_URI . 'build/app.css', array('wp-components'), filemtime(ZAPLANE_ASSETS_DIR_PATH . 'build/app.css'), 'all');
 			wp_enqueue_script(
 				'zaplane-app-scripts',
