@@ -2829,18 +2829,18 @@ const syncValue = (editorRef, fieldKey, setFieldValue) => {
   setFieldValue(fieldKey, backendValue);
 };
 // Convert backend text containing {{variables}} into styled HTML variable tags
-const renderVariableHTML = (val, vars) => {
+const renderVariableHTML = (val, vars = []) => {
   if (!val) return "";
   return val.split(/(\s+)/).map(word => {
     const match = word.match(/^{{(.+)}}$/);
     if (match) {
       const key = match[1];
-      const variableObj = vars.flatMap(v => v.variables || []).find(v => v.key === key);
+      const variableObj = (vars || []).flatMap(v => v.variables || []).find(v => v.key === key);
       const displayLabel = variableObj?.label || key;
       return `<span class="zaplane-variable-item" data-variable="${key}">
-          <span class="zaplane-variable-label">${displayLabel}</span>
-          <span class="zaplane-variable-remove">&times;</span>
-        </span>`;
+                    <span class="zaplane-variable-label">${displayLabel}</span>
+                    <span class="zaplane-variable-remove">&times;</span>
+                </span>`;
     }
     return word;
   }).join("");
@@ -2918,17 +2918,26 @@ const VariableEditor = ({
   setFieldValue,
   field,
   variables,
-  label
+  label,
+  placeholder,
+  containerStyle
 }) => {
   const editorRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
   const [isPopoverOpen, setPopoverOpen] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
   const [activeRange, setActiveRange] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(null);
   const [isEmpty, setIsEmpty] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(!value);
+
+  // render value when load/change
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
-    if (editorRef.current && value) {
-      editorRef.current.innerHTML = (0,_helper__WEBPACK_IMPORTED_MODULE_5__.renderVariableHTML)(value, variables);
+    if (editorRef.current) {
+      if (value) {
+        editorRef.current.innerHTML = (0,_helper__WEBPACK_IMPORTED_MODULE_5__.renderVariableHTML)(value, variables);
+      }
+      setIsEmpty(!value || value.trim() === "");
     }
   }, [value, variables]);
+
+  // remove variable
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
     const editor = editorRef.current;
     if (!editor) return;
@@ -2937,41 +2946,58 @@ const VariableEditor = ({
         const span = e.target.parentNode;
         span.remove();
         (0,_helper__WEBPACK_IMPORTED_MODULE_5__.syncValue)(editorRef, field.key, setFieldValue);
+        const text = editor.textContent.trim();
+        setIsEmpty(text === "");
       }
     };
     editor.addEventListener("click", handleRemoveClick);
     return () => editor.removeEventListener("click", handleRemoveClick);
   }, [field.key, setFieldValue]);
+
+  // detect editor empty
   const handleInput = () => {
     if (!editorRef.current) return;
-    setIsEmpty(editorRef.current.textContent.trim() === "");
+    const text = editorRef.current.textContent.trim();
+    setIsEmpty(text === "");
   };
+
+  // open popover when @ typed
   const handleKeyDown = e => {
     if (e.key === "@") {
-      setActiveRange((0,_helper__WEBPACK_IMPORTED_MODULE_5__.saveSelection)());
+      const range = (0,_helper__WEBPACK_IMPORTED_MODULE_5__.saveSelection)();
+      setActiveRange(range);
       setPopoverOpen(true);
       e.preventDefault();
     }
+  };
+
+  // save cursor inside editor
+  const handleCursorSave = () => {
+    const range = (0,_helper__WEBPACK_IMPORTED_MODULE_5__.saveSelection)();
+    setActiveRange(range);
   };
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.Fragment, {
     children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Flex, {
       as: "label",
       direction: "column",
       gap: 2,
+      style: {
+        ...containerStyle
+      },
       children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
         className: "zaplane-label",
         children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)(label, "zaplane")
       }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)("div", {
-        onInput: handleInput,
         ref: editorRef,
+        onInput: handleInput,
         className: `zaplane-variable-editor ${isEmpty ? "zaplane-empty" : ""}`,
         contentEditable: true,
         suppressContentEditableWarning: true,
         onKeyDown: handleKeyDown,
-        onClick: () => setActiveRange((0,_helper__WEBPACK_IMPORTED_MODULE_5__.saveSelection)()),
-        onKeyUp: () => setActiveRange((0,_helper__WEBPACK_IMPORTED_MODULE_5__.saveSelection)()),
+        onClick: handleCursorSave,
+        onKeyUp: handleCursorSave,
         onBlur: () => (0,_helper__WEBPACK_IMPORTED_MODULE_5__.syncValue)(editorRef, field.key, setFieldValue),
-        "data-placeholder": (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Type "@" here to add dynamic', "zaplane")
+        "data-placeholder": placeholder
       })]
     }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_VariablePopover__WEBPACK_IMPORTED_MODULE_4__["default"], {
       isOpen: isPopoverOpen,
@@ -2979,10 +3005,9 @@ const VariableEditor = ({
       onClose: () => setPopoverOpen(false),
       data: variables,
       onSelectVariable: variable => {
-        const range = activeRange;
-        if (!range) return;
+        if (!activeRange) return;
         (0,_helper__WEBPACK_IMPORTED_MODULE_5__.insertVariableAtRange)({
-          range,
+          range: activeRange,
           variableKey: variable.key || variable.replace("{{", "").replace("}}", ""),
           variables,
           editorRef,
@@ -2990,6 +3015,10 @@ const VariableEditor = ({
           setPopoverOpen,
           syncValueFn: () => (0,_helper__WEBPACK_IMPORTED_MODULE_5__.syncValue)(editorRef, field.key, setFieldValue)
         });
+        setTimeout(() => {
+          if (!editorRef.current) return;
+          setIsEmpty(editorRef.current.textContent.trim() === "");
+        }, 0);
       }
     })]
   });
@@ -3207,7 +3236,6 @@ const ZAPInput = ({
       className: "zaplane-label",
       children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_5__.__)(label, "zaplane")
     }), isTextarea ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Textarea, {
-      ref: inputRef || textareaRef,
       className: "zaplane-textarea",
       placeholder: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_5__.__)(placeholder, "zaplane"),
       value: value,
@@ -6002,7 +6030,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _ZAPRedux_Slices_workFlowSlice_actions_conditonVariales__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @ZAPRedux/Slices/workFlowSlice/actions/conditonVariales */ "./dev_zaplane/redux/Slices/workFlowSlice/actions/conditonVariales.js");
 /* harmony import */ var _helper__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./helper */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/ActionFieldRenderer/helper.js");
 /* harmony import */ var _helper__WEBPACK_IMPORTED_MODULE_8___default = /*#__PURE__*/__webpack_require__.n(_helper__WEBPACK_IMPORTED_MODULE_8__);
-/* harmony import */ var _VariablePopaver_VariablePopover__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../VariablePopaver/VariablePopover */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/VariablePopaver/VariablePopover.js");
+Object(function webpackMissingModule() { var e = new Error("Cannot find module '../VariablePopaver/VariablePopover'"); e.code = 'MODULE_NOT_FOUND'; throw e; }());
 /* harmony import */ var _styles_scss__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./styles.scss */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/ActionFieldRenderer/styles.scss");
 /* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
 /* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_11___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_11__);
@@ -6064,7 +6092,8 @@ const ActionFieldRenderer = ({
           setValue: val => setFieldValue(field.key, val),
           variables: workflowVariables?.data || [],
           field: field,
-          setFieldValue: setFieldValue
+          setFieldValue: setFieldValue,
+          placeholder: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_11__.__)('Type "@" here to add dynamic', "zaplane")
         })
       });
     case "date":
@@ -6176,9 +6205,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _helper__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./helper */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/ConditionGroupField/helper.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! react */ "react");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_10___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_10__);
-/* harmony import */ var _VariablePopaver_VariablePopover__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ../VariablePopaver/VariablePopover */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/VariablePopaver/VariablePopover.js");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__);
+Object(function webpackMissingModule() { var e = new Error("Cannot find module '../VariablePopaver/VariablePopover'"); e.code = 'MODULE_NOT_FOUND'; throw e; }());
+/* harmony import */ var _ZAPComponents_VariableEditor__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @ZAPComponents/VariableEditor */ "./dev_zaplane/components/VariableEditor/index.js");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__);
+
 
 
 
@@ -6198,7 +6229,7 @@ function ConditionGroupField({
   const EMPTY_RULE = (0,_helper__WEBPACK_IMPORTED_MODULE_9__.buildEmptyRule)(ruleFields);
   const [isPopoverOpen, setPopoverOpen] = (0,react__WEBPACK_IMPORTED_MODULE_10__.useState)(false);
   const [activeInput, setActiveInput] = (0,react__WEBPACK_IMPORTED_MODULE_10__.useState)(null);
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(formik__WEBPACK_IMPORTED_MODULE_4__.FieldArray, {
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(formik__WEBPACK_IMPORTED_MODULE_4__.FieldArray, {
     name: field.key,
     children: groupHelpers => {
       if (!value || !value.length) {
@@ -6207,36 +6238,36 @@ function ConditionGroupField({
         }]);
       }
       const groups = value || [];
-      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Flex, {
+      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Flex, {
         direction: "column",
         gap: 4,
-        children: [groups.map((group, gIndex) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
-          children: [groups.length > 1 && gIndex !== 0 && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Flex, {
+        children: [groups.map((group, gIndex) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
+          children: [groups.length > 1 && gIndex !== 0 && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Flex, {
             align: "center",
             mb: 3,
-            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
+            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
               flex: "1",
               h: "1px",
               bg: "gray.300"
-            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
+            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
               mx: 3,
               fontSize: "sm",
               children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_8__.__)("OR", "zaplane")
-            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
+            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Box, {
               flex: "1",
               h: "1px",
               bg: "gray.300"
             })]
-          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(formik__WEBPACK_IMPORTED_MODULE_4__.FieldArray, {
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(formik__WEBPACK_IMPORTED_MODULE_4__.FieldArray, {
             name: `${field.key}.${gIndex}`,
-            children: ruleHelpers => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.Fragment, {
-              children: group.map((rule, rIndex) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Flex, {
+            children: ruleHelpers => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.Fragment, {
+              children: group.map((rule, rIndex) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Flex, {
                 gap: 4,
                 align: "flex-start",
                 mb: "15px",
                 children: [ruleFields.map(f => {
                   if (f.type === "select") {
-                    return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_ZAPComponents_ZAPSelect__WEBPACK_IMPORTED_MODULE_7__["default"], {
+                    return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_ZAPComponents_ZAPSelect__WEBPACK_IMPORTED_MODULE_7__["default"], {
                       label: f.label,
                       options: f.options,
                       value: rule[f.key],
@@ -6249,36 +6280,30 @@ function ConditionGroupField({
                       }
                     }, f.key);
                   }
-                  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_ZAPComponents_ZAPInput__WEBPACK_IMPORTED_MODULE_6__["default"], {
-                    type: "textarea",
+                  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_ZAPComponents_VariableEditor__WEBPACK_IMPORTED_MODULE_12__["default"], {
+                    containerStyle: {
+                      width: '30%'
+                    },
                     label: f.label,
+                    placeholder: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_8__.__)('Type "@" here to...', "zaplane"),
                     value: rule[f.key],
-                    placeholder: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_8__.__)('Type "@" here to add dynamic', 'zaplane'),
-                    onChange: e => {
-                      const val = e.target.value;
+                    variables: variables,
+                    field: {
+                      key: `${field.key}.${gIndex}.${rIndex}.${f.key}`
+                    },
+                    setFieldValue: (key, val) => {
                       ruleHelpers.replace(rIndex, {
                         ...rule,
                         [f.key]: val
                       });
-                      if (val.endsWith("@")) {
-                        setActiveInput({
-                          gIndex,
-                          rIndex,
-                          fieldKey: f.key
-                        });
-                        setPopoverOpen(true);
-                      }
-                    },
-                    containerStyle: {
-                      width: "30%"
                     }
-                  }, f.key);
-                }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Flex, {
+                  });
+                }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Flex, {
                   gap: 2,
                   mt: "27px",
                   align: "center",
                   minH: "30px",
-                  children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Button, {
+                  children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Button, {
                     type: "button",
                     height: "34px",
                     bg: "var(--zaplane-secondary)",
@@ -6287,7 +6312,7 @@ function ConditionGroupField({
                       ...EMPTY_RULE
                     }),
                     children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_8__.__)("Add", "zaplane")
-                  }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Button, {
+                  }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Button, {
                     type: "button",
                     variant: "ghost",
                     size: "sm",
@@ -6299,13 +6324,13 @@ function ConditionGroupField({
                         ruleHelpers.remove(rIndex);
                       }
                     },
-                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(react_icons_fi__WEBPACK_IMPORTED_MODULE_5__.FiTrash2, {})
+                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(react_icons_fi__WEBPACK_IMPORTED_MODULE_5__.FiTrash2, {})
                   })]
                 })]
               }, rIndex))
             })
           })]
-        }, gIndex)), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Button, {
+        }, gIndex)), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Button, {
           bg: "var(--zaplane-secondary)",
           color: "var(--zaplane-font-color)",
           size: "sm",
@@ -6315,7 +6340,7 @@ function ConditionGroupField({
             ...EMPTY_RULE
           }]),
           children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_8__.__)("OR Group", "zaplane")
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_VariablePopaver_VariablePopover__WEBPACK_IMPORTED_MODULE_11__["default"], {
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(Object(function webpackMissingModule() { var e = new Error("Cannot find module '../VariablePopaver/VariablePopover'"); e.code = 'MODULE_NOT_FOUND'; throw e; }()), {
           isOpen: isPopoverOpen,
           onClose: () => {
             setPopoverOpen(false);
@@ -7248,187 +7273,6 @@ const TestRun = ({
   });
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (TestRun);
-
-/***/ },
-
-/***/ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/VariablePopaver/VariablePopover.js"
-/*!********************************************************************************************************************************!*\
-  !*** ./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/VariablePopaver/VariablePopover.js ***!
-  \********************************************************************************************************************************/
-(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (/* binding */ VariablePopover)
-/* harmony export */ });
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/text/index.js");
-/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/accordion/accordion.js");
-/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/components/flex/flex.js");
-/* harmony import */ var _ZAPComponents_Popaver_WPPopover__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @ZAPComponents/Popaver/WPPopover */ "./dev_zaplane/components/Popaver/WPPopover.js");
-/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
-/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_5__);
-/* harmony import */ var _helper__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./helper */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/VariablePopaver/helper.js");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__);
-
-
-
-
-
-
-function VariablePopover({
-  isOpen,
-  onClose,
-  data,
-  onSelectVariable,
-  activeInput,
-  groups,
-  groupHelpers,
-  setPopoverOpen,
-  setActiveInput,
-  prefix
-}) {
-  const handleClick = (item, variable) => {
-    const formattedValue = `{{${item.node_id}.${variable.key}}}`;
-    if (onSelectVariable) {
-      onSelectVariable(formattedValue);
-    } else if (activeInput && groups && groupHelpers) {
-      (0,_helper__WEBPACK_IMPORTED_MODULE_6__.insertVariableIntoGroup)({
-        activeInput,
-        groups,
-        groupHelpers,
-        valueToInsert: formattedValue,
-        setPopoverOpen,
-        setActiveInput
-      });
-    }
-  };
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_ZAPComponents_Popaver_WPPopover__WEBPACK_IMPORTED_MODULE_4__["default"], {
-    isOpen: isOpen,
-    onClose: onClose,
-    title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_5__.__)("Insert data for Dynamic content", 'zaplane'),
-    prefix: prefix,
-    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.AccordionRoot, {
-      type: "single",
-      collapsible: true,
-      children: data?.map((item, index) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.AccordionItem, {
-        value: `node-${item.node_id}`,
-        border: "1px solid var(--zaplane-border-color)",
-        borderBottom: index === data.length - 1 ? "1px solid var(--zaplane-border-color)" : "0",
-        borderRadius: index === 0 ? "4px 4px 0 0" : index === data.length - 1 ? "0 0 4px 4px" : "0",
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.AccordionItemTrigger, {
-          px: "12px",
-          py: "10px",
-          bg: "var(--zaplane-body-background)",
-          _focus: {
-            boxShadow: "none",
-            outline: "none"
-          },
-          _focusVisible: {
-            boxShadow: "none",
-            outline: "none"
-          },
-          _expanded: {
-            bg: "var(--zaplane-body-background)"
-          },
-          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Flex, {
-            align: "center",
-            w: "100%",
-            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
-              flex: "1",
-              className: "zaplane-label",
-              children: item.node_name
-            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.AccordionItemIndicator, {})]
-          })
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.AccordionItemContent, {
-          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.AccordionItemBody, {
-            py: "10px",
-            bg: "var(--zaplane-background)",
-            maxH: "200px",
-            overflowY: "auto",
-            children: item.variables?.length > 0 ? item.variables.map((v, vi) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Flex, {
-              p: "8px 15px",
-              alignItems: "center",
-              cursor: "pointer",
-              _hover: {
-                background: "var(--zaplane-body-background)"
-              },
-              onClick: () => handleClick(item, v),
-              children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
-                as: "span",
-                fontSize: "sm",
-                className: "zaplane-label",
-                children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_5__.__)((0,_helper__WEBPACK_IMPORTED_MODULE_6__.formatVariableKey)(v.key), 'zaplane')
-              }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
-                as: "p",
-                m: "0",
-                fontWeight: "400",
-                color: "#64748b",
-                textOverflow: "ellipsis",
-                overflow: "hidden",
-                children: [" : ", (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_5__.__)(v.sample, 'zaplane')]
-              })]
-            }, vi)) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Text, {
-              textAlign: "center",
-              children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_5__.__)("No fields available", 'zaplane')
-            })
-          })
-        })]
-      }, item.node_id))
-    })
-  });
-}
-
-/***/ },
-
-/***/ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/VariablePopaver/helper.js"
-/*!***********************************************************************************************************************!*\
-  !*** ./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/VariablePopaver/helper.js ***!
-  \***********************************************************************************************************************/
-(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   formatVariableKey: () => (/* binding */ formatVariableKey),
-/* harmony export */   insertVariableIntoGroup: () => (/* binding */ insertVariableIntoGroup)
-/* harmony export */ });
-const insertVariableIntoGroup = ({
-  activeInput,
-  groups,
-  groupHelpers,
-  valueToInsert,
-  setPopoverOpen,
-  setActiveInput
-}) => {
-  if (!activeInput) return;
-  const {
-    gIndex,
-    rIndex,
-    fieldKey
-  } = activeInput;
-  const newGroups = [...groups];
-  const currentRule = newGroups[gIndex][rIndex];
-  let baseValue = currentRule[fieldKey] || "";
-  if (baseValue.endsWith("@")) baseValue = baseValue.slice(0, -1);
-
-  // Append selected variable remove space " "
-  const newValue = baseValue ? `${baseValue}${valueToInsert}` : valueToInsert;
-  newGroups[gIndex][rIndex] = {
-    ...currentRule,
-    [fieldKey]: newValue
-  };
-  groupHelpers.replace(gIndex, newGroups[gIndex]);
-  setPopoverOpen(false);
-  setActiveInput(null);
-};
-const formatVariableKey = key => {
-  if (!key) return "";
-  return key.split(".").pop().replace(/\[\]/g, "").replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
-};
 
 /***/ },
 

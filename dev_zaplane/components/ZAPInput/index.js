@@ -34,7 +34,6 @@ const ZAPInput = ({
       </Text>
       {isTextarea ? (
         <Textarea
-          ref={inputRef || textareaRef}
           className="zaplane-textarea"
           placeholder={__(placeholder, "zaplane")}
           value={value}

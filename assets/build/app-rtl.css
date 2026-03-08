@@ -2782,10 +2782,6 @@ h2.react-datepicker__current-month {
   margin-top: -0.7em;
 }
 
-/*!****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/@wordpress/scripts/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/ActionFieldRenderer/styles.scss ***!
-  \****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
-
 /*!**********************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/@wordpress/scripts/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./dev_zaplane/components/VariableEditor/styles.scss ***!
   \**********************************************************************************************************************************************************************************************************************************************************************************************************/
@@ -2796,13 +2792,9 @@ h2.react-datepicker__current-month {
   padding: 8px;
   white-space: pre-wrap;
   word-break: break-word;
+  position: relative;
 }
-.zaplane-variable-editor[data-placeholder]:empty::before {
-  content: attr(data-placeholder);
-  color: #A0AEC0;
-  pointer-events: none;
-  display: block;
-}
+
 .zaplane-variable-item {
   display: inline-flex;
   align-items: center;
@@ -2811,22 +2803,29 @@ h2.react-datepicker__current-month {
   padding: 0 4px;
   margin: 0 2px;
 }
+
 .zaplane-variable-remove {
   cursor: pointer;
   margin-right: 4px;
   font-weight: bold;
 }
+
 .zaplane-variable-label {
   -webkit-user-select: none;
      -moz-user-select: none;
           user-select: none;
 }
+
 .zaplane-variable-editor.zaplane-empty::before {
   content: attr(data-placeholder);
   color: #A0AEC0;
   pointer-events: none;
   display: block;
 }
+/*!****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/@wordpress/scripts/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/ActionFieldRenderer/styles.scss ***!
+  \****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+
 /*!******************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/@wordpress/scripts/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/styles.scss ***!
   \******************************************************************************************************************************************************************************************************************************************************************************************************************************************************/

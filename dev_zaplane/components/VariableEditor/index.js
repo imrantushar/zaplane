@@ -9,21 +9,25 @@ import {
   renderVariableHTML,
   insertVariableAtRange,
 } from "./helper";
-import './styles.scss';
+import "./styles.scss";
 
-
-const VariableEditor = ({ value, setFieldValue, field, variables, label }) => {
+const VariableEditor = ({ value, setFieldValue, field, variables, label,placeholder,containerStyle}) => {
   const editorRef = useRef(null);
   const [isPopoverOpen, setPopoverOpen] = useState(false);
   const [activeRange, setActiveRange] = useState(null);
   const [isEmpty, setIsEmpty] = useState(!value);
 
+  // render value when load/change
   useEffect(() => {
-    if (editorRef.current && value) {
-      editorRef.current.innerHTML = renderVariableHTML(value, variables);
+    if (editorRef.current) {
+      if (value) {
+        editorRef.current.innerHTML = renderVariableHTML(value, variables);
+      }
+      setIsEmpty(!value || value.trim() === "");
     }
   }, [value, variables]);
 
+  // remove variable
   useEffect(() => {
     const editor = editorRef.current;
     if (!editor) return;
@@ -32,7 +36,11 @@ const VariableEditor = ({ value, setFieldValue, field, variables, label }) => {
       if (e.target.classList.contains("zaplane-variable-remove")) {
         const span = e.target.parentNode;
         span.remove();
+
         syncValue(editorRef, field.key, setFieldValue);
+
+        const text = editor.textContent.trim();
+        setIsEmpty(text === "");
       }
     };
 
@@ -40,35 +48,45 @@ const VariableEditor = ({ value, setFieldValue, field, variables, label }) => {
     return () => editor.removeEventListener("click", handleRemoveClick);
   }, [field.key, setFieldValue]);
 
-
+  // detect editor empty
   const handleInput = () => {
     if (!editorRef.current) return;
-    setIsEmpty(editorRef.current.textContent.trim() === "");
+    const text = editorRef.current.textContent.trim();
+    setIsEmpty(text === "");
   };
 
+  // open popover when @ typed
   const handleKeyDown = (e) => {
     if (e.key === "@") {
-      setActiveRange(saveSelection());
+      const range = saveSelection();
+      setActiveRange(range);
       setPopoverOpen(true);
       e.preventDefault();
     }
   };
 
+  // save cursor inside editor
+  const handleCursorSave = () => {
+    const range = saveSelection();
+    setActiveRange(range);
+  };
+
   return (
     <>
-      <Flex as="label" direction="column" gap={2}>
+      <Flex as="label" direction="column" gap={2} style={{...containerStyle}}>
         <Text className="zaplane-label">{__(label, "zaplane")}</Text>
+
         <div
-          onInput={handleInput}
           ref={editorRef}
+          onInput={handleInput}
           className={`zaplane-variable-editor ${isEmpty ? "zaplane-empty" : ""}`}
           contentEditable
           suppressContentEditableWarning
           onKeyDown={handleKeyDown}
-          onClick={() => setActiveRange(saveSelection())}
-          onKeyUp={() => setActiveRange(saveSelection())}
+          onClick={handleCursorSave}
+          onKeyUp={handleCursorSave}
           onBlur={() => syncValue(editorRef, field.key, setFieldValue)}
-          data-placeholder={__('Type "@" here to add dynamic', "zaplane")}
+          data-placeholder={placeholder}
         />
       </Flex>
 
@@ -78,17 +96,25 @@ const VariableEditor = ({ value, setFieldValue, field, variables, label }) => {
         onClose={() => setPopoverOpen(false)}
         data={variables}
         onSelectVariable={(variable) => {
-          const range = activeRange;
-          if (!range) return;
+          if (!activeRange) return;
+
           insertVariableAtRange({
-            range,
-            variableKey: variable.key || variable.replace("{{", "").replace("}}", ""),
+            range: activeRange,
+            variableKey:
+              variable.key ||
+              variable.replace("{{", "").replace("}}", ""),
             variables,
             editorRef,
             setActiveRange,
             setPopoverOpen,
-            syncValueFn: () => syncValue(editorRef, field.key, setFieldValue),
+            syncValueFn: () =>
+              syncValue(editorRef, field.key, setFieldValue),
           });
+
+          setTimeout(() => {
+            if (!editorRef.current) return;
+            setIsEmpty(editorRef.current.textContent.trim() === "");
+          }, 0);
         }}
       />
     </>

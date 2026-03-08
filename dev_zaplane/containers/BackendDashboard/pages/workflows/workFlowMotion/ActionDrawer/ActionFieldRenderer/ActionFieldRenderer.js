@@ -57,6 +57,7 @@ const ActionFieldRenderer = ({
             variables={workflowVariables?.data || []}
             field={field}
             setFieldValue={setFieldValue}
+            placeholder={__('Type "@" here to add dynamic', "zaplane")}
           />
         </>
       );

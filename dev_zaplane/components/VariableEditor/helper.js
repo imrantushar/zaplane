@@ -59,20 +59,25 @@ export const syncValue = (editorRef, fieldKey, setFieldValue) => {
     setFieldValue(fieldKey, backendValue);
 };
 // Convert backend text containing {{variables}} into styled HTML variable tags
-export const renderVariableHTML = (val, vars) => {
+export const renderVariableHTML = (val, vars = []) => {
     if (!val) return "";
+
     return val
         .split(/(\s+)/)
         .map((word) => {
             const match = word.match(/^{{(.+)}}$/);
             if (match) {
                 const key = match[1];
-                const variableObj = vars.flatMap((v) => v.variables || []).find((v) => v.key === key);
+                const variableObj = (vars || [])
+                    .flatMap((v) => v.variables || [])
+                    .find((v) => v.key === key);
+
                 const displayLabel = variableObj?.label || key;
+
                 return `<span class="zaplane-variable-item" data-variable="${key}">
-          <span class="zaplane-variable-label">${displayLabel}</span>
-          <span class="zaplane-variable-remove">&times;</span>
-        </span>`;
+                    <span class="zaplane-variable-label">${displayLabel}</span>
+                    <span class="zaplane-variable-remove">&times;</span>
+                </span>`;
             }
             return word;
         })
