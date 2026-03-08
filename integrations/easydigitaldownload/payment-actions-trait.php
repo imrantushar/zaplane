@@ -11,7 +11,7 @@ trait PaymentActionsTrait {
 		$payment_id = (int) ( $config['payment_id'] ?? 0 );
 		$status = $config['status'] ?? '';
 
-		if ( ! $payment_id || $status === '' ) {
+		if ( ! $payment_id || '' === $status ) {
 			return self::action_error( 'Payment ID and status are required', $input );
 		}
 
@@ -40,7 +40,7 @@ trait PaymentActionsTrait {
 		$payment_id = (int) ( $config['payment_id'] ?? 0 );
 		$note = trim( $config['note'] ?? '' );
 
-		if ( ! $payment_id || $note === '' ) {
+		if ( ! $payment_id || '' === $note ) {
 			return self::action_error( 'Payment ID and note are required', $input );
 		}
 

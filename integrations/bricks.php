@@ -81,11 +81,6 @@ class Bricks extends IntegrationBase {
 	}
 
 	public static function execute_node( array $node, array $input ): array {
-
-		$config = $node['data']['config'] ?? [];
-
-		switch ( $node['data']['event'] ?? '' ) {
-		}
 		return [
 			'port' => 'main',
 			'data' => $input

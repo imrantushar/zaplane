@@ -39,7 +39,7 @@ trait CustomerActionsTrait {
 
 	private static function action_get_customer_by_email( array $config, array $input ): array {
 		$email = $config['email'] ?? '';
-		if ( $email === '' ) {
+		if ( '' === $email ) {
 			return self::error( 'Email is required' );
 		}
 		$customer_id = self::get_customer_id_by_email( $email );
@@ -57,7 +57,7 @@ trait CustomerActionsTrait {
 
 	private static function action_create_customer( array $config, array $input ): array {
 		$email = $config['email'] ?? '';
-		if ( $email === '' ) {
+		if ( '' === $email ) {
 			return self::error( 'Email is required' );
 		}
 		$username = $config['username'] ?? '';
@@ -66,7 +66,7 @@ trait CustomerActionsTrait {
 		if ( function_exists( 'wc_create_new_customer' ) ) {
 			$user_id = wc_create_new_customer( $email, $username, $password );
 		} else {
-			$user_id = wp_create_user( $username ?: $email, $password ?: wp_generate_password(), $email );
+			$user_id = wp_create_user( $username ? $username : $email, $password ? $password : wp_generate_password(), $email );
 		}
 
 		if ( is_wp_error( $user_id ) ) {

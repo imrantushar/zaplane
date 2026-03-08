@@ -13,7 +13,7 @@ trait DiscountActionsTrait {
 		$amount = $config['amount'] ?? '';
 		$type = $config['type'] ?? 'percent';
 
-		if ( $name === '' || $code === '' || $amount === '' ) {
+		if ( '' === $name || '' === $code || '' === $amount ) {
 			return self::action_error( 'Discount name, code, and amount are required', $input );
 		}
 

@@ -29,6 +29,7 @@ class Trello extends IntegrationBase {
 
 	public static function execute_node( array $node, array $input ): array {
 		if ( ( $node['config']['action'] ?? '' ) === 'create_card' ) {
+			return [];
 		}
 		return [
 			'port' => 'main',

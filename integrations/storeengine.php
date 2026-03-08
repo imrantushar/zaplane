@@ -169,7 +169,7 @@ class Storeengine extends IntegrationBase {
 				$old_status      = $args[1] ?? '';
 				$restored_status = $args[2] ?? '';
 
-				if ( ! $order_id || $old_status !== 'trash' ) {
+				if ( ! $order_id || 'trash' !== $old_status ) {
 					return false;
 				}
 

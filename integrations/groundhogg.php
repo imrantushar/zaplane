@@ -114,7 +114,7 @@ class Groundhogg extends IntegrationBase {
 				$tag_id     = (int) $tag_id;
 
 				$select_tag = $node['config']['tag_id'] ?? 'any';
-				if ( $select_tag !== 'any' && (int) $select_tag !== (int) $tag_id ) {
+				if ( 'any' !== $select_tag && (int) $select_tag !== (int) $tag_id ) {
 					return false;
 				}
 

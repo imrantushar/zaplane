@@ -25,7 +25,7 @@ class Gravityforms extends IntegrationBase {
 	}
 
 	public static function get_trigger_config_schema( string $trigger ): array {
-		if ( $trigger === 'form_submitted' ) {
+		if ( 'form_submitted' === $trigger ) {
 			$options = [
 				[
 					'label' => 'Any From',
@@ -78,7 +78,7 @@ class Gravityforms extends IntegrationBase {
 
 				$form_id = $form['id'] ?? 0;
 
-				if ( ! empty( $node['form_id'] ) && $node['form_id'] !== 'any' ) {
+				if ( ! empty( $node['form_id'] ) &&  'any' !== $node['form_id'] ) {
 					if ( (int) $form_id !== (int) $node['form_id'] ) {
 						return false;
 					}

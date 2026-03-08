@@ -26,10 +26,10 @@ class Coblocks extends IntegrationBase {
 	public static function resolve_trigger( array $node, array $args ) {
 		switch ( $node['event'] ) {
 			case 'coblocks_form_submit':
-					  $form_data = $args[0] ?? [];
+					$form_data = $args[0] ?? [];
 				if ( is_array( $form_data ) ) {
 					foreach ( $form_data as $key => $value ) {
-							  $result[ $key ] = $value;
+						$result[ $key ] = $value;
 					}
 				}
 				return $result;

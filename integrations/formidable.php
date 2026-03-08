@@ -28,7 +28,7 @@ class Formidable extends IntegrationBase {
 	}
 
 	public static function get_trigger_config_schema( string $trigger ): array {
-		if ( $trigger === 'form_submitted' ) {
+		if ( 'form_submitted' === $trigger ) {
 			$options[] = [
 				'label' => 'Any Form',
 				'value' => 'any'
@@ -67,7 +67,7 @@ class Formidable extends IntegrationBase {
 		}
 
 		foreach ( $fields as $value ) {
-			if ( $value->type === 'name' ) {
+			if ( 'name' === $value->type ) {
 				$field_list[] = (object) [
 					'name'  => $value->field_key . '_first',
 					'label' => $value->name . ' (First)',
@@ -86,7 +86,7 @@ class Formidable extends IntegrationBase {
 				continue;
 			}
 
-			if ( $value->type === 'address' ) {
+			if ( 'address' === $value->type ) {
 				foreach ( $value->default_value as $key => $val ) {
 					$field_list[] = (object) [
 						'name'  => $value->field_key . '_' . $key,
@@ -118,19 +118,19 @@ class Formidable extends IntegrationBase {
 			$val = isset( $field_values[ $field->id ] ) ? $field_values[ $field->id ]->get_saved_value() : '';
 
 			if ( is_array( $val ) ) {
-				if ( $field->type === 'name' ) {
+				if ( 'name' === $field->type ) {
 					$form_fields[ $key . '_first' ]  = $val['first'] ?? '';
 					$form_fields[ $key . '_middle' ] = $val['middle'] ?? '';
 					$form_fields[ $key . '_last' ]   = $val['last'] ?? '';
-				} elseif ( $field->type === 'checkbox' ) {
+				} elseif ( 'checkbox' === $field->type ) {
 					$form_fields[ $key ] = $val;
-				} elseif ( $field->type === 'file' ) {
+				} elseif ( 'file' === $field->type ) {
 					$urls = [];
 					foreach ( $val as $attachment_id ) {
 						$urls[] = wp_get_attachment_url( $attachment_id );
 					}
 					$form_fields[ $key ] = $urls;
-				} elseif ( $field->type === 'address' ) {
+				} elseif ( 'address' === $field->type ) {
 					foreach ( $val as $k => $value ) {
 						$form_fields[ $key . '_' . $k ] = $value;
 					}
@@ -153,7 +153,7 @@ class Formidable extends IntegrationBase {
 					return false;
 				}
 
-				if ( ! empty( $node['form_id'] ) && $node['form_id'] !== 'any' ) {
+				if ( ! empty( $node['form_id'] ) &&  'any' !== $node['form_id'] ) {
 					if ( (int) $form_id !== (int) $node['form_id'] ) {
 						return false;
 					}

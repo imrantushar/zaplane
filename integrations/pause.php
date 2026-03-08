@@ -23,7 +23,7 @@ class Pause extends IntegrationBase {
 			$wpdb->prefix . 'zaplane_runs',
 			[
 				'status'    => 'paused',
-				'resume_at' => date( 'Y-m-d H:i:s', time() + $delay ),
+				'resume_at' => gmdate( 'Y-m-d H:i:s', time() + $delay ),
 			],
 			[ 'id' => $input['_run_id'] ]
 		);

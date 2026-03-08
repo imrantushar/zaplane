@@ -82,7 +82,7 @@ class FluentForm extends IntegrationBase {
 					$config       = $node['data']['config'] ?? [];
 					$requiredForm = $config['form_id'] ?? 'any';
 
-				if ( $requiredForm !== 'any' && (int) $requiredForm !== (int) $form->id ) {
+				if ( 'any' !== $requiredForm && (int) $requiredForm !== (int) $form->id ) {
 					return false;
 				}
 
@@ -105,11 +105,6 @@ class FluentForm extends IntegrationBase {
 	}
 
 	public static function execute_node( array $node, array $input ): array {
-
-		$config = $node['data']['config'] ?? [];
-
-		switch ( $node['data']['event'] ?? '' ) {
-		}
 		return [
 			'port' => 'main',
 			'data' => $input
