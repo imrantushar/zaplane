@@ -66,7 +66,7 @@ class woocommerce extends IntegrationBase {
             return false;
         }
 
-        if (in_array($event, self::ORDER_STATUS_EVENTS, true)) {
+        if (in_array($event, self::$order_status_event, true)) {
             return self::order_status_payload_from_args($args) ?: false;
         }
 

@@ -25,14 +25,13 @@ import { conditionVariables } from "@ZAPRedux/Slices/workFlowSlice/actions/condi
 const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode, workFlow, isFullscreen, nodes, edges }) => {
   const { source, node } = context;
   const dispatch = useDispatch();
-  const { values, setFieldValue, resetForm ,initialValues} = useFormikContext();
+  const { values, setFieldValue, resetForm, initialValues } = useFormikContext();
   const [step, setStep] = useState("select");
   const isTrigger = node?.data?.action === "trigger" && source === "node";
   const [showWarning, setShowWarning] = useState(false);
 
   const { mode, setMode, selectedItem, setSelectedItem, search, setSearch, list, searchList } =
     useActionDrawer(open, node, source, setFieldValue, isTrigger);
-
 
   // Auto-set actionType if only one tool action
 
@@ -64,6 +63,11 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
     if (isTrigger) return integration.triggers?.[values.actionType]?.schema || [];
     return integration.actions?.[values.actionType]?.schema || [];
   }, [mode, selectedItem, values?.actionType, isTrigger]);
+
+  // seleted intregation
+  const selectedIntegration = useMemo(() => {
+    return getIntegration(mode, selectedItem);
+  }, [mode, selectedItem]);
 
   // NOW call dynamic hook
   const {
@@ -97,6 +101,7 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
         app: selectedItem.name,
         name: selectedItem.name,
         event: values.actionType,
+        icon:selectedIntegration?.icon,
         config: selectedActionFields.reduce((acc, f) => {
           acc[f.key] = values[f.key];
           return acc;
@@ -118,10 +123,6 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
       resetAll();
     }
   };
-  // seleted intregation
-  const selectedIntegration = useMemo(() => {
-    return getIntegration(mode, selectedItem);
-  }, [mode, selectedItem]);
 
   // get global variable
   useEffect(() => {
@@ -145,6 +146,7 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
       isFullscreen={isFullscreen}
       onClose={resetAll}
       arrowClose={mode === 'app'}
+      maxWidth='700px'
       arrowOnClick={() => {
         setSelectedItem(null);
         setMode(null);

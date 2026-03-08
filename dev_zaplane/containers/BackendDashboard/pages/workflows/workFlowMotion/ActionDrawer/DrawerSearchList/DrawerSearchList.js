@@ -28,7 +28,7 @@ const DrawerSearchList = ({ searchList, setMode, setSelectedItem, setSearch }) =
               p="10px"
               borderRadius='4px'
               border="1px solid var(--zaplane-border-color)">
-              <Icon as={SlackIcon} boxSize="20px" />
+              <Text as={"span"} m='0'className={`zaplan-icon ${searchList?.icon}`}></Text>
             </Flex>
             <Text className="zaplane-label" >{sprintf(__("%s", "zaplane"), item.name)}</Text>
           </Flex>
