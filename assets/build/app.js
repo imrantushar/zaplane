@@ -2797,17 +2797,19 @@ const ZAPInput = ({
   inputStyle,
   inputRef
 }) => {
-  const textareaRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
-  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
-    if (type === "textarea" && textareaRef.current) {
-      const el = inputRef?.current || textareaRef.current;
-      const minHeight = 35;
-      el.style.height = "0px";
-      const newHeight = Math.max(el.scrollHeight, minHeight);
-      el.style.height = newHeight + "px";
-    }
-  }, [value, type]);
+  // const textareaRef = useRef(null);
+  // useEffect(() => {
+  //   if (type === "textarea" && textareaRef.current) {
+  //     const el = inputRef?.current || textareaRef.current;
+  //     const minHeight = 35;
+  //     el.style.height = "0px";
+  //     const newHeight = Math.max(el.scrollHeight, minHeight);
+  //     el.style.height = newHeight + "px";
+  //   }
+  // }, [value, type]);
+
   const isTextarea = type === "textarea";
+  console.log(isTextarea, 'is');
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Flex, {
     as: "label",
     direction: "column",
@@ -2824,8 +2826,7 @@ const ZAPInput = ({
       placeholder: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_5__.__)(placeholder, "zaplane"),
       value: value,
       onChange: onChange,
-      resize: "none",
-      overflow: "hidden",
+      autoresize: true,
       onKeyDown: onKeyDown,
       ...inputStyle
     }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Input, {
@@ -5660,6 +5661,7 @@ const ActionFieldRenderer = ({
     case "textarea":
       return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.Fragment, {
         children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_ZAPComponents_ZAPInput__WEBPACK_IMPORTED_MODULE_2__["default"], {
+          type: field.type,
           label: field.label,
           placeholder: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_11__.__)('Type "@" here to add dynamic', 'zaplane'),
           value: value || "",

@@ -40,6 +40,7 @@ const ActionFieldRenderer = ({
       return (
         <>
           <ZAPInput
+            type={field.type}
             label={field.label}
             placeholder={__('Type "@" here to add dynamic', 'zaplane')}
             value={value || ""}
