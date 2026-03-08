@@ -6,10 +6,11 @@ import ZAPDatePicker from "@ZAPComponents/ZAPDatePicker";
 import ConditionGroupField from "../ConditionGroupField/ConditionGroupField";
 import { mapEdgesForBackend, mapNodesForBackend } from "../../helper";
 import { conditionVariables } from "@ZAPRedux/Slices/workFlowSlice/actions/conditonVariales";
-import {  insertVariableAtCursor } from "./helper";
+import { insertVariableAtCursor } from "./helper";
 import VariablePopover from "../VariablePopaver/VariablePopover";
 import './styles.scss'
 import { __ } from "@wordpress/i18n";
+import VariableEditor from "@ZAPComponents/VariableEditor/index.js";
 
 const ActionFieldRenderer = ({
   field,
@@ -31,42 +32,31 @@ const ActionFieldRenderer = ({
   );
   switch (field.type) {
 
-    case "text":
-    case "expression":
     case "number":
     case "email":
     case "url":
+
+      return <>
+        <ZAPInput
+          type={field.type}
+          label={field.label}
+          value={value || ""}
+          inputRef={inputRef}
+          onChange={(e) => setFieldValue(field.key, e.target.value)}
+        /></>
+    case "text":
+    case "expression":
+
     case "textarea":
       return (
         <>
-          <ZAPInput
-            type={field.type}
+          <VariableEditor
             label={field.label}
-            placeholder={__('Type "@" here to add dynamic', 'zaplane')}
             value={value || ""}
-            inputRef={inputRef}
-            onChange={(e) => setFieldValue(field.key, e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "@") {
-                setPopoverOpen(true);
-              }
-            }}
-          />
-
-          <VariablePopover
-            isOpen={isPopoverOpen}
-            prefix="variables-popaver"
-            onClose={() => setPopoverOpen(false)}
-            data={workflowVariables?.data}
-            onSelectVariable={(variable) => {
-              insertVariableAtCursor({
-                variable,
-                inputRef,
-                fieldKey: field.key,
-                setFieldValue,
-                setPopoverOpen,
-              });
-            }}
+            setValue={(val) => setFieldValue(field.key, val)}
+            variables={workflowVariables?.data || []}
+            field={field}
+            setFieldValue={setFieldValue}
           />
         </>
       );
