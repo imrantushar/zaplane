@@ -6,7 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 trait Helper {
-    protected const ORDER_STATUS_EVENTS = [
+    protected $order_status_event = [
         'order_status_pending',
         'order_status_failed',
         'order_status_on_hold',
