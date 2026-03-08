@@ -97,7 +97,7 @@ class FluentCrm extends IntegrationBase {
 
         // if ( $trigger === 'contact_status_updated' ) {
         //     return [
-        //         [ 'key' => 'status', 'label' => 'Status Updated', 'type'  => 'select', 'options' => [
+        //         [ 'key' => 'fluent_status', 'label' => 'Status Updated', 'type'  => 'select', 'options' => [
         //                 ['label' => 'Any Status', 'value' => 'any' ],
         //                 ['label' => 'Subscribed', 'value' => 'subscribed' ],
         //                 ['label' => 'Pending', 'value' => 'pending' ],

@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-03-04 09:52:50",
+    "generated_at": "2026-03-08 06:59:03",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -4613,32 +4613,74 @@
                                     "value": "any"
                                 },
                                 {
-                                    "label": "Copy of Copy of Copy of course 1",
-                                    "value": 87
-                                },
-                                {
-                                    "label": "Copy of Copy of course 1",
-                                    "value": 83
-                                },
-                                {
-                                    "label": "Copy of Copy of course 2",
-                                    "value": 113
-                                },
-                                {
-                                    "label": "Copy of course 1",
-                                    "value": 81
-                                },
-                                {
-                                    "label": "Copy of course 2",
-                                    "value": 102
-                                },
-                                {
-                                    "label": "course 1",
-                                    "value": 77
+                                    "label": "course 10",
+                                    "value": 35
                                 },
                                 {
                                     "label": "course 2",
-                                    "value": 100
+                                    "value": 13
+                                },
+                                {
+                                    "label": "course 3",
+                                    "value": 17
+                                },
+                                {
+                                    "label": "course 4",
+                                    "value": 26
+                                },
+                                {
+                                    "label": "course 6",
+                                    "value": 30
+                                },
+                                {
+                                    "label": "course1",
+                                    "value": 6
+                                }
+                            ],
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "user_unenroll_course": {
+                    "key": "user_unenroll_course",
+                    "label": "User Is Unenrolled In A Course",
+                    "hook": "learndash_update_course_access",
+                    "schema": [
+                        {
+                            "key": "course_id",
+                            "label": "Course",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Any course",
+                                    "value": "any"
+                                },
+                                {
+                                    "label": "course 10",
+                                    "value": 35
+                                },
+                                {
+                                    "label": "course 2",
+                                    "value": 13
+                                },
+                                {
+                                    "label": "course 3",
+                                    "value": 17
+                                },
+                                {
+                                    "label": "course 4",
+                                    "value": 26
+                                },
+                                {
+                                    "label": "course 6",
+                                    "value": 30
+                                },
+                                {
+                                    "label": "course1",
+                                    "value": 6
                                 }
                             ],
                             "required": true
@@ -4663,32 +4705,28 @@
                                     "value": "any"
                                 },
                                 {
-                                    "label": "Copy of Copy of Copy of course 1",
-                                    "value": 87
-                                },
-                                {
-                                    "label": "Copy of Copy of course 1",
-                                    "value": 83
-                                },
-                                {
-                                    "label": "Copy of Copy of course 2",
-                                    "value": 113
-                                },
-                                {
-                                    "label": "Copy of course 1",
-                                    "value": 81
-                                },
-                                {
-                                    "label": "Copy of course 2",
-                                    "value": 102
-                                },
-                                {
-                                    "label": "course 1",
-                                    "value": 77
+                                    "label": "course 10",
+                                    "value": 35
                                 },
                                 {
                                     "label": "course 2",
-                                    "value": 100
+                                    "value": 13
+                                },
+                                {
+                                    "label": "course 3",
+                                    "value": 17
+                                },
+                                {
+                                    "label": "course 4",
+                                    "value": 26
+                                },
+                                {
+                                    "label": "course 6",
+                                    "value": 30
+                                },
+                                {
+                                    "label": "course1",
+                                    "value": 6
                                 }
                             ],
                             "required": true
@@ -4713,32 +4751,28 @@
                                     "value": "any"
                                 },
                                 {
-                                    "label": "Copy of Copy of Copy of course 1",
-                                    "value": 87
-                                },
-                                {
-                                    "label": "Copy of Copy of course 1",
-                                    "value": 83
-                                },
-                                {
-                                    "label": "Copy of Copy of course 2",
-                                    "value": 113
-                                },
-                                {
-                                    "label": "Copy of course 1",
-                                    "value": 81
-                                },
-                                {
-                                    "label": "Copy of course 2",
-                                    "value": 102
-                                },
-                                {
-                                    "label": "course 1",
-                                    "value": 77
+                                    "label": "course 10",
+                                    "value": 35
                                 },
                                 {
                                     "label": "course 2",
-                                    "value": 100
+                                    "value": 13
+                                },
+                                {
+                                    "label": "course 3",
+                                    "value": 17
+                                },
+                                {
+                                    "label": "course 4",
+                                    "value": 26
+                                },
+                                {
+                                    "label": "course 6",
+                                    "value": 30
+                                },
+                                {
+                                    "label": "course1",
+                                    "value": 6
                                 }
                             ],
                             "required": true
@@ -4753,8 +4787,32 @@
                                     "value": "any"
                                 },
                                 {
+                                    "label": "lesson",
+                                    "value": 31
+                                },
+                                {
                                     "label": "lesson 1",
-                                    "value": 78
+                                    "value": 8
+                                },
+                                {
+                                    "label": "lesson 10",
+                                    "value": 36
+                                },
+                                {
+                                    "label": "lesson 2",
+                                    "value": 14
+                                },
+                                {
+                                    "label": "lesson 4",
+                                    "value": 27
+                                },
+                                {
+                                    "label": "lesson1",
+                                    "value": 10
+                                },
+                                {
+                                    "label": "sds",
+                                    "value": 18
                                 }
                             ],
                             "required": true
@@ -4779,32 +4837,28 @@
                                     "value": "any"
                                 },
                                 {
-                                    "label": "Copy of Copy of Copy of course 1",
-                                    "value": 87
-                                },
-                                {
-                                    "label": "Copy of Copy of course 1",
-                                    "value": 83
-                                },
-                                {
-                                    "label": "Copy of Copy of course 2",
-                                    "value": 113
-                                },
-                                {
-                                    "label": "Copy of course 1",
-                                    "value": 81
-                                },
-                                {
-                                    "label": "Copy of course 2",
-                                    "value": 102
-                                },
-                                {
-                                    "label": "course 1",
-                                    "value": 77
+                                    "label": "course 10",
+                                    "value": 35
                                 },
                                 {
                                     "label": "course 2",
-                                    "value": 100
+                                    "value": 13
+                                },
+                                {
+                                    "label": "course 3",
+                                    "value": 17
+                                },
+                                {
+                                    "label": "course 4",
+                                    "value": 26
+                                },
+                                {
+                                    "label": "course 6",
+                                    "value": 30
+                                },
+                                {
+                                    "label": "course1",
+                                    "value": 6
                                 }
                             ],
                             "required": true
@@ -4819,8 +4873,32 @@
                                     "value": "any"
                                 },
                                 {
+                                    "label": "lesson",
+                                    "value": 31
+                                },
+                                {
                                     "label": "lesson 1",
-                                    "value": 78
+                                    "value": 8
+                                },
+                                {
+                                    "label": "lesson 10",
+                                    "value": 36
+                                },
+                                {
+                                    "label": "lesson 2",
+                                    "value": 14
+                                },
+                                {
+                                    "label": "lesson 4",
+                                    "value": 27
+                                },
+                                {
+                                    "label": "lesson1",
+                                    "value": 10
+                                },
+                                {
+                                    "label": "sds",
+                                    "value": 18
                                 }
                             ],
                             "required": true
@@ -4836,7 +4914,7 @@
                                 },
                                 {
                                     "label": "topic 1",
-                                    "value": 85
+                                    "value": 22
                                 }
                             ],
                             "required": true
@@ -4859,10 +4937,6 @@
                                 {
                                     "label": "Any Quiz",
                                     "value": "any"
-                                },
-                                {
-                                    "label": "Quiz 1",
-                                    "value": 90
                                 }
                             ],
                             "required": true
@@ -4887,8 +4961,8 @@
                                     "value": "any"
                                 },
                                 {
-                                    "label": "Group 1",
-                                    "value": 96
+                                    "label": "group 1",
+                                    "value": 24
                                 }
                             ],
                             "required": true
@@ -4913,8 +4987,8 @@
                                     "value": "any"
                                 },
                                 {
-                                    "label": "Group 1",
-                                    "value": 96
+                                    "label": "group 1",
+                                    "value": 24
                                 }
                             ],
                             "required": true
@@ -4939,32 +5013,28 @@
                                     "value": "any"
                                 },
                                 {
-                                    "label": "Copy of Copy of Copy of course 1",
-                                    "value": 87
-                                },
-                                {
-                                    "label": "Copy of Copy of course 1",
-                                    "value": 83
-                                },
-                                {
-                                    "label": "Copy of Copy of course 2",
-                                    "value": 113
-                                },
-                                {
-                                    "label": "Copy of course 1",
-                                    "value": 81
-                                },
-                                {
-                                    "label": "Copy of course 2",
-                                    "value": 102
-                                },
-                                {
-                                    "label": "course 1",
-                                    "value": 77
+                                    "label": "course 10",
+                                    "value": 35
                                 },
                                 {
                                     "label": "course 2",
-                                    "value": 100
+                                    "value": 13
+                                },
+                                {
+                                    "label": "course 3",
+                                    "value": 17
+                                },
+                                {
+                                    "label": "course 4",
+                                    "value": 26
+                                },
+                                {
+                                    "label": "course 6",
+                                    "value": 30
+                                },
+                                {
+                                    "label": "course1",
+                                    "value": 6
                                 }
                             ],
                             "required": true
@@ -4979,8 +5049,32 @@
                                     "value": "any"
                                 },
                                 {
+                                    "label": "lesson",
+                                    "value": 31
+                                },
+                                {
                                     "label": "lesson 1",
-                                    "value": 78
+                                    "value": 8
+                                },
+                                {
+                                    "label": "lesson 10",
+                                    "value": 36
+                                },
+                                {
+                                    "label": "lesson 2",
+                                    "value": 14
+                                },
+                                {
+                                    "label": "lesson 4",
+                                    "value": 27
+                                },
+                                {
+                                    "label": "lesson1",
+                                    "value": 10
+                                },
+                                {
+                                    "label": "sds",
+                                    "value": 18
                                 }
                             ],
                             "required": true
@@ -5083,6 +5177,14 @@
                                 {
                                     "label": "Any Tag",
                                     "value": "any"
+                                },
+                                {
+                                    "label": "tag 1",
+                                    "value": 1
+                                },
+                                {
+                                    "label": "tag 2",
+                                    "value": 2
                                 }
                             ],
                             "required": true
@@ -5105,6 +5207,14 @@
                                 {
                                     "label": "Any Tag",
                                     "value": "any"
+                                },
+                                {
+                                    "label": "tag 1",
+                                    "value": 1
+                                },
+                                {
+                                    "label": "tag 2",
+                                    "value": 2
                                 }
                             ],
                             "required": true
@@ -5127,6 +5237,14 @@
                                 {
                                     "label": "Any List",
                                     "value": "any"
+                                },
+                                {
+                                    "label": "list 1",
+                                    "value": 1
+                                },
+                                {
+                                    "label": "list 2",
+                                    "value": 2
                                 }
                             ],
                             "required": true
@@ -5149,6 +5267,14 @@
                                 {
                                     "label": "Any List",
                                     "value": "any"
+                                },
+                                {
+                                    "label": "list 1",
+                                    "value": 1
+                                },
+                                {
+                                    "label": "list 2",
+                                    "value": 2
                                 }
                             ],
                             "required": true
@@ -5162,6 +5288,51 @@
                     "key": "created_contact",
                     "label": "Created Contact",
                     "hook": "fluentcrm_contact_created",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "contact_status_updated_to_subscribed": {
+                    "key": "contact_status_updated_to_subscribed",
+                    "label": "Contact Status Updated To Subscribed",
+                    "hook": "fluentcrm_subscriber_status_to_subscribed",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "contact_status_updated_to_pending": {
+                    "key": "contact_status_updated_to_pending",
+                    "label": "Contact Status Updated To Pending",
+                    "hook": "fluentcrm_subscriber_status_to_pending",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "contact_status_updated_to_unsubscribed": {
+                    "key": "contact_status_updated_to_unsubscribed",
+                    "label": "Contact Status Updated To Unsubscribed",
+                    "hook": "fluentcrm_subscriber_status_to_unsubscribed",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "contact_status_updated_to_bounced": {
+                    "key": "contact_status_updated_to_bounced",
+                    "label": "Contact Status Updated To Bounced",
+                    "hook": "fluentcrm_subscriber_status_to_bounced",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "contact_status_updated_to_complained": {
+                    "key": "contact_status_updated_to_complained",
+                    "label": "Contact Status Updated To Complained",
+                    "hook": "fluentcrm_subscriber_status_to_complained",
                     "schema": [],
                     "outputs": [
                         "main"
@@ -5269,6 +5440,14 @@
                                 {
                                     "label": "Any List",
                                     "value": "any"
+                                },
+                                {
+                                    "label": "list 1",
+                                    "value": 1
+                                },
+                                {
+                                    "label": "list 2",
+                                    "value": 2
                                 }
                             ],
                             "required": true,
@@ -5282,6 +5461,14 @@
                                 {
                                     "label": "Any Tag",
                                     "value": "any"
+                                },
+                                {
+                                    "label": "tag 1",
+                                    "value": 1
+                                },
+                                {
+                                    "label": "tag 2",
+                                    "value": 2
                                 }
                             ],
                             "required": true,
@@ -5517,6 +5704,14 @@
                                 {
                                     "label": "Any Tag",
                                     "value": "any"
+                                },
+                                {
+                                    "label": "tag 1",
+                                    "value": 1
+                                },
+                                {
+                                    "label": "tag 2",
+                                    "value": 2
                                 }
                             ],
                             "required": true,
@@ -5545,6 +5740,14 @@
                                 {
                                     "label": "Any Tag",
                                     "value": "any"
+                                },
+                                {
+                                    "label": "tag 1",
+                                    "value": 1
+                                },
+                                {
+                                    "label": "tag 2",
+                                    "value": 2
                                 }
                             ],
                             "required": true,
@@ -5623,6 +5826,14 @@
                                 {
                                     "label": "Any List",
                                     "value": "any"
+                                },
+                                {
+                                    "label": "list 1",
+                                    "value": 1
+                                },
+                                {
+                                    "label": "list 2",
+                                    "value": 2
                                 }
                             ],
                             "required": true,
@@ -5651,6 +5862,14 @@
                                 {
                                     "label": "Any List",
                                     "value": "any"
+                                },
+                                {
+                                    "label": "list 1",
+                                    "value": 1
+                                },
+                                {
+                                    "label": "list 2",
+                                    "value": 2
                                 }
                             ],
                             "required": true,
