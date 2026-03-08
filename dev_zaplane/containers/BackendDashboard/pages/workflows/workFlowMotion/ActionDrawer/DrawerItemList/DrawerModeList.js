@@ -23,7 +23,7 @@ const DrawerModeList = ({ setMode, setSelectedItem, isTrigger, source, TOOLS }) 
               setMode("tools");
               setSelectedItem(tool);
             }}
-            icon={SlackIcon}
+            icon={tool?.icon}
           />
         ))}
     </VStack>

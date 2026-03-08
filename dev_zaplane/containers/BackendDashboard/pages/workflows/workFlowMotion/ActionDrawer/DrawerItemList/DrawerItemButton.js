@@ -25,6 +25,7 @@ const DrawerItemButton = ({ item, onClick, showType = true, arrowIcon, icon, }) 
                 borderRadius='4px'
                 border="1px solid var(--zaplane-border-color)">
                 <Icon as={icon} boxSize="20px" />
+                 <Text as={"span"} m='0' className={`zaplan-icon ${icon}`}></Text>
               </Flex>
             </>
           )

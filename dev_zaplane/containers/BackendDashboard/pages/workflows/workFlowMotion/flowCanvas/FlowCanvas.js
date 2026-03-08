@@ -105,8 +105,8 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
         setEdges((eds) => eds.filter((e) => e.id !== edgeId));
     };
 
-    console.log(nodes, 'all nodes',);
-    console.log(edges, 'all edges');
+    // console.log(nodes, 'all nodes',);
+    // console.log(edges, 'all edges');
     const nodeTypes = {
         custom: (props) => (
             <CustomNode

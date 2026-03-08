@@ -12,7 +12,7 @@ const DrawerItemList = ({ list, setSelectedItem, setMode }) => {
     <VStack alignItems="left" overflow="hidden"  gap='16px'>
       {list.map(item => (
           <DrawerItemButton
-           icon={SlackIcon}
+           icon={list?.icon}
             key={item.id}
             item={item}
             onClick={() => setSelectedItem(item)}
