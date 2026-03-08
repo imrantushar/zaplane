@@ -44,5 +44,6 @@ return [
         'groundhogg'           => [ 'file' => 'groundhogg.php',           'class' => \Zaplane\Integrations\Groundhogg::class ],
         'bricks'               => [ 'file' => 'bricks.php',               'class' => \Zaplane\Integrations\Bricks::class ],
         'elementor'            => [ 'file' => 'elementor.php',            'class' => \Zaplane\Integrations\Elementor::class ],
+        'profilebuilder'       => [ 'file' => 'profilebuilder.php',       'class' => \Zaplane\Integrations\Profilebuilder::class ],
     ],
 ];
