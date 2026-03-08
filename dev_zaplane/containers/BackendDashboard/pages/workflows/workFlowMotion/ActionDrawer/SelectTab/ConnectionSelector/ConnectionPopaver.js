@@ -9,9 +9,10 @@ import ZAPLabel from '@ZAPComponents/Labels/ZAPLabel';
 import './styles.scss'
 import { formatLabel } from '@ZAPUtils/helper';
 import ZAPInput from '@ZAPComponents/ZAPInput';
+import { fetchConnectionsByApp } from '@ZAPRedux/Slices/workFlowSlice/actions/connectionsSlice';
 
 const ConnectionPopaver = (props) => {
-    const { isOpen, onClose, appSlug, selectedIntegration } = props
+    const { isOpen, onClose, appSlug, onConnected  } = props
     const dispatch = useDispatch()
     const { authFields } = useSelector(
         (state) => state.connections || []
@@ -52,7 +53,7 @@ const ConnectionPopaver = (props) => {
                         popup?.close();
 
                         if (event.data.data?.success) {
-                            dispatch(fetchConnections());
+                            onConnected?.(res);
                             onclose()
                         }
                     }
@@ -78,6 +79,7 @@ const ConnectionPopaver = (props) => {
                     if (action.type === "connections/createTokenConnection/fulfilled") {
                         setCredentials({});
                         onClose();
+                         onConnected?.(action);
                     }
                     setLoadingOAuth(false);
 
