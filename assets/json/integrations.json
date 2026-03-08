@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-03-03 04:57:29",
+    "generated_at": "2026-03-05 04:33:39",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -3380,6 +3380,469 @@
                             "type": "text",
                             "placeholder": "name@example.com or {{email}}",
                             "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
+        },
+        "hubspot": {
+            "slug": "hubspot",
+            "name": "HubSpot",
+            "icon": "hubspot",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": [],
+            "actions": {
+                "create_contact": {
+                    "key": "create_contact",
+                    "label": "Create Contact",
+                    "schema": [
+                        {
+                            "key": "access_token",
+                            "label": "Private App Token",
+                            "type": "password",
+                            "placeholder": "pat-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+                            "help": "Optional if you already selected a connection. Required if no connection is used."
+                        },
+                        {
+                            "key": "email",
+                            "label": "Email",
+                            "type": "text",
+                            "placeholder": "name@example.com or {{email}}",
+                            "required": true
+                        },
+                        {
+                            "key": "firstname",
+                            "label": "First Name",
+                            "type": "text",
+                            "placeholder": "John or {{first_name}}"
+                        },
+                        {
+                            "key": "lastname",
+                            "label": "Last Name",
+                            "type": "text",
+                            "placeholder": "Doe or {{last_name}}"
+                        },
+                        {
+                            "key": "properties",
+                            "label": "Properties (JSON)",
+                            "type": "textarea",
+                            "placeholder": "{\"phone\":\"+18884827768\",\"company\":\"Acme Inc\"}",
+                            "help": "Optional JSON object of contact properties to set."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_contact": {
+                    "key": "update_contact",
+                    "label": "Update Contact (by Email)",
+                    "schema": [
+                        {
+                            "key": "access_token",
+                            "label": "Private App Token",
+                            "type": "password",
+                            "placeholder": "pat-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+                            "help": "Optional if you already selected a connection. Required if no connection is used."
+                        },
+                        {
+                            "key": "email",
+                            "label": "Email",
+                            "type": "text",
+                            "placeholder": "name@example.com or {{email}}",
+                            "required": true
+                        },
+                        {
+                            "key": "properties",
+                            "label": "Properties (JSON)",
+                            "type": "textarea",
+                            "placeholder": "{\"jobtitle\":\"Manager\",\"phone\":\"+18884827768\"}",
+                            "required": true,
+                            "help": "JSON object of properties to update."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "upsert_contact": {
+                    "key": "upsert_contact",
+                    "label": "Upsert Contact (by Email)",
+                    "schema": [
+                        {
+                            "key": "access_token",
+                            "label": "Private App Token",
+                            "type": "password",
+                            "placeholder": "pat-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+                            "help": "Optional if you already selected a connection. Required if no connection is used."
+                        },
+                        {
+                            "key": "email",
+                            "label": "Email",
+                            "type": "text",
+                            "placeholder": "name@example.com or {{email}}",
+                            "required": true
+                        },
+                        {
+                            "key": "properties",
+                            "label": "Properties (JSON)",
+                            "type": "textarea",
+                            "placeholder": "{\"firstname\":\"Jane\",\"lastname\":\"Doe\"}",
+                            "required": true,
+                            "help": "JSON object of properties to set or update."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_contact": {
+                    "key": "get_contact",
+                    "label": "Get Contact (by ID)",
+                    "schema": [
+                        {
+                            "key": "access_token",
+                            "label": "Private App Token",
+                            "type": "password",
+                            "placeholder": "pat-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+                            "help": "Optional if you already selected a connection. Required if no connection is used."
+                        },
+                        {
+                            "key": "contact_id",
+                            "label": "Contact ID",
+                            "type": "text",
+                            "placeholder": "12345",
+                            "required": true
+                        },
+                        {
+                            "key": "properties",
+                            "label": "Properties (comma-separated)",
+                            "type": "text",
+                            "placeholder": "email,firstname,lastname,phone",
+                            "help": "Optional list of properties to return."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "find_contact": {
+                    "key": "find_contact",
+                    "label": "Find Contact (by Email)",
+                    "schema": [
+                        {
+                            "key": "access_token",
+                            "label": "Private App Token",
+                            "type": "password",
+                            "placeholder": "pat-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+                            "help": "Optional if you already selected a connection. Required if no connection is used."
+                        },
+                        {
+                            "key": "email",
+                            "label": "Email",
+                            "type": "text",
+                            "placeholder": "name@example.com or {{email}}",
+                            "required": true
+                        },
+                        {
+                            "key": "properties",
+                            "label": "Properties (comma-separated)",
+                            "type": "text",
+                            "placeholder": "email,firstname,lastname",
+                            "help": "Optional list of properties to return."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_deal": {
+                    "key": "create_deal",
+                    "label": "Create Deal",
+                    "schema": [
+                        {
+                            "key": "access_token",
+                            "label": "Private App Token",
+                            "type": "password",
+                            "placeholder": "pat-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+                            "help": "Optional if you already selected a connection. Required if no connection is used."
+                        },
+                        {
+                            "key": "properties",
+                            "label": "Deal Properties (JSON)",
+                            "type": "textarea",
+                            "placeholder": "{\"dealname\":\"New deal\",\"dealstage\":\"contractsent\",\"pipeline\":\"default\",\"amount\":\"1500.00\"}",
+                            "required": true,
+                            "help": "Include at least dealname and dealstage. Add pipeline if you use multiple pipelines."
+                        },
+                        {
+                            "key": "associations",
+                            "label": "Associations (JSON)",
+                            "type": "textarea",
+                            "placeholder": "[{\"to\":{\"id\":123},\"types\":[{\"associationCategory\":\"HUBSPOT_DEFINED\",\"associationTypeId\":5}]}]",
+                            "help": "Optional associations array to link records (contacts, companies, etc.)."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_deal": {
+                    "key": "update_deal",
+                    "label": "Update Deal (by ID)",
+                    "schema": [
+                        {
+                            "key": "access_token",
+                            "label": "Private App Token",
+                            "type": "password",
+                            "placeholder": "pat-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+                            "help": "Optional if you already selected a connection. Required if no connection is used."
+                        },
+                        {
+                            "key": "deal_id",
+                            "label": "Deal ID",
+                            "type": "text",
+                            "placeholder": "12345",
+                            "required": true
+                        },
+                        {
+                            "key": "properties",
+                            "label": "Deal Properties (JSON)",
+                            "type": "textarea",
+                            "placeholder": "{\"dealname\":\"Updated deal\",\"amount\":\"2000.00\"}",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_company": {
+                    "key": "create_company",
+                    "label": "Create Company",
+                    "schema": [
+                        {
+                            "key": "access_token",
+                            "label": "Private App Token",
+                            "type": "password",
+                            "placeholder": "pat-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+                            "help": "Optional if you already selected a connection. Required if no connection is used."
+                        },
+                        {
+                            "key": "properties",
+                            "label": "Company Properties (JSON)",
+                            "type": "textarea",
+                            "placeholder": "{\"name\":\"Acme Inc\",\"domain\":\"acme.com\"}",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_company": {
+                    "key": "update_company",
+                    "label": "Update Company (by ID)",
+                    "schema": [
+                        {
+                            "key": "access_token",
+                            "label": "Private App Token",
+                            "type": "password",
+                            "placeholder": "pat-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+                            "help": "Optional if you already selected a connection. Required if no connection is used."
+                        },
+                        {
+                            "key": "company_id",
+                            "label": "Company ID",
+                            "type": "text",
+                            "placeholder": "12345",
+                            "required": true
+                        },
+                        {
+                            "key": "properties",
+                            "label": "Company Properties (JSON)",
+                            "type": "textarea",
+                            "placeholder": "{\"name\":\"Acme Inc\",\"phone\":\"+18884827768\"}",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "submit_form": {
+                    "key": "submit_form",
+                    "label": "Submit Form",
+                    "schema": [
+                        {
+                            "key": "access_token",
+                            "label": "Private App Token",
+                            "type": "password",
+                            "placeholder": "pat-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+                            "help": "Optional if you already selected a connection. Required if no connection is used."
+                        },
+                        {
+                            "key": "portal_id",
+                            "label": "Portal ID",
+                            "type": "text",
+                            "placeholder": "123456",
+                            "required": true
+                        },
+                        {
+                            "key": "form_guid",
+                            "label": "Form GUID",
+                            "type": "text",
+                            "placeholder": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+                            "required": true
+                        },
+                        {
+                            "key": "fields",
+                            "label": "Fields (JSON)",
+                            "type": "textarea",
+                            "placeholder": "{\"email\":\"name@example.com\",\"firstname\":\"John\"}",
+                            "required": true,
+                            "help": "JSON object (field name to value) or array of field objects."
+                        },
+                        {
+                            "key": "context",
+                            "label": "Context (JSON)",
+                            "type": "textarea",
+                            "placeholder": "{\"pageUri\":\"https://example.com\",\"pageName\":\"Landing\"}",
+                            "help": "Optional. Include hutk, pageUri, pageName, ipAddress, etc."
+                        },
+                        {
+                            "key": "legal_consent_options",
+                            "label": "Legal Consent (JSON)",
+                            "type": "textarea",
+                            "placeholder": "{\"consent\":{\"consentToProcess\":true,\"text\":\"...\",\"communications\":[{\"value\":true,\"subscriptionTypeId\":123,\"text\":\"...\"}]}}",
+                            "help": "Optional. GDPR/consent data."
+                        },
+                        {
+                            "key": "submitted_at",
+                            "label": "Submitted At (ms)",
+                            "type": "text",
+                            "placeholder": "1700000000000",
+                            "help": "Optional timestamp in milliseconds."
+                        },
+                        {
+                            "key": "skip_validation",
+                            "label": "Skip Validation",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "value": "",
+                                    "label": "Default"
+                                },
+                                {
+                                    "value": "true",
+                                    "label": "True"
+                                },
+                                {
+                                    "value": "false",
+                                    "label": "False"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_subscription_status": {
+                    "key": "update_subscription_status",
+                    "label": "Update Email Subscription Status",
+                    "schema": [
+                        {
+                            "key": "access_token",
+                            "label": "Private App Token",
+                            "type": "password",
+                            "placeholder": "pat-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+                            "help": "Optional if you already selected a connection. Required if no connection is used."
+                        },
+                        {
+                            "key": "email",
+                            "label": "Email",
+                            "type": "text",
+                            "placeholder": "name@example.com or {{email}}",
+                            "required": true
+                        },
+                        {
+                            "key": "subscription_id",
+                            "label": "Subscription ID",
+                            "type": "text",
+                            "placeholder": "123",
+                            "required": true
+                        },
+                        {
+                            "key": "status_state",
+                            "label": "Status",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "value": "SUBSCRIBED",
+                                    "label": "Subscribed"
+                                },
+                                {
+                                    "value": "UNSUBSCRIBED",
+                                    "label": "Unsubscribed"
+                                },
+                                {
+                                    "value": "NOT_SPECIFIED",
+                                    "label": "Not Specified"
+                                }
+                            ],
+                            "required": true
+                        },
+                        {
+                            "key": "legal_basis",
+                            "label": "Legal Basis",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "value": "",
+                                    "label": "Leave Empty"
+                                },
+                                {
+                                    "value": "CONSENT_WITH_NOTICE",
+                                    "label": "Consent With Notice"
+                                },
+                                {
+                                    "value": "LEGITIMATE_INTEREST_CLIENT",
+                                    "label": "Legitimate Interest (Client)"
+                                },
+                                {
+                                    "value": "LEGITIMATE_INTEREST_OTHER",
+                                    "label": "Legitimate Interest (Other)"
+                                },
+                                {
+                                    "value": "LEGITIMATE_INTEREST_PQL",
+                                    "label": "Legitimate Interest (PQL)"
+                                },
+                                {
+                                    "value": "NON_GDPR",
+                                    "label": "Non GDPR"
+                                },
+                                {
+                                    "value": "PERFORMANCE_OF_CONTRACT",
+                                    "label": "Performance of Contract"
+                                },
+                                {
+                                    "value": "PROCESS_AND_STORE",
+                                    "label": "Process and Store"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "legal_basis_explanation",
+                            "label": "Legal Basis Explanation",
+                            "type": "text",
+                            "placeholder": "Consent collected via website form"
                         }
                     ],
                     "outputs": [
