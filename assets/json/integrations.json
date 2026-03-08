@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-03-06 09:11:18",
+    "generated_at": "2026-03-08 17:26:35",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -5422,8 +5422,40 @@
                                     "value": "any"
                                 },
                                 {
-                                    "label": "course 55",
-                                    "value": 117
+                                    "label": "bbbbbbbbbbbbbbbbbbbbbbb",
+                                    "value": 48
+                                },
+                                {
+                                    "label": "colurse 33",
+                                    "value": 37
+                                },
+                                {
+                                    "label": "course",
+                                    "value": 30
+                                },
+                                {
+                                    "label": "dddddddddddddd",
+                                    "value": 59
+                                },
+                                {
+                                    "label": "fgfdsaaaaaaaaaaaaaaaaaaaa",
+                                    "value": 45
+                                },
+                                {
+                                    "label": "gfgfgf",
+                                    "value": 33
+                                },
+                                {
+                                    "label": "qqqqqqqqqqqqqqqqqqqq",
+                                    "value": 56
+                                },
+                                {
+                                    "label": "vcbnnnnnnnnnnnnnnn",
+                                    "value": 41
+                                },
+                                {
+                                    "label": "xxxxxxxxxxxxxxx",
+                                    "value": 52
                                 }
                             ],
                             "required": true
@@ -5448,8 +5480,40 @@
                                     "value": "any"
                                 },
                                 {
-                                    "label": "course 55",
-                                    "value": 117
+                                    "label": "bbbbbbbbbbbbbbbbbbbbbbb",
+                                    "value": 48
+                                },
+                                {
+                                    "label": "colurse 33",
+                                    "value": 37
+                                },
+                                {
+                                    "label": "course",
+                                    "value": 30
+                                },
+                                {
+                                    "label": "dddddddddddddd",
+                                    "value": 59
+                                },
+                                {
+                                    "label": "fgfdsaaaaaaaaaaaaaaaaaaaa",
+                                    "value": 45
+                                },
+                                {
+                                    "label": "gfgfgf",
+                                    "value": 33
+                                },
+                                {
+                                    "label": "qqqqqqqqqqqqqqqqqqqq",
+                                    "value": 56
+                                },
+                                {
+                                    "label": "vcbnnnnnnnnnnnnnnn",
+                                    "value": 41
+                                },
+                                {
+                                    "label": "xxxxxxxxxxxxxxx",
+                                    "value": 52
                                 }
                             ],
                             "required": true
@@ -5474,8 +5538,40 @@
                                     "value": "any"
                                 },
                                 {
-                                    "label": "course 55",
-                                    "value": 117
+                                    "label": "bbbbbbbbbbbbbbbbbbbbbbb",
+                                    "value": 48
+                                },
+                                {
+                                    "label": "colurse 33",
+                                    "value": 37
+                                },
+                                {
+                                    "label": "course",
+                                    "value": 30
+                                },
+                                {
+                                    "label": "dddddddddddddd",
+                                    "value": 59
+                                },
+                                {
+                                    "label": "fgfdsaaaaaaaaaaaaaaaaaaaa",
+                                    "value": 45
+                                },
+                                {
+                                    "label": "gfgfgf",
+                                    "value": 33
+                                },
+                                {
+                                    "label": "qqqqqqqqqqqqqqqqqqqq",
+                                    "value": 56
+                                },
+                                {
+                                    "label": "vcbnnnnnnnnnnnnnnn",
+                                    "value": 41
+                                },
+                                {
+                                    "label": "xxxxxxxxxxxxxxx",
+                                    "value": 52
                                 }
                             ],
                             "required": true
@@ -5490,24 +5586,92 @@
                                     "value": "any"
                                 },
                                 {
-                                    "label": "lesson 12",
-                                    "value": 104
+                                    "label": "aaaaaaaaaaaaaaaaaaaaaaaaaa",
+                                    "value": 46
                                 },
                                 {
-                                    "label": "lesson 1",
-                                    "value": 108
+                                    "label": "bbbbb",
+                                    "value": 49
                                 },
                                 {
-                                    "label": "lesson 3",
-                                    "value": 111
+                                    "label": "ddddddddddd",
+                                    "value": 60
                                 },
                                 {
-                                    "label": "lesson 4",
-                                    "value": 115
+                                    "label": "errrr",
+                                    "value": 38
                                 },
                                 {
-                                    "label": "lesson 55",
-                                    "value": 118
+                                    "label": "fgg",
+                                    "value": 42
+                                },
+                                {
+                                    "label": "fggf",
+                                    "value": 34
+                                },
+                                {
+                                    "label": "lesson",
+                                    "value": 29
+                                },
+                                {
+                                    "label": "qqqqqqqqqqqqqqqq",
+                                    "value": 58
+                                },
+                                {
+                                    "label": "xxxxxxxxxx",
+                                    "value": 53
+                                }
+                            ],
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "quiz_passed": {
+                    "key": "quiz_passed",
+                    "label": "Quiz Passed",
+                    "hook": "stm_lms_quiz_passed",
+                    "schema": [
+                        {
+                            "key": "quiz_id",
+                            "label": "Quiz",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Any Quiz",
+                                    "value": "any"
+                                },
+                                {
+                                    "label": "Quiz 1",
+                                    "value": "27"
+                                }
+                            ],
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "quiz_failed": {
+                    "key": "quiz_failed",
+                    "label": "Quiz Failed",
+                    "hook": "stm_lms_quiz_failed",
+                    "schema": [
+                        {
+                            "key": "quiz_id",
+                            "label": "Quiz",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Any Quiz",
+                                    "value": "any"
+                                },
+                                {
+                                    "label": "Quiz 1",
+                                    "value": "27"
                                 }
                             ],
                             "required": true

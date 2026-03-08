@@ -25,6 +25,14 @@ class Masterstudy extends IntegrationBase {
                 'label' => 'User Completed A Lesson', 
                 'hook'  => 'stm_lms_lesson_passed'
             ],
+            'quiz_passed' => [
+                'label' => 'Quiz Passed', 
+                'hook'  => 'stm_lms_quiz_passed'
+            ],
+            'quiz_failed' => [
+                'label' => 'Quiz Failed', 
+                'hook'  => 'stm_lms_quiz_failed'
+            ],
         ]; 
     }
 
@@ -37,7 +45,7 @@ class Masterstudy extends IntegrationBase {
             $courses = get_posts([
                 'post_type'      => 'stm-courses',
                 'post_status'    => 'publish',
-                'orderby'        => 'label',
+                'orderby'        => 'post_title',
                 'order'          => 'ASC',
                 'posts_per_page' => 999,
             ]);
@@ -62,7 +70,7 @@ class Masterstudy extends IntegrationBase {
             $lessons = get_posts([
                 'post_type'      => 'stm-lessons',
                 'post_status'    => 'publish',
-                'orderby'        => 'label',
+                'orderby'        => 'post_title',
                 'order'          => 'ASC',
                 'posts_per_page' => 999,
             ]);
@@ -76,6 +84,55 @@ class Masterstudy extends IntegrationBase {
         }
 
         return $all_lesson;
+    }
+
+    private static function resolve_all_quiz_payload( $course_id = 'any' ) {
+        global $wpdb;
+        $all_quiz = [
+            ['label' => 'Any Quiz', 'value' => 'any'],
+        ];
+
+        if ( $course_id === 'any' ) {
+
+            $quizzes = $wpdb->get_results(
+                $wpdb->prepare(
+                    "SELECT ID, post_title 
+                    FROM {$wpdb->posts}
+                    WHERE post_type = %s 
+                    AND post_status = 'publish'
+                    ORDER BY post_title ASC",
+                    'stm-quizzes'
+                )
+            );
+        } else {
+            $quizzes = $wpdb->get_results(
+                $wpdb->prepare(
+                    "SELECT p.ID, p.post_title
+                    FROM {$wpdb->posts} p
+                    INNER JOIN {$wpdb->prefix}stm_lms_curriculum_materials cm 
+                        ON p.ID = cm.post_id
+                    INNER JOIN {$wpdb->prefix}stm_lms_curriculum_sections cs 
+                        ON cm.section_id = cs.id
+                    WHERE p.post_type = %s
+                    AND p.post_status = 'publish'
+                    AND cs.course_id = %d
+                    ORDER BY p.post_title ASC",
+                    'stm-quizzes',
+                    (int) $course_id
+                )
+            );
+        }
+
+        if ( $quizzes ) {
+            foreach ( $quizzes as $quiz ) {
+                $all_quiz[] = [
+                    'label' => $quiz->post_title,
+                    'value' => $quiz->ID
+                ];
+            }
+        }
+
+        return $all_quiz;
     }
 
     public static function get_trigger_config_schema( string $trigger ): array {
@@ -105,6 +162,18 @@ class Masterstudy extends IntegrationBase {
                     'label'    => 'Lesson',
                     'type'     => 'select',
                     'options'  => self::resolve_all_lesson_payload(),
+                    'required' => true,
+                ],
+            ];
+        }
+
+        if ( in_array( $trigger, ['quiz_passed','quiz_failed'], true ) ) {
+            return [
+                [
+                    'key'      => 'quiz_id',
+                    'label'    => 'Quiz',
+                    'type'     => 'select',
+                    'options'  => self::resolve_all_quiz_payload(),
                     'required' => true,
                 ],
             ];
@@ -205,6 +274,45 @@ class Masterstudy extends IntegrationBase {
                         'avatar_url'         => get_avatar_url( $user_id ),
                         'user_roles'         => $user->roles,
                         'completed_at'       => current_time('mysql'),
+                    ]
+                ];
+
+            case 'quiz_passed':
+            case 'quiz_failed':
+                $user_id    = $args[0] ?? 0;
+                $quiz_id    = $args[1] ?? 0;
+                $percentage = $args[2] ?? 0;
+
+                if ( ! $user_id || ! $quiz_id ) return false;
+
+                $selected_quiz = $node['data']['config']['quiz_id'] ?? 'any';
+
+                if ( $selected_quiz !== 'any' && (int) $selected_quiz !== (int) $quiz_id ) return false;
+
+                $quiz = get_post( $quiz_id );
+                $user = get_user_by('id', $user_id );
+
+                if ( ! $quiz || ! $user ) return false;
+
+                return [
+                    'success'   => true,
+                    'timestamp' => current_time('mysql'),
+                    'data' => [
+                        'quiz_id'          => $quiz->ID,
+                        'quiz_title'       => $quiz->post_title,
+                        'quiz_description' => $quiz->post_content,
+                        'quiz_url'         => get_permalink( $quiz->ID ),
+                        'score'            => $percentage,
+                        'status'           => $node['event'] === 'quiz_passed' ? 'passed' : 'failed',
+                        'user_id'          => $user_id,
+                        'first_name'       => $user->first_name,
+                        'last_name'        => $user->last_name,
+                        'user_login'       => $user->user_login,
+                        'user_email'       => $user->user_email,
+                        'display_name'     => $user->display_name,
+                        'avatar_url'       => get_avatar_url( $user_id ),
+                        'user_roles'       => $user->roles,
+                        'completed_at'     => current_time('mysql'),
                     ]
                 ];
         }
