@@ -27,13 +27,13 @@ const ZAPDrawer = ({
     arrowClose,
     isFullscreen = false,
     arrowOnClick,
+    maxWidth
 }) => {
     return (
         <Drawer.Root
             placement={placement}
             size={size}
             open={open}
-            width='700px'
             modal={false}
             closeOnInteractOutside={closeOnOverlayClick}
             closeOnOverlayClick={closeOnOverlayClick}
@@ -52,7 +52,7 @@ const ZAPDrawer = ({
             <Portal>
                 <Drawer.Positioner marginTop={isFullscreen ? '0' : "32px"}   height={isFullscreen ? '100%' : 'calc(100vh - 32px)'} zIndex={"9999"}
                     pointerEvents="none">
-                    <Drawer.Content pointerEvents="auto" mr="15px" maxWidth="700px">
+                    <Drawer.Content pointerEvents="auto" mr="15px" maxWidth={maxWidth}>
                         {title && (
                             <Drawer.Header>
                                 {
