@@ -245,7 +245,6 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
                 workFlow={workFlow}
                 nodes={nodes}
                 edges={edges}
-                id={id}
 
             />
 
