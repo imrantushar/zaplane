@@ -30,7 +30,7 @@ const RecentLogs = ({ data = [] }) => {
     },
     {
       name: (
-        <Text className="zaplane-label">
+        <Text className="zaplane-label" ml='-23px'>
           {__("CREATED AT", "zaplane")}
         </Text>
       ),
@@ -50,7 +50,7 @@ const RecentLogs = ({ data = [] }) => {
     },
     {
       name: (
-        <Text className="zaplane-label">
+        <Text className="zaplane-label" ml='-23px'>
           {__("Updated At", "zaplane")}
         </Text>
       ),

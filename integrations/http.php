@@ -6,60 +6,91 @@ use Zaplane\Framework\Classes\Expression;
 
 class Http extends IntegrationBase {
 
-    public static function get_slug(): string {
-        return 'http';
-    }
 
-    public static function get_name(): string {
-        return 'HTTP Request';
-    }
+	public static function get_slug(): string {
+		return 'http';
+	}
 
-    public static function get_category(): string {
-        return 'tool';
-    }
+	public static function get_name(): string {
+		return 'HTTP Request';
+	}
 
-    public static function get_actions(): array {
-        return [
-            'request' => ['label'=>'Send HTTP Request']
-        ];
-    }
+	public static function get_category(): string {
+		return 'tool';
+	}
 
-    public static function get_action_config_schema(string $action): array {
-        return [
-            ['key'=>'url','label'=>'URL','type'=>'expression','required'=>true],
-            ['key'=>'method','label'=>'Method','type'=>'select','options'=>[
-                ['label'=>'GET','value'=>'GET'],
-                ['label'=>'POST','value'=>'POST'],
-                ['label'=>'PUT','value'=>'PUT'],
-                ['label'=>'DELETE','value'=>'DELETE'],
-            ]],
-            ['key'=>'headers','label'=>'Headers (JSON)','type'=>'textarea'],
-            ['key'=>'body','label'=>'Body','type'=>'expression'],
-        ];
-    }
+	public static function get_actions(): array {
+		return [
+			'request' => [ 'label' => 'Send HTTP Request' ]
+		];
+	}
 
-    public static function execute_node(array $node, array $input): array {
+	public static function get_action_config_schema( string $action ): array {
+		return [
+			[
+				'key' => 'url',
+				'label' => 'URL',
+				'type' => 'expression',
+				'required' => true
+			],
+			[
+				'key' => 'method',
+				'label' => 'Method',
+				'type' => 'select',
+				'options' => [
+					[
+						'label' => 'GET',
+						'value' => 'GET'
+					],
+					[
+						'label' => 'POST',
+						'value' => 'POST'
+					],
+					[
+						'label' => 'PUT',
+						'value' => 'PUT'
+					],
+					[
+						'label' => 'DELETE',
+						'value' => 'DELETE'
+					],
+				]
+			],
+			[
+				'key' => 'headers',
+				'label' => 'Headers (JSON)',
+				'type' => 'textarea'
+			],
+			[
+				'key' => 'body',
+				'label' => 'Body',
+				'type' => 'expression'
+			],
+		];
+	}
 
-        $c = $node['data']['config'];
+	public static function execute_node( array $node, array $input ): array {
 
-        $url = Expression::evaluate($c['url'], $input);
-        $body = Expression::evaluate($c['body'] ?? '', $input);
+		$c = $node['data']['config'];
 
-        $headers = json_decode($c['headers'] ?? '{}', true);
+		$url = Expression::evaluate( $c['url'], $input );
+		$body = Expression::evaluate( $c['body'] ?? '', $input );
 
-        $response = wp_remote_request($url, [
-            'method' => $c['method'] ?? 'GET',
-            'headers' => $headers,
-            'body' => $body
-        ]);
+		$headers = json_decode( $c['headers'] ?? '{}', true );
 
-        return [
-            'port'=>'main',
-            'data'=>[
-                'status' => wp_remote_retrieve_response_code($response),
-                'body' => wp_remote_retrieve_body($response),
-                'headers' => wp_remote_retrieve_headers($response),
-            ]
-        ];
-    }
+		$response = wp_remote_request($url, [
+			'method' => $c['method'] ?? 'GET',
+			'headers' => $headers,
+			'body' => $body
+		]);
+
+		return [
+			'port' => 'main',
+			'data' => [
+				'status' => wp_remote_retrieve_response_code( $response ),
+				'body' => wp_remote_retrieve_body( $response ),
+				'headers' => wp_remote_retrieve_headers( $response ),
+			]
+		];
+	}
 }

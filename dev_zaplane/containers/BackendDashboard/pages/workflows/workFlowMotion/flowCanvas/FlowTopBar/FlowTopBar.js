@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Text, Flex, Input, Box } from "@chakra-ui/react";
 import TopBar from "@ZAPComponents/TopBar";
 import { FiArrowLeft } from "react-icons/fi";
@@ -42,6 +42,7 @@ export default function FlowTopBar({
   isFlowDirty
 }) {
   const { apiCountdown, apiRequestRunning } = useSelector((state) => state.workflows);
+  const [refreshing, setRefreshing] = useState(false);
   const dispatch = useDispatch()
   const navigate = useNavigate()
   useApiCountdown()
@@ -62,6 +63,21 @@ export default function FlowTopBar({
 
     updateStatusAndTitle();
   }, [values?.status, values?.title, workFlow, dispatch, id]);
+  //listiner
+  useEffect(() => {
+    if (activeDrawer !== "logs") return;
+
+    const interval = setInterval(async () => {
+      setRefreshing(true);
+
+      await dispatch(getRunWorkFlow({ id }));
+
+      setRefreshing(false);
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, [activeDrawer, dispatch, id]);
+
   return (
     <TopBar
       leftContent={() => (
@@ -168,7 +184,7 @@ export default function FlowTopBar({
                 border={"none"}
                 onClick={() => dispatch(getRunWorkFlow({ id }))}
               >
-                <TfiReload />{__("Refresh", "zaplane")}
+                <TfiReload className={refreshing ? "zaplane-refresh-spin" : ""} />{__("Refresh", "zaplane")}
               </Button>
               <Button
                 size="sm"

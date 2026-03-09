@@ -27,7 +27,7 @@ import ZAPTooltip from "@ZAPComponents/ZAPTooltip";
 import { getSingleWorkFlow} from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow";
 import FlowTopBar from "./FlowTopBar/FlowTopBar";
 
-export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdgesChange, onNodesChange, getNewNodeId, workFlow,isFlowDirty}) {
+export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdgesChange, onNodesChange, getNewNodeId, workFlow,isFlowDirty,canvasLayout,setCanvasLayOut}) {
     const dispatch = useDispatch();
     const navigate = useNavigate()
     const [drawerOpen, setDrawerOpen] = useState(false);
@@ -37,8 +37,6 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [activeDrawer, setActiveDrawer] = useState(null);
     const { versions } = useSelector((state) => state.workflows);
-    //store layout 
-    const canvasLayout = values?.layout
     useEffect(() => {
         if (!workFlow?.graph) return;
         const { nodes, edges } = mapGraphFromBackend(workFlow.graph);
@@ -81,7 +79,7 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
         openDrawerForNode,
         openDrawerFromAdd,
         onLayout
-    } = useFlowActions({ nodes, setNodes, edges, setEdges, drawerContext, getNewNodeId, setDrawerContext, setDrawerOpen, setFieldValue, canvasLayout });
+    } = useFlowActions({ nodes, setNodes, edges, setEdges, drawerContext, getNewNodeId, setDrawerContext, setDrawerOpen, setFieldValue, canvasLayout,setCanvasLayOut });
 
     const onAddNode = (edgeId) => {
         const edge = edges.find((e) => e.id === edgeId);
@@ -107,8 +105,8 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
         setEdges((eds) => eds.filter((e) => e.id !== edgeId));
     };
 
-    console.log(nodes, 'all nodes',);
-    console.log(edges, 'all edges');
+    // console.log(nodes, 'all nodes',);
+    // console.log(edges, 'all edges');
     const nodeTypes = {
         custom: (props) => (
             <CustomNode
@@ -247,6 +245,7 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
                 workFlow={workFlow}
                 nodes={nodes}
                 edges={edges}
+                id={id}
 
             />
 
