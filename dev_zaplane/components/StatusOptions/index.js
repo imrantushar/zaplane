@@ -82,9 +82,9 @@ const StatusOptions = ( props ) => {
 			>
 				<span className="label">{ statusLabel[ value ] }</span>
 				<span
-					className={ `zaplane-icon zaplane-icon--arrow-down` }
+					// className={ `zaplane-icon zaplane-icon--arrow-down` }
 				>
-					{/* <Icon as={FaAngleDown} /> */}
+					<Icon as={FaAngleDown} />
 				</span>
 			</button>
 			{ createPortal(
