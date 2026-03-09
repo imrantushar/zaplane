@@ -308,7 +308,6 @@ class Academy extends IntegrationBase {
     public static function get_action_config_schema( string $action ): array {
 
         $schemas = [];
-
         return $schemas[$action] ?? [];
     }
 
