@@ -29,32 +29,16 @@ class Ninjaform extends IntegrationBase {
 			return [];
 		}
 
-		$options = [
-			[
-				'label' => 'Any Form',
-				'value' => 'any',
-			],
-		];
-
-		if ( function_exists( 'Ninja_Forms' ) ) {
-			$forms = Ninja_Forms()->form()->get_forms();
-
-			if ( ! empty( $forms ) ) {
-				foreach ( $forms as $form ) {
-					$options[] = [
-						'label' => $form->get_setting( 'title' ),
-						'value' => $form->get_id(),
-					];
-				}
-			}
-		}
-
 		return [
 			[
 				'key'      => 'form_id',
 				'label'    => 'Form',
 				'type'     => 'select',
-				'options'  => $options,
+				'dynamic' => [
+						'integration' => 'ninjaform',
+						'query'       => 'forms',
+						'select'      => [ 'name', 'label' ],
+					],
 				'required' => true,
 			],
 		];
@@ -137,4 +121,37 @@ class Ninjaform extends IntegrationBase {
 			'data' => $input
 		];
 	}
+	
+	public static function get_dynamic_queries(): array {
+		return [
+			'forms' => [ self::class, 'query_forms' ],
+		];
+	}
+
+	public static function query_forms() {
+
+		$options = [
+			[
+				'label' => 'Any Form',
+				'name' => 'any',
+			],
+		];
+
+		if ( function_exists( 'Ninja_Forms' ) ) {
+			$forms = Ninja_Forms()->form()->get_forms();
+
+			if ( ! empty( $forms ) ) {
+				foreach ( $forms as $form ) {
+					$options[] = [
+						'label' => $form->get_setting( 'title' ),
+						'name' => $form->get_id(),
+					];
+				}
+			}
+		}
+
+		return $options;
+	}
+
+
 }

@@ -356,7 +356,7 @@ class Tutor extends IntegrationBase {
 			$options = [
 				[
 					'label' => 'Any lesson',
-					'value' => 'any'
+					'name' => 'any'
 				],
 			];
 
@@ -370,7 +370,7 @@ class Tutor extends IntegrationBase {
 				foreach ( $lessons as $lesson ) {
 					$options[] = [
 						'label' => $lesson->post_title,
-						'value' => $lesson->ID,
+						'name' => $lesson->ID,
 					];
 				}
 			}
