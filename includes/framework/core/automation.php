@@ -45,6 +45,7 @@ class Automation {
 		add_action( 'init', [ $this, 'dispatch_active_listeners' ] );
 		add_action( 'zaplane_execute_node_run', [ $this, 'dispatch_node_run' ], 10, 1 );
 		add_action( 'zaplane_workflow_updated', [ $this, 'reload_triggers' ] );
+		add_action( 'zaplane_resume_delayed_run', [ $this, 'resume_delayed_run' ], 10, 4 );
 	}
 
 	public function reload_triggers() {
@@ -198,6 +199,26 @@ class Automation {
 		do_action( 'zaplane_execute_node_run', $node_run_id );
 	}
 
+	public function resume_delayed_run( int $run_id, int $node_run_id, int $node_key, array $output ) {
+		$run = Run::find( $run_id );
+		$nodeRun = NodeRun::find( $node_run_id );
+
+		if ( ! $run || ! $nodeRun || $nodeRun->status !== 'delayed' ) {
+			return;
+		}
+
+		$graph = $this->load_graph( $run->workflow_version_id );
+
+		$nodeRun->setOutput( $output );
+		$nodeRun->status = 'completed';
+		$nodeRun->finished_at = current_time( 'mysql' );
+		$nodeRun->save();
+
+		$this->spawn_children( $nodeRun, $output, $graph, $run );
+
+		$this->finalize_run( $run_id );
+	}
+
 	public function dispatch_node_run( int $node_run_id ) {
 		$nodeRun = NodeRun::find( $node_run_id );
 
@@ -225,6 +246,9 @@ class Automation {
 
 		$context = $this->buildNodeContext( $run->id );
 		$resolveData = $input + $context;
+		
+		$node['_run_id'] = $run->id;
+		$node['_node_run_id'] = $nodeRun->id;
 
 		try {
 			if ( $node['type'] === 'trigger' ) {
@@ -244,6 +268,15 @@ class Automation {
 				$node = $this->inject_credentials( $node );
 				$node = $this->resolveNodeConfig( $node, $resolveData );
 				$output = $integration::execute_node( $node, $input );
+			}
+
+			if ( isset( $output['status'] ) && $output['status'] === 'delayed' ) {
+				$nodeRun->status = 'delayed';
+				$nodeRun->output_json = $output;
+				$nodeRun->save();
+				
+				$this->finalize_run( $run->id );
+				return;
 			}
 
 			$nodeRun->setOutput( $output );
@@ -312,6 +345,15 @@ class Automation {
 			->count();
 
 		if ( $pendingCount == 0 ) {
+			$delayedCount = NodeRun::where( 'run_id', $run_id )
+				->where( 'status', 'delayed' )
+				->fresh()
+				->count();
+
+			if ( $delayedCount > 0 ) {
+				return;
+			}
+
 			$failedCount = NodeRun::where( 'run_id', $run_id )
 				->where( 'status', 'failed' )
 				->fresh()
