@@ -64,18 +64,20 @@ export default function FlowTopBar({
     updateStatusAndTitle();
   }, [values?.status, values?.title, workFlow, dispatch, id]);
   //listiner
+  useEffect(() => {
+    if (activeDrawer !== "logs") return;
 
-  // useEffect(() => {
-  //   const interval = setInterval(async () => {
-  //     setRefreshing(true);
+    const interval = setInterval(async () => {
+      setRefreshing(true);
 
-  //     await dispatch(getRunWorkFlow({ id }));
+      await dispatch(getRunWorkFlow({ id }));
 
-  //     setRefreshing(false);
-  //   }, 3000);
+      setRefreshing(false);
+    }, 2000);
 
-  //   return () => clearInterval(interval);
-  // }, [dispatch, id]);
+    return () => clearInterval(interval);
+  }, [activeDrawer, dispatch, id]);
+
   return (
     <TopBar
       leftContent={() => (
