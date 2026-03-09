@@ -26,6 +26,7 @@ import { primaryBtn } from "../../../../../assets/scss/chakra/recipe";
 import ConnectionTable from "./ConnectionTable";
 import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
 import { formatLabel } from "@ZAPUtils/helper";
+import ZAPInput from "@ZAPComponents/ZAPInput";
 
 
 const Connections = () => {
@@ -36,7 +37,6 @@ const Connections = () => {
     );
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [detailsOpen, setDetailsOpen] = useState(false);
-
     const [selectedApp, setSelectedApp] = useState(null);
     const [selectedAuthType, setSelectedAuthType] = useState(null);
     const [credentials, setCredentials] = useState({});
@@ -180,8 +180,8 @@ const Connections = () => {
 
                                         return (
                                             <Flex flexDirection="column" gap={"4px"} key={fieldKey}>
-                                                <ZAPLabel label={field.label} type={"simple"} />
-                                                <Input
+                                                <ZAPInput
+                                                    label={field.label}
                                                     type={field.type === "password" ? "password" : "text"}
                                                     placeholder={field.placeholder || ""}
                                                     value={value}
@@ -193,8 +193,7 @@ const Connections = () => {
                                                     }
                                                 />
                                                 {field.help && (
-                                                    <Text fontSize="sm" className="zaplane-sub-title" color="var(--zaplane-text-muted)">
-
+                                                    <Text fontSize="sm" mt='7px' className="zaplane-sub-title" color="var(--zaplane-text-muted)">
                                                         {__(field.help, "zaplane")}
                                                     </Text>
                                                 )}
@@ -207,6 +206,7 @@ const Connections = () => {
 
                         {selectedAuthType &&
                             <Button
+                                mt="16px"
                                 {...primaryBtn}
                                 width="220px"
                                 onClick={handleConnect}

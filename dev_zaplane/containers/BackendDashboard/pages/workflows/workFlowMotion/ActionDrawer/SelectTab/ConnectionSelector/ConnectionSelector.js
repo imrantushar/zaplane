@@ -17,6 +17,11 @@ const ConnectionSelector = ({ appSlug, values, setFieldValue }) => {
             dispatch(fetchConnectionsByApp(appSlug));
         }
     }, [appSlug, dispatch]);
+    const handleConnected = (connection) => {
+        dispatch(fetchConnectionsByApp(appSlug));
+
+        setFieldValue("connection_id", String(connection?.payload?.id));
+    };
 
     const options = appConnections
         ?.filter((c) => c.app === appSlug)
@@ -51,7 +56,7 @@ const ConnectionSelector = ({ appSlug, values, setFieldValue }) => {
                     classNamePrefix="zaplane-select"
                     options={options}
                     value={options?.find((o) => o.value === values?.connection_id) || null}
-                    onChange={(val) => setFieldValue("connection_id", val.value)}
+                    onChange={(val) => setFieldValue("connection_id", val?.value)}
                     placeholder={__("Select a connection", "zaplane")}
                     isClearable
                     components={{ MenuList: CustomMenuList }}
@@ -62,6 +67,7 @@ const ConnectionSelector = ({ appSlug, values, setFieldValue }) => {
                 appSlug={appSlug}
                 isOpen={isPopoverOpen}
                 onClose={() => setPopoverOpen(false)}
+                onConnected={handleConnected}
             />
         </>
     );

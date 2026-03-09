@@ -8,6 +8,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class Helper { 
+class Helper {
+
 	use Menu;
 }
