@@ -35,8 +35,8 @@ class Mailchimp extends IntegrationBase {
 	}
 
 	public static function get_action_config_schema( string $action ): array {
-		$common = array(
-			array(
+		$common = [
+			[
 				'key'         => 'list_id',
 				'label'       => 'Audience/List ID',
 				'type'        => 'text',
@@ -378,7 +378,7 @@ class Mailchimp extends IntegrationBase {
 	private static function get_auth_headers( string $api_key ): array {
 		return array(
 			'Authorization' => 'Basic ' . base64_encode( 'zaplane:' . $api_key ),
-		];
+		);
 	}
 
 	private static function get_status_options( bool $allow_empty = true ): array {

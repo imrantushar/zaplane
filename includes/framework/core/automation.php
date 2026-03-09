@@ -278,6 +278,32 @@ class Automation {
 				$this->finalize_run( $run->id );
 				return;
 			}
+			
+			if ( isset( $output['status'] ) && $output['status'] === 'iterate' ) {
+				$nodeRun->setOutput( $output );
+				
+				// 1. Spawn the 'loop' branch for the single item
+				$this->spawn_children( $nodeRun, $output, $graph, $run );
+				
+				// 2. Re-enqueue this exact Iterator node for the rest of the items
+				$remaining = $output['remaining'] ?? [];
+				if ( ! empty( $remaining ) ) {
+					$iteratorInput = array_merge( $input, [ 
+						'_is_iterating' => true, 
+						'_remaining'    => $remaining 
+					] );
+					
+					$this->spawn_node_run(
+						$run->id,
+						$nodeRun->node_key,
+						$iteratorInput,
+						$nodeRun->parent_node_run_id // Keep it sibling-level
+					);
+				}
+				
+				$this->finalize_run( $run->id );
+				return;
+			}
 
 			$nodeRun->setOutput( $output );
 
