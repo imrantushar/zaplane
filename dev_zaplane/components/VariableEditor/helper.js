@@ -66,28 +66,19 @@ export const renderVariableHTML = (val, vars = []) => {
         .split(/(\s+)/)
         .map((word) => {
             const match = word.match(/^{{(.+)}}$/);
-
             if (match) {
                 const key = match[1];
-                const parts = key.split(".");
-                const indexNumber = parts[0];
-                const actualKey = parts.slice(1).join(".");
-
                 const variableObj = (vars || [])
                     .flatMap((v) => v.variables || [])
-                    .find((v) => v.key === actualKey);
+                    .find((v) => v.key === key);
 
-                const label = variableObj?.label || actualKey;
-
-                // show number in UI
-                const displayLabel = `${indexNumber}. ${formatVariableKey(label)}`;
+                const displayLabel = variableObj?.label || key;
 
                 return `<span class="zaplane-variable-item" data-variable="${key}">
-                        <span class="zaplane-variable-label">${displayLabel}</span>
-                         <span class="zaplane-variable-remove">&times;</span>
-                        </span>`;
+                    <span class="zaplane-variable-label">${displayLabel}</span>
+                    <span class="zaplane-variable-remove">&times;</span>
+                </span>`;
             }
-
             return word;
         })
         .join("");
@@ -102,12 +93,9 @@ export const insertVariableAtRange = ({
     setPopoverOpen,
     syncValueFn,
 }) => {
-    if (!editorRef.current || !range) return;
-
-    const variableObj = variables.flatMap(v => v.variables || []).find(v => v.key === variableKey);
+    const variableObj = variables.flatMap((v) => v.variables || []).find((v) => v.key === variableKey);
     const displayLabel = variableObj?.label || variableKey;
 
-    // Create span
     const span = document.createElement("span");
     span.className = "zaplane-variable-item";
     span.setAttribute("data-variable", variableKey);
@@ -123,26 +111,18 @@ export const insertVariableAtRange = ({
     span.appendChild(labelSpan);
     span.appendChild(removeSpan);
 
-    // Ensure range is still inside editor
-    const editor = editorRef.current;
-    if (!editor.contains(range.startContainer)) {
-        // Fallback: place cursor at end
-        range = document.createRange();
-        range.selectNodeContents(editor);
-        range.collapse(false);
-    }
-    range.collapse(true);
+    restoreSelection(range);
+    range.deleteContents();
     range.insertNode(span);
+
     const space = document.createTextNode(" ");
     span.parentNode.insertBefore(space, span.nextSibling);
+
     const newRange = document.createRange();
     newRange.setStartAfter(space);
     newRange.collapse(true);
+    restoreSelection(newRange);
 
-    const sel = window.getSelection();
-    sel.removeAllRanges();
-    sel.addRange(newRange);
-    // Save the new range and update
     setActiveRange(newRange);
     setPopoverOpen(false);
 

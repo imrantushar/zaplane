@@ -11,7 +11,7 @@ import {
 } from "./helper";
 import "./styles.scss";
 
-const VariableEditor = ({ value, setFieldValue, field, variables, label, placeholder, containerStyle }) => {
+const VariableEditor = ({ value, setFieldValue, field, variables, label,placeholder,containerStyle}) => {
   const editorRef = useRef(null);
   const [isPopoverOpen, setPopoverOpen] = useState(false);
   const [activeRange, setActiveRange] = useState(null);
@@ -73,7 +73,7 @@ const VariableEditor = ({ value, setFieldValue, field, variables, label, placeho
 
   return (
     <>
-      <Flex as="label" direction="column" gap={2} style={{ ...containerStyle }}>
+      <Flex as="label" direction="column" gap={2} style={{...containerStyle}}>
         <Text className="zaplane-label">{__(label, "zaplane")}</Text>
 
         <div
