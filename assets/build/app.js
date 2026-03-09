@@ -3227,7 +3227,6 @@ const ZAPInput = ({
   // }, [value, type]);
 
   const isTextarea = type === "textarea";
-  console.log(isTextarea, 'is');
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Flex, {
     as: "label",
     direction: "column",
@@ -7126,8 +7125,8 @@ const TestDetails = ({
     values
   } = (0,formik__WEBPACK_IMPORTED_MODULE_6__.useFormikContext)();
   const selectedOutput = workFlow?.test_outputs?.[id]?.output || {};
-  const inputData = singleNodeExecution?.input || values || {};
-  const outputData = singleNodeExecution?.output || selectedOutput;
+  const inputData = singleNodeExecution[id]?.input || values || {};
+  const outputData = singleNodeExecution[id]?.output || selectedOutput;
   const isNode = source === "node";
   (0,react__WEBPACK_IMPORTED_MODULE_7__.useEffect)(() => {
     dispatch((0,_ZAPRedux_Slices_workFlowSlice_workFlowSlice__WEBPACK_IMPORTED_MODULE_5__.resetSingleNodeExecution)());
@@ -10583,7 +10582,7 @@ const workflowsSlice = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createSl
     versions: [],
     nodeDetails: [],
     isLoading: true,
-    singleNodeExecution: null,
+    singleNodeExecution: {},
     apiCountdown: 0,
     apiRequestRunning: false,
     workflowVariables: [],
@@ -10593,7 +10592,7 @@ const workflowsSlice = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createSl
   },
   reducers: {
     resetSingleNodeExecution(state) {
-      state.singleNodeExecution = null;
+      // state.singleNodeExecution = null;
       state.isLoading = false;
     },
     startApiCountdown(state, action) {
@@ -10688,7 +10687,11 @@ const workflowsSlice = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createSl
       state.isLoading = false;
     }).addCase(_actions_workflowExctions__WEBPACK_IMPORTED_MODULE_5__.workFLowSingeNodeExction.fulfilled, (state, action) => {
       state.isLoading = false;
-      state.singleNodeExecution = action.payload?.data || null;
+      const node_id = action?.payload?.data?.node?.id;
+      if (!state.singleNodeExecution[node_id]) {
+        state.singleNodeExecution[node_id] = {};
+      }
+      state.singleNodeExecution[node_id] = action.payload.data;
     }).addCase(_actions_workFlowListiner__WEBPACK_IMPORTED_MODULE_6__.workflowNodeListiner.fulfilled, state => {
       state.isLoading = false;
       state.apiRequestRunning = false;
