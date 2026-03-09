@@ -152,5 +152,9 @@ return [
 			'file' => 'elementor.php',
 			'class' => \Zaplane\Integrations\Elementor::class
 		],
+		'masterstudy'          => [ 
+			'file' => 'masterstudy.php',          
+			'class' => \Zaplane\Integrations\Masterstudy::class 
+		],
 	],
 ];

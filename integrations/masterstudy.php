@@ -36,105 +36,6 @@ class Masterstudy extends IntegrationBase {
         ]; 
     }
 
-    private static function resolve_all_course_payload() {
-        $all_course = [ 
-            ['label' => 'Any course', 'value' => 'any'],
-        ];
-
-        if ( ! function_exists( 'MasterStudy' ) ) {
-            $courses = get_posts([
-                'post_type'      => 'stm-courses',
-                'post_status'    => 'publish',
-                'orderby'        => 'post_title',
-                'order'          => 'ASC',
-                'posts_per_page' => 999,
-            ]);
-            
-            foreach ( $courses as $course ) {
-                $all_course[] = [
-                    'label' => $course->post_title,
-                    'value' => $course->ID
-                ];
-            }
-        }
-
-        return $all_course;
-    }
-
-    private static function resolve_all_lesson_payload() {
-        $all_lesson = [ 
-            ['label' => 'Any lesson', 'value' => 'any'],
-        ];
-
-        if ( ! function_exists( 'MasterStudy' ) ) {
-            $lessons = get_posts([
-                'post_type'      => 'stm-lessons',
-                'post_status'    => 'publish',
-                'orderby'        => 'post_title',
-                'order'          => 'ASC',
-                'posts_per_page' => 999,
-            ]);
-            
-            foreach ( $lessons as $lesson ) {
-                $all_lesson[] = [
-                    'label' => $lesson->post_title,
-                    'value' => $lesson->ID
-                ];
-            }
-        }
-
-        return $all_lesson;
-    }
-
-    private static function resolve_all_quiz_payload( $course_id = 'any' ) {
-        global $wpdb;
-        $all_quiz = [
-            ['label' => 'Any Quiz', 'value' => 'any'],
-        ];
-
-        if ( $course_id === 'any' ) {
-
-            $quizzes = $wpdb->get_results(
-                $wpdb->prepare(
-                    "SELECT ID, post_title 
-                    FROM {$wpdb->posts}
-                    WHERE post_type = %s 
-                    AND post_status = 'publish'
-                    ORDER BY post_title ASC",
-                    'stm-quizzes'
-                )
-            );
-        } else {
-            $quizzes = $wpdb->get_results(
-                $wpdb->prepare(
-                    "SELECT p.ID, p.post_title
-                    FROM {$wpdb->posts} p
-                    INNER JOIN {$wpdb->prefix}stm_lms_curriculum_materials cm 
-                        ON p.ID = cm.post_id
-                    INNER JOIN {$wpdb->prefix}stm_lms_curriculum_sections cs 
-                        ON cm.section_id = cs.id
-                    WHERE p.post_type = %s
-                    AND p.post_status = 'publish'
-                    AND cs.course_id = %d
-                    ORDER BY p.post_title ASC",
-                    'stm-quizzes',
-                    (int) $course_id
-                )
-            );
-        }
-
-        if ( $quizzes ) {
-            foreach ( $quizzes as $quiz ) {
-                $all_quiz[] = [
-                    'label' => $quiz->post_title,
-                    'value' => $quiz->ID
-                ];
-            }
-        }
-
-        return $all_quiz;
-    }
-
     public static function get_trigger_config_schema( string $trigger ): array {
         if ( in_array( $trigger, ['user_enroll_course','course_complete'], true ) ) {
             return [
@@ -142,7 +43,11 @@ class Masterstudy extends IntegrationBase {
                     'key'      => 'course_id',
                     'label'    => 'Course',
                     'type'     => 'select',
-                    'options'  => self::resolve_all_course_payload(),
+                    'dynamic' => [
+						'integration' => 'masterstudy',
+						'query'       => 'course_query',
+						'select'      => [ 'name', 'label' ],
+					],
                     'required' => true,
                 ],
             ];
@@ -154,14 +59,22 @@ class Masterstudy extends IntegrationBase {
                     'key'      => 'course_id',
                     'label'    => 'Course',
                     'type'     => 'select',
-                    'options'  => self::resolve_all_course_payload(),
+                    'dynamic' => [
+						'integration' => 'masterstudy',
+						'query'       => 'course_query',
+						'select'      => [ 'name', 'label' ],
+					],
                     'required' => true,
                 ],
                 [
                     'key'      => 'lesson_id',
                     'label'    => 'Lesson',
                     'type'     => 'select',
-                    'options'  => self::resolve_all_lesson_payload(),
+                    'dynamic' => [
+						'integration' => 'masterstudy',
+						'query'       => 'lesson_query',
+						'select'      => [ 'name', 'label' ],
+					],
                     'required' => true,
                 ],
             ];
@@ -173,7 +86,11 @@ class Masterstudy extends IntegrationBase {
                     'key'      => 'quiz_id',
                     'label'    => 'Quiz',
                     'type'     => 'select',
-                    'options'  => self::resolve_all_quiz_payload(),
+                    'dynamic' => [
+						'integration' => 'masterstudy',
+						'query'       => 'quiz_query',
+						'select'      => [ 'name', 'label' ],
+					],
                     'required' => true,
                 ],
             ];
@@ -318,4 +235,121 @@ class Masterstudy extends IntegrationBase {
         }
         return false;
     }
+
+    public static function get_dynamic_queries(): array {
+		return [
+			'course_query' => [ self::class, 'course_query_types' ],
+			'lesson_query' => [ self::class, 'lesson_query_types' ],
+			'quiz_query' => [ self::class, 'quiz_query_types' ],
+		];
+	}
+
+    public static function course_query_types( $q ) {
+        $all_course = [ 
+            [
+                'label' => 'Any course', 
+                'name' => 'any'
+            ],
+        ];
+
+        if ( ! function_exists( 'MasterStudy' ) ) {
+            $courses = get_posts([
+                'post_type'      => 'stm-courses',
+                'post_status'    => 'publish',
+                'orderby'        => 'post_title',
+                'order'          => 'ASC',
+                'posts_per_page' => 999,
+            ]);
+            
+            foreach ( $courses as $course ) {
+                $all_course[] = [
+                    'label' => $course->post_title,
+                    'name' => $course->ID
+                ];
+            }
+        }
+
+        return $all_course;
+	}
+
+    public static function lesson_query_types( $q ) {
+        $all_lesson = [ 
+            [
+                'label' => 'Any lesson', 
+                'name' => 'any'
+            ],
+        ];
+
+        if ( ! function_exists( 'MasterStudy' ) ) {
+            $lessons = get_posts([
+                'post_type'      => 'stm-lessons',
+                'post_status'    => 'publish',
+                'orderby'        => 'post_title',
+                'order'          => 'ASC',
+                'posts_per_page' => 999,
+            ]);
+            
+            foreach ( $lessons as $lesson ) {
+                $all_lesson[] = [
+                    'label' => $lesson->post_title,
+                    'name' => $lesson->ID
+                ];
+            }
+        }
+
+        return $all_lesson;
+	}
+
+    public static function quiz_query_types( $q ) {
+        global $wpdb;
+        $course_id = $q['course_id'] ?? 'any';
+        $all_quiz = [
+            [
+                'label' => 'Any Quiz', 
+                'name' => 'any'
+            ],
+        ];
+
+        if ( $course_id === 'any' ) {
+
+            $quizzes = $wpdb->get_results(
+                $wpdb->prepare(
+                    "SELECT ID, post_title 
+                    FROM {$wpdb->posts}
+                    WHERE post_type = %s 
+                    AND post_status = 'publish'
+                    ORDER BY post_title ASC",
+                    'stm-quizzes'
+                )
+            );
+        } else {
+            $quizzes = $wpdb->get_results(
+                $wpdb->prepare(
+                    "SELECT p.ID, p.post_title
+                    FROM {$wpdb->posts} p
+                    INNER JOIN {$wpdb->prefix}stm_lms_curriculum_materials cm 
+                        ON p.ID = cm.post_id
+                    INNER JOIN {$wpdb->prefix}stm_lms_curriculum_sections cs 
+                        ON cm.section_id = cs.id
+                    WHERE p.post_type = %s
+                    AND p.post_status = 'publish'
+                    AND cs.course_id = %d
+                    ORDER BY p.post_title ASC",
+                    'stm-quizzes',
+                    (int) $course_id
+                )
+            );
+        }
+
+        if ( $quizzes ) {
+            foreach ( $quizzes as $quiz ) {
+                $all_quiz[] = [
+                    'label' => $quiz->post_title,
+                    'name' => $quiz->ID
+                ];
+            }
+        }
+
+        return $all_quiz;
+	}
 }
