@@ -9,6 +9,7 @@ namespace Zaplane\Tests {
 		private static array $users = [];
 		private static array $comments = [];
 		private static int $lastInsertId = 100;
+		private static array $httpResponses = [];
 
 		public static function reset(): void {
 			self::$options = [];
@@ -17,6 +18,15 @@ namespace Zaplane\Tests {
 			self::$users = [];
 			self::$comments = [];
 			self::$lastInsertId = 100;
+			self::$httpResponses = [];
+		}
+
+		public static function setHttpResponse( array $body, int $status = 200 ): void {
+			self::$httpResponses[] = [ 'body' => wp_json_encode( $body ), 'status' => $status ];
+		}
+
+		public static function nextHttpResponse(): ?array {
+			return array_shift( self::$httpResponses );
 		}
 
 		// Posts
@@ -381,21 +391,62 @@ namespace {
 		}
 	}
 
+	if ( ! function_exists( 'wp_remote_request' ) ) {
+		function wp_remote_request( string $url, array $args = [] ) {
+			$next = \Zaplane\Tests\WPMocks::nextHttpResponse();
+			if ( $next === null ) {
+				return new \WP_Error( 'http_request_failed', 'Mock: no HTTP response queued' );
+			}
+			return [ 'response' => [ 'code' => $next['status'], 'message' => 'OK' ], 'body' => $next['body'] ];
+		}
+	}
+
 	if ( ! function_exists( 'wp_remote_post' ) ) {
 		function wp_remote_post( string $url, array $args = [] ) {
-			return new \WP_Error( 'http_request_failed', 'Mock: HTTP requests disabled in tests' );
+			$next = \Zaplane\Tests\WPMocks::nextHttpResponse();
+			if ( $next === null ) {
+				return new \WP_Error( 'http_request_failed', 'Mock: no HTTP response queued' );
+			}
+			return [ 'response' => [ 'code' => $next['status'], 'message' => 'OK' ], 'body' => $next['body'] ];
 		}
 	}
 
 	if ( ! function_exists( 'wp_remote_get' ) ) {
 		function wp_remote_get( string $url, array $args = [] ) {
-			return new \WP_Error( 'http_request_failed', 'Mock: HTTP requests disabled in tests' );
+			$next = \Zaplane\Tests\WPMocks::nextHttpResponse();
+			if ( $next === null ) {
+				return new \WP_Error( 'http_request_failed', 'Mock: no HTTP response queued' );
+			}
+			return [ 'response' => [ 'code' => $next['status'], 'message' => 'OK' ], 'body' => $next['body'] ];
 		}
 	}
 
 	if ( ! function_exists( 'wp_remote_retrieve_body' ) ) {
 		function wp_remote_retrieve_body( $response ): string {
+			if ( is_array( $response ) ) {
+				return $response['body'] ?? '';
+			}
 			return '';
+		}
+	}
+
+	if ( ! function_exists( 'wp_remote_retrieve_response_code' ) ) {
+		function wp_remote_retrieve_response_code( $response ) {
+			if ( is_array( $response ) ) {
+				return $response['response']['code'] ?? 200;
+			}
+			return 0;
+		}
+	}
+
+	if ( ! function_exists( 'wp_strip_all_tags' ) ) {
+		function wp_strip_all_tags( string $text, bool $remove_breaks = false ): string {
+			$text = preg_replace( '@<(script|style)[^>]*?>.*?</\\1>@si', '', $text );
+			$text = strip_tags( $text );
+			if ( $remove_breaks ) {
+				$text = preg_replace( '/[\r\n\t ]+/', ' ', $text );
+			}
+			return trim( $text );
 		}
 	}
 
