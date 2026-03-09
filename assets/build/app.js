@@ -6275,14 +6275,15 @@ const DrawerSearchList = ({
           children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Text, {
             as: "span",
             m: "0",
-            className: `zaplan-icon ${searchList?.icon}`
+            className: `zaplane-icon--${searchList?.icon}`
           })
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Text, {
           className: "zaplane-label",
+          fontWeight: "400",
           children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.sprintf)((0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)("%s", "zaplane"), item.name)
         })]
       }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Text, {
-        fontSize: "xs",
+        fontWeight: "400",
         className: "zaplane-label",
         children: item.type === 'tools' ? (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)('Tool', 'zaplane') : (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)('App', 'zaplane')
       })]

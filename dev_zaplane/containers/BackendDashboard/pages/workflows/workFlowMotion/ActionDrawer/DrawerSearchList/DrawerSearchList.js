@@ -28,12 +28,12 @@ const DrawerSearchList = ({ searchList, setMode, setSelectedItem, setSearch }) =
               p="10px"
               borderRadius='4px'
               border="1px solid var(--zaplane-border-color)">
-              <Text as={"span"} m='0'className={`zaplan-icon ${searchList?.icon}`}></Text>
+              <Text as={"span"} m='0'className={`zaplane-icon--${searchList?.icon}`}/>
             </Flex>
-            <Text className="zaplane-label" >{sprintf(__("%s", "zaplane"), item.name)}</Text>
+            <Text className="zaplane-label" fontWeight='400' >{sprintf(__("%s", "zaplane"), item.name)}</Text>
           </Flex>
 
-          <Text fontSize="xs" className="zaplane-label">
+          <Text fontWeight='400' className="zaplane-label">
             {item.type === 'tools' ? __('Tool', 'zaplane') : __('App', 'zaplane')}
           </Text>
         </Button>
