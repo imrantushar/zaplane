@@ -117,7 +117,7 @@ export default function CustomNode({ id, data, canvasLayout }) {
             bg="orange.50"
           >
             {/* <Icon as={FaWordpress} boxSize={5} color="orange.500" /> */}
-             <Text as={"span"} className={`zaplan-icon ${data.icon}`}></Text>
+             <Text as={"span"} className={`zaplane-icon--${data.icon}`}></Text>
           </Box>
           <Box textAlign="left" flex="1" minW="0">
             <Text className="zaplane-label" overflow='hidden' textOverflow="ellipsis" whiteSpace="nowrap">{isSelectApp ? __(data.app, "zaplane")

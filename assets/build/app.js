@@ -6038,7 +6038,7 @@ const DrawerItemButton = ({
           children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Text, {
             as: "span",
             m: "0",
-            className: `zaplan-icon ${icon}`
+            className: `zaplane-icon--${icon}`
           })
         })
       }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Text, {
@@ -7446,7 +7446,7 @@ function CustomNode({
           bg: "orange.50",
           children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Text, {
             as: "span",
-            className: `zaplan-icon ${data.icon}`
+            className: `zaplane-icon--${data.icon}`
           })
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Box, {
           textAlign: "left",
