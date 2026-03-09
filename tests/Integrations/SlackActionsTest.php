@@ -10,16 +10,14 @@ use Zaplane\Integrations\Slack;
  * Note: Slack requires OAuth credentials, so we only test registration/schema.
  * Actual execution would need mocked credentials.
  */
-class SlackActionsTest extends IntegrationTestCase
-{
-    protected function getIntegrationClass(): string
-    {
-        return Slack::class;
-    }
+class SlackActionsTest extends IntegrationTestCase {
 
-    // Skip execution tests - requires credentials
-    protected function getActionTests(): array
-    {
-        return [];
-    }
+	protected function getIntegrationClass(): string {
+		return Slack::class;
+	}
+
+	// Skip execution tests - requires credentials
+	protected function getActionTests(): array {
+		return [];
+	}
 }
