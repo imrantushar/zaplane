@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-03-09 17:42:58",
+    "generated_at": "2026-03-09 18:45:57",
     "apps": {
         "pause": {
             "slug": "pause",
@@ -10719,8 +10719,8 @@
                 }
             }
         },
-        "Http": {
-            "slug": "Http",
+        "http": {
+            "slug": "http",
             "name": "HTTP Request",
             "icon": "",
             "category": "tool",
