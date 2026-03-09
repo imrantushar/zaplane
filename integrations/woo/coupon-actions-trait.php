@@ -9,7 +9,7 @@ trait CouponActionsTrait {
 
 	private static function action_create_coupon( array $config, array $input ): array {
 		$code = $config['code'] ?? '';
-		if ( $code === '' ) {
+		if ( '' === $code ) {
 			return self::error( 'Coupon code is required' );
 		}
 		$coupon = new \WC_Coupon();
@@ -98,7 +98,7 @@ trait CouponActionsTrait {
 			return self::error( 'Coupon not found' );
 		}
 		$new_code = $config['new_code'] ?? '';
-		if ( $new_code === '' ) {
+		if ( '' === $new_code ) {
 			return self::error( 'New coupon code is required' );
 		}
 		$coupon->set_code( $new_code );
@@ -132,7 +132,7 @@ trait CouponActionsTrait {
 			return self::error( 'Cart is not available' );
 		}
 		$code = $config['code'] ?? '';
-		if ( $code === '' ) {
+		if ( '' === $code ) {
 			return self::error( 'Coupon code is required' );
 		}
 		$applied = WC()->cart->apply_coupon( $code );
@@ -146,7 +146,11 @@ trait CouponActionsTrait {
 		if ( ! function_exists( 'WC' ) || ! WC()->cart ) {
 			return self::error( 'Cart is not available' );
 		}
-		return self::respond( [ 'coupons' => WC()->cart->get_applied_coupons() ] );
+		$response = [ 'coupons' => WC()->cart->get_applied_coupons() ];
+		if ( isset( $config['include_totals'] ) && self::parse_bool( $config['include_totals'] ) ) {
+			$response['coupon_totals'] = WC()->cart->get_coupon_discount_totals();
+		}
+		return self::respond( $response );
 	}
 
 	private static function action_remove_coupon_from_cart( array $config, array $input ): array {
@@ -154,7 +158,7 @@ trait CouponActionsTrait {
 			return self::error( 'Cart is not available' );
 		}
 		$code = $config['code'] ?? '';
-		if ( $code === '' ) {
+		if ( '' === $code ) {
 			return self::error( 'Coupon code is required' );
 		}
 		WC()->cart->remove_coupon( $code );
@@ -201,11 +205,21 @@ trait CouponActionsTrait {
 		$result = self::query_coupons( [ 'limit' => -1 ] );
 		$totals = [];
 		foreach ( $result['items'] as $coupon ) {
-			$type = $coupon->get_discount_type() ?: 'unknown';
+			$type = $coupon->get_discount_type();
+			if ( '' === $type ) {
+				$type = 'unknown';
+			}
 			if ( ! isset( $totals[ $type ] ) ) {
 				$totals[ $type ] = 0;
 			}
 			$totals[ $type ]++;
+		}
+		if ( isset( $config['include_empty_types'] ) && self::parse_bool( $config['include_empty_types'] ) ) {
+			foreach ( [ 'percent', 'fixed_cart', 'fixed_product' ] as $known_type ) {
+				if ( ! isset( $totals[ $known_type ] ) ) {
+					$totals[ $known_type ] = 0;
+				}
+			}
 		}
 		return self::respond( [ 'totals' => $totals ] );
 	}
@@ -217,7 +231,7 @@ trait CouponActionsTrait {
 			$coupon = new \WC_Coupon( $coupon_id );
 			return $coupon->get_id() ? $coupon : null;
 		}
-		if ( $code !== '' ) {
+		if ( '' !== $code ) {
 			$coupon = new \WC_Coupon( $code );
 			return $coupon->get_id() ? $coupon : null;
 		}

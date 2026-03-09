@@ -9,7 +9,7 @@ trait ProductActionsTrait {
 
 	private static function action_create_product( array $config, array $input ): array {
 		$name = $config['name'] ?? '';
-		if ( $name === '' ) {
+		if ( '' === $name ) {
 			return self::error( 'Product name is required' );
 		}
 
@@ -259,7 +259,7 @@ trait ProductActionsTrait {
 
 	private static function action_get_product_by_sku( array $config, array $input ): array {
 		$sku = $config['sku'] ?? '';
-		if ( $sku === '' ) {
+		if ( '' === $sku ) {
 			return self::error( 'SKU is required' );
 		}
 		$product_id = wc_get_product_id_by_sku( $sku );
@@ -321,12 +321,15 @@ trait ProductActionsTrait {
 	}
 
 	private static function action_get_products_totals( array $config, array $input ): array {
+		$include_variations = ! isset( $config['include_variations'] ) || self::parse_bool( $config['include_variations'] );
 		$product_counts = wp_count_posts( 'product' );
-		$variation_counts = wp_count_posts( 'product_variation' );
-		return self::respond([
+		$response = [
 			'products' => (array) $product_counts,
-			'variations' => (array) $variation_counts,
-		]);
+		];
+		if ( $include_variations ) {
+			$response['variations'] = (array) wp_count_posts( 'product_variation' );
+		}
+		return self::respond( $response );
 	}
 
 	private static function action_get_product_sales_count_by_id( array $config, array $input ): array {
@@ -347,7 +350,7 @@ trait ProductActionsTrait {
 	private static function action_update_product_status( array $config, array $input ): array {
 		$product_id = $config['product_id'] ?? 0;
 		$status = $config['status'] ?? '';
-		if ( ! $product_id || $status === '' ) {
+		if ( ! $product_id || '' === $status ) {
 			return self::error( 'Product ID and status are required' );
 		}
 		$result = wp_update_post([

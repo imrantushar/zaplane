@@ -21,6 +21,7 @@ use Zaplane\Integrations\Wordpress\CommentActionsTrait;
 use Zaplane\Integrations\Wordpress\QueryTrait;
 use Zaplane\Integrations\Wordpress\Helper;
 
+// phpcs:ignore WordPress.WP.CapitalPDangit.MisspelledClassName -- Kept for backwards compatibility.
 class Wordpress extends IntegrationBase {
 
 	use ActionResponseTrait;
@@ -372,7 +373,7 @@ class Wordpress extends IntegrationBase {
 			];
 		}
 
-		if ( $trigger === 'transition_comment_status' ) {
+		if ( 'transition_comment_status' === $trigger ) {
 			return [
 				[
 					'key' => 'from_status',
@@ -422,7 +423,7 @@ class Wordpress extends IntegrationBase {
 				],
 			];
 		}//end if
-		if ( $trigger === 'do_action' ) {
+		if ( 'do_action' === $trigger ) {
 			return [
 				[
 					'key' => 'hook_name',
@@ -433,7 +434,7 @@ class Wordpress extends IntegrationBase {
 			];
 		}
 
-		if ( $trigger === 'activated_plugin' ) {
+		if ( 'activated_plugin' === $trigger ) {
 			return [
 				[
 					'key'     => 'plugin',
@@ -449,7 +450,7 @@ class Wordpress extends IntegrationBase {
 			];
 		}
 
-		if ( $trigger === 'switch_theme' ) {
+		if ( 'switch_theme' === $trigger ) {
 			return [
 				[
 					'key'     => 'theme',
@@ -465,7 +466,7 @@ class Wordpress extends IntegrationBase {
 			];
 		}
 
-		if ( $trigger === 'add_action' ) {
+		if ( 'add_action' === $trigger ) {
 			return [
 				[
 					'key'      => 'hook_name',
@@ -493,7 +494,7 @@ class Wordpress extends IntegrationBase {
 		}
 
 		$attachment = Post::find( $attachment_id );
-		if ( ! $attachment || $attachment->post_type !== 'attachment' ) {
+		if ( ! $attachment || 'attachment' !== $attachment->post_type ) {
 			return false;
 		}
 
@@ -544,7 +545,7 @@ class Wordpress extends IntegrationBase {
 
 			case 'wp_insert_post':
 				$post = Post::find( $args[0] ?? 0 );
-				if ( ! $post || $post->post_type !== 'revision' ) {
+				if ( ! $post || 'revision' !== $post->post_type ) {
 					return false;
 				}
 
@@ -593,7 +594,7 @@ class Wordpress extends IntegrationBase {
 				}
 
 				$attachment = Post::find( $post_id );
-				if ( ! $attachment || $attachment->post_type !== 'attachment' ) {
+				if ( ! $attachment || 'attachment' !== $attachment->post_type ) {
 					return false;
 				}
 
@@ -622,7 +623,7 @@ class Wordpress extends IntegrationBase {
 				}
 
 				$attachment = Post::find( $attachment_id );
-				if ( ! $attachment || $attachment->post_type !== 'attachment' ) {
+				if ( ! $attachment || 'attachment' !== $attachment->post_type ) {
 					return false;
 				}
 
@@ -1124,9 +1125,85 @@ class Wordpress extends IntegrationBase {
 			[
 				'key' => 'user_id',
 				'label' => 'User ID',
-				'type' => 'expression',
+				'type' => 'select',
+				'dynamic' => [
+					'integration' => 'wordpress',
+					'query'       => 'users',
+					'select'      => [ 'ID', 'name' ],
+				],
 				'required' => true
 			]
+		];
+	}
+
+	private static function field_role( bool $required = true ): array {
+		return [
+			[
+				'key' => 'role',
+				'label' => 'Role',
+				'type' => 'select',
+				'dynamic' => [
+					'integration' => 'wordpress',
+					'query'       => 'roles',
+					'select'      => [ 'name', 'label' ],
+				],
+				'required' => $required,
+			],
+		];
+	}
+
+	private static function field_taxonomy( bool $required = true ): array {
+		return [
+			[
+				'key' => 'taxonomy',
+				'label' => 'Taxonomy',
+				'type' => 'select',
+				'dynamic' => [
+					'integration' => 'wordpress',
+					'query'       => 'taxonomies',
+					'select'      => [ 'name', 'label' ],
+				],
+				'required' => $required,
+			],
+		];
+	}
+
+	private static function field_term_id( string $taxonomy = '', bool $required = true ): array {
+		$dynamic = [
+			'integration' => 'wordpress',
+			'query'       => 'terms',
+			'select'      => [ 'term_id', 'name' ],
+		];
+		if ( '' !== $taxonomy ) {
+			$dynamic['where'] = [
+				'taxonomy' => $taxonomy,
+			];
+		}
+
+		return [
+			[
+				'key' => 'term_id',
+				'label' => 'Term ID',
+				'type' => 'select',
+				'dynamic' => $dynamic,
+				'required' => $required,
+			],
+		];
+	}
+
+	private static function field_category_id( bool $required = true ): array {
+		return [
+			[
+				'key' => 'category_id',
+				'label' => 'Category',
+				'type' => 'select',
+				'dynamic' => [
+					'integration' => 'wordpress',
+					'query'       => 'categories',
+					'select'      => [ 'id', 'label' ],
+				],
+				'required' => $required,
+			],
 		];
 	}
 
@@ -1671,7 +1748,12 @@ class Wordpress extends IntegrationBase {
 				[
 					'key' => 'role',
 					'label' => 'Role',
-					'type' => 'text'
+					'type' => 'select',
+					'dynamic' => [
+						'integration' => 'wordpress',
+						'query'       => 'roles',
+						'select'      => [ 'name', 'label' ],
+					]
 				],
 			],
 
@@ -1705,7 +1787,12 @@ class Wordpress extends IntegrationBase {
 				[
 					'key' => 'role',
 					'label' => 'Role',
-					'type' => 'text'
+					'type' => 'select',
+					'dynamic' => [
+						'integration' => 'wordpress',
+						'query'       => 'roles',
+						'select'      => [ 'name', 'label' ],
+					]
 				],
 			],
 
@@ -1714,12 +1801,467 @@ class Wordpress extends IntegrationBase {
 				[
 					'key' => 'reassign',
 					'label' => 'Reassign User ID',
-					'type' => 'expression'
+					'type' => 'select',
+					'dynamic' => [
+						'integration' => 'wordpress',
+						'query'       => 'users',
+						'select'      => [ 'ID', 'name' ],
+					]
 				],
 			],
 
 			'activate_user'          => self::field_user_id(),
 			'deactivate_user'        => self::field_user_id(),
+			'get_users' => [
+				[
+					'key' => 'search',
+					'label' => 'Search',
+					'type' => 'text',
+				],
+				...self::field_role( false ),
+			],
+			'get_users_by_role'      => self::field_role(),
+			'get_user_by_id'         => self::field_user_id(),
+			'get_user_by_email'      => [
+				[
+					'key' => 'email',
+					'label' => 'User Email',
+					'type' => 'text',
+					'required' => true,
+				],
+			],
+			'get_user_by_field'      => [
+				[
+					'key' => 'field',
+					'label' => 'Field',
+					'type' => 'select',
+					'options' => [
+						[
+							'label' => 'User ID',
+							'value' => 'id'
+						],
+						[
+							'label' => 'Email',
+							'value' => 'email'
+						],
+						[
+							'label' => 'Login',
+							'value' => 'login'
+						],
+						[
+							'label' => 'Slug',
+							'value' => 'slug'
+						],
+					],
+					'default' => 'id',
+					'required' => true,
+				],
+				[
+					'key' => 'value',
+					'label' => 'Field Value',
+					'type' => 'text',
+					'required' => true,
+				],
+			],
+			'get_user_meta_all'      => self::field_user_id(),
+			'get_user_meta_single'   => [
+				...self::field_user_id(),
+				[
+					'key' => 'meta_key',
+					'label' => 'Meta Key',
+					'type' => 'text',
+					'required' => true,
+				],
+			],
+			'update_user_meta'       => [
+				...self::field_user_id(),
+				[
+					'key' => 'meta_key',
+					'label' => 'Meta Key',
+					'type' => 'text',
+					'required' => true,
+				],
+				[
+					'key' => 'meta_value',
+					'label' => 'Meta Value',
+					'type' => 'textarea',
+				],
+			],
+			'send_password_reset_email' => [
+				[
+					'key' => 'user_login_or_email',
+					'label' => 'Username or Email',
+					'type' => 'text',
+					'required' => true,
+				],
+			],
+
+			'create_role' => [
+				[
+					'key' => 'role',
+					'label' => 'Role Slug',
+					'type' => 'text',
+					'required' => true,
+				],
+				[
+					'key' => 'display_name',
+					'label' => 'Display Name',
+					'type' => 'text',
+					'required' => true,
+				],
+				[
+					'key' => 'capabilities',
+					'label' => 'Capabilities (CSV)',
+					'type' => 'textarea',
+				],
+			],
+			'delete_role'            => self::field_role(),
+			'add_user_role'          => [ ...self::field_user_id(), ...self::field_role() ],
+			'remove_user_role'       => [ ...self::field_user_id(), ...self::field_role() ],
+			'update_user_role'       => [ ...self::field_user_id(), ...self::field_role() ],
+			'get_roles' => [
+				[
+					'key' => 'search',
+					'label' => 'Search',
+					'type' => 'text',
+				],
+			],
+			'get_caps' => [
+				[
+					'key' => 'search',
+					'label' => 'Search',
+					'type' => 'text',
+				],
+			],
+			'get_role_caps'          => self::field_role(),
+			'add_role_caps'          => [
+				...self::field_role(),
+				[
+					'key' => 'caps',
+					'label' => 'Capabilities (CSV)',
+					'type' => 'textarea',
+					'required' => true,
+				],
+			],
+			'remove_role_caps'       => [
+				...self::field_role(),
+				[
+					'key' => 'caps',
+					'label' => 'Capabilities (CSV)',
+					'type' => 'textarea',
+					'required' => true,
+				],
+			],
+			'get_user_caps'          => self::field_user_id(),
+			'add_user_caps'          => [
+				...self::field_user_id(),
+				[
+					'key' => 'caps',
+					'label' => 'Capabilities (CSV)',
+					'type' => 'textarea',
+					'required' => true,
+				],
+			],
+			'remove_user_caps'       => [
+				...self::field_user_id(),
+				[
+					'key' => 'caps',
+					'label' => 'Capabilities (CSV)',
+					'type' => 'textarea',
+					'required' => true,
+				],
+			],
+
+			'get_term'               => [ ...self::field_taxonomy(), ...self::field_term_id() ],
+			'get_terms_by_taxonomy'  => [
+				...self::field_taxonomy(),
+				[
+					'key' => 'hide_empty',
+					'label' => 'Hide Empty Terms',
+					'type' => 'boolean',
+				],
+				[
+					'key' => 'search',
+					'label' => 'Search',
+					'type' => 'text',
+				],
+				[
+					'key' => 'limit',
+					'label' => 'Limit',
+					'type' => 'number',
+					'default' => 20,
+				],
+			],
+			'get_term_by_field'      => [
+				...self::field_taxonomy(),
+				[
+					'key' => 'field',
+					'label' => 'Field',
+					'type' => 'select',
+					'options' => [
+						[
+							'label' => 'ID',
+							'value' => 'id'
+						],
+						[
+							'label' => 'Slug',
+							'value' => 'slug'
+						],
+						[
+							'label' => 'Name',
+							'value' => 'name'
+						],
+					],
+					'default' => 'id',
+					'required' => true,
+				],
+				[
+					'key' => 'value',
+					'label' => 'Field Value',
+					'type' => 'text',
+					'required' => true,
+				],
+			],
+			'create_term'            => [
+				...self::field_taxonomy(),
+				[
+					'key' => 'name',
+					'label' => 'Name',
+					'type' => 'text',
+					'required' => true,
+				],
+				[
+					'key' => 'slug',
+					'label' => 'Slug',
+					'type' => 'text',
+				],
+				[
+					'key' => 'parent',
+					'label' => 'Parent Term ID',
+					'type' => 'select',
+					'dynamic' => [
+						'integration' => 'wordpress',
+						'query'       => 'terms',
+						'select'      => [ 'term_id', 'name' ],
+						'where'       => [ 'taxonomy' => 'category' ],
+					],
+				],
+				[
+					'key' => 'description',
+					'label' => 'Description',
+					'type' => 'textarea',
+				],
+			],
+			'update_term'            => [
+				...self::field_taxonomy(),
+				...self::field_term_id(),
+				[
+					'key' => 'name',
+					'label' => 'Name',
+					'type' => 'text',
+				],
+				[
+					'key' => 'slug',
+					'label' => 'Slug',
+					'type' => 'text',
+				],
+				[
+					'key' => 'parent',
+					'label' => 'Parent Term ID',
+					'type' => 'select',
+					'dynamic' => [
+						'integration' => 'wordpress',
+						'query'       => 'terms',
+						'select'      => [ 'term_id', 'name' ],
+						'where'       => [ 'taxonomy' => 'category' ],
+					],
+				],
+				[
+					'key' => 'description',
+					'label' => 'Description',
+					'type' => 'textarea',
+				],
+			],
+			'delete_term'            => [ ...self::field_taxonomy(), ...self::field_term_id() ],
+			'register_taxonomy'      => [
+				[
+					'key' => 'taxonomy',
+					'label' => 'Taxonomy Slug',
+					'type' => 'text',
+					'required' => true,
+				],
+				[
+					'key' => 'object_type',
+					'label' => 'Object Types (CSV)',
+					'type' => 'textarea',
+					'required' => true,
+				],
+				[
+					'key' => 'args',
+					'label' => 'Arguments (JSON)',
+					'type' => 'textarea',
+				],
+			],
+			'unregister_taxonomy'    => self::field_taxonomy(),
+			'get_taxonomies'         => [
+				[
+					'key' => 'search',
+					'label' => 'Search',
+					'type' => 'text',
+				],
+			],
+			'get_taxonomy'           => self::field_taxonomy(),
+			'add_taxonomy_to_post'   => [
+				...self::field_post_id(),
+				...self::field_taxonomy(),
+				[
+					'key' => 'terms',
+					'label' => 'Terms (IDs/Slugs, CSV)',
+					'type' => 'textarea',
+					'required' => true,
+				],
+				[
+					'key' => 'append',
+					'label' => 'Append',
+					'type' => 'boolean',
+				],
+			],
+			'remove_taxonomy_from_post' => [
+				...self::field_post_id(),
+				...self::field_taxonomy(),
+				[
+					'key' => 'terms',
+					'label' => 'Terms (IDs/Slugs, CSV)',
+					'type' => 'textarea',
+					'required' => true,
+				],
+			],
+			'bulk_assign_terms_to_posts' => [
+				...self::field_taxonomy(),
+				[
+					'key' => 'post_ids',
+					'label' => 'Post IDs (CSV)',
+					'type' => 'textarea',
+					'required' => true,
+				],
+				[
+					'key' => 'terms',
+					'label' => 'Terms (IDs/Slugs, CSV)',
+					'type' => 'textarea',
+					'required' => true,
+				],
+				[
+					'key' => 'append',
+					'label' => 'Append',
+					'type' => 'boolean',
+				],
+			],
+			'bulk_remove_terms_from_posts' => [
+				...self::field_taxonomy(),
+				[
+					'key' => 'post_ids',
+					'label' => 'Post IDs (CSV)',
+					'type' => 'textarea',
+					'required' => true,
+				],
+				[
+					'key' => 'terms',
+					'label' => 'Terms (IDs/Slugs, CSV)',
+					'type' => 'textarea',
+					'required' => true,
+				],
+			],
+
+			'create_category'        => [
+				[
+					'key' => 'name',
+					'label' => 'Category Name',
+					'type' => 'text',
+					'required' => true,
+				],
+				[
+					'key' => 'slug',
+					'label' => 'Slug',
+					'type' => 'text',
+				],
+				[
+					'key' => 'parent',
+					'label' => 'Parent Category',
+					'type' => 'select',
+					'dynamic' => [
+						'integration' => 'wordpress',
+						'query'       => 'categories',
+						'select'      => [ 'id', 'label' ],
+					],
+				],
+				[
+					'key' => 'description',
+					'label' => 'Description',
+					'type' => 'textarea',
+				],
+			],
+			'update_category'        => [
+				...self::field_category_id(),
+				[
+					'key' => 'name',
+					'label' => 'Category Name',
+					'type' => 'text',
+				],
+				[
+					'key' => 'slug',
+					'label' => 'Slug',
+					'type' => 'text',
+				],
+				[
+					'key' => 'parent',
+					'label' => 'Parent Category',
+					'type' => 'select',
+					'dynamic' => [
+						'integration' => 'wordpress',
+						'query'       => 'categories',
+						'select'      => [ 'id', 'label' ],
+					],
+				],
+				[
+					'key' => 'description',
+					'label' => 'Description',
+					'type' => 'textarea',
+				],
+			],
+			'delete_category'        => self::field_category_id(),
+			'add_category_to_post'   => [
+				...self::field_post_id(),
+				[
+					'key' => 'categories',
+					'label' => 'Category IDs (CSV)',
+					'type' => 'textarea',
+					'required' => true,
+				],
+				[
+					'key' => 'append',
+					'label' => 'Append',
+					'type' => 'boolean',
+				],
+			],
+			'get_categories'         => [
+				[
+					'key' => 'search',
+					'label' => 'Search',
+					'type' => 'text',
+				],
+				[
+					'key' => 'hide_empty',
+					'label' => 'Hide Empty',
+					'type' => 'boolean',
+				],
+				[
+					'key' => 'limit',
+					'label' => 'Limit',
+					'type' => 'number',
+					'default' => 20,
+				],
+			],
+			'get_category'           => self::field_category_id(),
 
 			'add_plugin_theme_option' => [
 				[
@@ -1879,16 +2421,22 @@ class Wordpress extends IntegrationBase {
 				[
 					'key' => 'remember',
 					'label' => 'Remember',
-					'type' => 'text'
+					'type' => 'boolean'
 				],
 				[
 					'key' => 'secure_cookie',
 					'label' => 'Secure Cookie',
-					'type' => 'text'
+					'type' => 'boolean'
 				],
 			],
 
-			'logout_user' => [],
+			'logout_user' => [
+				[
+					'key' => 'force',
+					'label' => 'Force',
+					'type' => 'boolean',
+				],
+			],
 
 		];
 

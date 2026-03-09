@@ -38,7 +38,7 @@ return [
 		],
 		'woocommerce'          => [
 			'file' => 'woocommerce.php',
-			'class' => \Zaplane\Integrations\woocommerce::class
+			'class' => \Zaplane\Integrations\Woocommerce::class
 		],
 		'slack'                => [
 			'file' => 'Slack.php',
