@@ -2,111 +2,100 @@
 
 namespace Zaplane\Framework\Exceptions;
 
-if( ! defined('ABSPATH') ) {
-    exit; // Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
-class OAuthException extends ZaplaneException
-{
-    protected string $errorCode = 'oauth_error';
-    protected string $integration = '';
-    protected ?string $oauthError = null;
+class OAuthException extends ZaplaneException {
 
-    public function __construct(
-        string $message,
-        string $integration = '',
-        ?string $oauthError = null,
-        array $context = []
-    ) {
-        $this->integration = $integration;
-        $this->oauthError = $oauthError;
+	protected string $errorCode = 'oauth_error';
+	protected string $integration = '';
+	protected ?string $oauthError = null;
 
-        if ($integration) {
-            $context['integration'] = $integration;
-        }
-        if ($oauthError) {
-            $context['oauth_error'] = $oauthError;
-        }
+	public function __construct(
+		string $message,
+		string $integration = '',
+		?string $oauthError = null,
+		array $context = []
+	) {
+		$this->integration = $integration;
+		$this->oauthError = $oauthError;
 
-        parent::__construct($message, $context);
-    }
+		if ( $integration ) {
+			$context['integration'] = $integration;
+		}
+		if ( $oauthError ) {
+			$context['oauth_error'] = $oauthError;
+		}
 
-    public static function invalidState(): self
-    {
-        return new self('Invalid or expired OAuth state token');
-    }
+		parent::__construct( $message, $context );
+	}
 
-    public static function tokenExchangeFailed(string $integration, string $error): self
-    {
-        return new self(
-            "OAuth token exchange failed: {$error}",
-            $integration,
-            $error
-        );
-    }
+	public static function invalidState(): self {
+		return new self( 'Invalid or expired OAuth state token' );
+	}
 
-    public static function refreshFailed(string $integration, string $error): self
-    {
-        return new self(
-            "OAuth token refresh failed: {$error}",
-            $integration,
-            $error
-        );
-    }
+	public static function tokenExchangeFailed( string $integration, string $error ): self {
+		return new self(
+			"OAuth token exchange failed: {$error}",
+			$integration,
+			$error
+		);
+	}
 
-    public static function noAccessToken(string $integration): self
-    {
-        return new self(
-            'No access token received from OAuth provider',
-            $integration
-        );
-    }
+	public static function refreshFailed( string $integration, string $error ): self {
+		return new self(
+			"OAuth token refresh failed: {$error}",
+			$integration,
+			$error
+		);
+	}
 
-    public static function noRefreshToken(string $integration): self
-    {
-        return new self(
-            'No refresh token available',
-            $integration
-        );
-    }
+	public static function noAccessToken( string $integration ): self {
+		return new self(
+			'No access token received from OAuth provider',
+			$integration
+		);
+	}
 
-    public static function authUrlFailed(string $integration): self
-    {
-        return new self(
-            'Failed to generate OAuth authorization URL',
-            $integration
-        );
-    }
+	public static function noRefreshToken( string $integration ): self {
+		return new self(
+			'No refresh token available',
+			$integration
+		);
+	}
 
-    public static function notSupported(string $integration): self
-    {
-        return new self(
-            "Integration does not support OAuth2",
-            $integration
-        );
-    }
+	public static function authUrlFailed( string $integration ): self {
+		return new self(
+			'Failed to generate OAuth authorization URL',
+			$integration
+		);
+	}
 
-    public static function scopeError(string $integration, array $missingScopes): self
-    {
-        return new self(
-            'Missing required OAuth scopes: ' . implode(', ', $missingScopes),
-            $integration,
-            null,
-            ['missing_scopes' => $missingScopes]
-        );
-    }
+	public static function notSupported( string $integration ): self {
+		return new self(
+			'Integration does not support OAuth2',
+			$integration
+		);
+	}
 
-    public function getIntegration(): string
-    {
-        return $this->integration;
-    }
+	public static function scopeError( string $integration, array $missingScopes ): self {
+		return new self(
+			'Missing required OAuth scopes: ' . implode( ', ', $missingScopes ),
+			$integration,
+			null,
+			[ 'missing_scopes' => $missingScopes ]
+		);
+	}
 
-    public function getOAuthError(): ?string
-    {
-        return $this->oauthError;
-    }
+	public function getIntegration(): string {
+		return $this->integration;
+	}
 
-    public function getHttpStatusCode(): int
-    {
-        return 401;
-    }
+	public function getOAuthError(): ?string {
+		return $this->oauthError;
+	}
+
+	public function getHttpStatusCode(): int {
+		return 401;
+	}
 }

@@ -5,29 +5,29 @@ namespace Zaplane\Framework\Models;
 use Zaplane\Framework\Database\ORM\Model;
 use Zaplane\Framework\Database\ORM\QueryBuilder;
 
-if (!defined('ABSPATH')) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
-abstract class WPModel extends Model
-{
-    protected static bool $useZaplanePrefix = false;
+abstract class WPModel extends Model {
 
-    public static function getTable(): string
-    {
-        global $wpdb;
+	protected static bool $useZaplanePrefix = false;
 
-        if (empty(static::$table)) {
-            $className = (new \ReflectionClass(static::class))->getShortName();
-            $snakeCase = strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $className));
-            static::$table = $snakeCase . 's';
-        }
+	public static function getTable(): string {
+		global $wpdb;
 
-        return $wpdb->prefix . static::$table;
-    }
+		if ( empty( static::$table ) ) {
+			$className = ( new \ReflectionClass( static::class ) )->getShortName();
+			$snakeCase = strtolower( preg_replace( '/(?<!^)[A-Z]/', '_$0', $className ) );
+			static::$table = $snakeCase . 's';
+		}
 
-    public static function query(): QueryBuilder
-    {
-        $query = new QueryBuilder(static::getTable());
-        $query->setModel(static::class);
-        return $query;
-    }
+		return $wpdb->prefix . static::$table;
+	}
+
+	public static function query(): QueryBuilder {
+		$query = new QueryBuilder( static::getTable() );
+		$query->setModel( static::class );
+		return $query;
+	}
 }

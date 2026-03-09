@@ -6,52 +6,53 @@ use Zaplane\Framework\Console\Command;
 use Zaplane\Framework\Database\ORM\Migrator;
 use Zaplane\Framework\Database\ORM\Schema;
 
-if (!defined('ABSPATH')) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
-class MigrateFreshCommand extends Command
-{
-    protected string $signature = 'migrate:fresh';
-    protected string $description = 'Drop all tables and re-run all migrations';
+class MigrateFreshCommand extends Command {
 
-    protected array $tables = [
-        'migrations',
-        'workflows',
-        'workflow_versions',
-        'runs',
-        'node_runs',
-        'connections',
-    ];
+	protected string $signature = 'migrate:fresh';
+	protected string $description = 'Drop all tables and re-run all migrations';
 
-    public function handle(array $args, array $assoc_args): void
-    {
-        $force = isset($assoc_args['force']);
+	protected array $tables = [
+		'migrations',
+		'workflows',
+		'workflow_versions',
+		'runs',
+		'node_runs',
+		'connections',
+	];
 
-        if (!$force) {
-            $this->warning('This will drop all Zaplane tables and re-run migrations.');
-            if (!$this->confirm('Are you sure you want to continue?')) {
-                $this->info('Operation cancelled.');
-                return;
-            }
-        }
+	public function handle( array $args, array $assoc_args ): void {
+		$force = isset( $assoc_args['force'] );
 
-        $this->info('Dropping all tables...');
+		if ( ! $force ) {
+			$this->warning( 'This will drop all Zaplane tables and re-run migrations.' );
+			if ( ! $this->confirm( 'Are you sure you want to continue?' ) ) {
+				$this->info( 'Operation cancelled.' );
+				return;
+			}
+		}
 
-        foreach (array_reverse($this->tables) as $table) {
-            if (Schema::hasTable($table)) {
-                Schema::drop($table);
-                $this->info("Dropped: {$table}");
-            }
-        }
+		$this->info( 'Dropping all tables...' );
 
-        $this->info('Running migrations...');
+		foreach ( array_reverse( $this->tables ) as $table ) {
+			if ( Schema::hasTable( $table ) ) {
+				Schema::drop( $table );
+				$this->info( "Dropped: {$table}" );
+			}
+		}
 
-        $migrator = Migrator::getInstance();
-        $migrated = $migrator->run();
+		$this->info( 'Running migrations...' );
 
-        foreach ($migrated as $migration) {
-            $this->info("Migrated: {$migration}");
-        }
+		$migrator = Migrator::getInstance();
+		$migrated = $migrator->run();
 
-        $this->success('Database refreshed successfully.');
-    }
+		foreach ( $migrated as $migration ) {
+			$this->info( "Migrated: {$migration}" );
+		}
+
+		$this->success( 'Database refreshed successfully.' );
+	}
 }
