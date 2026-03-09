@@ -1,10 +1,21 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-03-07 23:38:13",
+    "generated_at": "2026-03-09 11:24:33",
     "apps": {
+        "pause": {
+            "slug": "pause",
+            "name": "Pause",
+            "icon": "",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": [],
+            "actions": []
+        },
         "wordpress": {
             "slug": "wordpress",
-            "name": "Wordpress",
+            "name": "WordPress",
             "icon": "",
             "category": "app",
             "requires_connection": false,
@@ -10190,12 +10201,14 @@
                             "key": "course_id",
                             "label": "course",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any course",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "tutor",
+                                "query": "course",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -10212,12 +10225,14 @@
                             "key": "course_id",
                             "label": "course",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any course",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "tutor",
+                                "query": "course",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -10234,12 +10249,14 @@
                             "key": "quiz_id",
                             "label": "Quiz",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any Quiz",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "tutor",
+                                "query": "quiz",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -10256,12 +10273,14 @@
                             "key": "lesson_id",
                             "label": "Lesson",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any lesson",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "tutor",
+                                "query": "lesson",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -10278,12 +10297,14 @@
                             "key": "quiz_id",
                             "label": "Quiz",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any Quiz",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "tutor",
+                                "query": "quiz",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         },
                         {
@@ -10415,5 +10436,341 @@
             "actions": []
         }
     },
-    "tools": []
+    "tools": {
+        "condition": {
+            "slug": "condition",
+            "name": "Condition",
+            "icon": "",
+            "category": "tool",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": [],
+            "actions": {
+                "if": {
+                    "key": "if",
+                    "label": "If Condition",
+                    "schema": [
+                        {
+                            "key": "conditions",
+                            "label": "Conditions",
+                            "type": "condition_group",
+                            "required": true,
+                            "help": "Build complex conditions with AND/OR groups",
+                            "fields": [
+                                {
+                                    "key": "left",
+                                    "label": "Left Value",
+                                    "type": "expression",
+                                    "required": true
+                                },
+                                {
+                                    "key": "operator",
+                                    "label": "Operator",
+                                    "type": "select",
+                                    "options": [
+                                        {
+                                            "label": "Equals",
+                                            "value": "=="
+                                        },
+                                        {
+                                            "label": "Not Equals",
+                                            "value": "!="
+                                        },
+                                        {
+                                            "label": "Greater Than",
+                                            "value": ">"
+                                        },
+                                        {
+                                            "label": "Less Than",
+                                            "value": "<"
+                                        },
+                                        {
+                                            "label": "Greater or Equal",
+                                            "value": ">="
+                                        },
+                                        {
+                                            "label": "Less or Equal",
+                                            "value": "<="
+                                        },
+                                        {
+                                            "label": "Contains",
+                                            "value": "contains"
+                                        },
+                                        {
+                                            "label": "Not Contains",
+                                            "value": "not_contains"
+                                        },
+                                        {
+                                            "label": "Starts With",
+                                            "value": "starts_with"
+                                        },
+                                        {
+                                            "label": "Ends With",
+                                            "value": "ends_with"
+                                        },
+                                        {
+                                            "label": "Is Empty",
+                                            "value": "is_empty"
+                                        },
+                                        {
+                                            "label": "Is Not Empty",
+                                            "value": "is_not_empty"
+                                        }
+                                    ],
+                                    "required": true
+                                },
+                                {
+                                    "key": "right",
+                                    "label": "Right Value",
+                                    "type": "expression",
+                                    "required": true
+                                }
+                            ],
+                            "logic_options": [
+                                "AND",
+                                "OR"
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "true",
+                        "false"
+                    ]
+                }
+            }
+        },
+        "filter": {
+            "slug": "filter",
+            "name": "Filter",
+            "icon": "",
+            "category": "tool",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": [],
+            "actions": {
+                "filter": {
+                    "key": "filter",
+                    "label": "Filter",
+                    "schema": [
+                        {
+                            "key": "conditions",
+                            "label": "Conditions",
+                            "type": "condition_group",
+                            "required": true,
+                            "help": "Only continue if these conditions are met",
+                            "fields": [
+                                {
+                                    "key": "left",
+                                    "label": "Left Value",
+                                    "type": "expression",
+                                    "required": true
+                                },
+                                {
+                                    "key": "operator",
+                                    "label": "Operator",
+                                    "type": "select",
+                                    "options": [
+                                        {
+                                            "label": "Equals",
+                                            "value": "=="
+                                        },
+                                        {
+                                            "label": "Not Equals",
+                                            "value": "!="
+                                        },
+                                        {
+                                            "label": "Greater Than",
+                                            "value": ">"
+                                        },
+                                        {
+                                            "label": "Less Than",
+                                            "value": "<"
+                                        },
+                                        {
+                                            "label": "Greater or Equal",
+                                            "value": ">="
+                                        },
+                                        {
+                                            "label": "Less or Equal",
+                                            "value": "<="
+                                        },
+                                        {
+                                            "label": "Contains",
+                                            "value": "contains"
+                                        },
+                                        {
+                                            "label": "Not Contains",
+                                            "value": "not_contains"
+                                        },
+                                        {
+                                            "label": "Starts With",
+                                            "value": "starts_with"
+                                        },
+                                        {
+                                            "label": "Ends With",
+                                            "value": "ends_with"
+                                        },
+                                        {
+                                            "label": "Is Empty",
+                                            "value": "is_empty"
+                                        },
+                                        {
+                                            "label": "Is Not Empty",
+                                            "value": "is_not_empty"
+                                        }
+                                    ],
+                                    "required": true
+                                },
+                                {
+                                    "key": "right",
+                                    "label": "Right Value",
+                                    "type": "expression",
+                                    "required": true
+                                }
+                            ],
+                            "logic_options": [
+                                "AND",
+                                "OR"
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
+        },
+        "delay": {
+            "slug": "delay",
+            "name": "Delay",
+            "icon": "",
+            "category": "tool",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": [],
+            "actions": {
+                "wait": {
+                    "key": "wait",
+                    "label": "Wait / Delay",
+                    "schema": [
+                        {
+                            "key": "seconds",
+                            "label": "Wait Seconds",
+                            "type": "number",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
+        },
+        "iterator": {
+            "slug": "iterator",
+            "name": "Iterator",
+            "icon": "",
+            "category": "tool",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": [],
+            "actions": []
+        },
+        "variable": {
+            "slug": "variable",
+            "name": "Set Variable",
+            "icon": "",
+            "category": "tool",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": [],
+            "actions": {
+                "set": {
+                    "key": "set",
+                    "label": "Set Variable",
+                    "schema": [
+                        {
+                            "key": "name",
+                            "label": "Variable Name",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "value",
+                            "label": "Value",
+                            "type": "expression"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
+        },
+        "Http": {
+            "slug": "Http",
+            "name": "HTTP Request",
+            "icon": "",
+            "category": "tool",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": [],
+            "actions": {
+                "request": {
+                    "key": "request",
+                    "label": "Send HTTP Request",
+                    "schema": [
+                        {
+                            "key": "url",
+                            "label": "URL",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "method",
+                            "label": "Method",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "GET",
+                                    "value": "GET"
+                                },
+                                {
+                                    "label": "POST",
+                                    "value": "POST"
+                                },
+                                {
+                                    "label": "PUT",
+                                    "value": "PUT"
+                                },
+                                {
+                                    "label": "DELETE",
+                                    "value": "DELETE"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "headers",
+                            "label": "Headers (JSON)",
+                            "type": "textarea"
+                        },
+                        {
+                            "key": "body",
+                            "label": "Body",
+                            "type": "expression"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
+        }
+    }
 }

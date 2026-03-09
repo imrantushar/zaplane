@@ -41,98 +41,49 @@ class Tutor extends IntegrationBase {
 
 	public static function get_trigger_config_schema( string $trigger ): array {
 		if ( in_array( $trigger, [ 'user_enroll_course', 'course_complete' ], true ) ) {
-			$options = [
-				[
-					'label' => 'Any course',
-					'value' => 'any'
-				],
-			];
-			if ( function_exists( 'tutor' ) ) {
-				$courses = get_posts([
-					'post_type'      => 'courses',
-					'post_status'    => 'publish',
-					'posts_per_page' => -1,
-				]);
-
-				foreach ( $courses as $course ) {
-					$options[] = [
-						'label' => $course->post_title,
-						'value' => $course->ID
-					];
-				}
-			}
 			return [
 				[
 					'key'      => 'course_id',
 					'label'    => 'course',
 					'type'     => 'select',
-					'options'  => $options,
+					'dynamic' => [
+						'integration' => 'tutor',
+						'query'       => 'course',
+						'select'      => [ 'name', 'label' ],
+					],
 					'required' => true,
 				],
 			];
-		}//end if
+		}
+		//end if
 
 		if ( in_array( $trigger, [ 'tutor_quiz_course_attempt' ], true ) ) {
-			$options = [
-				[
-					'label' => 'Any Quiz',
-					'value' => 'any'
-				],
-			];
-			if ( function_exists( 'tutor' ) ) {
-				$quizzes = get_posts([
-					'post_type'      => 'tutor_quiz',
-					'post_status'    => 'publish',
-					'posts_per_page' => -1,
-				]);
-
-				foreach ( $quizzes as $quiz ) {
-					$options[] = [
-						'label' => $quiz->post_title,
-						'value' => $quiz->ID,
-					];
-				}
-			}
 			return [
 				[
 					'key'      => 'quiz_id',
 					'label'    => 'Quiz',
 					'type'     => 'select',
-					'options'  => $options,
+					'dynamic' => [
+						'integration' => 'tutor',
+						'query'       => 'quiz',
+						'select'      => [ 'name', 'label' ],
+					],
 					'required' => true,
 				],
 			];
 		}//end if
 
 		if ( $trigger === 'quiz_target' ) {
-			$options = [
-				[
-					'label' => 'Any Quiz',
-					'value' => 'any'
-				],
-			];
-
-			if ( function_exists( 'tutor' ) ) {
-				$quizzes = get_posts([
-					'post_type'      => 'tutor_quiz',
-					'post_status'    => 'publish',
-					'posts_per_page' => -1,
-				]);
-
-				foreach ( $quizzes as $quiz ) {
-					$options[] = [
-						'label' => $quiz->post_title,
-						'value' => $quiz->ID,
-					];
-				}
-			}
-
 			return [
 				[
 					'key'      => 'quiz_id',
 					'label'    => 'Quiz',
 					'type'     => 'select',
-					'options'  => $options,
+					'dynamic' => [
+							'integration' => 'tutor',
+							'query'       => 'quiz',
+							'select'      => [ 'name', 'label' ],
+						],
 					'required' => true,
 				],
 				[
@@ -145,32 +96,17 @@ class Tutor extends IntegrationBase {
 		}//end if
 
 		if ( in_array( $trigger, [ 'lesson_complete' ], true ) ) {
-			$options = [
-				[
-					'label' => 'Any lesson',
-					'value' => 'any'
-				],
-			];
-			if ( function_exists( 'tutor' ) ) {
-				$lessons = get_posts([
-					'post_type'      => 'lesson',
-					'post_status'    => 'publish',
-					'posts_per_page' => -1,
-				]);
 
-				foreach ( $lessons as $lesson ) {
-					$options[] = [
-						'label' => $lesson->post_title,
-						'value' => $lesson->ID,
-					];
-				}
-			}
 			return [
 				[
 					'key'      => 'lesson_id',
 					'label'    => 'Lesson',
 					'type'     => 'select',
-					'options'  => $options,
+					'dynamic' => [
+						'integration' => 'tutor',
+						'query'       => 'lesson',
+						'select'      => [ 'name', 'label' ],
+					],
 					'required' => true,
 				],
 			];
@@ -343,10 +279,102 @@ class Tutor extends IntegrationBase {
 		$config = $node['data']['config'] ?? [];
 
 		switch ( $node['data']['event'] ?? '' ) {
+			default:
+				break;
 		}
 		return [
 			'port' => 'main',
 			'data' => $input
 		];
+	}
+
+	
+	
+	public static function get_dynamic_queries(): array {
+		return [
+			'course' => [ self::class, 'query_courses' ],
+			'quiz' => [ self::class, 'query_quiz' ],
+			'lesson' => [ self::class, 'query_lesson' ],
+		];
+	}
+
+	public static function query_courses() {
+
+		$options = [
+			[
+				'label' => 'Any Course',
+				'name'  => 'any'
+			],
+		];
+
+		if ( function_exists('tutor') ) {
+
+			$courses = get_posts([
+				'post_type'      => 'courses',
+				'post_status'    => 'publish',
+				'posts_per_page' => -1,
+			]);
+
+			foreach ($courses as $course) {
+				$options[] = [
+					'label' => $course->post_title,
+					'name'  => $course->ID
+				];
+			}
+		}
+
+		return $options;
+	}
+
+	public static function query_quiz() {
+
+			$options = [
+				[
+					'label' => 'Any Quiz',
+					'name' => 'any'
+				],
+			];
+			if ( function_exists( 'tutor' ) ) {
+				$quizzes = get_posts([
+					'post_type'      => 'tutor_quiz',
+					'post_status'    => 'publish',
+					'posts_per_page' => -1,
+				]);
+
+				foreach ( $quizzes as $quiz ) {
+					$options[] = [
+						'label' => $quiz->post_title,
+						'name' => $quiz->ID,
+					];
+				}
+			}
+
+		return $options;
+	}
+
+	public static function query_lesson() {
+			$options = [
+				[
+					'label' => 'Any lesson',
+					'value' => 'any'
+				],
+			];
+
+			if ( function_exists( 'tutor' ) ) {
+				$lessons = get_posts([
+					'post_type'      => 'lesson',
+					'post_status'    => 'publish',
+					'posts_per_page' => -1,
+				]);
+
+				foreach ( $lessons as $lesson ) {
+					$options[] = [
+						'label' => $lesson->post_title,
+						'value' => $lesson->ID,
+					];
+				}
+			}
+
+		return $options;
 	}
 }
