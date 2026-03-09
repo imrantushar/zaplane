@@ -2,24 +2,23 @@
 
 namespace Zaplane\Framework\Database\ORM;
 
-if (!defined('ABSPATH')) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
-class RawExpression
-{
-    protected string $value;
+class RawExpression {
 
-    public function __construct(string $value)
-    {
-        $this->value = $value;
-    }
+	protected string $value;
 
-    public function getValue(): string
-    {
-        return $this->value;
-    }
+	public function __construct( string $value ) {
+		$this->value = $value;
+	}
 
-    public function __toString(): string
-    {
-        return $this->value;
-    }
+	public function getValue(): string {
+		return $this->value;
+	}
+
+	public function __toString(): string {
+		return $this->value;
+	}
 }

@@ -1,57 +1,54 @@
 <?php
 namespace Zaplane\Integrations\Wordpress;
 
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 use Zaplane\Traits\ActionResponseTrait;
 
-trait UserActionsTrait
-{
-    protected static function action_create_user(array $config): array
-    {
-        $user_id = wp_insert_user($config);
+trait UserActionsTrait {
 
-        if (is_wp_error($user_id)) {
-            return static::error($user_id->get_error_message());
-        }
+	protected static function action_create_user( array $config ): array {
+		$user_id = wp_insert_user( $config );
 
-        return static::success(['user_id' => $user_id]);
-    }
+		if ( is_wp_error( $user_id ) ) {
+			return static::error( $user_id->get_error_message() );
+		}
 
-    protected static function action_update_user(array $config): array
-    {
-        $config['ID'] = $config['user_id'] ?? 0;
-        $updated = wp_update_user($config);
+		return static::success( [ 'user_id' => $user_id ] );
+	}
 
-        if (is_wp_error($updated)) {
-            return static::error($updated->get_error_message());
-        }
+	protected static function action_update_user( array $config ): array {
+		$config['ID'] = $config['user_id'] ?? 0;
+		$updated = wp_update_user( $config );
 
-        return static::success(['updated' => $updated]);
-    }
+		if ( is_wp_error( $updated ) ) {
+			return static::error( $updated->get_error_message() );
+		}
 
-    protected static function action_delete_user(array $config): array
-    {
-        $deleted = wp_delete_user($config['user_id'], $config['reassign'] ?? null);
+		return static::success( [ 'updated' => $updated ] );
+	}
 
-        if (!$deleted) {
-            return static::error("Failed to delete user ID {$config['user_id']}");
-        }
+	protected static function action_delete_user( array $config ): array {
+		$deleted = wp_delete_user( $config['user_id'], $config['reassign'] ?? null );
 
-        return static::success(['deleted_user_id' => $config['user_id']]);
-    }
+		if ( ! $deleted ) {
+			return static::error( "Failed to delete user ID {$config['user_id']}" );
+		}
 
-    protected static function action_get_users(array $config): array
-    {
-        $users = get_users($config);
-        return static::success([
-            'users' => static::query_users(['users' => $users])
-        ]);
-    }
+		return static::success( [ 'deleted_user_id' => $config['user_id'] ] );
+	}
 
-    protected static function action_get_users_by_role(array $config): array
-    {
-        // same behavior, reuse action_get_users
-        return static::action_get_users($config);
-    }
+	protected static function action_get_users( array $config ): array {
+		$users = get_users( $config );
+		return static::success([
+			'users' => static::query_users( [ 'users' => $users ] )
+		]);
+	}
+
+	protected static function action_get_users_by_role( array $config ): array {
+
+		return static::action_get_users( $config );
+	}
 }
