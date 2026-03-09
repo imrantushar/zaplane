@@ -178,4 +178,22 @@ class ContactForm extends IntegrationBase {
         }
         return false;
     }
+
+    /* =====================================================
+     * DYNAMIC DATA QUERIES (API)
+     * ===================================================== */
+
+    public static function get_dynamic_queries(): array {
+        return [
+            'form_query' => [ self::class, 'form_query_types' ],
+        ];
+    }
+
+    public static function form_query_types( $q ) {
+        $types = get_post_types(['public'=>true],'objects');
+        return array_map(fn($t)=>[
+            'name'=>$t->name,
+            'label'=>$t->label
+        ], $types);
+    }
 }
