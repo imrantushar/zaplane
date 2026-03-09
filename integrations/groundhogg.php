@@ -34,27 +34,16 @@ class Groundhogg extends IntegrationBase {
 
 	public static function get_trigger_config_schema( string $trigger ): array {
 		if ( in_array( $trigger, [ 'added_tag', 'removed_tag' ], true ) ) {
-			$options = [
-				[
-					'label' => 'Any Tag',
-					'value' => 'any'
-				],
-			];
-			if ( function_exists( '\Groundhogg\get_db' ) ) {
-				$tags = \Groundhogg\get_db( 'tags' )->query( [ 'limit' => 1000 ] );
-				foreach ( $tags as $tag ) {
-					$options[] = [
-						'value' => $tag->tag_id,
-						'label' => $tag->tag_name,
-					];
-				}
-			}
 			return [
 				[
 					'key'      => 'tag_id',
 					'label'    => 'Tags',
 					'type'     => 'select',
-					'options'  => $options,
+					'dynamic' => [
+						'integration' => 'groundhogg',
+						'query'       => 'groundhogg_query',
+						'select'      => [ 'name', 'label' ],
+					],
 					'required' => true,
 				],
 			];
@@ -136,5 +125,31 @@ class Groundhogg extends IntegrationBase {
 				];
 		}//end switch
 		return false;
+	}
+
+	public static function get_dynamic_queries(): array {
+		return [
+			'groundhogg_query' => [ self::class, 'grounhogg_query_types' ],
+		];
+	}
+
+    public static function grounhogg_query_types( $q ) {
+		$options = [
+				[
+					'label' => 'Any Tag',
+					'name' => 'any'
+				],
+			];
+			if ( function_exists( '\Groundhogg\get_db' ) ) {
+				$tags = \Groundhogg\get_db( 'tags' )->query( [ 'limit' => 1000 ] );
+				foreach ( $tags as $tag ) {
+					$options[] = [
+						'name' => $tag->tag_id,
+						'label' => $tag->tag_name,
+					];
+				}
+			}
+
+        return $options;
 	}
 }

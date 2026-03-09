@@ -36,29 +36,16 @@ class ContactForm extends IntegrationBase {
 	public static function get_trigger_config_schema( string $trigger ): array {
 
 		if ( $trigger === 'form_submitted' ) {
-			$options = [
-				[
-					'label' => 'Any From',
-					'value' => 'any'
-				],
-			];
-
-			if ( class_exists( 'WPCF7_ContactForm' ) ) {
-				$forms = \WPCF7_ContactForm::find();
-				foreach ( $forms as $form ) {
-					$options[]  = [
-						'label' => $form->title(),
-						'value' => $form->id(),
-					];
-				}
-			}
-
 			return [
 				[
 					'key'      => 'form_id',
 					'label'    => 'Forms',
 					'type'     => 'select',
-					'options'  => $options,
+					'dynamic' => [
+						'integration' => 'contact-form-7',
+						'query'       => 'form_query',
+						'select'      => [ 'name', 'label' ],
+					],
 					'required' => true,
 				],
 			];
@@ -196,5 +183,32 @@ class ContactForm extends IntegrationBase {
 				];
 		}//end switch
 		return false;
+	}
+
+    public static function get_dynamic_queries(): array {
+		return [
+			'form_query' => [ self::class, 'form_query_types' ],
+		];
+	}
+
+    public static function form_query_types( $q ) {
+		$options = [
+            [
+                'label' => 'Any Form',
+                'name' => 'any'
+            ],
+		];
+
+        if ( class_exists( 'WPCF7_ContactForm' ) ) {
+            $forms = \WPCF7_ContactForm::find();
+            foreach ( $forms as $form ) {
+                $options[]  = [
+                    'name' => $form->id(),
+                    'label' => $form->title(),
+                ];
+            }
+        }
+
+        return $options;
 	}
 }

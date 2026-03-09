@@ -53,54 +53,32 @@ class FluentCrm extends IntegrationBase {
 
 	public static function get_trigger_config_schema( string $trigger ): array {
 		if ( in_array( $trigger, [ 'added_tag', 'removed_tag' ], true ) ) {
-			$options = [
-				[
-					'label' => 'Any Tag',
-					'value' => 'any'
-				],
-			];
-			if ( class_exists( 'FluentCrm\App\Models\Tag' ) ) {
-				$tags = \FluentCrm\App\Models\Tag::all();
-				foreach ( $tags as $tag ) {
-					$options[] = [
-						'label' => $tag->title,
-						'value' => $tag->id,
-					];
-				}
-			}
 			return [
 				[
 					'key' => 'tag_id',
 					'label' => 'Tags',
 					'type' => 'select',
-					'options' => $options,
+					'dynamic' => [
+						'integration' => 'FluentCRM',
+						'query'       => 'tag_query',
+						'select'      => [ 'value', 'label' ],
+					],
 					'required' => true
 				],
 			];
 		}//end if
 
 		if ( in_array( $trigger, [ 'added_list', 'removed_list' ], true ) ) {
-			$options = [
-				[
-					'label' => 'Any List',
-					'value' => 'any'
-				],
-			];
-			if ( class_exists( 'FluentCrm\App\Models\Lists' ) ) {
-				$lists = \FluentCrm\App\Models\Lists::all();
-				foreach ( $lists as $list ) {
-					$options[] = [
-						'label' => $list->title,
-						'value' => $list->id,
-					];
-				}
-			}
 			return [
 				[
 					'key' => 'list_id',
 					'label' => 'List',
 					'type' => 'select',
-					'options' => $options,
+					'dynamic' => [
+						'integration' => 'FluentCRM',
+						'query'       => 'list_query',
+						'select'      => [ 'value', 'label' ],
+					],
 					'required' => true
 				],
 			];
@@ -290,65 +268,6 @@ class FluentCrm extends IntegrationBase {
 		];
 	}
 
-	private static function get_lists() {
-		$options = [
-			[
-				'label' => 'Any List',
-				'value' => 'any'
-			]
-		];
-		if ( class_exists( 'FluentCrm\App\Models\Lists' ) ) {
-			$lists = \FluentCrm\App\Models\Lists::all();
-			foreach ( $lists as $list ) {
-				$options[] = [
-					'label' => $list->title,
-					'value' => $list->id,
-				];
-			}
-		}
-		return $options;
-	}
-
-	private static function get_tags() {
-		$options = [
-			[
-				'label' => 'Any Tag',
-				'value' => 'any'
-			]
-		];
-		if ( class_exists( 'FluentCrm\App\Models\Tag' ) ) {
-			 $tags = \FluentCrm\App\Models\Tag::all();
-			foreach ( $tags as $tag ) {
-				$options[] = [
-					'label' => $tag->title,
-					'value' => $tag->id,
-				];
-			}
-		}
-		return $options;
-	}
-
-	private static function get_company() {
-		global $wpdb;
-		$options = [];
-		$table = $wpdb->prefix . 'fc_companies';
-		if ( $wpdb->get_var( $wpdb->prepare(
-			'SHOW TABLES LIKE %s', $table
-		) ) !== $table ) {
-			return $options;
-		}
-		if ( class_exists( 'FluentCrm\App\Models\Company' ) ) {
-			$companies = \FluentCrm\App\Models\Company::all();
-			foreach ( $companies as $company ) {
-				$options[] = [
-					'label' => $company->name,
-					'value' => $company->id,
-				];
-			}
-		}
-		return $options;
-	}
-
 	private static function contact_id(): array {
 		return [
 			[
@@ -415,26 +334,34 @@ class FluentCrm extends IntegrationBase {
 		];
 	}
 
-	private static function select_tag(): array {
+	public static function select_tag(): array {
 		return [
 			[
 				'key' => 'tags',
 				'label' => 'Tags',
 				'type' => 'select',
-				'options' => self::get_tags(),
+				'dynamic' => [
+					'integration' => 'FluentCRM',
+					'query'       => 'tag_query',
+					'select'      => [ 'value', 'label' ],
+				],
 				'required' => true,
 				'multiple' => true
 			]
 		];
 	}
 
-	private static function select_list(): array {
+	public static function select_list(): array {
 		return [
 			[
 				'key' => 'lists',
 				'label' => 'Lists',
 				'type' => 'select',
-				'options' => self::get_lists(),
+				'dynamic' => [
+					'integration' => 'FluentCRM',
+					'query'       => 'list_query',
+					'select'      => [ 'value', 'label' ],
+				],
 				'required' => true,
 				'multiple' => true
 			]
@@ -452,13 +379,17 @@ class FluentCrm extends IntegrationBase {
 		];
 	}
 
-	private static function select_company(): array {
+	public static function select_company(): array {
 		return [
 			[
 				'key' => 'company',
 				'label' => 'company',
 				'type' => 'select',
-				'options' => self::get_company(),
+				'dynamic' => [
+					'integration' => 'FluentCRM',
+					'query'       => 'company_query',
+					'select'      => [ 'value', 'label' ],
+				],
 				'required' => true,
 				'multiple' => true
 			]
@@ -916,7 +847,7 @@ class FluentCrm extends IntegrationBase {
 						$contact->updateMeta( $field, sanitize_text_field( $config[ $field ] ), false );
 					}
 				}
-				if ( ! empty( $config['lists'] ) && $config['lists'] !== 'any' ) {
+				if ( ! empty( $config['lists'] ) && 'any' !== $config['lists'] ) {
 					$contact->attachLists( (array) $config['lists'] );
 				}
 				if ( ! empty( $config['tags'] ) && $config['tags'] !== 'any' ) {
@@ -1850,7 +1781,7 @@ class FluentCrm extends IntegrationBase {
 				$contact = $contact->fresh( [ 'companies' ] );
 				$company_payload = [];
 				foreach ( $contact->companies as $company ) {
-					if ( in_array( $company->id, $valid_company_ids ) ) {
+					if ( in_array( $company->id, $valid_company_ids ) ) { // phpcs.ignore WordPress.PHP.StrictInArray.MissingTrueStrict
 						$company_payload[]   = self::resolve_company_payload( $company );
 					}
 				}
@@ -2090,7 +2021,7 @@ class FluentCrm extends IntegrationBase {
 				];
 
 			case 'delete_campaign':
-				 $campaign_id = intval( $config['campaign_id'] ?? 0 );
+				$campaign_id = intval( $config['campaign_id'] ?? 0 );
 				if ( ! $campaign_id ) {
 					return [
 						'port' => 'main',
@@ -2176,7 +2107,7 @@ class FluentCrm extends IntegrationBase {
 					'event_key' => $event_key,
 					'title'     => $event_title,
 					'value'     => $event_value,
-					'provider'  => $provider ?: 'custom',
+					'provider'  => $provider ? $provider : 'custom',
 				], true );
 				return [
 					'port' => 'main',
@@ -2256,5 +2187,77 @@ class FluentCrm extends IntegrationBase {
 			'port' => 'main',
 			'data' => $input
 		];
+	}
+
+	public static function get_dynamic_queries(): array {
+		return [
+			'tag_query'     => [ self::class, 'tag_query_types' ],
+			'list_query'    => [ self::class, 'list_query_types' ],
+			'company_query' => [ self::class, 'company_query_types' ],
+		];
+	}
+
+	public static function tag_query_types( $q ) {
+		$all_tag = [
+			[
+				'label' => 'Any Tag',
+				'value' => 'any'
+			],
+		];
+		if ( class_exists( 'FluentCrm\App\Models\Tag' ) ) {
+			$tags = \FluentCrm\App\Models\Tag::all();
+			foreach ( $tags as $tag ) {
+				$all_tag[] = [
+					'label' => $tag->title,
+					'value' => $tag->id,
+				];
+			}
+		}
+
+		return $all_tag;
+	}
+
+	public static function list_query_types( $q ) {
+		$all_list = [
+			[
+				'label' => 'Any List',
+				'value' => 'any'
+			],
+		];
+		if ( class_exists( 'FluentCrm\App\Models\Lists' ) ) {
+			$lists = \FluentCrm\App\Models\Lists::all();
+			foreach ( $lists as $list ) {
+				$all_list[] = [
+					'label' => $list->title,
+					'value' => $list->id,
+				];
+			}
+		}
+
+		return $all_list;
+	}
+
+	public static function company_query_types( $q ) {
+		global $wpdb;
+		$table = $wpdb->prefix . 'fc_companies';
+		$all_company = [
+			[
+				'label' => 'Any Company',
+				'value' => 'any'
+			],
+		];
+		if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table ) ) !== $table ) {
+			return $all_company;
+		}
+		if ( class_exists( 'FluentCrm\App\Models\Company' ) ) {
+			$companies = \FluentCrm\App\Models\Company::all();
+			foreach ( $companies as $company ) {
+				$all_company[] = [
+					'label' => $company->name,
+					'value' => $company->id,
+				];
+			}
+		}
+		return $all_company;
 	}
 }

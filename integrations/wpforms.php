@@ -25,29 +25,16 @@ class Wpforms extends IntegrationBase {
 
 	public static function get_trigger_config_schema( string $trigger ): array {
 		if ( $trigger === 'form_submitted' ) {
-			$options = [
-				[
-					'label' => 'Any From',
-					'value' => 'any'
-				],
-			];
-
-			if ( function_exists( 'WPForms' ) ) {
-				$forms = WPForms()->form->get();
-				foreach ( $forms as $form ) {
-					$options[]  = [
-						'label' => $form->post_title,
-						'value' => $form->ID,
-					];
-				}
-			}
-
 			return [
 				[
 					'key'      => 'form_id',
 					'label'    => 'Forms',
 					'type'     => 'select',
-					'options'  => $options,
+					'dynamic' => [
+						'integration' => 'wpforms',
+						'query'       => 'form_query',
+						'select'      => [ 'name', 'label' ],
+					],
 					'required' => true,
 				],
 			];
@@ -117,5 +104,32 @@ class Wpforms extends IntegrationBase {
 				];
 		}//end switch
 		return false;
+	}
+
+	public static function get_dynamic_queries(): array {
+		return [
+			'form_query' => [ self::class, 'form_query_types' ],
+		];
+	}
+
+    public static function form_query_types( $q ) {
+		$options = [
+				[
+					'label' => 'Any From',
+					'name' => 'any'
+				],
+			];
+
+			if ( function_exists( 'WPForms' ) ) {
+				$forms = WPForms()->form->get();
+				foreach ( $forms as $form ) {
+					$options[]  = [
+						'label' => $form->post_title,
+						'name' => $form->ID,
+					];
+				}
+			}
+
+        return $options;
 	}
 }
