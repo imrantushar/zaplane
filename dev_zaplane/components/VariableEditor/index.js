@@ -11,20 +11,26 @@ import {
 } from "./helper";
 import "./styles.scss";
 
-const VariableEditor = ({ value, setFieldValue, field, variables, label,placeholder,containerStyle}) => {
+const VariableEditor = ({ value, setFieldValue, field, variables, label, placeholder, containerStyle }) => {
   const editorRef = useRef(null);
   const [isPopoverOpen, setPopoverOpen] = useState(false);
   const [activeRange, setActiveRange] = useState(null);
   const [isEmpty, setIsEmpty] = useState(!value);
 
   // render value when load/change
+  const initialized = useRef(false);
+
   useEffect(() => {
-    if (editorRef.current) {
+    if (!editorRef.current) return;
+
+    if (!initialized.current) {
       if (value) {
         editorRef.current.innerHTML = renderVariableHTML(value, variables);
       }
-      setIsEmpty(!value || value.trim() === "");
+      initialized.current = true;
     }
+
+    setIsEmpty(!value || value.trim() === "");
   }, [value, variables]);
 
   // remove variable
@@ -73,7 +79,7 @@ const VariableEditor = ({ value, setFieldValue, field, variables, label,placehol
 
   return (
     <>
-      <Flex as="label" direction="column" gap={2} style={{...containerStyle}}>
+      <Flex as="label" direction="column" gap={2} style={{ ...containerStyle }}>
         <Text className="zaplane-label">{__(label, "zaplane")}</Text>
 
         <div
