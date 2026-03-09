@@ -84,7 +84,7 @@ const StatusOptions = ( props ) => {
 				<span
 					className={ `zaplane-icon zaplane-icon--arrow-down` }
 				>
-					<Icon as={FaAngleDown} />
+					{/* <Icon as={FaAngleDown} /> */}
 				</span>
 			</button>
 			{ createPortal(

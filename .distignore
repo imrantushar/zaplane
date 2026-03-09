@@ -5,6 +5,8 @@ dev_zaplane/
 assets/css/backend-dist.css
 assets/css/frontend-dist.css
 assets/scss
+assets/icon-src
+assets/library/icons/fonts/zaplane-icons.html
 vendor/
 docs/
 package-lock.json

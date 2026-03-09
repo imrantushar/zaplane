@@ -1,0 +1,5 @@
+{
+	{{~#each codepoints }}"
+		{{~../prefix}}-{{~@key}}":"{{~@key}}"{{~#if @last}}{{~else}},{{~/if}}
+	{{~/each }}
+}

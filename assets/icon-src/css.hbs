@@ -1,0 +1,8 @@
+/**
+ * Zaplane Icons.
+ * @version 1.0.0
+ */
+
+@font-face {font-family: "{{ name }}";src: {{{ fontSrc }}};}
+[class^="zaplane-icon--"]:before,[class*=" zaplane-icon--"]:before{font-family:{{ name }}!important;font-style:normal;font-weight:normal!important;font-variant:normal;text-transform:none;line-height:1;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+{{# each codepoints }}.zaplane-icon--{{ @key }}:before {content:"\\{{ codepoint this }}"}{{/ each }}

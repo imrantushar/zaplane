@@ -9,6 +9,17 @@ class Assets {
 
     public function register(): void {
         add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_app_assets' ] );
+        add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_icons' ] );
+        add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_icons' ] );
+    }
+
+    public function enqueue_icons(): void {
+        wp_enqueue_style(
+            'zaplane-icons',
+            ZAPLANE_ASSETS_URI . 'library/icons/zaplane-icons.css',
+            [],
+            filemtime( ZAPLANE_ASSETS_DIR_PATH . 'library/icons/zaplane-icons.css' )
+        );
     }
 
     public function enqueue_app_assets($hook){
