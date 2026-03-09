@@ -6,7 +6,6 @@ import ZAPSelect from "@ZAPComponents/ZAPSelect";
 import { __ } from "@wordpress/i18n";
 import { buildEmptyRule } from "./helper";
 import { useState } from "react";
-import VariablePopover from "../VariablePopaver/VariablePopover";
 import VariableEditor from "@ZAPComponents/VariableEditor";
 
 

@@ -7,7 +7,6 @@ import ConditionGroupField from "../ConditionGroupField/ConditionGroupField";
 import { mapEdgesForBackend, mapNodesForBackend } from "../../helper";
 import { conditionVariables } from "@ZAPRedux/Slices/workFlowSlice/actions/conditonVariales";
 import { insertVariableAtCursor } from "./helper";
-import VariablePopover from "../VariablePopaver/VariablePopover";
 import './styles.scss'
 import { __ } from "@wordpress/i18n";
 import VariableEditor from "@ZAPComponents/VariableEditor/index.js";
