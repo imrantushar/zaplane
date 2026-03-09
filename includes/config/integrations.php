@@ -84,7 +84,7 @@ return [
 			'file' => 'fluent-form.php',
 			'class' => \Zaplane\Integrations\FluentForm::class
 		],
-		'FluentCRM'            => [
+		'fluentcrm'            => [
 			'file' => 'fluent-crm.php',
 			'class' => \Zaplane\Integrations\FluentCrm::class
 		],

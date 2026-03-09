@@ -93,9 +93,9 @@ class Learndash extends IntegrationBase {
 					'required' => true,
 				],
 			];
-		}
+		}//end if
 
-		if ( $trigger === 'topic_complete' ) {
+		if ( 'topic_complete' === $trigger ) {
 			return [
 				[
 					'key'      => 'course_id',
@@ -133,7 +133,7 @@ class Learndash extends IntegrationBase {
 			];
 		}//end if
 
-		if ( $trigger === 'quiz_attempt' ) {
+		if ( 'quiz_attempt' === $trigger ) {
 			return [
 				[
 					'key'      => 'quiz_id',
@@ -208,7 +208,7 @@ class Learndash extends IntegrationBase {
 
 				$selected_course = $node['data']['config']['course_id'] ?? 'any';
 
-				if ( $selected_course !== 'any' && (int) $selected_course !== (int) $course_id ) {
+				if ( 'any' !== $selected_course && (int) $selected_course !== (int) $course_id ) {
 					return false;
 				}
 
@@ -229,7 +229,7 @@ class Learndash extends IntegrationBase {
 				$course_id = $data['course']->ID;
 				$selected_course = $node['data']['config']['course_id'] ?? 'any';
 
-				if ( $selected_course !== 'any' && (int) $selected_course !== (int) $course_id ) {
+				if ( 'any' !== $selected_course && (int) $selected_course !== (int) $course_id ) {
 					return false;
 				}
 
@@ -249,7 +249,7 @@ class Learndash extends IntegrationBase {
 
 				$selected_lesson = $node['data']['config']['lesson_id'] ?? 'any';
 
-				if ( $selected_lesson !== 'any' && (int) $selected_lesson !== (int) $lesson_id ) {
+				if ( 'any' !== $selected_lesson && (int) $selected_lesson !== (int) $lesson_id ) {
 					return false;
 				}
 
@@ -279,7 +279,7 @@ class Learndash extends IntegrationBase {
 				$topic  = $data['topic'];
 				$selected_topic = $node['data']['config']['topic_id'] ?? 'any';
 
-				if ( $selected_topic !== 'any' && (int) $selected_topic !== (int) $topic->ID ) {
+				if ( 'any' !== $selected_topic && (int) $selected_topic !== (int) $topic->ID ) {
 					return false;
 				}
 
@@ -323,7 +323,7 @@ class Learndash extends IntegrationBase {
 				$quiz   = get_post( (int) $quiz_id );
 				$selected_quiz = $node['data']['config']['quiz_id'] ?? 'any';
 
-				if ( $selected_quiz !== 'any' && (int) $selected_quiz !== (int) $quiz->ID ) {
+				if ( 'any' !== $selected_quiz && (int) $selected_quiz !== (int) $quiz->ID ) {
 					return false;
 				}
 
@@ -368,7 +368,7 @@ class Learndash extends IntegrationBase {
 
 				$selected_group = $node['data']['config']['group_id'] ?? 'any';
 
-				if ( $selected_group !== 'any' && (int) $selected_group !== (int) $group_id ) {
+				if ( 'any' !== $selected_group && (int) $selected_group !== (int) $group_id ) {
 					return false;
 				}
 
@@ -479,7 +479,7 @@ class Learndash extends IntegrationBase {
 		];
 	}
 
-    public static function course_query_types( $q ) {
+	public static function course_query_types( $q ) {
 		$all_course = [
 			[
 				'label' => 'Any course',
@@ -507,7 +507,7 @@ class Learndash extends IntegrationBase {
 		return $all_course;
 	}
 
-    public static function lesson_query_types( $q ) {
+	public static function lesson_query_types( $q ) {
 		$all_lesson = [
 			[
 				'label' => 'Any lesson',
@@ -535,7 +535,7 @@ class Learndash extends IntegrationBase {
 		return $all_lesson;
 	}
 
-    public static function topic_query_types( $q ) {
+	public static function topic_query_types( $q ) {
 		$all_topic = [
 			[
 				'label' => 'Any Topic',
@@ -563,7 +563,7 @@ class Learndash extends IntegrationBase {
 		return $all_topic;
 	}
 
-    public static function quiz_query_types( $q ) {
+	public static function quiz_query_types( $q ) {
 		$all_quiz = [
 			[
 				'label' => 'Any Quiz',
@@ -591,7 +591,7 @@ class Learndash extends IntegrationBase {
 		return $all_quiz;
 	}
 
-    public static function group_query_types( $q ) {
+	public static function group_query_types( $q ) {
 		$all_group = [
 			[
 				'label' => 'Any Group',

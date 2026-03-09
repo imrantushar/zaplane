@@ -133,23 +133,23 @@ class Groundhogg extends IntegrationBase {
 		];
 	}
 
-    public static function grounhogg_query_types( $q ) {
+	public static function grounhogg_query_types( $q ) {
 		$options = [
-				[
-					'label' => 'Any Tag',
-					'name' => 'any'
-				],
-			];
-			if ( function_exists( '\Groundhogg\get_db' ) ) {
-				$tags = \Groundhogg\get_db( 'tags' )->query( [ 'limit' => 1000 ] );
-				foreach ( $tags as $tag ) {
-					$options[] = [
-						'name' => $tag->tag_id,
-						'label' => $tag->tag_name,
-					];
-				}
+			[
+				'label' => 'Any Tag',
+				'name' => 'any'
+			],
+		];
+		if ( function_exists( '\Groundhogg\get_db' ) ) {
+			$tags = \Groundhogg\get_db( 'tags' )->query( [ 'limit' => 1000 ] );
+			foreach ( $tags as $tag ) {
+				$options[] = [
+					'name' => $tag->tag_id,
+					'label' => $tag->tag_name,
+				];
 			}
+		}
 
-        return $options;
+		return $options;
 	}
 }

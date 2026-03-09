@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-03-09 10:24:03",
+    "generated_at": "2026-03-09 17:44:27",
     "apps": {
         "pause": {
             "slug": "pause",
@@ -8527,9 +8527,9 @@
             },
             "actions": []
         },
-        "FluentCRM": {
-            "slug": "FluentCRM",
-            "name": "FluentCRM",
+        "fluentcrm": {
+            "slug": "fluentcrm",
+            "name": "Fluentcrm",
             "icon": "",
             "category": "app",
             "requires_connection": false,
@@ -8546,7 +8546,7 @@
                             "label": "Tags",
                             "type": "select",
                             "dynamic": {
-                                "integration": "FluentCRM",
+                                "integration": "fluentcrm",
                                 "query": "tag_query",
                                 "select": [
                                     "value",
@@ -8570,7 +8570,7 @@
                             "label": "Tags",
                             "type": "select",
                             "dynamic": {
-                                "integration": "FluentCRM",
+                                "integration": "fluentcrm",
                                 "query": "tag_query",
                                 "select": [
                                     "value",
@@ -8594,7 +8594,7 @@
                             "label": "List",
                             "type": "select",
                             "dynamic": {
-                                "integration": "FluentCRM",
+                                "integration": "fluentcrm",
                                 "query": "list_query",
                                 "select": [
                                     "value",
@@ -8618,7 +8618,7 @@
                             "label": "List",
                             "type": "select",
                             "dynamic": {
-                                "integration": "FluentCRM",
+                                "integration": "fluentcrm",
                                 "query": "list_query",
                                 "select": [
                                     "value",
@@ -8740,7 +8740,7 @@
                             "label": "Lists",
                             "type": "select",
                             "dynamic": {
-                                "integration": "FluentCRM",
+                                "integration": "fluentcrm",
                                 "query": "list_query",
                                 "select": [
                                     "value",
@@ -8755,7 +8755,7 @@
                             "label": "Tags",
                             "type": "select",
                             "dynamic": {
-                                "integration": "FluentCRM",
+                                "integration": "fluentcrm",
                                 "query": "tag_query",
                                 "select": [
                                     "value",
@@ -8770,7 +8770,7 @@
                             "label": "company",
                             "type": "select",
                             "dynamic": {
-                                "integration": "FluentCRM",
+                                "integration": "fluentcrm",
                                 "query": "company_query",
                                 "select": [
                                     "value",
@@ -8999,7 +8999,7 @@
                             "label": "Tags",
                             "type": "select",
                             "dynamic": {
-                                "integration": "FluentCRM",
+                                "integration": "fluentcrm",
                                 "query": "tag_query",
                                 "select": [
                                     "value",
@@ -9029,7 +9029,7 @@
                             "label": "Tags",
                             "type": "select",
                             "dynamic": {
-                                "integration": "FluentCRM",
+                                "integration": "fluentcrm",
                                 "query": "tag_query",
                                 "select": [
                                     "value",
@@ -9109,7 +9109,7 @@
                             "label": "Lists",
                             "type": "select",
                             "dynamic": {
-                                "integration": "FluentCRM",
+                                "integration": "fluentcrm",
                                 "query": "list_query",
                                 "select": [
                                     "value",
@@ -9139,7 +9139,7 @@
                             "label": "Lists",
                             "type": "select",
                             "dynamic": {
-                                "integration": "FluentCRM",
+                                "integration": "fluentcrm",
                                 "query": "list_query",
                                 "select": [
                                     "value",
@@ -9307,7 +9307,7 @@
                             "label": "company",
                             "type": "select",
                             "dynamic": {
-                                "integration": "FluentCRM",
+                                "integration": "fluentcrm",
                                 "query": "company_query",
                                 "select": [
                                     "value",
@@ -9337,7 +9337,7 @@
                             "label": "company",
                             "type": "select",
                             "dynamic": {
-                                "integration": "FluentCRM",
+                                "integration": "fluentcrm",
                                 "query": "company_query",
                                 "select": [
                                     "value",

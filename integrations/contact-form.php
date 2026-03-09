@@ -35,7 +35,7 @@ class ContactForm extends IntegrationBase {
 
 	public static function get_trigger_config_schema( string $trigger ): array {
 
-		if ( $trigger === 'form_submitted' ) {
+		if ( 'form_submitted' === $trigger ) {
 			return [
 				[
 					'key'      => 'form_id',
@@ -74,7 +74,7 @@ class ContactForm extends IntegrationBase {
 
 		$post_id = $submission->get_meta( 'container_post_id' );
 
-		if ( $post_id !== 0 ) {
+		if ( 0 !== $post_id ) {
 			$form_data['post_id'] = $post_id;
 		}
 
@@ -150,7 +150,7 @@ class ContactForm extends IntegrationBase {
 
 				$select_form = $node['config']['form_id'] ?? 'any';
 
-				if ( $select_form !== 'any' && (int) $select_form != (int) $payload['form_id'] ) {
+				if ( 'any' !== $select_form && (int) $select_form !== (int) $payload['form_id'] ) {
 					return false;
 				}
 
@@ -185,30 +185,30 @@ class ContactForm extends IntegrationBase {
 		return false;
 	}
 
-    public static function get_dynamic_queries(): array {
+	public static function get_dynamic_queries(): array {
 		return [
 			'form_query' => [ self::class, 'form_query_types' ],
 		];
 	}
 
-    public static function form_query_types( $q ) {
+	public static function form_query_types( $q ) {
 		$options = [
-            [
-                'label' => 'Any Form',
-                'name' => 'any'
-            ],
+			[
+				'label' => 'Any Form',
+				'name' => 'any'
+			],
 		];
 
-        if ( class_exists( 'WPCF7_ContactForm' ) ) {
-            $forms = \WPCF7_ContactForm::find();
-            foreach ( $forms as $form ) {
-                $options[]  = [
-                    'name' => $form->id(),
-                    'label' => $form->title(),
-                ];
-            }
-        }
+		if ( class_exists( 'WPCF7_ContactForm' ) ) {
+			$forms = \WPCF7_ContactForm::find();
+			foreach ( $forms as $form ) {
+				$options[]  = [
+					'name' => $form->id(),
+					'label' => $form->title(),
+				];
+			}
+		}
 
-        return $options;
+		return $options;
 	}
 }

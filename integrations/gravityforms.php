@@ -66,7 +66,7 @@ class Gravityforms extends IntegrationBase {
 
 				$form_id = $form['id'] ?? 0;
 
-				if ( ! empty( $node['form_id'] ) &&  'any' !== $node['form_id'] ) {
+				if ( ! empty( $node['form_id'] ) && 'any' !== $node['form_id'] ) {
 					if ( (int) $form_id !== (int) $node['form_id'] ) {
 						return false;
 					}
@@ -91,24 +91,24 @@ class Gravityforms extends IntegrationBase {
 		];
 	}
 
-    public static function form_query_types( $q ) {
+	public static function form_query_types( $q ) {
 		$options = [
-				[
-					'label' => 'Any Form',
-					'name' => 'any'
-				],
-			];
+			[
+				'label' => 'Any Form',
+				'name' => 'any'
+			],
+		];
 
-			if ( class_exists( 'GFFormsModel' ) && is_callable( [ 'GFFormsModel', 'get_forms' ] ) ) {
-				$forms = GFFormsModel::get_forms( true );
-				foreach ( $forms as $form ) {
-					$options[] =[
-						'name' => $form->id,
-						'label' => $form->title ?? $form->post_title ?? '',
-					];
-				}
+		if ( class_exists( 'GFFormsModel' ) && is_callable( [ 'GFFormsModel', 'get_forms' ] ) ) {
+			$forms = GFFormsModel::get_forms( true );
+			foreach ( $forms as $form ) {
+				$options[] = [
+					'name' => $form->id,
+					'label' => $form->title ?? $form->post_title ?? '',
+				];
 			}
+		}
 
-        return $options;
+		return $options;
 	}
 }

@@ -142,7 +142,7 @@ class Formidable extends IntegrationBase {
 					return false;
 				}
 
-				if ( ! empty( $node['form_id'] ) &&  'any' !== $node['form_id'] ) {
+				if ( ! empty( $node['form_id'] ) && 'any' !== $node['form_id'] ) {
 					if ( (int) $form_id !== (int) $node['form_id'] ) {
 						return false;
 					}
@@ -167,23 +167,23 @@ class Formidable extends IntegrationBase {
 		];
 	}
 
-    public static function form_query_types( $q ) {
+	public static function form_query_types( $q ) {
 		$options[] = [
-				'label' => 'Any Form',
-				'name' => 'any'
-			];
+			'label' => 'Any Form',
+			'name' => 'any'
+		];
 
-			if ( function_exists( 'load_formidable_forms' ) ) {
-				$forms = FrmForm::getAll();
+		if ( function_exists( 'load_formidable_forms' ) ) {
+			$forms = FrmForm::getAll();
 
-				foreach ( $forms as $form ) {
-					$options[] = [
-						'name' => $form->id,
-						'label' => $form->name,
-					];
-				}
+			foreach ( $forms as $form ) {
+				$options[] = [
+					'name' => $form->id,
+					'label' => $form->name,
+				];
 			}
+		}
 
-        return $options;
+		return $options;
 	}
 }

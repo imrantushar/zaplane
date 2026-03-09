@@ -10,7 +10,7 @@ use Zaplane\Framework\Classes\IntegrationBase;
 class FluentCrm extends IntegrationBase {
 
 	public static function get_slug(): string {
-		return 'FluentCRM';
+		return 'fluentcrm';
 	}
 
 	public static function get_triggers(): array {
@@ -59,7 +59,7 @@ class FluentCrm extends IntegrationBase {
 					'label' => 'Tags',
 					'type' => 'select',
 					'dynamic' => [
-						'integration' => 'FluentCRM',
+						'integration' => 'fluentcrm',
 						'query'       => 'tag_query',
 						'select'      => [ 'value', 'label' ],
 					],
@@ -75,7 +75,7 @@ class FluentCrm extends IntegrationBase {
 					'label' => 'List',
 					'type' => 'select',
 					'dynamic' => [
-						'integration' => 'FluentCRM',
+						'integration' => 'fluentcrm',
 						'query'       => 'list_query',
 						'select'      => [ 'value', 'label' ],
 					],
@@ -341,7 +341,7 @@ class FluentCrm extends IntegrationBase {
 				'label' => 'Tags',
 				'type' => 'select',
 				'dynamic' => [
-					'integration' => 'FluentCRM',
+					'integration' => 'fluentcrm',
 					'query'       => 'tag_query',
 					'select'      => [ 'value', 'label' ],
 				],
@@ -358,7 +358,7 @@ class FluentCrm extends IntegrationBase {
 				'label' => 'Lists',
 				'type' => 'select',
 				'dynamic' => [
-					'integration' => 'FluentCRM',
+					'integration' => 'fluentcrm',
 					'query'       => 'list_query',
 					'select'      => [ 'value', 'label' ],
 				],
@@ -386,7 +386,7 @@ class FluentCrm extends IntegrationBase {
 				'label' => 'company',
 				'type' => 'select',
 				'dynamic' => [
-					'integration' => 'FluentCRM',
+					'integration' => 'fluentcrm',
 					'query'       => 'company_query',
 					'select'      => [ 'value', 'label' ],
 				],
@@ -850,7 +850,7 @@ class FluentCrm extends IntegrationBase {
 				if ( ! empty( $config['lists'] ) && 'any' !== $config['lists'] ) {
 					$contact->attachLists( (array) $config['lists'] );
 				}
-				if ( ! empty( $config['tags'] ) && $config['tags'] !== 'any' ) {
+				if ( ! empty( $config['tags'] ) && 'any' !== $config['tags'] ) {
 					$contact->attachTags( (array) $config['tags'] );
 				}
 				if ( ! empty( $config['company_id'] ) ) {
@@ -1076,7 +1076,7 @@ class FluentCrm extends IntegrationBase {
 						]
 					];
 				}
-				if ( $status === 'any' ) {
+				if ( 'any' === $status ) {
 					$subscribers = \FluentCrm\App\Models\Subscriber::all();
 				} else {
 					$subscribers = \FluentCrm\App\Models\Subscriber::where( 'status', $status )->get();
@@ -1780,9 +1780,10 @@ class FluentCrm extends IntegrationBase {
 				$contact->attachCompanies( $valid_company_ids );
 				$contact = $contact->fresh( [ 'companies' ] );
 				$company_payload = [];
+				$valid_company_map = array_flip( $valid_company_ids );
 				foreach ( $contact->companies as $company ) {
-					if ( in_array( $company->id, $valid_company_ids ) ) { // phpcs.ignore WordPress.PHP.StrictInArray.MissingTrueStrict
-						$company_payload[]   = self::resolve_company_payload( $company );
+					if ( isset( $valid_company_map[ $company->id ] ) ) {
+						$company_payload[] = self::resolve_company_payload( $company );
 					}
 				}
 				if ( ! $contact->company_id ) {
