@@ -21,8 +21,9 @@ import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
 import { useDynamicFields } from "@ZAPHooks/useActionDrawer/useDynamicFields";
 import { mapEdgesForBackend, mapNodesForBackend } from "../helper";
 import { conditionVariables } from "@ZAPRedux/Slices/workFlowSlice/actions/conditonVariales";
+import { getSingleWorkFlow } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow";
 
-const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode, workFlow, isFullscreen, nodes, edges }) => {
+const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode, workFlow, isFullscreen, nodes, edges,id }) => {
   const { source, node } = context;
   const dispatch = useDispatch();
   const { values, setFieldValue, resetForm ,initialValues} = useFormikContext();
@@ -116,7 +117,9 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
 
     if (step === "test") {
       resetAll();
+       dispatch(getSingleWorkFlow(id))
     }
+   
   };
   // seleted intregation
   const selectedIntegration = useMemo(() => {

@@ -5,70 +5,66 @@ namespace Zaplane\Framework\Classes;
 use Zaplane\Models\Workflow;
 use Zaplane\Models\WorkflowVersion;
 
-if (!defined('ABSPATH')) {
-    exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
-class Query
-{
-    public static function get_active_trigger_events(): array
-    {
-        try {
-            $activeWorkflows = Workflow::active();
-        } catch (\Exception $e) {
-            // Tables might not exist yet during installation
-            return [];
-        }
+class Query {
 
-        $events = [];
+	public static function get_active_trigger_events(): array {
+		try {
+			$activeWorkflows = Workflow::active();
+		} catch ( \Exception $e ) {
+			return [];
+		}
 
-        foreach ($activeWorkflows as $workflow) {
-            $version = $workflow->activeVersion();
-            if (!$version) {
-                continue;
-            }
+		$events = [];
 
-            $graph = $version->getGraph();
-            foreach ($graph['nodes'] ?? [] as $node) {
-                if (($node['type'] ?? '') === 'trigger' && !empty($node['data']['hook'])) {
-                    $events[] = $node['data']['hook'];
-                }
-            }
-        }
-        return array_unique($events);
-    }
+		foreach ( $activeWorkflows as $workflow ) {
+			$version = $workflow->activeVersion();
+			if ( ! $version ) {
+				continue;
+			}
 
-    public static function get_active_workflows_for_event(string $event): array
-    {
-        try {
-            $activeWorkflows = Workflow::active();
-        } catch (\Exception $e) {
-            // Tables might not exist yet during installation
-            return [];
-        }
+			$graph = $version->getGraph();
+			foreach ( $graph['nodes'] ?? [] as $node ) {
+				if ( ( $node['type'] ?? '' ) === 'trigger' && ! empty( $node['data']['hook'] ) ) {
+					$events[] = $node['data']['hook'];
+				}
+			}
+		}
+		return array_unique( $events );
+	}
 
-        $out = [];
+	public static function get_active_workflows_for_event( string $event ): array {
+		try {
+			$activeWorkflows = Workflow::active();
+		} catch ( \Exception $e ) {
+			return [];
+		}
 
-        foreach ($activeWorkflows as $workflow) {
-            $version = $workflow->activeVersion();
-            if (!$version) {
-                continue;
-            }
+		$out = [];
 
-            $graph = $version->getGraph();
-            foreach ($graph['nodes'] ?? [] as $node) {
-                if (($node['type'] ?? '') === 'trigger' && ($node['data']['hook'] ?? '') === $event) {
-                    $out[] = [
-                        'workflow_version_id' => $version->id,
-                        'workflow_id' => $workflow->id,
-                        'id' => $node['id'],
-                        'app' => $node['data']['app'] ?? '',
-                        'graph_node' => $node,
-                    ];
-                }
-            }
-        }
+		foreach ( $activeWorkflows as $workflow ) {
+			$version = $workflow->activeVersion();
+			if ( ! $version ) {
+				continue;
+			}
 
-        return $out;
-    }
+			$graph = $version->getGraph();
+			foreach ( $graph['nodes'] ?? [] as $node ) {
+				if ( ( $node['type'] ?? '' ) === 'trigger' && ( $node['data']['hook'] ?? '' ) === $event ) {
+					$out[] = [
+						'workflow_version_id' => $version->id,
+						'workflow_id' => $workflow->id,
+						'id' => $node['id'],
+						'app' => $node['data']['app'] ?? '',
+						'graph_node' => $node,
+					];
+				}
+			}
+		}
+
+		return $out;
+	}
 }

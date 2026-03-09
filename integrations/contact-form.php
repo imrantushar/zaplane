@@ -1,7 +1,9 @@
 <?php
 namespace Zaplane\Integrations;
 
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 use Zaplane\Framework\Classes\IntegrationBase;
 use WPCF7_ContactForm;
@@ -9,173 +11,190 @@ use WPCF7_Submission;
 
 class ContactForm extends IntegrationBase {
 
-    public static function get_slug(): string {
-        return 'contact-form-7';
-    }
 
-    public static function get_triggers(): array {
-        return [
-            'form_submitted' => [
-                'label' => 'Form Submitted', 
-                'hook'  => 'wpcf7_before_send_mail'
-            ],
-            'form_created' => [
-                'label' => 'Form Created', 
-                'hook'  => 'wpcf7_after_create'
-            ],
-            'form_updated' => [
-                'label' => 'Form Updated', 
-                'hook'  => 'wpcf7_after_update'
-            ],
-        ]; 
-    }
+	public static function get_slug(): string {
+		return 'contact-form-7';
+	}
 
-    public static function get_trigger_config_schema( string $trigger ): array {
+	public static function get_triggers(): array {
+		return [
+			'form_submitted' => [
+				'label' => 'Form Submitted',
+				'hook'  => 'wpcf7_before_send_mail'
+			],
+			'form_created' => [
+				'label' => 'Form Created',
+				'hook'  => 'wpcf7_after_create'
+			],
+			'form_updated' => [
+				'label' => 'Form Updated',
+				'hook'  => 'wpcf7_after_update'
+			],
+		];
+	}
 
-        if ($trigger === 'form_submitted') {
-            $options = [
-                ['label'=>'Any From','value'=>'any'],
-            ];
+	public static function get_trigger_config_schema( string $trigger ): array {
 
-            if ( class_exists( 'WPCF7_ContactForm' ) ) {
-                $forms = \WPCF7_ContactForm::find();
-                foreach ( $forms as $form ) {
-                    $options[]  = [
-                        'label' => $form->title(),
-                        'value' => $form->id(),
-                    ];
-                }
-            }
+		if ( $trigger === 'form_submitted' ) {
+			$options = [
+				[
+					'label' => 'Any From',
+					'value' => 'any'
+				],
+			];
 
-            return [
-                [
-                    'key'      => 'form_id',
-                    'label'    => 'Forms',
-                    'type'     => 'select',
-                    'options'  => $options,
-                    'required' => true,
-                ],
-            ];
-        }
-        return [];
-    }
+			if ( class_exists( 'WPCF7_ContactForm' ) ) {
+				$forms = \WPCF7_ContactForm::find();
+				foreach ( $forms as $form ) {
+					$options[]  = [
+						'label' => $form->title(),
+						'value' => $form->id(),
+					];
+				}
+			}
 
-    public static function resolve_form_submit_payload( $contact_form, $abort = null, $submission_obj = null ) {
-        if ( ! class_exists('WPCF7_Submission') || ! $contact_form ) return false;
+			return [
+				[
+					'key'      => 'form_id',
+					'label'    => 'Forms',
+					'type'     => 'select',
+					'options'  => $options,
+					'required' => true,
+				],
+			];
+		}//end if
+		return [];
+	}
 
-        $submission = WPCF7_Submission::get_instance();
+	public static function resolve_form_submit_payload( $contact_form, $abort = null, $submission_obj = null ) {
+		if ( ! class_exists( 'WPCF7_Submission' ) || ! $contact_form ) {
+			return false;
+		}
 
-        if ( ! $submission ) return false;
+		$submission = WPCF7_Submission::get_instance();
 
-        $form_id   = $contact_form->id();
-        $form_data = $submission->get_posted_data() ?? [];
-        $files     = $submission->uploaded_files() ?? [];
-        $form_data = array_merge( 
-            $form_data, 
-            self::resolve_file_root_payload( $files ), 
-        );
+		if ( ! $submission ) {
+			return false;
+		}
 
-        $post_id = $submission->get_meta('container_post_id');
+		$form_id   = $contact_form->id();
+		$form_data = $submission->get_posted_data() ?? [];
+		$files     = $submission->uploaded_files() ?? [];
+		$form_data = array_merge(
+			$form_data,
+			self::resolve_file_root_payload( $files ),
+		);
 
-        if ( $post_id !== 0 ) {
-            $form_data['post_id'] = $post_id;
-        }
+		$post_id = $submission->get_meta( 'container_post_id' );
 
-        return [
-            'form_id'   => $form_id,
-            'form_data' => $form_data,
-        ];
-    }
+		if ( $post_id !== 0 ) {
+			$form_data['post_id'] = $post_id;
+		}
 
-    public static function resolve_file_root_payload( $files ) {
-        $all_files = [];
+		return [
+			'form_id'   => $form_id,
+			'form_data' => $form_data,
+		];
+	}
 
-        foreach ( $files as $key => $file ) {
-            $all_files[ $key ] = is_array( $file ) ? 
-            self::resolve_file_root_payload( $file ) : 
-            self::resolve_file_url_payload( $file );
-        }
+	public static function resolve_file_root_payload( $files ) {
+		$all_files = [];
 
-        return $all_files;
-    }
+		foreach ( $files as $key => $file ) {
+			$all_files[ $key ] = is_array( $file ) ?
+			self::resolve_file_root_payload( $file ) :
+			self::resolve_file_url_payload( $file );
+		}
 
-    public static function resolve_file_url_payload( $file ) {
-        $upload_dir = wp_upload_dir();
-        $base_url   = $upload_dir['baseurl'];
-        $base_path  = $upload_dir['basedir'];
+		return $all_files;
+	}
 
-        if ( is_array( $file ) ) {
-            $url = [];
-            foreach ( $file as $key => $file_url ) {
-                $url[ $key ] = str_replace( $base_path, $base_url, $file_url );
-            }
-        } else {
-            $url = str_replace( $base_path, $base_url, $file );
-        }
+	public static function resolve_file_url_payload( $file ) {
+		$upload_dir = wp_upload_dir();
+		$base_url   = $upload_dir['baseurl'];
+		$base_path  = $upload_dir['basedir'];
 
-        return $url;
-    }
+		if ( is_array( $file ) ) {
+			$url = [];
+			foreach ( $file as $key => $file_url ) {
+				$url[ $key ] = str_replace( $base_path, $base_url, $file_url );
+			}
+		} else {
+			$url = str_replace( $base_path, $base_url, $file );
+		}
 
-    public static function resolve_form_admin_payload( $contact_form ) {
-        if ( ! $contact_form || ! method_exists( $contact_form, 'id' ) ) return false;
+		return $url;
+	}
 
-        return [
-            'form_id'    => $contact_form->id(),
-            'form_title' => $contact_form->title(),
-            'status'     => $contact_form->prop('status'),
-            'locale'     => $contact_form->locale(),
-            'title'      => current_time('mysql'),
-            'user_id'    => get_current_user_id(),
-        ];
-    }
-    
-    public static function resolve_trigger( array $node, array $args ) {
+	public static function resolve_form_admin_payload( $contact_form ) {
+		if ( ! $contact_form || ! method_exists( $contact_form, 'id' ) ) {
+			return false;
+		}
 
-        switch ( $node['event'] ) {
+		return [
+			'form_id'    => $contact_form->id(),
+			'form_title' => $contact_form->title(),
+			'status'     => $contact_form->prop( 'status' ),
+			'locale'     => $contact_form->locale(),
+			'title'      => current_time( 'mysql' ),
+			'user_id'    => get_current_user_id(),
+		];
+	}
 
-            case 'form_submitted':
-                $contact_form = $args[0] ?? null;
+	public static function resolve_trigger( array $node, array $args ) {
 
-                if ( ! $contact_form ) return false;
+		switch ( $node['event'] ) {
+			case 'form_submitted':
+				$contact_form = $args[0] ?? null;
 
-                $payload = self::resolve_form_submit_payload( 
-                    $args[0] ?? null, 
-                    $args[1] ?? null, 
-                    $args[2] ?? null
-                );
+				if ( ! $contact_form ) {
+					return false;
+				}
 
-                if ( ! $payload ) return false;
+				$payload = self::resolve_form_submit_payload(
+					$args[0] ?? null,
+					$args[1] ?? null,
+					$args[2] ?? null
+				);
 
-                $select_form = $node['config']['form_id'] ?? 'any';
+				if ( ! $payload ) {
+					return false;
+				}
 
-                if ( $select_form !== 'any' && (int) $select_form != (int) $payload['form_id'] ) return false;
+				$select_form = $node['config']['form_id'] ?? 'any';
 
-                return [
-                    'success' => true,
-                    'form'    => $payload,
-                ];
+				if ( $select_form !== 'any' && (int) $select_form != (int) $payload['form_id'] ) {
+					return false;
+				}
 
-            case 'form_created':
-            case 'form_updated':
-                $payload = self::resolve_form_admin_payload( 
-                    $args[0] ?? null, 
-                );
+				return [
+					'success' => true,
+					'form'    => $payload,
+				];
 
-                if ( ! $payload ) return false;
-                $action_map = [
-                    'form_created' => 'created',
-                    'form_updated' => 'updated',
-                ];
+			case 'form_created':
+			case 'form_updated':
+				$payload = self::resolve_form_admin_payload(
+					$args[0] ?? null,
+				);
 
-                if ( isset( $action_map[ $node['event'] ] ) ) {
-                    $payload['action'] = $action_map[ $node['event'] ];
-                }
+				if ( ! $payload ) {
+					return false;
+				}
+				$action_map = [
+					'form_created' => 'created',
+					'form_updated' => 'updated',
+				];
 
-                return [
-                    'success' => true,
-                    'form'    => $payload,
-                ];
-        }
-        return false;
-    }
+				if ( isset( $action_map[ $node['event'] ] ) ) {
+					$payload['action'] = $action_map[ $node['event'] ];
+				}
+
+				return [
+					'success' => true,
+					'form'    => $payload,
+				];
+		}//end switch
+		return false;
+	}
 }
