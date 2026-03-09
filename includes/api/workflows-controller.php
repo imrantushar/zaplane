@@ -541,9 +541,7 @@ class WorkflowsController extends WP_REST_Controller {
 
 		$previousNodeIds = $this->findPreviousNodes( $targetNodeKey, $edges );
 
-		$nodeOutputs = $workflowId
-			? Run::latestTestNodeRunsByWorkflow( $workflowId, $previousNodeIds )
-			: Run::latestNodeOutputs( $workflowVersionId, nodeIds: $previousNodeIds );
+		$nodeOutputs = Run::latestTestNodeRunsByWorkflowAndVersion( $workflowId, $workflowVersionId, $previousNodeIds );
 
 		$data = [];
 		foreach ( $previousNodeIds as $nodeId ) {
@@ -553,7 +551,7 @@ class WorkflowsController extends WP_REST_Controller {
 			}
 
 			$nodeType = $node['type'] ?? '';
-			if ( ! in_array( $nodeType, [ 'action', 'trigger', 'condition', 'filter' ], true ) ) {
+			if ( ! in_array( $nodeType, [ 'action', 'condition', 'filter' ], true ) ) {
 				continue;
 			}
 

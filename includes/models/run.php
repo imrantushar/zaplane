@@ -141,6 +141,33 @@ class Run extends Model {
 		return $nodeOutputs;
 	}
 
+	public static function latestTestNodeRunsByWorkflowAndVersion( int $workflowId, int $versionId, array $nodeIds = [] ): array {
+		$testRuns = static::where( 'workflow_id', $workflowId )
+			->where( 'workflow_version_id', $versionId )
+			->where( 'is_test', 1 )
+			->orderBy( 'id', 'desc' );
+
+		if( $nodeIds ) {
+			$testRuns = $testRuns->whereIn( 'target_node_key', $nodeIds );
+		}
+
+		$testRuns = $testRuns->get();
+
+		$nodeOutputs = [];
+
+		foreach ( $testRuns as $run ) {
+			$nodeRuns = $run->nodeRuns();
+			foreach ( $nodeRuns as $nodeRun ) {
+				$key = $nodeRun->node_key;
+				if ( ! isset( $nodeOutputs[ $key ] ) ) {
+					$nodeOutputs[ $key ] = $nodeRun;
+				}
+			}
+		}
+
+		return $nodeOutputs;
+	}
+
 	public static function latestNodeOutputs( int $versionId, array $nodeIds ): array {
 		$runs = static::where( 'workflow_version_id', $versionId )
 			->whereIn( 'status', [ 'completed', 'failed', 'running' ] )
