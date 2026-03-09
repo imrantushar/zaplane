@@ -54,6 +54,9 @@ class Expression {
 			return $php;
 		}, $code);
 
+		// Prevent fatal compilation errors if the user's expression has trailing empty brackets (e.g `array[]`)
+		$php = str_replace('[]', '', $php);
+
 		try {
 			return eval( "return {$php};" );
 		} catch ( \Throwable $e ) {
