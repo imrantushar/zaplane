@@ -94,6 +94,7 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
     if (step === "configure") {
 
       const payload = {
+        icon:selectedItem.icon,
         app: selectedItem.name,
         name: selectedItem.name,
         event: values.actionType,
