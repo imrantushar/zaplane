@@ -480,7 +480,7 @@ class EasyDigitalDownload extends IntegrationBase {
 
 		return [
 			'port' => 'main',
-			'data' => $input
+			'data' => $input 
 		];
 	}
 }
