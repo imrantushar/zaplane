@@ -7371,7 +7371,7 @@ const CustomEdge = ({
     }), label && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("foreignObject", {
       width: 30,
       height: 20,
-      x: centerX - -15,
+      x: centerX - 20,
       y: centerY - 20,
       style: {
         overflow: "visible"
@@ -7387,36 +7387,36 @@ const CustomEdge = ({
         borderRadius: "10px",
         children: label
       })
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("foreignObject", {
-      className: "zaplane-edge-actions",
-      width: 24,
-      height: 24,
-      x: centerX - 12,
-      y: centerY - 20,
-      style: {
-        overflow: "visible"
-      },
-      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.HStack, {
-        bg: "var(--zaplane-background)",
-        color: "var(--zaplane-font-color)",
-        p: "7px",
-        marginLeft: "-20px",
-        marginTop: "4px",
-        borderRadius: "full",
-        boxShadow: "lg",
-        cursor: "pointer",
-        pointerEvents: "auto",
-        height: "30px",
-        width: "30px",
-        onClick: () => onEdgeDelete(id),
-        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Icon, {
-          as: react_icons_ri__WEBPACK_IMPORTED_MODULE_5__.RiDeleteBin5Line,
-          boxSize: 4,
-          cursor: "pointer"
+    }), !label && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.Fragment, {
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("foreignObject", {
+        className: "zaplane-edge-actions",
+        width: 24,
+        height: 24,
+        x: centerX - 12,
+        y: centerY - 20,
+        style: {
+          overflow: "visible"
+        },
+        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.HStack, {
+          bg: "var(--zaplane-background)",
+          color: "var(--zaplane-font-color)",
+          p: "7px",
+          marginLeft: "-20px",
+          marginTop: "4px",
+          borderRadius: "full",
+          boxShadow: "lg",
+          cursor: "pointer",
+          pointerEvents: "auto",
+          height: "30px",
+          width: "30px",
+          onClick: () => onEdgeDelete(id),
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Icon, {
+            as: react_icons_ri__WEBPACK_IMPORTED_MODULE_5__.RiDeleteBin5Line,
+            boxSize: 4,
+            cursor: "pointer"
+          })
         })
-      })
-    }), !label && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.Fragment, {
-      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("foreignObject", {
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("foreignObject", {
         width: 24,
         height: 24,
         x: centerX - 12,
@@ -7443,7 +7443,7 @@ const CustomEdge = ({
             cursor: "pointer"
           })
         })
-      })
+      })]
     })]
   });
 };
@@ -7581,7 +7581,8 @@ __webpack_require__.r(__webpack_exports__);
 function CustomNode({
   id,
   data,
-  canvasLayout
+  canvasLayout,
+  nodes
 }) {
   const [hovered, setHovered] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
   const {
@@ -7593,6 +7594,8 @@ function CustomNode({
   const isSelectApp = data.app === "Select an app";
   const formattedAction = data?.action?.charAt(0).toUpperCase() + data?.action?.slice(1);
   const isCondition = data?.app === "Condition";
+  const node = nodes.find(n => n.id === id);
+  const hasPort = node?.port === undefined;
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Box, {
     position: "relative",
     onMouseEnter: () => setHovered(true),
@@ -7611,7 +7614,7 @@ function CustomNode({
           children: formattedAction || "Action"
         })
       })
-    }), data.action !== "trigger" && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.NodeToolbar, {
+    }), data.action !== "trigger" && hasPort && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.NodeToolbar, {
       isVisible: hovered,
       position: _xyflow_react__WEBPACK_IMPORTED_MODULE_2__.Position.Bottom,
       align: "center",
@@ -7903,9 +7906,6 @@ function FlowCanvas({
   const onEdgeDelete = edgeId => {
     setEdges(eds => eds.filter(e => e.id !== edgeId));
   };
-
-  // console.log(nodes, 'all nodes',);
-  // console.log(edges, 'all edges');
   const nodeTypes = {
     custom: props => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)(_customNode_CustomNode__WEBPACK_IMPORTED_MODULE_15__["default"], {
       ...props,
@@ -7915,7 +7915,8 @@ function FlowCanvas({
         openDrawerFromAdd: () => openDrawerFromAdd(props),
         deleteNode: () => deleteNode(props.id)
       },
-      canvasLayout: canvasLayout
+      canvasLayout: canvasLayout,
+      nodes: nodes
     })
   };
   const edgeTypes = {
@@ -7925,15 +7926,9 @@ function FlowCanvas({
       onAddNode: onAddNode
     })
   };
-  //listiner
 
-  // useEffect(() => {
-  //     const interval = setInterval(() => {
-  //         dispatch(getRunWorkFlow());
-  //     }, 5000);
-
-  //     return () => clearInterval(interval);
-  // }, []);  
+  // console.log(nodes, 'all nodes',);
+  // console.log(edges, 'all edges');
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_8__.Box, {
     ref: containerRef,
     className: "zaplane_flowcanvas",
@@ -9090,10 +9085,8 @@ const useActionDrawer = (open, node, source, setFieldValue, isTrigger) => {
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
     if (!open || !node?.data || source === "add") return;
     const detectedItem = _helper__WEBPACK_IMPORTED_MODULE_1__.APPS.concat(_helper__WEBPACK_IMPORTED_MODULE_1__.TOOLS).find(i => i.name === node.data.app || i.id === node.data.app);
-    console.log(detectedItem, 'detectedItem');
     if (detectedItem) {
       setMode(_helper__WEBPACK_IMPORTED_MODULE_1__.TOOLS.includes(detectedItem) ? "tools" : "app");
-      console.log(detectedItem, 'detectedItem');
       setSelectedItem(detectedItem);
     }
     if (node.data.event) setFieldValue("actionType", node.data.event);

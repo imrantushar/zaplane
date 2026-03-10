@@ -52,7 +52,7 @@ const CustomEdge = ({
         <foreignObject
           width={30}
           height={20}
-          x={centerX - -15}
+          x={centerX - 20}
           y={centerY - 20}
           style={{ overflow: "visible" }}
         >
@@ -60,8 +60,8 @@ const CustomEdge = ({
             fontSize="12px"
             textAlign="center"
             bg={isFalse ? "#FEF2F2" : "#defce9"}
-            color={isFalse ? "#ef4444":"#22c55e"}
-            border={`1px solid ${isFalse? '#ef4444': '#22c55e'}`}
+            color={isFalse ? "#ef4444" : "#22c55e"}
+            border={`1px solid ${isFalse ? '#ef4444' : '#22c55e'}`}
             margin='10px 0 0 0'
             boxShadow="sm"
             borderRadius='10px'
@@ -71,34 +71,35 @@ const CustomEdge = ({
         </foreignObject>
       )}
 
-      {/* Delete icon */}
-      <foreignObject
-        className="zaplane-edge-actions"
-        width={24}
-        height={24}
-        x={centerX - 12}
-        y={centerY - 20}
-        style={{ overflow: "visible" }}
-      >
-        <HStack
-          bg="var(--zaplane-background)"
-          color="var(--zaplane-font-color)"
-          p="7px"
-          marginLeft="-20px"
-          marginTop="4px"
-          borderRadius="full"
-          boxShadow="lg"
-          cursor="pointer"
-          pointerEvents="auto"
-          height="30px"
-          width="30px"
-          onClick={() => onEdgeDelete(id)}
-        >
-          <Icon as={RiDeleteBin5Line} boxSize={4} cursor="pointer" />
-        </HStack>
-      </foreignObject>
+
       {
         !label && (<>
+          {/* Delete icon */}
+          <foreignObject
+            className="zaplane-edge-actions"
+            width={24}
+            height={24}
+            x={centerX - 12}
+            y={centerY - 20}
+            style={{ overflow: "visible" }}
+          >
+            <HStack
+              bg="var(--zaplane-background)"
+              color="var(--zaplane-font-color)"
+              p="7px"
+              marginLeft="-20px"
+              marginTop="4px"
+              borderRadius="full"
+              boxShadow="lg"
+              cursor="pointer"
+              pointerEvents="auto"
+              height="30px"
+              width="30px"
+              onClick={() => onEdgeDelete(id)}
+            >
+              <Icon as={RiDeleteBin5Line} boxSize={4} cursor="pointer" />
+            </HStack>
+          </foreignObject>
           {/* Add node icon */}
           <foreignObject
             width={24}

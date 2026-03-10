@@ -13,11 +13,11 @@ import { __, sprintf } from "@wordpress/i18n";
 import { formatLabel } from "@ZAPUtils/helper";
 import { FaWordpress } from "react-icons/fa6";
 
-export default function CustomNode({ id, data, canvasLayout }) {
+export default function CustomNode({ id, data, canvasLayout, nodes }) {
   const [hovered, setHovered] = useState(false);
-
   const { getEdges } = useReactFlow();
   const edges = getEdges();
+
 
   const hasOutgoingEdge = edges.some((e) => e.source === id);
 
@@ -28,6 +28,9 @@ export default function CustomNode({ id, data, canvasLayout }) {
     data?.action?.charAt(0).toUpperCase() + data?.action?.slice(1);
 
   const isCondition = data?.app === "Condition";
+  const node = nodes.find((n) => n.id === id);
+  const hasPort = node?.port === undefined;
+
 
   return (
     <Box
@@ -50,7 +53,7 @@ export default function CustomNode({ id, data, canvasLayout }) {
       </NodeToolbar>
 
       {/* DELETE TOOLBAR */}
-      {data.action !== "trigger" && (
+      {data.action !== "trigger" && hasPort && (
         <NodeToolbar isVisible={hovered} position={Position.Bottom} align="center" offset={-3}>
           <HStack
             bg="var(--zaplane-border-color)"
@@ -149,7 +152,6 @@ export default function CustomNode({ id, data, canvasLayout }) {
 
         {isCondition ? (
           <>
-            {/* TRUE HANDLE */}
             <Handle
               type="source"
               id="true"
@@ -164,8 +166,6 @@ export default function CustomNode({ id, data, canvasLayout }) {
                 border: "2px solid var(--zaplane-background)",
               }}
             />
-
-            {/* FALSE HANDLE */}
             <Handle
               type="source"
               id="false"
