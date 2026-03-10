@@ -445,6 +445,6 @@ class Automation {
 				return $node;
 			}
 		}
-		throw WorkflowException::nodeNotFound( $run_id, $key );
+		throw WorkflowException::nodeNotFound( esc_html( (string) $run_id ), esc_html( (string) $key ) );
 	}
 }

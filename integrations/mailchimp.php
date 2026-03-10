@@ -416,7 +416,7 @@ class Mailchimp extends IntegrationBase {
 
 		if ( $status >= 400 || ( isset( $response_body['status'] ) && (int) $response_body['status'] >= 400 ) ) {
 			$detail = $response_body['detail'] ?? $response_body['title'] ?? 'Unknown error';
-			throw new \Exception( 'Mailchimp API error: ' . $detail );
+			throw new \Exception( 'Mailchimp API error: ' . esc_html( $detail ) );
 		}
 
 		return [ $response_body, $status ];

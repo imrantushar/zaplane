@@ -285,13 +285,13 @@ class Slack extends IntegrationBase {
 		);
 
 		if ( is_wp_error( $response ) ) {
-			throw new \Exception( 'Slack API request failed: ' . $response->get_error_message() );
+			throw new \Exception( 'Slack API request failed: ' . esc_html( $response->get_error_message() ) );
 		}
 
 		$body = json_decode( wp_remote_retrieve_body( $response ), true );
 
 		if ( empty( $body['ok'] ) ) {
-			throw new \Exception( 'Slack API error: ' . ( $body['error'] ?? 'Unknown error' ) );
+			throw new \Exception( 'Slack API error: ' . esc_html( $body['error'] ?? 'Unknown error' ) );
 		}
 
 		return [
@@ -322,13 +322,13 @@ class Slack extends IntegrationBase {
 		);
 
 		if ( is_wp_error( $dm_response ) ) {
-			throw new \Exception( 'Failed to open DM: ' . $dm_response->get_error_message() );
+			throw new \Exception( 'Failed to open DM: ' . esc_html( $dm_response->get_error_message() ) );
 		}
 
 		$dm_body = json_decode( wp_remote_retrieve_body( $dm_response ), true );
 
 		if ( empty( $dm_body['ok'] ) ) {
-			throw new \Exception( 'Failed to open DM: ' . ( $dm_body['error'] ?? 'Unknown error' ) );
+			throw new \Exception( 'Failed to open DM: ' . esc_html( $dm_body['error'] ?? 'Unknown error' ) );
 		}
 
 		$channel_id = $dm_body['channel']['id'] ?? '';
@@ -350,13 +350,13 @@ class Slack extends IntegrationBase {
 		);
 
 		if ( is_wp_error( $response ) ) {
-			throw new \Exception( 'Slack API request failed: ' . $response->get_error_message() );
+			throw new \Exception( 'Slack API request failed: ' . esc_html( $response->get_error_message() ) );
 		}
 
 		$body = json_decode( wp_remote_retrieve_body( $response ), true );
 
 		if ( empty( $body['ok'] ) ) {
-			throw new \Exception( 'Slack API error: ' . ( $body['error'] ?? 'Unknown error' ) );
+			throw new \Exception( 'Slack API error: ' . esc_html( $body['error'] ?? 'Unknown error' ) );
 		}
 
 		return [
@@ -542,13 +542,13 @@ class Slack extends IntegrationBase {
 		);
 
 		if ( is_wp_error( $response ) ) {
-			throw new \Exception( 'OAuth token exchange failed: ' . $response->get_error_message() );
+			throw new \Exception( 'OAuth token exchange failed: ' . esc_html( $response->get_error_message() ) );
 		}
 
 		$body = json_decode( wp_remote_retrieve_body( $response ), true );
 
 		if ( empty( $body['ok'] ) ) {
-			throw new \Exception( 'Slack OAuth error: ' . ( $body['error'] ?? 'Unknown error' ) );
+			throw new \Exception( 'Slack OAuth error: ' . esc_html( $body['error'] ?? 'Unknown error' ) );
 		}
 
 		return [
@@ -578,7 +578,7 @@ class Slack extends IntegrationBase {
 		);
 
 		if ( empty( $body['ok'] ) ) {
-			throw new \Exception( 'Slack API error: ' . ( $body['error'] ?? 'Unknown error' ) );
+			throw new \Exception( 'Slack API error: ' . esc_html( $body['error'] ?? 'Unknown error' ) );
 		}
 
 		return [
@@ -604,7 +604,7 @@ class Slack extends IntegrationBase {
 		);
 
 		if ( empty( $body['ok'] ) ) {
-			throw new \Exception( 'Slack API error: ' . ( $body['error'] ?? 'Unknown error' ) );
+			throw new \Exception( 'Slack API error: ' . esc_html( $body['error'] ?? 'Unknown error' ) );
 		}
 
 		return [
@@ -629,7 +629,7 @@ class Slack extends IntegrationBase {
 		);
 
 		if ( empty( $body['ok'] ) ) {
-			throw new \Exception( 'Slack API error: ' . ( $body['error'] ?? 'Unknown error' ) );
+			throw new \Exception( 'Slack API error: ' . esc_html( $body['error'] ?? 'Unknown error' ) );
 		}
 
 		return [
@@ -656,7 +656,7 @@ class Slack extends IntegrationBase {
 		);
 
 		if ( empty( $body['ok'] ) && ( $body['error'] ?? '' ) !== 'already_reacted' ) {
-			throw new \Exception( 'Slack API error: ' . ( $body['error'] ?? 'Unknown error' ) );
+			throw new \Exception( 'Slack API error: ' . esc_html( $body['error'] ?? 'Unknown error' ) );
 		}
 
 		return [
@@ -676,7 +676,7 @@ class Slack extends IntegrationBase {
 		);
 
 		if ( empty( $body['ok'] ) ) {
-			throw new \Exception( 'Slack API error: ' . ( $body['error'] ?? 'Unknown error' ) );
+			throw new \Exception( 'Slack API error: ' . esc_html( $body['error'] ?? 'Unknown error' ) );
 		}
 
 		$user = $body['user'] ?? [];

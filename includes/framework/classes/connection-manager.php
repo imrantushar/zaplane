@@ -19,7 +19,7 @@ class ConnectionManager {
 	public function create( int $user_id, string $app, string $name, string $auth_type, array $credentials ): array {
 		$integration = IntegrationLoader::get( $app );
 		if ( ! $integration ) {
-			throw IntegrationException::notFound( $app );
+			throw IntegrationException::notFound( esc_html( $app ) );
 		}
 
 		$test_result = null;
@@ -28,8 +28,8 @@ class ConnectionManager {
 			$test_result = $class::test_connection( $credentials );
 			if ( ! ( $test_result['success'] ?? false ) ) {
 				throw ConnectionException::invalidCredentials(
-					$app,
-					$test_result['message'] ?? 'Connection test failed'
+					esc_html( $app ),
+					esc_html( $test_result['message'] ?? 'Connection test failed' )
 				);
 			}
 		}
@@ -37,7 +37,7 @@ class ConnectionManager {
 		try {
 			$encrypted = Encryption::encrypt( $credentials );
 		} catch ( EncryptionException $e ) {
-			throw ConnectionException::createFailed( $app, $e->getMessage() );
+			throw ConnectionException::createFailed( esc_html( $app ), esc_html( $e->getMessage() ) );
 		}
 
 		$connection = Connection::create([
@@ -173,11 +173,11 @@ class ConnectionManager {
 		$credentials = $connection->getCredentials();
 
 		if ( empty( $credentials ) && ! empty( $connection->encrypted_credentials ) ) {
-			throw ConnectionException::testFailed( $id, 'Failed to decrypt credentials' );
+			throw ConnectionException::testFailed( esc_html( (string) $id ), 'Failed to decrypt credentials' );
 		}
 
 		if ( ! IntegrationLoader::has( $connection->app ) ) {
-			throw IntegrationException::notFound( $connection->app );
+			throw IntegrationException::notFound( esc_html( $connection->app ) );
 		}
 
 		$integration = IntegrationLoader::get( $connection->app );

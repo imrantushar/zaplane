@@ -26,14 +26,14 @@ class OAuthHandler {
 	public function init_flow( string $app, int $user_id, string $connection_name, array $credentials ): array {
 
 		if ( ! IntegrationLoader::has( $app ) ) {
-			throw IntegrationException::notFound( $app );
+			throw IntegrationException::notFound( esc_html( $app ) );
 		}
 
 		$integration = IntegrationLoader::get( $app );
 		$class = get_class( $integration );
 
 		if ( $class::get_auth_type() !== 'oauth2' && $class::get_auth_type() !== 'both' ) {
-			throw OAuthException::notSupported( $app );
+			throw OAuthException::notSupported( esc_html( $app ) );
 		}
 
 		$redirect_uri = self::get_callback_url();
@@ -50,7 +50,7 @@ class OAuthHandler {
 		$auth_url = $class::get_oauth_auth_url( $redirect_uri, $state, $credentials );
 
 		if ( ! $auth_url ) {
-			throw OAuthException::authUrlFailed( $app );
+			throw OAuthException::authUrlFailed( esc_html( $app ) );
 		}
 
 		return [
@@ -74,7 +74,7 @@ class OAuthHandler {
 		$credentials = $state_data['credentials'] ?? [];
 
 		if ( ! IntegrationLoader::has( $app ) ) {
-			throw IntegrationException::notFound( $app );
+			throw IntegrationException::notFound( esc_html( $app ) );
 		}
 
 		$integration = IntegrationLoader::get( $app );
@@ -85,11 +85,11 @@ class OAuthHandler {
 		try {
 			$tokens = $class::exchange_oauth_code( $code, $redirect_uri, $credentials );
 		} catch ( \Throwable $e ) {
-			throw OAuthException::tokenExchangeFailed( $app, $e->getMessage() );
+			throw OAuthException::tokenExchangeFailed( esc_html( $app ), esc_html( $e->getMessage() ) );
 		}
 
 		if ( empty( $tokens['access_token'] ) ) {
-			throw OAuthException::noAccessToken( $app );
+			throw OAuthException::noAccessToken( esc_html( $app ) );
 		}
 
 		$create_result = $this->connections->create(

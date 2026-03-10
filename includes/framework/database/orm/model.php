@@ -72,7 +72,7 @@ abstract class Model implements JsonSerializable {
 	public static function findOrFail( int $id ): self {
 		$result = static::find( $id );
 		if ( $result === null ) {
-			throw DatabaseException::recordNotFound( static::getTable(), $id );
+			throw DatabaseException::recordNotFound( esc_html( static::getTable() ), esc_html( (string) $id ) );
 		}
 		return $result;
 	}
@@ -261,7 +261,7 @@ abstract class Model implements JsonSerializable {
 		$result = $wpdb->insert( static::getTable(), $attributes );
 
 		if ( $result === false ) {
-			throw DatabaseException::insertFailed( static::getTable(), $wpdb->last_error );
+			throw DatabaseException::insertFailed( esc_html( static::getTable() ), esc_html( $wpdb->last_error ) );
 		}
 
 		$this->attributes[ static::$primaryKey ] = $wpdb->insert_id;
@@ -294,7 +294,7 @@ abstract class Model implements JsonSerializable {
 		);
 
 		if ( $result === false ) {
-			throw new DatabaseException( 'Failed to update record: ' . $wpdb->last_error );
+			throw new DatabaseException( 'Failed to update record: ' . esc_html( $wpdb->last_error ) );
 		}
 
 		$this->original = $this->attributes;

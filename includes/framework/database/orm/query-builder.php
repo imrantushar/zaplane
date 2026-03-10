@@ -338,7 +338,7 @@ class QueryBuilder {
 	public function findOrFail( int $id ) {
 		$result = $this->find( $id );
 		if ( $result === null ) {
-			throw DatabaseException::recordNotFound( $this->table, $id );
+			throw DatabaseException::recordNotFound( esc_html( $this->table ), esc_html( (string) $id ) );
 		}
 		return $result;
 	}
@@ -428,7 +428,7 @@ class QueryBuilder {
 		$result = $wpdb->insert( $this->table, $values );
 
 		if ( $result === false ) {
-			throw DatabaseException::insertFailed( $this->table, $wpdb->last_error );
+			throw DatabaseException::insertFailed( esc_html( $this->table ), esc_html( $wpdb->last_error ) );
 		}
 
 		return $wpdb->insert_id;
