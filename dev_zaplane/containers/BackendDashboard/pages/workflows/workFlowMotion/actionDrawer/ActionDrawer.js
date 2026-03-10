@@ -2,7 +2,7 @@ import { Button, Flex, HStack, Input, } from "@chakra-ui/react";
 import ZAPDrawer from "@ZAPComponents/Drawer";
 import { integrations } from "@ZAPUtils/helper";
 import { useFormikContext } from "formik";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import ZAPTab from "@ZAPComponents/Tab";
 import { __, sprintf } from "@wordpress/i18n";
@@ -19,11 +19,13 @@ import DrawerItemList from "./DrawerItemList";
 import ActionFieldRenderer from "./ActionFieldRenderer/ActionFieldRenderer";
 import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
 import { useDynamicFields } from "@ZAPHooks/useActionDrawer/useDynamicFields";
+import { mapEdgesForBackend, mapNodesForBackend } from "../helper";
+import { conditionVariables } from "@ZAPRedux/Slices/workFlowSlice/actions/conditonVariales";
 
 const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode, workFlow, isFullscreen, nodes, edges }) => {
   const { source, node } = context;
   const dispatch = useDispatch();
-  const { values, setFieldValue, resetForm } = useFormikContext();
+  const { values, setFieldValue, resetForm ,initialValues} = useFormikContext();
   const [step, setStep] = useState("select");
   const isTrigger = node?.data?.action === "trigger" && source === "node";
   const [showWarning, setShowWarning] = useState(false);
@@ -53,7 +55,6 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
         : Object.values(integration.actions || {});
     return list.map(i => ({ label: i.label, value: i.key, hook: i.hook }));
   }, [mode, selectedItem, isTrigger]);
-
   //Get schema fields for the selected action
 
   const selectedActionFields = useMemo(() => {
@@ -76,7 +77,6 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
     selectedActionFields,
     values,
   });
-
   const resetAll = () => {
     setMode(null);
     setStep("select");
@@ -94,7 +94,8 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
     if (step === "configure") {
 
       const payload = {
-        app: selectedItem.name,
+        mode:selectedItem.mode,
+        app: selectedItem.id,
         name: selectedItem.name,
         event: values.actionType,
         config: selectedActionFields.reduce((acc, f) => {
@@ -117,17 +118,36 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
     if (step === "test") {
       resetAll();
     }
+   
   };
   // seleted intregation
   const selectedIntegration = useMemo(() => {
     return getIntegration(mode, selectedItem);
   }, [mode, selectedItem]);
+
+  // get global variable
+  useEffect(() => {
+    if (!node?.id || !workFlow?.version?.hash) return;
+    const payload = {
+      workflow_id: workFlow.workflow?.id,
+      workflow_hash: workFlow.version?.hash,
+      workflow_version_id: workFlow.version?.id,
+      target_node_key: node?.id,
+      graph: {
+        nodes: mapNodesForBackend(nodes),
+        edges: mapEdgesForBackend(edges),
+      },
+    };
+
+    dispatch(conditionVariables(payload));
+  }, [node?.id]);
   return (
     <ZAPDrawer
       open={open}
       isFullscreen={isFullscreen}
       onClose={resetAll}
       arrowClose={mode === 'app'}
+      maxWidth='700px'
       arrowOnClick={() => {
         setSelectedItem(null);
         setMode(null);
@@ -137,10 +157,10 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
       // closeOnOverlayClick
       title={!mode ? "Add Action" : selectedItem?.name || __('App', 'zaplane')}
       placement="end"
-      size={["filter", "condition"].includes(values?.actionType) ? "xl" : "md"}
+      // size={["filter", "condition"].includes(values?.actionType) ? "xl" : "md"}
       footer={
         <HStack justify="space-between">
-          <Button variant="ghost" onClick={resetAll}>{__("Cancel", "zaplane")}</Button>
+          <Button variant="outline" onClick={resetAll}>{__("Cancel", "zaplane")}</Button>
           <Button {...primaryBtn}
             disabled={!values.actionType}
             onClick={handleContinue}>{step === 'test' ? __('Submit', 'zaplane') : __('Continue', 'zaplane')}

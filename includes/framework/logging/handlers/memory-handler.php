@@ -5,129 +5,104 @@ namespace Zaplane\Framework\Logging\Handlers;
 use Zaplane\Framework\Logging\LogEntry;
 use Zaplane\Framework\Logging\LogLevel;
 
-if (!defined('ABSPATH')) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
-/**
- * Stores log entries in memory.
- * Useful for debugging and testing.
- */
-class MemoryHandler extends AbstractHandler
-{
-    protected array $entries = [];
-    protected int $maxEntries;
+class MemoryHandler extends AbstractHandler {
 
-    public function __construct(
-        string $minLevel = LogLevel::DEBUG,
-        int $maxEntries = 1000
-    ) {
-        parent::__construct($minLevel);
-        $this->maxEntries = $maxEntries;
-    }
+	protected array $entries = [];
+	protected int $maxEntries;
 
-    /**
-     * Handle a log entry.
-     */
-    public function handle(LogEntry $entry): bool
-    {
-        if (!$this->isHandling($entry->getLevel())) {
-            return false;
-        }
+	public function __construct(
+		string $minLevel = LogLevel::DEBUG,
+		int $maxEntries = 1000
+	) {
+		parent::__construct( $minLevel );
+		$this->maxEntries = $maxEntries;
+	}
 
-        $this->entries[] = $entry;
 
-        // Trim if exceeding max entries
-        if (count($this->entries) > $this->maxEntries) {
-            $this->entries = array_slice($this->entries, -$this->maxEntries);
-        }
 
-        return true;
-    }
+	public function handle( LogEntry $entry ): bool {
+		if ( ! $this->isHandling( $entry->getLevel() ) ) {
+			return false;
+		}
 
-    /**
-     * Get all stored entries.
-     */
-    public function getEntries(): array
-    {
-        return $this->entries;
-    }
+		$this->entries[] = $entry;
 
-    /**
-     * Get entries filtered by level.
-     */
-    public function getEntriesByLevel(string $level): array
-    {
-        return array_filter($this->entries, fn($entry) => $entry->getLevel() === $level);
-    }
+		if ( count( $this->entries ) > $this->maxEntries ) {
+			$this->entries = array_slice( $this->entries, -$this->maxEntries );
+		}
 
-    /**
-     * Get entries filtered by channel.
-     */
-    public function getEntriesByChannel(string $channel): array
-    {
-        return array_filter($this->entries, fn($entry) => $entry->getChannel() === $channel);
-    }
+		return true;
+	}
 
-    /**
-     * Get entries filtered by trace ID.
-     */
-    public function getEntriesByTraceId(string $traceId): array
-    {
-        return array_filter($this->entries, fn($entry) => $entry->getTraceId() === $traceId);
-    }
 
-    /**
-     * Search entries by message.
-     */
-    public function search(string $query): array
-    {
-        return array_filter($this->entries, function ($entry) use ($query) {
-            return stripos($entry->getMessage(), $query) !== false ||
-                   stripos($entry->getInterpolatedMessage(), $query) !== false;
-        });
-    }
 
-    /**
-     * Clear all entries.
-     */
-    public function clear(): void
-    {
-        $this->entries = [];
-    }
+	public function getEntries(): array {
+		return $this->entries;
+	}
 
-    /**
-     * Get entry count.
-     */
-    public function count(): int
-    {
-        return count($this->entries);
-    }
 
-    /**
-     * Get the last entry.
-     */
-    public function last(): ?LogEntry
-    {
-        return $this->entries[array_key_last($this->entries)] ?? null;
-    }
 
-    /**
-     * Check if any errors were logged.
-     */
-    public function hasErrors(): bool
-    {
-        foreach ($this->entries as $entry) {
-            if (LogLevel::meetsThreshold($entry->getLevel(), LogLevel::ERROR)) {
-                return true;
-            }
-        }
-        return false;
-    }
+	public function getEntriesByLevel( string $level ): array {
+		return array_filter( $this->entries, fn( $entry) => $entry->getLevel() === $level );
+	}
 
-    /**
-     * Convert all entries to array.
-     */
-    public function toArray(): array
-    {
-        return array_map(fn($entry) => $entry->toArray(), $this->entries);
-    }
+
+
+	public function getEntriesByChannel( string $channel ): array {
+		return array_filter( $this->entries, fn( $entry) => $entry->getChannel() === $channel );
+	}
+
+
+
+	public function getEntriesByTraceId( string $traceId ): array {
+		return array_filter( $this->entries, fn( $entry) => $entry->getTraceId() === $traceId );
+	}
+
+
+
+	public function search( string $query ): array {
+		return array_filter($this->entries, function ( $entry ) use ( $query ) {
+			return stripos( $entry->getMessage(), $query ) !== false ||
+				   stripos( $entry->getInterpolatedMessage(), $query ) !== false;
+		});
+	}
+
+
+
+	public function clear(): void {
+		$this->entries = [];
+	}
+
+
+
+	public function count(): int {
+		return count( $this->entries );
+	}
+
+
+
+	public function last(): ?LogEntry {
+		return $this->entries[ array_key_last( $this->entries ) ] ?? null;
+	}
+
+
+
+	public function hasErrors(): bool {
+		foreach ( $this->entries as $entry ) {
+			if ( LogLevel::meetsThreshold( $entry->getLevel(), LogLevel::ERROR ) ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+
+
+	public function toArray(): array {
+		return array_map( fn( $entry) => $entry->toArray(), $this->entries );
+	}
 }

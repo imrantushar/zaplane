@@ -1,42 +1,20 @@
-import { Box, Button, Flex, Text, Accordion } from "@chakra-ui/react";
+import { Box, Button, Flex, Text } from "@chakra-ui/react";
 import { FieldArray } from "formik";
 import { FiTrash2 } from "react-icons/fi";
 import ZAPInput from "@ZAPComponents/ZAPInput";
 import ZAPSelect from "@ZAPComponents/ZAPSelect";
 import { __ } from "@wordpress/i18n";
-import { buildEmptyRule, insertVariableIntoGroup } from "./helper";
-import WPPopover from "@ZAPComponents/Popaver/WPPopover";
-import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { conditionVariables } from "@ZAPRedux/Slices/workFlowSlice/actions/conditonVariales";
-import VariablePopover from "./VariablePopover";
-import { mapEdgesForBackend, mapNodesForBackend } from "../../helper";
+import { buildEmptyRule } from "./helper";
+import { useState } from "react";
+import VariableEditor from "@ZAPComponents/VariableEditor";
 
-export default function ConditionGroupField({ value, field, nodeId, workFlow, nodes, edges }) {
+
+
+export default function ConditionGroupField({ value, field, variables }) {
     const ruleFields = field?.fields;
     const EMPTY_RULE = buildEmptyRule(ruleFields);
-
     const [isPopoverOpen, setPopoverOpen] = useState(false);
     const [activeInput, setActiveInput] = useState(null);
-
-    const { data } = useSelector((state) => state.workflows?.workflowVariables);
-
-    const dispatch = useDispatch();
-
-    useEffect(() => {
-        if (!nodeId || !workFlow?.version?.hash) return;
-        const payload = {
-            workflow_id: workFlow.workflow.id,
-            target_node_key: nodeId,
-            nodes: mapNodesForBackend(nodes),
-            edges: mapEdgesForBackend(edges),
-        }
-
-        dispatch(
-            conditionVariables(payload)
-        );
-    }, [dispatch, nodeId, workFlow?.version?.hash]);
-
     return (
         <FieldArray name={field.key}>
             {(groupHelpers) => {
@@ -82,22 +60,19 @@ export default function ConditionGroupField({ value, field, nodeId, workFlow, no
                                                         }
 
                                                         return (
-                                                            <ZAPInput
-                                                                key={f.key}
-                                                                type="textarea"
+                                                            <VariableEditor
+                                                                containerStyle={{ width: '30%' }}
                                                                 label={f.label}
+                                                                placeholder={__('Type "@" here to...', "zaplane")}
                                                                 value={rule[f.key]}
-                                                                placeholder={__('Type "@" here to add dynamic', 'zaplane')}
-                                                                onChange={(e) => {
-                                                                    const val = e.target.value;
-                                                                    ruleHelpers.replace(rIndex, { ...rule, [f.key]: val });
-
-                                                                    if (val.endsWith("@")) {
-                                                                        setActiveInput({ gIndex, rIndex, fieldKey: f.key });
-                                                                        setPopoverOpen(true);
-                                                                    }
+                                                                variables={variables}
+                                                                field={{ key: `${field.key}.${gIndex}.${rIndex}.${f.key}` }}
+                                                                setFieldValue={(key, val) => {
+                                                                    ruleHelpers.replace(rIndex, {
+                                                                        ...rule,
+                                                                        [f.key]: val
+                                                                    });
                                                                 }}
-                                                                containerStyle={{ width: "30%" }}
                                                             />
                                                         );
                                                     })}
@@ -147,7 +122,7 @@ export default function ConditionGroupField({ value, field, nodeId, workFlow, no
                                 setPopoverOpen(false);
                                 setActiveInput(null);
                             }}
-                            data={data}
+                            data={variables}
                             activeInput={activeInput}
                             groups={groups}
                             groupHelpers={groupHelpers}

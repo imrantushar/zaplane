@@ -6,7 +6,7 @@ import { generateFlowHash, mapEdgesForBackend, mapNodesForBackend } from "./help
 import { useDispatch, useSelector } from "react-redux";
 import { createNodeIdGenerator } from "./flowCanvas/helper";
 import { Box, Flex } from "@chakra-ui/react";
-import { updateWorkFlow, updateWorkFlowLayout, } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow";
+import { updateWorkFlow } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow";
 import NavigationBlocker from "@ZAPComponents/NavigationBlocker";
 
 export default function Workflows({ id }) {
@@ -14,6 +14,7 @@ export default function Workflows({ id }) {
   const getNewNodeId = nodeIdRef.current;
   const [initialHash, setInitialHash] = useState("");
   const { workFlow } = useSelector((state) => state.workflows);
+ const [canvasLayout, setCanvasLayOut] = useState(workFlow?.workflow?.layout)
   const [nodes, setNodes, onNodesChange] = useNodesState([
     {
       id: getNewNodeId(),
@@ -48,24 +49,26 @@ export default function Workflows({ id }) {
 
     const hash = generateFlowHash(defaultNodes, []);
     setInitialHash(hash);
-
   }, [id]);
+  useEffect(() => {
+  if (workFlow?.workflow?.layout) {
+    setCanvasLayOut(workFlow.workflow.layout);
+  }
+}, [workFlow]);
   const currentHash = useMemo(() => {
     return generateFlowHash(nodes, edges);
   }, [nodes, edges]);
   const isFlowDirty = currentHash !== initialHash;
   const onSubmitHandler = async (values) => {
     const payload = {
-      nodes: mapNodesForBackend(nodes)
-      , edges: mapEdgesForBackend(edges),
-      is_version: true
+      nodes: mapNodesForBackend(nodes),
+      edges: mapEdgesForBackend(edges),
+      layout: canvasLayout
     }
     await dispatch(
       updateWorkFlow({ id, payload })
     );
-    if (values?.layout) {
-      await dispatch(updateWorkFlowLayout({ id, layout: values?.layout}));
-    }
+
     // Reset dirty state after successful save
     setInitialHash(currentHash);
   };
@@ -76,9 +79,7 @@ export default function Workflows({ id }) {
         <Formik
           enableReinitialize
           initialValues={
-            {
-              layout: workFlow?.workflow?.layout
-            }}
+            {}}
           onSubmit={onSubmitHandler}
         >
           {({ }) => (
@@ -86,7 +87,7 @@ export default function Workflows({ id }) {
               <NavigationBlocker when={isFlowDirty} />
               <FlowCanvas setNodes={setNodes} setEdges={setEdges} onEdgesChange={onEdgesChange}
                 onNodesChange={onNodesChange} nodes={nodes} edges={edges} getNewNodeId={getNewNodeId}
-                workFlow={workFlow} id={id} isFlowDirty={isFlowDirty} />
+                workFlow={workFlow} id={id} isFlowDirty={isFlowDirty} canvasLayout={canvasLayout} setCanvasLayOut={setCanvasLayOut} />
             </Box>
           )}
 

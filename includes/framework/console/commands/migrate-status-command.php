@@ -5,34 +5,35 @@ namespace Zaplane\Framework\Console\Commands;
 use Zaplane\Framework\Console\Command;
 use Zaplane\Framework\Database\ORM\Migrator;
 
-if (!defined('ABSPATH')) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
-class MigrateStatusCommand extends Command
-{
-    protected string $signature = 'migrate:status';
-    protected string $description = 'Show the status of each migration';
+class MigrateStatusCommand extends Command {
 
-    public function handle(array $args, array $assoc_args): void
-    {
-        $migrator = Migrator::getInstance();
-        $status = $migrator->status();
+	protected string $signature = 'migrate:status';
+	protected string $description = 'Show the status of each migration';
 
-        if (empty($status)) {
-            $this->info('No migrations found.');
-            return;
-        }
+	public function handle( array $args, array $assoc_args ): void {
+		$migrator = Migrator::getInstance();
+		$status = $migrator->status();
 
-        $this->line('');
-        $this->line('+' . str_repeat('-', 60) . '+' . str_repeat('-', 12) . '+');
-        $this->line('| ' . str_pad('Migration', 58) . ' | ' . str_pad('Status', 10) . ' |');
-        $this->line('+' . str_repeat('-', 60) . '+' . str_repeat('-', 12) . '+');
+		if ( empty( $status ) ) {
+			$this->info( 'No migrations found.' );
+			return;
+		}
 
-        foreach ($status as $row) {
-            $statusText = $row['status'] === 'Ran' ? 'Ran' : 'Pending';
-            $this->line('| ' . str_pad($row['migration'], 58) . ' | ' . str_pad($statusText, 10) . ' |');
-        }
+		$this->line( '' );
+		$this->line( '+' . str_repeat( '-', 60 ) . '+' . str_repeat( '-', 12 ) . '+' );
+		$this->line( '| ' . str_pad( 'Migration', 58 ) . ' | ' . str_pad( 'Status', 10 ) . ' |' );
+		$this->line( '+' . str_repeat( '-', 60 ) . '+' . str_repeat( '-', 12 ) . '+' );
 
-        $this->line('+' . str_repeat('-', 60) . '+' . str_repeat('-', 12) . '+');
-        $this->line('');
-    }
+		foreach ( $status as $row ) {
+			$statusText = $row['status'] === 'Ran' ? 'Ran' : 'Pending';
+			$this->line( '| ' . str_pad( $row['migration'], 58 ) . ' | ' . str_pad( $statusText, 10 ) . ' |' );
+		}
+
+		$this->line( '+' . str_repeat( '-', 60 ) . '+' . str_repeat( '-', 12 ) . '+' );
+		$this->line( '' );
+	}
 }

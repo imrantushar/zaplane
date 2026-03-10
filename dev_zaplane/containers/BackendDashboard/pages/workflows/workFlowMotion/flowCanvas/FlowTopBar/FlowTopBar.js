@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Text, Flex, Input, Box } from "@chakra-ui/react";
 import TopBar from "@ZAPComponents/TopBar";
 import { FiArrowLeft } from "react-icons/fi";
@@ -26,9 +26,10 @@ import { CiPlay1 } from "react-icons/ci";
 import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
 import { useFormikContext } from "formik";
 import { updateWorkFlowStatus, updateWorkFlowTitle } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow";
+import { useNavigate } from "react-router-dom";
+import { route_path } from "@ZAPUtils/helper";
 
 export default function FlowTopBar({
-  navigate,
   workFlow,
   isFullscreen,
   toggleFullscreen,
@@ -41,7 +42,9 @@ export default function FlowTopBar({
   isFlowDirty
 }) {
   const { apiCountdown, apiRequestRunning } = useSelector((state) => state.workflows);
+  const [refreshing, setRefreshing] = useState(false);
   const dispatch = useDispatch()
+  const navigate = useNavigate()
   useApiCountdown()
   useEffect(() => {
     if (!workFlow?.workflow) return;
@@ -60,14 +63,42 @@ export default function FlowTopBar({
 
     updateStatusAndTitle();
   }, [values?.status, values?.title, workFlow, dispatch, id]);
+  //listiner
+  useEffect(() => {
+    if (activeDrawer !== "logs") return;
+
+    const interval = setInterval(async () => {
+      setRefreshing(true);
+
+      await dispatch(getRunWorkFlow({ id }));
+
+      setRefreshing(false);
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [activeDrawer, dispatch, id]);
+
   return (
     <TopBar
       leftContent={() => (
         <>
 
-          <Button variant="outline" height="36px" width="36px" onClick={() => {
-            isFullscreen ? toggleFullscreen() : navigate(-1)
-          }}>
+          <Button variant="outline" height="36px" width="36px"
+            onClick={() => {
+              if (isFullscreen) {
+                toggleFullscreen();
+                return;
+              }
+
+              if (isFlowDirty) {
+                const confirmLeave = window.confirm(
+                  "You have unsaved changes. Are you sure you want to leave?"
+                );
+                if (!confirmLeave) return;
+              }
+
+              navigate(`${route_path}admin.php?page=zaplane-workflows`);
+            }}>
             <FiArrowLeft />
           </Button>
 
@@ -153,7 +184,7 @@ export default function FlowTopBar({
                 border={"none"}
                 onClick={() => dispatch(getRunWorkFlow({ id }))}
               >
-                <TfiReload />{__("Refresh", "zaplane")}
+                <TfiReload className={refreshing ? "zaplane-refresh-spin" : ""} />{__("Refresh", "zaplane")}
               </Button>
               <Button
                 size="sm"
