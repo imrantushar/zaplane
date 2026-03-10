@@ -9277,8 +9277,11 @@ const useFlowActions = ({
     }));
   };
   const deleteNode = nodeId => {
-    setNodes(nds => nds.filter(n => n.id !== nodeId));
-    setEdges(eds => eds.filter(e => e.source !== nodeId && e.target !== nodeId));
+    const childNodes = nodes.filter(n => n.parentNodeId === nodeId);
+    const childIds = childNodes.map(n => n.id);
+    const allDeleteIds = [nodeId, ...childIds];
+    setNodes(nds => nds.filter(n => !allDeleteIds.includes(n.id)));
+    setEdges(eds => eds.filter(e => !allDeleteIds.includes(e.source) && !allDeleteIds.includes(e.target)));
   };
   const createActionNode = actionData => {
     const layoutLR = canvasLayout === "LR";
@@ -9357,9 +9360,7 @@ const useFlowActions = ({
       });
     }
 
-    /**
-     * CONDITION NODE SUPPORT
-     */
+    //CONDITION NODE SUPPORT
 
     if (actionData.app === "Condition") {
       const trueNodeId = getNewNodeId();
