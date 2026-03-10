@@ -1240,6 +1240,17 @@ class Wordpress extends IntegrationBase {
 		];
 	}
 
+	private static function field_user_email(): array {
+		return [
+			[
+				'key' => 'user_email',
+				'label' => 'User Email',
+				'type' => 'expression',
+				'required' => true
+			]
+		];
+	}
+
 
 
 	public static function get_action_config_schema( string $action ): array {
@@ -1431,6 +1442,10 @@ class Wordpress extends IntegrationBase {
 					'required' => true
 				],
 			],
+
+			'get_post_comments_single' => self::field_post_id(),
+
+			'get_user_comments_email' => self::field_user_email(),
 
 			'register_post_type' => [
 				[
@@ -1633,7 +1648,16 @@ class Wordpress extends IntegrationBase {
 			'trash_comment'               => self::field_comment_id(),
 			'restore_comment'             => self::field_comment_id(),
 			'delete_trash_comment'        => self::field_comment_id(),
-			'get_comment_metadata_single' => self::field_comment_id(),
+			'get_comment_metadata_all'    => self::field_comment_id(),
+			'get_comment_metadata_single' => [
+				...self::field_comment_id(),
+				[
+					'key' => 'meta_key',
+					'label' => 'Comment Meta Key',
+					'type' => 'expression',
+					'required' => true
+				],
+			],
 
 			'set_comment_status' => [
 				...self::field_comment_id(),

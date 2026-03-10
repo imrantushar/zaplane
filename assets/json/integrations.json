@@ -2564,7 +2564,14 @@
                 "get_post_comments_single": {
                     "key": "get_post_comments_single",
                     "label": "Get Post Comments (Single Post)",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -2580,7 +2587,14 @@
                 "get_user_comments_email": {
                     "key": "get_user_comments_email",
                     "label": "Get User Comments (By Email)",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "user_email",
+                            "label": "User Email",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -2588,7 +2602,14 @@
                 "get_comment_metadata_all": {
                     "key": "get_comment_metadata_all",
                     "label": "Get Comment Metadata (All)",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "comment_id",
+                            "label": "Comment ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -2600,6 +2621,12 @@
                         {
                             "key": "comment_id",
                             "label": "Comment ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "meta_key",
+                            "label": "Comment Meta Key",
                             "type": "expression",
                             "required": true
                         }
