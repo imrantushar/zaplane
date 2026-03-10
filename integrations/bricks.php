@@ -14,6 +14,10 @@ class Bricks extends IntegrationBase {
 		return 'bricks';
 	}
 
+	public static function get_icon(): string {
+		return 'bricksb-builder';
+	}
+
 	public static function get_triggers(): array {
 		return [
 			'bricks_form_submit' => [

@@ -14,6 +14,10 @@ class FluentForm extends IntegrationBase {
 		return 'fluentform';
 	}
 
+	public static function get_icon(): string {
+		return 'fluentform';
+	}
+
 	public static function get_triggers(): array {
 		return [
 			'submission_inserted' => [

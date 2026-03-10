@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-03-10 09:59:43",
+    "generated_at": "2026-03-10 18:55:14",
     "apps": {
         "pause": {
             "slug": "pause",
@@ -3930,7 +3930,7 @@
         "woocommerce": {
             "slug": "woocommerce",
             "name": "Woocommerce",
-            "icon": "woo",
+            "icon": "",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -7611,7 +7611,7 @@
         "surecart": {
             "slug": "surecart",
             "name": "Surecart",
-            "icon": "surecart",
+            "icon": "",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -9190,7 +9190,7 @@
         "memberpress": {
             "slug": "memberpress",
             "name": "Memberpress",
-            "icon": "mp",
+            "icon": "",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -10363,7 +10363,7 @@
         "fluentform": {
             "slug": "fluentform",
             "name": "Fluentform",
-            "icon": "",
+            "icon": "fluentform",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -11402,7 +11402,7 @@
         "ninjaform": {
             "slug": "ninjaform",
             "name": "Ninjaform",
-            "icon": "",
+            "icon": "ninjaform",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -11708,7 +11708,7 @@
         "easydigitaldownload": {
             "slug": "easydigitaldownload",
             "name": "Easydigitaldownload",
-            "icon": "easydigitaldownload",
+            "icon": "",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -12170,7 +12170,7 @@
         "tutor": {
             "slug": "tutor",
             "name": "Tutor",
-            "icon": "",
+            "icon": "tutorlms",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -12377,7 +12377,7 @@
         "bricks": {
             "slug": "bricks",
             "name": "Bricks",
-            "icon": "",
+            "icon": "bricksb-builder",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -12426,7 +12426,7 @@
         "academy": {
             "slug": "academy",
             "name": "Academy",
-            "icon": "",
+            "icon": "academy",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",

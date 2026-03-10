@@ -14,6 +14,10 @@ class Tutor extends IntegrationBase {
 		return 'tutor';
 	}
 
+	public static function get_icon(): string {
+		return 'tutorlms';
+	}
+	
 	public static function get_triggers(): array {
 		return [
 			'user_enroll_course' => [
@@ -146,7 +150,7 @@ class Tutor extends IntegrationBase {
 
 				$selected_course = $node['data']['config']['course_id'] ?? 'any';
 
-				if ( 'any' !== $selected_course && (int) $selected_course !== (int) $course_id ) {
+				if ( $selected_course !== 'any' && (int) $selected_course !== (int) $course_id ) {
 					return false;
 				}
 
@@ -167,6 +171,7 @@ class Tutor extends IntegrationBase {
 					'first_name'   => $user->first_name,
 					'last_name'    => $user->last_name,
 				];
+
 
 			case 'lesson_complete':
 				$lesson_id = $args[0] ?? null;
