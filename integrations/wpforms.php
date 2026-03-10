@@ -1,112 +1,135 @@
 <?php
 namespace Zaplane\Integrations;
 
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 use Zaplane\Framework\Classes\IntegrationBase;
 
 class Wpforms extends IntegrationBase {
 
-    public static function get_slug(): string {
-        return 'wpforms';
-    }
 
-    public static function get_triggers(): array {
-        return [
-            'form_submitted' => [
-                'label' => 'Form Submitted',
-                'hook'  => 'wpforms_process_complete'
-            ],
-        ];
-    }
+	public static function get_slug(): string {
+		return 'wpforms';
+	}
 
-    public static function get_trigger_config_schema( string $trigger ): array {
-        if ( $trigger === 'form_submitted' ) {
-            $options = [
-                ['label'=>'Any From','value'=>'any'],
-            ];
+	public static function get_triggers(): array {
+		return [
+			'form_submitted' => [
+				'label' => 'Form Submitted',
+				'hook'  => 'wpforms_process_complete'
+			],
+		];
+	}
 
-            if ( function_exists( 'WPForms' ) ) {
-                $forms = WPForms()->form->get();
-                foreach ( $forms as $form ) {
-                    $options[]  = [
-                        'label' => $form->post_title,
-                        'value' => $form->ID,
-                    ];
-                }
-            }
+	public static function get_trigger_config_schema( string $trigger ): array {
+		if ( 'form_submitted' === $trigger ) {
+			return [
+				[
+					'key'      => 'form_id',
+					'label'    => 'Forms',
+					'type'     => 'select',
+					'dynamic' => [
+						'integration' => 'wpforms',
+						'query'       => 'form_query',
+						'select'      => [ 'name', 'label' ],
+					],
+					'required' => true,
+				],
+			];
+		}//end if
+		return [];
+	}
 
-            return [
-                [
-                    'key'      => 'form_id',
-                    'label'    => 'Forms',
-                    'type'     => 'select',
-                    'options'  => $options,
-                    'required' => true,
-                ],
-            ];
-        }
-        return [];
-    }
+	private static function uploadfield( array $files ) {
+		$all_files = [];
 
-    private static function uploadfield(array $files) {
-        $all_files = [];
+		foreach ( $files as $file ) {
+			$all_files[] = $file['value'] ?? null;
+		}
 
-        foreach ($files as $file) {
-            $all_files[] = $file['value'] ?? null;
-        }
+		return $all_files;
+	}
 
-        return $all_files;
-    }
+	public static function resolve_trigger( array $node, array $args ) {
 
-    public static function resolve_trigger( array $node, array $args ) {
+		switch ( $node['event'] ) {
+			case 'form_submitted':
+				$fields     = $args[0] ?? [];
+				$entry      = $args[1] ?? [];
+				$form_data  = $args[2] ?? [];
+				$entry_id = $entry['id'] ?? 0;
 
-        switch ( $node['event'] ) {
+				if ( empty( $form_data['id'] ) ) {
+					return false;
+				}
 
-            case 'form_submitted':
-                $fields     = $args[0] ?? [];
-                $entry      = $args[1] ?? [];
-                $form_data  = $args[2] ?? [];
-                $entry_id = $entry['id'] ?? 0;
+				if ( ! empty( $node['form_id'] ) && 'any' !== $node['form_id'] ) {
+					if ( (int) $form_data['id'] !== (int) $node['form_id'] ) {
+						return false;
+					}
+				}
 
-                if ( empty( $form_data['id'] ) )  return false;
+				$data = [];
 
-                if ( ! empty( $node['form_id'] ) && $node['form_id'] !== 'any') {
-                    if ( (int) $form_data['id'] !== (int) $node['form_id'] ) return false;
-                }
+				if ( ! empty( $entry['post_id'] ) ) {
+					$data['post_id'] = $entry['post_id'];
+				}
 
-                $data = [];
+				foreach ( $fields as $field_id => $field ) {
+					if ( ! is_array( $field ) ) {
+						continue;
+					}
 
-                if ( ! empty( $entry['post_id'] ) ) {
-                    $data['post_id'] = $entry['post_id'];
-                }
+					if ( ( $field['type'] ?? '' ) === 'name' ) {
+						$data[ $field_id ]            = $field['value'] ?? '';
+						$data[ $field_id . ':first' ]  = $field['first'] ?? '';
+						$data[ $field_id . ':last' ]   = $field['last'] ?? '';
+						$data[ $field_id . ':middle' ] = $field['middle'] ?? '';
+					} elseif ( ( $field['type'] ?? '' ) === 'file-upload' ) {
+						$data[ $field_id ] = self::uploadfield(
+							$field['value_raw'] ?? []
+						);
+					} else {
+						$data[ $field_id ] = $field['value'] ?? '';
+					}
+				}
 
-                foreach ( $fields as $field_id => $field ) {
+				return [
+					'success'   => true,
+					'form_id'   => $form_data['id'],
+					'entry_id'  => $entry_id,
+					'data'      => $data,
+				];
+		}//end switch
+		return false;
+	}
 
-                    if ( ! is_array( $field ) ) continue;
+	public static function get_dynamic_queries(): array {
+		return [
+			'form_query' => [ self::class, 'form_query_types' ],
+		];
+	}
 
-                    if ( ( $field['type'] ?? '') === 'name') {
-                        $data[ $field_id ]            = $field['value'] ?? '';
-                        $data[ $field_id . ':first']  = $field['first'] ?? '';
-                        $data[ $field_id . ':last']   = $field['last'] ?? '';
-                        $data[ $field_id . ':middle'] = $field['middle'] ?? '';
-                    } elseif ( ( $field['type'] ?? '') === 'file-upload') {
-                        $data[ $field_id ] = self::uploadfield(
-                            $field['value_raw'] ?? []
-                        );
-                    } else {
-                        $data[ $field_id ] = $field['value'] ?? '';
-                    }
-                }
+	public static function form_query_types( $q ) {
+		$options = [
+			[
+				'label' => 'Any From',
+				'name' => 'any'
+			],
+		];
 
-                return [
-                    'success'   => true,
-                    'form_id'   => $form_data['id'],
-                    'entry_id'  => $entry_id,
-                    'data'      => $data,
-                ];
+		if ( function_exists( 'WPForms' ) ) {
+			$forms = WPForms()->form->get();
+			foreach ( $forms as $form ) {
+				$options[]  = [
+					'label' => $form->post_title,
+					'name' => $form->ID,
+				];
+			}
+		}
 
-        }
-        return false;
-    }
+		return $options;
+	}
 }

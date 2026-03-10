@@ -20,7 +20,9 @@ const DrawerModeList = ({ setMode, setSelectedItem, isTrigger, source, TOOLS }) 
             item={{ ...tool, type: "tools" }}
             onClick={() => {
               setMode("tools");
-              setSelectedItem(tool);
+              setSelectedItem({
+                ...tool,
+               mode: "tools"});
             }}
             icon={tool?.icon}
           />

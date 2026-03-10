@@ -5,60 +5,57 @@ namespace Zaplane\Framework\Console\Commands;
 use Zaplane\Framework\Console\Command;
 use Zaplane\Framework\Database\ORM\Migrator;
 
-if (!defined('ABSPATH')) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
-class MakeModelCommand extends Command
-{
-    protected string $signature = 'make:model <name>';
-    protected string $description = 'Create a new model class';
+class MakeModelCommand extends Command {
 
-    public function handle(array $args, array $assoc_args): void
-    {
-        if (empty($args[0])) {
-            $this->error('Please provide a model name.');
-            return;
-        }
+	protected string $signature = 'make:model <name>';
+	protected string $description = 'Create a new model class';
 
-        $name = $this->formatClassName($args[0]);
-        $withMigration = isset($assoc_args['migration']) || isset($assoc_args['m']);
+	public function handle( array $args, array $assoc_args ): void {
+		if ( empty( $args[0] ) ) {
+			$this->error( 'Please provide a model name.' );
+			return;
+		}
 
-        $this->createModel($name);
+		$name = $this->formatClassName( $args[0] );
+		$withMigration = isset( $assoc_args['migration'] ) || isset( $assoc_args['m'] );
 
-        if ($withMigration) {
-            $this->createMigration($name);
-        }
-    }
+		$this->createModel( $name );
 
-    protected function formatClassName(string $name): string
-    {
-        $name = str_replace(['-', '_'], ' ', $name);
-        $name = ucwords($name);
-        return str_replace(' ', '', $name);
-    }
+		if ( $withMigration ) {
+			$this->createMigration( $name );
+		}
+	}
 
-    protected function getTableName(string $className): string
-    {
-        $snake = strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $className));
-        return $snake . 's';
-    }
+	protected function formatClassName( string $name ): string {
+		$name = str_replace( [ '-', '_' ], ' ', $name );
+		$name = ucwords( $name );
+		return str_replace( ' ', '', $name );
+	}
 
-    protected function getFileName(string $className): string
-    {
-        return strtolower(preg_replace('/(?<!^)[A-Z]/', '-$0', $className)) . '.php';
-    }
+	protected function getTableName( string $className ): string {
+		$snake = strtolower( preg_replace( '/(?<!^)[A-Z]/', '_$0', $className ) );
+		return $snake . 's';
+	}
 
-    protected function createModel(string $name): void
-    {
-        $table = $this->getTableName($name);
-        $filename = $this->getFileName($name);
-        $path = ZAPLANE_ROOT_DIR_PATH . 'includes/models/' . $filename;
+	protected function getFileName( string $className ): string {
+		return strtolower( preg_replace( '/(?<!^)[A-Z]/', '-$0', $className ) ) . '.php';
+	}
 
-        if (file_exists($path)) {
-            $this->error("Model {$name} already exists.");
-            return;
-        }
+	protected function createModel( string $name ): void {
+		$table = $this->getTableName( $name );
+		$filename = $this->getFileName( $name );
+		$path = ZAPLANE_ROOT_DIR_PATH . 'includes/models/' . $filename;
 
-        $content = <<<PHP
+		if ( file_exists( $path ) ) {
+			$this->error( "Model {$name} already exists." );
+			return;
+		}
+
+		$content = <<<PHP
 <?php
 
 namespace Zaplane\Models;
@@ -69,47 +66,46 @@ if (!defined('ABSPATH')) exit;
 
 class {$name} extends Model
 {
-    protected static string \$table = '{$table}';
+	protected static string \$table = '{$table}';
 
-    protected static array \$fillable = [
-        //
-    ];
+	protected static array \$fillable = [
+		//
+	];
 
-    protected static array \$casts = [
-        'id' => 'integer',
-    ];
+	protected static array \$casts = [
+		'id' => 'integer',
+	];
 }
 PHP;
 
-        file_put_contents($path, $content);
+		file_put_contents( $path, $content );
 
-        $this->success("Model created: includes/models/{$filename}");
-    }
+		$this->success( "Model created: includes/models/{$filename}" );
+	}
 
-    protected function createMigration(string $name): void
-    {
-        $table = $this->getTableName($name);
-        $migrationName = 'create_' . $table . '_table';
+	protected function createMigration( string $name ): void {
+		$table = $this->getTableName( $name );
+		$migrationName = 'create_' . $table . '_table';
 
-        $migrator = Migrator::getInstance();
-        $filename = $migrator->make($migrationName);
+		$migrator = Migrator::getInstance();
+		$filename = $migrator->make( $migrationName );
 
-        $path = ZAPLANE_ROOT_DIR_PATH . 'includes/database/migrations/' . $filename;
-        $content = file_get_contents($path);
+		$path = ZAPLANE_ROOT_DIR_PATH . 'includes/database/migrations/' . $filename;
+		$content = file_get_contents( $path );
 
-        $content = str_replace(
-            "Schema::create('table_name'",
-            "Schema::create('{$table}'",
-            $content
-        );
-        $content = str_replace(
-            "Schema::drop('table_name')",
-            "Schema::drop('{$table}')",
-            $content
-        );
+		$content = str_replace(
+			"Schema::create('table_name'",
+			"Schema::create('{$table}'",
+			$content
+		);
+		$content = str_replace(
+			"Schema::drop('table_name')",
+			"Schema::drop('{$table}')",
+			$content
+		);
 
-        file_put_contents($path, $content);
+		file_put_contents( $path, $content );
 
-        $this->success("Migration created: includes/database/migrations/{$filename}");
-    }
+		$this->success( "Migration created: includes/database/migrations/{$filename}" );
+	}
 }

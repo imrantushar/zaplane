@@ -95,7 +95,8 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
 
       const payload = {
         icon:selectedItem.icon,
-        app: selectedItem.name,
+        mode:selectedItem.mode,
+        app: selectedItem.id,
         name: selectedItem.name,
         event: values.actionType,
         config: selectedActionFields.reduce((acc, f) => {
@@ -118,6 +119,7 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
     if (step === "test") {
       resetAll();
     }
+   
   };
   // seleted intregation
   const selectedIntegration = useMemo(() => {
