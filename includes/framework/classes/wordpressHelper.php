@@ -99,21 +99,21 @@ class WordpressHelpers {
 
 	public static function resolve_role_key( $role_input, bool $require_existing = false ): string {
 		$role = trim( (string) $role_input );
-		if ( $role === '' ) {
+		if ( '' === $role ) {
 			return '';
 		}
 		$roles = wp_roles();
-		$key = sanitize_key( $role );
-		if ( isset( $roles->roles[ $key ] ) ) {
-			return $key;
+		$sanitized_key = sanitize_key( $role );
+		if ( isset( $roles->roles[ $sanitized_key ] ) ) {
+			return $sanitized_key;
 		}
 
-		foreach ( $roles->role_names as $key => $name ) {
+		foreach ( $roles->role_names as $existing_key => $name ) {
 			if ( strcasecmp( (string) $name, $role ) === 0 ) {
-				return $key;
+				return $existing_key;
 			}
 		}
 
-		return $require_existing ? '' : $key;
+		return $require_existing ? '' : $sanitized_key;
 	}
 }

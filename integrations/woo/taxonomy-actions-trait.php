@@ -20,7 +20,7 @@ trait TaxonomyActionsTrait {
 	}
 
 	private static function action_get_product_category_all( array $config, array $input ): array {
-		return self::get_terms_action( 'product_cat' );
+		return self::get_terms_action( 'product_cat', $config );
 	}
 
 	private static function action_get_product_category_single( array $config, array $input ): array {
@@ -40,7 +40,7 @@ trait TaxonomyActionsTrait {
 	}
 
 	private static function action_get_product_tag_all( array $config, array $input ): array {
-		return self::get_terms_action( 'product_tag' );
+		return self::get_terms_action( 'product_tag', $config );
 	}
 
 	private static function action_get_product_tag_single( array $config, array $input ): array {
@@ -60,7 +60,7 @@ trait TaxonomyActionsTrait {
 	}
 
 	private static function action_get_product_type_all( array $config, array $input ): array {
-		return self::get_terms_action( 'product_type' );
+		return self::get_terms_action( 'product_type', $config );
 	}
 
 	private static function action_get_product_type_single( array $config, array $input ): array {
@@ -80,7 +80,7 @@ trait TaxonomyActionsTrait {
 	}
 
 	private static function action_get_product_brand_all( array $config, array $input ): array {
-		return self::get_terms_action( 'product_brand' );
+		return self::get_terms_action( 'product_brand', $config );
 	}
 
 	private static function action_get_product_brand_single( array $config, array $input ): array {
@@ -100,7 +100,7 @@ trait TaxonomyActionsTrait {
 	}
 
 	private static function action_get_product_shipping_class_all( array $config, array $input ): array {
-		return self::get_terms_action( 'product_shipping_class' );
+		return self::get_terms_action( 'product_shipping_class', $config );
 	}
 
 	private static function action_get_product_shipping_class_single( array $config, array $input ): array {
@@ -112,7 +112,7 @@ trait TaxonomyActionsTrait {
 			return self::error( 'Taxonomy not found', [ 'taxonomy' => $taxonomy ] );
 		}
 		$name = $config['name'] ?? '';
-		if ( $name === '' ) {
+		if ( '' === $name ) {
 			return self::error( 'Name is required' );
 		}
 		$args = [];
@@ -181,14 +181,24 @@ trait TaxonomyActionsTrait {
 		return self::respond( [ 'term_id' => $term_id ] );
 	}
 
-	private static function get_terms_action( string $taxonomy ): array {
+	private static function get_terms_action( string $taxonomy, array $config = [] ): array {
 		if ( ! taxonomy_exists( $taxonomy ) ) {
 			return self::error( 'Taxonomy not found', [ 'taxonomy' => $taxonomy ] );
 		}
-		$terms = get_terms( [
+
+		$limit = isset( $config['limit'] ) ? max( 1, (int) $config['limit'] ) : 20;
+		$page = isset( $config['page'] ) ? max( 1, (int) $config['page'] ) : 1;
+		$args = [
 			'taxonomy' => $taxonomy,
-			'hide_empty' => false
-		] );
+			'hide_empty' => isset( $config['hide_empty'] ) ? self::parse_bool( $config['hide_empty'] ) : false,
+			'number' => $limit,
+			'offset' => ( $page - 1 ) * $limit,
+		];
+		if ( ! empty( $config['search'] ) ) {
+			$args['search'] = sanitize_text_field( (string) $config['search'] );
+		}
+
+		$terms = get_terms( $args );
 		if ( is_wp_error( $terms ) ) {
 			return self::error( $terms->get_error_message() );
 		}
@@ -197,7 +207,11 @@ trait TaxonomyActionsTrait {
 		}, $terms);
 		return self::respond( [
 			'count' => count( $items ),
-			'items' => $items
+			'items' => $items,
+			'pagination' => [
+				'limit' => $limit,
+				'page' => $page,
+			],
 		] );
 	}
 

@@ -350,8 +350,8 @@ class RunController extends WP_REST_Controller {
 		}
 
 		$testContext = [];
-		foreach ( Run::latestTestNodeRunsByWorkflow( $version->workflow_id ) as $nodeKey => $nodeRun ) {
-			$out = $nodeRun->getOutput();
+		foreach ( Run::latestTestNodeRunsByWorkflow( $version->workflow_id ) as $nodeKey => $prevNodeRun ) {
+			$out = $prevNodeRun->getOutput();
 			$testContext[ (string) $nodeKey ] = is_array( $out ) ? $out : [ 'value' => $out ];
 		}
 		$effectiveInput = $input + $testContext;
@@ -371,11 +371,8 @@ class RunController extends WP_REST_Controller {
 				$output = $integration::execute_node( $targetNode, $effectiveInput );
 			}
 
+			$run->markAsCompleted();
 			$nodeRun->setOutput( $output );
-
-			$run->status = 'completed';
-			$run->finished_at = current_time( 'mysql' );
-			$run->save();
 
 			return [
 				'status' => 'success',
