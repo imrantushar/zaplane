@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-03-09 17:44:27",
+    "generated_at": "2026-03-10 07:10:10",
     "apps": {
         "pause": {
             "slug": "pause",
@@ -8781,7 +8781,7 @@
                             "multiple": true
                         },
                         {
-                            "key": "status",
+                            "key": "fluent_status",
                             "label": "Status",
                             "type": "select",
                             "options": [
@@ -8894,7 +8894,7 @@
                     "label": "Get Contact (By Status)",
                     "schema": [
                         {
-                            "key": "status",
+                            "key": "fluent_status",
                             "label": "Status",
                             "type": "select",
                             "options": [
