@@ -14,9 +14,11 @@ const TestDetails = ({ id, workFlow, source, isLoading }) => {
     );
     const { values } = useFormikContext();
     const selectedOutput = workFlow?.test_outputs?.[id]?.output || {};
-    const inputData = singleNodeExecution?.input || values || {};
+    const inputData = singleNodeExecution[id]?.input || values || {};
 
-    const outputData = singleNodeExecution?.output || selectedOutput;
+    const outputData = singleNodeExecution[id]?.output || selectedOutput;
+
+    
     const isNode = source === "node"
 
     useEffect(() => {

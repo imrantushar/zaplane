@@ -73,7 +73,7 @@ export default function FlowTopBar({
       await dispatch(getRunWorkFlow({ id }));
 
       setRefreshing(false);
-    }, 2000);
+    }, 5000);
 
     return () => clearInterval(interval);
   }, [activeDrawer, dispatch, id]);
