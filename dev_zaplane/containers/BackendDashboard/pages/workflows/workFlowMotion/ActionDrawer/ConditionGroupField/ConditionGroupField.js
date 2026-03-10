@@ -115,20 +115,6 @@ export default function ConditionGroupField({ value, field, variables }) {
                             onClick={() => groupHelpers.push([{ ...EMPTY_RULE }])}>
                             {__("OR Group", "zaplane")}
                         </Button>
-
-                        <VariablePopover
-                            isOpen={isPopoverOpen}
-                            onClose={() => {
-                                setPopoverOpen(false);
-                                setActiveInput(null);
-                            }}
-                            data={variables}
-                            activeInput={activeInput}
-                            groups={groups}
-                            groupHelpers={groupHelpers}
-                            setPopoverOpen={setPopoverOpen}
-                            setActiveInput={setActiveInput}
-                        />
                     </Flex>
                 );
             }}
