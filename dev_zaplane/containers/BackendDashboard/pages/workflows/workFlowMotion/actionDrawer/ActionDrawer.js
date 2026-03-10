@@ -94,7 +94,7 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
     if (step === "configure") {
 
       const payload = {
-        app: selectedItem.name,
+        app: selectedItem.id,
         name: selectedItem.name,
         event: values.actionType,
         config: selectedActionFields.reduce((acc, f) => {
