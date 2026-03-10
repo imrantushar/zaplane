@@ -2,279 +2,260 @@
 
 namespace Zaplane\Framework\Database\ORM;
 
-if (!defined('ABSPATH')) exit;
-
-class Migrator
-{
-    protected static ?self $instance = null;
-    protected string $migrationsPath;
-    protected string $migrationsTable;
-
-    public static function getInstance(): self
-    {
-        if (self::$instance === null) {
-            self::$instance = new self();
-        }
-        return self::$instance;
-    }
-
-    protected function __construct()
-    {
-        $this->migrationsPath = ZAPLANE_ROOT_DIR_PATH . 'includes/database/migrations/';
-        $this->migrationsTable = Schema::getTable('migrations');
-    }
-
-    public function setMigrationsPath(string $path): self
-    {
-        $this->migrationsPath = rtrim($path, '/') . '/';
-        return $this;
-    }
-
-    public function run(): array
-    {
-        $this->ensureMigrationsTableExists();
-
-        $files = $this->getMigrationFiles();
-        $ran = $this->getRanMigrations();
-        $pending = array_diff($files, $ran);
-
-        $migrated = [];
-
-        foreach ($pending as $file) {
-            $this->runMigration($file);
-            $migrated[] = $file;
-        }
-
-        return $migrated;
-    }
-
-    public function rollback(int $steps = 1): array
-    {
-        $this->ensureMigrationsTableExists();
-
-        $migrations = $this->getLastBatchMigrations($steps);
-        $rolledBack = [];
-
-        foreach ($migrations as $migration) {
-            $this->rollbackMigration($migration);
-            $rolledBack[] = $migration;
-        }
-
-        return $rolledBack;
-    }
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
-    public function reset(): array
-    {
-        $this->ensureMigrationsTableExists();
+class Migrator {
 
-        $migrations = $this->getAllRanMigrations();
-        $rolledBack = [];
-
-        foreach (array_reverse($migrations) as $migration) {
-            $this->rollbackMigration($migration);
-            $rolledBack[] = $migration;
-        }
+	protected static ?self $instance = null;
+	protected string $migrationsPath;
+	protected string $migrationsTable;
 
-        return $rolledBack;
-    }
+	public static function getInstance(): self {
+		if ( self::$instance === null ) {
+			self::$instance = new self();
+		}
+		return self::$instance;
+	}
 
-    public function refresh(): void
-    {
-        $this->reset();
-        $this->run();
-    }
-
-    public function status(): array
-    {
-        $this->ensureMigrationsTableExists();
-
-        $files = $this->getMigrationFiles();
-        $ran = $this->getRanMigrations();
+	protected function __construct() {
+		$this->migrationsPath = ZAPLANE_ROOT_DIR_PATH . 'includes/database/migrations/';
+		$this->migrationsTable = Schema::getTable( 'migrations' );
+	}
 
-        $status = [];
+	public function setMigrationsPath( string $path ): self {
+		$this->migrationsPath = rtrim( $path, '/' ) . '/';
+		return $this;
+	}
 
-        foreach ($files as $file) {
-            $status[] = [
-                'migration' => $file,
-                'status' => in_array($file, $ran) ? 'Ran' : 'Pending',
-            ];
-        }
+	public function run(): array {
+		$this->ensureMigrationsTableExists();
 
-        return $status;
-    }
+		$files = $this->getMigrationFiles();
+		$ran = $this->getRanMigrations();
+		$pending = array_diff( $files, $ran );
 
-    protected function ensureMigrationsTableExists(): void
-    {
-        global $wpdb;
+		$migrated = [];
 
-        $charset = $wpdb->get_charset_collate();
+		foreach ( $pending as $file ) {
+			$this->runMigration( $file );
+			$migrated[] = $file;
+		}
 
-        $sql = "CREATE TABLE IF NOT EXISTS {$this->migrationsTable} (
-            id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-            migration VARCHAR(255) NOT NULL,
-            batch INT NOT NULL,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-        ) {$charset}";
+		return $migrated;
+	}
 
-        require_once ABSPATH . 'wp-admin/includes/upgrade.php';
-        dbDelta($sql);
-    }
+	public function rollback( int $steps = 1 ): array {
+		$this->ensureMigrationsTableExists();
 
-    protected function getMigrationFiles(): array
-    {
-        if (!is_dir($this->migrationsPath)) {
-            return [];
-        }
+		$migrations = $this->getLastBatchMigrations( $steps );
+		$rolledBack = [];
 
-        $files = glob($this->migrationsPath . '*.php');
-        $migrations = [];
+		foreach ( $migrations as $migration ) {
+			$this->rollbackMigration( $migration );
+			$rolledBack[] = $migration;
+		}
 
-        foreach ($files as $file) {
-            $migrations[] = basename($file, '.php');
-        }
+		return $rolledBack;
+	}
 
-        sort($migrations);
+	public function reset(): array {
+		$this->ensureMigrationsTableExists();
 
-        return $migrations;
-    }
+		$migrations = $this->getAllRanMigrations();
+		$rolledBack = [];
 
-    protected function getRanMigrations(): array
-    {
-        global $wpdb;
+		foreach ( array_reverse( $migrations ) as $migration ) {
+			$this->rollbackMigration( $migration );
+			$rolledBack[] = $migration;
+		}
 
-        $results = $wpdb->get_col("SELECT migration FROM {$this->migrationsTable}");
+		return $rolledBack;
+	}
 
-        return $results ?: [];
-    }
+	public function refresh(): void {
+		$this->reset();
+		$this->run();
+	}
 
-    protected function getAllRanMigrations(): array
-    {
-        global $wpdb;
+	public function status(): array {
+		$this->ensureMigrationsTableExists();
 
-        $results = $wpdb->get_col(
-            "SELECT migration FROM {$this->migrationsTable} ORDER BY batch DESC, migration DESC"
-        );
+		$files = $this->getMigrationFiles();
+		$ran = $this->getRanMigrations();
 
-        return $results ?: [];
-    }
+		$status = [];
 
-    protected function getLastBatchMigrations(int $steps): array
-    {
-        global $wpdb;
+		foreach ( $files as $file ) {
+			$status[] = [
+				'migration' => $file,
+				'status' => in_array( $file, $ran ) ? 'Ran' : 'Pending',
+			];
+		}
 
-        $batch = $wpdb->get_var(
-            "SELECT MAX(batch) FROM {$this->migrationsTable}"
-        );
+		return $status;
+	}
 
-        if (!$batch) {
-            return [];
-        }
+	protected function ensureMigrationsTableExists(): void {
+		global $wpdb;
 
-        $minBatch = max(1, $batch - $steps + 1);
+		$charset = $wpdb->get_charset_collate();
 
-        $results = $wpdb->get_col($wpdb->prepare(
-            "SELECT migration FROM {$this->migrationsTable} WHERE batch >= %d ORDER BY batch DESC, migration DESC",
-            $minBatch
-        ));
+		$sql = "CREATE TABLE IF NOT EXISTS {$this->migrationsTable} (
+			id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+			migration VARCHAR(255) NOT NULL,
+			batch INT NOT NULL,
+			created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+		) {$charset}";
 
-        return $results ?: [];
-    }
+		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+		dbDelta( $sql );
+	}
 
-    protected function getNextBatchNumber(): int
-    {
-        global $wpdb;
+	protected function getMigrationFiles(): array {
+		if ( ! is_dir( $this->migrationsPath ) ) {
+			return [];
+		}
 
-        $batch = $wpdb->get_var(
-            "SELECT MAX(batch) FROM {$this->migrationsTable}"
-        );
+		$files = glob( $this->migrationsPath . '*.php' );
+		$migrations = [];
 
-        return ($batch ?? 0) + 1;
-    }
+		foreach ( $files as $file ) {
+			$migrations[] = basename( $file, '.php' );
+		}
 
-    protected function runMigration(string $name): void
-    {
-        global $wpdb;
+		sort( $migrations );
 
-        $class = $this->resolveMigrationClass($name);
+		return $migrations;
+	}
 
-        if (!$class) {
-            return;
-        }
+	protected function getRanMigrations(): array {
+		global $wpdb;
 
-        $migration = new $class();
-        $migration->up();
+		$results = $wpdb->get_col( "SELECT migration FROM {$this->migrationsTable}" );
 
-        $batch = $this->getNextBatchNumber();
+		return $results ?: [];
+	}
 
-        $wpdb->insert($this->migrationsTable, [
-            'migration' => $name,
-            'batch' => $batch,
-        ]);
-    }
+	protected function getAllRanMigrations(): array {
+		global $wpdb;
 
-    protected function rollbackMigration(string $name): void
-    {
-        global $wpdb;
+		$results = $wpdb->get_col(
+			"SELECT migration FROM {$this->migrationsTable} ORDER BY batch DESC, migration DESC"
+		);
 
-        $class = $this->resolveMigrationClass($name);
+		return $results ?: [];
+	}
 
-        if ($class) {
-            $migration = new $class();
-            $migration->down();
-        }
+	protected function getLastBatchMigrations( int $steps ): array {
+		global $wpdb;
 
-        $wpdb->delete($this->migrationsTable, ['migration' => $name]);
-    }
+		$batch = $wpdb->get_var(
+			"SELECT MAX(batch) FROM {$this->migrationsTable}"
+		);
 
-    protected function resolveMigrationClass(string $name): ?string
-    {
-        $file = $this->migrationsPath . $name . '.php';
+		if ( ! $batch ) {
+			return [];
+		}
 
-        if (!file_exists($file)) {
-            return null;
-        }
+		$minBatch = max( 1, $batch - $steps + 1 );
 
-        require_once $file;
+		$results = $wpdb->get_col($wpdb->prepare(
+			"SELECT migration FROM {$this->migrationsTable} WHERE batch >= %d ORDER BY batch DESC, migration DESC",
+			$minBatch
+		));
 
-        $className = $this->getClassNameFromFile($name);
+		return $results ?: [];
+	}
 
-        if (!class_exists($className)) {
-            return null;
-        }
+	protected function getNextBatchNumber(): int {
+		global $wpdb;
 
-        return $className;
-    }
+		$batch = $wpdb->get_var(
+			"SELECT MAX(batch) FROM {$this->migrationsTable}"
+		);
 
-    protected function getClassNameFromFile(string $name): string
-    {
-        // Remove the timestamp prefix (YYYY_MM_DD_HHMMSS)
-        // Migration format: 2024_01_01_000001_create_workflows_table
-        $parts = explode('_', $name);
+		return ( $batch ?? 0 ) + 1;
+	}
 
-        // Remove first 4 parts (year, month, day, time)
-        array_splice($parts, 0, 4);
+	protected function runMigration( string $name ): void {
+		global $wpdb;
 
-        $className = '';
-        foreach ($parts as $part) {
-            $className .= ucfirst($part);
-        }
+		$class = $this->resolveMigrationClass( $name );
 
-        return 'Zaplane\\Database\\Migrations\\' . $className;
-    }
+		if ( ! $class ) {
+			return;
+		}
 
-    public function make(string $name): string
-    {
-        $timestamp = date('Y_m_d_His');
-        $filename = $timestamp . '_' . $name . '.php';
-        $filepath = $this->migrationsPath . $filename;
+		$migration = new $class();
+		$migration->up();
 
-        $className = '';
-        $parts = explode('_', $name);
-        foreach ($parts as $part) {
-            $className .= ucfirst($part);
-        }
+		$batch = $this->getNextBatchNumber();
 
-        $content = <<<PHP
+		$wpdb->insert($this->migrationsTable, [
+			'migration' => $name,
+			'batch' => $batch,
+		]);
+	}
+
+	protected function rollbackMigration( string $name ): void {
+		global $wpdb;
+
+		$class = $this->resolveMigrationClass( $name );
+
+		if ( $class ) {
+			$migration = new $class();
+			$migration->down();
+		}
+
+		$wpdb->delete( $this->migrationsTable, [ 'migration' => $name ] );
+	}
+
+	protected function resolveMigrationClass( string $name ): ?string {
+		$file = $this->migrationsPath . $name . '.php';
+
+		if ( ! file_exists( $file ) ) {
+			return null;
+		}
+
+		require_once $file;
+
+		$className = $this->getClassNameFromFile( $name );
+
+		if ( ! class_exists( $className ) ) {
+			return null;
+		}
+
+		return $className;
+	}
+
+	protected function getClassNameFromFile( string $name ): string {
+
+		$parts = explode( '_', $name );
+
+		array_splice( $parts, 0, 4 );
+
+		$className = '';
+		foreach ( $parts as $part ) {
+			$className .= ucfirst( $part );
+		}
+
+		return 'Zaplane\\Database\\Migrations\\' . $className;
+	}
+
+	public function make( string $name ): string {
+		$timestamp = date( 'Y_m_d_His' );
+		$filename = $timestamp . '_' . $name . '.php';
+		$filepath = $this->migrationsPath . $filename;
+
+		$className = '';
+		$parts = explode( '_', $name );
+		foreach ( $parts as $part ) {
+			$className .= ucfirst( $part );
+		}
+
+		$content = <<<PHP
 <?php
 
 namespace Zaplane\Database\Migrations;
@@ -287,27 +268,27 @@ if (!defined('ABSPATH')) exit;
 
 class {$className} extends Migration
 {
-    public function up(): void
-    {
-        Schema::create('table_name', function (Blueprint \$table) {
-            \$table->id();
-            \$table->timestamps();
-        });
-    }
+	public function up(): void
+	{
+		Schema::create('table_name', function (Blueprint \$table) {
+			\$table->id();
+			\$table->timestamps();
+		});
+	}
 
-    public function down(): void
-    {
-        Schema::drop('table_name');
-    }
+	public function down(): void
+	{
+		Schema::drop('table_name');
+	}
 }
 PHP;
 
-        if (!is_dir($this->migrationsPath)) {
-            mkdir($this->migrationsPath, 0755, true);
-        }
+		if ( ! is_dir( $this->migrationsPath ) ) {
+			mkdir( $this->migrationsPath, 0755, true );
+		}
 
-        file_put_contents($filepath, $content);
+		file_put_contents( $filepath, $content );
 
-        return $filename;
-    }
+		return $filename;
+	}
 }

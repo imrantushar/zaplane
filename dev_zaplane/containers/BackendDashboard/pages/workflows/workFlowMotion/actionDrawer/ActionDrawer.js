@@ -25,7 +25,7 @@ import { conditionVariables } from "@ZAPRedux/Slices/workFlowSlice/actions/condi
 const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode, workFlow, isFullscreen, nodes, edges }) => {
   const { source, node } = context;
   const dispatch = useDispatch();
-  const { values, setFieldValue, resetForm } = useFormikContext();
+  const { values, setFieldValue, resetForm ,initialValues} = useFormikContext();
   const [step, setStep] = useState("select");
   const isTrigger = node?.data?.action === "trigger" && source === "node";
   const [showWarning, setShowWarning] = useState(false);
@@ -77,7 +77,6 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
     selectedActionFields,
     values,
   });
-  console.log(selectedItem,'selted item');
 
   const resetAll = () => {
     setMode(null);
@@ -120,34 +119,36 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
     if (step === "test") {
       resetAll();
     }
+   
   };
   // seleted intregation
   const selectedIntegration = useMemo(() => {
     return getIntegration(mode, selectedItem);
   }, [mode, selectedItem]);
 
-// get global variable
-useEffect(() => {
- if (!node?.id || !workFlow?.version?.hash) return;
-  const payload = {
-    workflow_id: workFlow.workflow?.id,
-    workflow_hash: workFlow.version?.hash,
-    workflow_version_id: workFlow.version?.id,
-    target_node_key: node?.id,
-    graph: {
-      nodes: mapNodesForBackend(nodes),
-      edges: mapEdgesForBackend(edges),
-    },
-  };
+  // get global variable
+  useEffect(() => {
+    if (!node?.id || !workFlow?.version?.hash) return;
+    const payload = {
+      workflow_id: workFlow.workflow?.id,
+      workflow_hash: workFlow.version?.hash,
+      workflow_version_id: workFlow.version?.id,
+      target_node_key: node?.id,
+      graph: {
+        nodes: mapNodesForBackend(nodes),
+        edges: mapEdgesForBackend(edges),
+      },
+    };
 
-  dispatch(conditionVariables(payload));
-}, [node?.id]);
+    dispatch(conditionVariables(payload));
+  }, [node?.id]);
   return (
     <ZAPDrawer
       open={open}
       isFullscreen={isFullscreen}
       onClose={resetAll}
       arrowClose={mode === 'app'}
+      maxWidth='700px'
       arrowOnClick={() => {
         setSelectedItem(null);
         setMode(null);
@@ -157,10 +158,10 @@ useEffect(() => {
       // closeOnOverlayClick
       title={!mode ? "Add Action" : selectedItem?.name || __('App', 'zaplane')}
       placement="end"
-      size={["filter", "condition"].includes(values?.actionType) ? "xl" : "md"}
+      // size={["filter", "condition"].includes(values?.actionType) ? "xl" : "md"}
       footer={
         <HStack justify="space-between">
-          <Button variant="ghost" onClick={resetAll}>{__("Cancel", "zaplane")}</Button>
+          <Button variant="outline" onClick={resetAll}>{__("Cancel", "zaplane")}</Button>
           <Button {...primaryBtn}
             disabled={!values.actionType}
             onClick={handleContinue}>{step === 'test' ? __('Submit', 'zaplane') : __('Continue', 'zaplane')}

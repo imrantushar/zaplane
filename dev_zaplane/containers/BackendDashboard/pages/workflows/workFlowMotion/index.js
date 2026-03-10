@@ -14,6 +14,7 @@ export default function Workflows({ id }) {
   const getNewNodeId = nodeIdRef.current;
   const [initialHash, setInitialHash] = useState("");
   const { workFlow } = useSelector((state) => state.workflows);
+ const [canvasLayout, setCanvasLayOut] = useState(workFlow?.workflow?.layout)
   const [nodes, setNodes, onNodesChange] = useNodesState([
     {
       id: getNewNodeId(),
@@ -48,17 +49,21 @@ export default function Workflows({ id }) {
 
     const hash = generateFlowHash(defaultNodes, []);
     setInitialHash(hash);
-
   }, [id]);
+  useEffect(() => {
+  if (workFlow?.workflow?.layout) {
+    setCanvasLayOut(workFlow.workflow.layout);
+  }
+}, [workFlow]);
   const currentHash = useMemo(() => {
     return generateFlowHash(nodes, edges);
   }, [nodes, edges]);
   const isFlowDirty = currentHash !== initialHash;
   const onSubmitHandler = async (values) => {
     const payload = {
-      nodes: mapNodesForBackend(nodes), 
+      nodes: mapNodesForBackend(nodes),
       edges: mapEdgesForBackend(edges),
-      layout: values?.layout
+      layout: canvasLayout
     }
     await dispatch(
       updateWorkFlow({ id, payload })
@@ -74,9 +79,7 @@ export default function Workflows({ id }) {
         <Formik
           enableReinitialize
           initialValues={
-            {
-              layout: workFlow?.workflow?.layout
-            }}
+            {}}
           onSubmit={onSubmitHandler}
         >
           {({ }) => (
@@ -84,7 +87,7 @@ export default function Workflows({ id }) {
               <NavigationBlocker when={isFlowDirty} />
               <FlowCanvas setNodes={setNodes} setEdges={setEdges} onEdgesChange={onEdgesChange}
                 onNodesChange={onNodesChange} nodes={nodes} edges={edges} getNewNodeId={getNewNodeId}
-                workFlow={workFlow} id={id} isFlowDirty={isFlowDirty} />
+                workFlow={workFlow} id={id} isFlowDirty={isFlowDirty} canvasLayout={canvasLayout} setCanvasLayOut={setCanvasLayOut} />
             </Box>
           )}
 

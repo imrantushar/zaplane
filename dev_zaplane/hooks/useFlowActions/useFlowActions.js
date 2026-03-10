@@ -13,6 +13,8 @@ export const useFlowActions = ({
     getNewNodeId,
     setFieldValue,
     canvasLayout,
+    setCanvasLayOut
+
 }) => {
 
     const updateNodeData = (updatedData) => {
@@ -30,6 +32,7 @@ export const useFlowActions = ({
         setEdges((eds) =>
             eds.filter((e) => e.source !== nodeId && e.target !== nodeId)
         );
+        
     };
 
     const createActionNode = (actionData) => {
@@ -231,8 +234,7 @@ export const useFlowActions = ({
                 });
 
                 fitView({ padding: 0.2, duration: 300 });
-
-                setFieldValue("layout", direction);
+                setCanvasLayOut(direction)
             });
         },
         [nodes, edges, fitView, updateNodeInternals]

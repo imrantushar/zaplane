@@ -5,31 +5,32 @@ namespace Zaplane\Framework\Console\Commands;
 use Zaplane\Framework\Console\Command;
 use Zaplane\Framework\Database\ORM\Migrator;
 
-if (!defined('ABSPATH')) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
-class MigrateRollbackCommand extends Command
-{
-    protected string $signature = 'migrate:rollback';
-    protected string $description = 'Rollback the last database migration batch';
+class MigrateRollbackCommand extends Command {
 
-    public function handle(array $args, array $assoc_args): void
-    {
-        $steps = isset($assoc_args['step']) ? (int) $assoc_args['step'] : 1;
+	protected string $signature = 'migrate:rollback';
+	protected string $description = 'Rollback the last database migration batch';
 
-        $this->info("Rolling back {$steps} migration batch(es)...");
+	public function handle( array $args, array $assoc_args ): void {
+		$steps = isset( $assoc_args['step'] ) ? (int) $assoc_args['step'] : 1;
 
-        $migrator = Migrator::getInstance();
-        $rolledBack = $migrator->rollback($steps);
+		$this->info( "Rolling back {$steps} migration batch(es)..." );
 
-        if (empty($rolledBack)) {
-            $this->info('Nothing to rollback.');
-            return;
-        }
+		$migrator = Migrator::getInstance();
+		$rolledBack = $migrator->rollback( $steps );
 
-        foreach ($rolledBack as $migration) {
-            $this->info("Rolled back: {$migration}");
-        }
+		if ( empty( $rolledBack ) ) {
+			$this->info( 'Nothing to rollback.' );
+			return;
+		}
 
-        $this->success('Rollback completed successfully.');
-    }
+		foreach ( $rolledBack as $migration ) {
+			$this->info( "Rolled back: {$migration}" );
+		}
+
+		$this->success( 'Rollback completed successfully.' );
+	}
 }
