@@ -8232,7 +8232,7 @@ function FlowTopBar({
         id
       }));
       setRefreshing(false);
-    }, 9000);
+    }, 5000);
     return () => clearInterval(interval);
   }, [activeDrawer, dispatch, id]);
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsx)(_ZAPComponents_TopBar__WEBPACK_IMPORTED_MODULE_6__["default"], {
