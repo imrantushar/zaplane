@@ -16,7 +16,7 @@ trait MediaActionsTrait {
 	}
 
 	protected static function action_add_media_image( array $config ): array {
-		$result = WordpressHelpers::upload_media_from_url(
+		$result = self::upload_media_from_url(
 			$config['image_url'] ?? '',
 			$config['image_title'] ?? '',
 			$config['alternative_text'] ?? '',
@@ -61,8 +61,8 @@ trait MediaActionsTrait {
 	}
 
 	protected static function action_get_media_all( array $config ): array {
-		$media_posts = WordpressHelpers::get_media_posts();
-		$media_items = WordpressHelpers::format_media_items( $media_posts );
+		$media_posts = self::get_media_posts();
+		$media_items = self::format_media_items( $media_posts );
 		return static::success([
 			'media_items' => $media_items,
 		]);
@@ -70,8 +70,8 @@ trait MediaActionsTrait {
 
 	protected static function action_get_media_by_title( array $config ): array {
 		$title       = $config['title'] ?? '';
-		$media_posts = WordpressHelpers::get_media_posts( [ 's' => $title ] );
-		$media_items = WordpressHelpers::format_media_items( $media_posts );
+		$media_posts = self::get_media_posts( [ 's' => $title ] );
+		$media_items = self::format_media_items( $media_posts );
 		return static::success([
 			'media_items' => $media_items,
 		]);
@@ -80,7 +80,7 @@ trait MediaActionsTrait {
 	protected static function action_get_media_by_id( array $config ): array {
 		$media_id   = $config['media_id'] ?? 0;
 		$media      = get_post( $media_id );
-		$media_item = WordpressHelpers::format_media_items( [ $media ] )[0];
+		$media_item = self::format_media_items( [ $media ] )[0];
 		return static::success([
 			'media_item' => $media_item,
 		]);

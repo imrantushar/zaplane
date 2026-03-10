@@ -105,7 +105,8 @@ trait Helper {
 			return null;
 		}
 
-		return wc_get_product( $post->ID ) ?: null;
+		$product = wc_get_product( $post->ID );
+		return $product ? $product : null;
 	}
 
 	protected static function product_payload_from_post( $post_ref, array $extra = [] ): ?array {
@@ -209,7 +210,7 @@ trait Helper {
 	}
 
 	protected static function get_customer_id_by_email( string $email ): int {
-		if ( $email === '' ) {
+		if ( '' === $email ) {
 			return 0;
 		}
 		if ( function_exists( 'wc_get_customer_id_by_email' ) ) {
@@ -223,11 +224,14 @@ trait Helper {
 		if ( is_bool( $value ) ) {
 			return $value;
 		}
-		if ( $value === null || $value === '' ) {
+		if ( null === $value || '' === $value ) {
 			return $default;
 		}
 		$result = filter_var( $value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE );
-		return $result === null ? $default : $result;
+		if ( null === $result ) {
+			return $default;
+		}
+		return $result;
 	}
 
 	protected static function parse_json_array( $value ): array {
@@ -249,7 +253,7 @@ trait Helper {
 			return [];
 		}
 		$value = trim( $value );
-		if ( $value === '' ) {
+		if ( '' === $value ) {
 			return [];
 		}
 		$decoded = json_decode( $value, true );
@@ -337,7 +341,7 @@ trait Helper {
 		if ( function_exists( 'wc_get_customers' ) ) {
 			$result = wc_get_customers( $args );
 			return [
-				'items' => $result ?: [],
+				'items' => $result ? $result : [],
 				'total' => is_array( $result ) ? count( $result ) : 0,
 			];
 		}
@@ -351,7 +355,7 @@ trait Helper {
 		if ( function_exists( 'wc_get_coupons' ) ) {
 			$result = wc_get_coupons( $args );
 			return [
-				'items' => $result ?: [],
+				'items' => $result ? $result : [],
 				'total' => is_array( $result ) ? count( $result ) : 0,
 			];
 		}
@@ -363,7 +367,7 @@ trait Helper {
 
 	protected static function query_reviews( array $args ): array {
 		$query = new \WP_Comment_Query( $args );
-		$items = $query->comments ?: [];
+		$items = $query->comments ? $query->comments : [];
 		$total = (int) ( $query->found_comments ?? count( $items ) );
 		return [
 			'items' => $items,
@@ -479,7 +483,12 @@ trait Helper {
 			[
 				'key' => 'order_id',
 				'label' => 'Order ID',
-				'type' => 'expression',
+				'type' => 'select',
+				'dynamic' => [
+					'integration' => 'woocommerce',
+					'query' => 'orders',
+					'select' => [ 'id', 'label' ],
+				],
 				'required' => $required,
 			]
 		];
@@ -490,7 +499,12 @@ trait Helper {
 			[
 				'key' => 'customer_id',
 				'label' => 'Customer ID',
-				'type' => 'expression',
+				'type' => 'select',
+				'dynamic' => [
+					'integration' => 'woocommerce',
+					'query' => 'customers',
+					'select' => [ 'id', 'label' ],
+				],
 				'required' => $required,
 			]
 		];
@@ -501,7 +515,12 @@ trait Helper {
 			[
 				'key' => 'product_id',
 				'label' => 'Product ID',
-				'type' => 'expression',
+				'type' => 'select',
+				'dynamic' => [
+					'integration' => 'woocommerce',
+					'query' => 'products',
+					'select' => [ 'id', 'name' ],
+				],
 				'required' => $required,
 			]
 		];
@@ -512,7 +531,12 @@ trait Helper {
 			[
 				'key' => 'coupon_id',
 				'label' => 'Coupon ID',
-				'type' => 'expression'
+				'type' => 'select',
+				'dynamic' => [
+					'integration' => 'woocommerce',
+					'query' => 'coupons',
+					'select' => [ 'id', 'code' ],
+				],
 			],
 			[
 				'key' => 'code',
@@ -539,18 +563,42 @@ trait Helper {
 		];
 	}
 
-	protected static function field_term_id(): array {
+	protected static function field_term_list_filters(): array {
+		return [
+			[
+				'key' => 'hide_empty',
+				'label' => 'Hide Empty Terms',
+				'type' => 'boolean',
+			],
+			[
+				'key' => 'search',
+				'label' => 'Search',
+				'type' => 'text',
+			],
+			...self::field_limit_page(),
+		];
+	}
+
+	protected static function field_term_id( string $taxonomy = 'product_cat' ): array {
 		return [
 			[
 				'key' => 'term_id',
 				'label' => 'Term ID',
-				'type' => 'expression',
+				'type' => 'select',
+				'dynamic' => [
+					'integration' => 'woocommerce',
+					'query' => 'terms',
+					'select' => [ 'id', 'name' ],
+					'where' => [
+						'taxonomy' => $taxonomy,
+					],
+				],
 				'required' => true,
 			]
 		];
 	}
 
-	protected static function field_term_create( bool $with_parent = true ): array {
+	protected static function field_term_create( bool $with_parent = true, string $taxonomy = 'product_cat' ): array {
 		$fields = [
 			[
 				'key' => 'name',
@@ -573,14 +621,22 @@ trait Helper {
 			$fields[] = [
 				'key' => 'parent',
 				'label' => 'Parent Term ID',
-				'type' => 'expression'
+				'type' => 'select',
+				'dynamic' => [
+					'integration' => 'woocommerce',
+					'query' => 'terms',
+					'select' => [ 'id', 'name' ],
+					'where' => [
+						'taxonomy' => $taxonomy,
+					],
+				],
 			];
 		}
 		return $fields;
 	}
 
-	protected static function field_term_update( bool $with_parent = true ): array {
-		$fields = array_merge(self::field_term_id(), [
+	protected static function field_term_update( bool $with_parent = true, string $taxonomy = 'product_cat' ): array {
+		$fields = array_merge(self::field_term_id( $taxonomy ), [
 			[
 				'key' => 'name',
 				'label' => 'Name',
@@ -601,14 +657,22 @@ trait Helper {
 			$fields[] = [
 				'key' => 'parent',
 				'label' => 'Parent Term ID',
-				'type' => 'expression'
+				'type' => 'select',
+				'dynamic' => [
+					'integration' => 'woocommerce',
+					'query' => 'terms',
+					'select' => [ 'id', 'name' ],
+					'where' => [
+						'taxonomy' => $taxonomy,
+					],
+				],
 			];
 		}
 		return $fields;
 	}
 
-	protected static function field_term_delete(): array {
-		return self::field_term_id();
+	protected static function field_term_delete( string $taxonomy = 'product_cat' ): array {
+		return self::field_term_id( $taxonomy );
 	}
 
 	protected static function field_attribute_id(): array {
@@ -616,7 +680,12 @@ trait Helper {
 			[
 				'key' => 'attribute_id',
 				'label' => 'Attribute ID',
-				'type' => 'expression',
+				'type' => 'select',
+				'dynamic' => [
+					'integration' => 'woocommerce',
+					'query' => 'attributes',
+					'select' => [ 'id', 'label' ],
+				],
 				'required' => true,
 			]
 		];
@@ -737,5 +806,347 @@ trait Helper {
 				'type' => 'boolean'
 			],
 		]);
+	}
+
+	public static function query_dynamic_orders( $q ): array {
+		if ( ! function_exists( 'wc_get_orders' ) ) {
+			return [];
+		}
+
+		$q = is_array( $q ) ? $q : [];
+		$limit = self::normalize_dynamic_limit( $q );
+		$search = self::normalize_dynamic_search( $q );
+
+		$args = [ 'limit' => $limit ];
+		if ( '' !== $search ) {
+			$args['search'] = $search;
+		}
+
+		$orders = wc_get_orders( $args );
+		$items = [];
+
+		foreach ( $orders as $order ) {
+			if ( ! $order instanceof \WC_Order ) {
+				continue;
+			}
+			$id = $order->get_id();
+			$order_number = $order->get_order_number();
+			$email = $order->get_billing_email();
+			$label = '#' . $order_number . ( $email ? ' - ' . $email : '' );
+			if ( ! self::matches_dynamic_search( $search, $label ) ) {
+				continue;
+			}
+			$items[] = [
+				'id' => (string) $id,
+				'label' => $label,
+				'order_number' => (string) $order_number,
+				'status' => $order->get_status(),
+			];
+		}
+
+		return array_slice( $items, 0, $limit );
+	}
+
+	public static function query_dynamic_customers( $q ): array {
+		$q = is_array( $q ) ? $q : [];
+		$limit = self::normalize_dynamic_limit( $q );
+		$search = self::normalize_dynamic_search( $q );
+		$items = [];
+
+		if ( class_exists( '\WC_Customer_Query' ) ) {
+			$args = [
+				'limit' => $limit,
+			];
+			if ( '' !== $search ) {
+				$args['search'] = '*' . $search . '*';
+				$args['search_columns'] = [ 'user_login', 'user_email', 'display_name' ];
+			}
+			$query = new \WC_Customer_Query( $args );
+			$customers = $query->get_customers();
+
+			foreach ( $customers as $customer ) {
+				if ( ! $customer instanceof \WC_Customer ) {
+					continue;
+				}
+				$id = $customer->get_id();
+				$email = $customer->get_email();
+				$name = trim( $customer->get_first_name() . ' ' . $customer->get_last_name() );
+				$label = '' !== $name ? $name : $email;
+				if ( '' === $label ) {
+					$label = 'Customer #' . $id;
+				}
+				if ( ! self::matches_dynamic_search( $search, $label ) ) {
+					continue;
+				}
+				$items[] = [
+					'id' => (string) $id,
+					'label' => $label,
+					'email' => $email,
+				];
+			}
+		} elseif ( function_exists( 'get_users' ) ) {
+			$args = [ 'number' => $limit ];
+			if ( '' !== $search ) {
+				$args['search'] = '*' . $search . '*';
+				$args['search_columns'] = [ 'user_login', 'user_email', 'display_name' ];
+			}
+			$users = get_users( $args );
+			foreach ( $users as $user ) {
+				$id = $user->ID ?? 0;
+				if ( ! $id ) {
+					continue;
+				}
+				$label = ! empty( $user->display_name ) ? $user->display_name : ( $user->user_email ?? '' );
+				if ( '' === $label ) {
+					$label = 'User #' . $id;
+				}
+				if ( ! self::matches_dynamic_search( $search, $label ) ) {
+					continue;
+				}
+				$items[] = [
+					'id' => (string) $id,
+					'label' => $label,
+					'email' => $user->user_email ?? '',
+				];
+			}
+		}//end if
+
+		return array_slice( $items, 0, $limit );
+	}
+
+	public static function query_dynamic_products( $q ): array {
+		if ( ! function_exists( 'wc_get_products' ) ) {
+			return [];
+		}
+
+		$q = is_array( $q ) ? $q : [];
+		$limit = self::normalize_dynamic_limit( $q );
+		$search = self::normalize_dynamic_search( $q );
+
+		$args = [
+			'limit' => $limit,
+			'status' => 'publish',
+		];
+		if ( '' !== $search ) {
+			$args['search'] = $search;
+		}
+
+		$products = wc_get_products( $args );
+		$items = [];
+
+		foreach ( $products as $product ) {
+			if ( ! $product instanceof \WC_Product ) {
+				continue;
+			}
+			$id = $product->get_id();
+			$name = $product->get_name();
+			if ( '' === $name ) {
+				$name = 'Product #' . $id;
+			}
+			if ( ! self::matches_dynamic_search( $search, $name ) ) {
+				continue;
+			}
+			$items[] = [
+				'id' => (string) $id,
+				'name' => $name,
+				'sku' => $product->get_sku(),
+			];
+		}
+
+		return array_slice( $items, 0, $limit );
+	}
+
+	public static function query_dynamic_variations( $q ): array {
+		$q = is_array( $q ) ? $q : [];
+		$limit = self::normalize_dynamic_limit( $q );
+		$search = self::normalize_dynamic_search( $q );
+
+		$args = [
+			'post_type' => 'product_variation',
+			'post_status' => [ 'publish', 'private' ],
+			'posts_per_page' => $limit,
+			's' => $search,
+		];
+
+		$posts = function_exists( 'get_posts' ) ? get_posts( $args ) : [];
+		$items = [];
+
+		foreach ( $posts as $post ) {
+			$id = $post->ID ?? 0;
+			if ( ! $id ) {
+				continue;
+			}
+
+			$label = '#' . $id;
+			$product_id = (int) ( $post->post_parent ?? 0 );
+			if ( $product_id > 0 ) {
+				$product = function_exists( 'wc_get_product' ) ? wc_get_product( $product_id ) : null;
+				if ( $product instanceof \WC_Product ) {
+					$label .= ' - ' . $product->get_name();
+				}
+			}
+
+			if ( ! self::matches_dynamic_search( $search, $label ) ) {
+				continue;
+			}
+
+			$items[] = [
+				'id' => (string) $id,
+				'label' => $label,
+				'parent_id' => (string) $product_id,
+			];
+		}//end foreach
+
+		return array_slice( $items, 0, $limit );
+	}
+
+	public static function query_dynamic_coupons( $q ): array {
+		$q = is_array( $q ) ? $q : [];
+		$limit = self::normalize_dynamic_limit( $q );
+		$search = self::normalize_dynamic_search( $q );
+		$items = [];
+
+		if ( function_exists( 'wc_get_coupons' ) ) {
+			$args = [ 'limit' => $limit ];
+			if ( '' !== $search ) {
+				$args['search'] = $search;
+			}
+			$coupons = wc_get_coupons( $args );
+			foreach ( $coupons as $coupon ) {
+				if ( ! $coupon instanceof \WC_Coupon ) {
+					continue;
+				}
+				$id = $coupon->get_id();
+				$code = $coupon->get_code();
+				$label = '' !== $code ? $code : 'Coupon #' . $id;
+				if ( ! self::matches_dynamic_search( $search, $label ) ) {
+					continue;
+				}
+				$items[] = [
+					'id' => (string) $id,
+					'code' => $code,
+				];
+			}
+		} elseif ( function_exists( 'get_posts' ) ) {
+			$args = [
+				'post_type' => 'shop_coupon',
+				'numberposts' => $limit,
+				's' => $search,
+			];
+			$posts = get_posts( $args );
+			foreach ( $posts as $post ) {
+				$id = $post->ID ?? 0;
+				if ( ! $id ) {
+					continue;
+				}
+				$code = $post->post_title ?? '';
+				if ( '' !== $search && ! self::matches_dynamic_search( $search, $code ) ) {
+					continue;
+				}
+				$items[] = [
+					'id' => (string) $id,
+					'code' => $code,
+				];
+			}
+		}//end if
+
+		return array_slice( $items, 0, $limit );
+	}
+
+	public static function query_dynamic_terms( $q ): array {
+		$q = is_array( $q ) ? $q : [];
+		$limit = self::normalize_dynamic_limit( $q );
+		$search = self::normalize_dynamic_search( $q );
+		$taxonomy = 'product_cat';
+
+		if ( isset( $q['where'] ) && is_array( $q['where'] ) && ! empty( $q['where']['taxonomy'] ) ) {
+			$taxonomy = (string) $q['where']['taxonomy'];
+		}
+
+		if ( ! taxonomy_exists( $taxonomy ) ) {
+			return [];
+		}
+
+		$args = [
+			'taxonomy' => $taxonomy,
+			'hide_empty' => false,
+			'number' => $limit,
+		];
+		if ( '' !== $search ) {
+			$args['search'] = $search;
+		}
+
+		$terms = get_terms( $args );
+		$items = [];
+
+		foreach ( $terms as $term ) {
+			if ( ! $term instanceof \WP_Term ) {
+				continue;
+			}
+			$items[] = [
+				'id' => (string) $term->term_id,
+				'name' => $term->name,
+				'slug' => $term->slug,
+				'taxonomy' => $term->taxonomy,
+			];
+		}
+
+		return array_slice( $items, 0, $limit );
+	}
+
+	public static function query_dynamic_attributes( $q ): array {
+		if ( ! function_exists( 'wc_get_attribute_taxonomies' ) ) {
+			return [];
+		}
+
+		$q = is_array( $q ) ? $q : [];
+		$limit = self::normalize_dynamic_limit( $q );
+		$search = self::normalize_dynamic_search( $q );
+
+		$attrs = wc_get_attribute_taxonomies();
+		$items = [];
+
+		foreach ( $attrs as $attr ) {
+			$id = $attr->attribute_id ?? 0;
+			if ( ! $id ) {
+				continue;
+			}
+			$label = $attr->attribute_label ?? $attr->attribute_name ?? '';
+			if ( '' === $label ) {
+				$label = 'Attribute #' . $id;
+			}
+			if ( ! self::matches_dynamic_search( $search, $label ) ) {
+				continue;
+			}
+			$items[] = [
+				'id' => (string) $id,
+				'label' => $label,
+				'name' => $attr->attribute_name ?? '',
+			];
+		}
+
+		return array_slice( $items, 0, $limit );
+	}
+
+	protected static function normalize_dynamic_limit( array $q ): int {
+		$limit = (int) ( $q['limit'] ?? 20 );
+		if ( $limit < 1 ) {
+			$limit = 20;
+		}
+		if ( $limit > 200 ) {
+			$limit = 200;
+		}
+		return $limit;
+	}
+
+	protected static function normalize_dynamic_search( array $q ): string {
+		return trim( (string) ( $q['search'] ?? '' ) );
+	}
+
+	protected static function matches_dynamic_search( string $search, string $value ): bool {
+		if ( '' === $search ) {
+			return true;
+		}
+		return stripos( $value, $search ) !== false;
 	}
 }
