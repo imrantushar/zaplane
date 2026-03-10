@@ -55,7 +55,7 @@ class Tutor extends IntegrationBase {
 				],
 			];
 		}
-		//end if
+		// end if
 
 		if ( in_array( $trigger, [ 'tutor_quiz_course_attempt' ], true ) ) {
 			return [
@@ -73,17 +73,17 @@ class Tutor extends IntegrationBase {
 			];
 		}//end if
 
-		if ( $trigger === 'quiz_target' ) {
+		if ( 'quiz_target' === $trigger ) {
 			return [
 				[
 					'key'      => 'quiz_id',
 					'label'    => 'Quiz',
 					'type'     => 'select',
 					'dynamic' => [
-							'integration' => 'tutor',
-							'query'       => 'quiz',
-							'select'      => [ 'name', 'label' ],
-						],
+						'integration' => 'tutor',
+						'query'       => 'quiz',
+						'select'      => [ 'name', 'label' ],
+					],
 					'required' => true,
 				],
 				[
@@ -126,7 +126,7 @@ class Tutor extends IntegrationBase {
 
 				$selected_course = $node['data']['config']['course_id'] ?? 'any';
 
-				if ( $selected_course !== 'any' && (int) $selected_course !== (int) $course_id ) {
+				if ( 'any' !== $selected_course && (int) $selected_course !== (int) $course_id ) {
 					return false;
 				}
 
@@ -146,7 +146,7 @@ class Tutor extends IntegrationBase {
 
 				$selected_course = $node['data']['config']['course_id'] ?? 'any';
 
-				if ( $selected_course !== 'any' && (int) $selected_course !== (int) $course_id ) {
+				if ( 'any' !== $selected_course && (int) $selected_course !== (int) $course_id ) {
 					return false;
 				}
 
@@ -178,7 +178,7 @@ class Tutor extends IntegrationBase {
 
 				$selected_lesson = $node['data']['config']['lesson_id'] ?? 'any';
 
-				if ( $selected_lesson !== 'any' && (int) $selected_lesson !== (int) $lesson_id ) {
+				if ( 'any' !== $selected_lesson && (int) $selected_lesson !== (int) $lesson_id ) {
 					return false;
 				}
 
@@ -208,7 +208,7 @@ class Tutor extends IntegrationBase {
 
 				$selected_quiz = $node['data']['config']['quiz_id'] ?? 'any';
 
-				if ( $selected_quiz !== 'any' && (int) $selected_quiz !== (int) $quiz_id ) {
+				if ( 'any' !== $selected_quiz && (int) $selected_quiz !== (int) $quiz_id ) {
 					return false;
 				}
 
@@ -240,7 +240,7 @@ class Tutor extends IntegrationBase {
 
 				$selected_quiz = $node['data']['config']['quiz_id'] ?? 'any';
 
-				if ( $selected_quiz !== 'any' && (int) $selected_quiz !== (int) $quiz_id ) {
+				if ( 'any' !== $selected_quiz && (int) $selected_quiz !== (int) $quiz_id ) {
 					return false;
 				}
 
@@ -288,8 +288,8 @@ class Tutor extends IntegrationBase {
 		];
 	}
 
-	
-	
+
+
 	public static function get_dynamic_queries(): array {
 		return [
 			'course' => [ self::class, 'query_courses' ],
@@ -307,7 +307,7 @@ class Tutor extends IntegrationBase {
 			],
 		];
 
-		if ( function_exists('tutor') ) {
+		if ( function_exists( 'tutor' ) ) {
 
 			$courses = get_posts([
 				'post_type'      => 'courses',
@@ -315,7 +315,7 @@ class Tutor extends IntegrationBase {
 				'posts_per_page' => -1,
 			]);
 
-			foreach ($courses as $course) {
+			foreach ( $courses as $course ) {
 				$options[] = [
 					'label' => $course->post_title,
 					'name'  => $course->ID
@@ -349,7 +349,7 @@ class Tutor extends IntegrationBase {
 				}
 			}
 
-		return $options;
+			return $options;
 	}
 
 	public static function query_lesson() {
@@ -375,6 +375,6 @@ class Tutor extends IntegrationBase {
 				}
 			}
 
-		return $options;
+			return $options;
 	}
 }

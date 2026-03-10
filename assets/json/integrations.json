@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-03-09 20:51:56",
+    "generated_at": "2026-03-10 09:09:56",
     "apps": {
         "pause": {
             "slug": "pause",
@@ -10459,7 +10459,7 @@
                             "type": "select",
                             "dynamic": {
                                 "integration": "academy",
-                                "query": "course",
+                                "query": "acourse",
                                 "select": [
                                     "name",
                                     "label"
@@ -10531,7 +10531,7 @@
                             "type": "select",
                             "dynamic": {
                                 "integration": "academy",
-                                "query": "course",
+                                "query": "acourse",
                                 "select": [
                                     "name",
                                     "label"

@@ -99,30 +99,29 @@ class FluentForm extends IntegrationBase {
 		];
 	}
 
-		public static function query_forms() {
+	public static function query_forms() {
 
-			$options = [
-				[
-					'label' => 'Any Form',
-					'name' => 'any'
-				],
-			];
+		$options = [
+			[
+				'label' => 'Any Form',
+				'name'  => 'any'
+			],
+		];
+		if ( function_exists( 'wpFluent' ) ) {
+			$forms = wpFluent()
+				->table( 'fluentform_forms' )
+				->select( [ 'id', 'title' ] )
+				->get();
 
-			if ( ! function_exists( 'wpFluent' ) ) {
-				global $wpdb;
-
-				$forms = wpFluent()
-					->table( $wpdb->prefix . 'fluentform_forms' )
-					->select( 'id', 'title' )
-					->get();
-
+			if ( $forms ) {
 				foreach ( $forms as $form ) {
 					$options[] = [
 						'label' => $form->title,
-						'name' => $form->ID,
+						'name'  => $form->id,
 					];
 				}
 			}
+		}
 
 		return $options;
 	}

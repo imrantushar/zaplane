@@ -25,7 +25,7 @@ class Ninjaform extends IntegrationBase {
 	}
 
 	public static function get_trigger_config_schema( string $trigger ): array {
-		if ( 'process_ninja_form' !== $trigger) {
+		if ( 'process_ninja_form' !== $trigger ) {
 			return [];
 		}
 
@@ -35,10 +35,10 @@ class Ninjaform extends IntegrationBase {
 				'label'    => 'Form',
 				'type'     => 'select',
 				'dynamic' => [
-						'integration' => 'ninjaform',
-						'query'       => 'forms',
-						'select'      => [ 'name', 'label' ],
-					],
+					'integration' => 'ninjaform',
+					'query'       => 'forms',
+					'select'      => [ 'name', 'label' ],
+				],
 				'required' => true,
 			],
 		];
@@ -79,7 +79,7 @@ class Ninjaform extends IntegrationBase {
 				$config       = $node['data']['config'] ?? [];
 				$requiredForm = $config['form_id'] ?? 'any';
 
-				if (  'any' !== $requiredForm && (int) $requiredForm !== (int) $currentFormId ) {
+				if ( 'any' !== $requiredForm && (int) $requiredForm !== (int) $currentFormId ) {
 					return false;
 				}
 
@@ -121,7 +121,7 @@ class Ninjaform extends IntegrationBase {
 			'data' => $input
 		];
 	}
-	
+
 	public static function get_dynamic_queries(): array {
 		return [
 			'forms' => [ self::class, 'query_forms' ],
