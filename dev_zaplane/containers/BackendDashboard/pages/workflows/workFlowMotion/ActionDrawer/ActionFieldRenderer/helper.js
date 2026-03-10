@@ -1,23 +1,29 @@
-export const insertVariableAtCursor = ({
-  variable,
-  inputRef,
-  fieldKey,
-  setFieldValue,
-  setPopoverOpen,
-}) => {
-  const el = inputRef?.current;
-  if (!el) return;
-  const currentVal = el.value || "";
-  const cursorPos = el.selectionStart ?? currentVal.length;
-  const before = currentVal.slice(0, cursorPos).replace(/@$/, "");
-  const after = currentVal.slice(cursorPos);
-  // remove space " "
-  const newVal = before + variable;
-  setFieldValue(fieldKey, newVal + after);
-  setPopoverOpen(false);
-  setTimeout(() => {
-    const newCursorPos = before.length + variable.length + 1;
-    el.focus();
-    el.setSelectionRange(newCursorPos, newCursorPos);
-  }, 0);
+const insertVariable = (variableKey) => {
+    if (!activeRange) return;
+    restoreSelection(activeRange);
+
+    const span = document.createElement("span");
+    span.textContent = `{{${variableKey}}}`;
+    span.setAttribute("data-variable", "true");
+    span.style.background = "#E0F2FF";
+    span.style.borderRadius = "4px";
+    span.style.padding = "0 4px";
+    span.style.margin = "0 2px";
+
+    activeRange.deleteContents();
+    activeRange.insertNode(span);
+
+    const space = document.createTextNode(" ");
+    span.parentNode.insertBefore(space, span.nextSibling);
+
+    const newRange = document.createRange();
+    newRange.setStartAfter(space);
+    newRange.collapse(true);
+    restoreSelection(newRange);
+
+    setActiveRange(newRange);
+    setPopoverOpen(false);
+
+    // Update value
+    setValue(Array.from(editorRef.current.children).map(c => c.textContent).join(" "));
 };

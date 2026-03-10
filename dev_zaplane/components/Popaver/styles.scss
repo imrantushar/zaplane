@@ -6,10 +6,11 @@
   border-radius: 4px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   z-index: 9999;
-  left: -506px !important;
+  right: 720px !important;
+  left: unset !important;
   position: fixed !important;
-  top: 100px;
-  transform: translateX(1021px) translateY(145px) !important;
+  top: 110px !important;
+  transform: unset !important;
   z-index: 9999;
 
   .components-popover__content {

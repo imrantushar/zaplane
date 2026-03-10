@@ -1,15 +1,18 @@
 .babelrc
 .gitignore
 .distignore
+dev_zaplane/
 assets/css/backend-dist.css
 assets/css/frontend-dist.css
 assets/scss
+vendor/
 docs/
 package-lock.json
 package.json
 webpack.config.js
 .git
-node_modules
+node_modules/
+tests/
 composer.json
 composer.lock
 prepros.config
@@ -23,5 +26,7 @@ vendor
 .DS_Store
 .eslintignore
 .eslintrc.js
+composer.json
+composer.lock
 includes/commands
 includes/framework/console

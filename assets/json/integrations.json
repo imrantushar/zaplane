@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-03-08 09:59:57",
+    "generated_at": "2026-03-10 07:10:10",
     "apps": {
         "pause": {
             "slug": "pause",
@@ -15,7 +15,7 @@
         },
         "wordpress": {
             "slug": "wordpress",
-            "name": "Wordpress",
+            "name": "WordPress",
             "icon": "",
             "category": "app",
             "requires_connection": false,
@@ -890,7 +890,15 @@
                         {
                             "key": "role",
                             "label": "Role",
-                            "type": "text"
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "roles",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
                         }
                     ],
                     "outputs": [
@@ -904,7 +912,15 @@
                         {
                             "key": "user_id",
                             "label": "User ID",
-                            "type": "expression",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "users",
+                                "select": [
+                                    "ID",
+                                    "name"
+                                ]
+                            },
                             "required": true
                         },
                         {
@@ -935,7 +951,15 @@
                         {
                             "key": "role",
                             "label": "Role",
-                            "type": "text"
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "roles",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
                         }
                     ],
                     "outputs": [
@@ -949,13 +973,29 @@
                         {
                             "key": "user_id",
                             "label": "User ID",
-                            "type": "expression",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "users",
+                                "select": [
+                                    "ID",
+                                    "name"
+                                ]
+                            },
                             "required": true
                         },
                         {
                             "key": "reassign",
                             "label": "Reassign User ID",
-                            "type": "expression"
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "users",
+                                "select": [
+                                    "ID",
+                                    "name"
+                                ]
+                            }
                         }
                     ],
                     "outputs": [
@@ -965,7 +1005,27 @@
                 "get_users": {
                     "key": "get_users",
                     "label": "Get All Users",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "search",
+                            "label": "Search",
+                            "type": "text"
+                        },
+                        {
+                            "key": "role",
+                            "label": "Role",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "roles",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -973,7 +1033,22 @@
                 "get_users_by_role": {
                     "key": "get_users_by_role",
                     "label": "Get All Users by Role",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "role",
+                            "label": "Role",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "roles",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -981,7 +1056,22 @@
                 "get_user_by_id": {
                     "key": "get_user_by_id",
                     "label": "Get User by ID",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "users",
+                                "select": [
+                                    "ID",
+                                    "name"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -989,7 +1079,14 @@
                 "get_user_by_email": {
                     "key": "get_user_by_email",
                     "label": "Get User by Email",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "email",
+                            "label": "User Email",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -997,7 +1094,39 @@
                 "get_user_by_field": {
                     "key": "get_user_by_field",
                     "label": "Get User by Field",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "field",
+                            "label": "Field",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "User ID",
+                                    "value": "id"
+                                },
+                                {
+                                    "label": "Email",
+                                    "value": "email"
+                                },
+                                {
+                                    "label": "Login",
+                                    "value": "login"
+                                },
+                                {
+                                    "label": "Slug",
+                                    "value": "slug"
+                                }
+                            ],
+                            "default": "id",
+                            "required": true
+                        },
+                        {
+                            "key": "value",
+                            "label": "Field Value",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -1005,7 +1134,22 @@
                 "get_user_meta_all": {
                     "key": "get_user_meta_all",
                     "label": "Get User Metadata (All)",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "users",
+                                "select": [
+                                    "ID",
+                                    "name"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -1013,7 +1157,28 @@
                 "get_user_meta_single": {
                     "key": "get_user_meta_single",
                     "label": "Get User Metadata (Single)",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "users",
+                                "select": [
+                                    "ID",
+                                    "name"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "meta_key",
+                            "label": "Meta Key",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -1021,7 +1186,33 @@
                 "update_user_meta": {
                     "key": "update_user_meta",
                     "label": "Update User Metadata",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "users",
+                                "select": [
+                                    "ID",
+                                    "name"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "meta_key",
+                            "label": "Meta Key",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "meta_value",
+                            "label": "Meta Value",
+                            "type": "textarea"
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -1029,7 +1220,14 @@
                 "send_password_reset_email": {
                     "key": "send_password_reset_email",
                     "label": "Send Password Reset Email",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "user_login_or_email",
+                            "label": "Username or Email",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -1053,12 +1251,12 @@
                         {
                             "key": "remember",
                             "label": "Remember",
-                            "type": "text"
+                            "type": "boolean"
                         },
                         {
                             "key": "secure_cookie",
                             "label": "Secure Cookie",
-                            "type": "text"
+                            "type": "boolean"
                         }
                     ],
                     "outputs": [
@@ -1068,7 +1266,13 @@
                 "logout_user": {
                     "key": "logout_user",
                     "label": "Logout User",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "force",
+                            "label": "Force",
+                            "type": "boolean"
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -1080,7 +1284,15 @@
                         {
                             "key": "user_id",
                             "label": "User ID",
-                            "type": "expression",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "users",
+                                "select": [
+                                    "ID",
+                                    "name"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -1095,7 +1307,15 @@
                         {
                             "key": "user_id",
                             "label": "User ID",
-                            "type": "expression",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "users",
+                                "select": [
+                                    "ID",
+                                    "name"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -1106,7 +1326,25 @@
                 "create_role": {
                     "key": "create_role",
                     "label": "Create Role",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "role",
+                            "label": "Role Slug",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "display_name",
+                            "label": "Display Name",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "capabilities",
+                            "label": "Capabilities (CSV)",
+                            "type": "textarea"
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -1114,7 +1352,22 @@
                 "delete_role": {
                     "key": "delete_role",
                     "label": "Delete Role",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "role",
+                            "label": "Role",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "roles",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -1122,7 +1375,36 @@
                 "add_user_role": {
                     "key": "add_user_role",
                     "label": "Add User Role",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "users",
+                                "select": [
+                                    "ID",
+                                    "name"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "role",
+                            "label": "Role",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "roles",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -1130,7 +1412,36 @@
                 "remove_user_role": {
                     "key": "remove_user_role",
                     "label": "Remove User Role",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "users",
+                                "select": [
+                                    "ID",
+                                    "name"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "role",
+                            "label": "Role",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "roles",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -1138,7 +1449,36 @@
                 "update_user_role": {
                     "key": "update_user_role",
                     "label": "Update User Role",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "users",
+                                "select": [
+                                    "ID",
+                                    "name"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "role",
+                            "label": "Role",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "roles",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -1146,7 +1486,13 @@
                 "get_roles": {
                     "key": "get_roles",
                     "label": "Get All Roles",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "search",
+                            "label": "Search",
+                            "type": "text"
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -1154,7 +1500,13 @@
                 "get_caps": {
                     "key": "get_caps",
                     "label": "Get All Capabilities",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "search",
+                            "label": "Search",
+                            "type": "text"
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -1162,7 +1514,22 @@
                 "get_role_caps": {
                     "key": "get_role_caps",
                     "label": "Get Role Capabilities",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "role",
+                            "label": "Role",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "roles",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -1170,7 +1537,28 @@
                 "add_role_caps": {
                     "key": "add_role_caps",
                     "label": "Add Role Capabilities",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "role",
+                            "label": "Role",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "roles",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "caps",
+                            "label": "Capabilities (CSV)",
+                            "type": "textarea",
+                            "required": true
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -1178,7 +1566,28 @@
                 "remove_role_caps": {
                     "key": "remove_role_caps",
                     "label": "Remove Role Capabilities",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "role",
+                            "label": "Role",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "roles",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "caps",
+                            "label": "Capabilities (CSV)",
+                            "type": "textarea",
+                            "required": true
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -1186,7 +1595,22 @@
                 "get_user_caps": {
                     "key": "get_user_caps",
                     "label": "Get User Capabilities",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "users",
+                                "select": [
+                                    "ID",
+                                    "name"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -1194,7 +1618,28 @@
                 "add_user_caps": {
                     "key": "add_user_caps",
                     "label": "Add User Capabilities",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "users",
+                                "select": [
+                                    "ID",
+                                    "name"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "caps",
+                            "label": "Capabilities (CSV)",
+                            "type": "textarea",
+                            "required": true
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -1202,7 +1647,28 @@
                 "remove_user_caps": {
                     "key": "remove_user_caps",
                     "label": "Remove User Capabilities",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "users",
+                                "select": [
+                                    "ID",
+                                    "name"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "caps",
+                            "label": "Capabilities (CSV)",
+                            "type": "textarea",
+                            "required": true
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -1210,7 +1676,36 @@
                 "get_term": {
                     "key": "get_term",
                     "label": "Get Term (Single)",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "taxonomy",
+                            "label": "Taxonomy",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "taxonomies",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "term_id",
+                            "label": "Term ID",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "terms",
+                                "select": [
+                                    "term_id",
+                                    "name"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -1218,7 +1713,38 @@
                 "get_terms_by_taxonomy": {
                     "key": "get_terms_by_taxonomy",
                     "label": "Get Term by Taxonomy",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "taxonomy",
+                            "label": "Taxonomy",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "taxonomies",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "hide_empty",
+                            "label": "Hide Empty Terms",
+                            "type": "boolean"
+                        },
+                        {
+                            "key": "search",
+                            "label": "Search",
+                            "type": "text"
+                        },
+                        {
+                            "key": "limit",
+                            "label": "Limit",
+                            "type": "number",
+                            "default": 20
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -1226,7 +1752,49 @@
                 "get_term_by_field": {
                     "key": "get_term_by_field",
                     "label": "Get Term by Field",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "taxonomy",
+                            "label": "Taxonomy",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "taxonomies",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "field",
+                            "label": "Field",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "ID",
+                                    "value": "id"
+                                },
+                                {
+                                    "label": "Slug",
+                                    "value": "slug"
+                                },
+                                {
+                                    "label": "Name",
+                                    "value": "name"
+                                }
+                            ],
+                            "default": "id",
+                            "required": true
+                        },
+                        {
+                            "key": "value",
+                            "label": "Field Value",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -1234,7 +1802,54 @@
                 "create_term": {
                     "key": "create_term",
                     "label": "Create New Term",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "taxonomy",
+                            "label": "Taxonomy",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "taxonomies",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "name",
+                            "label": "Name",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "slug",
+                            "label": "Slug",
+                            "type": "text"
+                        },
+                        {
+                            "key": "parent",
+                            "label": "Parent Term ID",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "terms",
+                                "select": [
+                                    "term_id",
+                                    "name"
+                                ],
+                                "where": {
+                                    "taxonomy": "category"
+                                }
+                            }
+                        },
+                        {
+                            "key": "description",
+                            "label": "Description",
+                            "type": "textarea"
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -1242,7 +1857,67 @@
                 "update_term": {
                     "key": "update_term",
                     "label": "Update Term",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "taxonomy",
+                            "label": "Taxonomy",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "taxonomies",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "term_id",
+                            "label": "Term ID",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "terms",
+                                "select": [
+                                    "term_id",
+                                    "name"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "name",
+                            "label": "Name",
+                            "type": "text"
+                        },
+                        {
+                            "key": "slug",
+                            "label": "Slug",
+                            "type": "text"
+                        },
+                        {
+                            "key": "parent",
+                            "label": "Parent Term ID",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "terms",
+                                "select": [
+                                    "term_id",
+                                    "name"
+                                ],
+                                "where": {
+                                    "taxonomy": "category"
+                                }
+                            }
+                        },
+                        {
+                            "key": "description",
+                            "label": "Description",
+                            "type": "textarea"
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -1250,7 +1925,36 @@
                 "delete_term": {
                     "key": "delete_term",
                     "label": "Delete Term",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "taxonomy",
+                            "label": "Taxonomy",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "taxonomies",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "term_id",
+                            "label": "Term ID",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "terms",
+                                "select": [
+                                    "term_id",
+                                    "name"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -1258,7 +1962,25 @@
                 "register_taxonomy": {
                     "key": "register_taxonomy",
                     "label": "Register Taxonomy",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "taxonomy",
+                            "label": "Taxonomy Slug",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "object_type",
+                            "label": "Object Types (CSV)",
+                            "type": "textarea",
+                            "required": true
+                        },
+                        {
+                            "key": "args",
+                            "label": "Arguments (JSON)",
+                            "type": "textarea"
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -1266,7 +1988,22 @@
                 "unregister_taxonomy": {
                     "key": "unregister_taxonomy",
                     "label": "Unregister Taxonomy",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "taxonomy",
+                            "label": "Taxonomy",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "taxonomies",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -1274,7 +2011,13 @@
                 "get_taxonomies": {
                     "key": "get_taxonomies",
                     "label": "Get Taxonomy (All)",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "search",
+                            "label": "Search",
+                            "type": "text"
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -1282,7 +2025,22 @@
                 "get_taxonomy": {
                     "key": "get_taxonomy",
                     "label": "Get Taxonomy (Single)",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "taxonomy",
+                            "label": "Taxonomy",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "taxonomies",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -1290,7 +2048,39 @@
                 "add_taxonomy_to_post": {
                     "key": "add_taxonomy_to_post",
                     "label": "Add Taxonomy to Post",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "taxonomy",
+                            "label": "Taxonomy",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "taxonomies",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "terms",
+                            "label": "Terms (IDs/Slugs, CSV)",
+                            "type": "textarea",
+                            "required": true
+                        },
+                        {
+                            "key": "append",
+                            "label": "Append",
+                            "type": "boolean"
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -1298,7 +2088,34 @@
                 "remove_taxonomy_from_post": {
                     "key": "remove_taxonomy_from_post",
                     "label": "Remove Taxonomy from Post",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "taxonomy",
+                            "label": "Taxonomy",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "taxonomies",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "terms",
+                            "label": "Terms (IDs/Slugs, CSV)",
+                            "type": "textarea",
+                            "required": true
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -1306,7 +2123,39 @@
                 "bulk_assign_terms_to_posts": {
                     "key": "bulk_assign_terms_to_posts",
                     "label": "Bulk Assign Terms to Posts",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "taxonomy",
+                            "label": "Taxonomy",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "taxonomies",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "post_ids",
+                            "label": "Post IDs (CSV)",
+                            "type": "textarea",
+                            "required": true
+                        },
+                        {
+                            "key": "terms",
+                            "label": "Terms (IDs/Slugs, CSV)",
+                            "type": "textarea",
+                            "required": true
+                        },
+                        {
+                            "key": "append",
+                            "label": "Append",
+                            "type": "boolean"
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -1314,7 +2163,34 @@
                 "bulk_remove_terms_from_posts": {
                     "key": "bulk_remove_terms_from_posts",
                     "label": "Bulk Remove Terms from Posts",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "taxonomy",
+                            "label": "Taxonomy",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "taxonomies",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "post_ids",
+                            "label": "Post IDs (CSV)",
+                            "type": "textarea",
+                            "required": true
+                        },
+                        {
+                            "key": "terms",
+                            "label": "Terms (IDs/Slugs, CSV)",
+                            "type": "textarea",
+                            "required": true
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -1322,7 +2198,37 @@
                 "create_category": {
                     "key": "create_category",
                     "label": "Create Category",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "name",
+                            "label": "Category Name",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "slug",
+                            "label": "Slug",
+                            "type": "text"
+                        },
+                        {
+                            "key": "parent",
+                            "label": "Parent Category",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "categories",
+                                "select": [
+                                    "id",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "description",
+                            "label": "Description",
+                            "type": "textarea"
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -1330,7 +2236,50 @@
                 "update_category": {
                     "key": "update_category",
                     "label": "Update Category",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "category_id",
+                            "label": "Category",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "categories",
+                                "select": [
+                                    "id",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "name",
+                            "label": "Category Name",
+                            "type": "text"
+                        },
+                        {
+                            "key": "slug",
+                            "label": "Slug",
+                            "type": "text"
+                        },
+                        {
+                            "key": "parent",
+                            "label": "Parent Category",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "categories",
+                                "select": [
+                                    "id",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "description",
+                            "label": "Description",
+                            "type": "textarea"
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -1338,7 +2287,22 @@
                 "delete_category": {
                     "key": "delete_category",
                     "label": "Delete Category",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "category_id",
+                            "label": "Category",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "categories",
+                                "select": [
+                                    "id",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -1346,7 +2310,25 @@
                 "add_category_to_post": {
                     "key": "add_category_to_post",
                     "label": "Add Category to Post",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "categories",
+                            "label": "Category IDs (CSV)",
+                            "type": "textarea",
+                            "required": true
+                        },
+                        {
+                            "key": "append",
+                            "label": "Append",
+                            "type": "boolean"
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -1354,7 +2336,24 @@
                 "get_categories": {
                     "key": "get_categories",
                     "label": "Get Category (All)",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "search",
+                            "label": "Search",
+                            "type": "text"
+                        },
+                        {
+                            "key": "hide_empty",
+                            "label": "Hide Empty",
+                            "type": "boolean"
+                        },
+                        {
+                            "key": "limit",
+                            "label": "Limit",
+                            "type": "number",
+                            "default": 20
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -1362,7 +2361,22 @@
                 "get_category": {
                     "key": "get_category",
                     "label": "Get Category (Single)",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "category_id",
+                            "label": "Category",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "categories",
+                                "select": [
+                                    "id",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -1550,7 +2564,14 @@
                 "get_post_comments_single": {
                     "key": "get_post_comments_single",
                     "label": "Get Post Comments (Single Post)",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -1566,7 +2587,14 @@
                 "get_user_comments_email": {
                     "key": "get_user_comments_email",
                     "label": "Get User Comments (By Email)",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "user_email",
+                            "label": "User Email",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -1574,7 +2602,14 @@
                 "get_comment_metadata_all": {
                     "key": "get_comment_metadata_all",
                     "label": "Get Comment Metadata (All)",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "comment_id",
+                            "label": "Comment ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -1586,6 +2621,12 @@
                         {
                             "key": "comment_id",
                             "label": "Comment ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "meta_key",
+                            "label": "Comment Meta Key",
                             "type": "expression",
                             "required": true
                         }
@@ -3166,7 +4207,15 @@
                         {
                             "key": "order_id",
                             "label": "Order ID",
-                            "type": "expression",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "woocommerce",
+                                "query": "orders",
+                                "select": [
+                                    "id",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         },
                         {
@@ -3251,7 +4300,15 @@
                         {
                             "key": "order_id",
                             "label": "Order ID",
-                            "type": "expression",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "woocommerce",
+                                "query": "orders",
+                                "select": [
+                                    "id",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         },
                         {
@@ -3302,7 +4359,15 @@
                         {
                             "key": "order_id",
                             "label": "Order ID",
-                            "type": "expression",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "woocommerce",
+                                "query": "orders",
+                                "select": [
+                                    "id",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         },
                         {
@@ -3498,7 +4563,15 @@
                         {
                             "key": "customer_id",
                             "label": "Customer ID",
-                            "type": "expression",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "woocommerce",
+                                "query": "customers",
+                                "select": [
+                                    "id",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         },
                         {
@@ -3525,7 +4598,15 @@
                         {
                             "key": "order_id",
                             "label": "Order ID",
-                            "type": "expression",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "woocommerce",
+                                "query": "orders",
+                                "select": [
+                                    "id",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -3540,7 +4621,15 @@
                         {
                             "key": "customer_id",
                             "label": "Customer ID",
-                            "type": "expression",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "woocommerce",
+                                "query": "customers",
+                                "select": [
+                                    "id",
+                                    "label"
+                                ]
+                            },
                             "required": false
                         },
                         {
@@ -3560,7 +4649,15 @@
                         {
                             "key": "customer_id",
                             "label": "Customer ID",
-                            "type": "expression",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "woocommerce",
+                                "query": "customers",
+                                "select": [
+                                    "id",
+                                    "label"
+                                ]
+                            },
                             "required": false
                         },
                         {
@@ -3580,7 +4677,15 @@
                         {
                             "key": "order_id",
                             "label": "Order ID",
-                            "type": "expression",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "woocommerce",
+                                "query": "orders",
+                                "select": [
+                                    "id",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         },
                         {
@@ -3627,7 +4732,15 @@
                         {
                             "key": "customer_id",
                             "label": "Customer ID",
-                            "type": "expression",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "woocommerce",
+                                "query": "customers",
+                                "select": [
+                                    "id",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -3809,7 +4922,15 @@
                         {
                             "key": "parent_id",
                             "label": "Parent Product ID",
-                            "type": "expression",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "woocommerce",
+                                "query": "products",
+                                "select": [
+                                    "id",
+                                    "name"
+                                ]
+                            },
                             "required": true
                         },
                         {
@@ -3878,7 +4999,15 @@
                         {
                             "key": "product_id",
                             "label": "Product ID",
-                            "type": "expression",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "woocommerce",
+                                "query": "products",
+                                "select": [
+                                    "id",
+                                    "name"
+                                ]
+                            },
                             "required": true
                         },
                         {
@@ -4016,7 +5145,18 @@
                         {
                             "key": "category_id",
                             "label": "Category ID",
-                            "type": "expression"
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "woocommerce",
+                                "query": "terms",
+                                "select": [
+                                    "id",
+                                    "name"
+                                ],
+                                "where": {
+                                    "taxonomy": "product_cat"
+                                }
+                            }
                         },
                         {
                             "key": "category_slug",
@@ -4173,7 +5313,15 @@
                         {
                             "key": "product_id",
                             "label": "Product ID",
-                            "type": "expression",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "woocommerce",
+                                "query": "products",
+                                "select": [
+                                    "id",
+                                    "name"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -4203,7 +5351,15 @@
                         {
                             "key": "product_id",
                             "label": "Product ID",
-                            "type": "expression",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "woocommerce",
+                                "query": "products",
+                                "select": [
+                                    "id",
+                                    "name"
+                                ]
+                            },
                             "required": true
                         },
                         {
@@ -4247,7 +5403,15 @@
                         {
                             "key": "product_id",
                             "label": "Product ID",
-                            "type": "expression",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "woocommerce",
+                                "query": "products",
+                                "select": [
+                                    "id",
+                                    "name"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -4262,7 +5426,15 @@
                         {
                             "key": "product_id",
                             "label": "Product ID",
-                            "type": "expression",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "woocommerce",
+                                "query": "products",
+                                "select": [
+                                    "id",
+                                    "name"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -4273,7 +5445,13 @@
                 "get_products_totals": {
                     "key": "get_products_totals",
                     "label": "Get Products Totals",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "include_variations",
+                            "label": "Include Variations",
+                            "type": "boolean"
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -4285,7 +5463,15 @@
                         {
                             "key": "product_id",
                             "label": "Product ID",
-                            "type": "expression",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "woocommerce",
+                                "query": "products",
+                                "select": [
+                                    "id",
+                                    "name"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -4300,7 +5486,15 @@
                         {
                             "key": "product_id",
                             "label": "Product ID",
-                            "type": "expression",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "woocommerce",
+                                "query": "products",
+                                "select": [
+                                    "id",
+                                    "name"
+                                ]
+                            },
                             "required": true
                         },
                         {
@@ -4355,7 +5549,18 @@
                         {
                             "key": "parent",
                             "label": "Parent Term ID",
-                            "type": "expression"
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "woocommerce",
+                                "query": "terms",
+                                "select": [
+                                    "id",
+                                    "name"
+                                ],
+                                "where": {
+                                    "taxonomy": "product_cat"
+                                }
+                            }
                         }
                     ],
                     "outputs": [
@@ -4369,7 +5574,18 @@
                         {
                             "key": "term_id",
                             "label": "Term ID",
-                            "type": "expression",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "woocommerce",
+                                "query": "terms",
+                                "select": [
+                                    "id",
+                                    "name"
+                                ],
+                                "where": {
+                                    "taxonomy": "product_cat"
+                                }
+                            },
                             "required": true
                         },
                         {
@@ -4390,7 +5606,18 @@
                         {
                             "key": "parent",
                             "label": "Parent Term ID",
-                            "type": "expression"
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "woocommerce",
+                                "query": "terms",
+                                "select": [
+                                    "id",
+                                    "name"
+                                ],
+                                "where": {
+                                    "taxonomy": "product_cat"
+                                }
+                            }
                         }
                     ],
                     "outputs": [
@@ -4404,7 +5631,18 @@
                         {
                             "key": "term_id",
                             "label": "Term ID",
-                            "type": "expression",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "woocommerce",
+                                "query": "terms",
+                                "select": [
+                                    "id",
+                                    "name"
+                                ],
+                                "where": {
+                                    "taxonomy": "product_cat"
+                                }
+                            },
                             "required": true
                         }
                     ],
@@ -4415,7 +5653,30 @@
                 "get_product_category_all": {
                     "key": "get_product_category_all",
                     "label": "Get Product Category (All)",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "hide_empty",
+                            "label": "Hide Empty Terms",
+                            "type": "boolean"
+                        },
+                        {
+                            "key": "search",
+                            "label": "Search",
+                            "type": "text"
+                        },
+                        {
+                            "key": "limit",
+                            "label": "Limit",
+                            "type": "number",
+                            "default": 20
+                        },
+                        {
+                            "key": "page",
+                            "label": "Page",
+                            "type": "number",
+                            "default": 1
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -4427,7 +5688,18 @@
                         {
                             "key": "term_id",
                             "label": "Term ID",
-                            "type": "expression",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "woocommerce",
+                                "query": "terms",
+                                "select": [
+                                    "id",
+                                    "name"
+                                ],
+                                "where": {
+                                    "taxonomy": "product_cat"
+                                }
+                            },
                             "required": true
                         }
                     ],
@@ -4467,7 +5739,18 @@
                         {
                             "key": "term_id",
                             "label": "Term ID",
-                            "type": "expression",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "woocommerce",
+                                "query": "terms",
+                                "select": [
+                                    "id",
+                                    "name"
+                                ],
+                                "where": {
+                                    "taxonomy": "product_tag"
+                                }
+                            },
                             "required": true
                         },
                         {
@@ -4497,7 +5780,18 @@
                         {
                             "key": "term_id",
                             "label": "Term ID",
-                            "type": "expression",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "woocommerce",
+                                "query": "terms",
+                                "select": [
+                                    "id",
+                                    "name"
+                                ],
+                                "where": {
+                                    "taxonomy": "product_tag"
+                                }
+                            },
                             "required": true
                         }
                     ],
@@ -4508,7 +5802,30 @@
                 "get_product_tag_all": {
                     "key": "get_product_tag_all",
                     "label": "Get Product Tag (All)",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "hide_empty",
+                            "label": "Hide Empty Terms",
+                            "type": "boolean"
+                        },
+                        {
+                            "key": "search",
+                            "label": "Search",
+                            "type": "text"
+                        },
+                        {
+                            "key": "limit",
+                            "label": "Limit",
+                            "type": "number",
+                            "default": 20
+                        },
+                        {
+                            "key": "page",
+                            "label": "Page",
+                            "type": "number",
+                            "default": 1
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -4520,7 +5837,18 @@
                         {
                             "key": "term_id",
                             "label": "Term ID",
-                            "type": "expression",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "woocommerce",
+                                "query": "terms",
+                                "select": [
+                                    "id",
+                                    "name"
+                                ],
+                                "where": {
+                                    "taxonomy": "product_tag"
+                                }
+                            },
                             "required": true
                         }
                     ],
@@ -4560,7 +5888,18 @@
                         {
                             "key": "term_id",
                             "label": "Term ID",
-                            "type": "expression",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "woocommerce",
+                                "query": "terms",
+                                "select": [
+                                    "id",
+                                    "name"
+                                ],
+                                "where": {
+                                    "taxonomy": "product_type"
+                                }
+                            },
                             "required": true
                         },
                         {
@@ -4590,7 +5929,18 @@
                         {
                             "key": "term_id",
                             "label": "Term ID",
-                            "type": "expression",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "woocommerce",
+                                "query": "terms",
+                                "select": [
+                                    "id",
+                                    "name"
+                                ],
+                                "where": {
+                                    "taxonomy": "product_type"
+                                }
+                            },
                             "required": true
                         }
                     ],
@@ -4601,7 +5951,30 @@
                 "get_product_type_all": {
                     "key": "get_product_type_all",
                     "label": "Get Product Type (All)",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "hide_empty",
+                            "label": "Hide Empty Terms",
+                            "type": "boolean"
+                        },
+                        {
+                            "key": "search",
+                            "label": "Search",
+                            "type": "text"
+                        },
+                        {
+                            "key": "limit",
+                            "label": "Limit",
+                            "type": "number",
+                            "default": 20
+                        },
+                        {
+                            "key": "page",
+                            "label": "Page",
+                            "type": "number",
+                            "default": 1
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -4613,7 +5986,18 @@
                         {
                             "key": "term_id",
                             "label": "Term ID",
-                            "type": "expression",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "woocommerce",
+                                "query": "terms",
+                                "select": [
+                                    "id",
+                                    "name"
+                                ],
+                                "where": {
+                                    "taxonomy": "product_type"
+                                }
+                            },
                             "required": true
                         }
                     ],
@@ -4653,7 +6037,18 @@
                         {
                             "key": "term_id",
                             "label": "Term ID",
-                            "type": "expression",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "woocommerce",
+                                "query": "terms",
+                                "select": [
+                                    "id",
+                                    "name"
+                                ],
+                                "where": {
+                                    "taxonomy": "product_brand"
+                                }
+                            },
                             "required": true
                         },
                         {
@@ -4683,7 +6078,18 @@
                         {
                             "key": "term_id",
                             "label": "Term ID",
-                            "type": "expression",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "woocommerce",
+                                "query": "terms",
+                                "select": [
+                                    "id",
+                                    "name"
+                                ],
+                                "where": {
+                                    "taxonomy": "product_brand"
+                                }
+                            },
                             "required": true
                         }
                     ],
@@ -4694,7 +6100,30 @@
                 "get_product_brand_all": {
                     "key": "get_product_brand_all",
                     "label": "Get Product Brand (All)",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "hide_empty",
+                            "label": "Hide Empty Terms",
+                            "type": "boolean"
+                        },
+                        {
+                            "key": "search",
+                            "label": "Search",
+                            "type": "text"
+                        },
+                        {
+                            "key": "limit",
+                            "label": "Limit",
+                            "type": "number",
+                            "default": 20
+                        },
+                        {
+                            "key": "page",
+                            "label": "Page",
+                            "type": "number",
+                            "default": 1
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -4706,7 +6135,18 @@
                         {
                             "key": "term_id",
                             "label": "Term ID",
-                            "type": "expression",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "woocommerce",
+                                "query": "terms",
+                                "select": [
+                                    "id",
+                                    "name"
+                                ],
+                                "where": {
+                                    "taxonomy": "product_brand"
+                                }
+                            },
                             "required": true
                         }
                     ],
@@ -4746,7 +6186,18 @@
                         {
                             "key": "term_id",
                             "label": "Term ID",
-                            "type": "expression",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "woocommerce",
+                                "query": "terms",
+                                "select": [
+                                    "id",
+                                    "name"
+                                ],
+                                "where": {
+                                    "taxonomy": "product_shipping_class"
+                                }
+                            },
                             "required": true
                         },
                         {
@@ -4776,7 +6227,18 @@
                         {
                             "key": "term_id",
                             "label": "Term ID",
-                            "type": "expression",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "woocommerce",
+                                "query": "terms",
+                                "select": [
+                                    "id",
+                                    "name"
+                                ],
+                                "where": {
+                                    "taxonomy": "product_shipping_class"
+                                }
+                            },
                             "required": true
                         }
                     ],
@@ -4787,7 +6249,30 @@
                 "get_product_shipping_class_all": {
                     "key": "get_product_shipping_class_all",
                     "label": "Get Product Shipping Class (All)",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "hide_empty",
+                            "label": "Hide Empty Terms",
+                            "type": "boolean"
+                        },
+                        {
+                            "key": "search",
+                            "label": "Search",
+                            "type": "text"
+                        },
+                        {
+                            "key": "limit",
+                            "label": "Limit",
+                            "type": "number",
+                            "default": 20
+                        },
+                        {
+                            "key": "page",
+                            "label": "Page",
+                            "type": "number",
+                            "default": 1
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -4799,7 +6284,18 @@
                         {
                             "key": "term_id",
                             "label": "Term ID",
-                            "type": "expression",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "woocommerce",
+                                "query": "terms",
+                                "select": [
+                                    "id",
+                                    "name"
+                                ],
+                                "where": {
+                                    "taxonomy": "product_shipping_class"
+                                }
+                            },
                             "required": true
                         }
                     ],
@@ -4814,7 +6310,15 @@
                         {
                             "key": "product_id",
                             "label": "Product ID",
-                            "type": "expression",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "woocommerce",
+                                "query": "products",
+                                "select": [
+                                    "id",
+                                    "name"
+                                ]
+                            },
                             "required": true
                         },
                         {
@@ -4865,7 +6369,15 @@
                         {
                             "key": "product_id",
                             "label": "Product ID",
-                            "type": "expression",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "woocommerce",
+                                "query": "products",
+                                "select": [
+                                    "id",
+                                    "name"
+                                ]
+                            },
                             "required": true
                         },
                         {
@@ -4949,7 +6461,15 @@
                         {
                             "key": "attribute_id",
                             "label": "Attribute ID",
-                            "type": "expression",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "woocommerce",
+                                "query": "attributes",
+                                "select": [
+                                    "id",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         },
                         {
@@ -5017,7 +6537,15 @@
                         {
                             "key": "attribute_id",
                             "label": "Attribute ID",
-                            "type": "expression",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "woocommerce",
+                                "query": "attributes",
+                                "select": [
+                                    "id",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -5032,7 +6560,15 @@
                         {
                             "key": "attribute_id",
                             "label": "Attribute ID",
-                            "type": "expression",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "woocommerce",
+                                "query": "attributes",
+                                "select": [
+                                    "id",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -5043,7 +6579,21 @@
                 "get_cart_items_all": {
                     "key": "get_cart_items_all",
                     "label": "Get All Cart Items",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "product_id",
+                            "label": "Filter by Product ID",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "woocommerce",
+                                "query": "products",
+                                "select": [
+                                    "id",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -5051,7 +6601,13 @@
                 "get_cart_totals": {
                     "key": "get_cart_totals",
                     "label": "Get Cart Totals",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "with_items_count",
+                            "label": "Include Items Count",
+                            "type": "boolean"
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -5063,7 +6619,15 @@
                         {
                             "key": "product_id",
                             "label": "Product ID",
-                            "type": "expression",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "woocommerce",
+                                "query": "products",
+                                "select": [
+                                    "id",
+                                    "name"
+                                ]
+                            },
                             "required": true
                         },
                         {
@@ -5074,7 +6638,15 @@
                         {
                             "key": "variation_id",
                             "label": "Variation ID",
-                            "type": "expression"
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "woocommerce",
+                                "query": "variations",
+                                "select": [
+                                    "id",
+                                    "label"
+                                ]
+                            }
                         },
                         {
                             "key": "variations",
@@ -5177,7 +6749,15 @@
                         {
                             "key": "coupon_id",
                             "label": "Coupon ID",
-                            "type": "expression"
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "woocommerce",
+                                "query": "coupons",
+                                "select": [
+                                    "id",
+                                    "code"
+                                ]
+                            }
                         },
                         {
                             "key": "code",
@@ -5250,7 +6830,15 @@
                         {
                             "key": "coupon_id",
                             "label": "Coupon ID",
-                            "type": "expression"
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "woocommerce",
+                                "query": "coupons",
+                                "select": [
+                                    "id",
+                                    "code"
+                                ]
+                            }
                         },
                         {
                             "key": "code",
@@ -5275,7 +6863,15 @@
                         {
                             "key": "coupon_id",
                             "label": "Coupon ID",
-                            "type": "expression"
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "woocommerce",
+                                "query": "coupons",
+                                "select": [
+                                    "id",
+                                    "code"
+                                ]
+                            }
                         },
                         {
                             "key": "code",
@@ -5311,7 +6907,13 @@
                 "get_applied_coupons_from_cart": {
                     "key": "get_applied_coupons_from_cart",
                     "label": "Get Applied Coupons from Cart",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "include_totals",
+                            "label": "Include Coupon Totals",
+                            "type": "boolean"
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -5338,7 +6940,15 @@
                         {
                             "key": "coupon_id",
                             "label": "Coupon ID",
-                            "type": "expression"
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "woocommerce",
+                                "query": "coupons",
+                                "select": [
+                                    "id",
+                                    "code"
+                                ]
+                            }
                         },
                         {
                             "key": "code",
@@ -5378,7 +6988,15 @@
                         {
                             "key": "coupon_id",
                             "label": "Coupon ID",
-                            "type": "expression"
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "woocommerce",
+                                "query": "coupons",
+                                "select": [
+                                    "id",
+                                    "code"
+                                ]
+                            }
                         },
                         {
                             "key": "code",
@@ -5393,7 +7011,13 @@
                 "get_coupon_totals_by_discount_type": {
                     "key": "get_coupon_totals_by_discount_type",
                     "label": "Get Coupon Totals By Discount Type",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "include_empty_types",
+                            "label": "Include Empty Types",
+                            "type": "boolean"
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -5744,8 +7368,15 @@
                         {
                             "key": "list_id",
                             "label": "Audience/List ID",
-                            "type": "text",
-                            "placeholder": "a1b2c3d4e5",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "mailchimp",
+                                "query": "lists",
+                                "select": [
+                                    "id",
+                                    "name"
+                                ]
+                            },
                             "required": true,
                             "help": "Find it in Mailchimp \u2192 Audience \u2192 Settings \u2192 Audience name and defaults."
                         },
@@ -5842,8 +7473,15 @@
                         {
                             "key": "list_id",
                             "label": "Audience/List ID",
-                            "type": "text",
-                            "placeholder": "a1b2c3d4e5",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "mailchimp",
+                                "query": "lists",
+                                "select": [
+                                    "id",
+                                    "name"
+                                ]
+                            },
                             "required": true,
                             "help": "Find it in Mailchimp \u2192 Audience \u2192 Settings \u2192 Audience name and defaults."
                         },
@@ -5866,8 +7504,15 @@
                         {
                             "key": "list_id",
                             "label": "Audience/List ID",
-                            "type": "text",
-                            "placeholder": "a1b2c3d4e5",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "mailchimp",
+                                "query": "lists",
+                                "select": [
+                                    "id",
+                                    "name"
+                                ]
+                            },
                             "required": true,
                             "help": "Find it in Mailchimp \u2192 Audience \u2192 Settings \u2192 Audience name and defaults."
                         },
@@ -5898,8 +7543,15 @@
                         {
                             "key": "list_id",
                             "label": "Audience/List ID",
-                            "type": "text",
-                            "placeholder": "a1b2c3d4e5",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "mailchimp",
+                                "query": "lists",
+                                "select": [
+                                    "id",
+                                    "name"
+                                ]
+                            },
                             "required": true,
                             "help": "Find it in Mailchimp \u2192 Audience \u2192 Settings \u2192 Audience name and defaults."
                         },
@@ -5930,8 +7582,15 @@
                         {
                             "key": "list_id",
                             "label": "Audience/List ID",
-                            "type": "text",
-                            "placeholder": "a1b2c3d4e5",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "mailchimp",
+                                "query": "lists",
+                                "select": [
+                                    "id",
+                                    "name"
+                                ]
+                            },
                             "required": true,
                             "help": "Find it in Mailchimp \u2192 Audience \u2192 Settings \u2192 Audience name and defaults."
                         },
@@ -6100,7 +7759,15 @@
                         {
                             "key": "order_id",
                             "label": "Order ID",
-                            "type": "expression",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "surecart",
+                                "query": "orders",
+                                "select": [
+                                    "id",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         },
                         {
@@ -6186,7 +7853,15 @@
                         {
                             "key": "order_id",
                             "label": "Order ID",
-                            "type": "expression",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "surecart",
+                                "query": "orders",
+                                "select": [
+                                    "id",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         },
                         {
@@ -6255,7 +7930,15 @@
                         {
                             "key": "customer_id",
                             "label": "Customer ID",
-                            "type": "expression",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "surecart",
+                                "query": "customers",
+                                "select": [
+                                    "id",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         },
                         {
@@ -6341,7 +8024,15 @@
                         {
                             "key": "customer_id",
                             "label": "Customer ID",
-                            "type": "expression",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "surecart",
+                                "query": "customers",
+                                "select": [
+                                    "id",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         },
                         {
@@ -6510,7 +8201,15 @@
                         {
                             "key": "product_id",
                             "label": "Product ID",
-                            "type": "expression",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "surecart",
+                                "query": "products",
+                                "select": [
+                                    "id",
+                                    "name"
+                                ]
+                            },
                             "required": true
                         },
                         {
@@ -6550,7 +8249,15 @@
                         {
                             "key": "product_id",
                             "label": "Product ID",
-                            "type": "expression",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "surecart",
+                                "query": "products",
+                                "select": [
+                                    "id",
+                                    "name"
+                                ]
+                            },
                             "required": true
                         },
                         {
@@ -6626,7 +8333,15 @@
                         {
                             "key": "product_id",
                             "label": "Product ID",
-                            "type": "expression",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "surecart",
+                                "query": "products",
+                                "select": [
+                                    "id",
+                                    "name"
+                                ]
+                            },
                             "required": true
                         },
                         {
@@ -6695,7 +8410,15 @@
                         {
                             "key": "coupon_id",
                             "label": "Coupon ID",
-                            "type": "expression",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "surecart",
+                                "query": "coupons",
+                                "select": [
+                                    "id",
+                                    "code"
+                                ]
+                            },
                             "required": true
                         },
                         {
@@ -6735,7 +8458,15 @@
                         {
                             "key": "coupon_id",
                             "label": "Coupon ID",
-                            "type": "expression",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "surecart",
+                                "query": "coupons",
+                                "select": [
+                                    "id",
+                                    "code"
+                                ]
+                            },
                             "required": true
                         },
                         {
@@ -6811,7 +8542,15 @@
                         {
                             "key": "coupon_id",
                             "label": "Coupon ID",
-                            "type": "expression",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "surecart",
+                                "query": "coupons",
+                                "select": [
+                                    "id",
+                                    "code"
+                                ]
+                            },
                             "required": true
                         },
                         {
@@ -6880,7 +8619,15 @@
                         {
                             "key": "subscription_id",
                             "label": "Subscription ID",
-                            "type": "expression",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "surecart",
+                                "query": "subscriptions",
+                                "select": [
+                                    "id",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         },
                         {
@@ -6966,7 +8713,15 @@
                         {
                             "key": "subscription_id",
                             "label": "Subscription ID",
-                            "type": "expression",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "surecart",
+                                "query": "subscriptions",
+                                "select": [
+                                    "id",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         },
                         {
@@ -7190,12 +8945,14 @@
                             "key": "course_id",
                             "label": "Course",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any course",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "learndash",
+                                "query": "course_query",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -7212,12 +8969,14 @@
                             "key": "course_id",
                             "label": "Course",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any course",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "learndash",
+                                "query": "course_query",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -7234,24 +8993,28 @@
                             "key": "course_id",
                             "label": "Course",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any course",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "learndash",
+                                "query": "course_query",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         },
                         {
                             "key": "lesson_id",
                             "label": "Lesson",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any lesson",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "learndash",
+                                "query": "lesson_query",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -7268,36 +9031,42 @@
                             "key": "course_id",
                             "label": "Course",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any course",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "learndash",
+                                "query": "course_query",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         },
                         {
                             "key": "lesson_id",
                             "label": "Lesson",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any lesson",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "learndash",
+                                "query": "lesson_query",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         },
                         {
                             "key": "topic_id",
                             "label": "Topic",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any Topic",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "learndash",
+                                "query": "topic_query",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -7314,12 +9083,14 @@
                             "key": "quiz_id",
                             "label": "Quiz",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any Quiz",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "learndash",
+                                "query": "quiz_query",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -7336,12 +9107,14 @@
                             "key": "group_id",
                             "label": "Group",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any Group",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "learndash",
+                                "query": "group_query",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -7358,12 +9131,14 @@
                             "key": "group_id",
                             "label": "Group",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any Group",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "learndash",
+                                "query": "group_query",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -7380,24 +9155,28 @@
                             "key": "course_id",
                             "label": "Course",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any course",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "learndash",
+                                "query": "course_query",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         },
                         {
                             "key": "lesson_id",
                             "label": "Lesson",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any lesson",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "learndash",
+                                "query": "lesson_query",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -7967,7 +9746,15 @@
                         {
                             "key": "membership_id",
                             "label": "Membership ID",
-                            "type": "number",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "memberpress",
+                                "query": "memberships",
+                                "select": [
+                                    "id",
+                                    "name"
+                                ]
+                            },
                             "required": true
                         },
                         {
@@ -8180,13 +9967,29 @@
                         {
                             "key": "user_id",
                             "label": "User ID",
-                            "type": "number",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "memberpress",
+                                "query": "users",
+                                "select": [
+                                    "id",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         },
                         {
                             "key": "product_id",
                             "label": "Membership ID",
-                            "type": "number",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "memberpress",
+                                "query": "memberships",
+                                "select": [
+                                    "id",
+                                    "name"
+                                ]
+                            },
                             "required": true
                         },
                         {
@@ -8230,12 +10033,28 @@
                         {
                             "key": "gateway",
                             "label": "Gateway",
-                            "type": "text"
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "memberpress",
+                                "query": "gateways",
+                                "select": [
+                                    "id",
+                                    "label"
+                                ]
+                            }
                         },
                         {
                             "key": "subscription_id",
                             "label": "Subscription ID",
-                            "type": "number"
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "memberpress",
+                                "query": "subscriptions",
+                                "select": [
+                                    "id",
+                                    "label"
+                                ]
+                            }
                         }
                     ],
                     "outputs": [
@@ -8249,7 +10068,15 @@
                         {
                             "key": "transaction_id",
                             "label": "Transaction ID",
-                            "type": "number",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "memberpress",
+                                "query": "transactions",
+                                "select": [
+                                    "id",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         },
                         {
@@ -8292,7 +10119,15 @@
                         {
                             "key": "transaction_id",
                             "label": "Transaction ID",
-                            "type": "number",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "memberpress",
+                                "query": "transactions",
+                                "select": [
+                                    "id",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -8307,13 +10142,29 @@
                         {
                             "key": "user_id",
                             "label": "User ID",
-                            "type": "number",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "memberpress",
+                                "query": "users",
+                                "select": [
+                                    "id",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         },
                         {
                             "key": "product_id",
                             "label": "Membership ID",
-                            "type": "number",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "memberpress",
+                                "query": "memberships",
+                                "select": [
+                                    "id",
+                                    "name"
+                                ]
+                            },
                             "required": true
                         },
                         {
@@ -8376,7 +10227,15 @@
                         {
                             "key": "gateway",
                             "label": "Gateway",
-                            "type": "text"
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "memberpress",
+                                "query": "gateways",
+                                "select": [
+                                    "id",
+                                    "label"
+                                ]
+                            }
                         }
                     ],
                     "outputs": [
@@ -8390,7 +10249,15 @@
                         {
                             "key": "subscription_id",
                             "label": "Subscription ID",
-                            "type": "number",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "memberpress",
+                                "query": "subscriptions",
+                                "select": [
+                                    "id",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         },
                         {
@@ -8429,7 +10296,15 @@
                         {
                             "key": "subscription_id",
                             "label": "Subscription ID",
-                            "type": "number",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "memberpress",
+                                "query": "subscriptions",
+                                "select": [
+                                    "id",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -8444,7 +10319,15 @@
                         {
                             "key": "subscription_id",
                             "label": "Subscription ID",
-                            "type": "number",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "memberpress",
+                                "query": "subscriptions",
+                                "select": [
+                                    "id",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -8459,7 +10342,15 @@
                         {
                             "key": "subscription_id",
                             "label": "Subscription ID",
-                            "type": "number",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "memberpress",
+                                "query": "subscriptions",
+                                "select": [
+                                    "id",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -8485,14 +10376,16 @@
                     "schema": [
                         {
                             "key": "form_id",
-                            "label": "Form action",
+                            "label": "Form",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any Form",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "fluentform",
+                                "query": "form",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -8503,9 +10396,9 @@
             },
             "actions": []
         },
-        "FluentCRM": {
-            "slug": "FluentCRM",
-            "name": "FluentCRM",
+        "fluentcrm": {
+            "slug": "fluentcrm",
+            "name": "Fluentcrm",
             "icon": "",
             "category": "app",
             "requires_connection": false,
@@ -8521,12 +10414,14 @@
                             "key": "tag_id",
                             "label": "Tags",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any Tag",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "fluentcrm",
+                                "query": "tag_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -8543,12 +10438,14 @@
                             "key": "tag_id",
                             "label": "Tags",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any Tag",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "fluentcrm",
+                                "query": "tag_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -8565,12 +10462,14 @@
                             "key": "list_id",
                             "label": "List",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any List",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "fluentcrm",
+                                "query": "list_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -8587,12 +10486,14 @@
                             "key": "list_id",
                             "label": "List",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any List",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "fluentcrm",
+                                "query": "list_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -8707,12 +10608,14 @@
                             "key": "lists",
                             "label": "Lists",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any List",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "fluentcrm",
+                                "query": "list_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
                             "required": true,
                             "multiple": true
                         },
@@ -8720,12 +10623,14 @@
                             "key": "tags",
                             "label": "Tags",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any Tag",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "fluentcrm",
+                                "query": "tag_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
                             "required": true,
                             "multiple": true
                         },
@@ -8733,12 +10638,19 @@
                             "key": "company",
                             "label": "company",
                             "type": "select",
-                            "options": [],
+                            "dynamic": {
+                                "integration": "fluentcrm",
+                                "query": "company_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
                             "required": true,
                             "multiple": true
                         },
                         {
-                            "key": "status",
+                            "key": "fluent_status",
                             "label": "Status",
                             "type": "select",
                             "options": [
@@ -8851,7 +10763,7 @@
                     "label": "Get Contact (By Status)",
                     "schema": [
                         {
-                            "key": "status",
+                            "key": "fluent_status",
                             "label": "Status",
                             "type": "select",
                             "options": [
@@ -8955,12 +10867,14 @@
                             "key": "tags",
                             "label": "Tags",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any Tag",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "fluentcrm",
+                                "query": "tag_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
                             "required": true,
                             "multiple": true
                         }
@@ -8983,12 +10897,14 @@
                             "key": "tags",
                             "label": "Tags",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any Tag",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "fluentcrm",
+                                "query": "tag_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
                             "required": true,
                             "multiple": true
                         }
@@ -9061,12 +10977,14 @@
                             "key": "lists",
                             "label": "Lists",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any List",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "fluentcrm",
+                                "query": "list_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
                             "required": true,
                             "multiple": true
                         }
@@ -9089,12 +11007,14 @@
                             "key": "lists",
                             "label": "Lists",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any List",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "fluentcrm",
+                                "query": "list_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
                             "required": true,
                             "multiple": true
                         }
@@ -9255,7 +11175,14 @@
                             "key": "company",
                             "label": "company",
                             "type": "select",
-                            "options": [],
+                            "dynamic": {
+                                "integration": "fluentcrm",
+                                "query": "company_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
                             "required": true,
                             "multiple": true
                         }
@@ -9278,7 +11205,14 @@
                             "key": "company",
                             "label": "company",
                             "type": "select",
-                            "options": [],
+                            "dynamic": {
+                                "integration": "fluentcrm",
+                                "query": "company_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
                             "required": true,
                             "multiple": true
                         }
@@ -9447,12 +11381,14 @@
                             "key": "form_id",
                             "label": "Forms",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any From",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "gravityforms",
+                                "query": "form_query",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -9481,12 +11417,14 @@
                             "key": "form_id",
                             "label": "Form",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any Form",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "ninjaform",
+                                "query": "forms",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -9515,12 +11453,14 @@
                             "key": "form_id",
                             "label": "Forms",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any Form",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "formidable",
+                                "query": "form_query",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -9549,12 +11489,14 @@
                             "key": "form_id",
                             "label": "Forms",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any From",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "wpforms",
+                                "query": "form_query",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -9583,12 +11525,14 @@
                             "key": "form_id",
                             "label": "Forms",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any From",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "contact-form-7",
+                                "query": "form_query",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -9898,7 +11842,15 @@
                         {
                             "key": "user_id",
                             "label": "User ID",
-                            "type": "number"
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "easydigitaldownload",
+                                "query": "users",
+                                "select": [
+                                    "id",
+                                    "label"
+                                ]
+                            }
                         },
                         {
                             "key": "status",
@@ -9994,7 +11946,15 @@
                         {
                             "key": "payment_id",
                             "label": "Payment ID",
-                            "type": "number",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "easydigitaldownload",
+                                "query": "payments",
+                                "select": [
+                                    "id",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         },
                         {
@@ -10052,7 +12012,15 @@
                         {
                             "key": "payment_id",
                             "label": "Payment ID",
-                            "type": "number",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "easydigitaldownload",
+                                "query": "payments",
+                                "select": [
+                                    "id",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         },
                         {
@@ -10113,7 +12081,15 @@
                         {
                             "key": "download_id",
                             "label": "Product ID",
-                            "type": "number",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "easydigitaldownload",
+                                "query": "downloads",
+                                "select": [
+                                    "id",
+                                    "name"
+                                ]
+                            },
                             "required": true
                         },
                         {
@@ -10158,7 +12134,15 @@
                         {
                             "key": "download_id",
                             "label": "Product ID",
-                            "type": "number",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "easydigitaldownload",
+                                "query": "downloads",
+                                "select": [
+                                    "id",
+                                    "name"
+                                ]
+                            },
                             "required": true
                         },
                         {
@@ -10201,12 +12185,14 @@
                             "key": "course_id",
                             "label": "course",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any course",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "tutor",
+                                "query": "course",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -10223,12 +12209,14 @@
                             "key": "course_id",
                             "label": "course",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any course",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "tutor",
+                                "query": "course",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -10245,12 +12233,14 @@
                             "key": "quiz_id",
                             "label": "Quiz",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any Quiz",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "tutor",
+                                "query": "quiz",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -10267,12 +12257,14 @@
                             "key": "lesson_id",
                             "label": "Lesson",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any lesson",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "tutor",
+                                "query": "lesson",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -10289,12 +12281,14 @@
                             "key": "quiz_id",
                             "label": "Quiz",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any Quiz",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "tutor",
+                                "query": "quiz",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         },
                         {
@@ -10338,12 +12332,14 @@
                             "key": "tag_id",
                             "label": "Tags",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any Tag",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "groundhogg",
+                                "query": "groundhogg_query",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -10360,12 +12356,14 @@
                             "key": "tag_id",
                             "label": "Tags",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any Tag",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "groundhogg",
+                                "query": "groundhogg_query",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -10425,9 +12423,9 @@
             },
             "actions": []
         },
-        "profilebuilder": {
-            "slug": "profilebuilder",
-            "name": "Profilebuilder",
+        "academy": {
+            "slug": "academy",
+            "name": "Academy",
             "icon": "",
             "category": "app",
             "requires_connection": false,
@@ -10437,18 +12435,20 @@
                 "user_enroll_course": {
                     "key": "user_enroll_course",
                     "label": "User enrolled in a course",
-                    "hook": "tutor_after_enroll",
+                    "hook": "academy/course/after_enroll",
                     "schema": [
                         {
                             "key": "course_id",
-                            "label": "course",
+                            "label": "Course",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any course",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "academy",
+                                "query": "acourse",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -10456,43 +12456,23 @@
                         "main"
                     ]
                 },
-                "course_complete": {
-                    "key": "course_complete",
-                    "label": "User completed a course",
-                    "hook": "tutor_course_complete_after",
-                    "schema": [
-                        {
-                            "key": "course_id",
-                            "label": "course",
-                            "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any course",
-                                    "value": "any"
-                                }
-                            ],
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "tutor_quiz_course_attempt": {
-                    "key": "tutor_quiz_course_attempt",
+                "academy_quiz_course_attempt": {
+                    "key": "academy_quiz_course_attempt",
                     "label": "User attempted (submitted) a quiz",
-                    "hook": "tutor_quiz/attempt_ended",
+                    "hook": "academy_quizzes/api/after_quiz_attempt_finished",
                     "schema": [
                         {
                             "key": "quiz_id",
                             "label": "Quiz",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any Quiz",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "academy",
+                                "query": "quiz",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -10503,18 +12483,44 @@
                 "lesson_complete": {
                     "key": "lesson_complete",
                     "label": "User completed a lesson",
-                    "hook": "tutor_lesson_completed_after",
+                    "hook": "academy/frontend/after_mark_topic_complete",
                     "schema": [
                         {
                             "key": "lesson_id",
                             "label": "Lesson",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any lesson",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "academy",
+                                "query": "lesson",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "course_complete": {
+                    "key": "course_complete",
+                    "label": "User completed a course",
+                    "hook": "academy/admin/course_complete_after",
+                    "schema": [
+                        {
+                            "key": "course_id",
+                            "label": "Course",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "academy",
+                                "query": "acourse",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -10525,18 +12531,20 @@
                 "quiz_target": {
                     "key": "quiz_target",
                     "label": "User achieved target percentage on a quiz",
-                    "hook": "tutor_quiz/attempt_ended",
+                    "hook": "academy_quizzes/api/after_quiz_attempt_finished",
                     "schema": [
                         {
                             "key": "quiz_id",
                             "label": "Quiz",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any Quiz",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "academy",
+                                "query": "quiz",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         },
                         {
