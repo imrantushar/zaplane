@@ -21,6 +21,7 @@ import ConnectionDetails from "./ConnectionDetails/ConnectionDetails";
 import { formatDateTime } from "@ZAPUtils/helper";
 import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
 import { TableArrow } from "@ZAPUtils/icons";
+import ZAPActionBar from "@ZAPComponents/ZAPActionBar";
 
 const ConnectionTable = () => {
     const dispatch = useDispatch();
@@ -29,6 +30,7 @@ const ConnectionTable = () => {
     const { allConnection = [], isLoading, connection, currentPage, perPage, totalItems } = useSelector(
         (state) => state.connections
     );
+    const [selection, setSelection] = useState([]);
     const [loading, setLoading] = useState(allConnection.length === 0);
     const handleRefresh = async (page = 1, per_page = 10) => {
         setLoading(true)
@@ -61,6 +63,21 @@ const ConnectionTable = () => {
     const openDetails = (row) => {
         dispatch(fetchSingleConnection(row.id));
         setDetailsOpen(true);
+    };
+    const handleDeleteSelected = async () => {
+        if (!selection.length) return;
+        try {
+            await Promise.all(
+                selection
+                    .map((row) => row?.id)
+                    .filter(Boolean)
+                    .map((id) => dispatch(deleteConnection(id)))
+            );
+            setSelection([]);
+            dispatch(fetchConnections({ page: currentPage, per_page: perPage }));
+        } catch (e) {
+            console.error("Failed to delete selected team members", e);
+        }
     };
 
     const columns = [
@@ -116,10 +133,10 @@ const ConnectionTable = () => {
         },
         {
             name: (
-                    <Text className="zaplane-label" ml='-32px'>
-                        {__("Updated At", "zaplane")}
-                    </Text>
-               
+                <Text className="zaplane-label" ml='-32px'>
+                    {__("Updated At", "zaplane")}
+                </Text>
+
             ),
             cell: (row) => {
                 const { date, time } = formatDateTime(row.updated_at);
@@ -138,10 +155,10 @@ const ConnectionTable = () => {
         },
         {
             name: (
-                    <Text className="zaplane-label">
-                        {__("Status", "zaplane")}
-                    </Text>
-                   
+                <Text className="zaplane-label">
+                    {__("Status", "zaplane")}
+                </Text>
+
             ),
             cell: (row) => (
                 <StatusOptions
@@ -221,6 +238,14 @@ const ConnectionTable = () => {
                 perPage={perPage}
                 onChangePage={handlePageChange}
                 onChangeItemsPerPage={handlePerPageChange}
+                getSelectRowValue={(rows) => {
+                    setSelection(rows || []);
+                }}
+            />
+            <ZAPActionBar
+                selection={selection}
+                onDelete={handleDeleteSelected}
+                onClose={() => setSelection([])}
             />
 
             <ConnectionDetails
