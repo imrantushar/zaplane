@@ -7476,12 +7476,12 @@ function CustomNode({
           id: "true",
           position: isLR ? _xyflow_react__WEBPACK_IMPORTED_MODULE_2__.Position.Right : _xyflow_react__WEBPACK_IMPORTED_MODULE_2__.Position.Bottom,
           style: {
-            top: isLR ? "12%" : undefined,
-            left: !isLR ? "30%" : undefined,
+            top: isLR ? "50%" : undefined,
+            left: !isLR ? "50%" : undefined,
             width: 10,
             height: 10,
             borderRadius: "50%",
-            background: "green",
+            background: "var(--zaplane-primary)",
             border: "2px solid var(--zaplane-background)"
           }
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.Handle, {
@@ -7489,12 +7489,12 @@ function CustomNode({
           id: "false",
           position: isLR ? _xyflow_react__WEBPACK_IMPORTED_MODULE_2__.Position.Right : _xyflow_react__WEBPACK_IMPORTED_MODULE_2__.Position.Bottom,
           style: {
-            top: isLR ? "85%" : undefined,
-            left: !isLR ? "70%" : undefined,
+            top: isLR ? "50%" : undefined,
+            left: !isLR ? "50%" : undefined,
             width: 10,
             height: 10,
             borderRadius: "50%",
-            background: "red",
+            background: "var(--zaplane-primary)",
             border: "2px solid var(--zaplane-background)"
           }
         })]
