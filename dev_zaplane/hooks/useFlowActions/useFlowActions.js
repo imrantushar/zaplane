@@ -126,7 +126,9 @@ export const useFlowActions = ({
 
             const trueNode = {
                 id: trueNodeId,
+                parentNodeId: newNodeId,
                 type: "custom",
+                port: true,
                 position: {
                     x: layoutLR ? newX + LRGap : newX,
                     y: layoutLR ? newY - 60 : newY + TBGap,
@@ -134,13 +136,14 @@ export const useFlowActions = ({
                 data: {
                     action: "action",
                     app: "Select an app",
-
                 },
             };
 
             const falseNode = {
                 id: falseNodeId,
+                parentNodeId: newNodeId,
                 type: "custom",
+                port: false,
                 position: {
                     x: layoutLR ? newX + LRGap : newX,
                     y: layoutLR ? newY + 60 : newY + TBGap * 2,
