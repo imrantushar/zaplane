@@ -26,6 +26,16 @@ export const useFlowActions = ({
                     : n
             )
         );
+        setDrawerContext((prev) => ({
+            ...prev,
+            node: {
+                ...prev.node,
+                data: {
+                    ...prev.node.data,
+                    ...updatedData,
+                },
+            },
+        }));
     };
 
     const deleteNode = (nodeId) => {
@@ -33,7 +43,7 @@ export const useFlowActions = ({
         setEdges((eds) =>
             eds.filter((e) => e.source !== nodeId && e.target !== nodeId)
         );
-        
+
     };
 
     const createActionNode = (actionData) => {
