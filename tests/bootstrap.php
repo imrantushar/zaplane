@@ -26,6 +26,7 @@ require_once ZAPLANE_ROOT_DIR_PATH . 'vendor/autoload.php';
 require_once __DIR__ . '/WPDBMock.php';
 require_once __DIR__ . '/WPMocks.php';
 require_once __DIR__ . '/TestCase.php';
+require_once __DIR__ . '/Integrations/IntegrationTestCase.php';
 
 global $wpdb;
 $wpdb = new \Zaplane\Tests\WPDBMock();

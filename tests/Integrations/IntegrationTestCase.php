@@ -489,16 +489,26 @@ abstract class IntegrationTestCase extends TestCase {
 		];
 	}
 
-	protected function makeActionNode( string $event, array $config = [] ): array {
+	protected function makeActionNode( string $event, array $config = [], array $credentials = [] ): array {
 		$class = $this->getIntegrationClass();
 
-		return [
+		$node = [
 			'type' => 'action',
 			'data' => [
-				'app' => $class::get_slug(),
-				'event' => $event,
+				'app'    => $class::get_slug(),
+				'event'  => $event,
 				'config' => $config,
 			],
 		];
+
+		if ( ! empty( $credentials ) ) {
+			$node['_connection_credentials'] = $credentials;
+		}
+
+		return $node;
+	}
+
+	protected function mockHttp( array $body, int $status = 200 ): void {
+		WPMocks::setHttpResponse( $body, $status );
 	}
 }

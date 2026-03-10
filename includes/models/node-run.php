@@ -55,7 +55,7 @@ class NodeRun extends Model {
 		return static::find( $this->parent_node_run_id );
 	}
 
-	public function children(): array {
+	public function children(): Collection {
 		return static::where( 'parent_node_run_id', $this->id )->get();
 	}
 
@@ -96,6 +96,12 @@ class NodeRun extends Model {
 		if ( $resumeAt ) {
 			$this->resume_at = $resumeAt;
 		}
+		return $this->save();
+	}
+
+	public function markAsCompleted(): bool {
+		$this->status = 'completed';
+		$this->finished_at = current_time( 'mysql' );
 		return $this->save();
 	}
 

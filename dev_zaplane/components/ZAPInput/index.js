@@ -25,7 +25,7 @@ const ZAPInput = ({
   // }, [value, type]);
 
   const isTextarea = type === "textarea";
-  console.log(isTextarea,'is');
+ 
 
   return (
     <Flex as="label" direction="column" gap={2} style={{ ...containerStyle }}>
@@ -34,7 +34,6 @@ const ZAPInput = ({
       </Text>
       {isTextarea ? (
         <Textarea
-          ref={inputRef || textareaRef}
           className="zaplane-textarea"
           placeholder={__(placeholder, "zaplane")}
           value={value}

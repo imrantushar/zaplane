@@ -89,12 +89,13 @@ export const useFlowActions = ({
         const newNodeId = getNewNodeId();
         const newX = layoutLR ? sourceNode.position.x + LRGap : sourceNode.position.x;
         const newY = layoutLR ? sourceNode.position.y : sourceNode.position.y + TBGap;
+        const isTools= actionData?.mode === 'tools'
         const newNode = {
             id: newNodeId,
             type: "custom",
             position: { x: newX, y: newY },
             data: {
-                action: "action",
+                action: isTools ? actionData.app : "action",
                 ...actionData,
             },
         };

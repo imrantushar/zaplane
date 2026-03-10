@@ -1,0 +1,40 @@
+.zaplane-variable-editor {
+  border: 1px solid var(--zaplane-border-color);
+  border-radius: 6px;
+  min-height: 40px;
+  padding: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  position: relative;
+}
+
+.zaplane-variable-item {
+  display: inline-flex;
+  align-items: center;
+  background: #E0F2FF;
+  border-radius: 4px;
+  padding: 0 4px;
+  margin: 0 2px;
+}
+
+.zaplane-variable-remove {
+  cursor: pointer;
+  margin-left: 4px;
+  font-weight: bold;
+}
+
+.zaplane-variable-label {
+  user-select: none;
+}
+// [data-placeholder]:empty::before {
+//   content: attr(data-placeholder);
+//   color: #A0AEC0;       /* placeholder color */
+//   pointer-events: none; /* allow clicks inside editor */
+//   display: block;
+// }
+.zaplane-variable-editor.zaplane-empty::before {
+  content: attr(data-placeholder);
+  color: #A0AEC0;
+  pointer-events: none;
+  display: block;
+}
