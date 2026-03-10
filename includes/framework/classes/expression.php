@@ -16,7 +16,7 @@ class Expression {
 			return null;
 		}
 
-		if ( ! str_contains( $expr, '{{' ) ) {
+		if ( ! is_string($expr) || ! str_contains( $expr, '{{' ) ) {
 			return $expr;
 		}
 
