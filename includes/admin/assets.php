@@ -24,10 +24,6 @@ class Assets {
         );
     }
 
-	public function register(): void {
-		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_app_assets' ] );
-	}
-
 	public function enqueue_app_assets( $hook ) {
 		if ( strpos( $hook, '_page_' . ZAPLANE_PLUGIN_SLUG ) !== false ) {
 			remove_all_actions( 'admin_notices' );
