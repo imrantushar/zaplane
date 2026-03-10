@@ -1,6 +1,7 @@
 import { useReactFlow, useUpdateNodeInternals } from "@xyflow/react";
 import { getLayoutedElements } from "./utils/dagreLayout";
 import { useCallback } from "react";
+import { getBranchNodes } from "./utils/helper";
 
 export const useFlowActions = ({
     nodes,
@@ -55,7 +56,6 @@ export const useFlowActions = ({
         }
 
         const newNodeId = getNewNodeId();
-
         const newX = layoutLR
             ? sourceNode.position.x + LRGap
             : sourceNode.position.x;
@@ -64,8 +64,8 @@ export const useFlowActions = ({
             ? sourceNode.position.y
             : sourceNode.position.y + TBGap;
 
-        const isTools= actionData?.mode === 'tools'
-        console.log(isTools,actionData,'a');
+        const isTools = actionData?.mode === 'tools'
+        console.log(isTools, actionData, 'a');
 
         const newNode = {
             id: newNodeId,
@@ -76,30 +76,16 @@ export const useFlowActions = ({
                 ...actionData,
             },
         };
-
+        const branchNodes = edge?.sourceHandle
+            ? getBranchNodes(edge.target, edges)
+            : null;
         const updatedNodes = nodes.map((n) => {
+            if (!branchNodes || !branchNodes.has(n.id)) return n;
+
             if (layoutLR) {
-                if (n.position.x >= newX) {
-                    return {
-                        ...n,
-                        position: {
-                            ...n.position,
-                            x: n.position.x + LRGap,
-                        },
-                    };
-                }
-            } else {
-                if (n.position.y >= newY) {
-                    return {
-                        ...n,
-                        position: {
-                            ...n.position,
-                            y: n.position.y + TBGap,
-                        },
-                    };
-                }
+                return { ...n, position: { ...n.position, x: n.position.x + LRGap } };
             }
-            return n;
+            return { ...n, position: { ...n.position, y: n.position.y + TBGap } };
         });
 
         let newEdges = [...edges];

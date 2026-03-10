@@ -9246,6 +9246,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _utils_dagreLayout__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils/dagreLayout */ "./dev_zaplane/hooks/useFlowActions/utils/dagreLayout.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react */ "react");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _utils_helper__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./utils/helper */ "./dev_zaplane/hooks/useFlowActions/utils/helper.js");
+
 
 
 
@@ -9310,29 +9312,25 @@ const useFlowActions = ({
         ...actionData
       }
     };
+    const branchNodes = edge?.sourceHandle ? (0,_utils_helper__WEBPACK_IMPORTED_MODULE_3__.getBranchNodes)(edge.target, edges) : null;
     const updatedNodes = nodes.map(n => {
+      if (!branchNodes || !branchNodes.has(n.id)) return n;
       if (layoutLR) {
-        if (n.position.x >= newX) {
-          return {
-            ...n,
-            position: {
-              ...n.position,
-              x: n.position.x + LRGap
-            }
-          };
-        }
-      } else {
-        if (n.position.y >= newY) {
-          return {
-            ...n,
-            position: {
-              ...n.position,
-              y: n.position.y + TBGap
-            }
-          };
-        }
+        return {
+          ...n,
+          position: {
+            ...n.position,
+            x: n.position.x + LRGap
+          }
+        };
       }
-      return n;
+      return {
+        ...n,
+        position: {
+          ...n.position,
+          y: n.position.y + TBGap
+        }
+      };
     });
     let newEdges = [...edges];
     if (edge) {
@@ -9520,6 +9518,34 @@ const getLayoutedElements = (nodes, edges, direction = "TB") => {
     nodes: layoutedNodes,
     edges
   };
+};
+
+/***/ },
+
+/***/ "./dev_zaplane/hooks/useFlowActions/utils/helper.js"
+/*!**********************************************************!*\
+  !*** ./dev_zaplane/hooks/useFlowActions/utils/helper.js ***!
+  \**********************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   getBranchNodes: () => (/* binding */ getBranchNodes)
+/* harmony export */ });
+const getBranchNodes = (startId, edges) => {
+  const branch = new Set();
+  const stack = [startId];
+  while (stack.length) {
+    const current = stack.pop();
+    branch.add(current);
+    edges.forEach(e => {
+      if (e.source === current) {
+        stack.push(e.target);
+      }
+    });
+  }
+  return branch;
 };
 
 /***/ },
