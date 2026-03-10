@@ -2878,7 +2878,7 @@
         "woocommerce": {
             "slug": "woocommerce",
             "name": "Woocommerce",
-            "icon": "",
+            "icon": "woo",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -5941,7 +5941,7 @@
         "surecart": {
             "slug": "surecart",
             "name": "Surecart",
-            "icon": "",
+            "icon": "surecart",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -7400,7 +7400,7 @@
         "memberpress": {
             "slug": "memberpress",
             "name": "Memberpress",
-            "icon": "",
+            "icon": "mp",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -9753,7 +9753,7 @@
         "easydigitaldownload": {
             "slug": "easydigitaldownload",
             "name": "Easydigitaldownload",
-            "icon": "",
+            "icon": "easydigitaldownload",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
