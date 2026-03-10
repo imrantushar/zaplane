@@ -9365,14 +9365,15 @@ const useFlowActions = ({
     if (actionData.app === "Condition") {
       const trueNodeId = getNewNodeId();
       const falseNodeId = getNewNodeId();
+      const extraLRSpace = 80;
       const trueNode = {
         id: trueNodeId,
         parentNodeId: newNodeId,
         type: "custom",
         port: true,
         position: {
-          x: layoutLR ? newX + LRGap : newX,
-          y: layoutLR ? newY - 60 : newY + TBGap
+          x: layoutLR ? newX + LRGap + extraLRSpace : newX,
+          y: layoutLR ? newY - 60 - 30 : newY + TBGap
         },
         data: {
           action: "action",
@@ -9385,8 +9386,8 @@ const useFlowActions = ({
         type: "custom",
         port: false,
         position: {
-          x: layoutLR ? newX + LRGap : newX,
-          y: layoutLR ? newY + 60 : newY + TBGap * 2
+          x: layoutLR ? newX + LRGap + extraLRSpace : newX,
+          y: layoutLR ? newY + 60 + 30 : newY + TBGap * 2
         },
         data: {
           action: "action",
