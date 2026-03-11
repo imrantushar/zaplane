@@ -3,13 +3,35 @@ namespace Zaplane\Integrations\Memberpress;
 
 trait ActionsTrait {
 
+	private static function action_success_with_input( array $input, array $extra = [] ): array {
+		return self::action_success( array_merge( $input, $extra ) );
+	}
+
+	private static function require_transaction( int $transaction_id, array $input ) {
+		$transaction = new \MeprTransaction( $transaction_id );
+		if ( empty( $transaction->id ) ) {
+			return self::action_error( 'Transaction not found', $input );
+		}
+
+		return $transaction;
+	}
+
+	private static function require_subscription( int $subscription_id, array $input ) {
+		$subscription = new \MeprSubscription( $subscription_id );
+		if ( empty( $subscription->id ) ) {
+			return self::action_error( 'Subscription not found', $input );
+		}
+
+		return $subscription;
+	}
+
 	protected static function action_create_member( array $config, array $input ): array {
 		if ( ! class_exists( 'MeprUser' ) ) {
 			return self::action_error( 'MemberPress is not available', $input );
 		}
 
 		$email = trim( $config['email'] ?? '' );
-		if ( $email === '' ) {
+		if ( '' === $email ) {
 			return self::action_error( 'Email is required', $input );
 		}
 
@@ -18,7 +40,7 @@ trait ActionsTrait {
 			$user->user_email = $email;
 
 			$username = trim( $config['username'] ?? '' );
-			if ( $username === '' ) {
+			if ( '' === $username ) {
 				$username = $email;
 			}
 			$user->user_login = function_exists( 'sanitize_user' ) ? sanitize_user( $username, true ) : $username;
@@ -46,10 +68,10 @@ trait ActionsTrait {
 			return self::action_error( 'Failed to create member', $input );
 		}
 
-		return self::action_success(array_merge($input, [
+		return self::action_success_with_input( $input, [
 			'user_id' => (int) $user_id,
 			'email' => $email,
-		]));
+		] );
 	}
 
 	protected static function action_create_membership( array $config, array $input ): array {
@@ -60,7 +82,7 @@ trait ActionsTrait {
 		$name = trim( $config['name'] ?? '' );
 		$price = $config['price'] ?? '';
 
-		if ( $name === '' || $price === '' ) {
+		if ( '' === $name || '' === $price ) {
 			return self::action_error( 'Membership name and price are required', $input );
 		}
 
@@ -70,13 +92,14 @@ trait ActionsTrait {
 			if ( array_key_exists( 'description', $config ) ) {
 				$product->post_content = $config['description'];
 			}
-			if ( ! empty( $config['status'] ) ) {
-				$product->post_status = $config['status'];
+			$membership_status = self::get_membership_status_config( $config );
+			if ( '' !== $membership_status ) {
+				$product->post_status = self::normalize_post_status( $membership_status );
 			}
 
 			$product->price = (float) $price;
 
-			if ( isset( $config['period'] ) && $config['period'] !== '' ) {
+			if ( isset( $config['period'] ) && '' !== $config['period'] ) {
 				$product->period = (int) $config['period'];
 			}
 			if ( ! empty( $config['period_type'] ) ) {
@@ -85,16 +108,16 @@ trait ActionsTrait {
 			if ( array_key_exists( 'trial', $config ) ) {
 				$product->trial = self::to_bool( $config['trial'] );
 			}
-			if ( isset( $config['trial_days'] ) && $config['trial_days'] !== '' ) {
+			if ( isset( $config['trial_days'] ) && '' !== $config['trial_days'] ) {
 				$product->trial_days = (int) $config['trial_days'];
 			}
-			if ( isset( $config['trial_amount'] ) && $config['trial_amount'] !== '' ) {
+			if ( isset( $config['trial_amount'] ) && '' !== $config['trial_amount'] ) {
 				$product->trial_amount = (float) $config['trial_amount'];
 			}
 			if ( ! empty( $config['expire_type'] ) ) {
 				$product->expire_type = $config['expire_type'];
 			}
-			if ( isset( $config['expire_after'] ) && $config['expire_after'] !== '' ) {
+			if ( isset( $config['expire_after'] ) && '' !== $config['expire_after'] ) {
 				$product->expire_after = (int) $config['expire_after'];
 			}
 			if ( ! empty( $config['expire_unit'] ) ) {
@@ -134,10 +157,10 @@ trait ActionsTrait {
 			return self::action_error( 'Failed to create membership', $input );
 		}
 
-		return self::action_success(array_merge($input, [
+		return self::action_success_with_input( $input, [
 			'membership_id' => (int) $membership_id,
 			'membership_name' => $name,
-		]));
+		] );
 	}
 
 	protected static function action_update_membership( array $config, array $input ): array {
@@ -161,13 +184,14 @@ trait ActionsTrait {
 		if ( array_key_exists( 'description', $config ) ) {
 			$product->post_content = $config['description'];
 		}
-		if ( ! empty( $config['status'] ) ) {
-			$product->post_status = $config['status'];
+		$membership_status = self::get_membership_status_config( $config );
+		if ( '' !== $membership_status ) {
+			$product->post_status = self::normalize_post_status( $membership_status );
 		}
-		if ( isset( $config['price'] ) && $config['price'] !== '' ) {
+		if ( isset( $config['price'] ) && '' !== $config['price'] ) {
 			$product->price = (float) $config['price'];
 		}
-		if ( isset( $config['period'] ) && $config['period'] !== '' ) {
+		if ( isset( $config['period'] ) && '' !== $config['period'] ) {
 			$product->period = (int) $config['period'];
 		}
 		if ( ! empty( $config['period_type'] ) ) {
@@ -176,16 +200,16 @@ trait ActionsTrait {
 		if ( array_key_exists( 'trial', $config ) ) {
 			$product->trial = self::to_bool( $config['trial'] );
 		}
-		if ( isset( $config['trial_days'] ) && $config['trial_days'] !== '' ) {
+		if ( isset( $config['trial_days'] ) && '' !== $config['trial_days'] ) {
 			$product->trial_days = (int) $config['trial_days'];
 		}
-		if ( isset( $config['trial_amount'] ) && $config['trial_amount'] !== '' ) {
+		if ( isset( $config['trial_amount'] ) && '' !== $config['trial_amount'] ) {
 			$product->trial_amount = (float) $config['trial_amount'];
 		}
 		if ( ! empty( $config['expire_type'] ) ) {
 			$product->expire_type = $config['expire_type'];
 		}
-		if ( isset( $config['expire_after'] ) && $config['expire_after'] !== '' ) {
+		if ( isset( $config['expire_after'] ) && '' !== $config['expire_after'] ) {
 			$product->expire_after = (int) $config['expire_after'];
 		}
 		if ( ! empty( $config['expire_unit'] ) ) {
@@ -222,9 +246,9 @@ trait ActionsTrait {
 			return self::action_error( $e->getMessage(), $input );
 		}
 
-		return self::action_success(array_merge($input, [
+		return self::action_success_with_input( $input, [
 			'membership_id' => $membership_id,
-		]));
+		] );
 	}
 
 	protected static function action_create_transaction( array $config, array $input ): array {
@@ -236,7 +260,7 @@ trait ActionsTrait {
 		$product_id = (int) ( $config['product_id'] ?? 0 );
 		$amount = $config['amount'] ?? '';
 
-		if ( ! $user_id || ! $product_id || $amount === '' ) {
+		if ( ! $user_id || ! $product_id || '' === $amount ) {
 			return self::action_error( 'User ID, membership ID and amount are required', $input );
 		}
 
@@ -245,8 +269,9 @@ trait ActionsTrait {
 			$txn->user_id = $user_id;
 			$txn->product_id = $product_id;
 			$txn->amount = (float) $amount;
-			$txn->total = isset( $config['total'] ) && $config['total'] !== '' ? (float) $config['total'] : (float) $amount;
-			$txn->status = $config['status'] ?? \MeprTransaction::$complete_str;
+			$txn->total = isset( $config['total'] ) && '' !== $config['total'] ? (float) $config['total'] : (float) $amount;
+			$transaction_status = self::get_transaction_status_config( $config );
+			$txn->status = '' !== $transaction_status ? self::normalize_transaction_status( $transaction_status ) : \MeprTransaction::$complete_str;
 			$txn->gateway = $config['gateway'] ?? \MeprTransaction::$manual_gateway_str;
 
 			if ( ! empty( $config['subscription_id'] ) ) {
@@ -262,12 +287,12 @@ trait ActionsTrait {
 			return self::action_error( 'Failed to create transaction', $input );
 		}
 
-		return self::action_success(array_merge($input, [
+		return self::action_success_with_input( $input, [
 			'transaction_id' => (int) $txn_id,
 			'user_id' => $user_id,
 			'membership_id' => $product_id,
 			'amount' => (float) $amount,
-		]));
+		] );
 	}
 
 	protected static function action_update_transaction_status( array $config, array $input ): array {
@@ -276,24 +301,25 @@ trait ActionsTrait {
 		}
 
 		$txn_id = (int) ( $config['transaction_id'] ?? 0 );
-		$status = $config['status'] ?? '';
+		$transaction_status = self::get_transaction_status_config( $config );
+		$status = '' !== $transaction_status ? self::normalize_transaction_status( $transaction_status ) : '';
 
-		if ( ! $txn_id || $status === '' ) {
+		if ( ! $txn_id || '' === $status ) {
 			return self::action_error( 'Transaction ID and status are required', $input );
 		}
 
-		$txn = new \MeprTransaction( $txn_id );
-		if ( empty( $txn->id ) ) {
-			return self::action_error( 'Transaction not found', $input );
+		$txn = self::require_transaction( $txn_id, $input );
+		if ( is_array( $txn ) ) {
+			return $txn;
 		}
 
 		$txn->status = $status;
 		$txn->store();
 
-		return self::action_success(array_merge($input, [
+		return self::action_success_with_input( $input, [
 			'transaction_id' => $txn_id,
 			'status' => $status,
-		]));
+		] );
 	}
 
 	protected static function action_refund_transaction( array $config, array $input ): array {
@@ -306,9 +332,9 @@ trait ActionsTrait {
 			return self::action_error( 'Transaction ID is required', $input );
 		}
 
-		$txn = new \MeprTransaction( $txn_id );
-		if ( empty( $txn->id ) ) {
-			return self::action_error( 'Transaction not found', $input );
+		$txn = self::require_transaction( $txn_id, $input );
+		if ( is_array( $txn ) ) {
+			return $txn;
 		}
 
 		$refunded = $txn->refund();
@@ -316,10 +342,10 @@ trait ActionsTrait {
 			return self::action_error( 'Failed to refund transaction', $input );
 		}
 
-		return self::action_success(array_merge($input, [
+		return self::action_success_with_input( $input, [
 			'transaction_id' => $txn_id,
 			'refunded' => true,
-		]));
+		] );
 	}
 
 	protected static function action_create_subscription( array $config, array $input ): array {
@@ -331,7 +357,7 @@ trait ActionsTrait {
 		$product_id = (int) ( $config['product_id'] ?? 0 );
 		$price = $config['price'] ?? '';
 
-		if ( ! $user_id || ! $product_id || $price === '' ) {
+		if ( ! $user_id || ! $product_id || '' === $price ) {
 			return self::action_error( 'User ID, membership ID and price are required', $input );
 		}
 
@@ -341,7 +367,8 @@ trait ActionsTrait {
 		$sub->price = (float) $price;
 		$sub->period = (int) ( $config['period'] ?? 1 );
 		$sub->period_type = $config['period_type'] ?? 'months';
-		$sub->status = $config['status'] ?? \MeprSubscription::$active_str;
+		$subscription_status = self::get_subscription_status_config( $config );
+		$sub->status = '' !== $subscription_status ? self::normalize_subscription_status( $subscription_status ) : \MeprSubscription::$active_str;
 		$sub->gateway = $config['gateway'] ?? 'manual';
 
 		$sub_id = $sub->store();
@@ -350,11 +377,11 @@ trait ActionsTrait {
 			return self::action_error( 'Failed to create subscription', $input );
 		}
 
-		return self::action_success(array_merge($input, [
+		return self::action_success_with_input( $input, [
 			'subscription_id' => (int) $sub_id,
 			'user_id' => $user_id,
 			'membership_id' => $product_id,
-		]));
+		] );
 	}
 
 	protected static function action_update_subscription_status( array $config, array $input ): array {
@@ -363,24 +390,25 @@ trait ActionsTrait {
 		}
 
 		$sub_id = (int) ( $config['subscription_id'] ?? 0 );
-		$status = $config['status'] ?? '';
+		$subscription_status = self::get_subscription_status_config( $config );
+		$status = '' !== $subscription_status ? self::normalize_subscription_status( $subscription_status ) : '';
 
-		if ( ! $sub_id || $status === '' ) {
+		if ( ! $sub_id || '' === $status ) {
 			return self::action_error( 'Subscription ID and status are required', $input );
 		}
 
-		$sub = new \MeprSubscription( $sub_id );
-		if ( empty( $sub->id ) ) {
-			return self::action_error( 'Subscription not found', $input );
+		$sub = self::require_subscription( $sub_id, $input );
+		if ( is_array( $sub ) ) {
+			return $sub;
 		}
 
 		$sub->status = $status;
 		$sub->store();
 
-		return self::action_success(array_merge($input, [
+		return self::action_success_with_input( $input, [
 			'subscription_id' => $sub_id,
 			'status' => $status,
-		]));
+		] );
 	}
 
 	protected static function action_cancel_subscription( array $config, array $input ): array {
@@ -393,9 +421,9 @@ trait ActionsTrait {
 			return self::action_error( 'Subscription ID is required', $input );
 		}
 
-		$sub = new \MeprSubscription( $sub_id );
-		if ( empty( $sub->id ) ) {
-			return self::action_error( 'Subscription not found', $input );
+		$sub = self::require_subscription( $sub_id, $input );
+		if ( is_array( $sub ) ) {
+			return $sub;
 		}
 
 		$cancelled = $sub->cancel();
@@ -403,10 +431,10 @@ trait ActionsTrait {
 			return self::action_error( 'Failed to cancel subscription', $input );
 		}
 
-		return self::action_success(array_merge($input, [
+		return self::action_success_with_input( $input, [
 			'subscription_id' => $sub_id,
 			'cancelled' => true,
-		]));
+		] );
 	}
 
 	protected static function action_suspend_subscription( array $config, array $input ): array {
@@ -419,9 +447,9 @@ trait ActionsTrait {
 			return self::action_error( 'Subscription ID is required', $input );
 		}
 
-		$sub = new \MeprSubscription( $sub_id );
-		if ( empty( $sub->id ) ) {
-			return self::action_error( 'Subscription not found', $input );
+		$sub = self::require_subscription( $sub_id, $input );
+		if ( is_array( $sub ) ) {
+			return $sub;
 		}
 
 		$suspended = $sub->suspend();
@@ -429,10 +457,10 @@ trait ActionsTrait {
 			return self::action_error( 'Failed to suspend subscription', $input );
 		}
 
-		return self::action_success(array_merge($input, [
+		return self::action_success_with_input( $input, [
 			'subscription_id' => $sub_id,
 			'suspended' => true,
-		]));
+		] );
 	}
 
 	protected static function action_resume_subscription( array $config, array $input ): array {
@@ -445,9 +473,9 @@ trait ActionsTrait {
 			return self::action_error( 'Subscription ID is required', $input );
 		}
 
-		$sub = new \MeprSubscription( $sub_id );
-		if ( empty( $sub->id ) ) {
-			return self::action_error( 'Subscription not found', $input );
+		$sub = self::require_subscription( $sub_id, $input );
+		if ( is_array( $sub ) ) {
+			return $sub;
 		}
 
 		$resumed = $sub->resume();
@@ -455,10 +483,10 @@ trait ActionsTrait {
 			return self::action_error( 'Failed to resume subscription', $input );
 		}
 
-		return self::action_success(array_merge($input, [
+		return self::action_success_with_input( $input, [
 			'subscription_id' => $sub_id,
 			'resumed' => true,
-		]));
+		] );
 	}
 
 	protected static function action_error( string $message, array $input = [] ): array {

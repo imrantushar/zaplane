@@ -9,7 +9,8 @@ trait PaymentActionsTrait {
 		}
 
 		$payment_id = (int) ( $config['payment_id'] ?? 0 );
-		$status = $config['status'] ?? '';
+		$payment_status = self::get_payment_status_config( $config );
+		$status = '' !== $payment_status ? self::normalize_payment_status( $payment_status ) : '';
 
 		if ( ! $payment_id || '' === $status ) {
 			return self::action_error( 'Payment ID and status are required', $input );

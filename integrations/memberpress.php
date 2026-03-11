@@ -349,7 +349,7 @@ class Memberpress extends IntegrationBase {
 					'options' => self::get_membership_period_type_options()
 				],
 				[
-					'key' => 'status',
+					'key' => 'membership_status',
 					'label' => 'Status',
 					'type' => 'select',
 					'options' => self::get_post_status_options()
@@ -469,7 +469,7 @@ class Memberpress extends IntegrationBase {
 					'options' => self::get_membership_period_type_options()
 				],
 				[
-					'key' => 'status',
+					'key' => 'membership_status',
 					'label' => 'Status',
 					'type' => 'select',
 					'options' => self::get_post_status_options()
@@ -585,7 +585,7 @@ class Memberpress extends IntegrationBase {
 					'type' => 'number'
 				],
 				[
-					'key' => 'status',
+					'key' => 'transaction_status',
 					'label' => 'Status',
 					'type' => 'select',
 					'options' => self::get_transaction_status_options()
@@ -624,7 +624,7 @@ class Memberpress extends IntegrationBase {
 					'required' => true
 				],
 				[
-					'key' => 'status',
+					'key' => 'transaction_status',
 					'label' => 'Status',
 					'type' => 'select',
 					'options' => self::get_transaction_status_options(),
@@ -685,7 +685,7 @@ class Memberpress extends IntegrationBase {
 					'options' => self::get_period_type_options()
 				],
 				[
-					'key' => 'status',
+					'key' => 'subscription_status',
 					'label' => 'Status',
 					'type' => 'select',
 					'options' => self::get_subscription_status_options()
@@ -714,7 +714,7 @@ class Memberpress extends IntegrationBase {
 					'required' => true
 				],
 				[
-					'key' => 'status',
+					'key' => 'subscription_status',
 					'label' => 'Status',
 					'type' => 'select',
 					'options' => self::get_subscription_status_options(),

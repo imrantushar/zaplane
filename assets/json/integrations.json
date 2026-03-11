@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-03-10 05:46:17",
+    "generated_at": "2026-03-11 06:09:25",
     "apps": {
         "pause": {
             "slug": "pause",
@@ -4119,37 +4119,37 @@
                             "type": "expression"
                         },
                         {
-                            "key": "status",
+                            "key": "order_status",
                             "label": "Order Status",
                             "type": "select",
                             "options": [
                                 {
                                     "label": "Pending",
-                                    "value": "pending"
+                                    "value": "wc_order_pending"
                                 },
                                 {
                                     "label": "Processing",
-                                    "value": "processing"
+                                    "value": "wc_order_processing"
                                 },
                                 {
                                     "label": "On-hold",
-                                    "value": "on-hold"
+                                    "value": "wc_order_on-hold"
                                 },
                                 {
                                     "label": "Completed",
-                                    "value": "completed"
+                                    "value": "wc_order_completed"
                                 },
                                 {
                                     "label": "Cancelled",
-                                    "value": "cancelled"
+                                    "value": "wc_order_cancelled"
                                 },
                                 {
                                     "label": "Refunded",
-                                    "value": "refunded"
+                                    "value": "wc_order_refunded"
                                 },
                                 {
                                     "label": "Failed",
-                                    "value": "failed"
+                                    "value": "wc_order_failed"
                                 }
                             ]
                         },
@@ -4192,37 +4192,37 @@
                             "required": true
                         },
                         {
-                            "key": "status",
+                            "key": "order_status",
                             "label": "Order Status",
                             "type": "select",
                             "options": [
                                 {
                                     "label": "Pending",
-                                    "value": "pending"
+                                    "value": "wc_order_pending"
                                 },
                                 {
                                     "label": "Processing",
-                                    "value": "processing"
+                                    "value": "wc_order_processing"
                                 },
                                 {
                                     "label": "On-hold",
-                                    "value": "on-hold"
+                                    "value": "wc_order_on-hold"
                                 },
                                 {
                                     "label": "Completed",
-                                    "value": "completed"
+                                    "value": "wc_order_completed"
                                 },
                                 {
                                     "label": "Cancelled",
-                                    "value": "cancelled"
+                                    "value": "wc_order_cancelled"
                                 },
                                 {
                                     "label": "Refunded",
-                                    "value": "refunded"
+                                    "value": "wc_order_refunded"
                                 },
                                 {
                                     "label": "Failed",
-                                    "value": "failed"
+                                    "value": "wc_order_failed"
                                 }
                             ]
                         },
@@ -4285,37 +4285,37 @@
                             "required": true
                         },
                         {
-                            "key": "status",
+                            "key": "order_status",
                             "label": "Order Status",
                             "type": "select",
                             "options": [
                                 {
                                     "label": "Pending",
-                                    "value": "pending"
+                                    "value": "wc_order_pending"
                                 },
                                 {
                                     "label": "Processing",
-                                    "value": "processing"
+                                    "value": "wc_order_processing"
                                 },
                                 {
                                     "label": "On-hold",
-                                    "value": "on-hold"
+                                    "value": "wc_order_on-hold"
                                 },
                                 {
                                     "label": "Completed",
-                                    "value": "completed"
+                                    "value": "wc_order_completed"
                                 },
                                 {
                                     "label": "Cancelled",
-                                    "value": "cancelled"
+                                    "value": "wc_order_cancelled"
                                 },
                                 {
                                     "label": "Refunded",
-                                    "value": "refunded"
+                                    "value": "wc_order_refunded"
                                 },
                                 {
                                     "label": "Failed",
-                                    "value": "failed"
+                                    "value": "wc_order_failed"
                                 }
                             ],
                             "required": true
@@ -4364,37 +4364,37 @@
                     "label": "Get Total Orders Count",
                     "schema": [
                         {
-                            "key": "status",
+                            "key": "order_status",
                             "label": "Order Status",
                             "type": "select",
                             "options": [
                                 {
                                     "label": "Pending",
-                                    "value": "pending"
+                                    "value": "wc_order_pending"
                                 },
                                 {
                                     "label": "Processing",
-                                    "value": "processing"
+                                    "value": "wc_order_processing"
                                 },
                                 {
                                     "label": "On-hold",
-                                    "value": "on-hold"
+                                    "value": "wc_order_on-hold"
                                 },
                                 {
                                     "label": "Completed",
-                                    "value": "completed"
+                                    "value": "wc_order_completed"
                                 },
                                 {
                                     "label": "Cancelled",
-                                    "value": "cancelled"
+                                    "value": "wc_order_cancelled"
                                 },
                                 {
                                     "label": "Refunded",
-                                    "value": "refunded"
+                                    "value": "wc_order_refunded"
                                 },
                                 {
                                     "label": "Failed",
-                                    "value": "failed"
+                                    "value": "wc_order_failed"
                                 }
                             ]
                         }
@@ -4450,37 +4450,37 @@
                     "label": "Get Order (By Status)",
                     "schema": [
                         {
-                            "key": "status",
+                            "key": "order_status",
                             "label": "Order Status",
                             "type": "select",
                             "options": [
                                 {
                                     "label": "Pending",
-                                    "value": "pending"
+                                    "value": "wc_order_pending"
                                 },
                                 {
                                     "label": "Processing",
-                                    "value": "processing"
+                                    "value": "wc_order_processing"
                                 },
                                 {
                                     "label": "On-hold",
-                                    "value": "on-hold"
+                                    "value": "wc_order_on-hold"
                                 },
                                 {
                                     "label": "Completed",
-                                    "value": "completed"
+                                    "value": "wc_order_completed"
                                 },
                                 {
                                     "label": "Cancelled",
-                                    "value": "cancelled"
+                                    "value": "wc_order_cancelled"
                                 },
                                 {
                                     "label": "Refunded",
-                                    "value": "refunded"
+                                    "value": "wc_order_refunded"
                                 },
                                 {
                                     "label": "Failed",
-                                    "value": "failed"
+                                    "value": "wc_order_failed"
                                 }
                             ],
                             "required": true
@@ -4792,25 +4792,25 @@
                             "required": true
                         },
                         {
-                            "key": "status",
+                            "key": "product_status",
                             "label": "Status",
                             "type": "select",
                             "options": [
                                 {
                                     "label": "Publish",
-                                    "value": "publish"
+                                    "value": "wc_product_publish"
                                 },
                                 {
                                     "label": "Draft",
-                                    "value": "draft"
+                                    "value": "wc_product_draft"
                                 },
                                 {
                                     "label": "Pending",
-                                    "value": "pending"
+                                    "value": "wc_product_pending"
                                 },
                                 {
                                     "label": "Private",
-                                    "value": "private"
+                                    "value": "wc_product_private"
                                 }
                             ]
                         },
@@ -4938,25 +4938,25 @@
                             "type": "boolean"
                         },
                         {
-                            "key": "status",
+                            "key": "product_status",
                             "label": "Status",
                             "type": "select",
                             "options": [
                                 {
                                     "label": "Publish",
-                                    "value": "publish"
+                                    "value": "wc_product_publish"
                                 },
                                 {
                                     "label": "Draft",
-                                    "value": "draft"
+                                    "value": "wc_product_draft"
                                 },
                                 {
                                     "label": "Pending",
-                                    "value": "pending"
+                                    "value": "wc_product_pending"
                                 },
                                 {
                                     "label": "Private",
-                                    "value": "private"
+                                    "value": "wc_product_private"
                                 }
                             ]
                         }
@@ -4989,25 +4989,25 @@
                             "type": "text"
                         },
                         {
-                            "key": "status",
+                            "key": "product_status",
                             "label": "Status",
                             "type": "select",
                             "options": [
                                 {
                                     "label": "Publish",
-                                    "value": "publish"
+                                    "value": "wc_product_publish"
                                 },
                                 {
                                     "label": "Draft",
-                                    "value": "draft"
+                                    "value": "wc_product_draft"
                                 },
                                 {
                                     "label": "Pending",
-                                    "value": "pending"
+                                    "value": "wc_product_pending"
                                 },
                                 {
                                     "label": "Private",
-                                    "value": "private"
+                                    "value": "wc_product_private"
                                 }
                             ]
                         },
@@ -5471,25 +5471,25 @@
                             "required": true
                         },
                         {
-                            "key": "status",
+                            "key": "product_status",
                             "label": "Status",
                             "type": "select",
                             "options": [
                                 {
                                     "label": "Publish",
-                                    "value": "publish"
+                                    "value": "wc_product_publish"
                                 },
                                 {
                                     "label": "Draft",
-                                    "value": "draft"
+                                    "value": "wc_product_draft"
                                 },
                                 {
                                     "label": "Pending",
-                                    "value": "pending"
+                                    "value": "wc_product_pending"
                                 },
                                 {
                                     "label": "Private",
-                                    "value": "private"
+                                    "value": "wc_product_private"
                                 }
                             ],
                             "required": true
@@ -7361,7 +7361,7 @@
                             "required": true
                         },
                         {
-                            "key": "status",
+                            "key": "subscriber_status",
                             "label": "Status (Existing)",
                             "type": "select",
                             "options": [
@@ -7370,51 +7370,51 @@
                                     "label": "Leave Unchanged"
                                 },
                                 {
-                                    "value": "subscribed",
+                                    "value": "mailchimp_subscribed",
                                     "label": "Subscribed"
                                 },
                                 {
-                                    "value": "pending",
+                                    "value": "mailchimp_pending",
                                     "label": "Pending (double opt-in)"
                                 },
                                 {
-                                    "value": "unsubscribed",
+                                    "value": "mailchimp_unsubscribed",
                                     "label": "Unsubscribed"
                                 },
                                 {
-                                    "value": "cleaned",
+                                    "value": "mailchimp_cleaned",
                                     "label": "Cleaned"
                                 },
                                 {
-                                    "value": "transactional",
+                                    "value": "mailchimp_transactional",
                                     "label": "Transactional"
                                 }
                             ],
                             "help": "Applied when the subscriber already exists. Leave blank to keep current status."
                         },
                         {
-                            "key": "status_if_new",
+                            "key": "subscriber_status_if_new",
                             "label": "Status If New",
                             "type": "select",
                             "options": [
                                 {
-                                    "value": "subscribed",
+                                    "value": "mailchimp_subscribed",
                                     "label": "Subscribed"
                                 },
                                 {
-                                    "value": "pending",
+                                    "value": "mailchimp_pending",
                                     "label": "Pending (double opt-in)"
                                 },
                                 {
-                                    "value": "unsubscribed",
+                                    "value": "mailchimp_unsubscribed",
                                     "label": "Unsubscribed"
                                 },
                                 {
-                                    "value": "cleaned",
+                                    "value": "mailchimp_cleaned",
                                     "label": "Cleaned"
                                 },
                                 {
-                                    "value": "transactional",
+                                    "value": "mailchimp_transactional",
                                     "label": "Transactional"
                                 }
                             ],
@@ -8049,21 +8049,21 @@
                             "type": "textarea"
                         },
                         {
-                            "key": "status",
+                            "key": "product_status",
                             "label": "Status",
                             "type": "select",
                             "options": [
                                 {
                                     "label": "Published",
-                                    "value": "published"
+                                    "value": "surecart_product_published"
                                 },
                                 {
                                     "label": "Draft",
-                                    "value": "draft"
+                                    "value": "surecart_product_draft"
                                 },
                                 {
                                     "label": "Archived",
-                                    "value": "archived"
+                                    "value": "surecart_product_archived"
                                 }
                             ]
                         },
@@ -9529,21 +9529,21 @@
                             ]
                         },
                         {
-                            "key": "status",
+                            "key": "membership_status",
                             "label": "Status",
                             "type": "select",
                             "options": [
                                 {
                                     "label": "Publish",
-                                    "value": "publish"
+                                    "value": "mp_post_publish"
                                 },
                                 {
                                     "label": "Draft",
-                                    "value": "draft"
+                                    "value": "mp_post_draft"
                                 },
                                 {
                                     "label": "Private",
-                                    "value": "private"
+                                    "value": "mp_post_private"
                                 }
                             ]
                         },
@@ -9750,21 +9750,21 @@
                             ]
                         },
                         {
-                            "key": "status",
+                            "key": "membership_status",
                             "label": "Status",
                             "type": "select",
                             "options": [
                                 {
                                     "label": "Publish",
-                                    "value": "publish"
+                                    "value": "mp_post_publish"
                                 },
                                 {
                                     "label": "Draft",
-                                    "value": "draft"
+                                    "value": "mp_post_draft"
                                 },
                                 {
                                     "label": "Private",
-                                    "value": "private"
+                                    "value": "mp_post_private"
                                 }
                             ]
                         },
@@ -9953,29 +9953,29 @@
                             "type": "number"
                         },
                         {
-                            "key": "status",
+                            "key": "transaction_status",
                             "label": "Status",
                             "type": "select",
                             "options": [
                                 {
                                     "label": "Pending",
-                                    "value": "pending"
+                                    "value": "mp_transaction_pending"
                                 },
                                 {
                                     "label": "Complete",
-                                    "value": "complete"
+                                    "value": "mp_transaction_complete"
                                 },
                                 {
                                     "label": "Confirmed",
-                                    "value": "confirmed"
+                                    "value": "mp_transaction_confirmed"
                                 },
                                 {
                                     "label": "Failed",
-                                    "value": "failed"
+                                    "value": "mp_transaction_failed"
                                 },
                                 {
                                     "label": "Refunded",
-                                    "value": "refunded"
+                                    "value": "mp_transaction_refunded"
                                 }
                             ]
                         },
@@ -10029,29 +10029,29 @@
                             "required": true
                         },
                         {
-                            "key": "status",
+                            "key": "transaction_status",
                             "label": "Status",
                             "type": "select",
                             "options": [
                                 {
                                     "label": "Pending",
-                                    "value": "pending"
+                                    "value": "mp_transaction_pending"
                                 },
                                 {
                                     "label": "Complete",
-                                    "value": "complete"
+                                    "value": "mp_transaction_complete"
                                 },
                                 {
                                     "label": "Confirmed",
-                                    "value": "confirmed"
+                                    "value": "mp_transaction_confirmed"
                                 },
                                 {
                                     "label": "Failed",
-                                    "value": "failed"
+                                    "value": "mp_transaction_failed"
                                 },
                                 {
                                     "label": "Refunded",
-                                    "value": "refunded"
+                                    "value": "mp_transaction_refunded"
                                 }
                             ],
                             "required": true
@@ -10151,25 +10151,25 @@
                             ]
                         },
                         {
-                            "key": "status",
+                            "key": "subscription_status",
                             "label": "Status",
                             "type": "select",
                             "options": [
                                 {
                                     "label": "Active",
-                                    "value": "active"
+                                    "value": "mp_subscription_active"
                                 },
                                 {
                                     "label": "Pending",
-                                    "value": "pending"
+                                    "value": "mp_subscription_pending"
                                 },
                                 {
                                     "label": "Suspended",
-                                    "value": "suspended"
+                                    "value": "mp_subscription_suspended"
                                 },
                                 {
                                     "label": "Cancelled",
-                                    "value": "cancelled"
+                                    "value": "mp_subscription_cancelled"
                                 }
                             ]
                         },
@@ -10210,25 +10210,25 @@
                             "required": true
                         },
                         {
-                            "key": "status",
+                            "key": "subscription_status",
                             "label": "Status",
                             "type": "select",
                             "options": [
                                 {
                                     "label": "Active",
-                                    "value": "active"
+                                    "value": "mp_subscription_active"
                                 },
                                 {
                                     "label": "Pending",
-                                    "value": "pending"
+                                    "value": "mp_subscription_pending"
                                 },
                                 {
                                     "label": "Suspended",
-                                    "value": "suspended"
+                                    "value": "mp_subscription_suspended"
                                 },
                                 {
                                     "label": "Cancelled",
-                                    "value": "cancelled"
+                                    "value": "mp_subscription_cancelled"
                                 }
                             ],
                             "required": true
@@ -11749,17 +11749,17 @@
                             }
                         },
                         {
-                            "key": "status",
+                            "key": "customer_status",
                             "label": "Status",
                             "type": "select",
                             "options": [
                                 {
                                     "label": "Active",
-                                    "value": "active"
+                                    "value": "edd_customer_active"
                                 },
                                 {
                                     "label": "Inactive",
-                                    "value": "inactive"
+                                    "value": "edd_customer_inactive"
                                 }
                             ]
                         }
@@ -11806,17 +11806,17 @@
                             ]
                         },
                         {
-                            "key": "status",
+                            "key": "discount_status",
                             "label": "Status",
                             "type": "select",
                             "options": [
                                 {
                                     "label": "Active",
-                                    "value": "active"
+                                    "value": "edd_discount_active"
                                 },
                                 {
                                     "label": "Inactive",
-                                    "value": "inactive"
+                                    "value": "edd_discount_inactive"
                                 }
                             ]
                         },
@@ -11854,45 +11854,45 @@
                             "required": true
                         },
                         {
-                            "key": "status",
+                            "key": "payment_status",
                             "label": "Status",
                             "type": "select",
                             "options": [
                                 {
                                     "label": "Pending",
-                                    "value": "pending"
+                                    "value": "edd_payment_pending"
                                 },
                                 {
                                     "label": "Processing",
-                                    "value": "processing"
+                                    "value": "edd_payment_processing"
                                 },
                                 {
                                     "label": "Completed",
-                                    "value": "complete"
+                                    "value": "edd_payment_complete"
                                 },
                                 {
                                     "label": "Refunded",
-                                    "value": "refunded"
+                                    "value": "edd_payment_refunded"
                                 },
                                 {
                                     "label": "Partially Refunded",
-                                    "value": "partially_refunded"
+                                    "value": "edd_payment_partially_refunded"
                                 },
                                 {
                                     "label": "Revoked",
-                                    "value": "revoked"
+                                    "value": "edd_payment_revoked"
                                 },
                                 {
                                     "label": "Failed",
-                                    "value": "failed"
+                                    "value": "edd_payment_failed"
                                 },
                                 {
                                     "label": "Abandoned",
-                                    "value": "abandoned"
+                                    "value": "edd_payment_abandoned"
                                 },
                                 {
                                     "label": "On Hold",
-                                    "value": "on_hold"
+                                    "value": "edd_payment_on_hold"
                                 }
                             ]
                         }
@@ -11951,17 +11951,17 @@
                             "type": "number"
                         },
                         {
-                            "key": "status",
+                            "key": "download_status",
                             "label": "Status",
                             "type": "select",
                             "options": [
                                 {
                                     "label": "Draft",
-                                    "value": "draft"
+                                    "value": "edd_download_draft"
                                 },
                                 {
                                     "label": "Publish",
-                                    "value": "publish"
+                                    "value": "edd_download_publish"
                                 }
                             ]
                         }
@@ -12004,17 +12004,17 @@
                             "type": "number"
                         },
                         {
-                            "key": "status",
+                            "key": "download_status",
                             "label": "Status",
                             "type": "select",
                             "options": [
                                 {
                                     "label": "Draft",
-                                    "value": "draft"
+                                    "value": "edd_download_draft"
                                 },
                                 {
                                     "label": "Publish",
-                                    "value": "publish"
+                                    "value": "edd_download_publish"
                                 }
                             ]
                         }

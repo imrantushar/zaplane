@@ -264,11 +264,32 @@ trait Helper {
 	}
 
 	protected static function normalize_order_status( string $status ): string {
-		$status = sanitize_key( $status );
+		$status = self::normalize_prefixed_option_value( $status, 'wc_order_' );
 		if ( strpos( $status, 'wc-' ) === 0 ) {
 			return substr( $status, 3 );
 		}
 		return $status;
+	}
+
+	protected static function normalize_product_status( string $status ): string {
+		return self::normalize_prefixed_option_value( $status, 'wc_product_' );
+	}
+
+	protected static function get_order_status_config( array $config ): string {
+		return (string) ( $config['order_status'] ?? ( $config['status'] ?? '' ) );
+	}
+
+	protected static function get_product_status_config( array $config ): string {
+		return (string) ( $config['product_status'] ?? ( $config['status'] ?? '' ) );
+	}
+
+	protected static function normalize_prefixed_option_value( string $value, string $prefix ): string {
+		$value = sanitize_key( $value );
+		if ( 0 === strpos( $value, $prefix ) ) {
+			return substr( $value, strlen( $prefix ) );
+		}
+
+		return $value;
 	}
 
 	protected static function get_pagination_args( array $config, int $default_limit = 20 ): array {
@@ -394,19 +415,19 @@ trait Helper {
 		return [
 			[
 				'label' => 'Publish',
-				'value' => 'publish'
+				'value' => 'wc_product_publish'
 			],
 			[
 				'label' => 'Draft',
-				'value' => 'draft'
+				'value' => 'wc_product_draft'
 			],
 			[
 				'label' => 'Pending',
-				'value' => 'pending'
+				'value' => 'wc_product_pending'
 			],
 			[
 				'label' => 'Private',
-				'value' => 'private'
+				'value' => 'wc_product_private'
 			],
 		];
 	}
@@ -415,31 +436,31 @@ trait Helper {
 		return [
 			[
 				'label' => 'Pending',
-				'value' => 'pending'
+				'value' => 'wc_order_pending'
 			],
 			[
 				'label' => 'Processing',
-				'value' => 'processing'
+				'value' => 'wc_order_processing'
 			],
 			[
 				'label' => 'On-hold',
-				'value' => 'on-hold'
+				'value' => 'wc_order_on-hold'
 			],
 			[
 				'label' => 'Completed',
-				'value' => 'completed'
+				'value' => 'wc_order_completed'
 			],
 			[
 				'label' => 'Cancelled',
-				'value' => 'cancelled'
+				'value' => 'wc_order_cancelled'
 			],
 			[
 				'label' => 'Refunded',
-				'value' => 'refunded'
+				'value' => 'wc_order_refunded'
 			],
 			[
 				'label' => 'Failed',
-				'value' => 'failed'
+				'value' => 'wc_order_failed'
 			],
 		];
 	}

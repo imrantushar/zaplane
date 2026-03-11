@@ -205,21 +205,21 @@ class Surecart extends IntegrationBase {
 					'type' => 'textarea'
 				],
 				[
-					'key' => 'status',
+					'key' => 'product_status',
 					'label' => 'Status',
 					'type' => 'select',
 					'options' => [
 						[
 							'label' => 'Published',
-							'value' => 'published'
+							'value' => 'surecart_product_published'
 						],
 						[
 							'label' => 'Draft',
-							'value' => 'draft'
+							'value' => 'surecart_product_draft'
 						],
 						[
 							'label' => 'Archived',
-							'value' => 'archived'
+							'value' => 'surecart_product_archived'
 						],
 					]
 				],
