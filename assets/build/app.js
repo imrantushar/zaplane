@@ -7451,7 +7451,6 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-
 function CustomNode({
   id,
   data,
@@ -7467,7 +7466,7 @@ function CustomNode({
   const isLR = canvasLayout === "LR";
   const isSelectApp = data.app === "Select an app";
   const formattedAction = data?.action?.charAt(0).toUpperCase() + data?.action?.slice(1);
-  const isCondition = data?.app === "Condition";
+  const isCondition = data?.app === "condition";
   const node = nodes.find(n => n.id === id);
   const hasPort = node?.port === undefined;
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Box, {
@@ -9239,7 +9238,7 @@ const useFlowActions = ({
 
     //CONDITION NODE SUPPORT
 
-    if (actionData.app === "Condition") {
+    if (actionData.app === "condition") {
       const trueNodeId = getNewNodeId();
       const falseNodeId = getNewNodeId();
       const extraLRSpace = 80;

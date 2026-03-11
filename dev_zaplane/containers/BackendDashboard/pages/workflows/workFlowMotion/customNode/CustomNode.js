@@ -11,7 +11,7 @@ import { FaRegCopy } from "react-icons/fa";
 import FloatingEdge from "../FloatingEdge/FloatingEdge";
 import { __, sprintf } from "@wordpress/i18n";
 import { formatLabel } from "@ZAPUtils/helper";
-import { FaWordpress } from "react-icons/fa6";
+
 
 export default function CustomNode({ id, data, canvasLayout, nodes }) {
   const [hovered, setHovered] = useState(false);
@@ -27,7 +27,7 @@ export default function CustomNode({ id, data, canvasLayout, nodes }) {
   const formattedAction =
     data?.action?.charAt(0).toUpperCase() + data?.action?.slice(1);
 
-  const isCondition = data?.app === "Condition";
+  const isCondition = data?.app === "condition";
   const node = nodes.find((n) => n.id === id);
   const hasPort = node?.port === undefined;
 

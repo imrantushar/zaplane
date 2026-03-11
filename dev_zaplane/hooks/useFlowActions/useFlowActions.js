@@ -138,7 +138,7 @@ export const useFlowActions = ({
         //CONDITION NODE SUPPORT
 
 
-        if (actionData.app === "Condition") {
+        if (actionData.app === "condition") {
 
             const trueNodeId = getNewNodeId();
             const falseNodeId = getNewNodeId();
