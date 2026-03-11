@@ -11,9 +11,13 @@ trait CartActionsTrait {
 		if ( ! function_exists( 'WC' ) || ! WC()->cart ) {
 			return self::error( 'Cart is not available' );
 		}
+		$product_id = isset( $config['product_id'] ) ? (int) $config['product_id'] : 0;
 		$cart = WC()->cart;
 		$items = [];
 		foreach ( $cart->get_cart() as $key => $item ) {
+			if ( $product_id > 0 && (int) ( $item['product_id'] ?? 0 ) !== $product_id ) {
+				continue;
+			}
 			$items[] = [
 				'cart_item_key' => $key,
 				'product_id' => $item['product_id'] ?? 0,
@@ -34,7 +38,11 @@ trait CartActionsTrait {
 			return self::error( 'Cart is not available' );
 		}
 		$cart = WC()->cart;
-		return self::respond( [ 'totals' => $cart->get_totals() ] );
+		$response = [ 'totals' => $cart->get_totals() ];
+		if ( isset( $config['with_items_count'] ) && self::parse_bool( $config['with_items_count'] ) ) {
+			$response['items_count'] = (int) $cart->get_cart_contents_count();
+		}
+		return self::respond( $response );
 	}
 
 	private static function action_add_product_to_cart( array $config, array $input ): array {
@@ -62,7 +70,7 @@ trait CartActionsTrait {
 			return self::error( 'Cart is not available' );
 		}
 		$cart_item_key = $config['cart_item_key'] ?? '';
-		if ( $cart_item_key === '' ) {
+		if ( '' === $cart_item_key ) {
 			return self::error( 'Cart item key is required' );
 		}
 		$removed = WC()->cart->remove_cart_item( $cart_item_key );

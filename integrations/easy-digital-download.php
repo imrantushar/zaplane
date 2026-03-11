@@ -185,7 +185,12 @@ class EasyDigitalDownload extends IntegrationBase {
 				[
 					'key' => 'user_id',
 					'label' => 'User ID',
-					'type' => 'number'
+					'type' => 'select',
+					'dynamic' => [
+						'integration' => 'easydigitaldownload',
+						'query' => 'users',
+						'select' => [ 'id', 'label' ],
+					]
 				],
 				[
 					'key' => 'status',
@@ -267,7 +272,12 @@ class EasyDigitalDownload extends IntegrationBase {
 				[
 					'key' => 'payment_id',
 					'label' => 'Payment ID',
-					'type' => 'number',
+					'type' => 'select',
+					'dynamic' => [
+						'integration' => 'easydigitaldownload',
+						'query' => 'payments',
+						'select' => [ 'id', 'label' ],
+					],
 					'required' => true
 				],
 				[
@@ -318,7 +328,12 @@ class EasyDigitalDownload extends IntegrationBase {
 				[
 					'key' => 'payment_id',
 					'label' => 'Payment ID',
-					'type' => 'number',
+					'type' => 'select',
+					'dynamic' => [
+						'integration' => 'easydigitaldownload',
+						'query' => 'payments',
+						'select' => [ 'id', 'label' ],
+					],
 					'required' => true
 				],
 				[
@@ -365,7 +380,12 @@ class EasyDigitalDownload extends IntegrationBase {
 				[
 					'key' => 'download_id',
 					'label' => 'Product ID',
-					'type' => 'number',
+					'type' => 'select',
+					'dynamic' => [
+						'integration' => 'easydigitaldownload',
+						'query' => 'downloads',
+						'select' => [ 'id', 'name' ],
+					],
 					'required' => true
 				],
 				[
@@ -403,7 +423,12 @@ class EasyDigitalDownload extends IntegrationBase {
 				[
 					'key' => 'download_id',
 					'label' => 'Product ID',
-					'type' => 'number',
+					'type' => 'select',
+					'dynamic' => [
+						'integration' => 'easydigitaldownload',
+						'query' => 'downloads',
+						'select' => [ 'id', 'name' ],
+					],
 					'required' => true
 				],
 				[
@@ -427,6 +452,21 @@ class EasyDigitalDownload extends IntegrationBase {
 		return $schemas[ $action ] ?? [];
 	}
 
+	/**
+	 * =====================================================
+	 * DYNAMIC DATA QUERIES (API)
+	 * =====================================================
+	 */
+	public static function get_dynamic_queries(): array {
+		return [
+			'downloads' => [ self::class, 'query_downloads' ],
+			'payments' => [ self::class, 'query_payments' ],
+			'customers' => [ self::class, 'query_customers' ],
+			'discounts' => [ self::class, 'query_discounts' ],
+			'users' => [ self::class, 'query_users' ],
+		];
+	}
+
 
 
 	public static function execute_node( array $node, array $input ): array {
@@ -440,7 +480,7 @@ class EasyDigitalDownload extends IntegrationBase {
 
 		return [
 			'port' => 'main',
-			'data' => $input
+			'data' => $input 
 		];
 	}
 }

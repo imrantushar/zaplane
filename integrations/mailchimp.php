@@ -2,6 +2,7 @@
 namespace Zaplane\Integrations;
 
 use Zaplane\Framework\Classes\IntegrationBase;
+use Zaplane\Framework\Classes\ConnectionManager;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -39,11 +40,15 @@ class Mailchimp extends IntegrationBase {
 			[
 				'key'         => 'list_id',
 				'label'       => 'Audience/List ID',
-				'type'        => 'text',
-				'placeholder' => 'a1b2c3d4e5',
+				'type'        => 'select',
+				'dynamic'     => [
+					'integration' => 'mailchimp',
+					'query'       => 'lists',
+					'select'      => [ 'id', 'name' ],
+				],
 				'required'    => true,
 				'help'        => 'Find it in Mailchimp → Audience → Settings → Audience name and defaults.',
-			],
+			),
 			[
 				'key'         => 'email',
 				'label'       => 'Email Address',
@@ -51,7 +56,7 @@ class Mailchimp extends IntegrationBase {
 				'placeholder' => 'name@example.com or {{email}}',
 				'required'    => true,
 			],
-		];
+		);
 
 		switch ( $action ) {
 			case 'upsert_subscriber':
@@ -106,14 +111,25 @@ class Mailchimp extends IntegrationBase {
 			case 'unsubscribe_subscriber':
 			case 'archive_subscriber':
 				return $common;
-		}
+		}//end switch
 
 		return [];
 	}
 
+	/**
+	 * =====================================================
+	 * DYNAMIC DATA QUERIES (API)
+	 * =====================================================
+	 */
+	public static function get_dynamic_queries(): array {
+		return [
+			'lists' => [ self::class, 'query_lists' ],
+		];
+	}
+
 	public static function execute_node( array $node, array $input ): array {
 		$action = self::resolve_action( $node );
-		if ( $action === '' ) {
+		if ( '' === $action ) {
 			throw new \Exception( 'Mailchimp action type is missing' );
 		}
 
@@ -138,6 +154,46 @@ class Mailchimp extends IntegrationBase {
 		];
 	}
 
+	public static function query_lists( $q ): array {
+		$q = is_array( $q ) ? $q : [];
+		$api_key = self::resolve_dynamic_api_key( $q );
+		if ( '' === $api_key ) {
+			return [];
+		}
+
+		$limit = self::normalize_dynamic_limit( $q );
+		$search = self::normalize_dynamic_search( $q );
+
+		try {
+			[ $response ] = self::mailchimp_request( 'GET', '/lists?count=' . $limit, $api_key );
+		} catch ( \Throwable $e ) {
+			return [];
+		}
+
+		$lists = $response['lists'] ?? [];
+		$items = [];
+
+		foreach ( $lists as $list ) {
+			if ( ! is_array( $list ) ) {
+				continue;
+			}
+			$id = $list['id'] ?? '';
+			if ( '' === $id ) {
+				continue;
+			}
+			$name = $list['name'] ?? $id;
+			if ( ! self::matches_dynamic_search( $search, $name ) ) {
+				continue;
+			}
+			$items[] = [
+				'id' => (string) $id,
+				'name' => $name,
+			];
+		}
+
+		return array_slice( $items, 0, $limit );
+	}
+
 	public static function requires_connection(): bool {
 		return false;
 	}
@@ -160,7 +216,7 @@ class Mailchimp extends IntegrationBase {
 
 	public static function test_connection( array $credentials ): array {
 		$api_key = trim( $credentials['api_key'] ?? '' );
-		if ( $api_key === '' ) {
+		if ( '' === $api_key ) {
 			return [
 				'success' => false,
 				'message' => 'API key is required',
@@ -181,8 +237,8 @@ class Mailchimp extends IntegrationBase {
 		$account = $body['account_name'] ?? $body['account_id'] ?? 'Mailchimp account';
 
 		return [
-			'success' => $status === 200,
-			'message' => $status === 200 ? 'Connected to ' . $account : 'Connection failed',
+			'success' => 200 === $status,
+			'message' => 200 === $status ? 'Connected to ' . $account : 'Connection failed',
 			'details' => $body,
 		];
 	}
@@ -193,11 +249,11 @@ class Mailchimp extends IntegrationBase {
 		$list_id = self::substitute_variables( $data['list_id'] ?? '', $input );
 		$email   = self::substitute_variables( $data['email'] ?? '', $input );
 
-		if ( $list_id === '' ) {
+		if ( '' === $list_id ) {
 			throw new \Exception( 'Mailchimp list ID is required' );
 		}
 
-		if ( $email === '' || ! is_email( $email ) ) {
+		if ( '' === $email || ! is_email( $email ) ) {
 			throw new \Exception( 'A valid email address is required' );
 		}
 
@@ -212,9 +268,9 @@ class Mailchimp extends IntegrationBase {
 			'email_address' => $email,
 		];
 
-		$body['status_if_new'] = $status_if_new !== '' ? $status_if_new : 'subscribed';
+		$body['status_if_new'] = '' !== $status_if_new ? $status_if_new : 'subscribed';
 
-		if ( $status !== '' ) {
+		if ( '' !== $status ) {
 			$body['status'] = $status;
 		}
 
@@ -245,7 +301,7 @@ class Mailchimp extends IntegrationBase {
 			'data' => [
 				'mailchimp_list_id' => $list_id,
 				'mailchimp_email'   => $response['email_address'] ?? $email,
-				'mailchimp_status'  => $response['status'] ?? ( $status !== '' ? $status : ( $status_if_new !== '' ? $status_if_new : 'subscribed' ) ),
+				'mailchimp_status'  => $response['status'] ?? ( '' !== $status ? $status : ( '' !== $status_if_new ? $status_if_new : 'subscribed' ) ),
 				'mailchimp_id'      => $response['id'] ?? '',
 			],
 		];
@@ -350,7 +406,7 @@ class Mailchimp extends IntegrationBase {
 			'headers' => $headers,
 		];
 
-		if ( $body !== null ) {
+		if ( null !== $body ) {
 			$headers['Content-Type'] = 'application/json';
 			$args['headers'] = $headers;
 			$args['body'] = wp_json_encode( $body );
@@ -377,21 +433,39 @@ class Mailchimp extends IntegrationBase {
 
 	private static function get_auth_headers( string $api_key ): array {
 		return array(
-			'Authorization' => 'Basic ' . base64_encode( 'zaplane:' . $api_key ),
+			'Authorization' => 'Basic ' . base64_encode( 'zaplane:' . $api_key ), // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode -- Required for HTTP Basic auth header.
 		);
 	}
 
 	private static function get_status_options( bool $allow_empty = true ): array {
 		$options = array(
-			array( 'value' => 'subscribed', 'label' => 'Subscribed' ),
-			array( 'value' => 'pending', 'label' => 'Pending (double opt-in)' ),
-			array( 'value' => 'unsubscribed', 'label' => 'Unsubscribed' ),
-			array( 'value' => 'cleaned', 'label' => 'Cleaned' ),
-			array( 'value' => 'transactional', 'label' => 'Transactional' ),
+			array(
+				'value' => 'subscribed',
+				'label' => 'Subscribed'
+			),
+			array(
+				'value' => 'pending',
+				'label' => 'Pending (double opt-in)'
+			),
+			array(
+				'value' => 'unsubscribed',
+				'label' => 'Unsubscribed'
+			),
+			array(
+				'value' => 'cleaned',
+				'label' => 'Cleaned'
+			),
+			array(
+				'value' => 'transactional',
+				'label' => 'Transactional'
+			),
 		);
 
 		if ( $allow_empty ) {
-			array_unshift( $options, array( 'value' => '', 'label' => 'Leave Unchanged' ) );
+			array_unshift( $options, array(
+				'value' => '',
+				'label' => 'Leave Unchanged'
+			) );
 		}
 
 		return $options;
@@ -403,7 +477,7 @@ class Mailchimp extends IntegrationBase {
 		}
 
 		$raw = self::substitute_variables( trim( $raw ), $input );
-		if ( $raw === '' ) {
+		if ( '' === $raw ) {
 			return [];
 		}
 
@@ -421,11 +495,11 @@ class Mailchimp extends IntegrationBase {
 		}
 
 		$raw = self::substitute_variables( trim( $raw ), $input );
-		if ( $raw === '' ) {
+		if ( '' === $raw ) {
 			return [];
 		}
 
-		if ( $raw[0] === '[' ) {
+		if ( '[' === $raw[0] ) {
 			$decoded = json_decode( $raw, true );
 			if ( is_array( $decoded ) ) {
 				return self::normalize_tags( $decoded );
@@ -434,7 +508,7 @@ class Mailchimp extends IntegrationBase {
 
 		$items = array_map( 'trim', explode( ',', $raw ) );
 		$items = array_filter($items, static function ( $item ) {
-			return $item !== '';
+			return '' !== $item;
 		});
 
 		return self::normalize_tags( array_values( $items ) );
@@ -444,11 +518,11 @@ class Mailchimp extends IntegrationBase {
 		$list_id = self::substitute_variables( $data['list_id'] ?? '', $input );
 		$email   = self::substitute_variables( $data['email'] ?? '', $input );
 
-		if ( $list_id === '' ) {
+		if ( '' === $list_id ) {
 			throw new \Exception( 'Mailchimp list ID is required' );
 		}
 
-		if ( $email === '' || ! is_email( $email ) ) {
+		if ( '' === $email || ! is_email( $email ) ) {
 			throw new \Exception( 'A valid email address is required' );
 		}
 
@@ -462,15 +536,100 @@ class Mailchimp extends IntegrationBase {
 			$api_key = trim( $credentials['api_key'] ?? '' );
 		}
 
-		if ( $api_key === '' && function_exists( 'mc4wp_get_api_key' ) ) {
+		if ( '' === $api_key && function_exists( 'mc4wp_get_api_key' ) ) {
 			$api_key = trim( mc4wp_get_api_key() );
 		}
 
-		if ( $api_key === '' ) {
+		if ( '' === $api_key ) {
 			throw new \Exception( 'Mailchimp API key not found. Set it in MC4WP settings or create a Zaplane connection.' );
 		}
 
 		return $api_key;
+	}
+
+	private static function resolve_dynamic_api_key( array $q ): string {
+		$api_key = trim( (string) ( $q['api_key'] ?? '' ) );
+		if ( '' === $api_key && isset( $q['where'] ) && is_array( $q['where'] ) ) {
+			$api_key = trim( (string) ( $q['where']['api_key'] ?? '' ) );
+		}
+
+		if ( '' !== $api_key ) {
+			return $api_key;
+		}
+
+		$connection_id = null;
+		if ( isset( $q['where'] ) && is_array( $q['where'] ) ) {
+			$connection_id = $q['where']['connection_id'] ?? null;
+		}
+		if ( null === $connection_id && isset( $q['connection_id'] ) ) {
+			$connection_id = $q['connection_id'];
+		}
+
+		if ( $connection_id ) {
+			try {
+				$manager = new ConnectionManager();
+				$credentials = $manager->get_execution_credentials( (int) $connection_id );
+				$api_key = trim( (string) ( $credentials['api_key'] ?? '' ) );
+				if ( '' !== $api_key ) {
+					return $api_key;
+				}
+			} catch ( \Throwable $e ) {
+				unset( $e );
+				// Ignore and fall through.
+			}
+		}
+
+		if ( function_exists( 'get_current_user_id' ) ) {
+			$user_id = (int) get_current_user_id();
+			if ( $user_id > 0 ) {
+				try {
+					$manager = new ConnectionManager();
+					$connections = $manager->get_user_connections( $user_id, 'mailchimp', 1, 1 );
+					$first = $connections['data'][0] ?? null;
+					if ( $first && isset( $first['id'] ) ) {
+						$credentials = $manager->get_execution_credentials( (int) $first['id'] );
+						$api_key = trim( (string) ( $credentials['api_key'] ?? '' ) );
+						if ( '' !== $api_key ) {
+							return $api_key;
+						}
+					}
+				} catch ( \Throwable $e ) {
+					unset( $e );
+					// Ignore and fall through.
+				}
+			}
+		}
+
+		if ( function_exists( 'mc4wp_get_api_key' ) ) {
+			$api_key = trim( mc4wp_get_api_key() );
+			if ( '' !== $api_key ) {
+				return $api_key;
+			}
+		}
+
+		return '';
+	}
+
+	private static function normalize_dynamic_limit( array $q ): int {
+		$limit = (int) ( $q['limit'] ?? 20 );
+		if ( $limit < 1 ) {
+			$limit = 20;
+		}
+		if ( $limit > 200 ) {
+			$limit = 200;
+		}
+		return $limit;
+	}
+
+	private static function normalize_dynamic_search( array $q ): string {
+		return trim( (string) ( $q['search'] ?? '' ) );
+	}
+
+	private static function matches_dynamic_search( string $search, string $value ): bool {
+		if ( '' === $search ) {
+			return true;
+		}
+		return stripos( $value, $search ) !== false;
 	}
 
 	private static function resolve_action( array $node ): string {
@@ -513,7 +672,7 @@ class Mailchimp extends IntegrationBase {
 		foreach ( $tags as $tag ) {
 			if ( is_string( $tag ) ) {
 				$name = trim( $tag );
-				if ( $name === '' ) {
+				if ( '' === $name ) {
 					continue;
 				}
 				$normalized[] = [
@@ -525,7 +684,7 @@ class Mailchimp extends IntegrationBase {
 
 			if ( is_array( $tag ) ) {
 				$name = trim( $tag['name'] ?? '' );
-				if ( $name === '' ) {
+				if ( '' === $name ) {
 					continue;
 				}
 				$status = $tag['status'] ?? 'active';

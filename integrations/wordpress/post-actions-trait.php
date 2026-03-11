@@ -63,7 +63,7 @@ trait PostActionsTrait {
 		$new_title   = $config['new_title'] ?? '';
 		$status      = $config['status'] ?? 'draft';
 		$post        = get_post( $post_id );
-		$final_title = $new_title ?: $post->post_title . ' (copy)';
+		$final_title = '' !== $new_title ? $new_title : $post->post_title . ' (copy)';
 		$new_post_id = wp_insert_post([
 			'post_type'    => $post->post_type,
 			'post_title'   => $final_title,
@@ -75,8 +75,8 @@ trait PostActionsTrait {
 		if ( is_wp_error( $new_post_id ) ) {
 			return static::error( $new_post_id->get_error_message() );
 		}
-		WordpressHelpers::copy_taxonomies( $post_id, $new_post_id );
-		WordpressHelpers::copy_meta( $post_id, $new_post_id );
+		self::copy_taxonomies( $post_id, $new_post_id );
+		self::copy_meta( $post_id, $new_post_id );
 		return static::success([
 			'original_id' => $post_id,
 			'new_id' => $new_post_id,
@@ -181,13 +181,13 @@ trait PostActionsTrait {
 
 	protected static function action_get_posts_all( array $config ): array {
 		return static::success(
-			WordpressHelpers::get_posts()
+			self::get_posts()
 		);
 	}
 
 	protected static function action_get_post_single( array $config ): array {
 		return static::success(
-			WordpressHelpers::get_posts([
+			self::get_posts([
 				'post_id' => $config['post_id'] ?? 0
 			])
 		);
@@ -195,7 +195,7 @@ trait PostActionsTrait {
 
 	protected static function action_get_posts_by_post_type( array $config ): array {
 		return static::success(
-			WordpressHelpers::get_posts([
+			self::get_posts([
 				'post_type' => $config['post_type'] ?? 'post'
 			])
 		);
@@ -203,7 +203,7 @@ trait PostActionsTrait {
 
 	protected static function action_get_posts_by_metadata( array $config ): array {
 		return static::success(
-			WordpressHelpers::get_posts([
+			self::get_posts([
 				'post_type' => $config['post_type'] ?? 'post',
 				'meta_query' => [
 					[
@@ -278,12 +278,12 @@ trait PostActionsTrait {
 		]);
 	}
 	protected static function action_get_post_type_all( array $config ): array {
-		$post_types = WordpressHelpers::get_post_types();
+		$post_types = self::get_post_types();
 		return static::success( $post_types );
 	}
 	protected static function action_get_post_type_single( array $config ): array {
 		$post_id = absint( $config['post_id'] ?? 0 );
-		$post_type_info = WordpressHelpers::get_post_type_by_post_id( $post_id );
+		$post_type_info = self::get_post_type_by_post_id( $post_id );
 		if ( empty( $post_type_info ) ) {
 			return static::error( 'Post type not found for this post' );
 		}
@@ -291,7 +291,7 @@ trait PostActionsTrait {
 	}
 
 	protected static function action_register_post_type( array $config ): array {
-		$result = WordpressHelpers::register_post_type( $config );
+		$result = self::register_post_type( $config );
 		if ( isset( $result['error'] ) ) {
 			return static::error( $result['error'] );
 		}
@@ -339,7 +339,7 @@ trait PostActionsTrait {
 	protected static function action_add_taxonomy_to_post( array $config ): array {
 		$added = wp_set_object_terms(
 			$config['post_id'] ?? 0,
-			WordpressHelpers::normalize_list( $config['terms'] ?? [] ),
+			self::normalize_list( $config['terms'] ?? [] ),
 			$config['taxonomy'] ?? '',
 			$config['append'] ?? false
 		);
@@ -349,7 +349,7 @@ trait PostActionsTrait {
 	protected static function action_remove_taxonomy_from_post( array $config ): array {
 		$removed = wp_remove_object_terms(
 			$config['post_id'] ?? 0,
-			WordpressHelpers::normalize_list( $config['terms'] ?? [] ),
+			self::normalize_list( $config['terms'] ?? [] ),
 			$config['taxonomy'] ?? ''
 		);
 		return static::success( [ 'removed' => $removed ] );
@@ -357,8 +357,8 @@ trait PostActionsTrait {
 
 	protected static function action_bulk_assign_terms_to_posts( array $config ): array {
 		$results = [];
-		$post_ids = WordpressHelpers::normalize_list( $config['post_ids'] ?? [] );
-		$terms = WordpressHelpers::normalize_list( $config['terms'] ?? [] );
+		$post_ids = self::normalize_list( $config['post_ids'] ?? [] );
+		$terms = self::normalize_list( $config['terms'] ?? [] );
 		$taxonomy = $config['taxonomy'] ?? '';
 		$append   = $config['append'] ?? false;
 
@@ -371,8 +371,8 @@ trait PostActionsTrait {
 
 	protected static function action_bulk_remove_terms_from_posts( array $config ): array {
 		$results = [];
-		$post_ids = WordpressHelpers::normalize_list( $config['post_ids'] ?? [] );
-		$terms = WordpressHelpers::normalize_list( $config['terms'] ?? [] );
+		$post_ids = self::normalize_list( $config['post_ids'] ?? [] );
+		$terms = self::normalize_list( $config['terms'] ?? [] );
 		$taxonomy = $config['taxonomy'] ?? '';
 
 		foreach ( $post_ids as $post_id ) {
@@ -385,7 +385,7 @@ trait PostActionsTrait {
 	protected static function action_add_category_to_post( array $config ): array {
 		$added = wp_set_post_categories(
 			$config['post_id'] ?? 0,
-			WordpressHelpers::normalize_list( $config['categories'] ?? [] ),
+			self::normalize_list( $config['categories'] ?? [] ),
 			$config['append'] ?? false
 		);
 		return static::success( [ 'added' => $added ] );
@@ -394,7 +394,7 @@ trait PostActionsTrait {
 	protected static function action_add_tags_to_post( array $config ): array {
 		$added = wp_set_post_tags(
 			$config['post_id'] ?? 0,
-			WordpressHelpers::normalize_list( $config['tags'] ?? [] ),
+			self::normalize_list( $config['tags'] ?? [] ),
 			$config['append'] ?? false
 		);
 		return static::success( [ 'added' => $added ] );
@@ -403,7 +403,7 @@ trait PostActionsTrait {
 	protected static function action_remove_tags_from_post( array $config ): array {
 		$removed = wp_remove_object_terms(
 			$config['post_id'] ?? 0,
-			WordpressHelpers::normalize_list( $config['tags'] ?? [] ),
+			self::normalize_list( $config['tags'] ?? [] ),
 			'post_tag'
 		);
 		return static::success( [ 'removed' => $removed ] );

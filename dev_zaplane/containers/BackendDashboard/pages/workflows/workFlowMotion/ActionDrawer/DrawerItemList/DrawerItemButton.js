@@ -15,21 +15,18 @@ const DrawerItemButton = ({ item, onClick, showType = true, arrowIcon, icon, }) 
       onClick={onClick}
     >
       <Flex gap="8px">
-        {
-          icon && (
-            <>
-              <Flex w="40px"
-                h="40px"
-                bg='var(--zaplane-background)'
-                p="10px"
-                borderRadius='4px'
-                border="1px solid var(--zaplane-border-color)">
-                <Icon as={icon} boxSize="20px" />
-              </Flex>
-            </>
-          )
-        }
-        <Text className="zaplane-label" fontWeight="400" as="span"  display='flex' alignItems="center">{sprintf(__("%s", "zaplane"), item.name)}</Text>
+
+        <Flex w="40px"
+          h="40px"
+          justifyContent='center'
+          bg='var(--zaplane-background)'
+          p="10px"
+          borderRadius='4px'
+          border="1px solid var(--zaplane-border-color)">
+          <Text as={'span'} className={`zaplane-icon zaplane-icon--${icon}`} />
+        </Flex>
+
+        <Text className="zaplane-label" fontWeight="400" as="span" display='flex' alignItems="center">{sprintf(__("%s", "zaplane"), item.name)}</Text>
       </Flex>
       {arrowIcon && arrowIcon}
       {showType && item.type && (

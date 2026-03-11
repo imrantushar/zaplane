@@ -79,7 +79,7 @@ class Surecart extends IntegrationBase {
 
 	public static function resolve_trigger( array $node, array $args ) {
 		$event = $node['event'] ?? '';
-		if ( $event === '' ) {
+		if ( '' === $event ) {
 			return false;
 		}
 
@@ -346,6 +346,21 @@ class Surecart extends IntegrationBase {
 		];
 
 		return $schemas[ $action ] ?? [];
+	}
+
+	/**
+	 * =====================================================
+	 * DYNAMIC DATA QUERIES (API)
+	 * =====================================================
+	 */
+	public static function get_dynamic_queries(): array {
+		return [
+			'orders' => [ self::class, 'query_orders' ],
+			'customers' => [ self::class, 'query_customers' ],
+			'products' => [ self::class, 'query_products' ],
+			'coupons' => [ self::class, 'query_coupons' ],
+			'subscriptions' => [ self::class, 'query_subscriptions' ],
+		];
 	}
 
 	public static function execute_node( array $node, array $input ): array {

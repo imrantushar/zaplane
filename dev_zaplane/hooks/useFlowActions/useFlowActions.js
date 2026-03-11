@@ -85,7 +85,6 @@ export const useFlowActions = ({
             : sourceNode.position.y + TBGap;
 
         const isTools = actionData?.mode === 'tools'
-        console.log(isTools, actionData, 'a');
 
         const newNode = {
             id: newNodeId,
