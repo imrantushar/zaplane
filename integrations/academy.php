@@ -81,7 +81,7 @@ class Academy extends IntegrationBase {
 			];
 		}
 
-		if ( $trigger === 'quiz_target' ) {
+		if ( 'quiz_target' === $trigger ) {
 			return [
 				[
 					'key'      => 'quiz_id',
@@ -136,7 +136,7 @@ class Academy extends IntegrationBase {
 
 				$selected_course = $node['data']['config']['course_id'] ?? 'any';
 
-				if ( $selected_course !== 'any' && (int) $selected_course !== (int) $course_id ) {
+				if ( 'any' !== $selected_course && (int) $selected_course !== (int) $course_id ) {
 					return false;
 				}
 
@@ -156,7 +156,7 @@ class Academy extends IntegrationBase {
 
 				$selected_course = $node['data']['config']['course_id'] ?? 'any';
 
-				if ( $selected_course !== 'any' && (int) $selected_course !== (int) $course_id ) {
+				if ( 'any' !== $selected_course && (int) $selected_course !== (int) $course_id ) {
 					return false;
 				}
 
@@ -188,7 +188,7 @@ class Academy extends IntegrationBase {
 
 				$selected_lesson = $node['data']['config']['lesson_id'] ?? 'any';
 
-				if ( $selected_lesson !== 'any' && (int) $selected_lesson !== (int) $lesson_id ) {
+				if ( 'any' !== $selected_lesson && (int) $selected_lesson !== (int) $lesson_id ) {
 					return false;
 				}
 
@@ -204,7 +204,7 @@ class Academy extends IntegrationBase {
 					return false;
 				}
 
-				if ( $attempt->attempt_status === 'pending' ) {
+				if ( 'pending' === $attempt->attempt_status ) {
 					return false;
 				}
 
@@ -217,7 +217,7 @@ class Academy extends IntegrationBase {
 
 				$selected_quiz = $node['data']['config']['quiz_id'] ?? 'any';
 
-				if ( $selected_quiz !== 'any' && (int) $selected_quiz !== (int) $quiz_id ) {
+				if ( 'any' !== $selected_quiz && (int) $selected_quiz !== (int) $quiz_id ) {
 					return false;
 				}
 
@@ -235,7 +235,7 @@ class Academy extends IntegrationBase {
 					return false;
 				}
 
-				if ( $attempt->attempt_status === 'pending' ) {
+				if ( 'pending'=== $attempt->attempt_status  ) {
 					return false;
 				}
 
@@ -250,7 +250,7 @@ class Academy extends IntegrationBase {
 
 				$selected_quiz = $node['data']['config']['quiz_id'] ?? 'any';
 
-				if ( $selected_quiz !== 'any' && (int) $selected_quiz !== (int) $quiz_id ) {
+				if ( 'any' !== $selected_quiz && (int) $selected_quiz !== (int) $quiz_id ) {
 					return false;
 				}
 
