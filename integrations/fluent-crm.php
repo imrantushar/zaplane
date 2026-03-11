@@ -34,7 +34,7 @@ class FluentCrm extends IntegrationBase {
 	}
 
 	public static function get_icon(): string {
-		return '';
+		return 'fluentcrm-logo-icon';
 	}
 
 	public static function get_triggers(): array {
