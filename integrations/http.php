@@ -83,7 +83,7 @@ class Http extends IntegrationBase {
 
 		// If the user mapped an array dynamically directly into the body field, encode to JSON for HTTP transport unless it's form-encoded (which we'll just encode standard for now)
 		if ( is_array( $body ) ) {
-			$body = json_encode( $body );
+			$body = wp_json_encode( $body );
 			if ( ! isset( $headers['Content-Type'] ) ) {
 				$headers['Content-Type'] = 'application/json';
 			}
@@ -108,7 +108,7 @@ class Http extends IntegrationBase {
 		}
 
 		$response_body = wp_remote_retrieve_body( $response );
-		
+
 		// Attempt to parse the response body as JSON so downstream nodes can use dot notation (e.g. `1.data.body.user.name`)
 		$parsed_body = json_decode( $response_body, true );
 		if ( json_last_error() === JSON_ERROR_NONE ) {

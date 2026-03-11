@@ -135,7 +135,7 @@ class Woocommerce extends IntegrationBase {
 			return false;
 		}
 
-		if ( in_array( $event, self::ORDER_STATUS_EVENTS, true ) ) {
+		if ( in_array( $event, self::$order_status_events, true ) ) {
 			$payload = self::order_status_payload_from_args( $args );
 			return $payload ? $payload : false;
 		}

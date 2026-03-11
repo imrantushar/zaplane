@@ -3,17 +3,24 @@
 .github
 .gitignore
 .DS_Store
+.claude
 
 # Dev tooling
 .eslintrc.js
 .eslintignore
 .prettierrc.js
 .prettierignore
+.phpunit.result.cache
+.gitignore
+.fantasticonrc.js
+webpack.config.js
 phpcs.xml
 composer.json
 composer.lock
 package.json
 package-lock.json
+jsconfig.json
+phpunit.xml
 node_modules
 vendor
 

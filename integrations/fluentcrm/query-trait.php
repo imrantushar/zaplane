@@ -7,7 +7,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 trait QueryTrait {
 
-    public static function tag_query_types( $q ) {
+	public static function tag_query_types( $q ) {
 		$all_tag = [
 			[
 				'label' => 'Any Tag',
@@ -27,7 +27,7 @@ trait QueryTrait {
 		return $all_tag;
 	}
 
-    	public static function list_query_types( $q ) {
+	public static function list_query_types( $q ) {
 		$all_list = [
 			[
 				'label' => 'Any List',
@@ -68,7 +68,7 @@ trait QueryTrait {
 				];
 			}
 		}
-		
+
 		return $all_company;
 	}
 }

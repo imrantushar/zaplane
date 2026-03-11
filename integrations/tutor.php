@@ -21,7 +21,7 @@ class Tutor extends IntegrationBase {
 	public static function get_icon(): string {
 		return 'tutorlms';
 	}
-	
+
 	public static function get_triggers(): array {
 		return [
 			'user_enroll_course' => [

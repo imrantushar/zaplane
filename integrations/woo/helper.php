@@ -7,7 +7,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 trait Helper {
 
-	protected const ORDER_STATUS_EVENTS = [
+	protected static $order_status_events = [
 		'order_status_pending',
 		'order_status_failed',
 		'order_status_on_hold',
@@ -16,6 +16,7 @@ trait Helper {
 		'order_status_refunded',
 		'order_status_cancelled',
 	];
+
 	protected static function build_order_payload( \WC_Order $order, array $extra = [] ): array {
 		return array_merge([
 			'order_id' => $order->get_id(),

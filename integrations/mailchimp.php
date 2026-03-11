@@ -48,7 +48,7 @@ class Mailchimp extends IntegrationBase {
 				],
 				'required'    => true,
 				'help'        => 'Find it in Mailchimp → Audience → Settings → Audience name and defaults.',
-			),
+			],
 			[
 				'key'         => 'email',
 				'label'       => 'Email Address',
@@ -56,7 +56,7 @@ class Mailchimp extends IntegrationBase {
 				'placeholder' => 'name@example.com or {{email}}',
 				'required'    => true,
 			],
-		);
+		];
 
 		switch ( $action ) {
 			case 'upsert_subscriber':

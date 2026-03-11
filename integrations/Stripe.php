@@ -29,6 +29,7 @@ class Stripe extends IntegrationBase {
 
 	public static function execute_node( array $node, array $input ): array {
 		if ( ( $node['config']['action'] ?? '' ) === 'charge_customer' ) {
+			return [];
 		}
 		return [
 			'port' => 'main',

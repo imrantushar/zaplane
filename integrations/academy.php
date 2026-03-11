@@ -235,7 +235,7 @@ class Academy extends IntegrationBase {
 					return false;
 				}
 
-				if ( 'pending'=== $attempt->attempt_status  ) {
+				if ( 'pending' === $attempt->attempt_status ) {
 					return false;
 				}
 
@@ -284,11 +284,6 @@ class Academy extends IntegrationBase {
 	}
 
 	public static function execute_node( array $node, array $input ): array {
-
-		$config = $node['data']['config'] ?? [];
-
-		switch ( $node['data']['event'] ?? '' ) {
-		}
 		return [
 			'port' => 'main',
 			'data' => $input
@@ -319,8 +314,6 @@ class Academy extends IntegrationBase {
 					'posts_per_page' => -1,
 				]);
 
-				error_log( 'course:' . print_r( $courses, true ) );
-
 				foreach ( $courses as $course ) {
 					$options[] = [
 						'label' => $course->post_title,
@@ -346,7 +339,6 @@ class Academy extends IntegrationBase {
 				'post_status'    => 'publish',
 				'posts_per_page' => -1,
 			]);
-			error_log( 'Quiz:' . print_r( $quizzes, true ) );
 
 			foreach ( $quizzes as $quiz ) {
 				$options[] = [

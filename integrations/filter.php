@@ -125,7 +125,7 @@ class Filter extends IntegrationBase {
 		$directInput = array_filter( $input, fn( $k) => ! ctype_digit( (string) $k ), ARRAY_FILTER_USE_KEY );
 
 		$arrayFilter = self::detectArrayFilter( $rawConditions );
-		if ( $arrayFilter !== null ) {
+		if ( null !== $arrayFilter ) {
 			return self::runArrayFilter( $arrayFilter, $rawConditions, $input, $directInput );
 		}
 
@@ -350,7 +350,7 @@ class Filter extends IntegrationBase {
 			}
 		}
 
-		if ( $logic === 'AND' ) {
+		if ( 'AND' === $logic ) {
 			return ! in_array( false, $results, true );
 		} else {
 			return in_array( true, $results, true );
@@ -362,9 +362,9 @@ class Filter extends IntegrationBase {
 	protected static function compare( $left, $right, string $op ): bool {
 		switch ( $op ) {
 			case '==':
-				return $left == $right;
+				return $left == $right; // phpcs:ignore: WordPress.PHP.StrictComparisons.LooseComparison
 			case '!=':
-				return $left != $right;
+				return $left != $right; // phpcs:ignore: WordPress.PHP.StrictComparisons.LooseComparison
 			case '<':
 				return $left < $right;
 			case '>':

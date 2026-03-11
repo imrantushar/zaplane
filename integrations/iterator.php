@@ -64,7 +64,7 @@ class Iterator extends IntegrationBase {
 		if ( empty( $items ) ) {
 			return [
 				'port' => 'done',
-				'data' => [] 
+				'data' => []
 			];
 		}
 

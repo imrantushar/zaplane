@@ -277,19 +277,19 @@ class Automation {
 				$this->finalize_run( $run->id );
 				return;
 			}
-			
-			if ( isset( $output['status'] ) && $output['status'] === 'iterate' ) {
+
+			if ( isset( $output['status'] ) && 'iterate' === $output['status'] ) {
 				$nodeRun->setOutput( $output );
-				
+
 				$this->spawn_children( $nodeRun, $output, $graph, $run );
-				
+
 				$remaining = $output['remaining'] ?? [];
 				if ( ! empty( $remaining ) ) {
-					$iteratorInput = array_merge( $input, [ 
-						'_is_iterating' => true, 
-						'_remaining'    => $remaining 
+					$iteratorInput = array_merge( $input, [
+						'_is_iterating' => true,
+						'_remaining'    => $remaining
 					] );
-					
+
 					$this->spawn_node_run(
 						$run->id,
 						$nodeRun->node_key,
@@ -297,10 +297,10 @@ class Automation {
 						$nodeRun->parent_node_run_id
 					);
 				}
-				
+
 				$this->finalize_run( $run->id );
 				return;
-			}
+			}//end if
 
 			$nodeRun->setOutput( $output );
 

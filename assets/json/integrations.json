@@ -1,18 +1,7 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-03-10 18:55:14",
+    "generated_at": "2026-03-11 07:25:15",
     "apps": {
-        "pause": {
-            "slug": "pause",
-            "name": "Pause",
-            "icon": "",
-            "category": "app",
-            "requires_connection": false,
-            "auth_type": "none",
-            "supports_webhook": false,
-            "triggers": [],
-            "actions": []
-        },
         "wordpress": {
             "slug": "wordpress",
             "name": "WordPress",
@@ -10362,7 +10351,7 @@
         },
         "fluentform": {
             "slug": "fluentform",
-            "name": "Fluentform",
+            "name": "Fluent Form",
             "icon": "fluentform",
             "category": "app",
             "requires_connection": false,
@@ -11401,7 +11390,7 @@
         },
         "ninjaform": {
             "slug": "ninjaform",
-            "name": "Ninjaform",
+            "name": "Ninja Form",
             "icon": "ninjaform",
             "category": "app",
             "requires_connection": false,
@@ -12169,7 +12158,7 @@
         },
         "tutor": {
             "slug": "tutor",
-            "name": "Tutor",
+            "name": "Tutor LMS",
             "icon": "tutorlms",
             "category": "app",
             "requires_connection": false,
@@ -12180,30 +12169,6 @@
                     "key": "user_enroll_course",
                     "label": "User enrolled in a course",
                     "hook": "tutor_after_enroll",
-                    "schema": [
-                        {
-                            "key": "course_id",
-                            "label": "course",
-                            "type": "select",
-                            "dynamic": {
-                                "integration": "tutor",
-                                "query": "course",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            },
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "course_complete": {
-                    "key": "course_complete",
-                    "label": "User completed a course",
-                    "hook": "tutor_course_complete_after",
                     "schema": [
                         {
                             "key": "course_id",
@@ -12425,7 +12390,7 @@
         },
         "academy": {
             "slug": "academy",
-            "name": "Academy",
+            "name": "Academy LMS",
             "icon": "academy",
             "category": "app",
             "requires_connection": false,
@@ -12783,8 +12748,25 @@
                     "label": "Wait / Delay",
                     "schema": [
                         {
-                            "key": "seconds",
-                            "label": "Wait Seconds",
+                            "key": "unit",
+                            "label": "Delay Unit",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "value": "seconds",
+                                    "label": "Seconds"
+                                },
+                                {
+                                    "value": "days",
+                                    "label": "Days"
+                                }
+                            ],
+                            "default": "seconds",
+                            "required": true
+                        },
+                        {
+                            "key": "amount",
+                            "label": "Amount",
                             "type": "number",
                             "required": true
                         }
@@ -12804,7 +12786,24 @@
             "auth_type": "none",
             "supports_webhook": false,
             "triggers": [],
-            "actions": []
+            "actions": {
+                "iterator": {
+                    "key": "iterator",
+                    "label": "Iterator / Loop",
+                    "schema": [
+                        {
+                            "key": "source",
+                            "label": "Source / Array Data",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "loop",
+                        "done"
+                    ]
+                }
+            }
         },
         "variable": {
             "slug": "variable",
@@ -12822,7 +12821,7 @@
                     "schema": [
                         {
                             "key": "name",
-                            "label": "Variable Name",
+                            "label": "Variable Name (e.g. my_custom_var)",
                             "type": "text",
                             "required": true
                         },
@@ -12838,8 +12837,8 @@
                 }
             }
         },
-        "Http": {
-            "slug": "Http",
+        "http": {
+            "slug": "http",
             "name": "HTTP Request",
             "icon": "",
             "category": "tool",

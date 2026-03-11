@@ -31,8 +31,14 @@ class Delay extends IntegrationBase {
 				'label' => 'Delay Unit',
 				'type' => 'select',
 				'options' => [
-					[ 'value' => 'seconds', 'label' => 'Seconds' ],
-					[ 'value' => 'days', 'label' => 'Days' ]
+					[
+						'value' => 'seconds',
+						'label' => 'Seconds'
+					],
+					[
+						'value' => 'days',
+						'label' => 'Days'
+					]
 				],
 				'default' => 'seconds',
 				'required' => true
@@ -53,7 +59,7 @@ class Delay extends IntegrationBase {
 		$unit   = $node['data']['config']['unit'] ?? 'seconds';
 
 		$delay_seconds = $amount;
-		if ( $unit === 'days' ) {
+		if ( 'days' === $unit ) {
 			$delay_seconds = $amount * 86400; // 24 hours * 60 minutes * 60 seconds
 		}
 
