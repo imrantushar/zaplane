@@ -5095,136 +5095,20 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var react_redux__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/dist/react-redux.mjs");
-/* harmony import */ var _ZAPRedux_Slices_settingSlice_settingSlice__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @ZAPRedux/Slices/settingSlice/settingSlice */ "./dev_zaplane/redux/Slices/settingSlice/settingSlice.js");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__);
-
-
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__);
 
 
 const Setting = () => {
-  const dispatch = (0,react_redux__WEBPACK_IMPORTED_MODULE_1__.useDispatch)();
-  const {
-    data,
-    loading
-  } = (0,react_redux__WEBPACK_IMPORTED_MODULE_1__.useSelector)(state => state.setting);
-  const [method, setMethod] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)('GET');
-  const [path, setPath] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)('');
-  const [body, setBody] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)('');
-  const handleSubmit = () => {
-    try {
-      dispatch((0,_ZAPRedux_Slices_settingSlice_settingSlice__WEBPACK_IMPORTED_MODULE_2__.testAPI)({
-        method,
-        path,
-        body: body ? JSON.parse(body) : null
-      }));
-    } catch (e) {
-      alert('Invalid JSON body');
-    }
-  };
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("div", {
-    style: {
-      maxWidth: '900px',
-      margin: 'auto',
-      padding: '20px',
-      fontFamily: 'sans-serif'
-    },
-    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("h2", {
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("div", {
+    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("h2", {
       style: {
         fontSize: '24px',
         fontWeight: 'bold',
         marginBottom: '20px'
       },
-      children: "API Tester"
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("div", {
-      style: {
-        marginBottom: '15px'
-      },
-      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("select", {
-        value: method,
-        onChange: e => setMethod(e.target.value),
-        style: {
-          marginRight: '10px'
-        },
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("option", {
-          value: "GET",
-          children: "GET"
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("option", {
-          value: "POST",
-          children: "POST"
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("option", {
-          value: "PUT",
-          children: "PUT"
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("option", {
-          value: "DELETE",
-          children: "DELETE"
-        })]
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("input", {
-        type: "text",
-        placeholder: "",
-        value: path,
-        onChange: e => setPath(e.target.value),
-        style: {
-          padding: '8px',
-          width: '60%',
-          marginRight: '10px'
-        }
-      })]
-    }), (method === 'POST' || method === 'PUT') && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("textarea", {
-      placeholder: "JSON Body e.g. { \"name\": \"example\" }",
-      value: body,
-      onChange: e => setBody(e.target.value),
-      rows: 5,
-      style: {
-        width: '100%',
-        padding: '10px',
-        marginBottom: '10px',
-        fontFamily: 'monospace'
-      }
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("button", {
-      onClick: handleSubmit,
-      disabled: loading,
-      style: {
-        padding: '10px 20px',
-        backgroundColor: '#3182ce',
-        color: '#fff',
-        border: 'none',
-        borderRadius: '4px',
-        cursor: 'pointer'
-      },
-      children: loading ? 'Loading...' : 'Send Request'
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("hr", {
-      style: {
-        margin: '30px 0'
-      }
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("h3", {
-      style: {
-        fontWeight: 'bold',
-        marginBottom: '10px'
-      },
-      children: "data"
-    }), !data || data.length === 0 ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("p", {
-      style: {
-        color: '#666'
-      },
-      children: "No response yet"
-    }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
-      style: {
-        background: '#f7fafc',
-        padding: '10px',
-        border: '1px solid #e2e8f0',
-        borderRadius: '5px',
-        marginBottom: '10px'
-      },
-      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("pre", {
-        style: {
-          whiteSpace: 'pre-wrap',
-          wordBreak: 'break-word'
-        },
-        children: JSON.stringify(data, null, 2)
-      })
-    })]
+      children: "This Featured not ready Yet"
+    })
   });
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Setting);
@@ -5858,6 +5742,9 @@ const ActionDrawer = ({
           acc[f.key] = values[f.key];
           return acc;
         }, {}),
+        ...(selectedItem.mode && {
+          mode: selectedItem.mode
+        }),
         ...(values.hook && {
           hook: values.hook
         }),
