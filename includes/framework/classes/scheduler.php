@@ -9,7 +9,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Scheduler {
 	public static function enqueue( int $timestamp, int $run_id, int $node_run_id, int $node_key, array $output ): void {
 		if ( ! function_exists( 'as_schedule_single_action' ) ) {
-			error_log( 'Zaplane: Action Scheduler is not active. Delay will not work.' );
 			return;
 		}
 

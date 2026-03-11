@@ -153,7 +153,7 @@ class Formidable extends IntegrationBase {
 					return false;
 				}
 
-				if ( ! empty( $node['form_id'] ) &&  'any' !== $node['form_id'] ) {
+				if ( ! empty( $node['form_id'] ) && 'any' !== $node['form_id'] ) {
 					if ( (int) $form_id !== (int) $node['form_id'] ) {
 						return false;
 					}

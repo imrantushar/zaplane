@@ -313,19 +313,14 @@ class ListenerController extends WP_REST_Controller {
 	}
 
 	private function get_state_fresh( string $optionName ): ?array {
-		global $wpdb;
+		$option = Option::where( 'option_name', $optionName )->fresh()->first();
 
-		$value = $wpdb->get_var(
-			$wpdb->prepare(
-				"SELECT option_value FROM {$wpdb->options} WHERE option_name = %s LIMIT 1",
-				$optionName
-			)
-		);
-
-		if ( null === $value ) {
+		if ( ! $option ) {
 			return null;
 		}
 
-		return maybe_unserialize( $value );
+		$value = $option->getValue();
+
+		return is_array( $value ) ? $value : null;
 	}
 }

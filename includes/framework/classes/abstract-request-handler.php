@@ -88,7 +88,7 @@ abstract class AbstractRequestHandler {
 
 
 	protected function respond_success( $response ) {
-		if ( $response !== null ) {
+		if ( null !== $response ) {
 			if ( $this->is_ajax_action() ) {
 				wp_send_json_success( $response );
 			} elseif ( is_string( $response ) && filter_var( $response, FILTER_VALIDATE_URL ) ) {
@@ -103,7 +103,7 @@ abstract class AbstractRequestHandler {
 
 
 	protected function prepare_response() {
-		 $action = isset( $_REQUEST['action'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['action'] ) ) : '';
+		$action = isset( $_REQUEST['action'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['action'] ) ) : '';
 		$action = explode( $this->namespace . '/', $action )[1] ?? '';
 
 		if ( ! isset( $this->actions[ $action ] ) ) {
@@ -171,10 +171,12 @@ abstract class AbstractRequestHandler {
 		$payload = [];
 
 		foreach ( $fields as $key => $type ) {
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nonce verified in prepare_response().
 			if ( ! isset( $_REQUEST[ $key ] ) ) {
 				continue;
 			}
 
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized via sanitize_value() below.
 			$payload[ $key ] = $this->sanitize_value( $_REQUEST[ $key ], $type );
 		}
 
@@ -296,13 +298,13 @@ abstract class AbstractRequestHandler {
 
 
 	protected function maybe_decode( $value, string $type ) {
-		if ( in_array( $type, [ 'serialize', 'unserialize', 'php' ] ) ) {
+		if ( in_array( $type, [ 'serialize', 'unserialize', 'php' ], true ) ) {
 			return maybe_unserialize( $value );
 		}
 
-		if ( in_array( $type, [ 'json', 'array', 'object' ] ) ) {
+		if ( in_array( $type, [ 'json', 'array', 'object' ], true ) ) {
 			if ( is_string( $value ) && ( str_starts_with( $value, '[' ) || str_starts_with( $value, '{' ) ) ) {
-				return json_decode( $value, $type === 'array' );
+				return json_decode( $value, 'array' === $type );
 			}
 		}
 
@@ -319,7 +321,7 @@ abstract class AbstractRequestHandler {
 
 	protected function check_ajax_permissions( string $capability, bool $allow_visitors = false ) {
 
-		if ( $capability === 'only_logged_in' ) {
+		if ( 'only_logged_in' === $capability ) {
 			if ( ! is_user_logged_in() ) {
 				return new WP_Error(
 					'forbidden_action',
@@ -355,7 +357,7 @@ abstract class AbstractRequestHandler {
 			return true;
 		}
 
-		if ( $capability === 'only_logged_in' ) {
+		if ( 'only_logged_in' === $capability ) {
 			if ( ! is_user_logged_in() ) {
 				return new WP_Error(
 					'forbidden_action',

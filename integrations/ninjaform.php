@@ -25,7 +25,7 @@ class Ninjaform extends IntegrationBase {
 	}
 
 	public static function get_trigger_config_schema( string $trigger ): array {
-		if ( 'process_ninja_form' !== $trigger) {
+		if ( 'process_ninja_form' !== $trigger ) {
 			return [];
 		}
 
@@ -95,7 +95,7 @@ class Ninjaform extends IntegrationBase {
 				$config       = $node['data']['config'] ?? [];
 				$requiredForm = $config['form_id'] ?? 'any';
 
-				if (  'any' !== $requiredForm && (int) $requiredForm !== (int) $currentFormId ) {
+				if ( 'any' !== $requiredForm && (int) $requiredForm !== (int) $currentFormId ) {
 					return false;
 				}
 

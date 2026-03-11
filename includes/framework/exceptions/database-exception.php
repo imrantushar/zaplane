@@ -98,7 +98,7 @@ class DatabaseException extends ZaplaneException {
 	}
 
 	public function getHttpStatusCode(): int {
-		if ( $this->operation === 'select' && strpos( $this->getMessage(), 'not found' ) !== false ) {
+		if ( 'select' === $this->operation && false !== strpos( $this->getMessage(), 'not found' ) ) {
 			return 404;
 		}
 		return 500;

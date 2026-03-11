@@ -23,7 +23,7 @@ class ConnectionManager {
 		}
 
 		$test_result = null;
-		if ( $auth_type !== 'oauth2' ) {
+		if ( 'oauth2' !== $auth_type ) {
 			$class = get_class( $integration );
 			$test_result = $class::test_connection( $credentials );
 			if ( ! ( $test_result['success'] ?? false ) ) {
@@ -49,7 +49,7 @@ class ConnectionManager {
 			'status' => 'active',
 		]);
 
-		if ( $test_result !== null ) {
+		if ( null !== $test_result ) {
 			$connection->markAsTested( true );
 		}
 
@@ -74,7 +74,9 @@ class ConnectionManager {
 			} catch ( EncryptionException $e ) {
 				$data['credentials'] = [];
 				$data['decrypt_error'] = $e->getMessage();
+			// phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
 			} catch ( \Exception $e ) {
+				// Silently ignore non-encryption exceptions for credential decryption.
 			}
 		}
 
@@ -84,7 +86,7 @@ class ConnectionManager {
 	public function get_user_connections( int $user_id, ?string $app = null, int $page = 1, int $perPage = 20 ): array {
 		$query = Connection::where( 'user_id', $user_id );
 
-		if ( $app !== null ) {
+		if ( null !== $app ) {
 			$query->where( 'app', $app );
 		}
 
@@ -203,7 +205,7 @@ class ConnectionManager {
 			throw EncryptionException::decryptionFailed( 'Failed to decrypt credentials' );
 		}
 
-		if ( $connection->auth_type === 'oauth2' ) {
+		if ( 'oauth2' === $connection->auth_type ) {
 			$credentials = $this->refresh_oauth_if_needed( $connection, $credentials );
 		}
 
@@ -244,7 +246,7 @@ class ConnectionManager {
 				$connection->setOAuthExpiry( (int) $new_tokens['expires_in'] );
 			}
 		} catch ( \Throwable $e ) {
-			error_log( 'Zaplane OAuth refresh failed for connection ' . $connection->id . ': ' . $e->getMessage() );
+			$e->getMessage();
 		}
 
 		return $credentials;

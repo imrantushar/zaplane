@@ -14,7 +14,7 @@ abstract class AbstractPostHandler extends AbstractRequestHandler {
 		foreach ( $this->actions as $action => $details ) {
 			add_action( 'admin_post_' . $this->namespace . '/' . $action, [ $this, 'handle_request' ] );
 
-			if ( isset( $details['allow_visitor_action'] ) && $details['allow_visitor_action'] === true ) {
+			if ( isset( $details['allow_visitor_action'] ) && true === $details['allow_visitor_action'] ) {
 				add_action( 'admin_post_nopriv_' . $this->namespace . '/' . $action, [ $this, 'handle_request' ] );
 			}
 		}

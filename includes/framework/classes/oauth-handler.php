@@ -129,7 +129,7 @@ class OAuthHandler {
 	private function validate_state( string $state ): ?array {
 		$data = get_transient( self::STATE_TRANSIENT_PREFIX . $state );
 
-		if ( $data === false ) {
+		if ( false === $data ) {
 			return null;
 		}
 

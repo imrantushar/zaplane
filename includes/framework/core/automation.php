@@ -138,7 +138,6 @@ class Automation {
 
 	public function trigger_router() {
 		$event = current_filter();
-		error_log( print_r( 'events' . $event, true ) );
 
 		$args = func_get_args();
 		foreach ( Query::get_active_workflows_for_event( $event ) as $trigger ) {
@@ -203,7 +202,7 @@ class Automation {
 		$run = Run::find( $run_id );
 		$nodeRun = NodeRun::find( $node_run_id );
 
-		if ( ! $run || ! $nodeRun || $nodeRun->status !== 'delayed' ) {
+		if ( ! $run || ! $nodeRun || 'delayed' !== $nodeRun->status ) {
 			return;
 		}
 
@@ -246,14 +245,14 @@ class Automation {
 
 		$context = $this->buildNodeContext( $run->id );
 		$resolveData = $input + $context;
-		
+
 		$node['_run_id'] = $run->id;
 		$node['_node_run_id'] = $nodeRun->id;
 
 		try {
-			if ( $node['type'] === 'trigger' ) {
+			if ( 'trigger' === $node['type'] ) {
 				$output = $input;
-			} elseif ( in_array( $app, [ 'condition', 'filter' ] ) ) {
+			} elseif ( in_array( $app, [ 'condition', 'filter' ], true ) ) {
 				$integration = $this->container->get( 'integrations' )->get( $app );
 				if ( ! $integration ) {
 					throw IntegrationException::notFound( $node['data']['app'] );
@@ -270,11 +269,11 @@ class Automation {
 				$output = $integration::execute_node( $node, $input );
 			}
 
-			if ( isset( $output['status'] ) && $output['status'] === 'delayed' ) {
+			if ( isset( $output['status'] ) && 'delayed' === $output['status'] ) {
 				$nodeRun->status = 'delayed';
 				$nodeRun->output_json = $output;
 				$nodeRun->save();
-				
+
 				$this->finalize_run( $run->id );
 				return;
 			}
@@ -307,8 +306,8 @@ class Automation {
 		}
 
 		$pass = $output['pass'] ?? $output['data']['pass'] ?? null;
-		if ( $pass !== null ) {
-			if ( $pass === false ) {
+		if ( null !== $pass ) {
+			if ( false === $pass ) {
 				return;
 			}
 			$output = $output['data'] ?? $output;
@@ -322,9 +321,9 @@ class Automation {
 				continue;
 			}
 
-			if ( $port !== null ) {
+			if ( null !== $port ) {
 				$edgeHandle = $edge['sourceHandle'] ?? null;
-				if ( $edgeHandle !== null && $edgeHandle !== $port ) {
+				if ( null !== $edgeHandle && $edgeHandle !== $port ) {
 					continue;
 				}
 			}
@@ -344,7 +343,7 @@ class Automation {
 			->fresh()
 			->count();
 
-		if ( $pendingCount == 0 ) {
+		if ( 0 === $pendingCount ) {
 			$delayedCount = NodeRun::where( 'run_id', $run_id )
 				->where( 'status', 'delayed' )
 				->fresh()
@@ -365,7 +364,7 @@ class Automation {
 				$run->finished_at = current_time( 'mysql' );
 				$run->save();
 			}
-		}
+		}//end if
 	}
 
 
@@ -398,7 +397,7 @@ class Automation {
 			$manager = $this->container->get( 'connections' );
 			$node['_connection_credentials'] = $manager->get_execution_credentials( (int) $connection_id );
 		} catch ( \Throwable $e ) {
-			error_log( 'Zaplane: failed to load credentials for connection ' . $connection_id . ': ' . $e->getMessage() );
+			$e->getMessage();
 		}
 
 		return $node;

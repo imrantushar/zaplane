@@ -3,7 +3,7 @@
 namespace Zaplane\Framework\Console\Commands;
 
 use Zaplane\Framework\Console\Command;
-use Zaplane\Framework\Database\ORM\Migrator;
+use Zaplane\Framework\Console\DevMigrator;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -24,7 +24,7 @@ class MakeMigrationCommand extends Command {
 		$table = $assoc_args['table'] ?? null;
 		$create = isset( $assoc_args['create'] ) ? $assoc_args['create'] : $table;
 
-		$migrator = Migrator::getInstance();
+		$migrator = DevMigrator::getInstance();
 		$filename = $migrator->make( $name );
 
 		if ( $create || $table ) {

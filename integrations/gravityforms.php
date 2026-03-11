@@ -78,7 +78,7 @@ class Gravityforms extends IntegrationBase {
 
 				$form_id = $form['id'] ?? 0;
 
-				if ( ! empty( $node['form_id'] ) &&  'any' !== $node['form_id'] ) {
+				if ( ! empty( $node['form_id'] ) && 'any' !== $node['form_id'] ) {
 					if ( (int) $form_id !== (int) $node['form_id'] ) {
 						return false;
 					}

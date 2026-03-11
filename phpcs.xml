@@ -18,6 +18,12 @@
 	<exclude-pattern>*/assets/*</exclude-pattern>
 	<exclude-pattern>*/dev_zaplane/*</exclude-pattern>
 
+	<!-- Dev-only files (not shipped to WordPress) -->
+	<exclude-pattern>*/tests/*</exclude-pattern>
+	<exclude-pattern>*/includes/framework/console/*</exclude-pattern>
+	<exclude-pattern>*/includes/commands/*</exclude-pattern>
+	<exclude-pattern>*/docs/*</exclude-pattern>
+
 	<!-- PHP 7.4 and higher. -->
     <config name="testVersion" value="7.4-"/>
 
@@ -27,6 +33,17 @@
 	<arg name="colors"/>
     <arg value="sp"/>
 	<arg value="s"/>
+
+	<!-- Plugin prefix for global functions, classes, etc. -->
+	<config name="minimum_supported_wp_version" value="5.0"/>
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+		<properties>
+			<property name="prefixes" type="array">
+				<element value="zaplane"/>
+				<element value="Zaplane"/>
+			</property>
+		</properties>
+	</rule>
 
 	<!-- Rules -->
 	<rule ref="WordPress-Core" />
@@ -91,6 +108,7 @@
 		<exclude name="WordPress.Arrays.CommaAfterArrayItem.NoComma" />
 		<exclude name="WordPress.NamingConventions.ValidVariableName.InterpolatedVariableNotSnakeCase" />
 		<exclude name="WordPress.NamingConventions.ValidVariableName.PropertyNotSnakeCase" />
+		<exclude name="WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase" />
 		<exclude name="WordPress.NamingConventions.ValidFunctionName.MethodNameInvalid" />
 	</rule>
 

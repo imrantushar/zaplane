@@ -71,7 +71,7 @@ abstract class Model implements JsonSerializable {
 
 	public static function findOrFail( int $id ): self {
 		$result = static::find( $id );
-		if ( $result === null ) {
+		if ( null === $result ) {
 			throw DatabaseException::recordNotFound( esc_html( static::getTable() ), esc_html( (string) $id ) );
 		}
 		return $result;
@@ -224,7 +224,7 @@ abstract class Model implements JsonSerializable {
 	}
 
 	protected function isFillable( string $key ): bool {
-		if ( in_array( $key, static::$guarded ) ) {
+		if ( in_array( $key, static::$guarded, true ) ) {
 			return false;
 		}
 
@@ -232,7 +232,7 @@ abstract class Model implements JsonSerializable {
 			return true;
 		}
 
-		return in_array( $key, static::$fillable );
+		return in_array( $key, static::$fillable, true );
 	}
 
 	public function save(): bool {
@@ -258,9 +258,10 @@ abstract class Model implements JsonSerializable {
 
 		$attributes = $this->prepareAttributesForSave();
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 		$result = $wpdb->insert( static::getTable(), $attributes );
 
-		if ( $result === false ) {
+		if ( false === $result ) {
 			throw DatabaseException::insertFailed( esc_html( static::getTable() ), esc_html( $wpdb->last_error ) );
 		}
 
@@ -287,13 +288,14 @@ abstract class Model implements JsonSerializable {
 
 		$attributes = $this->prepareAttributesForSave( $dirty );
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$result = $wpdb->update(
 			static::getTable(),
 			$attributes,
 			[ static::$primaryKey => $this->getKey() ]
 		);
 
-		if ( $result === false ) {
+		if ( false === $result ) {
 			throw new DatabaseException( 'Failed to update record: ' . esc_html( $wpdb->last_error ) );
 		}
 
@@ -307,7 +309,7 @@ abstract class Model implements JsonSerializable {
 		$prepared = [];
 
 		foreach ( $attrs as $key => $value ) {
-			if ( $key === static::$primaryKey && ! isset( $attributes ) ) {
+			if ( static::$primaryKey === $key && ! isset( $attributes ) ) {
 				continue;
 			}
 			$prepared[ $key ] = $this->castAttributeForSave( $key, $value );
@@ -326,7 +328,7 @@ abstract class Model implements JsonSerializable {
 		switch ( $castType ) {
 			case 'array':
 			case 'json':
-				return is_string( $value ) ? $value : json_encode( $value );
+				return is_string( $value ) ? $value : wp_json_encode( $value );
 			case 'boolean':
 			case 'bool':
 				return $value ? 1 : 0;
@@ -348,12 +350,13 @@ abstract class Model implements JsonSerializable {
 			return false;
 		}
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$result = $wpdb->delete(
 			static::getTable(),
 			[ static::$primaryKey => $this->getKey() ]
 		);
 
-		if ( $result === false ) {
+		if ( false === $result ) {
 			return false;
 		}
 
@@ -423,7 +426,7 @@ abstract class Model implements JsonSerializable {
 	}
 
 	protected function castAttribute( string $key, $value ) {
-		if ( $value === null ) {
+		if ( null === $value ) {
 			return null;
 		}
 
@@ -476,7 +479,7 @@ abstract class Model implements JsonSerializable {
 	public function isDirty( $attributes = null ): bool {
 		$dirty = $this->getDirty();
 
-		if ( $attributes === null ) {
+		if ( null === $attributes ) {
 			return ! empty( $dirty );
 		}
 
@@ -500,7 +503,7 @@ abstract class Model implements JsonSerializable {
 	}
 
 	public function getOriginal( ?string $key = null ) {
-		if ( $key === null ) {
+		if ( null === $key ) {
 			return $this->original;
 		}
 
@@ -511,7 +514,7 @@ abstract class Model implements JsonSerializable {
 		$array = [];
 
 		foreach ( $this->attributes as $key => $value ) {
-			if ( ! in_array( $key, static::$hidden ) ) {
+			if ( ! in_array( $key, static::$hidden, true ) ) {
 				$array[ $key ] = $this->getAttribute( $key );
 			}
 		}
@@ -553,7 +556,7 @@ abstract class Model implements JsonSerializable {
 	}
 
 	public function toJson( int $options = 0 ): string {
-		return json_encode( $this->jsonSerialize(), $options );
+		return wp_json_encode( $this->jsonSerialize(), $options );
 	}
 
 	public function __get( string $key ) {
