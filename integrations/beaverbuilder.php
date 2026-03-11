@@ -13,7 +13,9 @@ class Beaverbuilder extends IntegrationBase {
 	public static function get_slug(): string {
 		return 'beaverbuilder';
 	}
-
+	public static function get_icon(): string {
+		return 'beaverbuilder';
+	}
 	public static function get_triggers(): array {
 		return [
 			'contact_form_submission' => [

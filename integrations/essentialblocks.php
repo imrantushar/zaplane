@@ -13,7 +13,9 @@ class Essentialblocks extends IntegrationBase {
 	public static function get_slug(): string {
 		return 'essentialblocks';
 	}
-
+	public static function get_icon(): string {
+		return 'essentialblocks';
+	}
 	public static function get_triggers(): array {
 		return [
 			'eb_form_submit_before_email' => [

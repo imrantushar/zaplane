@@ -13,7 +13,9 @@ class Coblocks extends IntegrationBase {
 	public static function get_slug(): string {
 		return 'coblocks';
 	}
-
+	public static function get_icon(): string {
+		return 'coblocks';
+	}
 	public static function get_triggers(): array {
 		return [
 			'coblocks_form_submit' => [

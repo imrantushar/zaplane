@@ -13,7 +13,9 @@ class Metform extends IntegrationBase {
 	public static function get_slug(): string {
 		return 'metform';
 	}
-
+	public static function get_icon(): string {
+		return 'metform';
+	}
 	public static function get_triggers(): array {
 		return [
 			'metform_after_store_form_data' => [
