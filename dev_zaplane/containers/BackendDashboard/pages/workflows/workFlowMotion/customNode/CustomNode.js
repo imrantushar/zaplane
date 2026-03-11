@@ -110,16 +110,15 @@ export default function CustomNode({ id, data, canvasLayout }) {
           <Box
             w="40px"
             h="40px"
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-            borderRadius="8px"
-            bg="orange.50"
+            bg='var(--zaplane-background)'
+            p="10px"
+            borderRadius='4px'
+            border="1px solid var(--zaplane-border-color)"
           >
-            <Icon as={FaWordpress} boxSize={5} color="orange.500" />
+            <Text as={'span'} justifyContent='center' className={`zaplane-icon zaplane-icon--${data?.icon}`} />
           </Box>
           <Box textAlign="left" flex="1" minW="0">
-            <Text className="zaplane-label" overflow='hidden' textOverflow="ellipsis" whiteSpace="nowrap">{isSelectApp ? __(data.app, "zaplane")
+            <Text className="zaplane-label" fontWeight='400' overflow='hidden' textOverflow="ellipsis" whiteSpace="nowrap">{isSelectApp ? __(data.app, "zaplane")
               : sprintf(__("%s", "zaplane"), formatLabel(data.event))}</Text>
             {!isSelectApp && (
               <Text className="zaplane-sub-title" fontSize='14px' overflow='hidden' textOverflow="ellipsis" whiteSpace="nowrap">

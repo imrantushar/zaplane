@@ -5,7 +5,7 @@ import { Formik } from "formik";
 import { generateFlowHash, mapEdgesForBackend, mapNodesForBackend } from "./helper";
 import { useDispatch, useSelector } from "react-redux";
 import { createNodeIdGenerator } from "./flowCanvas/helper";
-import { Box, Flex } from "@chakra-ui/react";
+import { Box, Flex, Icon } from "@chakra-ui/react";
 import { updateWorkFlow } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow";
 import NavigationBlocker from "@ZAPComponents/NavigationBlocker";
 
@@ -20,6 +20,7 @@ export default function Workflows({ id }) {
       id: getNewNodeId(),
       type: 'custom',
       data: {
+        icon:'plus',
         app: "Select an app",
         action: 'trigger',
         config: {}
@@ -36,6 +37,7 @@ export default function Workflows({ id }) {
         id: getNewNodeId(),
         type: "custom",
         data: {
+           icon:'plus',
           app: "Select an app",
           action: "trigger",
           config: {},

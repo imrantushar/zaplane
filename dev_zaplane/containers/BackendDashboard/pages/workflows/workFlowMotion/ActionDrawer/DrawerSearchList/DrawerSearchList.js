@@ -1,10 +1,9 @@
 import { VStack, Button, Text, Flex, Icon } from "@chakra-ui/react";
 import { sprintf, __ } from "@wordpress/i18n";
-import { ReactComponent as SlackIcon } from "./slack.svg";
+
 
 const DrawerSearchList = ({ searchList, setMode, setSelectedItem, setSearch }) => {
   if (!searchList?.length) return null;
-
   return (
     <VStack spacing={2} align="stretch">
       {searchList.map(item => (
@@ -27,10 +26,11 @@ const DrawerSearchList = ({ searchList, setMode, setSelectedItem, setSearch }) =
               bg='var(--zaplane-background)'
               p="10px"
               borderRadius='4px'
+              justifyContent='center'
               border="1px solid var(--zaplane-border-color)">
-              <Icon as={SlackIcon} boxSize="20px" />
+              <Text as={'span'}  className={`zaplane-icon zaplane-icon--${item?.icon}`}/>
             </Flex>
-            <Text className="zaplane-label" >{sprintf(__("%s", "zaplane"), item.name)}</Text>
+            <Text className="zaplane-label" fontWeight='400' >{sprintf(__("%s", "zaplane"), item.name)}</Text>
           </Flex>
 
           <Text fontSize="xs" className="zaplane-label">

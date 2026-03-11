@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-03-11 06:09:25",
+    "generated_at": "2026-03-10 09:59:43",
     "apps": {
         "pause": {
             "slug": "pause",
@@ -2564,7 +2564,14 @@
                 "get_post_comments_single": {
                     "key": "get_post_comments_single",
                     "label": "Get Post Comments (Single Post)",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -2580,7 +2587,14 @@
                 "get_user_comments_email": {
                     "key": "get_user_comments_email",
                     "label": "Get User Comments (By Email)",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "user_email",
+                            "label": "User Email",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -2588,7 +2602,14 @@
                 "get_comment_metadata_all": {
                     "key": "get_comment_metadata_all",
                     "label": "Get Comment Metadata (All)",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "comment_id",
+                            "label": "Comment ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -2600,6 +2621,12 @@
                         {
                             "key": "comment_id",
                             "label": "Comment ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "meta_key",
+                            "label": "Comment Meta Key",
                             "type": "expression",
                             "required": true
                         }
@@ -3903,7 +3930,7 @@
         "woocommerce": {
             "slug": "woocommerce",
             "name": "Woocommerce",
-            "icon": "",
+            "icon": "woo",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -7584,7 +7611,7 @@
         "surecart": {
             "slug": "surecart",
             "name": "Surecart",
-            "icon": "",
+            "icon": "surecart",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -8918,12 +8945,14 @@
                             "key": "course_id",
                             "label": "Course",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any course",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "learndash",
+                                "query": "course_query",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -8940,12 +8969,14 @@
                             "key": "course_id",
                             "label": "Course",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any course",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "learndash",
+                                "query": "course_query",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -8962,24 +8993,28 @@
                             "key": "course_id",
                             "label": "Course",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any course",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "learndash",
+                                "query": "course_query",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         },
                         {
                             "key": "lesson_id",
                             "label": "Lesson",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any lesson",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "learndash",
+                                "query": "lesson_query",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -8996,36 +9031,42 @@
                             "key": "course_id",
                             "label": "Course",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any course",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "learndash",
+                                "query": "course_query",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         },
                         {
                             "key": "lesson_id",
                             "label": "Lesson",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any lesson",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "learndash",
+                                "query": "lesson_query",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         },
                         {
                             "key": "topic_id",
                             "label": "Topic",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any Topic",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "learndash",
+                                "query": "topic_query",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -9042,12 +9083,14 @@
                             "key": "quiz_id",
                             "label": "Quiz",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any Quiz",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "learndash",
+                                "query": "quiz_query",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -9064,12 +9107,14 @@
                             "key": "group_id",
                             "label": "Group",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any Group",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "learndash",
+                                "query": "group_query",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -9086,12 +9131,14 @@
                             "key": "group_id",
                             "label": "Group",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any Group",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "learndash",
+                                "query": "group_query",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -9108,24 +9155,28 @@
                             "key": "course_id",
                             "label": "Course",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any course",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "learndash",
+                                "query": "course_query",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         },
                         {
                             "key": "lesson_id",
                             "label": "Lesson",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any lesson",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "learndash",
+                                "query": "lesson_query",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -9139,7 +9190,7 @@
         "memberpress": {
             "slug": "memberpress",
             "name": "Memberpress",
-            "icon": "",
+            "icon": "mp",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -10325,14 +10376,16 @@
                     "schema": [
                         {
                             "key": "form_id",
-                            "label": "Form action",
+                            "label": "Form",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any Form",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "fluentform",
+                                "query": "form",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -10343,9 +10396,9 @@
             },
             "actions": []
         },
-        "FluentCRM": {
-            "slug": "FluentCRM",
-            "name": "FluentCRM",
+        "fluentcrm": {
+            "slug": "fluentcrm",
+            "name": "Fluentcrm",
             "icon": "",
             "category": "app",
             "requires_connection": false,
@@ -10361,12 +10414,14 @@
                             "key": "tag_id",
                             "label": "Tags",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any Tag",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "fluentcrm",
+                                "query": "tag_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -10383,12 +10438,14 @@
                             "key": "tag_id",
                             "label": "Tags",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any Tag",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "fluentcrm",
+                                "query": "tag_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -10405,12 +10462,14 @@
                             "key": "list_id",
                             "label": "List",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any List",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "fluentcrm",
+                                "query": "list_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -10427,12 +10486,14 @@
                             "key": "list_id",
                             "label": "List",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any List",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "fluentcrm",
+                                "query": "list_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -10547,12 +10608,14 @@
                             "key": "lists",
                             "label": "Lists",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any List",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "fluentcrm",
+                                "query": "list_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
                             "required": true,
                             "multiple": true
                         },
@@ -10560,12 +10623,14 @@
                             "key": "tags",
                             "label": "Tags",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any Tag",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "fluentcrm",
+                                "query": "tag_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
                             "required": true,
                             "multiple": true
                         },
@@ -10573,12 +10638,19 @@
                             "key": "company",
                             "label": "company",
                             "type": "select",
-                            "options": [],
+                            "dynamic": {
+                                "integration": "fluentcrm",
+                                "query": "company_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
                             "required": true,
                             "multiple": true
                         },
                         {
-                            "key": "status",
+                            "key": "fluent_status",
                             "label": "Status",
                             "type": "select",
                             "options": [
@@ -10691,7 +10763,7 @@
                     "label": "Get Contact (By Status)",
                     "schema": [
                         {
-                            "key": "status",
+                            "key": "fluent_status",
                             "label": "Status",
                             "type": "select",
                             "options": [
@@ -10795,12 +10867,14 @@
                             "key": "tags",
                             "label": "Tags",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any Tag",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "fluentcrm",
+                                "query": "tag_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
                             "required": true,
                             "multiple": true
                         }
@@ -10823,12 +10897,14 @@
                             "key": "tags",
                             "label": "Tags",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any Tag",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "fluentcrm",
+                                "query": "tag_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
                             "required": true,
                             "multiple": true
                         }
@@ -10901,12 +10977,14 @@
                             "key": "lists",
                             "label": "Lists",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any List",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "fluentcrm",
+                                "query": "list_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
                             "required": true,
                             "multiple": true
                         }
@@ -10929,12 +11007,14 @@
                             "key": "lists",
                             "label": "Lists",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any List",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "fluentcrm",
+                                "query": "list_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
                             "required": true,
                             "multiple": true
                         }
@@ -11095,7 +11175,14 @@
                             "key": "company",
                             "label": "company",
                             "type": "select",
-                            "options": [],
+                            "dynamic": {
+                                "integration": "fluentcrm",
+                                "query": "company_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
                             "required": true,
                             "multiple": true
                         }
@@ -11118,7 +11205,14 @@
                             "key": "company",
                             "label": "company",
                             "type": "select",
-                            "options": [],
+                            "dynamic": {
+                                "integration": "fluentcrm",
+                                "query": "company_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
                             "required": true,
                             "multiple": true
                         }
@@ -11287,12 +11381,14 @@
                             "key": "form_id",
                             "label": "Forms",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any From",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "gravityforms",
+                                "query": "form_query",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -11321,12 +11417,14 @@
                             "key": "form_id",
                             "label": "Form",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any Form",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "ninjaform",
+                                "query": "forms",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -11355,12 +11453,14 @@
                             "key": "form_id",
                             "label": "Forms",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any Form",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "formidable",
+                                "query": "form_query",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -11389,12 +11489,14 @@
                             "key": "form_id",
                             "label": "Forms",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any From",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "wpforms",
+                                "query": "form_query",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -11423,12 +11525,14 @@
                             "key": "form_id",
                             "label": "Forms",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any From",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "contact-form-7",
+                                "query": "form_query",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -11604,7 +11708,7 @@
         "easydigitaldownload": {
             "slug": "easydigitaldownload",
             "name": "Easydigitaldownload",
-            "icon": "",
+            "icon": "easydigitaldownload",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -12081,12 +12185,14 @@
                             "key": "course_id",
                             "label": "course",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any course",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "tutor",
+                                "query": "course",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -12103,12 +12209,14 @@
                             "key": "course_id",
                             "label": "course",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any course",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "tutor",
+                                "query": "course",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -12125,12 +12233,14 @@
                             "key": "quiz_id",
                             "label": "Quiz",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any Quiz",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "tutor",
+                                "query": "quiz",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -12147,12 +12257,14 @@
                             "key": "lesson_id",
                             "label": "Lesson",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any lesson",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "tutor",
+                                "query": "lesson",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -12169,12 +12281,14 @@
                             "key": "quiz_id",
                             "label": "Quiz",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any Quiz",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "tutor",
+                                "query": "quiz",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         },
                         {
@@ -12218,12 +12332,14 @@
                             "key": "tag_id",
                             "label": "Tags",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any Tag",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "groundhogg",
+                                "query": "groundhogg_query",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -12240,12 +12356,14 @@
                             "key": "tag_id",
                             "label": "Tags",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any Tag",
-                                    "value": "any"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "groundhogg",
+                                "query": "groundhogg_query",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -12298,6 +12416,144 @@
                     "label": "Form New Record",
                     "hook": "elementor_pro/forms/new_record",
                     "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": []
+        },
+        "academy": {
+            "slug": "academy",
+            "name": "Academy",
+            "icon": "",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": {
+                "user_enroll_course": {
+                    "key": "user_enroll_course",
+                    "label": "User enrolled in a course",
+                    "hook": "academy/course/after_enroll",
+                    "schema": [
+                        {
+                            "key": "course_id",
+                            "label": "Course",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "academy",
+                                "query": "acourse",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "academy_quiz_course_attempt": {
+                    "key": "academy_quiz_course_attempt",
+                    "label": "User attempted (submitted) a quiz",
+                    "hook": "academy_quizzes/api/after_quiz_attempt_finished",
+                    "schema": [
+                        {
+                            "key": "quiz_id",
+                            "label": "Quiz",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "academy",
+                                "query": "quiz",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "lesson_complete": {
+                    "key": "lesson_complete",
+                    "label": "User completed a lesson",
+                    "hook": "academy/frontend/after_mark_topic_complete",
+                    "schema": [
+                        {
+                            "key": "lesson_id",
+                            "label": "Lesson",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "academy",
+                                "query": "lesson",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "course_complete": {
+                    "key": "course_complete",
+                    "label": "User completed a course",
+                    "hook": "academy/admin/course_complete_after",
+                    "schema": [
+                        {
+                            "key": "course_id",
+                            "label": "Course",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "academy",
+                                "query": "acourse",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "quiz_target": {
+                    "key": "quiz_target",
+                    "label": "User achieved target percentage on a quiz",
+                    "hook": "academy_quizzes/api/after_quiz_attempt_finished",
+                    "schema": [
+                        {
+                            "key": "quiz_id",
+                            "label": "Quiz",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "academy",
+                                "query": "quiz",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "target_percentage",
+                            "label": "Target Percentage (%)",
+                            "type": "number",
+                            "required": true
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
