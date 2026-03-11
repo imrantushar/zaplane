@@ -36,8 +36,8 @@ class Mailchimp extends IntegrationBase {
 	}
 
 	public static function get_action_config_schema( string $action ): array {
-		$common = array(
-			array(
+		$common = [
+			[
 				'key'         => 'list_id',
 				'label'       => 'Audience/List ID',
 				'type'        => 'select',

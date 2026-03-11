@@ -114,7 +114,6 @@ export default function ConditionGroupField({ value, field, variables }) {
                             onClick={() => groupHelpers.push([{ ...EMPTY_RULE }])}>
                             {__("OR Group", "zaplane")}
                         </Button>
-
                     </Flex>
                 );
             }}

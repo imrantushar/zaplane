@@ -2,9 +2,9 @@
 namespace Zaplane\Integrations;
 
 use Zaplane\Framework\Classes\IntegrationBase;
+use Zaplane\Framework\Classes\Scheduler;
 
 class Delay extends IntegrationBase {
-
 
 	public static function get_slug(): string {
 		return 'delay';
@@ -40,7 +40,7 @@ class Delay extends IntegrationBase {
 		$seconds = (int) ( $node['data']['config']['seconds'] ?? 0 );
 
 		if ( isset( $node['_run_id'], $node['_node_run_id'] ) ) {
-			\Zaplane\Framework\Classes\Scheduler::enqueue(
+			Scheduler::enqueue(
 				time() + $seconds,
 				(int) $node['_run_id'],
 				(int) $node['_node_run_id'],

@@ -36,7 +36,6 @@ export const useActionDrawer = (open, node, source, setFieldValue, isTrigger) =>
     const detectedItem = APPS.concat(TOOLS).find(
       i => i.name === node.data.app || i.id === node.data.app
     );
-
     if (detectedItem) {
       setMode(TOOLS.includes(detectedItem) ? "tools" : "app");
       setSelectedItem(detectedItem);
