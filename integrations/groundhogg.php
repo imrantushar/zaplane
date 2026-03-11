@@ -15,6 +15,14 @@ class Groundhogg extends IntegrationBase {
 		return 'groundhogg';
 	}
 
+	public static function get_name(): string {
+		return 'Groundhogg';
+	}
+
+	public static function get_icon(): string {
+		return 'groundhogg-icon';
+	}
+
 	public static function get_triggers(): array {
 		return [
 			'created_contact' => [
