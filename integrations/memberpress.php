@@ -18,6 +18,10 @@ class Memberpress extends IntegrationBase {
 		return 'memberpress';
 	}
 
+	public static function get_icon(): string {
+		return 'mp';
+	}
+
 	public static function get_triggers(): array {
 		return [
 			'member_added' => [

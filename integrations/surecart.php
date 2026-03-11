@@ -26,6 +26,10 @@ class Surecart extends IntegrationBase {
 		return 'surecart';
 	}
 
+	public static function get_icon(): string {
+		return 'surecart';
+	}
+
 
 
 	public static function get_triggers(): array {
