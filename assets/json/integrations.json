@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-03-11 07:27:46",
+    "generated_at": "2026-03-11 10:31:43",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -3919,7 +3919,7 @@
         "woocommerce": {
             "slug": "woocommerce",
             "name": "Woocommerce",
-            "icon": "",
+            "icon": "woo",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -7600,7 +7600,7 @@
         "surecart": {
             "slug": "surecart",
             "name": "Surecart",
-            "icon": "",
+            "icon": "surecart",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -9143,7 +9143,7 @@
         "memberpress": {
             "slug": "memberpress",
             "name": "Memberpress",
-            "icon": "",
+            "icon": "mp",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -11661,7 +11661,7 @@
         "easydigitaldownload": {
             "slug": "easydigitaldownload",
             "name": "Easydigitaldownload",
-            "icon": "",
+            "icon": "easydigitaldownload",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
