@@ -14,6 +14,10 @@ class Tutor extends IntegrationBase {
 		return 'tutor';
 	}
 
+	public static function get_name(): string {
+		return 'Tutor LMS';
+	}
+
 	public static function get_icon(): string {
 		return 'tutorlms';
 	}

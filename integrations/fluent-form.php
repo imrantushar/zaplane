@@ -14,6 +14,10 @@ class FluentForm extends IntegrationBase {
 		return 'fluentform';
 	}
 
+	public static function get_name(): string {
+		return 'Fluent Form';
+	}
+
 	public static function get_icon(): string {
 		return 'fluentform';
 	}

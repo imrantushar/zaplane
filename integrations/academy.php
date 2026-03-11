@@ -14,6 +14,10 @@ class Academy extends IntegrationBase {
 		return 'academy';
 	}
 
+	public static function get_name(): string {
+		return 'Academy LMS';
+	}
+
 	public static function get_icon(): string {
 		return 'academy';
 	}

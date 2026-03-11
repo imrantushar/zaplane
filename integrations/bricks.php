@@ -14,6 +14,10 @@ class Bricks extends IntegrationBase {
 		return 'bricks';
 	}
 
+	public static function get_name(): string {
+		return 'Bricks';
+	}
+
 	public static function get_icon(): string {
 		return 'bricksb-builder';
 	}

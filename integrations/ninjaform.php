@@ -14,6 +14,10 @@ class Ninjaform extends IntegrationBase {
 		return 'ninjaform';
 	}
 
+	public static function get_name(): string {
+		return 'Ninja Form';
+	}	
+
 	public static function get_icon(): string {
 		return 'ninjaform';
 	}	
