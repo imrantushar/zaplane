@@ -1,7 +1,9 @@
-import { Button, Flex, Icon, Text } from "@chakra-ui/react";
+import { Button, Flex, Text } from "@chakra-ui/react";
 import { sprintf, __ } from "@wordpress/i18n";
+import ZapIcon from "../../components/ZapIcon";
 
 const DrawerItemButton = ({ item, onClick, showType = true, arrowIcon, icon, }) => {
+
   return (
     <Button
       w="100%"
@@ -23,7 +25,8 @@ const DrawerItemButton = ({ item, onClick, showType = true, arrowIcon, icon, }) 
           p="10px"
           borderRadius='4px'
           border="1px solid var(--zaplane-border-color)">
-          <Text as={'span'} className={`zaplane-icon zaplane-icon--${icon}`} />
+        <ZapIcon icon={icon}  name={item.name} />
+          
         </Flex>
 
         <Text className="zaplane-label" fontWeight="400" as="span" display='flex' alignItems="center">{sprintf(__("%s", "zaplane"), item.name)}</Text>

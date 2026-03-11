@@ -11,6 +11,7 @@ import { FaRegCopy } from "react-icons/fa";
 import FloatingEdge from "../FloatingEdge/FloatingEdge";
 import { __, sprintf } from "@wordpress/i18n";
 import { formatLabel } from "@ZAPUtils/helper";
+import ZapIcon from "../components/ZapIcon";
 
 
 export default function CustomNode({ id, data, canvasLayout, nodes }) {
@@ -30,6 +31,7 @@ export default function CustomNode({ id, data, canvasLayout, nodes }) {
   const isCondition = data?.app === "condition";
   const node = nodes.find((n) => n.id === id);
   const hasPort = node?.port === undefined;
+  console.log(data,'data');
 
 
   return (
@@ -118,7 +120,7 @@ export default function CustomNode({ id, data, canvasLayout, nodes }) {
             borderRadius='4px'
             border="1px solid var(--zaplane-border-color)"
           >
-            <Text as={'span'} justifyContent='center' className={`zaplane-icon zaplane-icon--${data?.icon}`} />
+          <ZapIcon icon={data?.icon}  name={data.app} />
           </Box>
 
           <Box textAlign="left" flex="1" minW="0">
