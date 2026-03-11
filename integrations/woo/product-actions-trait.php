@@ -7,6 +7,44 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 trait ProductActionsTrait {
 
+	private static function get_product_id_from_config( array $config ): int {
+		return (int) ( $config['product_id'] ?? 0 );
+	}
+
+	private static function require_product_from_config( array $config, string &$error = '' ) {
+		$product_id = self::get_product_id_from_config( $config );
+		if ( ! $product_id ) {
+			$error = 'Product ID is required';
+			return null;
+		}
+
+		$product = wc_get_product( $product_id );
+		if ( ! $product ) {
+			$error = 'Product not found';
+			return null;
+		}
+
+		return $product;
+	}
+
+	private static function respond_with_product( $product, int $product_id = 0 ): array {
+		return self::respond([
+			'product' => $product ? self::build_product_payload( $product ) : [ 'product_id' => $product_id ],
+		]);
+	}
+
+	private static function sync_product_terms( int $product_id, array $config ): void {
+		$category_ids = self::parse_list( $config['category_ids'] ?? [] );
+		if ( ! empty( $category_ids ) ) {
+			wp_set_object_terms( $product_id, $category_ids, 'product_cat' );
+		}
+
+		$tag_ids = self::parse_list( $config['tag_ids'] ?? [] );
+		if ( ! empty( $tag_ids ) ) {
+			wp_set_object_terms( $product_id, $tag_ids, 'product_tag' );
+		}
+	}
+
 	private static function action_create_product( array $config, array $input ): array {
 		$name = $config['name'] ?? '';
 		if ( '' === $name ) {
@@ -16,8 +54,9 @@ trait ProductActionsTrait {
 		$product = new \WC_Product_Simple();
 		$product->set_name( $name );
 
-		if ( ! empty( $config['status'] ) ) {
-			$product->set_status( $config['status'] );
+		$product_status = self::get_product_status_config( $config );
+		if ( '' !== $product_status ) {
+			$product->set_status( self::normalize_product_status( $product_status ) );
 		}
 		if ( ! empty( $config['sku'] ) ) {
 			$product->set_sku( $config['sku'] );
@@ -52,21 +91,11 @@ trait ProductActionsTrait {
 			return self::error( 'Failed to create product' );
 		}
 
-		$category_ids = self::parse_list( $config['category_ids'] ?? [] );
-		if ( ! empty( $category_ids ) ) {
-			wp_set_object_terms( $product_id, $category_ids, 'product_cat' );
-		}
-
-		$tag_ids = self::parse_list( $config['tag_ids'] ?? [] );
-		if ( ! empty( $tag_ids ) ) {
-			wp_set_object_terms( $product_id, $tag_ids, 'product_tag' );
-		}
+		self::sync_product_terms( $product_id, $config );
 
 		$created = wc_get_product( $product_id );
 
-		return self::respond([
-			'product' => $created ? self::build_product_payload( $created ) : [ 'product_id' => $product_id ],
-		]);
+		return self::respond_with_product( $created, $product_id );
 	}
 
 	private static function action_create_product_variation( array $config, array $input ): array {
@@ -98,8 +127,9 @@ trait ProductActionsTrait {
 		if ( isset( $config['manage_stock'] ) ) {
 			$variation->set_manage_stock( self::parse_bool( $config['manage_stock'] ) );
 		}
-		if ( ! empty( $config['status'] ) ) {
-			$variation->set_status( $config['status'] );
+		$product_status = self::get_product_status_config( $config );
+		if ( '' !== $product_status ) {
+			$variation->set_status( self::normalize_product_status( $product_status ) );
 		}
 
 		$variation_id = $variation->save();
@@ -108,20 +138,16 @@ trait ProductActionsTrait {
 		}
 
 		$created = wc_get_product( $variation_id );
-		return self::respond([
-			'product' => $created ? self::build_product_payload( $created ) : [ 'product_id' => $variation_id ],
-		]);
+		return self::respond_with_product( $created, $variation_id );
 	}
 
 	private static function action_update_product( array $config, array $input ): array {
-		$product_id = $config['product_id'] ?? 0;
-		if ( ! $product_id ) {
-			return self::error( 'Product ID is required' );
-		}
-		$product = wc_get_product( $product_id );
+		$error = '';
+		$product = self::require_product_from_config( $config, $error );
 		if ( ! $product ) {
-			return self::error( 'Product not found', [ 'product_id' => $product_id ] );
+			return self::error( $error, [ 'product_id' => self::get_product_id_from_config( $config ) ] );
 		}
+		$product_id = self::get_product_id_from_config( $config );
 
 		$data = self::parse_json_array( $config['data'] ?? [] );
 		if ( ! empty( $data ) && method_exists( $product, 'set_props' ) ) {
@@ -131,8 +157,9 @@ trait ProductActionsTrait {
 		if ( ! empty( $config['name'] ) ) {
 			$product->set_name( $config['name'] );
 		}
-		if ( ! empty( $config['status'] ) ) {
-			$product->set_status( $config['status'] );
+		$product_status = self::get_product_status_config( $config );
+		if ( '' !== $product_status ) {
+			$product->set_status( self::normalize_product_status( $product_status ) );
 		}
 		if ( ! empty( $config['sku'] ) ) {
 			$product->set_sku( $config['sku'] );
@@ -164,18 +191,9 @@ trait ProductActionsTrait {
 
 		$product->save();
 
-		$category_ids = self::parse_list( $config['category_ids'] ?? [] );
-		if ( ! empty( $category_ids ) ) {
-			wp_set_object_terms( $product_id, $category_ids, 'product_cat' );
-		}
-		$tag_ids = self::parse_list( $config['tag_ids'] ?? [] );
-		if ( ! empty( $tag_ids ) ) {
-			wp_set_object_terms( $product_id, $tag_ids, 'product_tag' );
-		}
+		self::sync_product_terms( $product_id, $config );
 
-		return self::respond([
-			'product' => self::build_product_payload( $product ),
-		]);
+		return self::respond_with_product( $product, $product_id );
 	}
 
 	private static function action_get_products_all( array $config, array $input ): array {
@@ -246,15 +264,12 @@ trait ProductActionsTrait {
 	}
 
 	private static function action_get_product_by_id( array $config, array $input ): array {
-		$product_id = $config['product_id'] ?? 0;
-		if ( ! $product_id ) {
-			return self::error( 'Product ID is required' );
-		}
-		$product = wc_get_product( $product_id );
+		$error = '';
+		$product = self::require_product_from_config( $config, $error );
 		if ( ! $product ) {
-			return self::error( 'Product not found', [ 'product_id' => $product_id ] );
+			return self::error( $error, [ 'product_id' => self::get_product_id_from_config( $config ) ] );
 		}
-		return self::respond( [ 'product' => self::build_product_payload( $product ) ] );
+		return self::respond_with_product( $product, self::get_product_id_from_config( $config ) );
 	}
 
 	private static function action_get_product_by_sku( array $config, array $input ): array {
@@ -274,13 +289,10 @@ trait ProductActionsTrait {
 	}
 
 	private static function action_update_product_stock( array $config, array $input ): array {
-		$product_id = $config['product_id'] ?? 0;
-		if ( ! $product_id ) {
-			return self::error( 'Product ID is required' );
-		}
-		$product = wc_get_product( $product_id );
+		$error = '';
+		$product = self::require_product_from_config( $config, $error );
 		if ( ! $product ) {
-			return self::error( 'Product not found', [ 'product_id' => $product_id ] );
+			return self::error( $error, [ 'product_id' => self::get_product_id_from_config( $config ) ] );
 		}
 		if ( isset( $config['manage_stock'] ) ) {
 			$product->set_manage_stock( self::parse_bool( $config['manage_stock'] ) );
@@ -293,11 +305,11 @@ trait ProductActionsTrait {
 		}
 		$product->save();
 
-		return self::respond( [ 'product' => self::build_product_payload( $product ) ] );
+		return self::respond_with_product( $product, self::get_product_id_from_config( $config ) );
 	}
 
 	private static function action_delete_product_permanently( array $config, array $input ): array {
-		$product_id = $config['product_id'] ?? 0;
+		$product_id = self::get_product_id_from_config( $config );
 		if ( ! $product_id ) {
 			return self::error( 'Product ID is required' );
 		}
@@ -309,7 +321,7 @@ trait ProductActionsTrait {
 	}
 
 	private static function action_delete_product_soft( array $config, array $input ): array {
-		$product_id = $config['product_id'] ?? 0;
+		$product_id = self::get_product_id_from_config( $config );
 		if ( ! $product_id ) {
 			return self::error( 'Product ID is required' );
 		}
@@ -333,14 +345,12 @@ trait ProductActionsTrait {
 	}
 
 	private static function action_get_product_sales_count_by_id( array $config, array $input ): array {
-		$product_id = $config['product_id'] ?? 0;
-		if ( ! $product_id ) {
-			return self::error( 'Product ID is required' );
-		}
-		$product = wc_get_product( $product_id );
+		$error = '';
+		$product = self::require_product_from_config( $config, $error );
 		if ( ! $product ) {
-			return self::error( 'Product not found', [ 'product_id' => $product_id ] );
+			return self::error( $error, [ 'product_id' => self::get_product_id_from_config( $config ) ] );
 		}
+		$product_id = self::get_product_id_from_config( $config );
 		return self::respond([
 			'product_id' => $product_id,
 			'total_sales' => $product->get_total_sales(),
@@ -348,22 +358,20 @@ trait ProductActionsTrait {
 	}
 
 	private static function action_update_product_status( array $config, array $input ): array {
-		$product_id = $config['product_id'] ?? 0;
-		$status = $config['status'] ?? '';
+		$product_id = self::get_product_id_from_config( $config );
+		$status = self::get_product_status_config( $config );
 		if ( ! $product_id || '' === $status ) {
 			return self::error( 'Product ID and status are required' );
 		}
 		$result = wp_update_post([
 			'ID' => $product_id,
-			'post_status' => $status,
+			'post_status' => self::normalize_product_status( $status ),
 		], true);
 		if ( is_wp_error( $result ) ) {
 			return self::error( $result->get_error_message() );
 		}
 		$product = wc_get_product( $product_id );
-		return self::respond([
-			'product' => $product ? self::build_product_payload( $product ) : [ 'product_id' => $product_id ],
-		]);
+		return self::respond_with_product( $product, $product_id );
 	}
 
 	private static function get_products_by_type( string $type, array $config ): array {

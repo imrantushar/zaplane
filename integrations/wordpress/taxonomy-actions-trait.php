@@ -5,6 +5,41 @@ use Zaplane\Traits\ActionResponseTrait;
 
 trait TaxonomyActionsTrait {
 
+	private static function get_taxonomy_from_config( array $config ): string {
+		return (string) ( $config['taxonomy'] ?? '' );
+	}
+
+	private static function get_term_id_from_config( array $config ): int {
+		return (int) ( $config['term_id'] ?? 0 );
+	}
+
+	private static function get_category_id_from_config( array $config ): int {
+		return (int) ( $config['category_id'] ?? 0 );
+	}
+
+	private static function normalize_term_write_args( array $config ): array {
+		return [
+			'slug' => $config['slug'] ?? '',
+			'parent' => $config['parent'] ?? 0,
+			'description' => $config['description'] ?? '',
+		];
+	}
+
+	private static function normalize_category_write_args( array $config, int $category_id = 0 ): array {
+		$args = [
+			'cat_name' => (string) ( $config['name'] ?? '' ),
+			'category_nicename' => (string) ( $config['slug'] ?? '' ),
+			'category_parent' => (int) ( $config['parent'] ?? 0 ),
+			'category_description' => (string) ( $config['description'] ?? '' ),
+		];
+
+		if ( $category_id > 0 ) {
+			$args['cat_ID'] = $category_id;
+		}
+
+		return $args;
+	}
+
 	private static function normalize_term_payload( $term ): array {
 		if ( ! ( $term instanceof \WP_Term ) ) {
 			return [];
@@ -30,7 +65,7 @@ trait TaxonomyActionsTrait {
 	}
 
 	protected static function action_get_term( array $config ): array {
-		$term = get_term( (int) ( $config['term_id'] ?? 0 ), (string) ( $config['taxonomy'] ?? '' ) );
+		$term = get_term( self::get_term_id_from_config( $config ), self::get_taxonomy_from_config( $config ) );
 		if ( ! $term || is_wp_error( $term ) ) {
 			return static::error( 'Term not found' );
 		}
@@ -40,7 +75,7 @@ trait TaxonomyActionsTrait {
 
 	protected static function action_get_terms_by_taxonomy( array $config ): array {
 		$terms = get_terms([
-			'taxonomy' => $config['taxonomy'] ?? '',
+			'taxonomy' => self::get_taxonomy_from_config( $config ),
 			'hide_empty' => ! empty( $config['hide_empty'] ),
 			'search' => (string) ( $config['search'] ?? '' ),
 			'number' => ! empty( $config['limit'] ) ? (int) $config['limit'] : 20,
@@ -59,7 +94,7 @@ trait TaxonomyActionsTrait {
 		$term = get_term_by(
 			$config['field'] ?? '',
 			$config['value'] ?? '',
-			$config['taxonomy'] ?? ''
+			self::get_taxonomy_from_config( $config )
 		);
 		if ( ! $term || is_wp_error( $term ) ) {
 			return static::error( 'Term not found' );
@@ -71,18 +106,14 @@ trait TaxonomyActionsTrait {
 	protected static function action_create_term( array $config ): array {
 		$result = wp_insert_term(
 			$config['name'] ?? '',
-			$config['taxonomy'] ?? '',
-			[
-				'slug' => $config['slug'] ?? '',
-				'parent' => $config['parent'] ?? 0,
-				'description' => $config['description'] ?? '',
-			]
+			self::get_taxonomy_from_config( $config ),
+			self::normalize_term_write_args( $config )
 		);
 		if ( is_wp_error( $result ) ) {
 			return static::error( $result->get_error_message() );
 		}
 		$term_id = (int) ( $result['term_id'] ?? 0 );
-		$taxonomy = (string) ( $config['taxonomy'] ?? '' );
+		$taxonomy = self::get_taxonomy_from_config( $config );
 		$term = get_term( $term_id, $taxonomy );
 
 		return static::success( [
@@ -94,20 +125,20 @@ trait TaxonomyActionsTrait {
 
 	protected static function action_update_term( array $config ): array {
 		$result = wp_update_term(
-			$config['term_id'] ?? 0,
-			$config['taxonomy'] ?? '',
-			[
-				'name' => $config['name'] ?? '',
-				'slug' => $config['slug'] ?? '',
-				'description' => $config['description'] ?? '',
-				'parent' => $config['parent'] ?? 0,
-			]
+			self::get_term_id_from_config( $config ),
+			self::get_taxonomy_from_config( $config ),
+			array_merge(
+				[
+					'name' => $config['name'] ?? '',
+				],
+				self::normalize_term_write_args( $config )
+			)
 		);
 		if ( is_wp_error( $result ) ) {
 			return static::error( $result->get_error_message() );
 		}
-		$term_id = (int) ( $result['term_id'] ?? ( $config['term_id'] ?? 0 ) );
-		$taxonomy = (string) ( $config['taxonomy'] ?? '' );
+		$term_id = (int) ( $result['term_id'] ?? self::get_term_id_from_config( $config ) );
+		$taxonomy = self::get_taxonomy_from_config( $config );
 		$term = get_term( $term_id, $taxonomy );
 
 		return static::success( [
@@ -118,8 +149,8 @@ trait TaxonomyActionsTrait {
 	}
 
 	protected static function action_delete_term( array $config ): array {
-		$term_id = (int) ( $config['term_id'] ?? 0 );
-		$taxonomy = (string) ( $config['taxonomy'] ?? '' );
+		$term_id = self::get_term_id_from_config( $config );
+		$taxonomy = self::get_taxonomy_from_config( $config );
 		$result = wp_delete_term( $term_id, $taxonomy );
 		if ( is_wp_error( $result ) ) {
 			return static::error( $result->get_error_message() );
@@ -135,7 +166,7 @@ trait TaxonomyActionsTrait {
 
 	protected static function action_register_taxonomy( array $config ): array {
 		$taxonomy = register_taxonomy(
-			$config['taxonomy'] ?? '',
+			self::get_taxonomy_from_config( $config ),
 			self::normalize_list( $config['object_type'] ?? [] ),
 			self::normalize_taxonomy_args( $config['args'] ?? [] )
 		);
@@ -146,7 +177,7 @@ trait TaxonomyActionsTrait {
 	}
 
 	protected static function action_unregister_taxonomy( array $config ): array {
-		$removed = unregister_taxonomy( $config['taxonomy'] ?? '' );
+		$removed = unregister_taxonomy( self::get_taxonomy_from_config( $config ) );
 		return static::success( [ 'removed' => (bool) $removed ] );
 	}
 
@@ -169,7 +200,7 @@ trait TaxonomyActionsTrait {
 	}
 
 	protected static function action_get_taxonomy( array $config ): array {
-		$taxonomy = get_taxonomy( $config['taxonomy'] ?? '' );
+		$taxonomy = get_taxonomy( self::get_taxonomy_from_config( $config ) );
 		if ( ! $taxonomy ) {
 			return static::error( 'Taxonomy not found' );
 		}
@@ -183,12 +214,7 @@ trait TaxonomyActionsTrait {
 		}
 
 		$result = wp_insert_category(
-			[
-				'cat_name' => $name,
-				'category_nicename' => (string) ( $config['slug'] ?? '' ),
-				'category_parent' => (int) ( $config['parent'] ?? 0 ),
-				'category_description' => (string) ( $config['description'] ?? '' ),
-			],
+			self::normalize_category_write_args( $config ),
 			true
 		);
 
@@ -203,18 +229,12 @@ trait TaxonomyActionsTrait {
 	}
 
 	protected static function action_update_category( array $config ): array {
-		$category_id = (int) ( $config['category_id'] ?? 0 );
+		$category_id = self::get_category_id_from_config( $config );
 		if ( ! $category_id ) {
 			return static::error( 'Category ID is required' );
 		}
 
-		$result = wp_update_category( [
-			'cat_ID' => $category_id,
-			'cat_name' => (string) ( $config['name'] ?? '' ),
-			'category_nicename' => (string) ( $config['slug'] ?? '' ),
-			'category_parent' => (int) ( $config['parent'] ?? 0 ),
-			'category_description' => (string) ( $config['description'] ?? '' ),
-		] );
+		$result = wp_update_category( self::normalize_category_write_args( $config, $category_id ) );
 
 		if ( is_wp_error( $result ) ) {
 			return static::error( $result->get_error_message() );
@@ -227,7 +247,7 @@ trait TaxonomyActionsTrait {
 	}
 
 	protected static function action_delete_category( array $config ): array {
-		$category_id = (int) ( $config['category_id'] ?? 0 );
+		$category_id = self::get_category_id_from_config( $config );
 		if ( ! $category_id ) {
 			return static::error( 'Category ID is required' );
 		}
@@ -262,7 +282,7 @@ trait TaxonomyActionsTrait {
 	}
 
 	protected static function action_get_category( array $config ): array {
-		$category_id = (int) ( $config['category_id'] ?? 0 );
+		$category_id = self::get_category_id_from_config( $config );
 		if ( ! $category_id ) {
 			return static::error( 'Category ID is required' );
 		}
