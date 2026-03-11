@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-03-11 07:25:15",
+    "generated_at": "2026-03-11 07:27:46",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -8742,8 +8742,8 @@
         },
         "storeengine": {
             "slug": "storeengine",
-            "name": "Storeengine",
-            "icon": "",
+            "name": "StoreEngine",
+            "icon": "storeengine",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -8830,55 +8830,19 @@
                         "main"
                     ]
                 },
-                "payment_complete": {
-                    "key": "payment_complete",
-                    "label": "Completed Payment",
-                    "hook": "storeengine/payment_complete",
+                "order_restored": {
+                    "key": "order_restored",
+                    "label": "Order Restored",
+                    "hook": "storeengine/order/status_changed",
                     "schema": [],
                     "outputs": [
                         "main"
                     ]
                 },
-                "payment_processing": {
-                    "key": "payment_processing",
-                    "label": "Processing Payment",
-                    "hook": "storeengine/payment_processing",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "payment_pending": {
-                    "key": "payment_pending",
-                    "label": "Pending Payment",
-                    "hook": "storeengine/payment_pending",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "payment_confirmed": {
-                    "key": "payment_confirmed",
-                    "label": "Pending Payment",
-                    "hook": "storeengine/payment_confirmed",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "customer_created": {
-                    "key": "customer_created",
-                    "label": "Customer Created",
-                    "hook": "storeengine/checkout/customer_created",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "update_customer": {
-                    "key": "update_customer",
-                    "label": "Customer Updated",
-                    "hook": "storeengine/stripe/update_customer",
+                "payment_refunded": {
+                    "key": "payment_refunded",
+                    "label": "Payment Refunded",
+                    "hook": "storeengine/subscription/payment_refunded",
                     "schema": [],
                     "outputs": [
                         "main"
@@ -8918,7 +8882,7 @@
         },
         "learndash": {
             "slug": "learndash",
-            "name": "Learndash",
+            "name": "LearnDash",
             "icon": "",
             "category": "app",
             "requires_connection": false,
@@ -10387,7 +10351,7 @@
         },
         "fluentcrm": {
             "slug": "fluentcrm",
-            "name": "Fluentcrm",
+            "name": "FluentCRM",
             "icon": "",
             "category": "app",
             "requires_connection": false,
@@ -11354,7 +11318,7 @@
         },
         "gravityforms": {
             "slug": "gravityforms",
-            "name": "Gravityforms",
+            "name": "Gravity Forms",
             "icon": "",
             "category": "app",
             "requires_connection": false,
@@ -11426,7 +11390,7 @@
         },
         "formidable": {
             "slug": "formidable",
-            "name": "Formidable",
+            "name": "Formidable Forms",
             "icon": "",
             "category": "app",
             "requires_connection": false,
@@ -11462,7 +11426,7 @@
         },
         "wpforms": {
             "slug": "wpforms",
-            "name": "Wpforms",
+            "name": "WPForms",
             "icon": "",
             "category": "app",
             "requires_connection": false,
@@ -11498,7 +11462,7 @@
         },
         "contact-form-7": {
             "slug": "contact-form-7",
-            "name": "Contact-form-7",
+            "name": "Contact Form 7",
             "icon": "",
             "category": "app",
             "requires_connection": false,
@@ -12273,7 +12237,7 @@
         "groundhogg": {
             "slug": "groundhogg",
             "name": "Groundhogg",
-            "icon": "",
+            "icon": "groundhogg-icon",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
