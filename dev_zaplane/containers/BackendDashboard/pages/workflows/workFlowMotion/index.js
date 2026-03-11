@@ -5,7 +5,7 @@ import { Formik } from "formik";
 import { generateFlowHash, mapEdgesForBackend, mapNodesForBackend } from "./helper";
 import { useDispatch, useSelector } from "react-redux";
 import { createNodeIdGenerator } from "./flowCanvas/helper";
-import { Box, Flex, Icon } from "@chakra-ui/react";
+import { Box, Flex } from "@chakra-ui/react";
 import { updateWorkFlow } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow";
 import NavigationBlocker from "@ZAPComponents/NavigationBlocker";
 

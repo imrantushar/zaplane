@@ -1,4 +1,4 @@
-import { VStack, Button, Box, Flex, Image, Icon } from "@chakra-ui/react";
+import { VStack } from "@chakra-ui/react";
 import DrawerItemButton from "./DrawerItemButton";
 import { __ } from "@wordpress/i18n";
 

@@ -21,9 +21,9 @@ export const mapEdgesForBackend = (edges) => {
   return edges.map(({ type, ...edge }) => edge);
 };
 
-/**
- * Generate comparable flow hash
- */
+
+ // Generate comparable flow hash
+
 export const generateFlowHash = (nodes, edges) => {
   const mapped = {
     nodes: mapNodesForBackend(nodes),

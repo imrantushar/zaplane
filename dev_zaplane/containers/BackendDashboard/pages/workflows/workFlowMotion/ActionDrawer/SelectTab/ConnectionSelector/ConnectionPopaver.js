@@ -2,14 +2,12 @@ import React, { useEffect, useState } from 'react';
 import WPPopover from "@ZAPComponents/Popaver/WPPopover";
 import { __ } from "@wordpress/i18n";
 import { useDispatch, useSelector } from 'react-redux';
-import { createTokenConnection, fetchAuthFields, fetchConnections, initOAuth } from '@ZAPRedux/Slices/connectionsSlice/connectionsSlice';
-import { Button, Flex, Input, Text, VStack } from '@chakra-ui/react';
+import { createTokenConnection, fetchAuthFields,  initOAuth } from '@ZAPRedux/Slices/connectionsSlice/connectionsSlice';
+import { Button, Flex, Text, VStack } from '@chakra-ui/react';
 import { primaryBtn } from '../../../../../../../../../assets/scss/chakra/recipe';
-import ZAPLabel from '@ZAPComponents/Labels/ZAPLabel';
 import './styles.scss'
 import { formatLabel } from '@ZAPUtils/helper';
 import ZAPInput from '@ZAPComponents/ZAPInput';
-import { fetchConnectionsByApp } from '@ZAPRedux/Slices/workFlowSlice/actions/connectionsSlice';
 
 const ConnectionPopaver = (props) => {
     const { isOpen, onClose, appSlug, onConnected  } = props

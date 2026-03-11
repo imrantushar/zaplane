@@ -20,7 +20,6 @@ import {
 import ConnectionDetails from "./ConnectionDetails/ConnectionDetails";
 import { formatDateTime } from "@ZAPUtils/helper";
 import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
-import { TableArrow } from "@ZAPUtils/icons";
 import ZAPActionBar from "@ZAPComponents/ZAPActionBar";
 
 const ConnectionTable = () => {

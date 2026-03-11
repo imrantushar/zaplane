@@ -12,8 +12,7 @@ import VariableEditor from "@ZAPComponents/VariableEditor";
 export default function ConditionGroupField({ value, field, variables }) {
     const ruleFields = field?.fields;
     const EMPTY_RULE = buildEmptyRule(ruleFields);
-    const [isPopoverOpen, setPopoverOpen] = useState(false);
-    const [activeInput, setActiveInput] = useState(null);
+    
     return (
         <FieldArray name={field.key}>
             {(groupHelpers) => {

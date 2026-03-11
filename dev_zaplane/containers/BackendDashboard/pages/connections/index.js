@@ -5,8 +5,6 @@ import {
     Button,
     VStack,
     Text,
-    Input,
-    Heading,
     Flex,
 } from "@chakra-ui/react";
 import { __ } from "@wordpress/i18n";
@@ -36,7 +34,6 @@ const Connections = () => {
         (state) => state.connections || []
     );
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [detailsOpen, setDetailsOpen] = useState(false);
     const [selectedApp, setSelectedApp] = useState(null);
     const [selectedAuthType, setSelectedAuthType] = useState(null);
     const [credentials, setCredentials] = useState({});

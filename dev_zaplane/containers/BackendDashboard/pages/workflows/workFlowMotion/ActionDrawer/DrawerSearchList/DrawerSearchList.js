@@ -1,4 +1,4 @@
-import { VStack, Button, Text, Flex, Icon } from "@chakra-ui/react";
+import { VStack, Button, Text, Flex } from "@chakra-ui/react";
 import { sprintf, __ } from "@wordpress/i18n";
 
 

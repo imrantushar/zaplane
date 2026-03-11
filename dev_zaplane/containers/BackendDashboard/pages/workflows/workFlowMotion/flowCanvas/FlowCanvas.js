@@ -50,21 +50,7 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
         node: null,
         edge: null,
     });
-    // layout update
-    // useEffect(() => {
-    //     if (canvasLayout !== workFlow.workflow?.layout) {
-    //         const updateLayout = async () => {
-    //             try {
-    //                 await dispatch(updateWorkFlowLayout({ id, layout: canvasLayout }));
-    //             } catch (error) {
-    //                 console.error("Failed to update layout:", error);
-    //             }
-    //         };
-
-    //         updateLayout();
-    //     }
-    // }, [canvasLayout]);
-
+   
     const activeVersionId = versions?.find(v => v.is_active)?.id;
 
     useEffect(() => {

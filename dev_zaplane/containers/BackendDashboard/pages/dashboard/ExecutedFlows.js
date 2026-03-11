@@ -1,25 +1,18 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Box, Text, Flex, Stack } from "@chakra-ui/react";
 import { __ } from '@wordpress/i18n';
 import ZAPDivider from '@ZAPComponents/ZAPDivider';
-import { useDispatch, useSelector } from 'react-redux';
-import { topExecutedFlows } from '@ZAPRedux/Slices/dashboardSlice/dashboardSlice';
+import {  useSelector } from 'react-redux';
+
 import ZAPLabel from '@ZAPComponents/Labels/ZAPLabel';
 const ExecutedFlows = () => {
-  const dispatch = useDispatch
   const { topExecutedFlows: flows } = useSelector((state) => state.dashboard);
-
-  // fetch top executed flows on mount
-
-
   return (
     <Box
       bg="var(--zaplane-background)"
       borderRadius="lg"
       boxShadow="md"
-      // p={"24px"}
       w="100%"
-    // maxW="400px"
     >
       <Text className='zaplane-label' fontSize='14px' p={"24px"} >
         {__('Top Executed Flows', 'zaplane')}

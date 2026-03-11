@@ -1,15 +1,12 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
     Text,
     Box,
-    Button,
-    Badge,
     HStack,
     Icon,
-    Flex,
 } from "@chakra-ui/react";
 import { useDispatch, useSelector } from "react-redux";
-import { __, sprintf } from "@wordpress/i18n";
+import { __} from "@wordpress/i18n";
 
 import {
     getRunsList,
@@ -18,13 +15,11 @@ import {
 import { nodeLogsRunDetails } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlowLogs";
 
 import LogDetails from "@ZAPComponents/LogDetails";
-import ZAPLoading from "@ZAPComponents/Loading";
 import TopBar from "@ZAPComponents/TopBar";
 import ZAPDrawer from "@ZAPComponents/Drawer";
 import ListTable from "@ZAPComponents/ListTable";
 import { formatDateTime, formatLabel, getDuration } from "@ZAPUtils/helper";
-import { statusStyle } from "../workflows/helper";
-import { HistoryIcon, TableArrow } from "@ZAPUtils/icons";
+import { HistoryIcon} from "@ZAPUtils/icons";
 import ZAPTooltip from "@ZAPComponents/ZAPTooltip";
 import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
 
