@@ -133,19 +133,10 @@ class Mailchimp extends IntegrationBase {
 			throw new \Exception( 'Mailchimp action type is missing' );
 		}
 
-		$api_key = self::resolve_api_key( $node['_connection_credentials'] ?? null );
+		$method = 'action_' . $action;
 
-		switch ( $action ) {
-			case 'upsert_subscriber':
-				return self::action_upsert_subscriber( $node, $input, $api_key );
-			case 'unsubscribe_subscriber':
-				return self::action_unsubscribe_subscriber( $node, $input, $api_key );
-			case 'add_tags':
-				return self::action_update_tags( $node, $input, $api_key, 'active' );
-			case 'remove_tags':
-				return self::action_update_tags( $node, $input, $api_key, 'inactive' );
-			case 'archive_subscriber':
-				return self::action_archive_subscriber( $node, $input, $api_key );
+		if ( method_exists( static::class, $method ) ) {
+			return static::$method( $node, $input );
 		}
 
 		return [
@@ -243,7 +234,31 @@ class Mailchimp extends IntegrationBase {
 		];
 	}
 
-	private static function action_upsert_subscriber( array $node, array $input, string $api_key ): array {
+	private static function resolve_node_api_key( array $node ): string {
+		return self::resolve_api_key( $node['_connection_credentials'] ?? null );
+	}
+
+	private static function action_upsert_subscriber( array $node, array $input ): array {
+		return self::run_upsert_subscriber( $node, $input, self::resolve_node_api_key( $node ) );
+	}
+
+	private static function action_unsubscribe_subscriber( array $node, array $input ): array {
+		return self::run_unsubscribe_subscriber( $node, $input, self::resolve_node_api_key( $node ) );
+	}
+
+	private static function action_add_tags( array $node, array $input ): array {
+		return self::run_update_tags( $node, $input, self::resolve_node_api_key( $node ), 'active' );
+	}
+
+	private static function action_remove_tags( array $node, array $input ): array {
+		return self::run_update_tags( $node, $input, self::resolve_node_api_key( $node ), 'inactive' );
+	}
+
+	private static function action_archive_subscriber( array $node, array $input ): array {
+		return self::run_archive_subscriber( $node, $input, self::resolve_node_api_key( $node ) );
+	}
+
+	private static function run_upsert_subscriber( array $node, array $input, string $api_key ): array {
 		$data = self::get_node_config_data( $node );
 
 		$list_id = self::substitute_variables( $data['list_id'] ?? '', $input );
@@ -307,7 +322,7 @@ class Mailchimp extends IntegrationBase {
 		];
 	}
 
-	private static function action_unsubscribe_subscriber( array $node, array $input, string $api_key ): array {
+	private static function run_unsubscribe_subscriber( array $node, array $input, string $api_key ): array {
 		$data = self::get_node_config_data( $node );
 
 		[ $list_id, $email ] = self::extract_list_and_email( $data, $input );
@@ -337,7 +352,7 @@ class Mailchimp extends IntegrationBase {
 		];
 	}
 
-	private static function action_update_tags( array $node, array $input, string $api_key, string $status ): array {
+	private static function run_update_tags( array $node, array $input, string $api_key, string $status ): array {
 		$data = self::get_node_config_data( $node );
 
 		[ $list_id, $email ] = self::extract_list_and_email( $data, $input );
@@ -376,7 +391,7 @@ class Mailchimp extends IntegrationBase {
 		];
 	}
 
-	private static function action_archive_subscriber( array $node, array $input, string $api_key ): array {
+	private static function run_archive_subscriber( array $node, array $input, string $api_key ): array {
 		$data = self::get_node_config_data( $node );
 
 		[ $list_id, $email ] = self::extract_list_and_email( $data, $input );
