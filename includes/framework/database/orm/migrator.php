@@ -133,6 +133,7 @@ class Migrator {
 	protected function getRanMigrations(): array {
 		global $wpdb;
 
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$results = $wpdb->get_col( "SELECT migration FROM {$this->migrationsTable}" );
 
 		return $results ?: [];
@@ -141,6 +142,7 @@ class Migrator {
 	protected function getAllRanMigrations(): array {
 		global $wpdb;
 
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$results = $wpdb->get_col(
 			"SELECT migration FROM {$this->migrationsTable} ORDER BY batch DESC, migration DESC"
 		);
@@ -151,6 +153,7 @@ class Migrator {
 	protected function getLastBatchMigrations( int $steps ): array {
 		global $wpdb;
 
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$batch = $wpdb->get_var(
 			"SELECT MAX(batch) FROM {$this->migrationsTable}"
 		);
@@ -161,6 +164,7 @@ class Migrator {
 
 		$minBatch = max( 1, $batch - $steps + 1 );
 
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$results = $wpdb->get_col($wpdb->prepare(
 			"SELECT migration FROM {$this->migrationsTable} WHERE batch >= %d ORDER BY batch DESC, migration DESC",
 			$minBatch
@@ -172,6 +176,7 @@ class Migrator {
 	protected function getNextBatchNumber(): int {
 		global $wpdb;
 
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$batch = $wpdb->get_var(
 			"SELECT MAX(batch) FROM {$this->migrationsTable}"
 		);
@@ -245,7 +250,7 @@ class Migrator {
 	}
 
 	public function make( string $name ): string {
-		$timestamp = date( 'Y_m_d_His' );
+		$timestamp = gmdate( 'Y_m_d_His' );
 		$filename = $timestamp . '_' . $name . '.php';
 		$filepath = $this->migrationsPath . $filename;
 
@@ -255,36 +260,37 @@ class Migrator {
 			$className .= ucfirst( $part );
 		}
 
-		$content = <<<PHP
-<?php
-
-namespace Zaplane\Database\Migrations;
-
-use Zaplane\Framework\Database\ORM\Migration;
-use Zaplane\Framework\Database\ORM\Schema;
-use Zaplane\Framework\Database\ORM\Blueprint;
-
-if (!defined('ABSPATH')) exit;
-
-class {$className} extends Migration
-{
-	public function up(): void
-	{
-		Schema::create('table_name', function (Blueprint \$table) {
-			\$table->id();
-			\$table->timestamps();
-		});
-	}
-
-	public function down(): void
-	{
-		Schema::drop('table_name');
-	}
-}
-PHP;
+		$content = implode( "\n", [
+			'<?php',
+			'',
+			'namespace Zaplane\Database\Migrations;',
+			'',
+			'use Zaplane\Framework\Database\ORM\Migration;',
+			'use Zaplane\Framework\Database\ORM\Schema;',
+			'use Zaplane\Framework\Database\ORM\Blueprint;',
+			'',
+			"if (!defined('ABSPATH')) exit;",
+			'',
+			"class {$className} extends Migration",
+			'{',
+			'	public function up(): void',
+			'	{',
+			"		Schema::create('table_name', function (Blueprint \$table) {",
+			'			$table->id();',
+			'			$table->timestamps();',
+			'		});',
+			'	}',
+			'',
+			'	public function down(): void',
+			'	{',
+			"		Schema::drop('table_name');",
+			'	}',
+			'}',
+			'',
+		] );
 
 		if ( ! is_dir( $this->migrationsPath ) ) {
-			mkdir( $this->migrationsPath, 0755, true );
+			wp_mkdir_p( $this->migrationsPath );
 		}
 
 		file_put_contents( $filepath, $content );

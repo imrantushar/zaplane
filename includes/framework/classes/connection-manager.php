@@ -167,7 +167,7 @@ class ConnectionManager {
 		$connection = Connection::find( $id );
 
 		if ( ! $connection ) {
-			throw ConnectionException::notFound( $id );
+			throw ConnectionException::notFound( esc_html( (string) $id ) );
 		}
 
 		$credentials = $connection->getCredentials();
@@ -194,7 +194,7 @@ class ConnectionManager {
 		$connection = Connection::find( $id );
 
 		if ( ! $connection ) {
-			throw ConnectionException::notFound( $id );
+			throw ConnectionException::notFound( esc_html( (string) $id ) );
 		}
 
 		$credentials = $connection->getCredentials();

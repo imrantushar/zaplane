@@ -23,6 +23,7 @@ class DB {
 			$query = $wpdb->prepare( $query, ...$bindings );
 		}
 
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 		return $wpdb->get_results( $query, ARRAY_A ) ?: [];
 	}
 
@@ -33,6 +34,7 @@ class DB {
 			$query = $wpdb->prepare( $query, ...$bindings );
 		}
 
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 		return $wpdb->get_row( $query, ARRAY_A );
 	}
 
@@ -43,6 +45,7 @@ class DB {
 			$query = $wpdb->prepare( $query, ...$bindings );
 		}
 
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 		return $wpdb->query( $query ) !== false;
 	}
 
@@ -53,6 +56,7 @@ class DB {
 			$query = $wpdb->prepare( $query, ...$bindings );
 		}
 
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 		return (int) $wpdb->query( $query );
 	}
 
@@ -67,6 +71,7 @@ class DB {
 			$query = $wpdb->prepare( $query, ...$bindings );
 		}
 
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 		return $wpdb->query( $query ) !== false;
 	}
 

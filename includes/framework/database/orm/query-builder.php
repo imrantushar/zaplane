@@ -301,6 +301,7 @@ class QueryBuilder {
 			$sql = $wpdb->prepare( $sql, ...$bindings );
 		}
 
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 		$results = $wpdb->get_results( $sql, ARRAY_A );
 
 		if ( $this->modelClass && $results ) {
@@ -381,6 +382,7 @@ class QueryBuilder {
 			$sql = $wpdb->prepare( $sql, ...$bindings );
 		}
 
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 		return (int) $wpdb->get_var( $sql );
 	}
 
@@ -411,6 +413,7 @@ class QueryBuilder {
 			$sql = $wpdb->prepare( $sql, ...$bindings );
 		}
 
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 		return (float) $wpdb->get_var( $sql );
 	}
 
@@ -459,6 +462,7 @@ class QueryBuilder {
 
 		$bindings = array_merge( $bindings, $this->bindings );
 
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 		return (int) $wpdb->query( $wpdb->prepare( $sql, ...$bindings ) );
 	}
 
@@ -476,6 +480,7 @@ class QueryBuilder {
 			$sql = $wpdb->prepare( $sql, ...$bindings );
 		}
 
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 		return (int) $wpdb->query( $sql );
 	}
 
@@ -493,6 +498,7 @@ class QueryBuilder {
 		$sql .= $this->compileWheres();
 		$bindings = array_merge( $bindings, $this->bindings );
 
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 		return (int) $wpdb->query( $wpdb->prepare( $sql, ...$bindings ) );
 	}
 
@@ -502,6 +508,7 @@ class QueryBuilder {
 
 	public function truncate(): void {
 		global $wpdb;
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$wpdb->query( "TRUNCATE TABLE {$this->table}" );
 	}
 
