@@ -14,6 +14,14 @@ class Learndash extends IntegrationBase {
 		return 'learndash';
 	}
 
+	public static function get_name(): string {
+		return 'LearnDash';
+	}
+
+	public static function get_icon(): string {
+		return '';
+	}
+
 	public static function get_triggers(): array {
 		return [
 			'user_enroll_course' => [

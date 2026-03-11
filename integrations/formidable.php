@@ -18,6 +18,14 @@ class Formidable extends IntegrationBase {
 		return 'formidable';
 	}
 
+	public static function get_name(): string {
+		return 'Formidable Forms';
+	}
+
+	public static function get_icon(): string {
+		return '';
+	}
+
 	public static function get_triggers(): array {
 		return [
 			'form_submitted' => [

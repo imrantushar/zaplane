@@ -15,6 +15,14 @@ class Gravityforms extends IntegrationBase {
 		return 'gravityforms';
 	}
 
+	public static function get_name(): string {
+		return 'Gravity Forms';
+	}
+
+	public static function get_icon(): string {
+		return '';
+	}
+
 	public static function get_triggers(): array {
 		return [
 			'form_submitted' => [

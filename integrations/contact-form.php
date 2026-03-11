@@ -16,6 +16,14 @@ class ContactForm extends IntegrationBase {
 		return 'contact-form-7';
 	}
 
+	public static function get_name(): string {
+		return 'Contact Form 7';
+	}
+
+	public static function get_icon(): string {
+		return '';
+	}
+
 	public static function get_triggers(): array {
 		return [
 			'form_submitted' => [

@@ -29,6 +29,14 @@ class FluentCrm extends IntegrationBase {
 		return 'fluentcrm';
 	}
 
+	public static function get_name(): string {
+		return 'FluentCRM';
+	}
+
+	public static function get_icon(): string {
+		return '';
+	}
+
 	public static function get_triggers(): array {
 		return [
 			'added_tag' => [
