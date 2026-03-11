@@ -13,7 +13,9 @@ class Divi extends IntegrationBase {
 	public static function get_slug(): string {
 		return 'divi';
 	}
-
+	public static function get_icon(): string {
+		return 'divi';
+	}
 	public static function get_triggers(): array {
 		return [
 
