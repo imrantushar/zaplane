@@ -27,7 +27,7 @@ class Config implements ArrayAccess {
 
 
 	public static function getInstance(): self {
-		if ( self::$instance === null ) {
+		if ( null === self::$instance ) {
 			self::$instance = new self();
 		}
 		return self::$instance;
@@ -65,26 +65,6 @@ class Config implements ArrayAccess {
 				'debug' => defined( 'WP_DEBUG' ) && WP_DEBUG,
 				'timezone' => function_exists( 'wp_timezone_string' ) ? wp_timezone_string() : 'UTC',
 			],
-			'logging' => [
-				'enabled' => defined( 'ZAPLANE_ALLOW_LOGS' ) && ZAPLANE_ALLOW_LOGS,
-				'level' => 'debug',
-				'channel' => 'file',
-				'channels' => [
-					'file' => [
-						'driver' => 'file',
-						'path' => WP_CONTENT_DIR . '/zaplane-logs',
-						'days' => 14,
-					],
-					'database' => [
-						'driver' => 'database',
-						'table' => 'zaplane_logs',
-						'days' => 30,
-					],
-					'errorlog' => [
-						'driver' => 'errorlog',
-					],
-				],
-			],
 			'database' => [
 				'prefix' => 'zaplane_',
 				'charset' => defined( 'DB_CHARSET' ) ? DB_CHARSET : 'utf8mb4',
@@ -116,7 +96,7 @@ class Config implements ArrayAccess {
 			return $this;
 		}
 
-		if ( in_array( $path, $this->loadedFiles ) ) {
+		if ( in_array( $path, $this->loadedFiles, true ) ) {
 			return $this;
 		}
 
@@ -166,7 +146,7 @@ class Config implements ArrayAccess {
 	public function loadFromOptions( string $optionName ): self {
 		$value = get_option( $optionName );
 
-		if ( $value === false ) {
+		if ( false === $value ) {
 			return $this;
 		}
 
@@ -202,7 +182,7 @@ class Config implements ArrayAccess {
 		$current = &$this->items;
 
 		foreach ( $keys as $i => $segment ) {
-			if ( $i === count( $keys ) - 1 ) {
+			if ( count( $keys ) - 1 === $i ) {
 				$current[ $segment ] = $value;
 			} else {
 				if ( ! isset( $current[ $segment ] ) || ! is_array( $current[ $segment ] ) ) {
@@ -238,7 +218,7 @@ class Config implements ArrayAccess {
 		$current = &$this->items;
 
 		foreach ( $keys as $i => $segment ) {
-			if ( $i === count( $keys ) - 1 ) {
+			if ( count( $keys ) - 1 === $i ) {
 				unset( $current[ $segment ] );
 				return $this;
 			}
@@ -298,7 +278,7 @@ class Config implements ArrayAccess {
 
 	public function saveToOption( string $optionName, ?string $key = null ): bool {
 		$data = $key ? $this->get( $key ) : $this->items;
-		return update_option( $optionName, json_encode( $data ) );
+		return update_option( $optionName, wp_json_encode( $data ) );
 	}
 
 

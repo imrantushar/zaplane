@@ -12,7 +12,7 @@ class Expression {
 
 	public static function evaluate( $expr, array $data ) {
 
-		if ( $expr === null || $expr === '' ) {
+		if ( null === $expr || '' === $expr ) {
 			return null;
 		}
 
@@ -29,7 +29,7 @@ class Expression {
 			if ( is_array( $val ) ) {
 				return implode( ', ', array_filter( $val, 'is_scalar' ) );
 			}
-			return $val !== null ? (string) $val : '';
+			return null !== $val ? (string) $val : '';
 		}, $expr);
 	}
 
@@ -40,7 +40,7 @@ class Expression {
 
 			$key = $m[0];
 
-			if ( in_array( $key, [ 'true', 'false', 'null' ] ) || is_numeric( $key ) ) {
+			if ( in_array( $key, [ 'true', 'false', 'null' ], true ) || is_numeric( $key ) ) {
 				return $key;
 			}
 
@@ -58,7 +58,8 @@ class Expression {
 		$php = str_replace('[]', '', $php);
 
 		try {
-			return eval( "return {$php};" );
+			// phpcs:ignore Generic.PHP.ForbiddenFunctions.Found -- eval() is intentional for expression evaluation engine.
+			return eval( "return {$php};" ); // phpcs:ignore Squiz.PHP.Eval.Discouraged
 		} catch ( \Throwable $e ) {
 			return null;
 		}

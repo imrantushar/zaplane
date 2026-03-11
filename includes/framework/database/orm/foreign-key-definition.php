@@ -74,7 +74,7 @@ class ForeignKeyDefinition {
 		$constraintName = "fk_{$table}_{$this->column}";
 
 		return "CONSTRAINT {$constraintName} FOREIGN KEY ({$this->column}) " .
-			   "REFERENCES {$this->referencesTable}({$this->referencesColumn}) " .
-			   "ON DELETE {$this->onDelete} ON UPDATE {$this->onUpdate}";
+			"REFERENCES {$this->referencesTable}({$this->referencesColumn}) " .
+			"ON DELETE {$this->onDelete} ON UPDATE {$this->onUpdate}";
 	}
 }

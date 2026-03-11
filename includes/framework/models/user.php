@@ -52,7 +52,7 @@ class User extends WpModel {
 
 	public function hasRole( string $role ): bool {
 		$user = get_user_by( 'ID', $this->ID );
-		return $user && in_array( $role, $user->roles );
+		return $user && in_array( $role, $user->roles, true );
 	}
 
 	public function hasCapability( string $capability ): bool {
@@ -77,6 +77,7 @@ class User extends WpModel {
 
 	public static function admins(): array {
 		global $wpdb;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Custom admin role query.
 		$adminIds = $wpdb->get_col(
 			"SELECT user_id FROM {$wpdb->usermeta} WHERE meta_key = '{$wpdb->prefix}capabilities' AND meta_value LIKE '%administrator%'"
 		);

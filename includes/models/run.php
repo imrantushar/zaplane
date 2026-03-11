@@ -120,7 +120,7 @@ class Run extends Model {
 			->where( 'is_test', 1 )
 			->orderBy( 'id', 'desc' );
 
-		if( $nodeIds ) {
+		if ( $nodeIds ) {
 			$testRuns = $testRuns->whereIn( 'target_node_key', $nodeIds );
 		}
 
@@ -147,7 +147,7 @@ class Run extends Model {
 			->where( 'is_test', 1 )
 			->orderBy( 'id', 'desc' );
 
-		if( $nodeIds ) {
+		if ( $nodeIds ) {
 			$testRuns = $testRuns->whereIn( 'target_node_key', $nodeIds );
 		}
 
@@ -173,13 +173,13 @@ class Run extends Model {
 			->whereIn( 'status', [ 'completed', 'failed', 'running' ] )
 			->orderBy( 'id', 'desc' );
 
-		if( $nodeIds ) {
+		if ( $nodeIds ) {
 			$runs = $runs->whereIn( 'target_node_key', $nodeIds );
 		}
 
 		$runs = $runs->get();
 
-		ray($runs)->label( "Runs for workflow version ID $versionId" );
+		ray( $runs )->label( "Runs for workflow version ID $versionId" );
 
 		$nodeOutputs = [];
 

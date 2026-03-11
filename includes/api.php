@@ -3,6 +3,7 @@ namespace Zaplane;
 
 use Zaplane\Framework\Core\ModuleInterface;
 use Zaplane\Framework\Classes\Container;
+use Zaplane\Framework\Database\ORM\DB;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -40,13 +41,11 @@ class API implements ModuleInterface {
 			'methods'  => 'GET',
 			'permission_callback' => '__return_true',
 			'callback' => function ( $req ) {
-				global $wpdb;
-				return $wpdb->get_results(
-					$wpdb->prepare(
-						"SELECT * FROM {$wpdb->prefix}zaplane_run_logs WHERE run_id = %d",
-						$req['id']
-					)
-				);
+				return DB::table( 'run_logs' )
+					->where( 'run_id', (int) $req['id'] )
+					->fresh()
+					->get()
+					->toArray();
 			}
 		]);
 

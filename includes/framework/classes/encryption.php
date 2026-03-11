@@ -47,12 +47,13 @@ class Encryption {
 			self::TAG_LENGTH
 		);
 
-		if ( $ciphertext === false ) {
+		if ( false === $ciphertext ) {
 			throw EncryptionException::encryptionFailed();
 		}
 
 		$combined = $iv . $tag . $ciphertext;
 
+		// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode -- Required for encryption output.
 		return base64_encode( $combined );
 	}
 
@@ -60,9 +61,10 @@ class Encryption {
 
 	public static function decrypt( string $encrypted ): array {
 		$key = self::get_key();
+		// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode -- Required for decryption input.
 		$combined = base64_decode( $encrypted );
 
-		if ( $combined === false || strlen( $combined ) < 28 ) {
+		if ( false === $combined || strlen( $combined ) < 28 ) {
 			throw EncryptionException::invalidFormat();
 		}
 
@@ -79,13 +81,13 @@ class Encryption {
 			$tag
 		);
 
-		if ( $plaintext === false ) {
+		if ( false === $plaintext ) {
 			throw EncryptionException::dataCorrupted();
 		}
 
 		$data = json_decode( $plaintext, true );
 
-		if ( json_last_error() !== JSON_ERROR_NONE ) {
+		if ( JSON_ERROR_NONE !== json_last_error() ) {
 			throw EncryptionException::invalidJson();
 		}
 

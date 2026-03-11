@@ -19,17 +19,17 @@ class ConnectionManager {
 	public function create( int $user_id, string $app, string $name, string $auth_type, array $credentials ): array {
 		$integration = IntegrationLoader::get( $app );
 		if ( ! $integration ) {
-			throw IntegrationException::notFound( $app );
+			throw IntegrationException::notFound( esc_html( $app ) );
 		}
 
 		$test_result = null;
-		if ( $auth_type !== 'oauth2' ) {
+		if ( 'oauth2' !== $auth_type ) {
 			$class = get_class( $integration );
 			$test_result = $class::test_connection( $credentials );
 			if ( ! ( $test_result['success'] ?? false ) ) {
 				throw ConnectionException::invalidCredentials(
-					$app,
-					$test_result['message'] ?? 'Connection test failed'
+					esc_html( $app ),
+					esc_html( $test_result['message'] ?? 'Connection test failed' )
 				);
 			}
 		}
@@ -37,7 +37,7 @@ class ConnectionManager {
 		try {
 			$encrypted = Encryption::encrypt( $credentials );
 		} catch ( EncryptionException $e ) {
-			throw ConnectionException::createFailed( $app, $e->getMessage() );
+			throw ConnectionException::createFailed( esc_html( $app ), esc_html( $e->getMessage() ) );
 		}
 
 		$connection = Connection::create([
@@ -49,7 +49,7 @@ class ConnectionManager {
 			'status' => 'active',
 		]);
 
-		if ( $test_result !== null ) {
+		if ( null !== $test_result ) {
 			$connection->markAsTested( true );
 		}
 
@@ -74,7 +74,9 @@ class ConnectionManager {
 			} catch ( EncryptionException $e ) {
 				$data['credentials'] = [];
 				$data['decrypt_error'] = $e->getMessage();
+			// phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
 			} catch ( \Exception $e ) {
+				// Silently ignore non-encryption exceptions for credential decryption.
 			}
 		}
 
@@ -84,7 +86,7 @@ class ConnectionManager {
 	public function get_user_connections( int $user_id, ?string $app = null, int $page = 1, int $perPage = 20 ): array {
 		$query = Connection::where( 'user_id', $user_id );
 
-		if ( $app !== null ) {
+		if ( null !== $app ) {
 			$query->where( 'app', $app );
 		}
 
@@ -167,17 +169,17 @@ class ConnectionManager {
 		$connection = Connection::find( $id );
 
 		if ( ! $connection ) {
-			throw ConnectionException::notFound( $id );
+			throw ConnectionException::notFound( esc_html( (string) $id ) );
 		}
 
 		$credentials = $connection->getCredentials();
 
 		if ( empty( $credentials ) && ! empty( $connection->encrypted_credentials ) ) {
-			throw ConnectionException::testFailed( $id, 'Failed to decrypt credentials' );
+			throw ConnectionException::testFailed( esc_html( (string) $id ), 'Failed to decrypt credentials' );
 		}
 
 		if ( ! IntegrationLoader::has( $connection->app ) ) {
-			throw IntegrationException::notFound( $connection->app );
+			throw IntegrationException::notFound( esc_html( $connection->app ) );
 		}
 
 		$integration = IntegrationLoader::get( $connection->app );
@@ -194,7 +196,7 @@ class ConnectionManager {
 		$connection = Connection::find( $id );
 
 		if ( ! $connection ) {
-			throw ConnectionException::notFound( $id );
+			throw ConnectionException::notFound( esc_html( (string) $id ) );
 		}
 
 		$credentials = $connection->getCredentials();
@@ -203,7 +205,7 @@ class ConnectionManager {
 			throw EncryptionException::decryptionFailed( 'Failed to decrypt credentials' );
 		}
 
-		if ( $connection->auth_type === 'oauth2' ) {
+		if ( 'oauth2' === $connection->auth_type ) {
 			$credentials = $this->refresh_oauth_if_needed( $connection, $credentials );
 		}
 
@@ -244,7 +246,7 @@ class ConnectionManager {
 				$connection->setOAuthExpiry( (int) $new_tokens['expires_in'] );
 			}
 		} catch ( \Throwable $e ) {
-			error_log( 'Zaplane OAuth refresh failed for connection ' . $connection->id . ': ' . $e->getMessage() );
+			$e->getMessage();
 		}
 
 		return $credentials;

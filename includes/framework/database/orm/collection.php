@@ -52,7 +52,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
 	}
 
 	public function toJson( int $options = 0 ): string {
-		return json_encode( $this->toArray(), $options );
+		return wp_json_encode( $this->toArray(), $options );
 	}
 
 	public function jsonSerialize(): array {
@@ -72,7 +72,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
 	}
 
 	public function first( ?callable $callback = null, $default = null ) {
-		if ( $callback === null ) {
+		if ( null === $callback ) {
 			return $this->items[0] ?? $default;
 		}
 
@@ -86,7 +86,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
 	}
 
 	public function last( ?callable $callback = null, $default = null ) {
-		if ( $callback === null ) {
+		if ( null === $callback ) {
 			return ! empty( $this->items ) ? $this->items[ array_key_last( $this->items ) ] : $default;
 		}
 
@@ -138,7 +138,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
 	}
 
 	public function filter( ?callable $callback = null ): self {
-		if ( $callback === null ) {
+		if ( null === $callback ) {
 			return new static( array_filter( $this->items ) );
 		}
 
@@ -163,11 +163,13 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
 			switch ( $operator ) {
 				case '=':
 				case '==':
+					// phpcs:ignore WordPress.PHP.StrictComparisons.LooseComparison -- Intentional loose comparison for flexible where().
 					return $itemValue == $value;
 				case '===':
 					return $itemValue === $value;
 				case '!=':
 				case '<>':
+					// phpcs:ignore WordPress.PHP.StrictComparisons.LooseComparison -- Intentional loose comparison for flexible where().
 					return $itemValue != $value;
 				case '!==':
 					return $itemValue !== $value;
@@ -180,6 +182,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
 				case '>=':
 					return $itemValue >= $value;
 				default:
+					// phpcs:ignore WordPress.PHP.StrictComparisons.LooseComparison -- Intentional fallback uses loose comparison.
 					return $itemValue == $value;
 			}//end switch
 		});
@@ -187,13 +190,13 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
 
 	public function whereIn( string $key, array $values ): self {
 		return $this->filter(function ( $item ) use ( $key, $values ) {
-			return in_array( $this->getItemValue( $item, $key ), $values );
+			return in_array( $this->getItemValue( $item, $key ), $values, true );
 		});
 	}
 
 	public function whereNotIn( string $key, array $values ): self {
 		return $this->filter(function ( $item ) use ( $key, $values ) {
-			return ! in_array( $this->getItemValue( $item, $key ), $values );
+			return ! in_array( $this->getItemValue( $item, $key ), $values, true );
 		});
 	}
 
@@ -234,7 +237,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
 		foreach ( $this->items as $item ) {
 			$itemValue = $this->getItemValue( $item, $value );
 
-			if ( $key !== null ) {
+			if ( null !== $key ) {
 				$itemKey = $this->getItemValue( $item, $key );
 				$results[ $itemKey ] = $itemValue;
 			} else {
@@ -279,6 +282,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
 			$aVal = $callback( $a );
 			$bVal = $callback( $b );
 
+			// phpcs:ignore WordPress.PHP.StrictComparisons.LooseComparison -- Generic sort comparison.
 			if ( $aVal == $bVal ) {
 				return 0;
 			}
@@ -312,7 +316,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
 	}
 
 	public function unique( ?string $key = null ): self {
-		if ( $key === null ) {
+		if ( null === $key ) {
 			return new static( array_unique( $this->items, SORT_REGULAR ) );
 		}
 
@@ -322,7 +326,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
 		foreach ( $this->items as $item ) {
 			$itemKey = $this->getItemValue( $item, $key );
 
-			if ( ! in_array( $itemKey, $seen ) ) {
+			if ( ! in_array( $itemKey, $seen, true ) ) {
 				$seen[] = $itemKey;
 				$result[] = $item;
 			}
@@ -388,7 +392,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
 
 			if ( ! is_array( $item ) ) {
 				$result[] = $item;
-			} elseif ( $depth === 1 ) {
+			} elseif ( 1 === $depth ) {
 				$result = array_merge( $result, array_values( $item ) );
 			} else {
 				$result = array_merge( $result, $this->flattenArray( $item, $depth - 1 ) );
@@ -429,11 +433,11 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
 	}
 
 	public function pop() {
-		 return array_pop( $this->items );
+		return array_pop( $this->items );
 	}
 
 	public function prepend( $value, $key = null ): self {
-		if ( $key !== null ) {
+		if ( null !== $key ) {
 			$this->items = [ $key => $value ] + $this->items;
 		} else {
 			array_unshift( $this->items, $value );
@@ -481,7 +485,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
 				return false;
 			}
 
-			return in_array( $key, $this->items );
+			return in_array( $key, $this->items, true );
 		}
 
 		return $this->where( $key, $operator, $value )->isNotEmpty();
@@ -498,11 +502,12 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
 			return false;
 		}
 
+		// phpcs:ignore WordPress.PHP.StrictInArray.MissingTrueStrict -- $strict param controls this explicitly.
 		return array_search( $value, $this->items, $strict );
 	}
 
 	public function sum( $callback = null ) {
-		if ( $callback === null ) {
+		if ( null === $callback ) {
 			return array_sum( $this->items );
 		}
 
@@ -519,7 +524,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
 	public function avg( $callback = null ) {
 		$count = $this->count();
 
-		if ( $count === 0 ) {
+		if ( 0 === $count ) {
 			return null;
 		}
 
@@ -531,7 +536,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
 	}
 
 	public function min( $callback = null ) {
-		if ( $callback === null ) {
+		if ( null === $callback ) {
 			return min( $this->items );
 		}
 
@@ -543,7 +548,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
 	}
 
 	public function max( $callback = null ) {
-		if ( $callback === null ) {
+		if ( null === $callback ) {
 			return max( $this->items );
 		}
 
@@ -560,13 +565,13 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
 
 		$count = count( $values );
 
-		if ( $count === 0 ) {
+		if ( 0 === $count ) {
 			return null;
 		}
 
 		$middle = (int) ( $count / 2 );
 
-		if ( $count % 2 === 0 ) {
+		if ( 0 === $count % 2 ) {
 			return ( $values[ $middle - 1 ] + $values[ $middle ] ) / 2;
 		}
 
@@ -578,7 +583,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
 	}
 
 	public function implode( string $value, ?string $glue = null ): string {
-		if ( $glue === null ) {
+		if ( null === $glue ) {
 			return implode( $value, $this->items );
 		}
 
@@ -586,17 +591,17 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
 	}
 
 	public function join( string $glue, string $finalGlue = '' ): string {
-		if ( $finalGlue === '' ) {
+		if ( '' === $finalGlue ) {
 			return implode( $glue, $this->items );
 		}
 
 		$count = $this->count();
 
-		if ( $count === 0 ) {
+		if ( 0 === $count ) {
 			return '';
 		}
 
-		if ( $count === 1 ) {
+		if ( 1 === $count ) {
 			return (string) $this->first();
 		}
 
@@ -644,7 +649,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
 			$number = $count;
 		}
 
-		if ( $number === 1 ) {
+		if ( 1 === $number ) {
 			return $this->items[ array_rand( $this->items ) ];
 		}
 
@@ -688,11 +693,13 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
 	}
 
 	public function dd(): void {
+		// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_var_dump -- Intentional debug helper.
 		var_dump( $this->toArray() );
 		die( 1 );
 	}
 
 	public function dump(): self {
+		// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_var_dump -- Intentional debug helper.
 		var_dump( $this->toArray() );
 
 		return $this;
@@ -708,7 +715,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
 	}
 
 	public function offsetSet( $offset, $value ): void {
-		if ( $offset === null ) {
+		if ( null === $offset ) {
 			$this->items[] = $value;
 		} else {
 			$this->items[ $offset ] = $value;
