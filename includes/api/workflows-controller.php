@@ -543,6 +543,8 @@ class WorkflowsController extends WP_REST_Controller {
 
 		$nodeOutputs = Run::latestTestNodeRunsByWorkflowAndVersion( $workflowId, $workflowVersionId, $previousNodeIds );
 
+		ray($workflowId, $workflowVersionId, $nodeOutputs)->label('Node Outputs');
+
 		$data = [];
 		foreach ( $previousNodeIds as $nodeId ) {
 			$node = $nodeMap[ $nodeId ] ?? null;

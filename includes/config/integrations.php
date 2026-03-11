@@ -64,7 +64,7 @@ return [
 			'file' => 'storeengine.php',
 			'class' => \Zaplane\Integrations\Storeengine::class
 		],
-		'Http'                 => [
+		'http'                 => [
 			'file' => 'http.php',
 			'class' => \Zaplane\Integrations\Http::class
 		],
@@ -84,7 +84,7 @@ return [
 			'file' => 'fluent-form.php',
 			'class' => \Zaplane\Integrations\FluentForm::class
 		],
-		'FluentCRM'            => [
+		'fluentcrm'            => [
 			'file' => 'fluent-crm.php',
 			'class' => \Zaplane\Integrations\FluentCrm::class
 		],
@@ -151,6 +151,10 @@ return [
 		'elementor'            => [
 			'file' => 'elementor.php',
 			'class' => \Zaplane\Integrations\Elementor::class
+		],
+		'academy'            => [
+			'file' => 'academy.php',
+			'class' => \Zaplane\Integrations\Academy::class
 		],
 	],
 ];

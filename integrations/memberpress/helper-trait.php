@@ -3,6 +3,39 @@ namespace Zaplane\Integrations\Memberpress;
 
 trait HelperTrait {
 
+	protected static function normalize_prefixed_status( string $status, string $prefix ): string {
+		$status = sanitize_key( $status );
+		if ( 0 === strpos( $status, $prefix ) ) {
+			return substr( $status, strlen( $prefix ) );
+		}
+
+		return $status;
+	}
+
+	protected static function normalize_post_status( string $status ): string {
+		return self::normalize_prefixed_status( $status, 'mp_post_' );
+	}
+
+	protected static function get_membership_status_config( array $config ): string {
+		return (string) ( $config['membership_status'] ?? ( $config['status'] ?? '' ) );
+	}
+
+	protected static function normalize_transaction_status( string $status ): string {
+		return self::normalize_prefixed_status( $status, 'mp_transaction_' );
+	}
+
+	protected static function get_transaction_status_config( array $config ): string {
+		return (string) ( $config['transaction_status'] ?? ( $config['status'] ?? '' ) );
+	}
+
+	protected static function normalize_subscription_status( string $status ): string {
+		return self::normalize_prefixed_status( $status, 'mp_subscription_' );
+	}
+
+	protected static function get_subscription_status_config( array $config ): string {
+		return (string) ( $config['subscription_status'] ?? ( $config['status'] ?? '' ) );
+	}
+
 	protected static function to_bool( $value ): bool {
 		return in_array( $value, [ true, 1, '1', 'true', 'yes', 'on' ], true );
 	}
@@ -22,23 +55,23 @@ trait HelperTrait {
 		return [
 			[
 				'label' => 'Pending',
-				'value' => 'pending'
+				'value' => 'mp_transaction_pending'
 			],
 			[
 				'label' => 'Complete',
-				'value' => 'complete'
+				'value' => 'mp_transaction_complete'
 			],
 			[
 				'label' => 'Confirmed',
-				'value' => 'confirmed'
+				'value' => 'mp_transaction_confirmed'
 			],
 			[
 				'label' => 'Failed',
-				'value' => 'failed'
+				'value' => 'mp_transaction_failed'
 			],
 			[
 				'label' => 'Refunded',
-				'value' => 'refunded'
+				'value' => 'mp_transaction_refunded'
 			],
 		];
 	}
@@ -47,19 +80,19 @@ trait HelperTrait {
 		return [
 			[
 				'label' => 'Active',
-				'value' => 'active'
+				'value' => 'mp_subscription_active'
 			],
 			[
 				'label' => 'Pending',
-				'value' => 'pending'
+				'value' => 'mp_subscription_pending'
 			],
 			[
 				'label' => 'Suspended',
-				'value' => 'suspended'
+				'value' => 'mp_subscription_suspended'
 			],
 			[
 				'label' => 'Cancelled',
-				'value' => 'cancelled'
+				'value' => 'mp_subscription_cancelled'
 			],
 		];
 	}
@@ -106,15 +139,15 @@ trait HelperTrait {
 		return [
 			[
 				'label' => 'Publish',
-				'value' => 'publish'
+				'value' => 'mp_post_publish'
 			],
 			[
 				'label' => 'Draft',
-				'value' => 'draft'
+				'value' => 'mp_post_draft'
 			],
 			[
 				'label' => 'Private',
-				'value' => 'private'
+				'value' => 'mp_post_private'
 			],
 		];
 	}

@@ -6,10 +6,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use Zaplane\Framework\Classes\IntegrationBase;
+use Academy\Traits\Lessons;
 
 class Academy extends IntegrationBase {
 
 	public static function get_slug(): string {
+		return 'academy';
+	}
+
+	public static function get_name(): string {
+		return 'Academy LMS';
+	}
+
+	public static function get_icon(): string {
 		return 'academy';
 	}
 
@@ -40,99 +49,49 @@ class Academy extends IntegrationBase {
 
 	public static function get_trigger_config_schema( string $trigger ): array {
 		if ( in_array( $trigger, [ 'user_enroll_course', 'course_complete' ], true ) ) {
-			$options = [
-				[
-					'label' => 'Any course',
-					'value' => 'any'
-				],
-			];
-			if ( ! function_exists( 'Academy' ) ) {
-				$courses = get_posts([
-					'post_type'      => 'academy_courses',
-					'post_status'    => 'publish',
-					'posts_per_page' => -1,
-				]);
-
-				foreach ( $courses as $course ) {
-					$options[] = [
-						'label' => $course->post_title,
-						'value' => $course->ID
-					];
-				}
-			}
 			return [
 				[
 					'key'      => 'course_id',
-					'label'    => 'course',
+					'label'    => 'Course',
 					'type'     => 'select',
-					'options'  => $options,
+					'dynamic' => [
+						'integration' => 'academy',
+						'query'       => 'acourse',
+						'select'      => [ 'name', 'label' ],
+					],
 					'required' => true,
 				],
 			];
-		}//end if
+		}
 
 		if ( in_array( $trigger, [ 'academy_quiz_course_attempt' ], true ) ) {
-			$options = [
-				[
-					'label' => 'Any Quiz',
-					'value' => 'any'
-				],
-			];
-			if ( ! function_exists( 'Academy' ) ) {
-				$quizzes = get_posts([
-					'post_type'      => 'academy_quiz',
-					'post_status'    => 'publish',
-					'posts_per_page' => -1,
-				]);
 
-				foreach ( $quizzes as $quiz ) {
-					$options[] = [
-						'label' => $quiz->post_title,
-						'value' => $quiz->ID,
-					];
-				}
-			}
 			return [
 				[
 					'key'      => 'quiz_id',
 					'label'    => 'Quiz',
 					'type'     => 'select',
-					'options'  => $options,
+					'dynamic' => [
+						'integration' => 'academy',
+						'query'       => 'quiz',
+						'select'      => [ 'name', 'label' ],
+					],
 					'required' => true,
 				],
 			];
-		}//end if
+		}
 
 		if ( $trigger === 'quiz_target' ) {
-
-			$options = [
-				[
-					'label' => 'Any Quiz',
-					'value' => 'any'
-				],
-			];
-
-			if ( ! function_exists( 'Academy' ) ) {
-				$quizzes = get_posts([
-					'post_type'      => 'academy_quiz',
-					'post_status'    => 'publish',
-					'posts_per_page' => -1,
-				]);
-
-				foreach ( $quizzes as $quiz ) {
-					$options[] = [
-						'label' => $quiz->post_title,
-						'value' => $quiz->ID,
-					];
-				}
-			}
-
 			return [
 				[
 					'key'      => 'quiz_id',
 					'label'    => 'Quiz',
 					'type'     => 'select',
-					'options'  => $options,
+					'dynamic' => [
+						'integration' => 'academy',
+						'query'       => 'quiz',
+						'select'      => [ 'name', 'label' ],
+					],
 					'required' => true,
 				],
 				[
@@ -145,51 +104,25 @@ class Academy extends IntegrationBase {
 		}//end if
 
 		if ( in_array( $trigger, [ 'lesson_complete' ], true ) ) {
-			$options = [
+
+			return [
 				[
-					'label' => 'Any lesson',
-					'value' => 'any'
+					'key'      => 'lesson_id',
+					'label'    => 'Lesson',
+					'type'     => 'select',
+					'dynamic' => [
+						'integration' => 'academy',
+						'query'       => 'lesson',
+						'select'      => [ 'name', 'label' ],
+					],
+					'required' => true,
 				],
 			];
-			if ( ! function_exists( 'Academy' ) ) {
-				global $wpdb;
-				$table = $wpdb->prefix . 'academy_lessons';
+		}
 
-                // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-				$lessons = $wpdb->get_results(
-					"SELECT ID, lesson_title
-                    FROM {$table}
-                    WHERE lesson_status = 'publish'
-                    ORDER BY lesson_title ASC"
-				);
-
-				$options = [
-					[
-						'label' => 'Any lesson',
-						'value' => 'any'
-					],
-				];
-
-				foreach ( $lessons as $lesson ) {
-					$options[] = [
-						'label' => $lesson->lesson_title,
-						'value' => $lesson->ID,
-					];
-				}
-
-				return [
-					[
-						'key'      => 'lesson_id',
-						'label'    => 'Lesson',
-						'type'     => 'select',
-						'options'  => $options,
-						'required' => true,
-					],
-				];
-			}//end if
-			return [];
-		}//end if
+		return [];
 	}
+
 
 	public static function resolve_trigger( array $node, array $args ) {
 		switch ( $node['event'] ) {
@@ -360,5 +293,94 @@ class Academy extends IntegrationBase {
 			'port' => 'main',
 			'data' => $input
 		];
+	}
+
+	public static function get_dynamic_queries(): array {
+		return [
+			'acourse' => [ self::class, 'query_courses' ],
+			'quiz' => [ self::class, 'query_quiz' ],
+			'lesson' => [ self::class, 'query_lesson' ],
+		];
+	}
+
+	public static function query_courses() {
+
+			$options = [
+				[
+					'label' => 'Any course',
+					'name' => 'any'
+				],
+			];
+
+			if ( class_exists( 'Academy' ) ) {
+				$courses = get_posts([
+					'post_type'      => 'academy_courses',
+					'post_status'    => 'publish',
+					'posts_per_page' => -1,
+				]);
+
+				error_log( 'course:' . print_r( $courses, true ) );
+
+				foreach ( $courses as $course ) {
+					$options[] = [
+						'label' => $course->post_title,
+						'name' => $course->ID
+					];
+				}
+			}
+
+			return $options;
+	}
+
+	public static function query_quiz() {
+
+		$options = [
+			[
+				'label' => 'Any Quiz',
+				'name' => 'any'
+			],
+		];
+		if ( class_exists( 'Academy' ) ) {
+			$quizzes = get_posts([
+				'post_type'      => 'academy_quiz',
+				'post_status'    => 'publish',
+				'posts_per_page' => -1,
+			]);
+			error_log( 'Quiz:' . print_r( $quizzes, true ) );
+
+			foreach ( $quizzes as $quiz ) {
+				$options[] = [
+					'label' => $quiz->post_title,
+					'name' => $quiz->ID,
+				];
+			}
+		}
+
+		return $options;
+	}
+
+	public static function query_lesson() {
+		$options = [
+			[
+				'label' => 'Any lesson',
+				'name' => 'any'
+			],
+		];
+
+		if ( class_exists( 'Academy' ) ) {
+
+			$lessons = Lessons::get_lessons();
+
+			if ( ! empty( $lessons ) ) {
+				foreach ( $lessons as $lesson ) {
+					$options[] = [
+						'label' => $lesson->lesson_title,
+						'name'  => $lesson->ID,
+					];
+				}
+			}
+		}
+
+		return $options;
 	}
 }

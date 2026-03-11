@@ -105,10 +105,10 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
         setEdges((eds) => eds.filter((e) => e.id !== edgeId));
     };
 
-    // console.log(nodes, 'all nodes',);
-    // console.log(edges, 'all edges');
+    
     const nodeTypes = {
         custom: (props) => (
+        
             <CustomNode
                 {...props}
                 data={{
@@ -119,6 +119,7 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
 
                 }}
                 canvasLayout={canvasLayout}
+                nodes={nodes}
             />
         ),
     };
@@ -131,15 +132,9 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
             />
         ),
     };
-    //listiner
 
-    // useEffect(() => {
-    //     const interval = setInterval(() => {
-    //         dispatch(getRunWorkFlow());
-    //     }, 5000);
-
-    //     return () => clearInterval(interval);
-    // }, []);  
+    // console.log(nodes, 'all nodes',);
+    // console.log(edges, 'all edges');
     return (
         <Box
             ref={containerRef}

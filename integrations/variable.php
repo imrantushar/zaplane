@@ -29,7 +29,7 @@ class Variable extends IntegrationBase {
 		return [
 			[
 				'key' => 'name',
-				'label' => 'Variable Name',
+				'label' => 'Variable Name (e.g. my_custom_var)',
 				'type' => 'text',
 				'required' => true
 			],
@@ -43,13 +43,12 @@ class Variable extends IntegrationBase {
 
 	public static function execute_node( array $node, array $input ): array {
 
-		$name = $node['data']['config']['name'];
-		$value = Expression::evaluate(
-			$node['data']['config']['value'],
-			$input
-		);
+		$name = $node['data']['config']['name'] ?? '';
+		$value = $node['data']['config']['value'] ?? null;
 
-		$input[ $name ] = $value;
+		if ( ! empty( $name ) ) {
+			$input[ $name ] = $value;
+		}
 
 		return [
 			'port' => 'main',

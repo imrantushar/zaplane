@@ -324,7 +324,7 @@ trait Helper {
 			$data['description'] = $description;
 		}
 
-		$status = strtolower( trim( (string) ( $config['status'] ?? '' ) ) );
+		$status = self::normalize_product_status( $config['product_status'] ?? ( $config['status'] ?? '' ) );
 		if ( '' !== $status ) {
 			$data['status'] = $status;
 		}
@@ -354,6 +354,15 @@ trait Helper {
 		}
 
 		return $data;
+	}
+
+	protected static function normalize_product_status( $status ): string {
+		$status = strtolower( trim( (string) $status ) );
+		if ( 0 === strpos( $status, 'surecart_product_' ) ) {
+			return substr( $status, strlen( 'surecart_product_' ) );
+		}
+
+		return $status;
 	}
 
 	protected static function get_pagination_args( array $config, int $default_limit = 20 ): array {

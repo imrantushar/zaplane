@@ -1,7 +1,6 @@
 import { Box, Button, Flex, Text } from "@chakra-ui/react";
 import { FieldArray } from "formik";
 import { FiTrash2 } from "react-icons/fi";
-import ZAPInput from "@ZAPComponents/ZAPInput";
 import ZAPSelect from "@ZAPComponents/ZAPSelect";
 import { __ } from "@wordpress/i18n";
 import { buildEmptyRule } from "./helper";
@@ -115,20 +114,6 @@ export default function ConditionGroupField({ value, field, variables }) {
                             onClick={() => groupHelpers.push([{ ...EMPTY_RULE }])}>
                             {__("OR Group", "zaplane")}
                         </Button>
-
-                        <VariablePopover
-                            isOpen={isPopoverOpen}
-                            onClose={() => {
-                                setPopoverOpen(false);
-                                setActiveInput(null);
-                            }}
-                            data={variables}
-                            activeInput={activeInput}
-                            groups={groups}
-                            groupHelpers={groupHelpers}
-                            setPopoverOpen={setPopoverOpen}
-                            setActiveInput={setActiveInput}
-                        />
                     </Flex>
                 );
             }}

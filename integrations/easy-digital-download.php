@@ -193,17 +193,17 @@ class EasyDigitalDownload extends IntegrationBase {
 					]
 				],
 				[
-					'key' => 'status',
+					'key' => 'customer_status',
 					'label' => 'Status',
 					'type' => 'select',
 					'options' => [
 						[
 							'label' => 'Active',
-							'value' => 'active'
+							'value' => 'edd_customer_active'
 						],
 						[
 							'label' => 'Inactive',
-							'value' => 'inactive'
+							'value' => 'edd_customer_inactive'
 						],
 					]
 				],
@@ -243,17 +243,17 @@ class EasyDigitalDownload extends IntegrationBase {
 					]
 				],
 				[
-					'key' => 'status',
+					'key' => 'discount_status',
 					'label' => 'Status',
 					'type' => 'select',
 					'options' => [
 						[
 							'label' => 'Active',
-							'value' => 'active'
+							'value' => 'edd_discount_active'
 						],
 						[
 							'label' => 'Inactive',
-							'value' => 'inactive'
+							'value' => 'edd_discount_inactive'
 						],
 					]
 				],
@@ -281,45 +281,45 @@ class EasyDigitalDownload extends IntegrationBase {
 					'required' => true
 				],
 				[
-					'key' => 'status',
+					'key' => 'payment_status',
 					'label' => 'Status',
 					'type' => 'select',
 					'options' => [
 						[
 							'label' => 'Pending',
-							'value' => 'pending'
+							'value' => 'edd_payment_pending'
 						],
 						[
 							'label' => 'Processing',
-							'value' => 'processing'
+							'value' => 'edd_payment_processing'
 						],
 						[
 							'label' => 'Completed',
-							'value' => 'complete'
+							'value' => 'edd_payment_complete'
 						],
 						[
 							'label' => 'Refunded',
-							'value' => 'refunded'
+							'value' => 'edd_payment_refunded'
 						],
 						[
 							'label' => 'Partially Refunded',
-							'value' => 'partially_refunded'
+							'value' => 'edd_payment_partially_refunded'
 						],
 						[
 							'label' => 'Revoked',
-							'value' => 'revoked'
+							'value' => 'edd_payment_revoked'
 						],
 						[
 							'label' => 'Failed',
-							'value' => 'failed'
+							'value' => 'edd_payment_failed'
 						],
 						[
 							'label' => 'Abandoned',
-							'value' => 'abandoned'
+							'value' => 'edd_payment_abandoned'
 						],
 						[
 							'label' => 'On Hold',
-							'value' => 'on_hold'
+							'value' => 'edd_payment_on_hold'
 						],
 					]
 				],
@@ -361,17 +361,17 @@ class EasyDigitalDownload extends IntegrationBase {
 					'type' => 'number'
 				],
 				[
-					'key' => 'status',
+					'key' => 'download_status',
 					'label' => 'Status',
 					'type' => 'select',
 					'options' => [
 						[
 							'label' => 'Draft',
-							'value' => 'draft'
+							'value' => 'edd_download_draft'
 						],
 						[
 							'label' => 'Publish',
-							'value' => 'publish'
+							'value' => 'edd_download_publish'
 						],
 					]
 				],
@@ -404,17 +404,17 @@ class EasyDigitalDownload extends IntegrationBase {
 					'type' => 'number'
 				],
 				[
-					'key' => 'status',
+					'key' => 'download_status',
 					'label' => 'Status',
 					'type' => 'select',
 					'options' => [
 						[
 							'label' => 'Draft',
-							'value' => 'draft'
+							'value' => 'edd_download_draft'
 						],
 						[
 							'label' => 'Publish',
-							'value' => 'publish'
+							'value' => 'edd_download_publish'
 						],
 					]
 				],
@@ -480,7 +480,7 @@ class EasyDigitalDownload extends IntegrationBase {
 
 		return [
 			'port' => 'main',
-			'data' => $input
+			'data' => $input 
 		];
 	}
 }

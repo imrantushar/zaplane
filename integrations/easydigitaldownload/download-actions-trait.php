@@ -9,14 +9,15 @@ trait DownloadActionsTrait {
 		}
 
 		$name = trim( $config['name'] ?? '' );
-		if ( $name === '' ) {
+		if ( '' === $name ) {
 			return self::action_error( 'Product name is required', $input );
 		}
+		$download_status = self::get_download_status_config( $config );
 
 		$data = [
 			'post_title' => $name,
 			'post_content' => $config['description'] ?? '',
-			'post_status' => $config['status'] ?? 'draft',
+			'post_status' => '' !== $download_status ? self::normalize_download_status( $download_status ) : 'draft',
 			'post_type' => 'download',
 		];
 
@@ -32,7 +33,7 @@ trait DownloadActionsTrait {
 			return self::action_error( 'Failed to create product', $input );
 		}
 
-		if ( isset( $config['price'] ) && $config['price'] !== '' ) {
+		if ( isset( $config['price'] ) && '' !== $config['price'] ) {
 			update_post_meta( $download_id, 'edd_price', $config['price'] );
 		}
 
@@ -64,8 +65,9 @@ trait DownloadActionsTrait {
 		if ( array_key_exists( 'description', $config ) ) {
 			$update['post_content'] = $config['description'];
 		}
-		if ( ! empty( $config['status'] ) ) {
-			$update['post_status'] = $config['status'];
+		$download_status = self::get_download_status_config( $config );
+		if ( '' !== $download_status ) {
+			$update['post_status'] = self::normalize_download_status( $download_status );
 		}
 
 		if ( count( $update ) > 1 ) {
@@ -75,7 +77,7 @@ trait DownloadActionsTrait {
 			}
 		}
 
-		if ( isset( $config['price'] ) && $config['price'] !== '' ) {
+		if ( isset( $config['price'] ) && '' !== $config['price'] ) {
 			update_post_meta( $download_id, 'edd_price', $config['price'] );
 		}
 
@@ -91,11 +93,11 @@ trait DownloadActionsTrait {
 		}
 
 		$post = get_post( $download_id );
-		if ( ! $post || $post->post_type !== 'download' ) {
+		if ( ! $post || 'download' !== $post->post_type ) {
 			return self::action_error( 'Product not found', $input );
 		}
 
-		$force = ! empty( $config['force_delete'] ) && $config['force_delete'] !== '0';
+		$force = ! empty( $config['force_delete'] ) && '0' !== $config['force_delete'];
 		$deleted = wp_delete_post( $download_id, $force );
 
 		if ( ! $deleted ) {

@@ -29,28 +29,17 @@ class Formidable extends IntegrationBase {
 
 	public static function get_trigger_config_schema( string $trigger ): array {
 		if ( 'form_submitted' === $trigger ) {
-			$options[] = [
-				'label' => 'Any Form',
-				'value' => 'any'
-			];
-
-			if ( function_exists( 'load_formidable_forms' ) ) {
-				$forms = FrmForm::getAll();
-
-				foreach ( $forms as $form ) {
-					$options[] = [
-						'label' => $form->name,
-						'value' => $form->id,
-					];
-				}
-			}
 
 			return [
 				[
 					'key'      => 'form_id',
 					'label'    => 'Forms',
 					'type'     => 'select',
-					'options'  => $options,
+					'dynamic' => [
+						'integration' => 'formidable',
+						'query'       => 'form_query',
+						'select'      => [ 'name', 'label' ],
+					],
 					'required' => true,
 				],
 			];
@@ -170,5 +159,31 @@ class Formidable extends IntegrationBase {
 		}//end switch
 
 		return false;
+	}
+
+	public static function get_dynamic_queries(): array {
+		return [
+			'form_query' => [ self::class, 'form_query_types' ],
+		];
+	}
+
+	public static function form_query_types( $q ) {
+		$options[] = [
+			'label' => 'Any Form',
+			'name' => 'any'
+		];
+
+		if ( function_exists( 'load_formidable_forms' ) ) {
+			$forms = FrmForm::getAll();
+
+			foreach ( $forms as $form ) {
+				$options[] = [
+					'name' => $form->id,
+					'label' => $form->name,
+				];
+			}
+		}
+
+		return $options;
 	}
 }

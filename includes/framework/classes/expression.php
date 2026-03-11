@@ -16,7 +16,7 @@ class Expression {
 			return null;
 		}
 
-		if ( ! str_contains( $expr, '{{' ) ) {
+		if ( ! is_string($expr) || ! str_contains( $expr, '{{' ) ) {
 			return $expr;
 		}
 
@@ -53,6 +53,9 @@ class Expression {
 
 			return $php;
 		}, $code);
+
+		// Prevent fatal compilation errors if the user's expression has trailing empty brackets (e.g `array[]`)
+		$php = str_replace('[]', '', $php);
 
 		try {
 			// phpcs:ignore Generic.PHP.ForbiddenFunctions.Found -- eval() is intentional for expression evaluation engine.

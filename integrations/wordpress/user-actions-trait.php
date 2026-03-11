@@ -9,6 +9,26 @@ use Zaplane\Traits\ActionResponseTrait;
 
 trait UserActionsTrait {
 
+	private static function get_user_id_from_config( array $config ): int {
+		return (int) ( $config['user_id'] ?? 0 );
+	}
+
+	private static function require_user_from_config( array $config, string &$error = '' ) {
+		$user_id = static::get_user_id_from_config( $config );
+		if ( ! $user_id ) {
+			$error = 'User ID is required';
+			return null;
+		}
+
+		$user = static::find_user( 'id', $user_id );
+		if ( ! $user ) {
+			$error = 'User not found';
+			return null;
+		}
+
+		return $user;
+	}
+
 	private static function find_user( string $field, $value ) {
 		$user = get_user_by( $field, $value );
 		return $user instanceof \WP_User ? $user : null;
@@ -63,14 +83,10 @@ trait UserActionsTrait {
 	}
 
 	protected static function action_get_user_by_id( array $config ): array {
-		$user_id = (int) ( $config['user_id'] ?? 0 );
-		if ( ! $user_id ) {
-			return static::error( 'User ID is required' );
-		}
-
-		$user = static::find_user( 'id', $user_id );
+		$error = '';
+		$user = static::require_user_from_config( $config, $error );
 		if ( ! $user ) {
-			return static::error( 'User not found' );
+			return static::error( $error );
 		}
 
 		return static::success( static::format_user_response( $user ) );
@@ -115,7 +131,7 @@ trait UserActionsTrait {
 	}
 
 	protected static function action_get_user_meta_all( array $config ): array {
-		$user_id = (int) ( $config['user_id'] ?? 0 );
+		$user_id = static::get_user_id_from_config( $config );
 		if ( ! $user_id ) {
 			return static::error( 'User ID is required' );
 		}
@@ -127,7 +143,7 @@ trait UserActionsTrait {
 	}
 
 	protected static function action_get_user_meta_single( array $config ): array {
-		$user_id = (int) ( $config['user_id'] ?? 0 );
+		$user_id = static::get_user_id_from_config( $config );
 		$meta_key = (string) ( $config['meta_key'] ?? '' );
 		if ( ! $user_id || '' === $meta_key ) {
 			return static::error( 'User ID and meta key are required' );
@@ -141,7 +157,7 @@ trait UserActionsTrait {
 	}
 
 	protected static function action_update_user_meta( array $config ): array {
-		$user_id = (int) ( $config['user_id'] ?? 0 );
+		$user_id = static::get_user_id_from_config( $config );
 		$meta_key = (string) ( $config['meta_key'] ?? '' );
 		if ( ! $user_id || '' === $meta_key ) {
 			return static::error( 'User ID and meta key are required' );
@@ -204,13 +220,12 @@ trait UserActionsTrait {
 	}
 
 	protected static function action_activate_user( array $config ): array {
-		$user_id = (int) ( $config['user_id'] ?? 0 );
-		if ( ! $user_id ) {
-			return static::error( 'User ID is required' );
+		$error = '';
+		$user = static::require_user_from_config( $config, $error );
+		if ( ! $user ) {
+			return static::error( $error );
 		}
-		if ( ! static::find_user( 'id', $user_id ) ) {
-			return static::error( 'User not found' );
-		}
+		$user_id = (int) $user->ID;
 
 		delete_user_meta( $user_id, 'zaplane_user_deactivated' );
 		if ( is_multisite() && function_exists( 'update_user_status' ) ) {
@@ -225,13 +240,12 @@ trait UserActionsTrait {
 	}
 
 	protected static function action_deactivate_user( array $config ): array {
-		$user_id = (int) ( $config['user_id'] ?? 0 );
-		if ( ! $user_id ) {
-			return static::error( 'User ID is required' );
+		$error = '';
+		$user = static::require_user_from_config( $config, $error );
+		if ( ! $user ) {
+			return static::error( $error );
 		}
-		if ( ! static::find_user( 'id', $user_id ) ) {
-			return static::error( 'User not found' );
-		}
+		$user_id = (int) $user->ID;
 
 		update_user_meta( $user_id, 'zaplane_user_deactivated', 1 );
 		if ( is_multisite() && function_exists( 'update_user_status' ) ) {

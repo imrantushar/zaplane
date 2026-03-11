@@ -305,6 +305,10 @@ class RunController extends WP_REST_Controller {
 		$workflowVersionId = (int) ( $req['workflow_version_id'] ?? 0 );
 		$input             = $req['input'] ?? [];
 
+		if ( $targetNode && is_array( $input ) ) {
+			$targetNode['data']['config'] = array_merge( $targetNode['data']['config'] ?? [], $input );
+		}
+
 		if ( ! $workflowVersionId ) {
 			return new WP_Error( 'missing_params', 'workflow_version_id is required', [ 'status' => 400 ] );
 		}
