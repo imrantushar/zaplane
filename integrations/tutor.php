@@ -24,10 +24,6 @@ class Tutor extends IntegrationBase {
 				'label' => 'User enrolled in a course',
 				'hook'  => 'tutor_after_enroll'
 			],
-			'course_complete' => [
-				'label' => 'User completed a course',
-				'hook'  => 'tutor_course_complete_after'
-			],
 			'tutor_quiz_course_attempt' => [
 				'label' => 'User attempted (submitted) a quiz',
 				'hook'  => 'tutor_quiz/attempt_ended'
@@ -44,7 +40,7 @@ class Tutor extends IntegrationBase {
 	}
 
 	public static function get_trigger_config_schema( string $trigger ): array {
-		if ( in_array( $trigger, [ 'user_enroll_course', 'course_complete' ], true ) ) {
+		if ( in_array( $trigger, [ 'user_enroll_course' ], true ) ) {
 			return [
 				[
 					'key'      => 'course_id',
@@ -139,40 +135,6 @@ class Tutor extends IntegrationBase {
 					'course_id' => $course_id,
 					'enroll_id' => $enroll_id,
 				];
-
-			case 'course_complete':
-				$course_id = $args[0] ?? null;
-				$user_id   = $args[1] ?? get_current_user_id();
-
-				if ( ! $course_id || ! $user_id ) {
-					return false;
-				}
-
-				$selected_course = $node['data']['config']['course_id'] ?? 'any';
-
-				if ( $selected_course !== 'any' && (int) $selected_course !== (int) $course_id ) {
-					return false;
-				}
-
-				$course = get_post( $course_id );
-				$user   = get_userdata( $user_id );
-
-				if ( ! $course || ! $user ) {
-					return false;
-				}
-
-				return [
-					'success'      => true,
-					'course_id'    => $course->ID,
-					'course_title' => $course->post_title,
-					'course_url'   => get_permalink( $course->ID ),
-					'user_id'      => $user_id,
-					'user_email'   => $user->user_email,
-					'first_name'   => $user->first_name,
-					'last_name'    => $user->last_name,
-				];
-
-
 			case 'lesson_complete':
 				$lesson_id = $args[0] ?? null;
 				$user_id   = $args[1] ?? get_current_user_id();
