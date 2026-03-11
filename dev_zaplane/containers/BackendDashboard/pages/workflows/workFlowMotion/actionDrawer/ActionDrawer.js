@@ -77,6 +77,7 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
     selectedActionFields,
     values,
   });
+
   const resetAll = () => {
     setMode(null);
     setStep("select");
@@ -101,6 +102,7 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
           acc[f.key] = values[f.key];
           return acc;
         }, {}),
+         ...(selectedItem.mode && { mode: selectedItem.mode }),
         ...(values.hook && { hook: values.hook }),
         ...(values.connection_id && { connection_id: values.connection_id }),
       };

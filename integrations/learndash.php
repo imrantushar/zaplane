@@ -51,62 +51,6 @@ class Learndash extends IntegrationBase {
 		];
 	}
 
-	private static function resolve_all_course_payload() {
-		$all_course = [
-			[
-				'label' => 'Any course',
-				'value' => 'any'
-			],
-		];
-
-		if ( ! function_exists( 'LearnDash' ) ) {
-			$courses = get_posts([
-				'post_type'      => 'sfwd-courses',
-				'post_status'    => 'publish',
-				'orderby'        => 'post_title',
-				'order'          => 'ASC',
-				'posts_per_page' => -1,
-			]);
-
-			foreach ( $courses as $course ) {
-				$all_course[] = [
-					'label' => $course->post_title,
-					'value' => $course->ID
-				];
-			}
-		}
-
-		return $all_course;
-	}
-
-	private static function resolve_all_lesson_payload() {
-		$all_lesson = [
-			[
-				'label' => 'Any lesson',
-				'value' => 'any'
-			],
-		];
-
-		if ( ! function_exists( 'LearnDash' ) ) {
-			$lessons = get_posts([
-				'post_type'      => 'sfwd-lessons',
-				'post_status'    => 'publish',
-				'orderby'        => 'post_title',
-				'order'          => 'ASC',
-				'posts_per_page' => -1,
-			]);
-
-			foreach ( $lessons as $lesson ) {
-				$all_lesson[] = [
-					'label' => $lesson->post_title,
-					'value' => $lesson->ID
-				];
-			}
-		}
-
-		return $all_lesson;
-	}
-
 	public static function get_trigger_config_schema( string $trigger ): array {
 		if ( in_array( $trigger, [ 'user_enroll_course', 'course_complete' ], true ) ) {
 			return [
@@ -114,7 +58,11 @@ class Learndash extends IntegrationBase {
 					'key'      => 'course_id',
 					'label'    => 'Course',
 					'type'     => 'select',
-					'options'  => self::resolve_all_course_payload(),
+					'dynamic' => [
+						'integration' => 'learndash',
+						'query'       => 'course_query',
+						'select'      => [ 'name', 'label' ],
+					],
 					'required' => true,
 				],
 			];
@@ -126,135 +74,92 @@ class Learndash extends IntegrationBase {
 					'key'      => 'course_id',
 					'label'    => 'Course',
 					'type'     => 'select',
-					'options'  => self::resolve_all_course_payload(),
+					'dynamic' => [
+						'integration' => 'learndash',
+						'query'       => 'course_query',
+						'select'      => [ 'name', 'label' ],
+					],
 					'required' => true,
 				],
 				[
 					'key'      => 'lesson_id',
 					'label'    => 'Lesson',
 					'type'     => 'select',
-					'options'  => self::resolve_all_lesson_payload(),
+					'dynamic' => [
+						'integration' => 'learndash',
+						'query'       => 'lesson_query',
+						'select'      => [ 'name', 'label' ],
+					],
 					'required' => true,
 				],
 			];
-		}
+		}//end if
 
-		if ( $trigger === 'topic_complete' ) {
-			$all_topic = [
-				[
-					'label' => 'Any Topic',
-					'value' => 'any'
-				],
-			];
-
-			if ( ! function_exists( 'LearnDash' ) ) {
-				$topics = get_posts([
-					'post_type'      => 'sfwd-topic',
-					'post_status'    => 'publish',
-					'orderby'        => 'post_title',
-					'order'          => 'ASC',
-					'posts_per_page' => -1,
-				]);
-
-				foreach ( $topics as $topic ) {
-					$all_topic[] = [
-						'label' => $topic->post_title,
-						'value' => $topic->ID
-					];
-				}
-			}
-
+		if ( 'topic_complete' === $trigger ) {
 			return [
 				[
 					'key'      => 'course_id',
 					'label'    => 'Course',
 					'type'     => 'select',
-					'options'  => self::resolve_all_course_payload(),
+					'dynamic' => [
+						'integration' => 'learndash',
+						'query'       => 'course_query',
+						'select'      => [ 'name', 'label' ],
+					],
 					'required' => true,
 				],
 				[
 					'key'      => 'lesson_id',
 					'label'    => 'Lesson',
 					'type'     => 'select',
-					'options'  => self::resolve_all_lesson_payload(),
+					'dynamic' => [
+						'integration' => 'learndash',
+						'query'       => 'lesson_query',
+						'select'      => [ 'name', 'label' ],
+					],
 					'required' => true,
 				],
 				[
 					'key'      => 'topic_id',
 					'label'    => 'Topic',
 					'type'     => 'select',
-					'options'  => $all_topic,
+					'dynamic' => [
+						'integration' => 'learndash',
+						'query'       => 'topic_query',
+						'select'      => [ 'name', 'label' ],
+					],
 					'required' => true,
 				],
 			];
 		}//end if
 
-		if ( $trigger === 'quiz_attempt' ) {
-			$all_quiz = [
-				[
-					'label' => 'Any Quiz',
-					'value' => 'any'
-				],
-			];
-
-			if ( ! function_exists( 'LearnDash' ) ) {
-				$quizes = get_posts([
-					'post_type'      => 'sfwd-quiz',
-					'post_status'    => 'publish',
-					'orderby'        => 'post_title',
-					'order'          => 'ASC',
-					'posts_per_page' => -1,
-				]);
-
-				foreach ( $quizes as $quiz ) {
-					$all_quiz[] = [
-						'label' => $quiz->post_title,
-						'value' => $quiz->ID
-					];
-				}
-			}
-
+		if ( 'quiz_attempt' === $trigger ) {
 			return [
 				[
 					'key'      => 'quiz_id',
 					'label'    => 'Quiz',
 					'type'     => 'select',
-					'options'  => $all_quiz,
+					'dynamic' => [
+						'integration' => 'learndash',
+						'query'       => 'quiz_query',
+						'select'      => [ 'name', 'label' ],
+					],
 					'required' => true,
 				],
 			];
 		}//end if
 
 		if ( in_array( $trigger, [ 'added_group', 'removed_group' ], true ) ) {
-			$all_group = [
-				[
-					'label' => 'Any Group',
-					'value' => 'any'
-				],
-			];
-
-			if ( ! function_exists( 'LearnDash' ) ) {
-				$groups = get_posts([
-					'post_type'      => 'groups',
-					'post_status'    => 'publish',
-					'orderby'        => 'post_title',
-					'order'          => 'ASC',
-					'posts_per_page' => -1,
-				]);
-
-				foreach ( $groups as $group ) {
-					$all_group[] = [
-						'label' => $group->post_title,
-						'value' => $group->ID
-					];
-				}
-			}
 			return [
 				[
 					'key'      => 'group_id',
 					'label'    => 'Group',
 					'type'     => 'select',
-					'options'  => $all_group,
+					'dynamic' => [
+						'integration' => 'learndash',
+						'query'       => 'group_query',
+						'select'      => [ 'name', 'label' ],
+					],
 					'required' => true,
 				],
 			];
@@ -303,7 +208,7 @@ class Learndash extends IntegrationBase {
 
 				$selected_course = $node['data']['config']['course_id'] ?? 'any';
 
-				if ( $selected_course !== 'any' && (int) $selected_course !== (int) $course_id ) {
+				if ( 'any' !== $selected_course && (int) $selected_course !== (int) $course_id ) {
 					return false;
 				}
 
@@ -324,7 +229,7 @@ class Learndash extends IntegrationBase {
 				$course_id = $data['course']->ID;
 				$selected_course = $node['data']['config']['course_id'] ?? 'any';
 
-				if ( $selected_course !== 'any' && (int) $selected_course !== (int) $course_id ) {
+				if ( 'any' !== $selected_course && (int) $selected_course !== (int) $course_id ) {
 					return false;
 				}
 
@@ -344,7 +249,7 @@ class Learndash extends IntegrationBase {
 
 				$selected_lesson = $node['data']['config']['lesson_id'] ?? 'any';
 
-				if ( $selected_lesson !== 'any' && (int) $selected_lesson !== (int) $lesson_id ) {
+				if ( 'any' !== $selected_lesson && (int) $selected_lesson !== (int) $lesson_id ) {
 					return false;
 				}
 
@@ -374,7 +279,7 @@ class Learndash extends IntegrationBase {
 				$topic  = $data['topic'];
 				$selected_topic = $node['data']['config']['topic_id'] ?? 'any';
 
-				if ( $selected_topic !== 'any' && (int) $selected_topic !== (int) $topic->ID ) {
+				if ( 'any' !== $selected_topic && (int) $selected_topic !== (int) $topic->ID ) {
 					return false;
 				}
 
@@ -418,7 +323,7 @@ class Learndash extends IntegrationBase {
 				$quiz   = get_post( (int) $quiz_id );
 				$selected_quiz = $node['data']['config']['quiz_id'] ?? 'any';
 
-				if ( $selected_quiz !== 'any' && (int) $selected_quiz !== (int) $quiz->ID ) {
+				if ( 'any' !== $selected_quiz && (int) $selected_quiz !== (int) $quiz->ID ) {
 					return false;
 				}
 
@@ -463,7 +368,7 @@ class Learndash extends IntegrationBase {
 
 				$selected_group = $node['data']['config']['group_id'] ?? 'any';
 
-				if ( $selected_group !== 'any' && (int) $selected_group !== (int) $group_id ) {
+				if ( 'any' !== $selected_group && (int) $selected_group !== (int) $group_id ) {
 					return false;
 				}
 
@@ -562,5 +467,155 @@ class Learndash extends IntegrationBase {
 				];
 		}//end switch
 		return false;
+	}
+
+	public static function get_dynamic_queries(): array {
+		return [
+			'course_query' => [ self::class, 'course_query_types' ],
+			'lesson_query' => [ self::class, 'lesson_query_types' ],
+			'topic_query'  => [ self::class, 'topic_query_types' ],
+			'quiz_query'   => [ self::class, 'quiz_query_types' ],
+			'group_query'  => [ self::class, 'group_query_types' ],
+		];
+	}
+
+	public static function course_query_types( $q ) {
+		$all_course = [
+			[
+				'label' => 'Any course',
+				'name' => 'any'
+			],
+		];
+
+		if ( ! function_exists( 'LearnDash' ) ) {
+			$courses = get_posts([
+				'post_type'      => 'sfwd-courses',
+				'post_status'    => 'publish',
+				'orderby'        => 'post_title',
+				'order'          => 'ASC',
+				'posts_per_page' => -1,
+			]);
+
+			foreach ( $courses as $course ) {
+				$all_course[] = [
+					'label' => $course->post_title,
+					'name' => $course->ID
+				];
+			}
+		}
+
+		return $all_course;
+	}
+
+	public static function lesson_query_types( $q ) {
+		$all_lesson = [
+			[
+				'label' => 'Any lesson',
+				'name' => 'any'
+			],
+		];
+
+		if ( ! function_exists( 'LearnDash' ) ) {
+			$lessons = get_posts([
+				'post_type'      => 'sfwd-lessons',
+				'post_status'    => 'publish',
+				'orderby'        => 'post_title',
+				'order'          => 'ASC',
+				'posts_per_page' => -1,
+			]);
+
+			foreach ( $lessons as $lesson ) {
+				$all_lesson[] = [
+					'label' => $lesson->post_title,
+					'name' => $lesson->ID
+				];
+			}
+		}
+
+		return $all_lesson;
+	}
+
+	public static function topic_query_types( $q ) {
+		$all_topic = [
+			[
+				'label' => 'Any Topic',
+				'name' => 'any'
+			],
+		];
+
+		if ( ! function_exists( 'LearnDash' ) ) {
+			$topics = get_posts([
+				'post_type'      => 'sfwd-topic',
+				'post_status'    => 'publish',
+				'orderby'        => 'post_title',
+				'order'          => 'ASC',
+				'posts_per_page' => -1,
+			]);
+
+			foreach ( $topics as $topic ) {
+				$all_topic[] = [
+					'label' => $topic->post_title,
+					'name' => $topic->ID
+				];
+			}
+		}
+
+		return $all_topic;
+	}
+
+	public static function quiz_query_types( $q ) {
+		$all_quiz = [
+			[
+				'label' => 'Any Quiz',
+				'name' => 'any'
+			],
+		];
+
+		if ( ! function_exists( 'LearnDash' ) ) {
+			$quizes = get_posts([
+				'post_type'      => 'sfwd-quiz',
+				'post_status'    => 'publish',
+				'orderby'        => 'post_title',
+				'order'          => 'ASC',
+				'posts_per_page' => -1,
+			]);
+
+			foreach ( $quizes as $quiz ) {
+				$all_quiz[] = [
+					'label' => $quiz->post_title,
+					'name' => $quiz->ID
+				];
+			}
+		}
+
+		return $all_quiz;
+	}
+
+	public static function group_query_types( $q ) {
+		$all_group = [
+			[
+				'label' => 'Any Group',
+				'name' => 'any'
+			],
+		];
+
+		if ( ! function_exists( 'LearnDash' ) ) {
+			$groups = get_posts([
+				'post_type'      => 'groups',
+				'post_status'    => 'publish',
+				'orderby'        => 'post_title',
+				'order'          => 'ASC',
+				'posts_per_page' => -1,
+			]);
+
+			foreach ( $groups as $group ) {
+				$all_group[] = [
+					'label' => $group->post_title,
+					'name' => $group->ID
+				];
+			}
+		}
+
+		return $all_group;
 	}
 }

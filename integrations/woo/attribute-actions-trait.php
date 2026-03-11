@@ -10,7 +10,7 @@ trait AttributeActionsTrait {
 	private static function action_add_or_update_product_attribute( array $config, array $input ): array {
 		$product_id = (int) ( $config['product_id'] ?? 0 );
 		$attribute_name = $config['attribute_name'] ?? '';
-		if ( ! $product_id || $attribute_name === '' ) {
+		if ( ! $product_id || '' === $attribute_name ) {
 			return self::error( 'Product ID and attribute name are required' );
 		}
 		$product = wc_get_product( $product_id );
@@ -26,7 +26,7 @@ trait AttributeActionsTrait {
 
 		$is_taxonomy = self::parse_bool( $config['is_taxonomy'] ?? false );
 		$taxonomy = $config['taxonomy'] ?? '';
-		if ( ! $taxonomy && str_starts_with( $attribute_name, 'pa_' ) ) {
+		if ( ! $taxonomy && 0 === strpos( $attribute_name, 'pa_' ) ) {
 			$taxonomy = $attribute_name;
 			$is_taxonomy = true;
 		}
@@ -90,7 +90,7 @@ trait AttributeActionsTrait {
 	private static function action_remove_product_attribute( array $config, array $input ): array {
 		$product_id = (int) ( $config['product_id'] ?? 0 );
 		$attribute_name = $config['attribute_name'] ?? '';
-		if ( ! $product_id || $attribute_name === '' ) {
+		if ( ! $product_id || '' === $attribute_name ) {
 			return self::error( 'Product ID and attribute name are required' );
 		}
 		$product = wc_get_product( $product_id );
@@ -118,7 +118,7 @@ trait AttributeActionsTrait {
 			return self::error( 'WooCommerce attribute API not available' );
 		}
 		$name = $config['name'] ?? '';
-		if ( $name === '' ) {
+		if ( '' === $name ) {
 			return self::error( 'Attribute name is required' );
 		}
 		$data = [
@@ -151,9 +151,15 @@ trait AttributeActionsTrait {
 			'order_by' => $config['order_by'] ?? '',
 			'has_archives' => isset( $config['has_archives'] ) ? self::parse_bool( $config['has_archives'] ) : null,
 		];
-		$result = wc_update_attribute($attribute_id, array_filter($data, function ( $value ) {
-			return $value !== '' && $value !== null;
-		}));
+		$result = wc_update_attribute(
+			$attribute_id,
+			array_filter(
+				$data,
+				static function ( $value ) {
+					return '' !== $value && null !== $value;
+				}
+			)
+		);
 		if ( is_wp_error( $result ) ) {
 			return self::error( $result->get_error_message() );
 		}

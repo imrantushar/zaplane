@@ -32,8 +32,13 @@ trait QueryTrait {
 	}
 
 	public static function query_terms( $query ) {
+		$taxonomy = $query['where']['taxonomy'] ?? '';
+		if ( '' === $taxonomy ) {
+			$taxonomy = get_taxonomies( [], 'names' );
+		}
+
 		$term_args = [
-			'taxonomy'   => $query['where']['taxonomy'] ?? 'category',
+			'taxonomy'   => $taxonomy,
 			'search'     => $query['search'] ?? '',
 			'number'     => $query['limit'] ?? 20,
 			'hide_empty' => $query['where']['hide_empty'] ?? false,
@@ -167,7 +172,7 @@ trait QueryTrait {
 				continue;
 			}
 
-			if ( $plugin === 'zaplane/zaplane.php' ) {
+			if ( 'zaplane/zaplane.php' === $plugin ) {
 				continue;
 			}
 
@@ -194,7 +199,7 @@ trait QueryTrait {
 				continue;
 			}
 
-			if ( $inactive_plugin === 'zaplane/zaplane.php' ) {
+			if ( 'zaplane/zaplane.php' === $inactive_plugin ) {
 				continue;
 			}
 

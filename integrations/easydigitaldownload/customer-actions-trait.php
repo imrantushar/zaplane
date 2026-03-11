@@ -9,7 +9,7 @@ trait CustomerActionsTrait {
 		}
 
 		$email = trim( $config['email'] ?? '' );
-		if ( $email === '' ) {
+		if ( '' === $email ) {
 			return self::action_error( 'Customer email is required', $input );
 		}
 
@@ -25,8 +25,9 @@ trait CustomerActionsTrait {
 			$data['user_id'] = (int) $config['user_id'];
 		}
 
-		if ( ! empty( $config['status'] ) ) {
-			$data['status'] = $config['status'];
+		$customer_status = self::get_customer_status_config( $config );
+		if ( '' !== $customer_status ) {
+			$data['status'] = self::normalize_customer_status( $customer_status );
 		}
 
 		$customer_id = edd_add_customer( $data );

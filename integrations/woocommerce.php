@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class woocommerce extends IntegrationBase {
+class Woocommerce extends IntegrationBase {
 
 	use Helper;
 	use OrderActionsTrait;
@@ -131,52 +131,63 @@ class woocommerce extends IntegrationBase {
 
 	public static function resolve_trigger( array $node, array $args ) {
 		$event = $node['event'] ?? '';
-		if ( $event === '' ) {
+		if ( '' === $event ) {
 			return false;
 		}
 
 		if ( in_array( $event, self::ORDER_STATUS_EVENTS, true ) ) {
-			return self::order_status_payload_from_args( $args ) ?: false;
+			$payload = self::order_status_payload_from_args( $args );
+			return $payload ? $payload : false;
 		}
 
 		switch ( $event ) {
 			case 'new_order':
-				return self::order_payload_from_args( $args ) ?: false;
+				$payload = self::order_payload_from_args( $args );
+				return $payload ? $payload : false;
 			case 'restore_order':
-				return self::order_payload_from_args($args, [
+				$payload = self::order_payload_from_args($args, [
 					'previous_status' => $args[1] ?? '',
-				]) ?: false;
+				]);
+				return $payload ? $payload : false;
 			case 'order_status_changed':
-				return self::order_payload_from_args($args, [
+				$payload = self::order_payload_from_args($args, [
 					'old_status' => $args[1] ?? '',
 					'new_status' => $args[2] ?? '',
-				], 0, 3) ?: false;
+				], 0, 3);
+				return $payload ? $payload : false;
 			case 'new_coupon':
-				return self::coupon_payload_from_args( $args ) ?: false;
+				$payload = self::coupon_payload_from_args( $args );
+				return $payload ? $payload : false;
 			case 'create_customer':
-				return self::customer_payload_from_args($args, [
+				$payload = self::customer_payload_from_args($args, [
 					'password_generated' => (bool) ( $args[2] ?? false ),
-				]) ?: false;
+				]);
+				return $payload ? $payload : false;
 			case 'update_customer':
-				return self::customer_payload_from_args( $args ) ?: false;
+				$payload = self::customer_payload_from_args( $args );
+				return $payload ? $payload : false;
 			case 'delete_customer':
 				$customer_id = $args[0] ?? 0;
 				return $customer_id ? [ 'customer_id' => $customer_id ] : false;
 			case 'create_product':
 			case 'update_product':
-				return self::product_payload_from_args( $args ) ?: false;
+				$payload = self::product_payload_from_args( $args );
+				return $payload ? $payload : false;
 			case 'delete_product':
 			case 'restore_product':
-				return self::product_payload_from_post( $args[0] ?? 0 ) ?: false;
+				$payload = self::product_payload_from_post( $args[0] ?? 0 );
+				return $payload ? $payload : false;
 			case 'product_status_updated':
-				return self::product_payload_from_args($args, [
+				$payload = self::product_payload_from_args($args, [
 					'stock_status' => $args[1] ?? '',
-				], 0, 2) ?: false;
+				], 0, 2);
+				return $payload ? $payload : false;
 			case 'product_status_changed':
-				return self::product_payload_from_post($args[2] ?? null, [
+				$payload = self::product_payload_from_post($args[2] ?? null, [
 					'old_status' => $args[1] ?? '',
 					'new_status' => $args[0] ?? '',
-				]) ?: false;
+				]);
+				return $payload ? $payload : false;
 			case 'product_added_to_cart':
 				return self::build_cart_add_payload( $args );
 			case 'product_removed_from_cart':
@@ -289,7 +300,7 @@ class woocommerce extends IntegrationBase {
 					'type' => 'expression'
 				],
 				[
-					'key' => 'status',
+					'key' => 'order_status',
 					'label' => 'Order Status',
 					'type' => 'select',
 					'options' => self::order_status_options()
@@ -313,7 +324,7 @@ class woocommerce extends IntegrationBase {
 			'update_order' => [
 				...self::field_order_id(),
 				[
-					'key' => 'status',
+					'key' => 'order_status',
 					'label' => 'Order Status',
 					'type' => 'select',
 					'options' => self::order_status_options()
@@ -357,7 +368,7 @@ class woocommerce extends IntegrationBase {
 			'update_order_status' => [
 				...self::field_order_id(),
 				[
-					'key' => 'status',
+					'key' => 'order_status',
 					'label' => 'Order Status',
 					'type' => 'select',
 					'options' => self::order_status_options(),
@@ -380,7 +391,7 @@ class woocommerce extends IntegrationBase {
 			],
 			'get_total_orders_count' => [
 				[
-					'key' => 'status',
+					'key' => 'order_status',
 					'label' => 'Order Status',
 					'type' => 'select',
 					'options' => self::order_status_options()
@@ -394,7 +405,7 @@ class woocommerce extends IntegrationBase {
 			],
 			'get_orders_by_status' => [
 				[
-					'key' => 'status',
+					'key' => 'order_status',
 					'label' => 'Order Status',
 					'type' => 'select',
 					'options' => self::order_status_options(),
@@ -506,7 +517,7 @@ class woocommerce extends IntegrationBase {
 					'required' => true
 				],
 				[
-					'key' => 'status',
+					'key' => 'product_status',
 					'label' => 'Status',
 					'type' => 'select',
 					'options' => self::product_status_options()
@@ -572,7 +583,12 @@ class woocommerce extends IntegrationBase {
 				[
 					'key' => 'parent_id',
 					'label' => 'Parent Product ID',
-					'type' => 'expression',
+					'type' => 'select',
+					'dynamic' => [
+						'integration' => 'woocommerce',
+						'query' => 'products',
+						'select' => [ 'id', 'name' ],
+					],
 					'required' => true
 				],
 				[
@@ -607,7 +623,7 @@ class woocommerce extends IntegrationBase {
 					'type' => 'boolean'
 				],
 				[
-					'key' => 'status',
+					'key' => 'product_status',
 					'label' => 'Status',
 					'type' => 'select',
 					'options' => self::product_status_options()
@@ -621,7 +637,7 @@ class woocommerce extends IntegrationBase {
 					'type' => 'text'
 				],
 				[
-					'key' => 'status',
+					'key' => 'product_status',
 					'label' => 'Status',
 					'type' => 'select',
 					'options' => self::product_status_options()
@@ -695,7 +711,15 @@ class woocommerce extends IntegrationBase {
 				[
 					'key' => 'category_id',
 					'label' => 'Category ID',
-					'type' => 'expression'
+					'type' => 'select',
+					'dynamic' => [
+						'integration' => 'woocommerce',
+						'query' => 'terms',
+						'select' => [ 'id', 'name' ],
+						'where' => [
+							'taxonomy' => 'product_cat',
+						],
+					],
 				],
 				[
 					'key' => 'category_slug',
@@ -752,12 +776,18 @@ class woocommerce extends IntegrationBase {
 			],
 			'delete_product_permanently' => self::field_product_id(),
 			'delete_product_soft' => self::field_product_id(),
-			'get_products_totals' => [],
+			'get_products_totals' => [
+				[
+					'key' => 'include_variations',
+					'label' => 'Include Variations',
+					'type' => 'boolean',
+				],
+			],
 			'get_product_sales_count_by_id' => self::field_product_id(),
 			'update_product_status' => [
 				...self::field_product_id(),
 				[
-					'key' => 'status',
+					'key' => 'product_status',
 					'label' => 'Status',
 					'type' => 'select',
 					'options' => self::product_status_options(),
@@ -765,35 +795,45 @@ class woocommerce extends IntegrationBase {
 				],
 			],
 
-			'create_product_category' => self::field_term_create(),
-			'update_product_category' => self::field_term_update(),
-			'delete_product_category' => self::field_term_delete(),
-			'get_product_category_all' => [],
-			'get_product_category_single' => self::field_term_id(),
+			'create_product_category' => self::field_term_create( true, 'product_cat' ),
+			'update_product_category' => self::field_term_update( true, 'product_cat' ),
+			'delete_product_category' => self::field_term_delete( 'product_cat' ),
+			'get_product_category_all' => [
+				...self::field_term_list_filters(),
+			],
+			'get_product_category_single' => self::field_term_id( 'product_cat' ),
 
-			'create_product_tag' => self::field_term_create( false ),
-			'update_product_tag' => self::field_term_update( false ),
-			'delete_product_tag' => self::field_term_delete(),
-			'get_product_tag_all' => [],
-			'get_product_tag_single' => self::field_term_id(),
+			'create_product_tag' => self::field_term_create( false, 'product_tag' ),
+			'update_product_tag' => self::field_term_update( false, 'product_tag' ),
+			'delete_product_tag' => self::field_term_delete( 'product_tag' ),
+			'get_product_tag_all' => [
+				...self::field_term_list_filters(),
+			],
+			'get_product_tag_single' => self::field_term_id( 'product_tag' ),
 
-			'create_product_type' => self::field_term_create( false ),
-			'update_product_type' => self::field_term_update( false ),
-			'delete_product_type' => self::field_term_delete(),
-			'get_product_type_all' => [],
-			'get_product_type_single' => self::field_term_id(),
+			'create_product_type' => self::field_term_create( false, 'product_type' ),
+			'update_product_type' => self::field_term_update( false, 'product_type' ),
+			'delete_product_type' => self::field_term_delete( 'product_type' ),
+			'get_product_type_all' => [
+				...self::field_term_list_filters(),
+			],
+			'get_product_type_single' => self::field_term_id( 'product_type' ),
 
-			'create_product_brand' => self::field_term_create( false ),
-			'update_product_brand' => self::field_term_update( false ),
-			'delete_product_brand' => self::field_term_delete(),
-			'get_product_brand_all' => [],
-			'get_product_brand_single' => self::field_term_id(),
+			'create_product_brand' => self::field_term_create( false, 'product_brand' ),
+			'update_product_brand' => self::field_term_update( false, 'product_brand' ),
+			'delete_product_brand' => self::field_term_delete( 'product_brand' ),
+			'get_product_brand_all' => [
+				...self::field_term_list_filters(),
+			],
+			'get_product_brand_single' => self::field_term_id( 'product_brand' ),
 
-			'create_product_shipping_class' => self::field_term_create( false ),
-			'update_product_shipping_class' => self::field_term_update( false ),
-			'delete_product_shipping_class' => self::field_term_delete(),
-			'get_product_shipping_class_all' => [],
-			'get_product_shipping_class_single' => self::field_term_id(),
+			'create_product_shipping_class' => self::field_term_create( false, 'product_shipping_class' ),
+			'update_product_shipping_class' => self::field_term_update( false, 'product_shipping_class' ),
+			'delete_product_shipping_class' => self::field_term_delete( 'product_shipping_class' ),
+			'get_product_shipping_class_all' => [
+				...self::field_term_list_filters(),
+			],
+			'get_product_shipping_class_single' => self::field_term_id( 'product_shipping_class' ),
 
 			'add_or_update_product_attribute' => [
 				...self::field_product_id(),
@@ -848,8 +888,25 @@ class woocommerce extends IntegrationBase {
 			'get_attribute' => self::field_attribute_id(),
 			'delete_attribute' => self::field_attribute_id(),
 
-			'get_cart_items_all' => [],
-			'get_cart_totals' => [],
+			'get_cart_items_all' => [
+				[
+					'key' => 'product_id',
+					'label' => 'Filter by Product ID',
+					'type' => 'select',
+					'dynamic' => [
+						'integration' => 'woocommerce',
+						'query' => 'products',
+						'select' => [ 'id', 'label' ],
+					],
+				],
+			],
+			'get_cart_totals' => [
+				[
+					'key' => 'with_items_count',
+					'label' => 'Include Items Count',
+					'type' => 'boolean',
+				],
+			],
 			'add_product_to_cart' => [
 				...self::field_product_id(),
 				[
@@ -860,7 +917,12 @@ class woocommerce extends IntegrationBase {
 				[
 					'key' => 'variation_id',
 					'label' => 'Variation ID',
-					'type' => 'expression'
+					'type' => 'select',
+					'dynamic' => [
+						'integration' => 'woocommerce',
+						'query' => 'variations',
+						'select' => [ 'id', 'label' ],
+					],
 				],
 				[
 					'key' => 'variations',
@@ -996,7 +1058,13 @@ class woocommerce extends IntegrationBase {
 					'required' => true
 				],
 			],
-			'get_applied_coupons_from_cart' => [],
+			'get_applied_coupons_from_cart' => [
+				[
+					'key' => 'include_totals',
+					'label' => 'Include Coupon Totals',
+					'type' => 'boolean',
+				],
+			],
 			'remove_coupon_from_cart' => [
 				[
 					'key' => 'code',
@@ -1010,7 +1078,13 @@ class woocommerce extends IntegrationBase {
 				...self::field_limit_page(),
 			],
 			'get_coupon_single' => self::field_coupon_identifier(),
-			'get_coupon_totals_by_discount_type' => [],
+			'get_coupon_totals_by_discount_type' => [
+				[
+					'key' => 'include_empty_types',
+					'label' => 'Include Empty Types',
+					'type' => 'boolean',
+				],
+			],
 
 			'get_reviews_all' => [
 				...self::field_limit_page(),
@@ -1026,6 +1100,23 @@ class woocommerce extends IntegrationBase {
 		];
 
 		return $schemas[ $action ] ?? [];
+	}
+
+	/**
+	 * =====================================================
+	 * DYNAMIC DATA QUERIES (API)
+	 * =====================================================
+	 */
+	public static function get_dynamic_queries(): array {
+		return [
+			'orders' => [ self::class, 'query_dynamic_orders' ],
+			'customers' => [ self::class, 'query_dynamic_customers' ],
+			'products' => [ self::class, 'query_dynamic_products' ],
+			'variations' => [ self::class, 'query_dynamic_variations' ],
+			'coupons' => [ self::class, 'query_dynamic_coupons' ],
+			'terms' => [ self::class, 'query_dynamic_terms' ],
+			'attributes' => [ self::class, 'query_dynamic_attributes' ],
+		];
 	}
 
 	public static function execute_node( array $node, array $input ): array {
