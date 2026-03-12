@@ -10358,7 +10358,7 @@ const VariableEditor = ({
   const handleInput = () => {
     if (!editorRef.current) return;
     const editor = editorRef.current;
-    if (editor.innerHTML === "<br>" || editor.innerHTML === "<div><br></div>") {
+    if (editor.innerHTML === "<br>") {
       editor.innerHTML = "";
     }
     const text = editor.textContent.trim();
