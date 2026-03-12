@@ -13,7 +13,7 @@ const ZapIcon = ({ icon, name }) => {
     );
   }
 
-  return <Text as="span" className={`zaplane-icon zaplane-icon--${icon}`} />;
+  return <Text as="span" m='0' className={`zaplane-icon zaplane-icon--${icon}`} />;
 };
 
 export default ZapIcon;

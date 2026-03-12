@@ -14785,6 +14785,7 @@ const ZapIcon = ({
   }
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Text, {
     as: "span",
+    m: "0",
     className: `zaplane-icon zaplane-icon--${icon}`
   });
 };
