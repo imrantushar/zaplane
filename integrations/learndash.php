@@ -19,7 +19,7 @@ class Learndash extends IntegrationBase {
 	}
 
 	public static function get_icon(): string {
-		return 'learndash-icon';
+		return 'learndash-icon.svg';
 	}
 
 	public static function get_triggers(): array {

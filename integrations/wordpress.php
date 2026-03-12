@@ -44,7 +44,7 @@ class Wordpress extends IntegrationBase {
 	}
 
 	public static function get_icon(): string {
-		return 'wordpress';
+		return 'wordpress.svg';
 	}
 
 	public static function get_triggers(): array {

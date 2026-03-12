@@ -1,11 +1,11 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-03-12 06:16:59",
+    "generated_at": "2026-03-12 06:20:44",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
             "name": "WordPress",
-            "icon": "wordpress",
+            "icon": "wordpress.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -8872,7 +8872,7 @@
         "webhook": {
             "slug": "webhook",
             "name": "Webhook",
-            "icon": "webhook",
+            "icon": "webhook.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -8883,7 +8883,7 @@
         "learndash": {
             "slug": "learndash",
             "name": "LearnDash",
-            "icon": "learndash-icon",
+            "icon": "learndash-icon.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
