@@ -18,6 +18,10 @@ class Delay extends IntegrationBase {
 		return 'tool';
 	}
 
+	public static function get_icon(): string {
+		return 'delay';
+	}
+
 	public static function get_actions(): array {
 		return [
 			'wait' => [ 'label' => 'Wait / Delay' ],

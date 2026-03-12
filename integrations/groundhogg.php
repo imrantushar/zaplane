@@ -20,7 +20,7 @@ class Groundhogg extends IntegrationBase {
 	}
 
 	public static function get_icon(): string {
-		return 'groundhogg-icon';
+		return 'groundhogg-icon.svg';
 	}
 
 	public static function get_triggers(): array {

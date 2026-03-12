@@ -36,10 +36,16 @@ class Wordpress extends IntegrationBase {
 	use Helper;
 
 	public static function get_slug(): string {
+		return 'wordpress';
+	}
+
+	public static function get_name(): string {
 		return 'WordPress';
 	}
 
-
+	public static function get_icon(): string {
+		return 'wordpress.svg';
+	}
 
 	public static function get_triggers(): array {
 		return [

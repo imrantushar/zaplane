@@ -2,7 +2,7 @@
 
 ## Overview
 
-Each integration has a dedicated test class in `tests/Integrations/`. Tests run against in-memory WordPress mocks (`WPMocks`) — no database setup required. Run them with:
+Each integration has a dedicated test class in `tests/Integrations/`. Tests run against in-memory WordPress mocks (`WPMocks`) — no database or WordPress install required. Run them with:
 
 ```bash
 vendor/bin/phpunit
@@ -15,11 +15,13 @@ vendor/bin/phpunit
 ```
 tests/
   bootstrap.php                    ← defines constants, loads mocks + autoloader
-  WPMocks.php                      ← in-memory mocks for all WP functions
+  WPMocks.php                      ← in-memory mocks for all WP functions and classes
   WPDBMock.php                     ← mock for $wpdb
   TestCase.php                     ← base PHPUnit test case (resets mocks on each test)
   Integrations/
     IntegrationTestCase.php        ← base class for all integration tests
+    WordpressTest.php              ← full example — posts, users, comments, roles, terms
+    AcademyTest.php                ← example for trigger-only / external-class integrations
     SlackTest.php
     WpformsTest.php
     ...
@@ -40,6 +42,7 @@ Every integration test class extends `IntegrationTestCase` and implements one re
 namespace Zaplane\Tests\Integrations;
 
 use Zaplane\Integrations\Wordpress;
+use Zaplane\Tests\WPMocks;
 
 class WordpressTest extends IntegrationTestCase {
 
@@ -78,7 +81,7 @@ class WordpressTest extends IntegrationTestCase {
 | Method | Description |
 |---|---|
 | `makeActionNode(string $event, array $config = [], array $credentials = [])` | Builds an action node array. Pass `$credentials` for integrations that require a connection (e.g. Slack). |
-| `makeTriggerNode(string $event, array $config = [])` | Builds a trigger node array with the correct `app`, `event`, and `hook` keys. |
+| `makeTriggerNode(string $event, array $config = [])` | Builds a trigger node. `$config` maps to `$node['data']['config']` — this is how "selected course", "selected quiz", "target percentage" etc. are passed to `resolve_trigger()`. |
 
 ### HTTP mocking
 
@@ -92,7 +95,7 @@ HTTP responses are consumed in order (FIFO). Call `mockHttp()` multiple times fo
 
 ## Auto-Contract Tests
 
-Every test class that extends `IntegrationTestCase` automatically inherits these tests. They run without writing any code.
+Every class that extends `IntegrationTestCase` automatically inherits these tests. They run without writing any code.
 
 | Test method | What it catches |
 |---|---|
@@ -109,7 +112,7 @@ Every test class that extends `IntegrationTestCase` automatically inherits these
 
 ### Bulk-testing actions and triggers
 
-Override `getActionTests()` or `getTriggerTests()` to have the base class run format checks automatically against a list of events:
+Override `getActionTests()` or `getTriggerTests()` to have the base class run format checks automatically:
 
 ```php
 protected function getActionTests(): array {
@@ -122,10 +125,18 @@ protected function getActionTests(): array {
 protected function getTriggerTests(): array {
     return [
         'user_register' => [ 1 ],
-        'wp_login'      => [ 'admin', (object) [ 'ID' => 1 ] ],
+        // wp_login checks instanceof \WP_User — pass null for the bulk runner
+        // (returns false, which is valid). Use makeWpUser() in hand-written tests.
+        'wp_login'      => [ 'admin', null ],
     ];
 }
 ```
+
+> **Important — `WP_User` in `getTriggerTests()`:** `getTriggerTests()` is called at
+> test-collection time, before `WPMocks.php` has finished loading. Any code that
+> instantiates `\WP_User` there will cause a fatal "Class not found" error. Always
+> pass `null` for user arguments in the bulk runner and instantiate `\WP_User` only
+> inside individual test method bodies.
 
 ---
 
@@ -173,56 +184,174 @@ $this->mockHttp( [ 'ok' => true, 'ts' => '111.222', 'channel' => 'D123' ] ); // 
 
 ---
 
-## Trigger-Only Integrations (WPForms, etc.)
+## Trigger-Only / External-Class Integrations
 
-Some integrations expose only triggers and no actions. When the trigger reads properties directly from the node (not from `data.config`), build the node manually instead of using `makeTriggerNode()`:
+Some integrations (e.g. WPForms, Academy LMS) expose only triggers and no actions, or fire trigger args that are domain objects rather than simple scalars. Two patterns apply.
+
+### Pattern A — node reads config from `data.config` (standard)
+
+Use `makeTriggerNode($event, $config)` as normal. The second argument becomes `$node['data']['config']` and is used for filter values like "selected course" or "target percentage":
 
 ```php
-class WpformsTest extends IntegrationTestCase {
+// Academy: node configured for course 42 — enrollments in other courses return false.
+$result = Academy::resolve_trigger(
+    $this->makeTriggerNode( 'user_enroll_course', [ 'course_id' => '42' ] ),
+    [ 42, 7 ]   // course_id, enroll_id
+);
+```
 
-    protected function getIntegrationClass(): string {
-        return Wpforms::class;
-    }
+### Pattern B — node reads properties directly (non-standard)
 
-    private function makeWpformsNode( string $event, string $formId = 'any' ): array {
-        return [
-            'type'    => 'trigger',
-            'event'   => $event,
-            'form_id' => $formId,
-            'data'    => [ 'app' => 'wpforms', 'event' => $event ],
-        ];
-    }
+When the trigger reads from the node array itself (not `data.config`), build the node manually:
 
-    public function test_trigger_returns_payload_for_any_form(): void {
-        $node   = $this->makeWpformsNode( 'form_submitted', 'any' );
-        $result = Wpforms::resolve_trigger( $node, [ $fields, $entry, $formData ] );
-
-        $this->assertIsArray( $result );
-        $this->assertTrue( $result['success'] );
-    }
+```php
+private function makeWpformsNode( string $event, string $formId = 'any' ): array {
+    return [
+        'type'    => 'trigger',
+        'event'   => $event,
+        'form_id' => $formId,
+        'data'    => [ 'app' => 'wpforms', 'event' => $event ],
+    ];
 }
 ```
+
+### Domain object arguments
+
+Triggers that fire with domain objects (quiz attempts, form entries, etc.) need a helper to build those objects:
+
+```php
+// Academy — build a quiz attempt object
+private function makeAttempt( array $overrides = [] ): object {
+    return (object) array_merge( [
+        'quiz_id'        => 10,
+        'user_id'        => 1,
+        'earned_marks'   => 8,
+        'total_marks'    => 10,
+        'attempt_status' => 'attempt_ended',
+    ], $overrides );
+}
+
+// Use it
+$result = Academy::resolve_trigger(
+    $this->makeTriggerNode( 'quiz_target', [ 'quiz_id' => 'any', 'target_percentage' => '70' ] ),
+    [ $this->makeAttempt( [ 'earned_marks' => 8, 'total_marks' => 10 ] ) ]
+);
+```
+
+---
+
+## Actions That Return `error` Port
+
+Some actions validate preconditions (e.g. `delete_post` checks the post is already in trash before deleting). When such an action legitimately returns `error`, **remove it from `getActionTests()`** — the bulk runner only accepts `main` port. Write a dedicated hand-written test instead and assert both ports are acceptable:
+
+```php
+// Do NOT put this in getActionTests() — it returns 'error' when post is not in trash.
+public function test_action_delete_post_returns_valid_response(): void {
+    $result = Wordpress::execute_node(
+        $this->makeActionNode( 'delete_post', [ 'post_id' => 1, 'post_type' => 'post' ] ),
+        []
+    );
+
+    $this->assertArrayHasKey( 'port', $result );
+    $this->assertContains( $result['port'], [ 'main', 'error' ] );
+}
+```
+
+Similarly, **remove from `getTriggerTests()`** any trigger that calls an unstubbed WP function. Add it to the hand-written section with a contract-only assertion (`array|false`) instead.
 
 ---
 
 ## WP Function Mocks Available
 
-`WPMocks` provides in-memory implementations for:
+`WPMocks` provides in-memory implementations for the following. All are guarded with `function_exists` / `class_exists` checks so adding real WordPress later won't conflict.
 
-- Posts: `wp_insert_post`, `wp_update_post`, `wp_delete_post`, `wp_trash_post`, `wp_untrash_post`, `get_post`, `get_posts`
-- Users: `wp_insert_user`, `wp_update_user`, `wp_delete_user`, `get_user_by`, `get_userdata`
-- Comments: `wp_insert_comment`, `wp_delete_comment`, `get_comment`
-- Options: `get_option`, `update_option`, `delete_option`
-- HTTP: `wp_remote_request`, `wp_remote_post`, `wp_remote_get`, `wp_remote_retrieve_body`, `wp_remote_retrieve_response_code`
-- Misc: `wp_strip_all_tags`, `wp_json_encode`, `is_wp_error`, `wp_generate_password`
+### Posts
+`wp_insert_post`, `wp_update_post`, `wp_delete_post`, `wp_trash_post`, `wp_untrash_post`,
+`get_post`, `get_posts`, `get_post_type`, `get_post_status`, `get_post_types`,
+`get_post_meta`, `update_post_meta`, `delete_post_meta`, `set_post_thumbnail`,
+`get_post_permalink`, `register_post_type`, `add_post_type_support`, `post_type_exists`
 
-Pre-seed mock data in `setupMockData()` (called automatically before each test):
+### Users
+`wp_insert_user`, `wp_update_user`, `wp_delete_user`, `get_userdata`, `get_user_by`,
+`get_users`, `get_user_meta`, `update_user_meta`, `delete_user_meta`,
+`get_current_user_id`, `wp_get_current_user`, `current_user_can`, `user_can`,
+`wp_authenticate`, `wp_logout`, `wp_set_password`, `get_password_reset_key`, `wp_mail`
+
+### `WP_User` class
+The `WP_User` stub has full role and capability methods:
+`add_role()`, `remove_role()`, `set_role()`, `add_cap()`, `remove_cap()`, `has_cap()`.
+`get_userdata()` returns a real `WP_User` instance (not a plain `stdClass`).
+
+### Comments
+`wp_insert_comment`, `wp_update_comment`, `wp_delete_comment`, `wp_trash_comment`,
+`wp_untrash_comment`, `wp_set_comment_status`, `wp_spam_comment`, `wp_unspam_comment`,
+`get_comment`, `get_comment_meta`
+
+### Terms & Taxonomy
+`wp_insert_term`, `wp_update_term`, `wp_delete_term`, `get_term`, `get_terms`,
+`wp_set_object_terms`, `wp_get_object_terms`,
+`register_taxonomy`, `unregister_taxonomy`, `taxonomy_exists`, `get_object_taxonomies`
+
+### Roles
+`add_role`, `remove_role`, `get_role`, `wp_roles`
+
+### Options
+`get_option`, `update_option`, `add_option`, `delete_option`
+
+### Media / Attachments
+`wp_delete_attachment`, `wp_get_attachment_url`, `wp_count_attachments`,
+`wp_generate_attachment_metadata`, `wp_update_attachment_metadata`,
+`media_sideload_image`, `get_post_mime_type`, `set_post_thumbnail`
+
+### HTTP
+`wp_remote_request`, `wp_remote_post`, `wp_remote_get`,
+`wp_remote_retrieve_body`, `wp_remote_retrieve_response_code`
+
+### Date / Time
+`current_time`, `wp_timezone_string`, `get_gmt_from_date`
+
+### Multisite / Blog
+`get_home_url`, `get_blog_option`, `switch_to_blog`, `restore_current_blog`, `get_current_blog_id`
+
+### Misc
+`wp_json_encode`, `wp_strip_all_tags`, `wp_parse_args`, `absint`,
+`sanitize_text_field`, `sanitize_title`, `sanitize_key`, `esc_html`, `esc_attr`,
+`is_wp_error`, `get_avatar_url`, `wp_mkdir_p`, `wp_generate_password`
+
+### Classes
+`WP_Error`, `WP_User`, `WP_Query`, `WP_REST_Response`, `WP_REST_Controller`, `WP_REST_Server`
+
+### Pre-seeded mock data
+
+`parent::setupMockData()` seeds:
+- Posts `1`, `2`, `3` (status `publish`, type `post`)
+- Users `1`, `2`
+- Comment `1`
+
+Extend `setupMockData()` to add your own fixtures:
 
 ```php
 protected function setupMockData(): void {
-    parent::setupMockData(); // loads default posts 1-3, users 1-2, comment 1
-    WPMocks::setPost( 10, [ 'post_title' => 'My Post', 'post_status' => 'publish' ] );
-    WPMocks::setUser( 5,  [ 'user_email' => 'custom@example.com' ] );
+    parent::setupMockData();
+
+    // Extra attachment post
+    WPMocks::setPost( 10, [
+        'post_title'     => 'My Image',
+        'post_status'    => 'inherit',
+        'post_type'      => 'attachment',
+        'post_mime_type' => 'image/jpeg',
+    ] );
+
+    // Extra user
+    WPMocks::setUser( 5, [ 'user_email' => 'custom@example.com' ] );
+
+    // Seed a term so term triggers have something to return
+    WPMocks::setTerm( 5, [
+        'term_id'  => 5,
+        'name'     => 'PHP',
+        'slug'     => 'php',
+        'taxonomy' => 'category',
+    ] );
 }
 ```
 
@@ -232,7 +361,75 @@ protected function setupMockData(): void {
 
 - One test class per integration, named `{IntegrationName}Test.php` in `tests/Integrations/`
 - Test method names start with `test_`
-- Always cover both the success path and at least one failure path per action
+- Always cover both the success path and at least one failure path per action/trigger
 - Use `mockHttp()` for any integration that calls an external API — never make real HTTP calls
 - Call `mockHttp()` once per HTTP request the action makes, in order
-- Do not override `setUp()` for test-specific state — use `setupMockData()` for shared mock data or set up inline inside the test
+- Do not override `setUp()` for test-specific state — use `setupMockData()` for shared fixtures or set up inline inside the test method
+- Do not instantiate `\WP_User` inside `getTriggerTests()` — only inside test method bodies (see note above)
+- Actions that return `error` port under normal conditions must not go in `getActionTests()` — write a dedicated hand-written test
+- Triggers that call a WP function not in `WPMocks` must not go in `getTriggerTests()` — add the stub to `WPMocks.php` first, then add the trigger
+
+---
+
+## Quick Reference — Common Patterns
+
+```php
+// ── Happy path action ─────────────────────────────────────────────────────────
+$result = MyIntegration::execute_node(
+    $this->makeActionNode( 'action_name', [ 'key' => 'value' ] ),
+    []
+);
+$this->assertEquals( 'main', $result['port'] );
+$this->assertArrayHasKey( 'some_key', $result['data'] );
+
+// ── Sad path action (assert 'error' port) ─────────────────────────────────────
+$result = MyIntegration::execute_node(
+    $this->makeActionNode( 'action_name', [ 'key' => 'bad_value' ] ),
+    []
+);
+$this->assertEquals( 'error', $result['port'] );
+
+// ── Action that may return either port ───────────────────────────────────────
+$this->assertContains( $result['port'], [ 'main', 'error' ] );
+
+// ── Happy path trigger ────────────────────────────────────────────────────────
+$result = MyIntegration::resolve_trigger(
+    $this->makeTriggerNode( 'trigger_name' ),
+    [ $arg1, $arg2 ]
+);
+$this->assertIsArray( $result );
+$this->assertEquals( 'expected_value', $result['field'] );
+
+// ── Sad path trigger ──────────────────────────────────────────────────────────
+$result = MyIntegration::resolve_trigger(
+    $this->makeTriggerNode( 'trigger_name' ),
+    [ null ]    // missing required arg
+);
+$this->assertFalse( $result );
+
+// ── Trigger with filter config ────────────────────────────────────────────────
+// Config = specific ID → only matching events pass through
+$result = MyIntegration::resolve_trigger(
+    $this->makeTriggerNode( 'trigger_name', [ 'item_id' => '99' ] ),
+    [ 42 ]   // fired with ID 42 — should be filtered out
+);
+$this->assertFalse( $result );
+
+// Config = 'any' → all events pass through
+$result = MyIntegration::resolve_trigger(
+    $this->makeTriggerNode( 'trigger_name', [ 'item_id' => 'any' ] ),
+    [ 42 ]
+);
+$this->assertIsArray( $result );
+
+// ── Trigger contract (array|false, never null, never throws) ─────────────────
+$this->assertThat(
+    $result,
+    $this->logicalOr( $this->isType( 'array' ), $this->identicalTo( false ) )
+);
+
+// ── Pre-seeding mock data for a specific test ─────────────────────────────────
+WPMocks::setPost( 99, [ 'post_status' => 'trash', 'post_type' => 'post' ] );
+WPMocks::setUser( 10, [ 'user_email' => 'admin@example.com' ] );
+WPMocks::setTerm( 5,  [ 'name' => 'PHP', 'taxonomy' => 'category' ] );
+```

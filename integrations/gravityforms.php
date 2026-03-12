@@ -20,7 +20,7 @@ class Gravityforms extends IntegrationBase {
 	}
 
 	public static function get_icon(): string {
-		return 'gravity-forms-logo';
+		return 'gravity-forms-logo.svg';
 	}
 
 	public static function get_triggers(): array {
