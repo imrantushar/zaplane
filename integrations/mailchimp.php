@@ -22,7 +22,7 @@ class Mailchimp extends IntegrationBase {
 	}
 
 	public static function get_icon(): string {
-		return 'mailchimp';
+		return 'mailchimp.svg';
 	}
 
 	public static function get_actions(): array {

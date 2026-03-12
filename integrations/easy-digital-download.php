@@ -26,6 +26,10 @@ class EasyDigitalDownload extends IntegrationBase {
 		return 'easydigitaldownload';
 	}
 
+	public static function get_icon(): string {
+		return 'easydigitaldownload.svg';
+	}
+
 	public static function get_triggers(): array {
 		return [
 			'purchase_product' => [
