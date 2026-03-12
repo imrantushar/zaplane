@@ -91,32 +91,51 @@ class Storeengine extends IntegrationBase {
 			return false;
 		}
 
-		$order = storeengine_get_order( $order_id );
+		$order_obj = storeengine_get_order( $order_id );
 
-		if ( ! $order ) {
+		if ( ! $order_obj ) {
 			return false;
 		}
 
-		return array_merge([
+		$items = array_map( function ( $item ) {
+			if ( is_array( $item ) ) {
+				return [
+					'product_id' => $item['product_id'] ?? '',
+					'name'       => $item['name'] ?? '',
+					'quantity'   => $item['quantity'] ?? '',
+					'total'      => $item['total'] ?? '',
+				];
+			}
+
+			if ( is_object( $item ) ) {
+				return [
+					'product_id' => method_exists( $item, 'get_product_id' ) ? $item->get_product_id() : '',
+					'name'       => method_exists( $item, 'get_name' ) ? $item->get_name() : '',
+					'quantity'   => method_exists( $item, 'get_quantity' ) ? $item->get_quantity() : '',
+					'total'      => method_exists( $item, 'get_total' ) ? $item->get_total() : '',
+				];
+			}
+
+			return [];
+		}, array_values( $order_obj->get_items() ) );
+
+		return array_merge( [
 			'order_id'       => $order_id,
-			'order_number'   => $order->get_order_number(),
-			'order_status'   => $order->get_status(),
-			'total'          => $order->get_total(),
-			'currency'       => $order->get_currency(),
-			'payment_method' => $order->get_payment_method(),
-			'customer_email' => method_exists(
-			$order, 'get_billing_email' ) ?
-				$order->get_billing_email() : '',
-			'customer_name'  => method_exists(
-			$order, 'get_billing_first_name' ) ?
-				trim(
-					$order->get_billing_first_name() . ' ' .
-					$order->get_billing_last_name()
-				) : '',
-
-			'items'          => $order->get_items(),
-		], $extra);
-
+			'order_number'   => $order_obj->get_order_number(),
+			'order_status'   => $order_obj->get_status(),
+			'total'          => $order_obj->get_total(),
+			'currency'       => $order_obj->get_currency(),
+			'payment_method' => $order_obj->get_payment_method(),
+			'customer_email' => method_exists( $order_obj, 'get_billing_email' )
+				? $order_obj->get_billing_email() : '',
+			'customer_name'  => method_exists( $order_obj, 'get_billing_first_name' )
+				? trim(
+					$order_obj->get_billing_first_name() . ' ' .
+					$order_obj->get_billing_last_name()
+				)
+				: '',
+			'items'          => $items,
+		], $extra );
 	}
 
 	public static function resolve_trigger( array $node, array $args ) {
@@ -140,15 +159,17 @@ class Storeengine extends IntegrationBase {
 			case 'order_status_cancelled':
 			case 'order_status_draft':
 			case 'order_status_trash':
-				$order_id   = $args[0] ?? 0;
-				$old_status = $args[1] ?? '';
-				$new_status = $args[2] ?? '';
+				$order   = $args[1] ?? null;
+				$transition = $args[2] ?? [];
 
-				if ( ! $order_id || ! $new_status ) {
+				if ( ! $order || ! is_array( $transition ) ) {
 					return false;
 				}
 
-				return self::resolve_order_payload( $order_id, [
+				$old_status = $transition['from'] ?? '';
+				$new_status = $transition['to'] ?? '';
+
+				return self::resolve_order_payload( $order, [
 					'old_status' => $old_status,
 					'new_status' => $new_status,
 				]);
