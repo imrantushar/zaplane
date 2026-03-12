@@ -6,7 +6,7 @@ const ZapIcon = ({ icon, name }) => {
   if (isSvg) {
     return (
       <Image
-        src={`${plugin_root_url}assets/icons/${icon}`}
+        src={`${plugin_root_url}assets/images/icons/${icon}`}
         alt={name}
       />
     );
