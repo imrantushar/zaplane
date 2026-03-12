@@ -19,6 +19,10 @@ class Variable extends IntegrationBase {
 		return 'tool';
 	}
 
+	public static function get_icon(): string {
+		return 'variable';
+	}
+
 	public static function get_actions(): array {
 		return [
 			'set' => [ 'label' => 'Set Variable' ],

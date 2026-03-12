@@ -1,5 +1,6 @@
 import { VStack, Button, Text, Flex, Icon } from "@chakra-ui/react";
 import { sprintf, __ } from "@wordpress/i18n";
+import ZAPIcon from "@ZAPComponents/ZAPIcon";
 
 
 const DrawerSearchList = ({ searchList, setMode, setSelectedItem, setSearch }) => {
@@ -22,14 +23,7 @@ const DrawerSearchList = ({ searchList, setMode, setSelectedItem, setSearch }) =
           _hover={{ bg: "#F6F7F8" }}
         >
           <Flex gap='12px' alignItems='center'>
-            <Flex w="40px"
-              h="40px"
-              p="10px"
-              borderRadius='4px'
-              justifyContent='center'
-              border="1px solid var(--zaplane-border-color)">
-              <Text as={'span'} className={`zaplane-icon zaplane-icon--${item?.icon}`} />
-            </Flex>
+              <ZAPIcon icon={item.icon}  name={item.name} />
             <Text className="zaplane-label" fontWeight='400' >{sprintf(__("%s", "zaplane"), item.name)}</Text>
           </Flex>
 

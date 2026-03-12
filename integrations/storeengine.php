@@ -18,7 +18,7 @@ class Storeengine extends IntegrationBase {
 	}
 
 	public static function get_icon(): string {
-		return 'storeengine';
+		return 'storeengine.svg';
 	}
 
 	public static function get_triggers(): array {

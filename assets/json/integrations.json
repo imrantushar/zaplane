@@ -1,11 +1,11 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-03-11 07:27:46",
+    "generated_at": "2026-03-12 08:55:08",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
             "name": "WordPress",
-            "icon": "",
+            "icon": "wordpress.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -3919,7 +3919,7 @@
         "woocommerce": {
             "slug": "woocommerce",
             "name": "Woocommerce",
-            "icon": "",
+            "icon": "woo.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -7052,7 +7052,7 @@
         "slack": {
             "slug": "slack",
             "name": "Slack",
-            "icon": "slack",
+            "icon": "slack.svg",
             "category": "app",
             "requires_connection": true,
             "auth_type": "both",
@@ -7283,7 +7283,7 @@
         "trello": {
             "slug": "trello",
             "name": "Trello",
-            "icon": "",
+            "icon": "trello-icon.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -7313,7 +7313,7 @@
         "stripe": {
             "slug": "stripe",
             "name": "Stripe",
-            "icon": "",
+            "icon": "stripe.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -7600,7 +7600,7 @@
         "surecart": {
             "slug": "surecart",
             "name": "Surecart",
-            "icon": "",
+            "icon": "surecart.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -8743,7 +8743,7 @@
         "storeengine": {
             "slug": "storeengine",
             "name": "StoreEngine",
-            "icon": "storeengine",
+            "icon": "storeengine.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -8872,7 +8872,7 @@
         "webhook": {
             "slug": "webhook",
             "name": "Webhook",
-            "icon": "",
+            "icon": "webhook.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -8883,7 +8883,7 @@
         "learndash": {
             "slug": "learndash",
             "name": "LearnDash",
-            "icon": "",
+            "icon": "learndash-icon.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -9143,7 +9143,7 @@
         "memberpress": {
             "slug": "memberpress",
             "name": "Memberpress",
-            "icon": "",
+            "icon": "memberpress.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -10316,7 +10316,7 @@
         "fluentform": {
             "slug": "fluentform",
             "name": "Fluent Form",
-            "icon": "fluentform",
+            "icon": "fluentform.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -10352,7 +10352,7 @@
         "fluentcrm": {
             "slug": "fluentcrm",
             "name": "FluentCRM",
-            "icon": "",
+            "icon": "fluentcrm-logo-icon.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -11319,7 +11319,7 @@
         "gravityforms": {
             "slug": "gravityforms",
             "name": "Gravity Forms",
-            "icon": "",
+            "icon": "gravity-forms-logo.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -11355,7 +11355,7 @@
         "ninjaform": {
             "slug": "ninjaform",
             "name": "Ninja Form",
-            "icon": "ninjaform",
+            "icon": "ninjaform.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -11391,7 +11391,7 @@
         "formidable": {
             "slug": "formidable",
             "name": "Formidable Forms",
-            "icon": "",
+            "icon": "formidable.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -11427,7 +11427,7 @@
         "wpforms": {
             "slug": "wpforms",
             "name": "WPForms",
-            "icon": "",
+            "icon": "wpforms.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -11463,7 +11463,7 @@
         "contact-form-7": {
             "slug": "contact-form-7",
             "name": "Contact Form 7",
-            "icon": "",
+            "icon": "contact-form-7.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -11517,7 +11517,7 @@
         "divi": {
             "slug": "divi",
             "name": "Divi",
-            "icon": "",
+            "icon": "divi.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -11538,7 +11538,7 @@
         "essentialblocks": {
             "slug": "essentialblocks",
             "name": "Essentialblocks",
-            "icon": "",
+            "icon": "essentialblocks.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -11559,7 +11559,7 @@
         "coblocks": {
             "slug": "coblocks",
             "name": "Coblocks",
-            "icon": "",
+            "icon": "coblocks.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -11580,7 +11580,7 @@
         "spectra": {
             "slug": "spectra",
             "name": "Spectra",
-            "icon": "",
+            "icon": "spectra.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -11601,7 +11601,7 @@
         "beaverbuilder": {
             "slug": "beaverbuilder",
             "name": "Beaverbuilder",
-            "icon": "",
+            "icon": "beaverbuilder.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -11640,7 +11640,7 @@
         "metform": {
             "slug": "metform",
             "name": "Metform",
-            "icon": "",
+            "icon": "metform.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -11661,7 +11661,7 @@
         "easydigitaldownload": {
             "slug": "easydigitaldownload",
             "name": "Easydigitaldownload",
-            "icon": "",
+            "icon": "easydigitaldownload.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -12123,7 +12123,7 @@
         "tutor": {
             "slug": "tutor",
             "name": "Tutor LMS",
-            "icon": "tutorlms",
+            "icon": "tutorlms.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -12237,7 +12237,7 @@
         "groundhogg": {
             "slug": "groundhogg",
             "name": "Groundhogg",
-            "icon": "groundhogg-icon",
+            "icon": "groundhogg-icon.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -12306,7 +12306,7 @@
         "bricks": {
             "slug": "bricks",
             "name": "Bricks",
-            "icon": "bricksb-builder",
+            "icon": "bricksb-builder.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -12334,7 +12334,7 @@
         "elementor": {
             "slug": "elementor",
             "name": "Elementor",
-            "icon": "",
+            "icon": "elementor.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -12355,7 +12355,7 @@
         "academy": {
             "slug": "academy",
             "name": "Academy LMS",
-            "icon": "academy",
+            "icon": "academy.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -12495,7 +12495,7 @@
         "condition": {
             "slug": "condition",
             "name": "Condition",
-            "icon": "",
+            "icon": "condition",
             "category": "tool",
             "requires_connection": false,
             "auth_type": "none",
@@ -12598,7 +12598,7 @@
         "filter": {
             "slug": "filter",
             "name": "Filter",
-            "icon": "",
+            "icon": "filter",
             "category": "tool",
             "requires_connection": false,
             "auth_type": "none",
@@ -12700,7 +12700,7 @@
         "delay": {
             "slug": "delay",
             "name": "Delay",
-            "icon": "",
+            "icon": "delay",
             "category": "tool",
             "requires_connection": false,
             "auth_type": "none",
@@ -12744,7 +12744,7 @@
         "iterator": {
             "slug": "iterator",
             "name": "Iterator",
-            "icon": "",
+            "icon": "iterator",
             "category": "tool",
             "requires_connection": false,
             "auth_type": "none",
@@ -12772,7 +12772,7 @@
         "variable": {
             "slug": "variable",
             "name": "Set Variable",
-            "icon": "",
+            "icon": "variable",
             "category": "tool",
             "requires_connection": false,
             "auth_type": "none",
@@ -12804,7 +12804,7 @@
         "http": {
             "slug": "http",
             "name": "HTTP Request",
-            "icon": "",
+            "icon": "http-request",
             "category": "tool",
             "requires_connection": false,
             "auth_type": "none",

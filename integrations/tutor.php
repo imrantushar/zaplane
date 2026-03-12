@@ -19,7 +19,7 @@ class Tutor extends IntegrationBase {
 	}
 
 	public static function get_icon(): string {
-		return 'tutorlms';
+		return 'tutorlms.svg';
 	}
 
 	public static function get_triggers(): array {

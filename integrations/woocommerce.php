@@ -32,6 +32,10 @@ class Woocommerce extends IntegrationBase {
 		return 'woocommerce';
 	}
 
+	public static function get_icon(): string {
+		return 'woo.svg';
+	}
+
 
 
 	public static function get_triggers(): array {
