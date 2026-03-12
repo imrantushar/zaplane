@@ -57,7 +57,11 @@ const VariableEditor = ({ value, setFieldValue, field, variables, label, placeho
   // detect editor empty
   const handleInput = () => {
     if (!editorRef.current) return;
-    const text = editorRef.current.textContent.trim();
+    const editor = editorRef.current;
+    if (editor.innerHTML === "<br>") {
+      editor.innerHTML = "";
+    }
+    const text = editor.textContent.trim();
     setIsEmpty(text === "");
   };
 
