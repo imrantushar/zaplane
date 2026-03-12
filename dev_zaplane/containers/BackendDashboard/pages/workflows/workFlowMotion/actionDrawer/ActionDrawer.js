@@ -21,6 +21,7 @@ import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
 import { useDynamicFields } from "@ZAPHooks/useActionDrawer/useDynamicFields";
 import { mapEdgesForBackend, mapNodesForBackend } from "../helper";
 import { conditionVariables } from "@ZAPRedux/Slices/workFlowSlice/actions/conditonVariales";
+import './styles.scss'
 
 const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode, workFlow, isFullscreen, nodes, edges }) => {
   const { source, node } = context;
@@ -224,7 +225,7 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
             },
             {
               value: "configure", label: "Configure", content: <>
-                <Flex direction="column" gap={4}>
+                <Flex direction="column" className="action-drowar-lists" gap={4}>
                   {selectedActionFields?.length > 0 ? (
                     selectedActionFields.map((field) => (
                       <ActionFieldRenderer
