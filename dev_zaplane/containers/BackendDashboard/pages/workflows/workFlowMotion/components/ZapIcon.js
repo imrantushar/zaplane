@@ -1,9 +1,9 @@
 import { Image, Text } from "@chakra-ui/react";
 import { plugin_root_url } from "@ZAPUtils/helper";
 
-const ZapIcon = ({ icon, svg=false, name }) => {
-
-  if (svg) {
+const ZapIcon = ({ icon, name }) => {
+  const isSvg = icon.endsWith(".svg")
+  if (isSvg) {
     return (
       <Image
         src={`${plugin_root_url}assets/icons/${icon}.svg`}
