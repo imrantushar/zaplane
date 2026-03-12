@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-03-11 10:30:00",
+    "generated_at": "2026-03-12 06:42:07",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -10514,7 +10514,7 @@
                         {
                             "key": "email",
                             "label": "Email Address",
-                            "type": "expression",
+                            "type": "email",
                             "required": true
                         },
                         {
@@ -10673,7 +10673,7 @@
                         {
                             "key": "email",
                             "label": "Email Address",
-                            "type": "expression",
+                            "type": "email",
                             "required": true
                         }
                     ],
@@ -11031,7 +11031,7 @@
                         {
                             "key": "email",
                             "label": "Email Address",
-                            "type": "expression",
+                            "type": "email",
                             "required": true
                         },
                         {
@@ -11249,7 +11249,7 @@
                         {
                             "key": "email",
                             "label": "Email Address",
-                            "type": "expression",
+                            "type": "email",
                             "required": true
                         },
                         {

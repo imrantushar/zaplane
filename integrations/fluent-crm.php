@@ -397,7 +397,7 @@ class FluentCrm extends IntegrationBase {
 			[
 				'key' => 'email',
 				'label' => 'Email Address',
-				'type' => 'expression',
+				'type' => 'email',
 				'required' => true
 			]
 		];
