@@ -14778,7 +14778,7 @@ const ZapIcon = ({
   const isSvg = icon.endsWith(".svg");
   if (isSvg) {
     return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Image, {
-      src: `${_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.plugin_root_url}assets/icons/${icon}.svg`,
+      src: `${_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.plugin_root_url}assets/icons/${icon}`,
       boxSize: 20,
       alt: name
     });
@@ -14849,7 +14849,6 @@ function CustomNode({
   const isCondition = data?.app === "condition";
   const node = nodes.find(n => n.id === id);
   const hasPort = node?.port === undefined;
-  console.log(data, 'data');
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Box, {
     position: "relative",
     onMouseEnter: () => setHovered(true),

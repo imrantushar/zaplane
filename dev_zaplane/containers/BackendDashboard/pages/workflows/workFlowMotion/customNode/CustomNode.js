@@ -31,7 +31,6 @@ export default function CustomNode({ id, data, canvasLayout, nodes }) {
   const isCondition = data?.app === "condition";
   const node = nodes.find((n) => n.id === id);
   const hasPort = node?.port === undefined;
-  console.log(data,'data');
 
 
   return (
