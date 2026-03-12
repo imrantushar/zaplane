@@ -11,6 +11,7 @@ import { FaRegCopy } from "react-icons/fa";
 import FloatingEdge from "../FloatingEdge/FloatingEdge";
 import { __, sprintf } from "@wordpress/i18n";
 import { formatLabel } from "@ZAPUtils/helper";
+import ZAPIcon from "@ZAPComponents/ZAPIcon";
 
 
 export default function CustomNode({ id, data, canvasLayout, nodes }) {
@@ -110,24 +111,13 @@ export default function CustomNode({ id, data, canvasLayout, nodes }) {
 
         {/* NODE CONTENT */}
         <HStack spacing={3} align="center">
-          <Box
-            w="40px"
-            h="40px"
-            bg='var(--zaplane-background)'
-            p="10px"
-            borderRadius='4px'
-            border="1px solid var(--zaplane-border-color)"
-          >
-            <Text as={'span'} justifyContent='center' className={`zaplane-icon zaplane-icon--${data?.icon}`} />
-          </Box>
-
+          <ZAPIcon icon={data?.icon} name={data.app} />
           <Box textAlign="left" flex="1" minW="0">
             <Text
               className="zaplane-label"
               overflow="hidden"
               textOverflow="ellipsis"
               whiteSpace="nowrap"
-              fontWeight='400'
             >
               {isSelectApp
                 ? __(data.app, "zaplane")
@@ -141,6 +131,7 @@ export default function CustomNode({ id, data, canvasLayout, nodes }) {
                 overflow="hidden"
                 textOverflow="ellipsis"
                 whiteSpace="nowrap"
+                color='#454F59'
               >
                 {sprintf(__("%s", "zaplane"), data.app)}
               </Text>

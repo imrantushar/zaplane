@@ -319,7 +319,7 @@ trait Helper {
 			$query->limit( $args['posts_per_page'] );
 		}
 
-		return $query->get();
+		return $query->get()->toArray();
 	}
 
 	public static function format_media_items( array $media_posts ): array {

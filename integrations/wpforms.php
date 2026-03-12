@@ -19,7 +19,7 @@ class Wpforms extends IntegrationBase {
 	}
 
 	public static function get_icon(): string {
-		return '';
+		return 'wpforms.svg';
 	}
 
 	public static function get_triggers(): array {

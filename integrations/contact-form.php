@@ -21,7 +21,7 @@ class ContactForm extends IntegrationBase {
 	}
 
 	public static function get_icon(): string {
-		return '';
+		return 'contact-form-7.svg';
 	}
 
 	public static function get_triggers(): array {

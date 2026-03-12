@@ -19,6 +19,10 @@ class Filter extends IntegrationBase {
 		return 'tool';
 	}
 
+	public static function get_icon(): string {
+		return 'filter';
+	}
+
 	public static function get_actions(): array {
 		return [
 			'filter' => [ 'label' => 'Filter' ],

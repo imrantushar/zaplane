@@ -19,7 +19,7 @@ class Bricks extends IntegrationBase {
 	}
 
 	public static function get_icon(): string {
-		return 'bricksb-builder';
+		return 'bricksb-builder.svg';
 	}
 
 	public static function get_triggers(): array {
