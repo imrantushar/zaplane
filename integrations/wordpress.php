@@ -36,7 +36,7 @@ class Wordpress extends IntegrationBase {
 	use Helper;
 
 	public static function get_slug(): string {
-		return 'wordpress';
+		return 'WordPress';
 	}
 
 	public static function get_name(): string {
@@ -44,7 +44,7 @@ class Wordpress extends IntegrationBase {
 	}
 
 	public static function get_icon(): string {
-		return 'wordpress.svg';
+		return 'WordPress.svg';
 	}
 
 	public static function get_triggers(): array {
