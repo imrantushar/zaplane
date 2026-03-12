@@ -62,7 +62,7 @@ trait MediaActionsTrait {
 
 	protected static function action_get_media_all( array $config ): array {
 		$media_posts = self::get_media_posts();
-		$media_items = self::format_media_items( $media_posts );
+		$media_items = self::format_media_items( $media_posts->toArray() );
 		return static::success([
 			'media_items' => $media_items,
 		]);
@@ -71,7 +71,7 @@ trait MediaActionsTrait {
 	protected static function action_get_media_by_title( array $config ): array {
 		$title       = $config['title'] ?? '';
 		$media_posts = self::get_media_posts( [ 's' => $title ] );
-		$media_items = self::format_media_items( $media_posts );
+		$media_items = self::format_media_items( $media_posts->toArray() );
 		return static::success([
 			'media_items' => $media_items,
 		]);

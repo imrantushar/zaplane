@@ -1,6 +1,8 @@
 <?php
 namespace Zaplane\Integrations\Wordpress;
 
+use Zaplane\Framework\Database\ORM\Collection;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -310,7 +312,7 @@ trait Helper {
 		];
 	}
 
-	public static function get_media_posts( array $args = [] ): array {
+	public static function get_media_posts( array $args = [] ): Collection {
 		$query = Post::where( 'post_type', 'attachment' )
 			->where( 'post_status', 'inherit' )
 			->orderBy( 'post_date', 'desc' );
