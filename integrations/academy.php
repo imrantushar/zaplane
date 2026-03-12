@@ -19,7 +19,7 @@ class Academy extends IntegrationBase {
 	}
 
 	public static function get_icon(): string {
-		return 'academy';
+		return 'academy.svg';
 	}
 
 	public static function get_triggers(): array {

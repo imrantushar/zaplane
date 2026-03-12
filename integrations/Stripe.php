@@ -10,6 +10,10 @@ class Stripe extends IntegrationBase {
 		return 'stripe';
 	}
 
+	public static function get_icon(): string {
+		return 'stripe.svg';
+	}
+
 	public static function get_triggers(): array {
 		return [
 			'payment_succeeded' => [

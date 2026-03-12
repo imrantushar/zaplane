@@ -23,7 +23,7 @@ class Slack extends IntegrationBase {
 	}
 
 	public static function get_icon(): string {
-		return 'slack';
+		return 'slack.svg';
 	}
 
 	public static function get_triggers(): array {

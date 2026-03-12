@@ -19,7 +19,7 @@ class FluentForm extends IntegrationBase {
 	}
 
 	public static function get_icon(): string {
-		return 'fluentform';
+		return 'fluentform.svg';
 	}
 
 	public static function get_triggers(): array {

@@ -14,6 +14,9 @@ class Webhook extends IntegrationBase {
 		return 'Webhook';
 	}
 
+     public static function get_icon(): string {
+		return 'webhook';
+	}
 	public static function supports_webhook(): bool {
 		return true;
 	}
