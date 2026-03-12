@@ -5,7 +5,7 @@
         "wordpress": {
             "slug": "wordpress",
             "name": "WordPress",
-            "icon": "",
+            "icon": "wordpress",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -8743,7 +8743,7 @@
         "storeengine": {
             "slug": "storeengine",
             "name": "StoreEngine",
-            "icon": "storeengine",
+            "icon": "storeengine.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -8883,7 +8883,7 @@
         "learndash": {
             "slug": "learndash",
             "name": "LearnDash",
-            "icon": "",
+            "icon": "learndash-icon",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -10352,7 +10352,7 @@
         "fluentcrm": {
             "slug": "fluentcrm",
             "name": "FluentCRM",
-            "icon": "",
+            "icon": "fluentcrm-logo-icon.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -11319,7 +11319,7 @@
         "gravityforms": {
             "slug": "gravityforms",
             "name": "Gravity Forms",
-            "icon": "",
+            "icon": "gravity-forms-logo.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -11391,7 +11391,7 @@
         "formidable": {
             "slug": "formidable",
             "name": "Formidable Forms",
-            "icon": "",
+            "icon": "formidable.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -11427,7 +11427,7 @@
         "wpforms": {
             "slug": "wpforms",
             "name": "WPForms",
-            "icon": "",
+            "icon": "wpforms.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -11463,7 +11463,7 @@
         "contact-form-7": {
             "slug": "contact-form-7",
             "name": "Contact Form 7",
-            "icon": "",
+            "icon": "contact-form-7.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -12237,7 +12237,7 @@
         "groundhogg": {
             "slug": "groundhogg",
             "name": "Groundhogg",
-            "icon": "groundhogg-icon",
+            "icon": "groundhogg-icon.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",

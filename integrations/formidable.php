@@ -23,7 +23,7 @@ class Formidable extends IntegrationBase {
 	}
 
 	public static function get_icon(): string {
-		return '';
+		return 'formidable.svg';
 	}
 
 	public static function get_triggers(): array {
