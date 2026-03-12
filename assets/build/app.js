@@ -14775,7 +14775,7 @@ const ZapIcon = ({
   icon,
   name
 }) => {
-  const isSvg = icon.endsWith(".svg");
+  const isSvg = icon?.endsWith(".svg");
   if (isSvg) {
     return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Image, {
       src: `${_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.plugin_root_url}assets/icons/${icon}`,
