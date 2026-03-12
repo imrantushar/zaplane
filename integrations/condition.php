@@ -19,6 +19,10 @@ class Condition extends IntegrationBase {
 		return 'tool';
 	}
 
+	public static function get_icon(): string {
+		return 'condition';
+	}
+
 	public static function get_actions(): array {
 		return [
 			'if' => [ 'label' => 'If Condition' ],

@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-03-11 07:27:46",
+    "generated_at": "2026-03-12 05:48:20",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -12495,7 +12495,7 @@
         "condition": {
             "slug": "condition",
             "name": "Condition",
-            "icon": "",
+            "icon": "condition",
             "category": "tool",
             "requires_connection": false,
             "auth_type": "none",
@@ -12598,7 +12598,7 @@
         "filter": {
             "slug": "filter",
             "name": "Filter",
-            "icon": "",
+            "icon": "filter",
             "category": "tool",
             "requires_connection": false,
             "auth_type": "none",
@@ -12700,7 +12700,7 @@
         "delay": {
             "slug": "delay",
             "name": "Delay",
-            "icon": "",
+            "icon": "delay",
             "category": "tool",
             "requires_connection": false,
             "auth_type": "none",
@@ -12744,7 +12744,7 @@
         "iterator": {
             "slug": "iterator",
             "name": "Iterator",
-            "icon": "",
+            "icon": "iterator",
             "category": "tool",
             "requires_connection": false,
             "auth_type": "none",
@@ -12772,7 +12772,7 @@
         "variable": {
             "slug": "variable",
             "name": "Set Variable",
-            "icon": "",
+            "icon": "variable",
             "category": "tool",
             "requires_connection": false,
             "auth_type": "none",
@@ -12804,7 +12804,7 @@
         "http": {
             "slug": "http",
             "name": "HTTP Request",
-            "icon": "",
+            "icon": "http-request",
             "category": "tool",
             "requires_connection": false,
             "auth_type": "none",

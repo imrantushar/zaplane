@@ -18,6 +18,10 @@ class Http extends IntegrationBase {
 		return 'tool';
 	}
 
+	public static function get_icon(): string {
+		return 'http-request';
+	}
+
 	public static function get_actions(): array {
 		return [
 			'request' => [ 'label' => 'Send HTTP Request' ]

@@ -22,6 +22,10 @@ class Iterator extends IntegrationBase {
 		return 'tool';
 	}
 
+	public static function get_icon(): string {
+		return 'iterator';
+	}
+
 	public static function get_output_ports(): array {
 		return [ 'loop', 'done' ];
 	}
