@@ -17,18 +17,18 @@ const DrawerSearchList = ({ searchList, setMode, setSelectedItem, setSearch }) =
           }}
           height='50px'
           p="4px"
+          color="var(--zaplane-font-color)"
           background="var(--zaplane-background)"
           _hover={{ bg: "#F6F7F8" }}
         >
           <Flex gap='12px' alignItems='center'>
             <Flex w="40px"
               h="40px"
-              bg='var(--zaplane-background)'
               p="10px"
               borderRadius='4px'
               justifyContent='center'
               border="1px solid var(--zaplane-border-color)">
-              <Text as={'span'}  className={`zaplane-icon zaplane-icon--${item?.icon}`}/>
+              <Text as={'span'} className={`zaplane-icon zaplane-icon--${item?.icon}`} />
             </Flex>
             <Text className="zaplane-label" fontWeight='400' >{sprintf(__("%s", "zaplane"), item.name)}</Text>
           </Flex>
