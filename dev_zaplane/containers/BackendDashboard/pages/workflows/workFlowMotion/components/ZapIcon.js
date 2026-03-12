@@ -7,7 +7,6 @@ const ZapIcon = ({ icon, name }) => {
     return (
       <Image
         src={`${plugin_root_url}assets/icons/${icon}`}
-        boxSize={20}
         alt={name}
       />
     );
