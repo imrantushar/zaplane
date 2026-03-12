@@ -322,6 +322,12 @@ namespace Zaplane\Tests {
 namespace {
 	use Zaplane\Tests\WPMocks;
 
+	$mock_dir = __DIR__ . '/mocks/';
+
+	foreach (glob($mock_dir . '*.php') as $file) {
+		require_once $file;
+	}
+
 	// ── Options ───────────────────────────────────────────────────────────────
 
 	if ( ! function_exists( 'get_option' ) ) {
