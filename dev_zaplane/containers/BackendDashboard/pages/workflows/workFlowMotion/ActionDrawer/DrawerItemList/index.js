@@ -1,9 +1,9 @@
-import { VStack, Button, Box, Flex, Image, Icon } from "@chakra-ui/react";
+import { VStack } from "@chakra-ui/react";
 import DrawerItemButton from "./DrawerItemButton";
 import { __ } from "@wordpress/i18n";
 
 
-const DrawerItemList = ({ list, setSelectedItem, setMode }) => {
+const DrawerItemList = ({ list, setSelectedItem}) => {
   // app list item 
   return (
     <VStack alignItems="left" overflow="hidden"  gap='16px'>

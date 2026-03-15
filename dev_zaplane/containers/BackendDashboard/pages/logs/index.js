@@ -1,15 +1,13 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
     Text,
     Box,
-    Button,
-    Badge,
     HStack,
     Icon,
-    Flex,
+
 } from "@chakra-ui/react";
 import { useDispatch, useSelector } from "react-redux";
-import { __, sprintf } from "@wordpress/i18n";
+import { __ } from "@wordpress/i18n";
 
 import {
     getRunsList,
