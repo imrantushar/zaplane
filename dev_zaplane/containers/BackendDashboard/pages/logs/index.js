@@ -204,7 +204,7 @@ const Logs = () => {
             <div className="zaplane-page-content">
                 <ListTable
                     columns={columns}
-                    isRowSelectable={true}
+                    isRowSelectable={false}
                     data={data?.runs || []}
                     showSubHeader={false}
                     showColumnFilter={false}

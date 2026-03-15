@@ -4,7 +4,7 @@ import ZAPIcon from "@ZAPComponents/ZAPIcon";
 
 
 const DrawerSearchList = ({ searchList, setMode, setSelectedItem, setSearch }) => {
-  if (!searchList?.length) return null;
+  if (!searchList?.length) return <Text className="zaplane-label">{__("No results found", "zaplane")}</Text>;
   return (
     <VStack spacing={2} align="stretch">
       {searchList.map(item => (

@@ -10,7 +10,8 @@ import {
 import { __, sprintf } from "@wordpress/i18n";
 import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
 import ZAPLoading from "@ZAPComponents/Loading";
-import ReactJson from "react-json-view";
+import { allExpanded, defaultStyles, JsonView } from "react-json-view-lite";
+import "react-json-view-lite/dist/index.css";
 
 import { useSelector } from "react-redux";
 const LogDetails = ({ runId, onBack }) => {
@@ -73,13 +74,7 @@ const LogDetails = ({ runId, onBack }) => {
                       <Text className="zaplane-label" fontWeight="bold" mb="2">
                         {__('Input', 'zaplane')}
                       </Text>
-                     <ReactJson
-                        src={input}
-                        name="root"
-                        collapsed={1}
-                        enableClipboard={false}
-                        displayDataTypes={false}
-                      />
+                     <JsonView data={input} />
                     </Box>
 
                     <Box
@@ -91,13 +86,7 @@ const LogDetails = ({ runId, onBack }) => {
                       <Text fontWeight="bold" mb="2">
                         {__('Output', 'zaplane')}
                       </Text>
-                      <ReactJson
-                        src={output}
-                        name="root"
-                        collapsed={1}
-                        enableClipboard={false}
-                        displayDataTypes={false}
-                      />
+                      <JsonView data={output} shouldExpandNode={allExpanded} style={defaultStyles}/>
                     </Box>
                   </VStack>
                 </Accordion.ItemBody>
