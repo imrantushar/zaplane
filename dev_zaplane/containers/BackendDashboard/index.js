@@ -28,29 +28,6 @@ const renderSwitch = (page, id, action, path) => {
 		case 'zaplane-settings':
 			return <Setting />;
 
-		// case 'zaplane-settings':
-		// 	return <Settings />;
-
-		// case 'point-type':
-		// 	return <PointType />;
-
-		// case 'zaplane-achievements':
-		// 	if(path === 'achievements-type'){
-		// 		return <AchievementsType />
-		// 	}
-		// 	if ( action || id ) {
-		// 		return <AchievementsType action={ action } id={ id } />;
-		// 	}
-		// 	return <Achievements />;
-
-		// case 'zaplane-levels':
-		// 	if(path === 'levels-types'){
-		// 		return <LevelType />;
-		// 	}
-		// 	return <Levels />;
-		// case 'zaplane-leaderboards':
-		// 	return <Leaderboards />;
-
 		default:
 			return <>No page found</>;
 	}
