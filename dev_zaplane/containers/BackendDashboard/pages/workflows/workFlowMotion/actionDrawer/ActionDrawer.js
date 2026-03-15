@@ -146,7 +146,7 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
       open={open}
       isFullscreen={isFullscreen}
       onClose={resetAll}
-      arrowClose={mode === 'app'}
+      arrowClose={['tools', 'app'].includes(mode)}
       maxWidth='700px'
       arrowOnClick={() => {
         setSelectedItem(null);
