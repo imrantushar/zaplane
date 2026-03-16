@@ -8,6 +8,7 @@ import Logs from './pages/logs';
 import Setting from './pages/setting';
 import Connections from './pages/connections';
 import Dashboard from './pages/dashboard';
+import { __ } from '@wordpress/i18n';
 
 
 
@@ -29,7 +30,7 @@ const renderSwitch = (page, id, action, path) => {
 			return <Setting />;
 
 		default:
-			return <>No page found</>;
+			return <>{__('No page found', 'zaplane')}</>;
 	}
 };
 

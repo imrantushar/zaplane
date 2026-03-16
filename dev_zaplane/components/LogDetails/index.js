@@ -23,7 +23,7 @@ const LogDetails = ({ runId, onBack }) => {
   //after the  response I’ll add translation support.
   return (
     <Box>
-      <ZAPLabel label={__(`Run ID: ${runId}`, 'zaplane')} type={"inputLabel"} />
+      <ZAPLabel  label={sprintf(__('Run ID: %s', 'zaplane'), runId)} type={"inputLabel"} />
       <Accordion.Root collapsible>
         {nodeDetails?.nodes?.map((log) => {
           const input = log?.input_json || {};
