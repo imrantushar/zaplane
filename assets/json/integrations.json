@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-03-09 16:06:13",
+    "generated_at": "2026-03-16 09:52:43",
     "apps": {
         "pause": {
             "slug": "pause",
@@ -7196,16 +7196,8 @@
                                     "value": "any"
                                 },
                                 {
-                                    "label": "aaaaaaaaaa",
-                                    "value": 10
-                                },
-                                {
-                                    "label": "course",
-                                    "value": 8
-                                },
-                                {
-                                    "label": "sssssss",
-                                    "value": 12
+                                    "label": "zczxvc",
+                                    "value": 89
                                 }
                             ],
                             "required": true
@@ -7230,16 +7222,8 @@
                                     "value": "any"
                                 },
                                 {
-                                    "label": "aaaaaaaaaa",
-                                    "value": 10
-                                },
-                                {
-                                    "label": "course",
-                                    "value": 8
-                                },
-                                {
-                                    "label": "sssssss",
-                                    "value": 12
+                                    "label": "zczxvc",
+                                    "value": 89
                                 }
                             ],
                             "required": true
@@ -7264,16 +7248,8 @@
                                     "value": "any"
                                 },
                                 {
-                                    "label": "aaaaaaaaaa",
-                                    "value": 10
-                                },
-                                {
-                                    "label": "course",
-                                    "value": 8
-                                },
-                                {
-                                    "label": "sssssss",
-                                    "value": 12
+                                    "label": "zczxvc",
+                                    "value": 89
                                 }
                             ],
                             "required": true
@@ -7286,6 +7262,14 @@
                                 {
                                     "label": "Any lesson",
                                     "value": "any"
+                                },
+                                {
+                                    "label": "Lesson",
+                                    "value": 90
+                                },
+                                {
+                                    "label": "sfdsafsaf",
+                                    "value": 91
                                 }
                             ],
                             "required": true
@@ -7310,16 +7294,8 @@
                                     "value": "any"
                                 },
                                 {
-                                    "label": "aaaaaaaaaa",
-                                    "value": 10
-                                },
-                                {
-                                    "label": "course",
-                                    "value": 8
-                                },
-                                {
-                                    "label": "sssssss",
-                                    "value": 12
+                                    "label": "zczxvc",
+                                    "value": 89
                                 }
                             ],
                             "required": true
@@ -7332,6 +7308,14 @@
                                 {
                                     "label": "Any lesson",
                                     "value": "any"
+                                },
+                                {
+                                    "label": "Lesson",
+                                    "value": 90
+                                },
+                                {
+                                    "label": "sfdsafsaf",
+                                    "value": 91
                                 }
                             ],
                             "required": true
@@ -7344,6 +7328,10 @@
                                 {
                                     "label": "Any Topic",
                                     "value": "any"
+                                },
+                                {
+                                    "label": "dsfdsf",
+                                    "value": 96
                                 }
                             ],
                             "required": true
@@ -7366,6 +7354,10 @@
                                 {
                                     "label": "Any Quiz",
                                     "value": "any"
+                                },
+                                {
+                                    "label": "sadfsaf",
+                                    "value": 93
                                 }
                             ],
                             "required": true
@@ -7388,6 +7380,10 @@
                                 {
                                     "label": "Any Group",
                                     "value": "any"
+                                },
+                                {
+                                    "label": "dsfdsf",
+                                    "value": 98
                                 }
                             ],
                             "required": true
@@ -7410,6 +7406,10 @@
                                 {
                                     "label": "Any Group",
                                     "value": "any"
+                                },
+                                {
+                                    "label": "dsfdsf",
+                                    "value": 98
                                 }
                             ],
                             "required": true
@@ -7434,16 +7434,8 @@
                                     "value": "any"
                                 },
                                 {
-                                    "label": "aaaaaaaaaa",
-                                    "value": 10
-                                },
-                                {
-                                    "label": "course",
-                                    "value": 8
-                                },
-                                {
-                                    "label": "sssssss",
-                                    "value": 12
+                                    "label": "zczxvc",
+                                    "value": 89
                                 }
                             ],
                             "required": true
@@ -7456,6 +7448,14 @@
                                 {
                                     "label": "Any lesson",
                                     "value": "any"
+                                },
+                                {
+                                    "label": "Lesson",
+                                    "value": 90
+                                },
+                                {
+                                    "label": "sfdsafsaf",
+                                    "value": 91
                                 }
                             ],
                             "required": true
@@ -8585,6 +8585,14 @@
                                 {
                                     "label": "Any Tag",
                                     "value": "any"
+                                },
+                                {
+                                    "label": "tag 1",
+                                    "value": 1
+                                },
+                                {
+                                    "label": "tag 2",
+                                    "value": 2
                                 }
                             ],
                             "required": true
@@ -8607,6 +8615,14 @@
                                 {
                                     "label": "Any Tag",
                                     "value": "any"
+                                },
+                                {
+                                    "label": "tag 1",
+                                    "value": 1
+                                },
+                                {
+                                    "label": "tag 2",
+                                    "value": 2
                                 }
                             ],
                             "required": true
@@ -8629,6 +8645,14 @@
                                 {
                                     "label": "Any List",
                                     "value": "any"
+                                },
+                                {
+                                    "label": "list 1",
+                                    "value": 1
+                                },
+                                {
+                                    "label": "list 2",
+                                    "value": 2
                                 }
                             ],
                             "required": true
@@ -8651,6 +8675,14 @@
                                 {
                                     "label": "Any List",
                                     "value": "any"
+                                },
+                                {
+                                    "label": "list 1",
+                                    "value": 1
+                                },
+                                {
+                                    "label": "list 2",
+                                    "value": 2
                                 }
                             ],
                             "required": true
@@ -8771,6 +8803,14 @@
                                 {
                                     "label": "Any List",
                                     "value": "any"
+                                },
+                                {
+                                    "label": "list 1",
+                                    "value": 1
+                                },
+                                {
+                                    "label": "list 2",
+                                    "value": 2
                                 }
                             ],
                             "required": true,
@@ -8784,6 +8824,14 @@
                                 {
                                     "label": "Any Tag",
                                     "value": "any"
+                                },
+                                {
+                                    "label": "tag 1",
+                                    "value": 1
+                                },
+                                {
+                                    "label": "tag 2",
+                                    "value": 2
                                 }
                             ],
                             "required": true,
@@ -8793,7 +8841,12 @@
                             "key": "company",
                             "label": "company",
                             "type": "select",
-                            "options": [],
+                            "options": [
+                                {
+                                    "label": "asd",
+                                    "value": 1
+                                }
+                            ],
                             "required": true,
                             "multiple": true
                         },
@@ -9019,6 +9072,14 @@
                                 {
                                     "label": "Any Tag",
                                     "value": "any"
+                                },
+                                {
+                                    "label": "tag 1",
+                                    "value": 1
+                                },
+                                {
+                                    "label": "tag 2",
+                                    "value": 2
                                 }
                             ],
                             "required": true,
@@ -9047,6 +9108,14 @@
                                 {
                                     "label": "Any Tag",
                                     "value": "any"
+                                },
+                                {
+                                    "label": "tag 1",
+                                    "value": 1
+                                },
+                                {
+                                    "label": "tag 2",
+                                    "value": 2
                                 }
                             ],
                             "required": true,
@@ -9125,6 +9194,14 @@
                                 {
                                     "label": "Any List",
                                     "value": "any"
+                                },
+                                {
+                                    "label": "list 1",
+                                    "value": 1
+                                },
+                                {
+                                    "label": "list 2",
+                                    "value": 2
                                 }
                             ],
                             "required": true,
@@ -9153,6 +9230,14 @@
                                 {
                                     "label": "Any List",
                                     "value": "any"
+                                },
+                                {
+                                    "label": "list 1",
+                                    "value": 1
+                                },
+                                {
+                                    "label": "list 2",
+                                    "value": 2
                                 }
                             ],
                             "required": true,
@@ -9315,7 +9400,12 @@
                             "key": "company",
                             "label": "company",
                             "type": "select",
-                            "options": [],
+                            "options": [
+                                {
+                                    "label": "asd",
+                                    "value": 1
+                                }
+                            ],
                             "required": true,
                             "multiple": true
                         }
@@ -9338,7 +9428,12 @@
                             "key": "company",
                             "label": "company",
                             "type": "select",
-                            "options": [],
+                            "options": [
+                                {
+                                    "label": "asd",
+                                    "value": 1
+                                }
+                            ],
                             "required": true,
                             "multiple": true
                         }
@@ -9511,6 +9606,18 @@
                                 {
                                     "label": "Any From",
                                     "value": "any"
+                                },
+                                {
+                                    "label": "simple",
+                                    "value": "1"
+                                },
+                                {
+                                    "label": "wwwwwwwwwwwwwwwwww",
+                                    "value": "3"
+                                },
+                                {
+                                    "label": "zzzzz",
+                                    "value": "2"
                                 }
                             ],
                             "required": true
@@ -9579,6 +9686,30 @@
                                 {
                                     "label": "Any Form",
                                     "value": "any"
+                                },
+                                {
+                                    "label": "Contact Us",
+                                    "value": "1"
+                                },
+                                {
+                                    "label": "Contact Us",
+                                    "value": "2"
+                                },
+                                {
+                                    "label": "Stripe Payment",
+                                    "value": "3"
+                                },
+                                {
+                                    "label": "Contact Us",
+                                    "value": "4"
+                                },
+                                {
+                                    "label": "",
+                                    "value": "5"
+                                },
+                                {
+                                    "label": "xzczzzzzzzzzzzzzz",
+                                    "value": "6"
                                 }
                             ],
                             "required": true
@@ -9613,6 +9744,14 @@
                                 {
                                     "label": "Any From",
                                     "value": "any"
+                                },
+                                {
+                                    "label": "kkkkkkkkkkkkkkk",
+                                    "value": 83
+                                },
+                                {
+                                    "label": "mmmmmmmmmmmm",
+                                    "value": 86
                                 }
                             ],
                             "required": true
@@ -9647,6 +9786,22 @@
                                 {
                                     "label": "Any From",
                                     "value": "any"
+                                },
+                                {
+                                    "label": "Untitled",
+                                    "value": 65
+                                },
+                                {
+                                    "label": "Untitled_copy",
+                                    "value": 66
+                                },
+                                {
+                                    "label": "Untitled_copy_copy",
+                                    "value": 67
+                                },
+                                {
+                                    "label": "Untitled_copy_copy_copy",
+                                    "value": 68
                                 }
                             ],
                             "required": true
@@ -10402,6 +10557,14 @@
                                 {
                                     "label": "Any Tag",
                                     "value": "any"
+                                },
+                                {
+                                    "value": "2",
+                                    "label": "fun"
+                                },
+                                {
+                                    "value": "1",
+                                    "label": "this"
                                 }
                             ],
                             "required": true
@@ -10424,6 +10587,14 @@
                                 {
                                     "label": "Any Tag",
                                     "value": "any"
+                                },
+                                {
+                                    "value": "2",
+                                    "label": "fun"
+                                },
+                                {
+                                    "value": "1",
+                                    "label": "this"
                                 }
                             ],
                             "required": true
@@ -10487,7 +10658,7 @@
         },
         "masterstudy": {
             "slug": "masterstudy",
-            "name": "Masterstudy",
+            "name": "MasterStudy LMS",
             "icon": "",
             "category": "app",
             "requires_connection": false,

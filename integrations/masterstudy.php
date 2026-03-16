@@ -13,6 +13,14 @@ class Masterstudy extends IntegrationBase {
 		return 'masterstudy';
 	}
 
+	public static function get_name(): string {
+		return 'MasterStudy LMS';
+	}
+
+	public static function get_icon(): string {
+		return '';
+	}
+
 	public static function get_triggers(): array {
 		return [
 			'user_enroll_course' => [
@@ -101,18 +109,12 @@ class Masterstudy extends IntegrationBase {
 		return [];
 	}
 
-	private static function resolve_course_payload( int $user_id, $course_id ) {
-		$user_id   = (int) $user_id;
-		$course_id = (int) $course_id;
+	private static function resolve_user_payload( int $user_id, array $extra = [] ) {
 		$user = get_user_by( 'id', $user_id );
 		if ( ! $user ) {
 			return false;
 		}
-		return [
-			'course_id'          => (int) $course_id,
-			'course_title'       => get_the_title( $course_id ),
-			'course_description' => get_post_field( 'post_content', $course_id ),
-			'course_url'         => get_permalink( $course_id ),
+		$data = [
 			'user_id'            => (int) $user_id,
 			'first_name'         => $user->first_name,
 			'last_name'          => $user->last_name,
@@ -124,6 +126,7 @@ class Masterstudy extends IntegrationBase {
 			'user_roles'         => $user->roles,
 			'completed_at'       => current_time( 'mysql' ),
 		];
+		return array_merge( $data, $extra );
 	}
 
 	public static function resolve_trigger( array $node, array $args ) {
@@ -131,6 +134,7 @@ class Masterstudy extends IntegrationBase {
 		switch ( $node['event'] ) {
 
 			case 'user_enroll_course':
+			case 'course_complete':
 				$user_id   = $args[0] ?? 0;
 				$course_id = $args[1] ?? 0;
 
@@ -144,30 +148,23 @@ class Masterstudy extends IntegrationBase {
 					return false;
 				}
 
-				return [
-					'success'   => true,
-					'timestamp' => current_time( 'mysql' ),
-					'data'      => self::resolve_course_payload( $user_id, $course_id ),
+				$course = get_post( $course_id );
+
+				if ( ! $course ) {
+					return false;
+				}
+
+				$course_data = [
+					'course_id'          => $course->ID,
+					'course_title'       => $course->post_title,
+					'course_description' => $course->post_content,
+					'course_url'         => get_permalink( $course_id ),
 				];
 
-			case 'course_complete':
-				$course_id = $args[0] ?? 0;
-				$user_id   = $args[1] ?? 0;
-
-				if ( ! $course_id || ! $user_id ) {
-					return false;
-				}
-
-				$selected_course = $node['data']['config']['course_id'] ?? 'any';
-
-				if ( 'any' !== $selected_course && (int) $selected_course !== (int) $course_id ) {
-					return false;
-				}
-
 				return [
 					'success'   => true,
 					'timestamp' => current_time( 'mysql' ),
-					'data' => self::resolve_course_payload( $user_id, $course_id ),
+					'data' => self::resolve_user_payload( $user_id, $course_data ),
 				];
 
 			case 'lesson_complete':
@@ -185,31 +182,22 @@ class Masterstudy extends IntegrationBase {
 				}
 
 				$lesson = get_post( $lesson_id );
-				$user   = get_user_by( 'id', $user_id );
 
-				if ( ! $user ) {
+				if ( ! $lesson ) {
 					return false;
 				}
 
+				$lesson_data = [
+					'lesson_id'          => $lesson->ID,
+					'lesson_title'       => $lesson->post_title,
+					'lesson_description' => $lesson->post_content,
+					'lesson_url'         => get_permalink( $lesson_id ),
+				];
+
 				return [
-					'success' => true,
+					'success'   => true,
 					'timestamp' => current_time( 'mysql' ),
-					'data' => [
-						'lesson_id'          => $lesson->ID,
-						'lesson_title'       => $lesson->post_title,
-						'lesson_description' => $lesson->post_content,
-						'lesson_url'         => get_permalink( $lesson->ID ),
-						'user_id'            => $user_id,
-						'first_name'         => $user->first_name,
-						'last_name'          => $user->last_name,
-						'user_login'         => $user->user_login,
-						'user_email'         => $user->user_email,
-						'nickname'           => $user->nickname,
-						'display_name'       => $user->display_name,
-						'avatar_url'         => get_avatar_url( $user_id ),
-						'user_roles'         => $user->roles,
-						'completed_at'       => current_time( 'mysql' ),
-					]
+					'data' => self::resolve_user_payload( $user_id, $lesson_data ),
 				];
 
 			case 'quiz_passed':
@@ -229,32 +217,24 @@ class Masterstudy extends IntegrationBase {
 				}
 
 				$quiz = get_post( $quiz_id );
-				$user = get_user_by( 'id', $user_id );
 
-				if ( ! $quiz || ! $user ) {
+				if ( ! $quiz ) {
 					return false;
 				}
+
+				$quiz_data = [
+					'quiz_id'          => $quiz->ID,
+					'quiz_title'       => $quiz->post_title,
+					'quiz_description' => $quiz->post_content,
+					'quiz_url'         => get_permalink( $quiz_id ),
+					'score'            => $percentage,
+					'status'           => 'quiz_passed' ? 'passed' : 'failed' === $node['event'],
+				];
 
 				return [
 					'success'   => true,
 					'timestamp' => current_time( 'mysql' ),
-					'data' => [
-						'quiz_id'          => $quiz->ID,
-						'quiz_title'       => $quiz->post_title,
-						'quiz_description' => $quiz->post_content,
-						'quiz_url'         => get_permalink( $quiz->ID ),
-						'score'            => $percentage,
-						'status'           => 'quiz_passed' ? 'passed' : 'failed' === $node['event'],
-						'user_id'          => $user_id,
-						'first_name'       => $user->first_name,
-						'last_name'        => $user->last_name,
-						'user_login'       => $user->user_login,
-						'user_email'       => $user->user_email,
-						'display_name'     => $user->display_name,
-						'avatar_url'       => get_avatar_url( $user_id ),
-						'user_roles'       => $user->roles,
-						'completed_at'     => current_time( 'mysql' ),
-					]
+					'data' => self::resolve_user_payload( $user_id, $quiz_data ),
 				];
 		}//end switch
 		return false;
@@ -264,7 +244,7 @@ class Masterstudy extends IntegrationBase {
 		return [
 			'course_query' => [ self::class, 'course_query_types' ],
 			'lesson_query' => [ self::class, 'lesson_query_types' ],
-			'quiz_query' => [ self::class, 'quiz_query_types' ],
+			'quiz_query'   => [ self::class, 'quiz_query_types' ],
 		];
 	}
 
