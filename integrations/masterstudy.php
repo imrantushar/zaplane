@@ -18,7 +18,7 @@ class Masterstudy extends IntegrationBase {
 	}
 
 	public static function get_icon(): string {
-		return '';
+		return 'master-study-lms.svg';
 	}
 
 	public static function get_triggers(): array {
