@@ -179,8 +179,6 @@ class Run extends Model {
 
 		$runs = $runs->get();
 
-		ray( $runs )->label( "Runs for workflow version ID $versionId" );
-
 		$nodeOutputs = [];
 
 		foreach ( $runs as $run ) {

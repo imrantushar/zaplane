@@ -85,7 +85,7 @@ class NodeRun extends Model {
 		return $this->save();
 	}
 
-	public function markAsFailed( string $error = null ): bool {
+	public function markAsFailed( string $status = '' ): bool {
 		$this->status = 'failed';
 		$this->finished_at = current_time( 'mysql' );
 		return $this->save();
