@@ -45,6 +45,7 @@ class Automation {
 		add_action( 'init', [ $this, 'dispatch_active_listeners' ] );
 		add_action( 'zaplane_execute_node_run', [ $this, 'dispatch_node_run' ], 10, 1 );
 		add_action( 'zaplane_workflow_updated', [ $this, 'reload_triggers' ] );
+		add_action( 'zaplane_resume_delayed_run', [ $this, 'resume_delayed_run' ], 10, 4 );
 	}
 
 	public function reload_triggers() {
@@ -137,7 +138,6 @@ class Automation {
 
 	public function trigger_router() {
 		$event = current_filter();
-		error_log( print_r( 'events' . $event, true ) );
 
 		$args = func_get_args();
 		foreach ( Query::get_active_workflows_for_event( $event ) as $trigger ) {
@@ -198,6 +198,26 @@ class Automation {
 		do_action( 'zaplane_execute_node_run', $node_run_id );
 	}
 
+	public function resume_delayed_run( int $run_id, int $node_run_id, int $node_key, array $output ) {
+		$run = Run::find( $run_id );
+		$nodeRun = NodeRun::find( $node_run_id );
+
+		if ( ! $run || ! $nodeRun || 'delayed' !== $nodeRun->status ) {
+			return;
+		}
+
+		$graph = $this->load_graph( $run->workflow_version_id );
+
+		$nodeRun->setOutput( $output );
+		$nodeRun->status = 'completed';
+		$nodeRun->finished_at = current_time( 'mysql' );
+		$nodeRun->save();
+
+		$this->spawn_children( $nodeRun, $output, $graph, $run );
+
+		$this->finalize_run( $run_id );
+	}
+
 	public function dispatch_node_run( int $node_run_id ) {
 		$nodeRun = NodeRun::find( $node_run_id );
 
@@ -226,10 +246,13 @@ class Automation {
 		$context = $this->buildNodeContext( $run->id );
 		$resolveData = $input + $context;
 
+		$node['_run_id'] = $run->id;
+		$node['_node_run_id'] = $nodeRun->id;
+
 		try {
-			if ( $node['type'] === 'trigger' ) {
+			if ( 'trigger' === $node['type'] ) {
 				$output = $input;
-			} elseif ( in_array( $app, [ 'condition', 'filter' ] ) ) {
+			} elseif ( in_array( $app, [ 'condition', 'filter' ], true ) ) {
 				$integration = $this->container->get( 'integrations' )->get( $app );
 				if ( ! $integration ) {
 					throw IntegrationException::notFound( $node['data']['app'] );
@@ -245,6 +268,39 @@ class Automation {
 				$node = $this->resolveNodeConfig( $node, $resolveData );
 				$output = $integration::execute_node( $node, $input );
 			}
+
+			if ( isset( $output['status'] ) && 'delayed' === $output['status'] ) {
+				$nodeRun->status = 'delayed';
+				$nodeRun->output_json = $output;
+				$nodeRun->save();
+
+				$this->finalize_run( $run->id );
+				return;
+			}
+
+			if ( isset( $output['status'] ) && 'iterate' === $output['status'] ) {
+				$nodeRun->setOutput( $output );
+
+				$this->spawn_children( $nodeRun, $output, $graph, $run );
+
+				$remaining = $output['remaining'] ?? [];
+				if ( ! empty( $remaining ) ) {
+					$iteratorInput = array_merge( $input, [
+						'_is_iterating' => true,
+						'_remaining'    => $remaining
+					] );
+
+					$this->spawn_node_run(
+						$run->id,
+						$nodeRun->node_key,
+						$iteratorInput,
+						$nodeRun->parent_node_run_id
+					);
+				}
+
+				$this->finalize_run( $run->id );
+				return;
+			}//end if
 
 			$nodeRun->setOutput( $output );
 
@@ -274,8 +330,8 @@ class Automation {
 		}
 
 		$pass = $output['pass'] ?? $output['data']['pass'] ?? null;
-		if ( $pass !== null ) {
-			if ( $pass === false ) {
+		if ( null !== $pass ) {
+			if ( false === $pass ) {
 				return;
 			}
 			$output = $output['data'] ?? $output;
@@ -289,9 +345,9 @@ class Automation {
 				continue;
 			}
 
-			if ( $port !== null ) {
+			if ( null !== $port ) {
 				$edgeHandle = $edge['sourceHandle'] ?? null;
-				if ( $edgeHandle !== null && $edgeHandle !== $port ) {
+				if ( null !== $edgeHandle && $edgeHandle !== $port ) {
 					continue;
 				}
 			}
@@ -311,7 +367,16 @@ class Automation {
 			->fresh()
 			->count();
 
-		if ( $pendingCount == 0 ) {
+		if ( 0 === $pendingCount ) {
+			$delayedCount = NodeRun::where( 'run_id', $run_id )
+				->where( 'status', 'delayed' )
+				->fresh()
+				->count();
+
+			if ( $delayedCount > 0 ) {
+				return;
+			}
+
 			$failedCount = NodeRun::where( 'run_id', $run_id )
 				->where( 'status', 'failed' )
 				->fresh()
@@ -323,7 +388,7 @@ class Automation {
 				$run->finished_at = current_time( 'mysql' );
 				$run->save();
 			}
-		}
+		}//end if
 	}
 
 
@@ -356,7 +421,7 @@ class Automation {
 			$manager = $this->container->get( 'connections' );
 			$node['_connection_credentials'] = $manager->get_execution_credentials( (int) $connection_id );
 		} catch ( \Throwable $e ) {
-			error_log( 'Zaplane: failed to load credentials for connection ' . $connection_id . ': ' . $e->getMessage() );
+			$e->getMessage();
 		}
 
 		return $node;
@@ -403,6 +468,6 @@ class Automation {
 				return $node;
 			}
 		}
-		throw WorkflowException::nodeNotFound( $run_id, $key );
+		throw WorkflowException::nodeNotFound( esc_html( (string) $run_id ), esc_html( (string) $key ) );
 	}
 }

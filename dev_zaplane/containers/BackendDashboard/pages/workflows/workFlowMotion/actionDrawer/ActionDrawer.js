@@ -21,9 +21,9 @@ import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
 import { useDynamicFields } from "@ZAPHooks/useActionDrawer/useDynamicFields";
 import { mapEdgesForBackend, mapNodesForBackend } from "../helper";
 import { conditionVariables } from "@ZAPRedux/Slices/workFlowSlice/actions/conditonVariales";
-import { getSingleWorkFlow } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow";
+import './styles.scss'
 
-const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode, workFlow, isFullscreen, nodes, edges,id }) => {
+const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode, workFlow, isFullscreen, nodes, edges }) => {
   const { source, node } = context;
   const dispatch = useDispatch();
   const { values, setFieldValue, resetForm ,initialValues} = useFormikContext();
@@ -78,6 +78,7 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
     selectedActionFields,
     values,
   });
+
   const resetAll = () => {
     setMode(null);
     setStep("select");
@@ -95,13 +96,15 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
     if (step === "configure") {
 
       const payload = {
-        app: selectedItem.name,
+        icon:selectedItem.icon,
+        app: selectedItem.id,
         name: selectedItem.name,
         event: values.actionType,
         config: selectedActionFields.reduce((acc, f) => {
           acc[f.key] = values[f.key];
           return acc;
         }, {}),
+         ...(selectedItem.mode && { mode: selectedItem.mode }),
         ...(values.hook && { hook: values.hook }),
         ...(values.connection_id && { connection_id: values.connection_id }),
       };
@@ -117,7 +120,6 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
 
     if (step === "test") {
       resetAll();
-       dispatch(getSingleWorkFlow(id))
     }
    
   };
@@ -224,7 +226,7 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
             },
             {
               value: "configure", label: "Configure", content: <>
-                <Flex direction="column" gap={4}>
+                <Flex direction="column" className="action-drowar-lists" gap={4}>
                   {selectedActionFields?.length > 0 ? (
                     selectedActionFields.map((field) => (
                       <ActionFieldRenderer

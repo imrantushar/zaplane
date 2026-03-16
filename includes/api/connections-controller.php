@@ -407,35 +407,32 @@ class ConnectionsController extends WP_REST_Controller {
 
 		$json_data = wp_json_encode( $data );
 
-		$html = <<<HTML
-<!DOCTYPE html>
-<html>
-<head>
-	<title>OAuth Callback</title>
-</head>
-<body>
-	<p>{$message}</p>
-	<script>
-		(function() {
-			var data = {$json_data};
-			if (window.opener) {
-				window.opener.postMessage({ type: 'zaplane_oauth_callback', data: data }, '*');
-				window.close();
-			} else {
-				// Fallback: redirect to admin with query params
-				var adminUrl = '/wp-admin/admin.php?page=zaplane';
-				adminUrl += '&oauth_success=' + (data.success ? '1' : '0');
-				adminUrl += '&oauth_message=' + encodeURIComponent(data.message);
-				if (data.connection_id) {
-					adminUrl += '&connection_id=' + data.connection_id;
-				}
-				window.location.href = adminUrl;
-			}
-		})();
-	</script>
-</body>
-</html>
-HTML;
+		$html = "<!DOCTYPE html>\n"
+			. "<html>\n"
+			. "<head>\n"
+			. "\t<title>OAuth Callback</title>\n"
+			. "</head>\n"
+			. "<body>\n"
+			. "\t<p>{$message}</p>\n"
+			. "\t<script>\n"
+			. "\t\t(function() {\n"
+			. "\t\t\tvar data = {$json_data};\n"
+			. "\t\t\tif (window.opener) {\n"
+			. "\t\t\t\twindow.opener.postMessage({ type: 'zaplane_oauth_callback', data: data }, '*');\n"
+			. "\t\t\t\twindow.close();\n"
+			. "\t\t\t} else {\n"
+			. "\t\t\t\tvar adminUrl = '/wp-admin/admin.php?page=zaplane';\n"
+			. "\t\t\t\tadminUrl += '&oauth_success=' + (data.success ? '1' : '0');\n"
+			. "\t\t\t\tadminUrl += '&oauth_message=' + encodeURIComponent(data.message);\n"
+			. "\t\t\t\tif (data.connection_id) {\n"
+			. "\t\t\t\t\tadminUrl += '&connection_id=' + data.connection_id;\n"
+			. "\t\t\t\t}\n"
+			. "\t\t\t\twindow.location.href = adminUrl;\n"
+			. "\t\t\t}\n"
+			. "\t\t})();\n"
+			. "\t</script>\n"
+			. "</body>\n"
+			. '</html>';
 
 		$response = new WP_REST_Response( $html );
 		$response->set_headers( [ 'Content-Type' => 'text/html; charset=utf-8' ] );

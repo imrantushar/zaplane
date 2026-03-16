@@ -11,7 +11,7 @@ class Schema {
 	protected static ?string $prefix = null;
 
 	public static function getPrefix(): string {
-		if ( self::$prefix === null ) {
+		if ( null === self::$prefix ) {
 			global $wpdb;
 			self::$prefix = ( $wpdb->prefix ?? 'wp_' ) . 'zaplane_';
 		}
@@ -50,6 +50,7 @@ class Schema {
 	public static function drop( string $table ): void {
 		global $wpdb;
 		$fullTable = self::getTable( $table );
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange
 		$wpdb->query( "DROP TABLE IF EXISTS {$fullTable}" );
 	}
 
@@ -61,12 +62,14 @@ class Schema {
 		global $wpdb;
 		$fromTable = self::getTable( $from );
 		$toTable = self::getTable( $to );
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->query( "RENAME TABLE {$fromTable} TO {$toTable}" );
 	}
 
 	public static function hasTable( string $table ): bool {
 		global $wpdb;
 		$fullTable = self::getTable( $table );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$result = $wpdb->get_var(
 			$wpdb->prepare( 'SHOW TABLES LIKE %s', $fullTable )
 		);
@@ -76,7 +79,9 @@ class Schema {
 	public static function hasColumn( string $table, string $column ): bool {
 		global $wpdb;
 		$fullTable = self::getTable( $table );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$result = $wpdb->get_results(
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 			$wpdb->prepare( "SHOW COLUMNS FROM {$fullTable} LIKE %s", $column )
 		);
 		return count( $result ) > 0;
@@ -85,6 +90,7 @@ class Schema {
 	public static function getColumnListing( string $table ): array {
 		global $wpdb;
 		$fullTable = self::getTable( $table );
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$columns = $wpdb->get_results( "SHOW COLUMNS FROM {$fullTable}" );
 		return array_map( fn( $col) => $col->Field, $columns );
 	}
@@ -98,6 +104,7 @@ class Schema {
 				case 'foreign':
 					$foreignSql = $command['definition']->toSql( $table );
 					if ( $foreignSql ) {
+						// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange
 						$wpdb->query( "ALTER TABLE {$table} ADD {$foreignSql}" );
 					}
 					break;
@@ -115,6 +122,7 @@ class Schema {
 			} else {
 				$sql = "ALTER TABLE {$table} ADD COLUMN " . $column->toSql();
 			}
+			// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange
 			$wpdb->query( $sql );
 		}
 
@@ -122,9 +130,11 @@ class Schema {
 			$cols = implode( ', ', $index['columns'] );
 			switch ( $index['type'] ) {
 				case 'unique':
+					// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange
 					$wpdb->query( "ALTER TABLE {$table} ADD UNIQUE KEY {$index['name']} ({$cols})" );
 					break;
 				case 'index':
+					// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange
 					$wpdb->query( "ALTER TABLE {$table} ADD KEY {$index['name']} ({$cols})" );
 					break;
 			}
@@ -133,30 +143,37 @@ class Schema {
 		foreach ( $blueprint->getCommands() as $command ) {
 			switch ( $command['type'] ) {
 				case 'dropColumn':
+					// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange
 					$wpdb->query( "ALTER TABLE {$table} DROP COLUMN {$command['column']}" );
 					break;
 				case 'renameColumn':
+					// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 					$colInfo = $wpdb->get_row( "SHOW COLUMNS FROM {$table} LIKE '{$command['from']}'" );
 					if ( $colInfo ) {
+						// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange
 						$wpdb->query( "ALTER TABLE {$table} CHANGE {$command['from']} {$command['to']} {$colInfo->Type}" );
 					}
 					break;
 				case 'dropIndex':
+					// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange
 					$wpdb->query( "ALTER TABLE {$table} DROP INDEX {$command['name']}" );
 					break;
 				case 'foreign':
 					$foreignSql = $command['definition']->toSql( $table );
 					if ( $foreignSql ) {
+						// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange
 						$wpdb->query( "ALTER TABLE {$table} ADD {$foreignSql}" );
 					}
 					break;
-			}
+			}//end switch
 		}//end foreach
 	}
 
 	protected static function columnExists( string $table, string $column ): bool {
 		global $wpdb;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$result = $wpdb->get_results(
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 			$wpdb->prepare( "SHOW COLUMNS FROM {$table} LIKE %s", $column )
 		);
 		return count( $result ) > 0;

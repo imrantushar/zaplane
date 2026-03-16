@@ -1,12 +1,11 @@
 import { Box, Button, Flex, Text } from "@chakra-ui/react";
 import { FieldArray } from "formik";
 import { FiTrash2 } from "react-icons/fi";
-import ZAPInput from "@ZAPComponents/ZAPInput";
 import ZAPSelect from "@ZAPComponents/ZAPSelect";
 import { __ } from "@wordpress/i18n";
 import { buildEmptyRule } from "./helper";
 import { useState } from "react";
-import VariablePopover from "../VariablePopaver/VariablePopover";
+import VariableEditor from "@ZAPComponents/VariableEditor";
 
 
 
@@ -54,28 +53,25 @@ export default function ConditionGroupField({ value, field, variables }) {
                                                                     onChange={(val) =>
                                                                         ruleHelpers.replace(rIndex, { ...rule, [f.key]: val.value })
                                                                     }
-                                                                    containerStyle={{ width: "30%"  }}
+                                                                    containerStyle={{ width: "30%" }}
                                                                 />
                                                             );
                                                         }
 
                                                         return (
-                                                            <ZAPInput
-                                                                key={f.key}
-                                                                type="textarea"
+                                                            <VariableEditor
+                                                                containerStyle={{ width: '30%' }}
                                                                 label={f.label}
+                                                                placeholder={__('Type "@" here to...', "zaplane")}
                                                                 value={rule[f.key]}
-                                                                placeholder={__('Type "@" here to add dynamic', 'zaplane')}
-                                                                onChange={(e) => {
-                                                                    const val = e.target.value;
-                                                                    ruleHelpers.replace(rIndex, { ...rule, [f.key]: val });
-
-                                                                    if (val.endsWith("@")) {
-                                                                        setActiveInput({ gIndex, rIndex, fieldKey: f.key });
-                                                                        setPopoverOpen(true);
-                                                                    }
+                                                                variables={variables}
+                                                                field={{ key: `${field.key}.${gIndex}.${rIndex}.${f.key}` }}
+                                                                setFieldValue={(key, val) => {
+                                                                    ruleHelpers.replace(rIndex, {
+                                                                        ...rule,
+                                                                        [f.key]: val
+                                                                    });
                                                                 }}
-                                                                containerStyle={{ width: "30%" }}
                                                             />
                                                         );
                                                     })}
@@ -118,20 +114,6 @@ export default function ConditionGroupField({ value, field, variables }) {
                             onClick={() => groupHelpers.push([{ ...EMPTY_RULE }])}>
                             {__("OR Group", "zaplane")}
                         </Button>
-
-                        <VariablePopover
-                            isOpen={isPopoverOpen}
-                            onClose={() => {
-                                setPopoverOpen(false);
-                                setActiveInput(null);
-                            }}
-                            data={variables}
-                            activeInput={activeInput}
-                            groups={groups}
-                            groupHelpers={groupHelpers}
-                            setPopoverOpen={setPopoverOpen}
-                            setActiveInput={setActiveInput}
-                        />
                     </Flex>
                 );
             }}

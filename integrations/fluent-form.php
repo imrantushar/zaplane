@@ -14,6 +14,14 @@ class FluentForm extends IntegrationBase {
 		return 'fluentform';
 	}
 
+	public static function get_name(): string {
+		return 'Fluent Form';
+	}
+
+	public static function get_icon(): string {
+		return 'fluentform.svg';
+	}
+
 	public static function get_triggers(): array {
 		return [
 			'submission_inserted' => [
@@ -25,34 +33,16 @@ class FluentForm extends IntegrationBase {
 
 	public static function get_trigger_config_schema( string $trigger ): array {
 		if ( in_array( $trigger, [ 'submission_inserted' ], true ) ) {
-			$options = [
-				[
-					'label' => 'Any Form',
-					'value' => 'any'
-				],
-			];
-			if ( function_exists( 'wpFluent' ) ) {
-				global $wpdb;
-				$forms = wpFluent()
-					->table( $wpdb->prefix . 'fluentform_forms' )
-					->select( 'id', 'title' )
-					->where( 'status', 'published' )
-					->get();
-
-				foreach ( $forms as $form ) {
-					$options[] = [
-						'value' => $form->id,
-						'label' => $form->title,
-					];
-				}
-			}
-
 			return [
 				[
 					'key'      => 'form_id',
-					'label'    => 'Form action',
+					'label'    => 'Form',
 					'type'     => 'select',
-					'options'   => $options,
+					'dynamic' => [
+						'integration' => 'fluentform',
+						'query'       => 'form',
+						'select'      => [ 'name', 'label' ],
+					],
 					'required' => true,
 				],
 			];
@@ -109,5 +99,38 @@ class FluentForm extends IntegrationBase {
 			'port' => 'main',
 			'data' => $input
 		];
+	}
+
+	public static function get_dynamic_queries(): array {
+		return [
+			'form' => [ self::class, 'query_forms' ],
+		];
+	}
+
+	public static function query_forms() {
+
+		$options = [
+			[
+				'label' => 'Any Form',
+				'name'  => 'any'
+			],
+		];
+		if ( function_exists( 'wpFluent' ) ) {
+			$forms = wpFluent()
+				->table( 'fluentform_forms' )
+				->select( [ 'id', 'title' ] )
+				->get();
+
+			if ( $forms ) {
+				foreach ( $forms as $form ) {
+					$options[] = [
+						'label' => $form->title,
+						'name'  => $form->id,
+					];
+				}
+			}
+		}
+
+		return $options;
 	}
 }

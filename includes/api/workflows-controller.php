@@ -541,7 +541,7 @@ class WorkflowsController extends WP_REST_Controller {
 
 		$previousNodeIds = $this->findPreviousNodes( $targetNodeKey, $edges );
 
-		$nodeOutputs = Run::latestTestNodeRunsByWorkflowAndVersion( $workflowId, $workflowVersionId, $previousNodeIds );
+		$nodeOutputs = Run::latestTestNodeRunsByWorkflow( $workflowId, $previousNodeIds );
 
 		$data = [];
 		foreach ( $previousNodeIds as $nodeId ) {

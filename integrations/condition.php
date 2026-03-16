@@ -19,6 +19,10 @@ class Condition extends IntegrationBase {
 		return 'tool';
 	}
 
+	public static function get_icon(): string {
+		return 'condition';
+	}
+
 	public static function get_actions(): array {
 		return [
 			'if' => [ 'label' => 'If Condition' ],
@@ -198,9 +202,9 @@ class Condition extends IntegrationBase {
 	protected static function compare( $left, $right, string $op ): bool {
 		switch ( $op ) {
 			case '==':
-				return $left == $right; // phpcs.ignore: WordPress.PHP.StrictComparisons.LooseComparison
+				return $left == $right; // phpcs:ignore: WordPress.PHP.StrictComparisons.LooseComparison
 			case '!=':
-				return $left != $right; // phpcs.ignore: WordPress.PHP.StrictComparisons.LooseComparison
+				return $left != $right; // phpcs:ignore: WordPress.PHP.StrictComparisons.LooseComparison
 			case '<':
 				return $left < $right;
 			case '>':

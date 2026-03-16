@@ -18,6 +18,10 @@ class Memberpress extends IntegrationBase {
 		return 'memberpress';
 	}
 
+	public static function get_icon(): string {
+		return 'memberpress.svg';
+	}
+
 	public static function get_triggers(): array {
 		return [
 			'member_added' => [
@@ -169,7 +173,7 @@ class Memberpress extends IntegrationBase {
 			'args' => self::decode_event_args( $event->args ?? null ),
 		];
 
-		if ( $payload['event'] === '' || $payload['evt_id'] <= 0 ) {
+		if ( '' === $payload['event'] || $payload['evt_id'] <= 0 ) {
 			return false;
 		}
 
@@ -235,8 +239,8 @@ class Memberpress extends IntegrationBase {
 					'user_id' => $user_id,
 					'product_id' => $membership_id,
 					'subscription_id' => $subscription_id,
-					'amount' => $amount !== null ? (float) $amount : null,
-					'total' => $total !== null ? (float) $total : null,
+					'amount' => null !== $amount ? (float) $amount : null,
+					'total' => null !== $total ? (float) $total : null,
 					'status' => $data->status ?? '',
 					'gateway' => $data->gateway ?? '',
 					'created_at' => $data->created_at ?? null,
@@ -260,7 +264,7 @@ class Memberpress extends IntegrationBase {
 					'id' => $subscription_id,
 					'user_id' => $user_id,
 					'product_id' => $membership_id,
-					'price' => $price !== null ? (float) $price : null,
+					'price' => null !== $price ? (float) $price : null,
 					'period' => isset( $data->period ) ? (int) $data->period : null,
 					'period_type' => $data->period_type ?? '',
 					'status' => $data->status ?? '',
@@ -349,7 +353,7 @@ class Memberpress extends IntegrationBase {
 					'options' => self::get_membership_period_type_options()
 				],
 				[
-					'key' => 'status',
+					'key' => 'membership_status',
 					'label' => 'Status',
 					'type' => 'select',
 					'options' => self::get_post_status_options()
@@ -434,7 +438,12 @@ class Memberpress extends IntegrationBase {
 				[
 					'key' => 'membership_id',
 					'label' => 'Membership ID',
-					'type' => 'number',
+					'type' => 'select',
+					'dynamic' => [
+						'integration' => 'memberpress',
+						'query' => 'memberships',
+						'select' => [ 'id', 'name' ],
+					],
 					'required' => true
 				],
 				[
@@ -464,7 +473,7 @@ class Memberpress extends IntegrationBase {
 					'options' => self::get_membership_period_type_options()
 				],
 				[
-					'key' => 'status',
+					'key' => 'membership_status',
 					'label' => 'Status',
 					'type' => 'select',
 					'options' => self::get_post_status_options()
@@ -549,13 +558,23 @@ class Memberpress extends IntegrationBase {
 				[
 					'key' => 'user_id',
 					'label' => 'User ID',
-					'type' => 'number',
+					'type' => 'select',
+					'dynamic' => [
+						'integration' => 'memberpress',
+						'query' => 'users',
+						'select' => [ 'id', 'label' ],
+					],
 					'required' => true
 				],
 				[
 					'key' => 'product_id',
 					'label' => 'Membership ID',
-					'type' => 'number',
+					'type' => 'select',
+					'dynamic' => [
+						'integration' => 'memberpress',
+						'query' => 'memberships',
+						'select' => [ 'id', 'name' ],
+					],
 					'required' => true
 				],
 				[
@@ -570,7 +589,7 @@ class Memberpress extends IntegrationBase {
 					'type' => 'number'
 				],
 				[
-					'key' => 'status',
+					'key' => 'transaction_status',
 					'label' => 'Status',
 					'type' => 'select',
 					'options' => self::get_transaction_status_options()
@@ -578,23 +597,38 @@ class Memberpress extends IntegrationBase {
 				[
 					'key' => 'gateway',
 					'label' => 'Gateway',
-					'type' => 'text'
+					'type' => 'select',
+					'dynamic' => [
+						'integration' => 'memberpress',
+						'query' => 'gateways',
+						'select' => [ 'id', 'label' ],
+					],
 				],
 				[
 					'key' => 'subscription_id',
 					'label' => 'Subscription ID',
-					'type' => 'number'
+					'type' => 'select',
+					'dynamic' => [
+						'integration' => 'memberpress',
+						'query' => 'subscriptions',
+						'select' => [ 'id', 'label' ],
+					],
 				],
 			],
 			'update_transaction_status' => [
 				[
 					'key' => 'transaction_id',
 					'label' => 'Transaction ID',
-					'type' => 'number',
+					'type' => 'select',
+					'dynamic' => [
+						'integration' => 'memberpress',
+						'query' => 'transactions',
+						'select' => [ 'id', 'label' ],
+					],
 					'required' => true
 				],
 				[
-					'key' => 'status',
+					'key' => 'transaction_status',
 					'label' => 'Status',
 					'type' => 'select',
 					'options' => self::get_transaction_status_options(),
@@ -605,7 +639,12 @@ class Memberpress extends IntegrationBase {
 				[
 					'key' => 'transaction_id',
 					'label' => 'Transaction ID',
-					'type' => 'number',
+					'type' => 'select',
+					'dynamic' => [
+						'integration' => 'memberpress',
+						'query' => 'transactions',
+						'select' => [ 'id', 'label' ],
+					],
 					'required' => true
 				],
 			],
@@ -613,13 +652,23 @@ class Memberpress extends IntegrationBase {
 				[
 					'key' => 'user_id',
 					'label' => 'User ID',
-					'type' => 'number',
+					'type' => 'select',
+					'dynamic' => [
+						'integration' => 'memberpress',
+						'query' => 'users',
+						'select' => [ 'id', 'label' ],
+					],
 					'required' => true
 				],
 				[
 					'key' => 'product_id',
 					'label' => 'Membership ID',
-					'type' => 'number',
+					'type' => 'select',
+					'dynamic' => [
+						'integration' => 'memberpress',
+						'query' => 'memberships',
+						'select' => [ 'id', 'name' ],
+					],
 					'required' => true
 				],
 				[
@@ -640,7 +689,7 @@ class Memberpress extends IntegrationBase {
 					'options' => self::get_period_type_options()
 				],
 				[
-					'key' => 'status',
+					'key' => 'subscription_status',
 					'label' => 'Status',
 					'type' => 'select',
 					'options' => self::get_subscription_status_options()
@@ -648,18 +697,28 @@ class Memberpress extends IntegrationBase {
 				[
 					'key' => 'gateway',
 					'label' => 'Gateway',
-					'type' => 'text'
+					'type' => 'select',
+					'dynamic' => [
+						'integration' => 'memberpress',
+						'query' => 'gateways',
+						'select' => [ 'id', 'label' ],
+					],
 				],
 			],
 			'update_subscription_status' => [
 				[
 					'key' => 'subscription_id',
 					'label' => 'Subscription ID',
-					'type' => 'number',
+					'type' => 'select',
+					'dynamic' => [
+						'integration' => 'memberpress',
+						'query' => 'subscriptions',
+						'select' => [ 'id', 'label' ],
+					],
 					'required' => true
 				],
 				[
-					'key' => 'status',
+					'key' => 'subscription_status',
 					'label' => 'Status',
 					'type' => 'select',
 					'options' => self::get_subscription_status_options(),
@@ -670,7 +729,12 @@ class Memberpress extends IntegrationBase {
 				[
 					'key' => 'subscription_id',
 					'label' => 'Subscription ID',
-					'type' => 'number',
+					'type' => 'select',
+					'dynamic' => [
+						'integration' => 'memberpress',
+						'query' => 'subscriptions',
+						'select' => [ 'id', 'label' ],
+					],
 					'required' => true
 				],
 			],
@@ -678,7 +742,12 @@ class Memberpress extends IntegrationBase {
 				[
 					'key' => 'subscription_id',
 					'label' => 'Subscription ID',
-					'type' => 'number',
+					'type' => 'select',
+					'dynamic' => [
+						'integration' => 'memberpress',
+						'query' => 'subscriptions',
+						'select' => [ 'id', 'label' ],
+					],
 					'required' => true
 				],
 			],
@@ -686,7 +755,12 @@ class Memberpress extends IntegrationBase {
 				[
 					'key' => 'subscription_id',
 					'label' => 'Subscription ID',
-					'type' => 'number',
+					'type' => 'select',
+					'dynamic' => [
+						'integration' => 'memberpress',
+						'query' => 'subscriptions',
+						'select' => [ 'id', 'label' ],
+					],
 					'required' => true
 				],
 			],
@@ -695,38 +769,33 @@ class Memberpress extends IntegrationBase {
 		return $schemas[ $action ] ?? [];
 	}
 
+	/**
+	 * =====================================================
+	 * DYNAMIC DATA QUERIES (API)
+	 * =====================================================
+	 */
+	public static function get_dynamic_queries(): array {
+		return [
+			'memberships' => [ self::class, 'query_memberships' ],
+			'subscriptions' => [ self::class, 'query_subscriptions' ],
+			'transactions' => [ self::class, 'query_transactions' ],
+			'users' => [ self::class, 'query_users' ],
+			'gateways' => [ self::class, 'query_gateways' ],
+		];
+	}
+
 	public static function execute_node( array $node, array $input ): array {
 		$event = $node['data']['event'] ?? ( $node['config']['action'] ?? '' );
 		$config = $node['data']['config'] ?? ( $node['config']['data'] ?? [] );
+		$method = 'action_' . $event;
 
-		switch ( $event ) {
-			case 'create_member':
-				return static::action_create_member( $config, $input );
-			case 'create_membership':
-				return static::action_create_membership( $config, $input );
-			case 'update_membership':
-				return static::action_update_membership( $config, $input );
-			case 'create_transaction':
-				return static::action_create_transaction( $config, $input );
-			case 'update_transaction_status':
-				return static::action_update_transaction_status( $config, $input );
-			case 'refund_transaction':
-				return static::action_refund_transaction( $config, $input );
-			case 'create_subscription':
-				return static::action_create_subscription( $config, $input );
-			case 'update_subscription_status':
-				return static::action_update_subscription_status( $config, $input );
-			case 'cancel_subscription':
-				return static::action_cancel_subscription( $config, $input );
-			case 'suspend_subscription':
-				return static::action_suspend_subscription( $config, $input );
-			case 'resume_subscription':
-				return static::action_resume_subscription( $config, $input );
-			default:
-				return [
-					'port' => 'main',
-					'data' => $input
-				];
-		}//end switch
+		if ( method_exists( static::class, $method ) ) {
+			return static::$method( $config, $input );
+		}
+
+		return [
+			'port' => 'main',
+			'data' => $input
+		];
 	}
 }

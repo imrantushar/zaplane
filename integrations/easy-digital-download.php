@@ -26,6 +26,9 @@ class EasyDigitalDownload extends IntegrationBase {
 		return 'easydigitaldownload';
 	}
 
+	public static function get_icon(): string {
+		return 'easydigitaldownload.svg';
+	}
 	public static function get_triggers(): array {
 		return [
 			'purchase_product' => [
@@ -185,20 +188,25 @@ class EasyDigitalDownload extends IntegrationBase {
 				[
 					'key' => 'user_id',
 					'label' => 'User ID',
-					'type' => 'number'
+					'type' => 'select',
+					'dynamic' => [
+						'integration' => 'easydigitaldownload',
+						'query' => 'users',
+						'select' => [ 'id', 'label' ],
+					]
 				],
 				[
-					'key' => 'status',
+					'key' => 'customer_status',
 					'label' => 'Status',
 					'type' => 'select',
 					'options' => [
 						[
 							'label' => 'Active',
-							'value' => 'active'
+							'value' => 'edd_customer_active'
 						],
 						[
 							'label' => 'Inactive',
-							'value' => 'inactive'
+							'value' => 'edd_customer_inactive'
 						],
 					]
 				],
@@ -238,17 +246,17 @@ class EasyDigitalDownload extends IntegrationBase {
 					]
 				],
 				[
-					'key' => 'status',
+					'key' => 'discount_status',
 					'label' => 'Status',
 					'type' => 'select',
 					'options' => [
 						[
 							'label' => 'Active',
-							'value' => 'active'
+							'value' => 'edd_discount_active'
 						],
 						[
 							'label' => 'Inactive',
-							'value' => 'inactive'
+							'value' => 'edd_discount_inactive'
 						],
 					]
 				],
@@ -267,49 +275,54 @@ class EasyDigitalDownload extends IntegrationBase {
 				[
 					'key' => 'payment_id',
 					'label' => 'Payment ID',
-					'type' => 'number',
+					'type' => 'select',
+					'dynamic' => [
+						'integration' => 'easydigitaldownload',
+						'query' => 'payments',
+						'select' => [ 'id', 'label' ],
+					],
 					'required' => true
 				],
 				[
-					'key' => 'status',
+					'key' => 'payment_status',
 					'label' => 'Status',
 					'type' => 'select',
 					'options' => [
 						[
 							'label' => 'Pending',
-							'value' => 'pending'
+							'value' => 'edd_payment_pending'
 						],
 						[
 							'label' => 'Processing',
-							'value' => 'processing'
+							'value' => 'edd_payment_processing'
 						],
 						[
 							'label' => 'Completed',
-							'value' => 'complete'
+							'value' => 'edd_payment_complete'
 						],
 						[
 							'label' => 'Refunded',
-							'value' => 'refunded'
+							'value' => 'edd_payment_refunded'
 						],
 						[
 							'label' => 'Partially Refunded',
-							'value' => 'partially_refunded'
+							'value' => 'edd_payment_partially_refunded'
 						],
 						[
 							'label' => 'Revoked',
-							'value' => 'revoked'
+							'value' => 'edd_payment_revoked'
 						],
 						[
 							'label' => 'Failed',
-							'value' => 'failed'
+							'value' => 'edd_payment_failed'
 						],
 						[
 							'label' => 'Abandoned',
-							'value' => 'abandoned'
+							'value' => 'edd_payment_abandoned'
 						],
 						[
 							'label' => 'On Hold',
-							'value' => 'on_hold'
+							'value' => 'edd_payment_on_hold'
 						],
 					]
 				],
@@ -318,7 +331,12 @@ class EasyDigitalDownload extends IntegrationBase {
 				[
 					'key' => 'payment_id',
 					'label' => 'Payment ID',
-					'type' => 'number',
+					'type' => 'select',
+					'dynamic' => [
+						'integration' => 'easydigitaldownload',
+						'query' => 'payments',
+						'select' => [ 'id', 'label' ],
+					],
 					'required' => true
 				],
 				[
@@ -346,17 +364,17 @@ class EasyDigitalDownload extends IntegrationBase {
 					'type' => 'number'
 				],
 				[
-					'key' => 'status',
+					'key' => 'download_status',
 					'label' => 'Status',
 					'type' => 'select',
 					'options' => [
 						[
 							'label' => 'Draft',
-							'value' => 'draft'
+							'value' => 'edd_download_draft'
 						],
 						[
 							'label' => 'Publish',
-							'value' => 'publish'
+							'value' => 'edd_download_publish'
 						],
 					]
 				],
@@ -365,7 +383,12 @@ class EasyDigitalDownload extends IntegrationBase {
 				[
 					'key' => 'download_id',
 					'label' => 'Product ID',
-					'type' => 'number',
+					'type' => 'select',
+					'dynamic' => [
+						'integration' => 'easydigitaldownload',
+						'query' => 'downloads',
+						'select' => [ 'id', 'name' ],
+					],
 					'required' => true
 				],
 				[
@@ -384,17 +407,17 @@ class EasyDigitalDownload extends IntegrationBase {
 					'type' => 'number'
 				],
 				[
-					'key' => 'status',
+					'key' => 'download_status',
 					'label' => 'Status',
 					'type' => 'select',
 					'options' => [
 						[
 							'label' => 'Draft',
-							'value' => 'draft'
+							'value' => 'edd_download_draft'
 						],
 						[
 							'label' => 'Publish',
-							'value' => 'publish'
+							'value' => 'edd_download_publish'
 						],
 					]
 				],
@@ -403,7 +426,12 @@ class EasyDigitalDownload extends IntegrationBase {
 				[
 					'key' => 'download_id',
 					'label' => 'Product ID',
-					'type' => 'number',
+					'type' => 'select',
+					'dynamic' => [
+						'integration' => 'easydigitaldownload',
+						'query' => 'downloads',
+						'select' => [ 'id', 'name' ],
+					],
 					'required' => true
 				],
 				[
@@ -425,6 +453,21 @@ class EasyDigitalDownload extends IntegrationBase {
 		];
 
 		return $schemas[ $action ] ?? [];
+	}
+
+	/**
+	 * =====================================================
+	 * DYNAMIC DATA QUERIES (API)
+	 * =====================================================
+	 */
+	public static function get_dynamic_queries(): array {
+		return [
+			'downloads' => [ self::class, 'query_downloads' ],
+			'payments' => [ self::class, 'query_payments' ],
+			'customers' => [ self::class, 'query_customers' ],
+			'discounts' => [ self::class, 'query_discounts' ],
+			'users' => [ self::class, 'query_users' ],
+		];
 	}
 
 

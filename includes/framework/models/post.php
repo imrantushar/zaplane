@@ -2,6 +2,8 @@
 
 namespace Zaplane\Framework\Models;
 
+use Zaplane\Framework\Database\ORM\Collection;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -73,26 +75,26 @@ class Post extends WpModel {
 	}
 
 	public function isPublished(): bool {
-		return $this->post_status === 'publish';
+		return 'publish' === $this->post_status;
 	}
 
 	public function isDraft(): bool {
-		return $this->post_status === 'draft';
+		return 'draft' === $this->post_status;
 	}
 
 	public function isTrash(): bool {
-		return $this->post_status === 'trash';
+		return 'trash' === $this->post_status;
 	}
 
-	public static function published(): array {
+	public static function published(): Collection {
 		return static::where( 'post_status', 'publish' )->get();
 	}
 
-	public static function ofType( string $type ): array {
+	public static function ofType( string $type ): Collection {
 		return static::where( 'post_type', $type )->get();
 	}
 
-	public static function byAuthor( int $authorId ): array {
+	public static function byAuthor( int $authorId ): Collection {
 		return static::where( 'post_author', $authorId )->get();
 	}
 }

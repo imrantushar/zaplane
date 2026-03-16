@@ -13,7 +13,9 @@ class Spectra extends IntegrationBase {
 	public static function get_slug(): string {
 		return 'spectra';
 	}
-
+	public static function get_icon(): string {
+		return 'spectra.svg';
+	}
 	public static function get_triggers(): array {
 		return [
 			'uagb_form_success' => [

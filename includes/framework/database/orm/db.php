@@ -20,19 +20,24 @@ class DB {
 		global $wpdb;
 
 		if ( ! empty( $bindings ) ) {
+			// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- $query is prepared here with bindings.
 			$query = $wpdb->prepare( $query, ...$bindings );
 		}
 
-		return $wpdb->get_results( $query, ARRAY_A ) ?: [];
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$results = $wpdb->get_results( $query, ARRAY_A );
+		return $results ? $results : [];
 	}
 
 	public static function selectOne( string $query, array $bindings = [] ) {
 		global $wpdb;
 
 		if ( ! empty( $bindings ) ) {
+			// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- $query is prepared here with bindings.
 			$query = $wpdb->prepare( $query, ...$bindings );
 		}
 
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		return $wpdb->get_row( $query, ARRAY_A );
 	}
 
@@ -40,9 +45,11 @@ class DB {
 		global $wpdb;
 
 		if ( ! empty( $bindings ) ) {
+			// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- $query is prepared here with bindings.
 			$query = $wpdb->prepare( $query, ...$bindings );
 		}
 
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		return $wpdb->query( $query ) !== false;
 	}
 
@@ -50,9 +57,11 @@ class DB {
 		global $wpdb;
 
 		if ( ! empty( $bindings ) ) {
+			// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- $query is prepared here with bindings.
 			$query = $wpdb->prepare( $query, ...$bindings );
 		}
 
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		return (int) $wpdb->query( $query );
 	}
 
@@ -64,9 +73,11 @@ class DB {
 		global $wpdb;
 
 		if ( ! empty( $bindings ) ) {
+			// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- $query is prepared here with bindings.
 			$query = $wpdb->prepare( $query, ...$bindings );
 		}
 
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		return $wpdb->query( $query ) !== false;
 	}
 
@@ -82,16 +93,19 @@ class DB {
 
 	public static function beginTransaction(): void {
 		global $wpdb;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->query( 'START TRANSACTION' );
 	}
 
 	public static function commit(): void {
 		global $wpdb;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->query( 'COMMIT' );
 	}
 
 	public static function rollBack(): void {
 		global $wpdb;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->query( 'ROLLBACK' );
 	}
 

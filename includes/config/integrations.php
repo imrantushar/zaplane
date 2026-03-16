@@ -38,7 +38,7 @@ return [
 		],
 		'woocommerce'          => [
 			'file' => 'woocommerce.php',
-			'class' => \Zaplane\Integrations\woocommerce::class
+			'class' => \Zaplane\Integrations\Woocommerce::class
 		],
 		'slack'                => [
 			'file' => 'Slack.php',
@@ -64,7 +64,7 @@ return [
 			'file' => 'storeengine.php',
 			'class' => \Zaplane\Integrations\Storeengine::class
 		],
-		'Http'                 => [
+		'http'                 => [
 			'file' => 'http.php',
 			'class' => \Zaplane\Integrations\Http::class
 		],
@@ -84,7 +84,7 @@ return [
 			'file' => 'fluent-form.php',
 			'class' => \Zaplane\Integrations\FluentForm::class
 		],
-		'FluentCRM'            => [
+		'fluentcrm'            => [
 			'file' => 'fluent-crm.php',
 			'class' => \Zaplane\Integrations\FluentCrm::class
 		],

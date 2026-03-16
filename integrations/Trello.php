@@ -10,6 +10,9 @@ class Trello extends IntegrationBase {
 		return 'trello';
 	}
 
+	public static function get_icon(): string {
+		return 'trello-icon.svg';
+	}
 	public static function get_triggers(): array {
 		return [
 			'card_created' => [

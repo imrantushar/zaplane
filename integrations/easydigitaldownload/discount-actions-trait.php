@@ -24,8 +24,9 @@ trait DiscountActionsTrait {
 			'type' => $type,
 		];
 
-		if ( ! empty( $config['status'] ) ) {
-			$data['status'] = $config['status'];
+		$discount_status = self::get_discount_status_config( $config );
+		if ( '' !== $discount_status ) {
+			$data['status'] = self::normalize_discount_status( $discount_status );
 		}
 
 		if ( ! empty( $config['start_date'] ) ) {

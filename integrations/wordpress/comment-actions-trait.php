@@ -147,4 +147,36 @@ trait CommentActionsTrait {
 
 		return static::success( [ 'comment_id' => $config['comment_id'] ] );
 	}
+
+	protected static function action_get_post_comments_single( array $config ): array {
+		$post_id = $config['post_id'] ?? 0;
+
+		if ( ! $post_id ) {
+			return static::error( 'Post ID is required' );
+		}
+
+		$comments = get_comments( [ 'post_id' => $post_id ] );
+
+		return static::success( [
+			'post_id' => $post_id,
+			'comments' => $comments,
+			'count' => count( $comments )
+		] );
+	}
+
+	protected static function action_get_user_comments_email( array $config ): array {
+		$user_email = $config['user_email'] ?? '';
+
+		if ( ! $user_email ) {
+			return static::error( 'User email is required' );
+		}
+
+		$comments = get_comments( [ 'author_email' => $user_email ] );
+
+		return static::success( [
+			'user_email' => $user_email,
+			'comments' => $comments,
+			'count' => count( $comments )
+		] );
+	}
 }
