@@ -1,7 +1,7 @@
 <?php
 use Zaplane\Integrations\Gravityforms;
-
-class GravityFormsTest extends \PHPUnit\Framework\TestCase {
+use \PHPUnit\Framework\TestCase;
+class GravityFormsTest extends TestCase {
 
     protected function setUp(): void {
         parent::setUp();
@@ -9,9 +9,17 @@ class GravityFormsTest extends \PHPUnit\Framework\TestCase {
 
     public function test_form_query_types() {
         $results = Gravityforms::form_query_types([]);
-        $this->assertContains( ['name' => 'any', 'label' => 'Any Form'], $results );
-        $this->assertContains( ['name' => 10,    'label' => 'Test Form 1'], $results );
-        $this->assertContains( ['name' => 11,    'label' => 'Test Form 2'], $results );
+
+        $this->assertEquals( 'any', $results[0]['name'] );
+        $this->assertEquals( 'Any Form', $results[0]['label'] );
+
+        $this->assertTrue(
+            in_array( ['name'=>10,'label'=>'Test Form 1'], $results )
+        );
+
+        $this->assertTrue(
+            in_array( ['name'=>11,'label'=>'Test Form 2'], $results )
+        );
     }
 
     public function test_resolve_trigger_form_submitted() {
