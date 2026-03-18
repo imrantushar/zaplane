@@ -47,6 +47,9 @@ namespace Zaplane\Tests {
 			if ( ! isset( self::$posts[ $id ] ) ) {
 				return null;
 			}
+			if ( class_exists( '\WP_Post' ) ) {
+				return new \WP_Post( self::$posts[ $id ] );
+			}
 			return (object) self::$posts[ $id ];
 		}
 
@@ -411,6 +414,16 @@ namespace {
 		}
 	}
 
+	if ( ! function_exists( 'is_email' ) ) {
+		function is_email( $email ) {
+			$email = trim( (string) $email );
+			if ( '' === $email ) {
+				return false;
+			}
+			return filter_var( $email, FILTER_VALIDATE_EMAIL ) ? $email : false;
+		}
+	}
+
 	if ( ! function_exists( 'esc_html' ) ) {
 		function esc_html( $text ) {
 			return htmlspecialchars( $text, ENT_QUOTES, 'UTF-8' );
@@ -516,28 +529,76 @@ namespace {
 		}
 	}
 
+	// ── WP_Post ───────────────────────────────────────────────────────────────
+
+	if ( ! class_exists( 'WP_Post' ) ) {
+		#[\AllowDynamicProperties]
+		class WP_Post {
+			public function __construct( array $data = [] ) {
+				foreach ( $data as $key => $value ) {
+					$this->$key = $value;
+				}
+			}
+		}
+	}
+
 	// ── WP_User ───────────────────────────────────────────────────────────────
 
 	if ( ! class_exists( 'WP_User' ) ) {
+		#[\AllowDynamicProperties]
 		class WP_User {
-			public int    $ID    = 0;
+			public int    $ID = 0;
+			public string $user_login = '';
+			public string $user_pass = '';
+			public string $user_nicename = '';
+			public string $user_email = '';
+			public string $user_url = '';
+			public string $user_registered = '';
+			public string $user_activation_key = '';
+			public int    $user_status = 0;
+			public string $display_name = '';
+			public string $first_name = '';
+			public string $last_name = '';
 			public array  $roles = [];
-			public array  $caps  = [];
+			public array  $caps = [];
 			public array  $allcaps = [];
+			public object $data;
 
 			public function __construct( int $id = 0 ) {
 				if ( $id ) {
 					$this->ID = $id;
 					$data = WPMocks::getUser( $id );
 					if ( $data ) {
-						foreach ( get_object_vars( $data ) as $k => $v ) {
-							$this->$k = $v;
-						}
+						$this->hydrate_from_object( $data );
 					}
 				}
 				if ( empty( $this->roles ) ) {
 					$this->roles = [ 'subscriber' ];
 				}
+				$this->sync_data();
+			}
+
+			private function hydrate_from_object( object $data ): void {
+				foreach ( get_object_vars( $data ) as $k => $v ) {
+					$this->$k = $v;
+				}
+			}
+
+			public function sync_data(): void {
+				$this->data = (object) [
+					'ID'                  => $this->ID,
+					'user_login'          => $this->user_login,
+					'user_pass'           => $this->user_pass,
+					'user_nicename'       => $this->user_nicename,
+					'user_email'          => $this->user_email,
+					'user_url'            => $this->user_url,
+					'user_registered'     => $this->user_registered,
+					'user_activation_key' => $this->user_activation_key,
+					'user_status'         => $this->user_status,
+					'display_name'        => $this->display_name,
+					'first_name'          => $this->first_name,
+					'last_name'           => $this->last_name,
+				];
 			}
 
 			public function add_role( string $role ): void {
@@ -1064,6 +1125,9 @@ namespace {
 			}
 			if ( empty( $user->roles ) ) {
 				$user->roles = [ 'subscriber' ];
+			}
+			if ( method_exists( $user, 'sync_data' ) ) {
+				$user->sync_data();
 			}
 			return $user;
 		}
