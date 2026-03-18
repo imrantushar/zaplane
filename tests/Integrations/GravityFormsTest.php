@@ -1,10 +1,14 @@
 <?php
-use Zaplane\Integrations\Gravityforms;
-use \PHPUnit\Framework\TestCase;
-class GravityFormsTest extends TestCase {
 
-    protected function setUp(): void {
-        parent::setUp();
+namespace Zaplane\Tests\Integrations;
+
+use Zaplane\Integrations\Gravityforms;
+
+class GravityFormsTest extends IntegrationTestCase {
+
+    protected function getIntegrationClass(): string
+    {
+        return Gravityforms::class;
     }
 
     public function test_form_query_types() {
