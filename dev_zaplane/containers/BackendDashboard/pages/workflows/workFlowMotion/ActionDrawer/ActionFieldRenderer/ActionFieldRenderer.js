@@ -1,12 +1,9 @@
-import { useState, useRef, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import {  useRef,  } from "react";
+import {  useSelector } from "react-redux";
 import ZAPInput from "@ZAPComponents/ZAPInput";
 import ZAPSelect from "@ZAPComponents/ZAPSelect";
 import ZAPDatePicker from "@ZAPComponents/ZAPDatePicker";
 import ConditionGroupField from "../ConditionGroupField/ConditionGroupField";
-import { mapEdgesForBackend, mapNodesForBackend } from "../../helper";
-import { conditionVariables } from "@ZAPRedux/Slices/workFlowSlice/actions/conditonVariales";
-import { insertVariableAtCursor } from "./helper";
 import './styles.scss'
 import { __ } from "@wordpress/i18n";
 import VariableEditor from "@ZAPComponents/VariableEditor/index.js";
@@ -19,12 +16,8 @@ const ActionFieldRenderer = ({
   dynamicOptions,
   loadingFields,
   fetchDynamicOptions,
-  nodeId,
-  workFlow,
-  nodes,
-  edges
 }) => {
-  const [isPopoverOpen, setPopoverOpen] = useState(false);
+
   const inputRef = useRef(null);
   const { workflowVariables } = useSelector(
     (state) => state.workflows

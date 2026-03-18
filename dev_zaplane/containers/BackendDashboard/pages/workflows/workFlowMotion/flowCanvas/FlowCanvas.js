@@ -20,7 +20,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { toggleFullscreenMode, mapGraphFromBackend } from "./helper";
 import ZAPLoading from "@ZAPComponents/Loading";
 import { useFlowActions } from "@ZAPHooks/useFlowActions/useFlowActions";
-import CustomNode from "../customNode/CustomNode";
+import CustomNode from "../CustomNode/CustomNode";
 import './styles.scss'
 import { IoSwapHorizontal, IoSwapVerticalOutline } from "react-icons/io5";
 import ZAPTooltip from "@ZAPComponents/ZAPTooltip";

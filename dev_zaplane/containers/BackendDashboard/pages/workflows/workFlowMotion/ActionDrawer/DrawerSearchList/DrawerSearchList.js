@@ -1,10 +1,10 @@
-import { VStack, Button, Text, Flex, Icon } from "@chakra-ui/react";
+import { VStack, Button, Text, Flex} from "@chakra-ui/react";
 import { sprintf, __ } from "@wordpress/i18n";
 import ZAPIcon from "@ZAPComponents/ZAPIcon";
 
 
 const DrawerSearchList = ({ searchList, setMode, setSelectedItem, setSearch }) => {
-  if (!searchList?.length) return null;
+  if (!searchList?.length) return <Text className="zaplane-label" textAlign='center'>{__("No results found", "zaplane")}</Text>;
   return (
     <VStack spacing={2} align="stretch">
       {searchList.map(item => (
