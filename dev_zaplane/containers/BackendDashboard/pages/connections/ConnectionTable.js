@@ -1,4 +1,4 @@
-import { Text, Icon, Box, Flex } from "@chakra-ui/react";
+import { Text, Icon, Box } from "@chakra-ui/react";
 import { __ } from "@wordpress/i18n";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
