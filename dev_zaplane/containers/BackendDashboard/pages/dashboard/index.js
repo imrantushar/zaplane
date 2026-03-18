@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { __ } from '@wordpress/i18n';
 import TopBar from '@ZAPComponents/TopBar';
 import ZAPLabel from '@ZAPComponents/Labels/ZAPLabel';
-import { Box, Button, Flex} from '@chakra-ui/react';
+import { Box, Button, Flex } from '@chakra-ui/react';
 import { outlineBtn } from '../../../../../assets/scss/chakra/recipe';
 import { FiHelpCircle } from 'react-icons/fi';
 import { useDispatch, useSelector } from 'react-redux';
@@ -11,10 +11,11 @@ import ExecutedFlows from './ExecutedFlows';
 import { getRunsList } from '@ZAPRedux/Slices/logsSlice/logsSlice';
 import TotalExecutions from './TotalExecutions';
 import { topExecutedFlows } from '@ZAPRedux/Slices/dashboardSlice/dashboardSlice';
+import OverviewSection from './OverviewSection/OverviewSection';
 
 export default function Dashboard() {
     const dispatch = useDispatch();
-    const { data=[] } = useSelector((state) => state.logs || {});
+    const { data = [] } = useSelector((state) => state.logs || {});
     useEffect(() => {
         dispatch(getRunsList());
         dispatch(topExecutedFlows());
@@ -51,12 +52,13 @@ export default function Dashboard() {
             />
             <Box className="zaplane-page-content">
                 <Flex gap="24px" mb="24px">
-                    <Box width="40%">
+                    <OverviewSection />
+                    {/* <Box width="40%">
                         <ExecutedFlows />
                     </Box>
                     <Box width="60%">
                         <TotalExecutions data={data} />
-                    </Box>
+                    </Box> */}
                 </Flex>
                 <RecentLogs data={data} />
             </Box>
