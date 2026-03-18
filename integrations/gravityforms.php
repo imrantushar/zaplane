@@ -102,8 +102,8 @@ class Gravityforms extends IntegrationBase {
 	public static function form_query_types( $q ) {
 		$options = [
 			[
-				'name' => 'any',
 				'label' => 'Any Form',
+				'name'  => 'any'
 			],
 		];
 
