@@ -33,13 +33,12 @@ class NinjaformTest extends IntegrationTestCase {
 
     protected function getTriggerTests(): array {
         return [
-            // Pass an empty array as form data; trigger will return false (acceptable per contract)
             'process_ninja_form' => [ [] ],
         ];
     }
 
     protected function getActionTests(): array {
-        return []; // No actions
+        return [];
     }
 
     // -------------------------------------------------------------------------
@@ -55,7 +54,6 @@ class NinjaformTest extends IntegrationTestCase {
      * @param bool $returnNull Whether Ninja_Forms() should return null
      */
     private function mockNinjaForms(array $forms = [], bool $returnNull = false): void {
-        // Define the global function only once
         if (!function_exists('Ninja_Forms')) {
             eval('
                 namespace {
@@ -67,11 +65,12 @@ class NinjaformTest extends IntegrationTestCase {
         }
 
         if ($returnNull) {
+            // When Ninja Forms is not active, the global function returns null.
             $this->ninjaFormsMock = null;
             return;
         }
 
-        // Create a mock Ninja_Forms main object
+        // Normal mock with actual forms
         $this->ninjaFormsMock = new class($forms) {
             private $forms;
 
@@ -99,7 +98,6 @@ class NinjaformTest extends IntegrationTestCase {
 
                     public function get_setting($key) {
                         if ($key === 'title') {
-                            // Find form with matching ID
                             foreach ($this->forms as $form) {
                                 if ($form->get_id() == $this->id) {
                                     return $form->get_setting('title');
@@ -115,7 +113,6 @@ class NinjaformTest extends IntegrationTestCase {
     }
 
     public static function getNinjaFormsMock() {
-        // Find the current test instance from the call stack
         foreach (debug_backtrace() as $trace) {
             if (isset($trace['object']) && $trace['object'] instanceof self) {
                 return $trace['object']->ninjaFormsMock;
@@ -124,13 +121,6 @@ class NinjaformTest extends IntegrationTestCase {
         return null;
     }
 
-    /**
-     * Creates a mock Ninja Form object with id and title.
-     *
-     * @param int $id
-     * @param string $title
-     * @return object
-     */
     private function makeMockForm(int $id = 1, string $title = 'Contact Form'): object {
         return new class($id, $title) {
             private $id;
@@ -156,7 +146,6 @@ class NinjaformTest extends IntegrationTestCase {
 
     protected function setUp(): void {
         parent::setUp();
-        // Default mock with empty forms list
         $this->mockNinjaForms([]);
     }
 
@@ -169,9 +158,6 @@ class NinjaformTest extends IntegrationTestCase {
     // Hand-Written Tests
     // -------------------------------------------------------------------------
 
-    /**
-     * Test process_ninja_form trigger – success path with no config filtering.
-     */
     public function test_trigger_process_ninja_form_success_no_filter(): void {
         $mockForm = $this->makeMockForm(5, 'Newsletter');
         $this->mockNinjaForms([$mockForm]);
@@ -182,7 +168,7 @@ class NinjaformTest extends IntegrationTestCase {
             'extra'   => ['some' => 'data'],
         ];
 
-        $node = $this->makeTriggerNode('process_ninja_form'); // no config
+        $node = $this->makeTriggerNode('process_ninja_form');
         $result = Ninjaform::resolve_trigger($node, [$formData]);
 
         $this->assertIsArray($result);
@@ -195,15 +181,12 @@ class NinjaformTest extends IntegrationTestCase {
         $this->assertEquals('Newsletter', $payload['title']);
     }
 
-    /**
-     * Test process_ninja_form trigger – success path with matching config filter.
-     */
     public function test_trigger_process_ninja_form_success_with_matching_config(): void {
         $mockForm = $this->makeMockForm(10, 'Support');
         $this->mockNinjaForms([$mockForm]);
 
         $formData = [
-            'id' => 10, // alternative key
+            'id' => 10,
             'submission' => ['id' => 456],
         ];
 
@@ -216,59 +199,33 @@ class NinjaformTest extends IntegrationTestCase {
         $this->assertEquals(10, $result['form']['id']);
     }
 
-    /**
-     * Test process_ninja_form trigger – failure when config does not match.
-     */
     public function test_trigger_process_ninja_form_fails_on_form_mismatch(): void {
-        $formData = [
-            'form_id' => 10,
-        ];
-
+        $formData = ['form_id' => 10];
         $node = $this->makeTriggerNode('process_ninja_form', ['form_id' => '99']);
         $result = Ninjaform::resolve_trigger($node, [$formData]);
-
         $this->assertFalse($result);
     }
 
-    /**
-     * Test process_ninja_form trigger – failure when form_id is missing in formData.
-     */
     public function test_trigger_process_ninja_form_returns_false_without_form_id(): void {
-        $formData = [
-            'sub_id' => 123,
-        ];
-
+        $formData = ['sub_id' => 123];
         $node = $this->makeTriggerNode('process_ninja_form');
         $result = Ninjaform::resolve_trigger($node, [$formData]);
-
         $this->assertFalse($result);
     }
 
-    /**
-     * Test process_ninja_form trigger – failure when formData is empty.
-     */
     public function test_trigger_process_ninja_form_returns_false_with_empty_data(): void {
         $formData = [];
-
         $node = $this->makeTriggerNode('process_ninja_form');
         $result = Ninjaform::resolve_trigger($node, [$formData]);
-
         $this->assertFalse($result);
     }
 
-    /**
-     * Test process_ninja_form trigger – failure when formData is not array.
-     */
     public function test_trigger_process_ninja_form_returns_false_with_non_array(): void {
         $node = $this->makeTriggerNode('process_ninja_form');
         $result = Ninjaform::resolve_trigger($node, [null]);
-
         $this->assertFalse($result);
     }
 
-    /**
-     * Test process_ninja_form trigger – config 'any' passes any form.
-     */
     public function test_trigger_process_ninja_form_any_passes_all(): void {
         $mockForm1 = $this->makeMockForm(1, 'Form A');
         $mockForm2 = $this->makeMockForm(2, 'Form B');
@@ -286,12 +243,8 @@ class NinjaformTest extends IntegrationTestCase {
         $this->assertIsArray($result2);
     }
 
-    /**
-     * Test that when Ninja_Forms function exists but returns null, the trigger still succeeds but form payload is null.
-     */
     public function test_trigger_process_ninja_form_succeeds_with_null_ninja_forms(): void {
-        // Mock Ninja_Forms to return null
-        $this->mockNinjaForms([], true); // true = return null
+        $this->mockNinjaForms([], true);
 
         $formData = ['form_id' => 5, 'sub_id' => 123];
         $node = $this->makeTriggerNode('process_ninja_form');
@@ -300,28 +253,18 @@ class NinjaformTest extends IntegrationTestCase {
         $this->assertIsArray($result);
         $this->assertTrue($result['success']);
         $this->assertEquals(123, $result['entry_id']);
-        $this->assertNull($result['form']); // form is null because Ninja_Forms() returned null
+        $this->assertNull($result['form']);
     }
-
-    // -------------------------------------------------------------------------
-    // Action Passthrough Test (since no actions)
-    // -------------------------------------------------------------------------
 
     public function test_execute_node_passthrough(): void {
         $input = ['some' => 'data'];
-
         $result = Ninjaform::execute_node(
             $this->makeActionNode('__any__'),
             $input
         );
-
         $this->assertEquals('main', $result['port']);
         $this->assertEquals($input, $result['data']);
     }
-
-    // -------------------------------------------------------------------------
-    // Schema & Contract Tests
-    // -------------------------------------------------------------------------
 
     public function test_get_slug(): void {
         $this->assertEquals('ninjaform', Ninjaform::get_slug());
@@ -357,19 +300,11 @@ class NinjaformTest extends IntegrationTestCase {
         $this->assertSame([], Ninjaform::get_trigger_config_schema('__unknown__'));
     }
 
-    /**
-     * Test that get_output_ports returns an array with at least 'main'.
-     * This is required by the auto-contract test.
-     */
     public function test_get_output_ports_returns_array(): void {
         $ports = Ninjaform::get_output_ports();
         $this->assertIsArray($ports);
         $this->assertArrayHasKey('main', $ports);
     }
-
-    // -------------------------------------------------------------------------
-    // Dynamic Queries
-    // -------------------------------------------------------------------------
 
     public function test_dynamic_queries_registered(): void {
         $queries = Ninjaform::get_dynamic_queries();
@@ -378,9 +313,7 @@ class NinjaformTest extends IntegrationTestCase {
     }
 
     public function test_query_forms_returns_at_least_any_option(): void {
-        // Ensure Ninja_Forms returns null (function exists but no forms)
-        $this->mockNinjaForms([], true); // null return
-
+        $this->mockNinjaForms([], true);
         $options = Ninjaform::query_forms();
         $this->assertIsArray($options);
         $this->assertNotEmpty($options);
@@ -389,7 +322,6 @@ class NinjaformTest extends IntegrationTestCase {
     }
 
     public function test_query_forms_returns_forms_from_ninja_forms_when_available(): void {
-        // Create mock forms
         $form1 = $this->makeMockForm(1, 'Contact');
         $form2 = $this->makeMockForm(2, 'Newsletter');
         $this->mockNinjaForms([$form1, $form2]);
@@ -402,12 +334,7 @@ class NinjaformTest extends IntegrationTestCase {
         $this->assertEquals(2, $options[2]['name']);
     }
 
-    // -------------------------------------------------------------------------
-    // Contract: All triggers must return array|false (additional explicit test)
-    // -------------------------------------------------------------------------
-
     public function test_trigger_follows_contract(): void {
-        // Success case
         $formData = ['form_id' => 1, 'sub_id' => 1];
         $result = Ninjaform::resolve_trigger(
             $this->makeTriggerNode('process_ninja_form'),
@@ -418,7 +345,6 @@ class NinjaformTest extends IntegrationTestCase {
             $this->identicalTo(false)
         ));
 
-        // Failure case
         $result = Ninjaform::resolve_trigger(
             $this->makeTriggerNode('process_ninja_form'),
             [null]
