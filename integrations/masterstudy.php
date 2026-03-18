@@ -134,9 +134,41 @@ class Masterstudy extends IntegrationBase {
 		switch ( $node['event'] ) {
 
 			case 'user_enroll_course':
-			case 'course_complete':
 				$user_id   = $args[0] ?? 0;
 				$course_id = $args[1] ?? 0;
+
+				if ( ! $user_id || ! $course_id ) {
+					return false;
+				}
+
+				$selected_course = $node['data']['config']['course_id'] ?? 'any';
+
+				if ( 'any' !== $selected_course && (int) $selected_course !== (int) $course_id ) {
+					return false;
+				}
+
+				$course = get_post( $course_id );
+
+				if ( ! $course ) {
+					return false;
+				}
+
+				$course_data = [
+					'course_id'          => $course->ID,
+					'course_title'       => $course->post_title,
+					'course_description' => $course->post_content,
+					'course_url'         => get_permalink( $course_id ),
+				];
+
+				return [
+					'success'   => true,
+					'timestamp' => current_time( 'mysql' ),
+					'data' => self::resolve_user_payload( $user_id, $course_data ),
+				];
+
+			case 'course_complete':
+				$course_id = $args[0] ?? 0;
+				$user_id   = $args[1] ?? 0;
 
 				if ( ! $user_id || ! $course_id ) {
 					return false;
@@ -228,7 +260,7 @@ class Masterstudy extends IntegrationBase {
 					'quiz_description' => $quiz->post_content,
 					'quiz_url'         => get_permalink( $quiz_id ),
 					'score'            => $percentage,
-					'status'           => 'quiz_passed' ? 'passed' : 'failed' === $node['event'],
+					'status'           => 'quiz_passed' === $node['event'] ? 'passed' : 'failed',
 				];
 
 				return [
