@@ -1,11 +1,11 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-03-12 08:55:08",
+    "generated_at": "2026-03-18 05:39:08",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
             "name": "WordPress",
-            "icon": "wordpress.svg",
+            "icon": "WordPress.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -853,7 +853,7 @@
                         {
                             "key": "user_email",
                             "label": "Email",
-                            "type": "text",
+                            "type": "email",
                             "required": true
                         },
                         {
@@ -915,7 +915,7 @@
                         {
                             "key": "user_email",
                             "label": "Email",
-                            "type": "text"
+                            "type": "email"
                         },
                         {
                             "key": "user_pass",
@@ -1072,7 +1072,7 @@
                         {
                             "key": "email",
                             "label": "User Email",
-                            "type": "text",
+                            "type": "email",
                             "required": true
                         }
                     ],
@@ -1213,7 +1213,7 @@
                         {
                             "key": "user_login_or_email",
                             "label": "Username or Email",
-                            "type": "text",
+                            "type": "email",
                             "required": true
                         }
                     ],
@@ -1228,7 +1228,7 @@
                         {
                             "key": "user_login",
                             "label": "Username or Email",
-                            "type": "text",
+                            "type": "email",
                             "required": true
                         },
                         {
@@ -2580,7 +2580,7 @@
                         {
                             "key": "user_email",
                             "label": "User Email",
-                            "type": "expression",
+                            "type": "email",
                             "required": true
                         }
                     ],
@@ -2643,7 +2643,7 @@
                         {
                             "key": "author_email",
                             "label": "Author Email",
-                            "type": "expression",
+                            "type": "email",
                             "required": true
                         },
                         {
@@ -2676,7 +2676,7 @@
                         {
                             "key": "author_email",
                             "label": "Author Email",
-                            "type": "expression",
+                            "type": "email",
                             "required": true
                         },
                         {
@@ -7347,8 +7347,111 @@
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
-            "supports_webhook": false,
-            "triggers": [],
+            "supports_webhook": true,
+            "triggers": {
+                "subscribed": {
+                    "key": "subscribed",
+                    "label": "Subscriber Added",
+                    "hook": "mailchimp_webhook_subscribed",
+                    "schema": [
+                        {
+                            "key": "list_id",
+                            "label": "Audience/List ID",
+                            "type": "text",
+                            "placeholder": "a6b5da1054",
+                            "help": "Optional. Only continue if the webhook came from this Mailchimp audience."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "unsubscribed": {
+                    "key": "unsubscribed",
+                    "label": "Subscriber Unsubscribed",
+                    "hook": "mailchimp_webhook_unsubscribed",
+                    "schema": [
+                        {
+                            "key": "list_id",
+                            "label": "Audience/List ID",
+                            "type": "text",
+                            "placeholder": "a6b5da1054",
+                            "help": "Optional. Only continue if the webhook came from this Mailchimp audience."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "profile_updated": {
+                    "key": "profile_updated",
+                    "label": "Subscriber Profile Updated",
+                    "hook": "mailchimp_webhook_profile_updated",
+                    "schema": [
+                        {
+                            "key": "list_id",
+                            "label": "Audience/List ID",
+                            "type": "text",
+                            "placeholder": "a6b5da1054",
+                            "help": "Optional. Only continue if the webhook came from this Mailchimp audience."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "cleaned": {
+                    "key": "cleaned",
+                    "label": "Email Cleaned",
+                    "hook": "mailchimp_webhook_cleaned",
+                    "schema": [
+                        {
+                            "key": "list_id",
+                            "label": "Audience/List ID",
+                            "type": "text",
+                            "placeholder": "a6b5da1054",
+                            "help": "Optional. Only continue if the webhook came from this Mailchimp audience."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "email_changed": {
+                    "key": "email_changed",
+                    "label": "Subscriber Email Changed",
+                    "hook": "mailchimp_webhook_email_changed",
+                    "schema": [
+                        {
+                            "key": "list_id",
+                            "label": "Audience/List ID",
+                            "type": "text",
+                            "placeholder": "a6b5da1054",
+                            "help": "Optional. Only continue if the webhook came from this Mailchimp audience."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "campaign_sent": {
+                    "key": "campaign_sent",
+                    "label": "Campaign Sent",
+                    "hook": "mailchimp_webhook_campaign_sent",
+                    "schema": [
+                        {
+                            "key": "list_id",
+                            "label": "Audience/List ID",
+                            "type": "text",
+                            "placeholder": "a6b5da1054",
+                            "help": "Optional. Only continue if the webhook came from this Mailchimp audience."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
             "actions": {
                 "upsert_subscriber": {
                     "key": "upsert_subscriber",
@@ -10514,7 +10617,7 @@
                         {
                             "key": "email",
                             "label": "Email Address",
-                            "type": "expression",
+                            "type": "email",
                             "required": true
                         },
                         {
@@ -10673,7 +10776,7 @@
                         {
                             "key": "email",
                             "label": "Email Address",
-                            "type": "expression",
+                            "type": "email",
                             "required": true
                         }
                     ],
@@ -11031,7 +11134,7 @@
                         {
                             "key": "email",
                             "label": "Email Address",
-                            "type": "expression",
+                            "type": "email",
                             "required": true
                         },
                         {
@@ -11249,7 +11352,7 @@
                         {
                             "key": "email",
                             "label": "Email Address",
-                            "type": "expression",
+                            "type": "email",
                             "required": true
                         },
                         {
