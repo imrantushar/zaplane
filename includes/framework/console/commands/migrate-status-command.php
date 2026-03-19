@@ -3,7 +3,7 @@
 namespace Zaplane\Framework\Console\Commands;
 
 use Zaplane\Framework\Console\Command;
-use Zaplane\Framework\Database\ORM\Migrator;
+use Zaplane\Framework\Console\DevMigrator;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -15,7 +15,7 @@ class MigrateStatusCommand extends Command {
 	protected string $description = 'Show the status of each migration';
 
 	public function handle( array $args, array $assoc_args ): void {
-		$migrator = Migrator::getInstance();
+		$migrator = DevMigrator::getInstance();
 		$status = $migrator->status();
 
 		if ( empty( $status ) ) {

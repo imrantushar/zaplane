@@ -35,12 +35,12 @@ class QueryBuilder {
 	}
 
 	public function select( ...$columns ): self {
-		$this->columns = $columns ?: [ '*' ];
+		$this->columns = $columns ? $columns : [ '*' ];
 		return $this;
 	}
 
 	public function addSelect( ...$columns ): self {
-		if ( $this->columns === [ '*' ] ) {
+		if ( [ '*' ] === $this->columns ) {
 			$this->columns = [];
 		}
 		$this->columns = array_merge( $this->columns, $columns );
@@ -48,7 +48,7 @@ class QueryBuilder {
 	}
 
 	public function selectRaw( string $expression ): self {
-		if ( $this->columns === [ '*' ] ) {
+		if ( [ '*' ] === $this->columns ) {
 			$this->columns = [];
 		}
 		$this->columns[] = new RawExpression( $expression );
@@ -60,7 +60,7 @@ class QueryBuilder {
 			return $this->whereNested( $column );
 		}
 
-		if ( $value === null ) {
+		if ( null === $value ) {
 			$value = $operator;
 			$operator = '=';
 		}
@@ -79,7 +79,7 @@ class QueryBuilder {
 	}
 
 	public function orWhere( $column, $operator = null, $value = null ): self {
-		if ( $value === null ) {
+		if ( null === $value ) {
 			$value = $operator;
 			$operator = '=';
 		}
@@ -203,7 +203,7 @@ class QueryBuilder {
 	}
 
 	public function latest( ?string $column = null ): self {
-		if ( $column === null && $this->modelClass ) {
+		if ( null === $column && $this->modelClass ) {
 			$column = call_user_func( [ $this->modelClass, 'getCreatedAtColumn' ] );
 		}
 		$column = $column ?? 'created_at';
@@ -211,7 +211,7 @@ class QueryBuilder {
 	}
 
 	public function oldest( ?string $column = null ): self {
-		if ( $column === null && $this->modelClass ) {
+		if ( null === $column && $this->modelClass ) {
 			$column = call_user_func( [ $this->modelClass, 'getCreatedAtColumn' ] );
 		}
 		$column = $column ?? 'created_at';
@@ -291,6 +291,7 @@ class QueryBuilder {
 		$sql = $this->toSql();
 		$bindings = $this->getBindings();
 
+		// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.serialize_serialize -- Used for cache key generation only.
 		$cacheKey = md5( $sql . serialize( $bindings ) );
 
 		if ( ! $this->skipCache && isset( self::$queryCache[ $cacheKey ] ) ) {
@@ -298,15 +299,17 @@ class QueryBuilder {
 		}
 
 		if ( ! empty( $bindings ) ) {
+			// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- $sql is built internally by toSql().
 			$sql = $wpdb->prepare( $sql, ...$bindings );
 		}
 
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$results = $wpdb->get_results( $sql, ARRAY_A );
 
 		if ( $this->modelClass && $results ) {
 			$collection = new Collection( array_map( fn( $row) => $this->modelClass::hydrate( $row ), $results ) );
 		} else {
-			$collection = new Collection( $results ?: [] );
+			$collection = new Collection( $results ? $results : [] );
 		}
 
 		if ( ! $this->skipCache ) {
@@ -337,8 +340,8 @@ class QueryBuilder {
 
 	public function findOrFail( int $id ) {
 		$result = $this->find( $id );
-		if ( $result === null ) {
-			throw DatabaseException::recordNotFound( $this->table, $id );
+		if ( null === $result ) {
+			throw DatabaseException::recordNotFound( esc_html( $this->table ), esc_html( (string) $id ) );
 		}
 		return $result;
 	}
@@ -378,9 +381,11 @@ class QueryBuilder {
 		$bindings = $this->getBindings();
 
 		if ( ! empty( $bindings ) ) {
+			// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- $sql is built internally by toSql().
 			$sql = $wpdb->prepare( $sql, ...$bindings );
 		}
 
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		return (int) $wpdb->get_var( $sql );
 	}
 
@@ -408,9 +413,11 @@ class QueryBuilder {
 		$bindings = $this->getBindings();
 
 		if ( ! empty( $bindings ) ) {
+			// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- $sql is built internally by toSql().
 			$sql = $wpdb->prepare( $sql, ...$bindings );
 		}
 
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		return (float) $wpdb->get_var( $sql );
 	}
 
@@ -425,10 +432,11 @@ class QueryBuilder {
 	public function insert( array $values ): int {
 		global $wpdb;
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 		$result = $wpdb->insert( $this->table, $values );
 
-		if ( $result === false ) {
-			throw DatabaseException::insertFailed( $this->table, $wpdb->last_error );
+		if ( false === $result ) {
+			throw DatabaseException::insertFailed( esc_html( $this->table ), esc_html( $wpdb->last_error ) );
 		}
 
 		return $wpdb->insert_id;
@@ -459,6 +467,7 @@ class QueryBuilder {
 
 		$bindings = array_merge( $bindings, $this->bindings );
 
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		return (int) $wpdb->query( $wpdb->prepare( $sql, ...$bindings ) );
 	}
 
@@ -473,9 +482,11 @@ class QueryBuilder {
 		$bindings = $this->getBindings();
 
 		if ( ! empty( $bindings ) ) {
+			// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- $sql is built internally.
 			$sql = $wpdb->prepare( $sql, ...$bindings );
 		}
 
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		return (int) $wpdb->query( $sql );
 	}
 
@@ -493,6 +504,7 @@ class QueryBuilder {
 		$sql .= $this->compileWheres();
 		$bindings = array_merge( $bindings, $this->bindings );
 
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		return (int) $wpdb->query( $wpdb->prepare( $sql, ...$bindings ) );
 	}
 
@@ -502,6 +514,7 @@ class QueryBuilder {
 
 	public function truncate(): void {
 		global $wpdb;
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->query( "TRUNCATE TABLE {$this->table}" );
 	}
 
@@ -528,11 +541,11 @@ class QueryBuilder {
 			$sql .= $this->compileOrders();
 		}
 
-		if ( $this->limitValue !== null ) {
+		if ( null !== $this->limitValue ) {
 			$sql .= ' LIMIT ' . $this->limitValue;
 		}
 
-		if ( $this->offsetValue !== null ) {
+		if ( null !== $this->offsetValue ) {
 			$sql .= ' OFFSET ' . $this->offsetValue;
 		}
 

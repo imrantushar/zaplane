@@ -3,6 +3,47 @@ namespace Zaplane\Integrations\Easydigitaldownload;
 
 trait HelperTrait {
 
+	protected static function normalize_prefixed_status( string $status, string $prefix ): string {
+		$status = sanitize_key( $status );
+		if ( 0 === strpos( $status, $prefix ) ) {
+			return substr( $status, strlen( $prefix ) );
+		}
+
+		return $status;
+	}
+
+	protected static function normalize_customer_status( string $status ): string {
+		return self::normalize_prefixed_status( $status, 'edd_customer_' );
+	}
+
+	protected static function get_customer_status_config( array $config ): string {
+		return (string) ( $config['customer_status'] ?? ( $config['status'] ?? '' ) );
+	}
+
+	protected static function normalize_discount_status( string $status ): string {
+		return self::normalize_prefixed_status( $status, 'edd_discount_' );
+	}
+
+	protected static function get_discount_status_config( array $config ): string {
+		return (string) ( $config['discount_status'] ?? ( $config['status'] ?? '' ) );
+	}
+
+	protected static function normalize_payment_status( string $status ): string {
+		return self::normalize_prefixed_status( $status, 'edd_payment_' );
+	}
+
+	protected static function get_payment_status_config( array $config ): string {
+		return (string) ( $config['payment_status'] ?? ( $config['status'] ?? '' ) );
+	}
+
+	protected static function normalize_download_status( string $status ): string {
+		return self::normalize_prefixed_status( $status, 'edd_download_' );
+	}
+
+	protected static function get_download_status_config( array $config ): string {
+		return (string) ( $config['download_status'] ?? ( $config['status'] ?? '' ) );
+	}
+
 	protected static function is_valid_download_post( $post ): bool {
 		if ( ! is_object( $post ) || ! property_exists( $post, 'ID' ) ) {
 			return false;

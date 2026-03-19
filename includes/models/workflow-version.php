@@ -62,6 +62,7 @@ class WorkflowVersion extends Model {
 	public function activate(): bool {
 		global $wpdb;
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->update(
 			static::getTable(),
 			[ 'is_active' => 0 ],

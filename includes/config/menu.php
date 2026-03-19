@@ -20,19 +20,9 @@ return [
 			'title'       => __( 'Connections', 'zaplane' ),
 			'capability'  => 'manage_options',
 		],
-
-
-
-
-
 		ZAPLANE_PLUGIN_SLUG . '-logs' => [
 			'parent_slug' => ZAPLANE_PLUGIN_SLUG,
 			'title'       => __( 'Logs', 'zaplane' ),
-			'capability'  => 'manage_options',
-		],
-		ZAPLANE_PLUGIN_SLUG . '-settings' => [
-			'parent_slug' => ZAPLANE_PLUGIN_SLUG,
-			'title'       => __( 'Settings', 'zaplane' ),
 			'capability'  => 'manage_options',
 		],
 	],

@@ -2,6 +2,8 @@
 
 namespace Zaplane\Framework\Models;
 
+use Zaplane\Framework\Database\ORM\Collection;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -55,31 +57,31 @@ class Comment extends WpModel {
 		return static::find( $this->comment_parent );
 	}
 
-	public function replies(): array {
+	public function replies(): Collection {
 		return static::where( 'comment_parent', $this->comment_ID )->get();
 	}
 
 	public function isApproved(): bool {
-		return $this->comment_approved === '1';
+		return '1' === $this->comment_approved;
 	}
 
 	public function isPending(): bool {
-		return $this->comment_approved === '0';
+		return '0' === $this->comment_approved;
 	}
 
 	public function isSpam(): bool {
-		return $this->comment_approved === 'spam';
+		return 'spam' === $this->comment_approved;
 	}
 
-	public static function approved(): array {
+	public static function approved(): Collection {
 		return static::where( 'comment_approved', '1' )->get();
 	}
 
-	public static function pending(): array {
+	public static function pending(): Collection {
 		return static::where( 'comment_approved', '0' )->get();
 	}
 
-	public static function forPost( int $postId ): array {
+	public static function forPost( int $postId ): Collection {
 		return static::where( 'comment_post_ID', $postId )
 			->where( 'comment_approved', '1' )
 			->orderBy( 'comment_date', 'asc' )

@@ -23,7 +23,7 @@ class Slack extends IntegrationBase {
 	}
 
 	public static function get_icon(): string {
-		return 'slack';
+		return 'slack.svg';
 	}
 
 	public static function get_triggers(): array {
@@ -64,7 +64,7 @@ class Slack extends IntegrationBase {
 	}
 
 	public static function get_action_config_schema( string $action ): array {
-		if ( $action === 'send_message' ) {
+		if ( 'send_message' === $action ) {
 			return [
 				[
 					'key' => 'channel',
@@ -83,7 +83,7 @@ class Slack extends IntegrationBase {
 			];
 		}
 
-		if ( $action === 'send_dm' ) {
+		if ( 'send_dm' === $action ) {
 			return [
 				[
 					'key' => 'user_id',
@@ -102,7 +102,7 @@ class Slack extends IntegrationBase {
 			];
 		}
 
-		if ( $action === 'create_channel' ) {
+		if ( 'create_channel' === $action ) {
 			return [
 				[
 					'key' => 'name',
@@ -130,7 +130,7 @@ class Slack extends IntegrationBase {
 			];
 		}//end if
 
-		if ( $action === 'invite_to_channel' ) {
+		if ( 'invite_to_channel' === $action ) {
 			return [
 				[
 					'key' => 'channel',
@@ -150,7 +150,7 @@ class Slack extends IntegrationBase {
 			];
 		}
 
-		if ( $action === 'set_topic' ) {
+		if ( 'set_topic' === $action ) {
 			return [
 				[
 					'key' => 'channel',
@@ -169,7 +169,7 @@ class Slack extends IntegrationBase {
 			];
 		}
 
-		if ( $action === 'add_reaction' ) {
+		if ( 'add_reaction' === $action ) {
 			return [
 				[
 					'key' => 'channel',
@@ -197,7 +197,7 @@ class Slack extends IntegrationBase {
 			];
 		}//end if
 
-		if ( $action === 'get_user_info' ) {
+		if ( 'get_user_info' === $action ) {
 			return [
 				[
 					'key' => 'user_id',
@@ -230,31 +230,31 @@ class Slack extends IntegrationBase {
 			throw new \Exception( 'Slack access token is missing' );
 		}
 
-		if ( $action === 'send_message' ) {
+		if ( 'send_message' === $action ) {
 			return self::action_send_message( $node, $input, $token );
 		}
 
-		if ( $action === 'send_dm' ) {
+		if ( 'send_dm' === $action ) {
 			return self::action_send_dm( $node, $input, $token );
 		}
 
-		if ( $action === 'create_channel' ) {
+		if ( 'create_channel' === $action ) {
 			return self::action_create_channel( $node, $input, $token );
 		}
 
-		if ( $action === 'invite_to_channel' ) {
+		if ( 'invite_to_channel' === $action ) {
 			return self::action_invite_to_channel( $node, $input, $token );
 		}
 
-		if ( $action === 'set_topic' ) {
+		if ( 'set_topic' === $action ) {
 			return self::action_set_topic( $node, $input, $token );
 		}
 
-		if ( $action === 'add_reaction' ) {
+		if ( 'add_reaction' === $action ) {
 			return self::action_add_reaction( $node, $input, $token );
 		}
 
-		if ( $action === 'get_user_info' ) {
+		if ( 'get_user_info' === $action ) {
 			return self::action_get_user_info( $node, $input, $token );
 		}
 
@@ -285,13 +285,13 @@ class Slack extends IntegrationBase {
 		);
 
 		if ( is_wp_error( $response ) ) {
-			throw new \Exception( 'Slack API request failed: ' . $response->get_error_message() );
+			throw new \Exception( 'Slack API request failed: ' . esc_html( $response->get_error_message() ) );
 		}
 
 		$body = json_decode( wp_remote_retrieve_body( $response ), true );
 
 		if ( empty( $body['ok'] ) ) {
-			throw new \Exception( 'Slack API error: ' . ( $body['error'] ?? 'Unknown error' ) );
+			throw new \Exception( 'Slack API error: ' . esc_html( $body['error'] ?? 'Unknown error' ) );
 		}
 
 		return [
@@ -322,13 +322,13 @@ class Slack extends IntegrationBase {
 		);
 
 		if ( is_wp_error( $dm_response ) ) {
-			throw new \Exception( 'Failed to open DM: ' . $dm_response->get_error_message() );
+			throw new \Exception( 'Failed to open DM: ' . esc_html( $dm_response->get_error_message() ) );
 		}
 
 		$dm_body = json_decode( wp_remote_retrieve_body( $dm_response ), true );
 
 		if ( empty( $dm_body['ok'] ) ) {
-			throw new \Exception( 'Failed to open DM: ' . ( $dm_body['error'] ?? 'Unknown error' ) );
+			throw new \Exception( 'Failed to open DM: ' . esc_html( $dm_body['error'] ?? 'Unknown error' ) );
 		}
 
 		$channel_id = $dm_body['channel']['id'] ?? '';
@@ -350,13 +350,13 @@ class Slack extends IntegrationBase {
 		);
 
 		if ( is_wp_error( $response ) ) {
-			throw new \Exception( 'Slack API request failed: ' . $response->get_error_message() );
+			throw new \Exception( 'Slack API request failed: ' . esc_html( $response->get_error_message() ) );
 		}
 
 		$body = json_decode( wp_remote_retrieve_body( $response ), true );
 
 		if ( empty( $body['ok'] ) ) {
-			throw new \Exception( 'Slack API error: ' . ( $body['error'] ?? 'Unknown error' ) );
+			throw new \Exception( 'Slack API error: ' . esc_html( $body['error'] ?? 'Unknown error' ) );
 		}
 
 		return [
@@ -421,11 +421,11 @@ class Slack extends IntegrationBase {
 			],
 		];
 
-		if ( $auth_type === 'oauth2' ) {
+		if ( 'oauth2' === $auth_type ) {
 			return $oauth_fields;
 		}
 
-		if ( $auth_type === 'api_key' ) {
+		if ( 'api_key' === $auth_type ) {
 			return $token_fields;
 		}
 
@@ -542,13 +542,13 @@ class Slack extends IntegrationBase {
 		);
 
 		if ( is_wp_error( $response ) ) {
-			throw new \Exception( 'OAuth token exchange failed: ' . $response->get_error_message() );
+			throw new \Exception( 'OAuth token exchange failed: ' . esc_html( $response->get_error_message() ) );
 		}
 
 		$body = json_decode( wp_remote_retrieve_body( $response ), true );
 
 		if ( empty( $body['ok'] ) ) {
-			throw new \Exception( 'Slack OAuth error: ' . ( $body['error'] ?? 'Unknown error' ) );
+			throw new \Exception( 'Slack OAuth error: ' . esc_html( $body['error'] ?? 'Unknown error' ) );
 		}
 
 		return [
@@ -578,7 +578,7 @@ class Slack extends IntegrationBase {
 		);
 
 		if ( empty( $body['ok'] ) ) {
-			throw new \Exception( 'Slack API error: ' . ( $body['error'] ?? 'Unknown error' ) );
+			throw new \Exception( 'Slack API error: ' . esc_html( $body['error'] ?? 'Unknown error' ) );
 		}
 
 		return [
@@ -604,7 +604,7 @@ class Slack extends IntegrationBase {
 		);
 
 		if ( empty( $body['ok'] ) ) {
-			throw new \Exception( 'Slack API error: ' . ( $body['error'] ?? 'Unknown error' ) );
+			throw new \Exception( 'Slack API error: ' . esc_html( $body['error'] ?? 'Unknown error' ) );
 		}
 
 		return [
@@ -629,7 +629,7 @@ class Slack extends IntegrationBase {
 		);
 
 		if ( empty( $body['ok'] ) ) {
-			throw new \Exception( 'Slack API error: ' . ( $body['error'] ?? 'Unknown error' ) );
+			throw new \Exception( 'Slack API error: ' . esc_html( $body['error'] ?? 'Unknown error' ) );
 		}
 
 		return [
@@ -656,7 +656,7 @@ class Slack extends IntegrationBase {
 		);
 
 		if ( empty( $body['ok'] ) && ( $body['error'] ?? '' ) !== 'already_reacted' ) {
-			throw new \Exception( 'Slack API error: ' . ( $body['error'] ?? 'Unknown error' ) );
+			throw new \Exception( 'Slack API error: ' . esc_html( $body['error'] ?? 'Unknown error' ) );
 		}
 
 		return [
@@ -676,7 +676,7 @@ class Slack extends IntegrationBase {
 		);
 
 		if ( empty( $body['ok'] ) ) {
-			throw new \Exception( 'Slack API error: ' . ( $body['error'] ?? 'Unknown error' ) );
+			throw new \Exception( 'Slack API error: ' . esc_html( $body['error'] ?? 'Unknown error' ) );
 		}
 
 		$user = $body['user'] ?? [];
@@ -731,11 +731,11 @@ class Slack extends IntegrationBase {
 		$body = $request->get_json_params();
 		$type = $body['type'] ?? '';
 
-		if ( $type === 'url_verification' ) {
+		if ( 'url_verification' === $type ) {
 			return null;
 		}
 
-		if ( $type !== 'event_callback' ) {
+		if ( 'event_callback' !== $type ) {
 			return null;
 		}
 

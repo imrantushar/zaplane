@@ -114,7 +114,7 @@ class ColumnDefinition {
 			if ( $this->attributes['useCurrentOnUpdate'] ) {
 				$sql .= ' ON UPDATE CURRENT_TIMESTAMP';
 			}
-		} elseif ( $this->attributes['default'] !== null ) {
+		} elseif ( null !== $this->attributes['default'] ) {
 			$default = $this->attributes['default'];
 			if ( is_string( $default ) ) {
 				$sql .= " DEFAULT '{$default}'";

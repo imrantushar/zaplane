@@ -2,7 +2,6 @@
 namespace Zaplane\Integrations;
 
 use Zaplane\Framework\Classes\IntegrationBase;
-use Zaplane\Framework\Classes\Expression;
 
 class Http extends IntegrationBase {
 
@@ -17,6 +16,10 @@ class Http extends IntegrationBase {
 
 	public static function get_category(): string {
 		return 'tool';
+	}
+
+	public static function get_icon(): string {
+		return 'http-request';
 	}
 
 	public static function get_actions(): array {
@@ -71,12 +74,24 @@ class Http extends IntegrationBase {
 
 	public static function execute_node( array $node, array $input ): array {
 
-		$c = $node['data']['config'];
+		$c = $node['data']['config'] ?? [];
 
-		$url = Expression::evaluate( $c['url'], $input );
-		$body = Expression::evaluate( $c['body'] ?? '', $input );
+		$url = $c['url'] ?? '';
+		$body = $c['body'] ?? '';
 
-		$headers = json_decode( $c['headers'] ?? '{}', true );
+		$headers = $c['headers'] ?? [];
+		if ( is_string( $headers ) ) {
+			$decoded = json_decode( $headers, true );
+			$headers = is_array( $decoded ) ? $decoded : [];
+		}
+
+		// If the user mapped an array dynamically directly into the body field, encode to JSON for HTTP transport unless it's form-encoded (which we'll just encode standard for now)
+		if ( is_array( $body ) ) {
+			$body = wp_json_encode( $body );
+			if ( ! isset( $headers['Content-Type'] ) ) {
+				$headers['Content-Type'] = 'application/json';
+			}
+		}
 
 		$response = wp_remote_request($url, [
 			'method' => $c['method'] ?? 'GET',
@@ -84,12 +99,35 @@ class Http extends IntegrationBase {
 			'body' => $body
 		]);
 
+		if ( is_wp_error( $response ) ) {
+			return [
+				'port' => 'main',
+				'data' => [
+					'status' => 500,
+					'error'  => $response->get_error_message(),
+					'body'   => null,
+					'headers' => []
+				]
+			];
+		}
+
+		$response_body = wp_remote_retrieve_body( $response );
+
+		// Attempt to parse the response body as JSON so downstream nodes can use dot notation (e.g. `1.data.body.user.name`)
+		$parsed_body = json_decode( $response_body, true );
+		if ( json_last_error() === JSON_ERROR_NONE ) {
+			$response_body = $parsed_body;
+		}
+
+		$response_headers = wp_remote_retrieve_headers( $response );
+		$headers_array = is_object( $response_headers ) && method_exists( $response_headers, 'getAll' ) ? $response_headers->getAll() : (array) $response_headers;
+
 		return [
 			'port' => 'main',
 			'data' => [
-				'status' => wp_remote_retrieve_response_code( $response ),
-				'body' => wp_remote_retrieve_body( $response ),
-				'headers' => wp_remote_retrieve_headers( $response ),
+				'status'  => wp_remote_retrieve_response_code( $response ),
+				'body'    => $response_body,
+				'headers' => $headers_array,
 			]
 		];
 	}

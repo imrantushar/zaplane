@@ -7,6 +7,26 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 trait OrderActionsTrait {
 
+	private static function get_order_id_from_config( array $config ): int {
+		return (int) ( $config['order_id'] ?? 0 );
+	}
+
+	private static function require_order_from_config( array $config, string &$error = '' ) {
+		$order_id = self::get_order_id_from_config( $config );
+		if ( ! $order_id ) {
+			$error = 'Order ID is required';
+			return null;
+		}
+
+		$order = wc_get_order( $order_id );
+		if ( ! $order ) {
+			$error = 'Order not found';
+			return null;
+		}
+
+		return $order;
+	}
+
 	private static function respond_with_order( \WC_Order $order ): array {
 		return self::respond(
 			[
@@ -49,8 +69,9 @@ trait OrderActionsTrait {
 		if ( ! empty( $config['currency'] ) ) {
 			$order->set_currency( $config['currency'] );
 		}
-		if ( ! empty( $config['status'] ) ) {
-			$order->set_status( self::normalize_order_status( $config['status'] ) );
+		$order_status = self::get_order_status_config( $config );
+		if ( '' !== $order_status ) {
+			$order->set_status( self::normalize_order_status( $order_status ) );
 		}
 		if ( ! empty( $config['note'] ) ) {
 			$order->add_order_note( $config['note'], self::parse_bool( $config['is_customer_note'] ?? false ) );
@@ -62,13 +83,10 @@ trait OrderActionsTrait {
 	}
 
 	private static function action_update_order( array $config, array $input ): array {
-		$order_id = (int) ( $config['order_id'] ?? 0 );
-		if ( ! $order_id ) {
-			return self::error( 'Order ID is required' );
-		}
-		$order = wc_get_order( $order_id );
+		$error = '';
+		$order = self::require_order_from_config( $config, $error );
 		if ( ! $order ) {
-			return self::error( 'Order not found', [ 'order_id' => $order_id ] );
+			return self::error( $error, [ 'order_id' => self::get_order_id_from_config( $config ) ] );
 		}
 
 		$data = self::parse_json_array( $config['data'] ?? [] );
@@ -76,8 +94,9 @@ trait OrderActionsTrait {
 			$order->set_props( $data );
 		}
 
-		if ( ! empty( $config['status'] ) ) {
-			$order->set_status( self::normalize_order_status( $config['status'] ) );
+		$order_status = self::get_order_status_config( $config );
+		if ( '' !== $order_status ) {
+			$order->set_status( self::normalize_order_status( $order_status ) );
 		}
 		if ( ! empty( $config['customer_id'] ) ) {
 			$order->set_customer_id( (int) $config['customer_id'] );
@@ -109,14 +128,15 @@ trait OrderActionsTrait {
 	}
 
 	private static function action_update_order_status( array $config, array $input ): array {
-		$order_id = (int) ( $config['order_id'] ?? 0 );
-		$status = $config['status'] ?? '';
+		$order_id = self::get_order_id_from_config( $config );
+		$status = self::get_order_status_config( $config );
 		if ( ! $order_id || '' === $status ) {
 			return self::error( 'Order ID and status are required' );
 		}
-		$order = wc_get_order( $order_id );
+		$error = '';
+		$order = self::require_order_from_config( $config, $error );
 		if ( ! $order ) {
-			return self::error( 'Order not found', [ 'order_id' => $order_id ] );
+			return self::error( $error, [ 'order_id' => $order_id ] );
 		}
 
 		$order->set_status( self::normalize_order_status( $status ) );
@@ -126,14 +146,15 @@ trait OrderActionsTrait {
 	}
 
 	private static function action_add_or_update_order_meta( array $config, array $input ): array {
-		$order_id = (int) ( $config['order_id'] ?? 0 );
+		$order_id = self::get_order_id_from_config( $config );
 		$meta_key = $config['meta_key'] ?? '';
 		if ( ! $order_id || '' === $meta_key ) {
 			return self::error( 'Order ID and meta key are required' );
 		}
-		$order = wc_get_order( $order_id );
+		$error = '';
+		$order = self::require_order_from_config( $config, $error );
 		if ( ! $order ) {
-			return self::error( 'Order not found', [ 'order_id' => $order_id ] );
+			return self::error( $error, [ 'order_id' => $order_id ] );
 		}
 
 		$order->update_meta_data( $meta_key, $config['meta_value'] ?? '' );
@@ -147,7 +168,7 @@ trait OrderActionsTrait {
 	}
 
 	private static function action_get_total_orders_count( array $config, array $input ): array {
-		$status = $config['status'] ?? '';
+		$status = self::get_order_status_config( $config );
 		$args = [
 			'limit' => 1,
 			'paginate' => true,
@@ -183,7 +204,7 @@ trait OrderActionsTrait {
 	}
 
 	private static function action_get_orders_by_status( array $config, array $input ): array {
-		$status = $config['status'] ?? '';
+		$status = self::get_order_status_config( $config );
 		if ( '' === $status ) {
 			return self::error( 'Status is required' );
 		}
@@ -231,13 +252,10 @@ trait OrderActionsTrait {
 	}
 
 	private static function action_get_order_single( array $config, array $input ): array {
-		$order_id = (int) ( $config['order_id'] ?? 0 );
-		if ( ! $order_id ) {
-			return self::error( 'Order ID is required' );
-		}
-		$order = wc_get_order( $order_id );
+		$error = '';
+		$order = self::require_order_from_config( $config, $error );
 		if ( ! $order ) {
-			return self::error( 'Order not found', [ 'order_id' => $order_id ] );
+			return self::error( $error, [ 'order_id' => self::get_order_id_from_config( $config ) ] );
 		}
 		return self::respond_with_order( $order );
 	}
@@ -288,14 +306,15 @@ trait OrderActionsTrait {
 	}
 
 	private static function action_add_order_note( array $config, array $input ): array {
-		$order_id = (int) ( $config['order_id'] ?? 0 );
+		$order_id = self::get_order_id_from_config( $config );
 		$note = $config['note'] ?? '';
 		if ( ! $order_id || '' === $note ) {
 			return self::error( 'Order ID and note are required' );
 		}
-		$order = wc_get_order( $order_id );
+		$error = '';
+		$order = self::require_order_from_config( $config, $error );
 		if ( ! $order ) {
-			return self::error( 'Order not found', [ 'order_id' => $order_id ] );
+			return self::error( $error, [ 'order_id' => $order_id ] );
 		}
 
 		$is_customer_note = self::parse_bool( $config['is_customer_note'] ?? false );

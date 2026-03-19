@@ -39,7 +39,13 @@ class Wordpress extends IntegrationBase {
 		return 'WordPress';
 	}
 
+	public static function get_name(): string {
+		return 'WordPress';
+	}
 
+	public static function get_icon(): string {
+		return 'WordPress.svg';
+	}
 
 	public static function get_triggers(): array {
 		return [
@@ -1245,7 +1251,7 @@ class Wordpress extends IntegrationBase {
 			[
 				'key' => 'user_email',
 				'label' => 'User Email',
-				'type' => 'expression',
+				'type' => 'email',
 				'required' => true
 			]
 		];
@@ -1698,7 +1704,7 @@ class Wordpress extends IntegrationBase {
 				[
 					'key' => 'author_email',
 					'label' => 'Author Email',
-					'type' => 'expression',
+					'type' => 'email',
 					'required' => true
 				],
 				[
@@ -1725,7 +1731,7 @@ class Wordpress extends IntegrationBase {
 				[
 					'key' => 'author_email',
 					'label' => 'Author Email',
-					'type' => 'expression',
+					'type' => 'email',
 					'required' => true
 				],
 				[
@@ -1746,7 +1752,7 @@ class Wordpress extends IntegrationBase {
 				[
 					'key' => 'user_email',
 					'label' => 'Email',
-					'type' => 'text',
+					'type' => 'email',
 					'required' => true
 				],
 				[
@@ -1786,7 +1792,7 @@ class Wordpress extends IntegrationBase {
 				[
 					'key' => 'user_email',
 					'label' => 'Email',
-					'type' => 'text'
+					'type' => 'email'
 				],
 				[
 					'key' => 'user_pass',
@@ -1850,7 +1856,7 @@ class Wordpress extends IntegrationBase {
 				[
 					'key' => 'email',
 					'label' => 'User Email',
-					'type' => 'text',
+					'type' => 'email',
 					'required' => true,
 				],
 			],
@@ -1915,7 +1921,7 @@ class Wordpress extends IntegrationBase {
 				[
 					'key' => 'user_login_or_email',
 					'label' => 'Username or Email',
-					'type' => 'text',
+					'type' => 'email',
 					'required' => true,
 				],
 			],
@@ -2433,7 +2439,7 @@ class Wordpress extends IntegrationBase {
 				[
 					'key' => 'user_login',
 					'label' => 'Username or Email',
-					'type' => 'text',
+					'type' => 'email',
 					'required' => true
 				],
 				[

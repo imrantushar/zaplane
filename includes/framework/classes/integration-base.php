@@ -197,7 +197,7 @@ abstract class IntegrationBase {
 	protected static function http_request( string $method, string $url, array $args = [] ): array {
 		$response = wp_remote_request( $url, array_merge( [ 'method' => strtoupper( $method ) ], $args ) );
 		if ( is_wp_error( $response ) ) {
-			throw new \Exception( 'HTTP request failed: ' . $response->get_error_message() );
+			throw new \Exception( 'HTTP request failed: ' . esc_html( $response->get_error_message() ) );
 		}
 		$body   = json_decode( wp_remote_retrieve_body( $response ), true ) ?? [];
 		$status = (int) wp_remote_retrieve_response_code( $response );

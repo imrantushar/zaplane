@@ -3,7 +3,7 @@
 namespace Zaplane\Framework\Console\Commands;
 
 use Zaplane\Framework\Console\Command;
-use Zaplane\Framework\Database\ORM\Migrator;
+use Zaplane\Framework\Console\DevMigrator;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -19,7 +19,7 @@ class MigrateRollbackCommand extends Command {
 
 		$this->info( "Rolling back {$steps} migration batch(es)..." );
 
-		$migrator = Migrator::getInstance();
+		$migrator = DevMigrator::getInstance();
 		$rolledBack = $migrator->rollback( $steps );
 
 		if ( empty( $rolledBack ) ) {

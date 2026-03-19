@@ -64,7 +64,7 @@ return [
 			'file' => 'storeengine.php',
 			'class' => \Zaplane\Integrations\Storeengine::class
 		],
-		'Http'                 => [
+		'http'                 => [
 			'file' => 'http.php',
 			'class' => \Zaplane\Integrations\Http::class
 		],

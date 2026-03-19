@@ -2,15 +2,14 @@ import { Button, Flex, HStack, Input, } from "@chakra-ui/react";
 import ZAPDrawer from "@ZAPComponents/Drawer";
 import { integrations } from "@ZAPUtils/helper";
 import { useFormikContext } from "formik";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
 import ZAPTab from "@ZAPComponents/Tab";
-import { __, sprintf } from "@wordpress/i18n";
+import { __ } from "@wordpress/i18n";
 import { primaryBtn } from "../../../../../../../assets/scss/chakra/recipe";
 import { useActionDrawer } from "@ZAPHooks/useActionDrawer/useActionDrawer";
 import { TOOLS } from "@ZAPHooks/useActionDrawer/helper";
 import { getIntegration } from "./helper";
-import { fetchDynamic } from "@ZAPRedux/Slices/workFlowSlice/helper";
 import SelectTab from "./SelectTab/SelectTab";
 import TestRun from "./TestRun/TestRun";
 import DrawerSearchList from "./DrawerSearchList/DrawerSearchList";
@@ -21,14 +20,14 @@ import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
 import { useDynamicFields } from "@ZAPHooks/useActionDrawer/useDynamicFields";
 import { mapEdgesForBackend, mapNodesForBackend } from "../helper";
 import { conditionVariables } from "@ZAPRedux/Slices/workFlowSlice/actions/conditonVariales";
+import './styles.scss'
 
 const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode, workFlow, isFullscreen, nodes, edges }) => {
   const { source, node } = context;
   const dispatch = useDispatch();
-  const { values, setFieldValue, resetForm ,initialValues} = useFormikContext();
+  const { values, setFieldValue, resetForm} = useFormikContext();
   const [step, setStep] = useState("select");
   const isTrigger = node?.data?.action === "trigger" && source === "node";
-  const [showWarning, setShowWarning] = useState(false);
 
   const { mode, setMode, selectedItem, setSelectedItem, search, setSearch, list, searchList } =
     useActionDrawer(open, node, source, setFieldValue, isTrigger);
@@ -77,6 +76,7 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
     selectedActionFields,
     values,
   });
+
   const resetAll = () => {
     setMode(null);
     setStep("select");
@@ -84,7 +84,6 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
     setSearch("");
     resetForm();
     onClose();
-    setShowWarning(false)
   };
 
   const handleContinue = () => {
@@ -94,7 +93,7 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
     if (step === "configure") {
 
       const payload = {
-        mode:selectedItem.mode,
+        icon:selectedItem.icon,
         app: selectedItem.id,
         name: selectedItem.name,
         event: values.actionType,
@@ -102,6 +101,7 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
           acc[f.key] = values[f.key];
           return acc;
         }, {}),
+         ...(selectedItem.mode && { mode: selectedItem.mode }),
         ...(values.hook && { hook: values.hook }),
         ...(values.connection_id && { connection_id: values.connection_id }),
       };
@@ -146,7 +146,7 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
       open={open}
       isFullscreen={isFullscreen}
       onClose={resetAll}
-      arrowClose={mode === 'app'}
+      arrowClose={['tools', 'app'].includes(mode)}
       maxWidth='700px'
       arrowOnClick={() => {
         setSelectedItem(null);
@@ -223,7 +223,7 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
             },
             {
               value: "configure", label: "Configure", content: <>
-                <Flex direction="column" gap={4}>
+                <Flex direction="column" className="action-drowar-lists" gap={4}>
                   {selectedActionFields?.length > 0 ? (
                     selectedActionFields.map((field) => (
                       <ActionFieldRenderer

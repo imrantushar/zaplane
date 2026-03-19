@@ -14,6 +14,14 @@ class Wpforms extends IntegrationBase {
 		return 'wpforms';
 	}
 
+	public static function get_name(): string {
+		return 'WPForms';
+	}
+
+	public static function get_icon(): string {
+		return 'wpforms.svg';
+	}
+
 	public static function get_triggers(): array {
 		return [
 			'form_submitted' => [

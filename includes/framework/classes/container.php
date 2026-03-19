@@ -23,7 +23,7 @@ class Container {
 		}
 
 		if ( ! isset( $this->services[ $name ] ) ) {
-			throw new ZaplaneException( "Service {$name} not registered.", [ 'service' => $name ] );
+			throw new ZaplaneException( 'Service ' . esc_html( $name ) . ' not registered.', [ 'service' => esc_html( $name ) ] );
 		}
 
 		$this->instances[ $name ] = ( $this->services[ $name ] )( $this );

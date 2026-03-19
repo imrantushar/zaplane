@@ -36,8 +36,8 @@ class Mailchimp extends IntegrationBase {
 	}
 
 	public static function get_action_config_schema( string $action ): array {
-		$common = array(
-			array(
+		$common = [
+			[
 				'key'         => 'list_id',
 				'label'       => 'Audience/List ID',
 				'type'        => 'select',
@@ -48,7 +48,7 @@ class Mailchimp extends IntegrationBase {
 				],
 				'required'    => true,
 				'help'        => 'Find it in Mailchimp → Audience → Settings → Audience name and defaults.',
-			),
+			],
 			[
 				'key'         => 'email',
 				'label'       => 'Email Address',
@@ -56,7 +56,7 @@ class Mailchimp extends IntegrationBase {
 				'placeholder' => 'name@example.com or {{email}}',
 				'required'    => true,
 			],
-		);
+		];
 
 		switch ( $action ) {
 			case 'upsert_subscriber':
@@ -64,14 +64,14 @@ class Mailchimp extends IntegrationBase {
 					$common,
 					array(
 						array(
-							'key'     => 'status',
+							'key'     => 'subscriber_status',
 							'label'   => 'Status (Existing)',
 							'type'    => 'select',
 							'options' => self::get_status_options(),
 							'help'    => 'Applied when the subscriber already exists. Leave blank to keep current status.',
 						),
 						array(
-							'key'     => 'status_if_new',
+							'key'     => 'subscriber_status_if_new',
 							'label'   => 'Status If New',
 							'type'    => 'select',
 							'options' => self::get_status_options( false ),
@@ -133,19 +133,10 @@ class Mailchimp extends IntegrationBase {
 			throw new \Exception( 'Mailchimp action type is missing' );
 		}
 
-		$api_key = self::resolve_api_key( $node['_connection_credentials'] ?? null );
+		$method = 'action_' . $action;
 
-		switch ( $action ) {
-			case 'upsert_subscriber':
-				return self::action_upsert_subscriber( $node, $input, $api_key );
-			case 'unsubscribe_subscriber':
-				return self::action_unsubscribe_subscriber( $node, $input, $api_key );
-			case 'add_tags':
-				return self::action_update_tags( $node, $input, $api_key, 'active' );
-			case 'remove_tags':
-				return self::action_update_tags( $node, $input, $api_key, 'inactive' );
-			case 'archive_subscriber':
-				return self::action_archive_subscriber( $node, $input, $api_key );
+		if ( method_exists( static::class, $method ) ) {
+			return static::$method( $node, $input );
 		}
 
 		return [
@@ -243,7 +234,63 @@ class Mailchimp extends IntegrationBase {
 		];
 	}
 
-	private static function action_upsert_subscriber( array $node, array $input, string $api_key ): array {
+	private static function resolve_node_api_key( array $node ): string {
+		return self::resolve_api_key( $node['_connection_credentials'] ?? null );
+	}
+
+	private static function action_upsert_subscriber( array $node, array $input ): array {
+		return self::run_upsert_subscriber( $node, $input, self::resolve_node_api_key( $node ) );
+	}
+
+	private static function action_unsubscribe_subscriber( array $node, array $input ): array {
+		return self::run_unsubscribe_subscriber( $node, $input, self::resolve_node_api_key( $node ) );
+	}
+
+	private static function action_add_tags( array $node, array $input ): array {
+		return self::run_update_tags( $node, $input, self::resolve_node_api_key( $node ), 'active' );
+	}
+
+	private static function action_remove_tags( array $node, array $input ): array {
+		return self::run_update_tags( $node, $input, self::resolve_node_api_key( $node ), 'inactive' );
+	}
+
+	private static function action_archive_subscriber( array $node, array $input ): array {
+		return self::run_archive_subscriber( $node, $input, self::resolve_node_api_key( $node ) );
+	}
+
+	private static function build_member_path( string $list_id, string $email, string $suffix = '' ): string {
+		$path = '/lists/' . rawurlencode( $list_id ) . '/members/' . md5( strtolower( $email ) );
+		if ( '' !== $suffix ) {
+			$path .= '/' . ltrim( $suffix, '/' );
+		}
+
+		return $path;
+	}
+
+	private static function extract_subscriber_statuses( array $data, array $input ): array {
+		$status = self::normalize_status_value(
+			self::substitute_variables( $data['subscriber_status'] ?? ( $data['status'] ?? '' ), $input )
+		);
+		$status_if_new = self::normalize_status_value(
+			self::substitute_variables( $data['subscriber_status_if_new'] ?? ( $data['status_if_new'] ?? '' ), $input )
+		);
+
+		return [ $status, $status_if_new ];
+	}
+
+	private static function subscriber_response( string $list_id, string $email, string $status, string $member_id = '' ): array {
+		return [
+			'port' => 'main',
+			'data' => [
+				'mailchimp_list_id' => $list_id,
+				'mailchimp_email'   => $email,
+				'mailchimp_status'  => $status,
+				'mailchimp_id'      => $member_id,
+			],
+		];
+	}
+
+	private static function run_upsert_subscriber( array $node, array $input, string $api_key ): array {
 		$data = self::get_node_config_data( $node );
 
 		$list_id = self::substitute_variables( $data['list_id'] ?? '', $input );
@@ -257,12 +304,9 @@ class Mailchimp extends IntegrationBase {
 			throw new \Exception( 'A valid email address is required' );
 		}
 
-		$status         = self::substitute_variables( $data['status'] ?? '', $input );
-		$status_if_new  = self::substitute_variables( $data['status_if_new'] ?? '', $input );
+		[ $status, $status_if_new ] = self::extract_subscriber_statuses( $data, $input );
 		$merge_fields_raw = $data['merge_fields'] ?? '';
 		$tags_raw         = $data['tags'] ?? '';
-
-		$subscriber_hash = md5( strtolower( $email ) );
 
 		$body = [
 			'email_address' => $email,
@@ -281,7 +325,7 @@ class Mailchimp extends IntegrationBase {
 
 		[ $response ] = self::mailchimp_request(
 			'PUT',
-			'/lists/' . rawurlencode( $list_id ) . '/members/' . $subscriber_hash,
+			self::build_member_path( $list_id, $email ),
 			$api_key,
 			$body
 		);
@@ -290,29 +334,25 @@ class Mailchimp extends IntegrationBase {
 		if ( ! empty( $tags ) ) {
 			self::mailchimp_request(
 				'POST',
-				'/lists/' . rawurlencode( $list_id ) . '/members/' . $subscriber_hash . '/tags',
+				self::build_member_path( $list_id, $email, 'tags' ),
 				$api_key,
 				[ 'tags' => $tags ]
 			);
 		}
 
-		return [
-			'port' => 'main',
-			'data' => [
-				'mailchimp_list_id' => $list_id,
-				'mailchimp_email'   => $response['email_address'] ?? $email,
-				'mailchimp_status'  => $response['status'] ?? ( '' !== $status ? $status : ( '' !== $status_if_new ? $status_if_new : 'subscribed' ) ),
-				'mailchimp_id'      => $response['id'] ?? '',
-			],
-		];
+		return self::subscriber_response(
+			$list_id,
+			$response['email_address'] ?? $email,
+			$response['status'] ?? ( '' !== $status ? $status : ( '' !== $status_if_new ? $status_if_new : 'subscribed' ) ),
+			$response['id'] ?? ''
+		);
 	}
 
-	private static function action_unsubscribe_subscriber( array $node, array $input, string $api_key ): array {
+	private static function run_unsubscribe_subscriber( array $node, array $input, string $api_key ): array {
 		$data = self::get_node_config_data( $node );
 
 		[ $list_id, $email ] = self::extract_list_and_email( $data, $input );
 
-		$subscriber_hash = md5( strtolower( $email ) );
 		$body = [
 			'email_address' => $email,
 			'status'        => 'unsubscribed',
@@ -321,23 +361,20 @@ class Mailchimp extends IntegrationBase {
 
 		[ $response ] = self::mailchimp_request(
 			'PUT',
-			'/lists/' . rawurlencode( $list_id ) . '/members/' . $subscriber_hash,
+			self::build_member_path( $list_id, $email ),
 			$api_key,
 			$body
 		);
 
-		return [
-			'port' => 'main',
-			'data' => [
-				'mailchimp_list_id' => $list_id,
-				'mailchimp_email'   => $response['email_address'] ?? $email,
-				'mailchimp_status'  => $response['status'] ?? 'unsubscribed',
-				'mailchimp_id'      => $response['id'] ?? '',
-			],
-		];
+		return self::subscriber_response(
+			$list_id,
+			$response['email_address'] ?? $email,
+			$response['status'] ?? 'unsubscribed',
+			$response['id'] ?? ''
+		);
 	}
 
-	private static function action_update_tags( array $node, array $input, string $api_key, string $status ): array {
+	private static function run_update_tags( array $node, array $input, string $api_key, string $status ): array {
 		$data = self::get_node_config_data( $node );
 
 		[ $list_id, $email ] = self::extract_list_and_email( $data, $input );
@@ -358,7 +395,7 @@ class Mailchimp extends IntegrationBase {
 
 		self::mailchimp_request(
 			'POST',
-			'/lists/' . rawurlencode( $list_id ) . '/members/' . md5( strtolower( $email ) ) . '/tags',
+			self::build_member_path( $list_id, $email, 'tags' ),
 			$api_key,
 			[ 'tags' => $tags ]
 		);
@@ -376,25 +413,18 @@ class Mailchimp extends IntegrationBase {
 		];
 	}
 
-	private static function action_archive_subscriber( array $node, array $input, string $api_key ): array {
+	private static function run_archive_subscriber( array $node, array $input, string $api_key ): array {
 		$data = self::get_node_config_data( $node );
 
 		[ $list_id, $email ] = self::extract_list_and_email( $data, $input );
 
 		self::mailchimp_request(
 			'DELETE',
-			'/lists/' . rawurlencode( $list_id ) . '/members/' . md5( strtolower( $email ) ),
+			self::build_member_path( $list_id, $email ),
 			$api_key
 		);
 
-		return [
-			'port' => 'main',
-			'data' => [
-				'mailchimp_list_id' => $list_id,
-				'mailchimp_email'   => $email,
-				'mailchimp_status'  => 'archived',
-			],
-		];
+		return self::subscriber_response( $list_id, $email, 'archived' );
 	}
 
 	private static function mailchimp_request( string $method, string $path, string $api_key, ?array $body = null ): array {
@@ -416,7 +446,7 @@ class Mailchimp extends IntegrationBase {
 
 		if ( $status >= 400 || ( isset( $response_body['status'] ) && (int) $response_body['status'] >= 400 ) ) {
 			$detail = $response_body['detail'] ?? $response_body['title'] ?? 'Unknown error';
-			throw new \Exception( 'Mailchimp API error: ' . $detail );
+			throw new \Exception( 'Mailchimp API error: ' . esc_html( $detail ) );
 		}
 
 		return [ $response_body, $status ];
@@ -440,23 +470,23 @@ class Mailchimp extends IntegrationBase {
 	private static function get_status_options( bool $allow_empty = true ): array {
 		$options = array(
 			array(
-				'value' => 'subscribed',
+				'value' => 'mailchimp_subscribed',
 				'label' => 'Subscribed'
 			),
 			array(
-				'value' => 'pending',
+				'value' => 'mailchimp_pending',
 				'label' => 'Pending (double opt-in)'
 			),
 			array(
-				'value' => 'unsubscribed',
+				'value' => 'mailchimp_unsubscribed',
 				'label' => 'Unsubscribed'
 			),
 			array(
-				'value' => 'cleaned',
+				'value' => 'mailchimp_cleaned',
 				'label' => 'Cleaned'
 			),
 			array(
-				'value' => 'transactional',
+				'value' => 'mailchimp_transactional',
 				'label' => 'Transactional'
 			),
 		);
@@ -469,6 +499,15 @@ class Mailchimp extends IntegrationBase {
 		}
 
 		return $options;
+	}
+
+	private static function normalize_status_value( string $status ): string {
+		$status = sanitize_key( $status );
+		if ( 0 === strpos( $status, 'mailchimp_' ) ) {
+			return substr( $status, strlen( 'mailchimp_' ) );
+		}
+
+		return $status;
 	}
 
 	private static function parse_merge_fields( $raw, array $input ): array {

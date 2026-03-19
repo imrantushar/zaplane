@@ -1,0 +1,54 @@
+/**
+ * Zaplane Icons.
+ * @version 1.0.0
+ */
+
+@use 'sass:map';
+
+${{ name }}-font: "{{ name }}";
+
+//noinspection CssUnknownTarget
+@font-face {
+    font-family: ${{ name }}-font;
+    src: url('../fonts/{{ name }}.eot');
+	src: url("../fonts/{{ name }}.eot#iefix") format("embedded-opentype"),
+	     url("../fonts/{{ name }}.ttf") format("truetype"),
+	     url("../fonts/{{ name }}.woff2") format("woff2"),
+	     url("../fonts/{{ name }}.woff") format("woff"),
+	     url("../fonts/{{ name }}.svg#{{ name }}") format("svg");
+}
+
+//noinspection CssNoGenericFontName
+{{# if selector }}
+{{ selector }}:before {
+{{ else }}
+[class^="{{prefix}}-"], [class*=" {{prefix}}-"], [class^="{{prefix}}-"]:before, [class*=" {{prefix}}-"]:before {
+{{/ if }}
+    /* use !important to prevent issues with browser extensions that change fonts */
+    font-family: {{ name }} !important;
+    speak: never;
+    font-style: normal;
+    font-weight: normal !important;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+    /* Better Font Rendering =========== */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+${{ name }}-map: (
+{{# each codepoints }}
+    "{{ @key }}": "\\{{ codepoint this }}",
+{{/ each }}
+);
+
+{{# each codepoints }}
+{{# if ../selector }}
+{{ ../selector }}.{{ ../prefix }}-{{ @key }}:before {
+{{ else }}
+{{ tag }}.{{ ../prefix }}-{{ @key }}:before {
+{{/ if }}
+    content: map.get(${{ ../name }}-map, "{{ @key }}");
+}
+{{/ each }}

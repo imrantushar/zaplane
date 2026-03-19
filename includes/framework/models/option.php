@@ -24,8 +24,9 @@ class Option extends WpModel {
 
 	public function getValue() {
 		$value = $this->option_value;
-		$unserialized = @unserialize( $value );
-		return $unserialized !== false ? $unserialized : $value;
+		// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.serialize_serialize -- WordPress options use serialization.
+		$unserialized = maybe_unserialize( $value );
+		return $unserialized !== $value ? $unserialized : $value;
 	}
 
 	public static function get( string $name, $default = null ) {
@@ -37,6 +38,7 @@ class Option extends WpModel {
 	}
 
 	public static function set( string $name, $value, string $autoload = 'yes' ): bool {
+		// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.serialize_serialize -- Required for WP option storage compatibility.
 		$serialized = is_array( $value ) || is_object( $value ) ? serialize( $value ) : $value;
 
 		$existing = static::where( 'option_name', $name )->first();

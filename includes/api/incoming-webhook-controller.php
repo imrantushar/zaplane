@@ -109,6 +109,7 @@ class IncomingWebhookController extends WP_REST_Controller {
 
 		$hook = $triggers[ $event ]['hook'];
 
+		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound -- Dynamic hook dispatched from integration config.
 		do_action( $hook, $payload );
 
 		return rest_ensure_response([

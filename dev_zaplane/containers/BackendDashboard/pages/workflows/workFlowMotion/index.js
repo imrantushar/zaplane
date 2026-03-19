@@ -1,13 +1,13 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { ReactFlowProvider, useEdgesState, useNodesState } from "@xyflow/react";
-import FlowCanvas from "./flowCanvas/FlowCanvas";
+import FlowCanvas from "./FlowCanvas/FlowCanvas";
 import { Formik } from "formik";
 import { generateFlowHash, mapEdgesForBackend, mapNodesForBackend } from "./helper";
 import { useDispatch, useSelector } from "react-redux";
-import { createNodeIdGenerator } from "./flowCanvas/helper";
 import { Box, Flex } from "@chakra-ui/react";
 import { updateWorkFlow } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow";
 import NavigationBlocker from "@ZAPComponents/NavigationBlocker";
+import { createNodeIdGenerator } from "./FlowCanvas/helper";
 
 export default function Workflows({ id }) {
   const nodeIdRef = useRef(createNodeIdGenerator());
@@ -20,6 +20,7 @@ export default function Workflows({ id }) {
       id: getNewNodeId(),
       type: 'custom',
       data: {
+        icon:'plus',
         app: "Select an app",
         action: 'trigger',
         config: {}
@@ -36,6 +37,7 @@ export default function Workflows({ id }) {
         id: getNewNodeId(),
         type: "custom",
         data: {
+           icon:'plus',
           app: "Select an app",
           action: "trigger",
           config: {},

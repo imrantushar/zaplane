@@ -32,6 +32,10 @@ class Woocommerce extends IntegrationBase {
 		return 'woocommerce';
 	}
 
+	public static function get_icon(): string {
+		return 'woo.svg';
+	}
+
 
 
 	public static function get_triggers(): array {
@@ -135,7 +139,7 @@ class Woocommerce extends IntegrationBase {
 			return false;
 		}
 
-		if ( in_array( $event, self::ORDER_STATUS_EVENTS, true ) ) {
+		if ( in_array( $event, self::$order_status_events, true ) ) {
 			$payload = self::order_status_payload_from_args( $args );
 			return $payload ? $payload : false;
 		}
@@ -300,7 +304,7 @@ class Woocommerce extends IntegrationBase {
 					'type' => 'expression'
 				],
 				[
-					'key' => 'status',
+					'key' => 'order_status',
 					'label' => 'Order Status',
 					'type' => 'select',
 					'options' => self::order_status_options()
@@ -324,7 +328,7 @@ class Woocommerce extends IntegrationBase {
 			'update_order' => [
 				...self::field_order_id(),
 				[
-					'key' => 'status',
+					'key' => 'order_status',
 					'label' => 'Order Status',
 					'type' => 'select',
 					'options' => self::order_status_options()
@@ -368,7 +372,7 @@ class Woocommerce extends IntegrationBase {
 			'update_order_status' => [
 				...self::field_order_id(),
 				[
-					'key' => 'status',
+					'key' => 'order_status',
 					'label' => 'Order Status',
 					'type' => 'select',
 					'options' => self::order_status_options(),
@@ -391,7 +395,7 @@ class Woocommerce extends IntegrationBase {
 			],
 			'get_total_orders_count' => [
 				[
-					'key' => 'status',
+					'key' => 'order_status',
 					'label' => 'Order Status',
 					'type' => 'select',
 					'options' => self::order_status_options()
@@ -405,7 +409,7 @@ class Woocommerce extends IntegrationBase {
 			],
 			'get_orders_by_status' => [
 				[
-					'key' => 'status',
+					'key' => 'order_status',
 					'label' => 'Order Status',
 					'type' => 'select',
 					'options' => self::order_status_options(),
@@ -517,7 +521,7 @@ class Woocommerce extends IntegrationBase {
 					'required' => true
 				],
 				[
-					'key' => 'status',
+					'key' => 'product_status',
 					'label' => 'Status',
 					'type' => 'select',
 					'options' => self::product_status_options()
@@ -623,7 +627,7 @@ class Woocommerce extends IntegrationBase {
 					'type' => 'boolean'
 				],
 				[
-					'key' => 'status',
+					'key' => 'product_status',
 					'label' => 'Status',
 					'type' => 'select',
 					'options' => self::product_status_options()
@@ -637,7 +641,7 @@ class Woocommerce extends IntegrationBase {
 					'type' => 'text'
 				],
 				[
-					'key' => 'status',
+					'key' => 'product_status',
 					'label' => 'Status',
 					'type' => 'select',
 					'options' => self::product_status_options()
@@ -787,7 +791,7 @@ class Woocommerce extends IntegrationBase {
 			'update_product_status' => [
 				...self::field_product_id(),
 				[
-					'key' => 'status',
+					'key' => 'product_status',
 					'label' => 'Status',
 					'type' => 'select',
 					'options' => self::product_status_options(),

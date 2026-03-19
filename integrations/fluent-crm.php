@@ -29,6 +29,14 @@ class FluentCrm extends IntegrationBase {
 		return 'fluentcrm';
 	}
 
+	public static function get_name(): string {
+		return 'FluentCRM';
+	}
+
+	public static function get_icon(): string {
+		return 'fluentcrm-logo-icon.svg';
+	}
+
 	public static function get_triggers(): array {
 		return [
 			'added_tag' => [
@@ -389,7 +397,7 @@ class FluentCrm extends IntegrationBase {
 			[
 				'key' => 'email',
 				'label' => 'Email Address',
-				'type' => 'expression',
+				'type' => 'email',
 				'required' => true
 			]
 		];

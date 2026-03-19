@@ -18,6 +18,10 @@ class Memberpress extends IntegrationBase {
 		return 'memberpress';
 	}
 
+	public static function get_icon(): string {
+		return 'memberpress.svg';
+	}
+
 	public static function get_triggers(): array {
 		return [
 			'member_added' => [
@@ -349,7 +353,7 @@ class Memberpress extends IntegrationBase {
 					'options' => self::get_membership_period_type_options()
 				],
 				[
-					'key' => 'status',
+					'key' => 'membership_status',
 					'label' => 'Status',
 					'type' => 'select',
 					'options' => self::get_post_status_options()
@@ -469,7 +473,7 @@ class Memberpress extends IntegrationBase {
 					'options' => self::get_membership_period_type_options()
 				],
 				[
-					'key' => 'status',
+					'key' => 'membership_status',
 					'label' => 'Status',
 					'type' => 'select',
 					'options' => self::get_post_status_options()
@@ -585,7 +589,7 @@ class Memberpress extends IntegrationBase {
 					'type' => 'number'
 				],
 				[
-					'key' => 'status',
+					'key' => 'transaction_status',
 					'label' => 'Status',
 					'type' => 'select',
 					'options' => self::get_transaction_status_options()
@@ -624,7 +628,7 @@ class Memberpress extends IntegrationBase {
 					'required' => true
 				],
 				[
-					'key' => 'status',
+					'key' => 'transaction_status',
 					'label' => 'Status',
 					'type' => 'select',
 					'options' => self::get_transaction_status_options(),
@@ -685,7 +689,7 @@ class Memberpress extends IntegrationBase {
 					'options' => self::get_period_type_options()
 				],
 				[
-					'key' => 'status',
+					'key' => 'subscription_status',
 					'label' => 'Status',
 					'type' => 'select',
 					'options' => self::get_subscription_status_options()
@@ -714,7 +718,7 @@ class Memberpress extends IntegrationBase {
 					'required' => true
 				],
 				[
-					'key' => 'status',
+					'key' => 'subscription_status',
 					'label' => 'Status',
 					'type' => 'select',
 					'options' => self::get_subscription_status_options(),
@@ -783,35 +787,15 @@ class Memberpress extends IntegrationBase {
 	public static function execute_node( array $node, array $input ): array {
 		$event = $node['data']['event'] ?? ( $node['config']['action'] ?? '' );
 		$config = $node['data']['config'] ?? ( $node['config']['data'] ?? [] );
+		$method = 'action_' . $event;
 
-		switch ( $event ) {
-			case 'create_member':
-				return static::action_create_member( $config, $input );
-			case 'create_membership':
-				return static::action_create_membership( $config, $input );
-			case 'update_membership':
-				return static::action_update_membership( $config, $input );
-			case 'create_transaction':
-				return static::action_create_transaction( $config, $input );
-			case 'update_transaction_status':
-				return static::action_update_transaction_status( $config, $input );
-			case 'refund_transaction':
-				return static::action_refund_transaction( $config, $input );
-			case 'create_subscription':
-				return static::action_create_subscription( $config, $input );
-			case 'update_subscription_status':
-				return static::action_update_subscription_status( $config, $input );
-			case 'cancel_subscription':
-				return static::action_cancel_subscription( $config, $input );
-			case 'suspend_subscription':
-				return static::action_suspend_subscription( $config, $input );
-			case 'resume_subscription':
-				return static::action_resume_subscription( $config, $input );
-			default:
-				return [
-					'port' => 'main',
-					'data' => $input
-				];
-		}//end switch
+		if ( method_exists( static::class, $method ) ) {
+			return static::$method( $config, $input );
+		}
+
+		return [
+			'port' => 'main',
+			'data' => $input
+		];
 	}
 }

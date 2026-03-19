@@ -10,6 +10,10 @@ class Stripe extends IntegrationBase {
 		return 'stripe';
 	}
 
+	public static function get_icon(): string {
+		return 'stripe.svg';
+	}
+
 	public static function get_triggers(): array {
 		return [
 			'payment_succeeded' => [
@@ -29,6 +33,7 @@ class Stripe extends IntegrationBase {
 
 	public static function execute_node( array $node, array $input ): array {
 		if ( ( $node['config']['action'] ?? '' ) === 'charge_customer' ) {
+			return [];
 		}
 		return [
 			'port' => 'main',
