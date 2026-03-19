@@ -17,339 +17,151 @@ class Profilebuilder extends IntegrationBase
     public static function get_triggers(): array
     {
         return [
-
             'user_registration' => [
                 'label' => 'User Registration',
-                'hook' => 'wppb_register_success'
+                'hook'  => 'wppb_register_success'
             ],
             'user_profile_update' => [
                 'label' => 'User Profile Update',
-                'hook' => 'wppb_edit_profile_success'
+                'hook'  => 'wppb_edit_profile_success'
             ],
             'user_email_confirmation' => [
                 'label' => 'User Email Confirmation',
-                'hook' => 'wppb_activate_user'
+                'hook'  => 'wppb_activate_user'
             ],
             'email_send_by_profile_builder' => [
                 'label' => 'Email Send By Profile Builder',
-                'hook' => 'wppb_after_sending_email'
+                'hook'  => 'wppb_after_sending_email'
             ],
             'user_approved_by_admin' => [
                 'label' => 'User Approved By Admin',
-                'hook' => 'wppb_after_user_approval'
+                'hook'  => 'wppb_after_user_approval'
             ],
             'user_unapproved_by_admin' => [
                 'label' => 'User UnApproved By Admin',
-                'hook' => 'wppb_after_user_unapproval'
+                'hook'  => 'wppb_after_user_unapproval'
             ],
-
         ];
     }
 
+    /**
+     * ট্রিগারের ডেটা রিজল্ভ করে
+     *
+     * @param array $node নোড কনফিগারেশন
+     * @param array $args হুক আর্গুমেন্ট
+     * @return array|false
+     */
     public static function resolve_trigger(array $node, array $args)
     {
-        switch ($node['event']) {
+        $event = $node['event'];
+        $data  = [];
+
+        switch ($event) {
             case 'user_registration':
-                $form_data = $args[0] ?? [];
-                if (!$form_data) {
-                    return [];
+                // হুক: wppb_register_success( $request, $form_name, $user_id )
+                if ( isset( $args[0], $args[1], $args[2] ) ) {
+                    $data = [
+                        'user_id'   => (int) $args[2],
+                        'form_name' => sanitize_text_field( $args[1] ),
+                        'request'   => $args[0], // সংবেদনশীল তথ্য থাকতে পারে, প্রয়োজনে ফিল্টার করুন
+                    ];
+                    $data = array_merge( $data, self::get_user_info( $args[2] ) );
                 }
-                $result  = [];
-                foreach ($form_data as $form_field  => $value) {
-                    $result[$form_field]  = $value;
-                }
-                return $result;
+                break;
 
             case 'user_profile_update':
-                $form_data = $args[0] ?? [];
-                if (!$form_data) {
-                    return [];
+                // হুক: wppb_edit_profile_success( $request, $form_name, $user_id )
+                if ( isset( $args[0], $args[1], $args[2] ) ) {
+                    $data = [
+                        'user_id'   => (int) $args[2],
+                        'form_name' => sanitize_text_field( $args[1] ),
+                        'request'   => $args[0],
+                    ];
+                    $data = array_merge( $data, self::get_user_info( $args[2] ) );
                 }
-                $result  = [];
-                foreach ($form_data as $form_field  => $value) {
-                    $result[$form_field]  = $value;
-                }
-                return $result;
+                break;
 
             case 'user_email_confirmation':
-                //need to ceck later
-                $form_fields = $args[0] ?? [];
-                $form_meta = $args[2] ?? [];
-                return [
+                // হুক: wppb_activate_user( $user_id, $password, $meta )
+                if ( isset( $args[0], $args[1], $args[2] ) ) {
+                    $data = [
+                        'user_id'  => (int) $args[0],
+                        'password' => $args[1], // এনক্রিপ্টেড পাসওয়ার্ড
+                        'meta'     => $args[2],
+                    ];
+                    $data = array_merge( $data, self::get_user_info( $args[0] ) );
+                }
+                break;
 
-                    'submitted_at' => current_time('mysql'),
-                ];
             case 'email_send_by_profile_builder':
-                $email_data = $args ?? [];
-                if (!$email_data) {
-                    return [];
+                // হুক: wppb_after_sending_email( $sent, $to, $subject, $message, $send_email, $context )
+                if ( isset( $args[0], $args[1], $args[2], $args[3], $args[4], $args[5] ) ) {
+                    $data = [
+                        'sent'       => (bool) $args[0],
+                        'to'         => sanitize_email( $args[1] ),
+                        'subject'    => sanitize_text_field( $args[2] ),
+                        'message'    => wp_kses_post( $args[3] ),
+                        'send_email' => $args[4], // অ্যারে বা অন্যান্য
+                        'context'    => $args[5],
+                    ];
                 }
-                return [
-                    'mail_to' => $email_data[1] ?? '',
-                    'notify_message' => $email_data[2] ?? '',
-                    'message_body' => $email_data[3] ?? '',
-                    'current_time' => current_time('mysql'),
-                ];
+                break;
+
             case 'user_approved_by_admin':
-                $form_fields = $args[0] ?? [];
-                $form_meta = $args[2] ?? [];
-                return [
+                // হুক: wppb_after_user_approval( $user_id )
+                if ( isset( $args[0] ) ) {
+                    $user_id = (int) $args[0];
+                    $data    = [ 'user_id' => $user_id ];
+                    $data    = array_merge( $data, self::get_user_info( $user_id ) );
+                }
+                break;
 
-                    'submitted_at' => current_time('mysql'),
-                ];
             case 'user_unapproved_by_admin':
-                $form_fields = $args[0] ?? [];
-                $form_meta = $args[2] ?? [];
-                return [
-
-                    'submitted_at' => current_time('mysql'),
-                ];
-        }
-
-        if ( in_array( $trigger, ['tutor_quiz_course_attempt'], true ) ) {
-            $options = [
-                ['label' => 'Any Quiz', 'value' => 'any'],
-            ];
-            if ( function_exists( 'tutor' ) ) {
-                $quizzes = get_posts([
-                    'post_type'      => 'tutor_quiz',
-                    'post_status'    => 'publish',
-                    'posts_per_page' => -1,
-                ]);
-
-                foreach ( $quizzes as $quiz ) {
-                    $options[] = [
-                        'label' => $quiz->post_title,
-                        'value' => $quiz->ID,
-                    ];
+                // হুক: wppb_after_user_unapproval( $user_id )
+                if ( isset( $args[0] ) ) {
+                    $user_id = (int) $args[0];
+                    $data    = [ 'user_id' => $user_id ];
+                    $data    = array_merge( $data, self::get_user_info( $user_id ) );
                 }
-            }
-            return [
-                [
-                    'key'      => 'quiz_id',
-                    'label'    => 'Quiz',
-                    'type'     => 'select',
-                    'options'  => $options,
-                    'required' => true,
-                ],
-            ];
+                break;
+
+            default:
+                return false;
         }
 
-        if ( $trigger === 'quiz_target' ) {
-
-            $options = [
-                ['label' => 'Any Quiz', 'value' => 'any'],
-            ];
-
-            if ( function_exists( 'tutor' ) ) {
-                $quizzes = get_posts([
-                    'post_type'      => 'tutor_quiz',
-                    'post_status'    => 'publish',
-                    'posts_per_page' => -1,
-                ]);
-
-                foreach ( $quizzes as $quiz ) {
-                    $options[] = [
-                        'label' => $quiz->post_title,
-                        'value' => $quiz->ID,
-                    ];
-                }
-            }
-
-            return [
-                [
-                    'key'      => 'quiz_id',
-                    'label'    => 'Quiz',
-                    'type'     => 'select',
-                    'options'  => $options,
-                    'required' => true,
-                ],
-                [
-                    'key'      => 'target_percentage',
-                    'label'    => 'Target Percentage (%)',
-                    'type'     => 'number',
-                    'required' => true,
-                ],
-            ];
+        // ট্রিগার হওয়ার সময় সংযুক্ত করুন
+        if ( ! empty( $data ) ) {
+            $data['triggered_at'] = current_time( 'mysql' );
         }
 
-        if ( in_array( $trigger, ['lesson_complete'], true ) ) {
-            $options = [
-                ['label' => 'Any lesson', 'value' => 'any'],
-            ];
-            if ( function_exists( 'tutor' ) ) {
-                $lessons = get_posts([
-                    'post_type'      => 'lesson',
-                    'post_status'    => 'publish',
-                    'posts_per_page' => -1,
-                ]);
-
-                foreach ( $lessons as $lesson ) {
-                    $options[] = [
-                        'label' => $lesson->post_title,
-                        'value' => $lesson->ID,
-                    ];
-                }
-            }
-            return [
-                [
-                    'key'      => 'lesson_id',
-                    'label'    => 'Lesson',
-                    'type'     => 'select',
-                    'options'  => $options,
-                    'required' => true,
-                ],
-            ];
-        }
-        return [];
+        return $data;
     }
 
-    public static function resolve_trigger( array $node, array $args ) {
-        switch ( $node['event'] ) {
-            case 'user_enroll_course':
-                $course_id = $args[0] ?? null;
-                $enroll_id = $args[1] ?? null;
-
-                if ( ! $course_id || ! $enroll_id ) return false;
-
-                $selected_course = $node['data']['config']['course_id'] ?? 'any';
-
-                if ( $selected_course !== 'any' && (int)$selected_course !== (int)$course_id ) {
-                    return false;
-                }
-
-                return [
-                    'success'   => true,
-                    'course_id' => $course_id,
-                    'enroll_id' => $enroll_id,
-                ];
-
-            case 'course_complete':
-                $course_id = $args[0] ?? null;
-                $user_id   = $args[1] ?? get_current_user_id();
-
-                if ( ! $course_id || ! $user_id ) return false;
-
-                $selected_course = $node['data']['config']['course_id'] ?? 'any';
-
-                if ( $selected_course !== 'any' && (int)$selected_course !== (int)$course_id ) {
-                    return false;
-                }
-
-                $course = get_post( $course_id );
-                $user   = get_userdata( $user_id );
-
-                if ( ! $course || ! $user ) return false;
-
-                return [
-                    'success'      => true,
-                    'course_id'    => $course->ID,
-                    'course_title' => $course->post_title,
-                    'course_url'   => get_permalink( $course->ID ),
-                    'user_id'      => $user_id,
-                    'user_email'   => $user->user_email,
-                    'first_name'   => $user->first_name,
-                    'last_name'    => $user->last_name,
-                ];
-
-           case 'lesson_complete':
-                $lesson_id = $args[0] ?? null;
-                $user_id   = $args[1] ?? get_current_user_id();
-
-                if ( ! $lesson_id || ! $user_id ) return false;
-
-                $selected_lesson = $node['data']['config']['lesson_id'] ?? 'any';
-
-                if ( $selected_lesson !== 'any' && (int)$selected_lesson !== (int)$lesson_id ) {
-                    return false;
-                }
-
-                return [
-                    'success'   => true,
-                    'lesson_id' => $lesson_id,
-                    'user_id'   => $user_id,
-                ];
-
-            case 'tutor_quiz_course_attempt':
-                $attempt_id = $args[0] ?? null;
-                if ( ! $attempt_id ) return false;
-
-                $attempt = tutor_utils()->get_attempt( $attempt_id );
-                if ( ! $attempt ) return false;
-
-                $quiz_id = $attempt->quiz_id ?? null;
-                $user_id = $attempt->user_id ?? null;
-
-                if ( ! $quiz_id || ! $user_id ) return false;
-
-                $selected_quiz = $node['data']['config']['quiz_id'] ?? 'any';
-
-                if ( $selected_quiz !== 'any' && (int) $selected_quiz !== (int) $quiz_id ) {
-                    return false;
-                }
-
-                return [
-                    'success' => true,
-                    'quiz_id' => $quiz_id,
-                    'user_id' => $user_id,
-                ];
-
-
-            case 'quiz_target':
-               $attempt_id = $args[0] ?? null;
-                if ( ! $attempt_id ) return false;
-
-                $attempt = tutor_utils()->get_attempt( $attempt_id );
-                if ( ! $attempt ) return false;
-
-                $quiz_id = $attempt->quiz_id ?? null;
-                $user_id = $attempt->user_id ?? null;
-                $earned  = $attempt->earned_marks ?? 0;
-                $total   = $attempt->total_marks ?? 0;
-
-                if ( ! $quiz_id || ! $user_id || ! $total ) return false;
-
-                $selected_quiz = $node['data']['config']['quiz_id'] ?? 'any';
-
-                if ( $selected_quiz !== 'any' && (int) $selected_quiz !== (int) $quiz_id ) {
-                    return false;
-                }
-
-                $percentage = ( $earned / $total ) * 100;
-                $target     = (float) ( $node['data']['config']['target_percentage'] ?? 0 );
-
-                if ( $percentage < $target ) return false;
-
-                return [
-                    'success'     => true,
-                    'quiz_id'     => $quiz_id,
-                    'user_id'     => $user_id,
-                    'score'       => $earned,
-                    'total_marks' => $total,
-                    'percentage'  => round( $percentage, 2 ),
-                ];
+    /**
+     * ইউজারের বেসিক তথ্য সংগ্রহ করে
+     *
+     * @param int $user_id
+     * @return array
+     */
+    private static function get_user_info( $user_id )
+    {
+        $user = get_userdata( $user_id );
+        if ( ! $user ) {
+            return [];
         }
-        return false;
-    }
 
-    public static function get_actions(): array {
         return [
+            'user_email'   => $user->user_email,
+            'user_login'   => $user->user_login,
+            'display_name' => $user->display_name,
+            'user_url'     => $user->user_url,
+            'registered'   => $user->user_registered,
         ];
     }
 
-    public static function get_action_config_schema( string $action ): array {
-
-        $schemas = [];
-
-        return $schemas[$action] ?? [];
-    }
-
-    public static function execute_node( array $node, array $input ): array {
-
-        $config = $node['data']['config'] ?? [];
-
-        switch ( $node['data']['event'] ?? '' ) {
-        }
-        return ['port'=>'main','data'=>$input];
+    public static function execute_node(array $node, array $input): array
+    {
+        // নোড এক্সিকিউশন লজিক (প্রয়োজনে পরিবর্তন করুন)
+        return ['port' => 'main', 'data' => $input];
     }
 }
