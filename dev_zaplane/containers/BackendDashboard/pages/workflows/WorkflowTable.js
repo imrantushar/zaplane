@@ -1,14 +1,9 @@
-import { useMemo, useCallback, useState, useEffect } from "react";
+import {  useState, useEffect } from "react";
 import { __ } from "@wordpress/i18n";
-import { Text, Box, Icon, HStack, Flex } from "@chakra-ui/react";
-import Select from "react-select";
+import { Text, Box, Icon, HStack} from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-
 import ListTable from "@ZAPComponents/ListTable";
-import OptionMenu from "@ZAPComponents/OptionMenu";
-
-import { FiEdit, FiTrash2 } from "react-icons/fi";
 import { formatDateTime, route_path } from "@ZAPUtils/helper";
 import { statusOptions } from "./helper";
 
@@ -19,28 +14,27 @@ import {
 } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow";
 import StatusOptions from "@ZAPComponents/StatusOptions";
 import ZAPTooltip from "@ZAPComponents/ZAPTooltip";
-import { FaRegEdit } from "react-icons/fa";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { LiaEditSolid } from "react-icons/lia";
 import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
 import ZAPDrawer from "@ZAPComponents/Drawer";
 import LogDetails from "@ZAPComponents/LogDetails";
 import { nodeLogsRunDetails } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlowLogs";
-import { HistoryIcon, TableArrow } from "@ZAPUtils/icons";
+import { HistoryIcon } from "@ZAPUtils/icons";
+import ZAPActionBar from "@ZAPComponents/ZAPActionBar";
 
 const WorkflowTable = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [activeRunId, setActiveRunId] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
-
-
   const {
     allWorkFlows,
     totalItems,
     currentPage,
     perPage,
   } = useSelector((state) => state.workflows);
+  const [selection, setSelection] = useState([]);
   const [loading, setLoading] = useState(allWorkFlows.length === 0);
   const handleRefresh = async (page = 1, per_page = 10) => {
     setLoading(true)
@@ -62,12 +56,9 @@ const WorkflowTable = () => {
   const columns = [
     {
       name: (
-        <Flex gap="2px" alignItems='center'>
-          <Text className="zaplane-label">
-            {__("Title", "zaplane")}
-          </Text>
-          <Icon as={TableArrow} />
-        </Flex>
+        <Text className="zaplane-label">
+          {__("Title", "zaplane")}
+        </Text>
       ),
       cell: (row) => (
         <Text
@@ -90,12 +81,10 @@ const WorkflowTable = () => {
     },
     {
       name: (
-        <Flex gap="2px" alignItems='center' justifyContent="center" ml='-32px'>
-          <Text className="zaplane-label">
-            {__("Created At", "zaplane")}
-          </Text>
-          <Icon as={TableArrow} />
-        </Flex>
+        <Text className="zaplane-label" ml='-33px'>
+          {__("Created At", "zaplane")}
+        </Text>
+
       ),
       cell: (row) => {
         const { date, time } = formatDateTime(row.created_at);
@@ -114,12 +103,10 @@ const WorkflowTable = () => {
 
     {
       name: (
-        <Flex gap="2px" alignItems='center' justifyContent="center">
-          <Text className="zaplane-label">
-            {__("Sucess Run", "zaplane")}
-          </Text>
-          <Icon as={TableArrow} />
-        </Flex>
+        <Text className="zaplane-label">
+          {__("Sucess Run", "zaplane")}
+        </Text>
+
       ),
       cell: (row) => (
         <ZAPLabel label={row?.success_runs} type={"simple"} />
@@ -129,12 +116,9 @@ const WorkflowTable = () => {
     },
     {
       name: (
-        <Flex gap="2px" alignItems='center' justifyContent="center" >
-          <Text className="zaplane-label">
-            {__("Failed Runs", "zaplane")}
-          </Text>
-          <Icon as={TableArrow} />
-        </Flex>
+        <Text className="zaplane-label">
+          {__("Failed Runs", "zaplane")}
+        </Text>
       ),
       cell: (row) => (
         <ZAPLabel label={row?.failed_runs} type={"simple"} />
@@ -144,12 +128,10 @@ const WorkflowTable = () => {
     },
     {
       name: (
-        <Flex gap="2px" alignItems='center' justifyContent="center" ml='-32px'>
-          <Text className="zaplane-label">
-            {__("Status", "zaplane")}
-          </Text>
-          <Icon as={TableArrow} />
-        </Flex>
+        <Text className="zaplane-label">
+          {__("Status", "zaplane")}
+        </Text>
+
       ),
       cell: (row) => {
         const handleStatusChange = (row, newStatus) => {
@@ -253,17 +235,34 @@ const WorkflowTable = () => {
       textAlign: "center",
     },
   ]
-
+  const handleDeleteSelected = async () => {
+    if (!selection.length) return;
+    try {
+      await Promise.all(
+        selection
+          .map((row) => row?.id)
+          .filter(Boolean)
+          .map((id) => dispatch(deleteWorkFlow(id)))
+      );
+      setSelection([]);
+      dispatch(getWorkFlow({ page: currentPage, per_page: perPage }));
+    } catch (e) {
+      console.error("Failed to delete selected team members", e);
+    }
+  };
 
   return (
     <>
       <ListTable
         columns={columns}
-        data={Array.isArray(allWorkFlows)? allWorkFlows : []}
+        data={Array.isArray(allWorkFlows) ? allWorkFlows : []}
         isRowSelectable={true}
         showSubHeader={false}
         showColumnFilter={false}
-       showPagination={ allWorkFlows.length >= 10 }
+        getSelectRowValue={(rows) => {
+          setSelection(rows || []);
+        }}
+        showPagination={allWorkFlows.length >= 10}
         noDataText={__("No workflows found", "zaplane")}
         dataFetchingStatus={loading}
         suffix="workflow-table"
@@ -273,7 +272,11 @@ const WorkflowTable = () => {
         onChangePage={handlePageChange}
         onChangeItemsPerPage={handlePerPageChange}
       />
-
+      <ZAPActionBar
+        selection={selection}
+        onDelete={handleDeleteSelected}
+        onClose={() => setSelection([])}
+      />
       <ZAPDrawer
         open={drawerOpen}
         arrowClose

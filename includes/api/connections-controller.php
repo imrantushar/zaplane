@@ -16,6 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class ConnectionsController extends WP_REST_Controller {
 
+
 	protected Container $container;
 
 	public function __construct( Container $container ) {
@@ -28,125 +29,125 @@ class ConnectionsController extends WP_REST_Controller {
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base,
-			array(
-				array(
+			[
+				[
 					'methods'             => WP_REST_Server::READABLE,
-					'callback'            => array( $this, 'get_items' ),
-					'permission_callback' => array( $this, 'permissions_check' ),
-					'args'                => array(
-						'app' => array(
+					'callback'            => [ $this, 'get_items' ],
+					'permission_callback' => [ $this, 'permissions_check' ],
+					'args'                => [
+						'app' => [
 							'type'              => 'string',
 							'sanitize_callback' => 'sanitize_text_field',
-						),
-					),
-				),
-				array(
+						],
+					],
+				],
+				[
 					'methods'             => WP_REST_Server::CREATABLE,
-					'callback'            => array( $this, 'create_item' ),
-					'permission_callback' => array( $this, 'permissions_check' ),
+					'callback'            => [ $this, 'create_item' ],
+					'permission_callback' => [ $this, 'permissions_check' ],
 					'args'                => $this->get_create_args(),
-				),
-			)
+				],
+			]
 		);
 
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/(?P<id>\d+)',
-			array(
-				array(
+			[
+				[
 					'methods'             => WP_REST_Server::READABLE,
-					'callback'            => array( $this, 'get_item' ),
-					'permission_callback' => array( $this, 'item_permissions_check' ),
-				),
-				array(
+					'callback'            => [ $this, 'get_item' ],
+					'permission_callback' => [ $this, 'item_permissions_check' ],
+				],
+				[
 					'methods'             => WP_REST_Server::EDITABLE,
-					'callback'            => array( $this, 'update_item' ),
-					'permission_callback' => array( $this, 'item_permissions_check' ),
+					'callback'            => [ $this, 'update_item' ],
+					'permission_callback' => [ $this, 'item_permissions_check' ],
 					'args'                => $this->get_update_args(),
-				),
-				array(
+				],
+				[
 					'methods'             => WP_REST_Server::DELETABLE,
-					'callback'            => array( $this, 'delete_item' ),
-					'permission_callback' => array( $this, 'item_permissions_check' ),
-				),
-			)
+					'callback'            => [ $this, 'delete_item' ],
+					'permission_callback' => [ $this, 'item_permissions_check' ],
+				],
+			]
 		);
 
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/(?P<id>\d+)/test',
-			array(
+			[
 				'methods'             => WP_REST_Server::CREATABLE,
-				'callback'            => array( $this, 'test_connection' ),
-				'permission_callback' => array( $this, 'item_permissions_check' ),
-			)
+				'callback'            => [ $this, 'test_connection' ],
+				'permission_callback' => [ $this, 'item_permissions_check' ],
+			]
 		);
 
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/oauth/init',
-			array(
+			[
 				'methods'             => WP_REST_Server::CREATABLE,
-				'callback'            => array( $this, 'init_oauth' ),
-				'permission_callback' => array( $this, 'permissions_check' ),
-				'args'                => array(
-					'app'         => array(
+				'callback'            => [ $this, 'init_oauth' ],
+				'permission_callback' => [ $this, 'permissions_check' ],
+				'args'                => [
+					'app'         => [
 						'required'          => true,
 						'type'              => 'string',
 						'sanitize_callback' => 'sanitize_text_field',
-					),
-					'name'        => array(
+					],
+					'name'        => [
 						'required'          => true,
 						'type'              => 'string',
 						'sanitize_callback' => 'sanitize_text_field',
-					),
-					'credentials' => array(
+					],
+					'credentials' => [
 						'type'        => 'object',
 						'description' => 'OAuth credentials (client_id, client_secret) if user-provided',
-					),
-				),
-			)
+					],
+				],
+			]
 		);
 
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/oauth/callback',
-			array(
+			[
 				'methods'             => WP_REST_Server::READABLE,
-				'callback'            => array( $this, 'oauth_callback' ),
-				'permission_callback' => '__return_true', // Public for OAuth redirect
-				'args'                => array(
-					'code'  => array(
+				'callback'            => [ $this, 'oauth_callback' ],
+				'permission_callback' => '__return_true',
+				'args'                => [
+					'code'  => [
 						'type'              => 'string',
 						'sanitize_callback' => 'sanitize_text_field',
-					),
-					'state' => array(
+					],
+					'state' => [
 						'required'          => true,
 						'type'              => 'string',
 						'sanitize_callback' => 'sanitize_text_field',
-					),
-					'error' => array(
+					],
+					'error' => [
 						'type'              => 'string',
 						'sanitize_callback' => 'sanitize_text_field',
-					),
-				),
-			)
+					],
+				],
+			]
 		);
 
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/auth-fields/(?P<app>[a-z0-9_-]+)',
-			array(
+			[
 				'methods'             => WP_REST_Server::READABLE,
-				'callback'            => array( $this, 'get_auth_fields' ),
-				'permission_callback' => array( $this, 'permissions_check' ),
-				'args'                => array(
-					'auth_type' => array(
+				'callback'            => [ $this, 'get_auth_fields' ],
+				'permission_callback' => [ $this, 'permissions_check' ],
+				'args'                => [
+					'auth_type' => [
 						'type'              => 'string',
 						'sanitize_callback' => 'sanitize_text_field',
-					),
-				),
-			)
+					],
+				],
+			]
 		);
 	}
 
@@ -159,7 +160,7 @@ class ConnectionsController extends WP_REST_Controller {
 			return new WP_Error(
 				'rest_forbidden',
 				'You must be logged in.',
-				array( 'status' => 401 )
+				[ 'status' => 401 ]
 			);
 		}
 
@@ -172,7 +173,7 @@ class ConnectionsController extends WP_REST_Controller {
 			return new WP_Error(
 				'rest_forbidden',
 				'You do not own this connection.',
-				array( 'status' => 403 )
+				[ 'status' => 403 ]
 			);
 		}
 
@@ -189,10 +190,10 @@ class ConnectionsController extends WP_REST_Controller {
 		$result = $manager->get_user_connections( $user_id, $app, $page, $per_page );
 
 		return rest_ensure_response(
-			array(
+			[
 				'data'       => $result['data'],
 				'pagination' => $result['pagination'],
-			)
+			]
 		);
 	}
 
@@ -207,7 +208,7 @@ class ConnectionsController extends WP_REST_Controller {
 			return new WP_Error(
 				'invalid_credentials',
 				'Credentials must be an object',
-				array( 'status' => 400 )
+				[ 'status' => 400 ]
 			);
 		}
 
@@ -219,13 +220,13 @@ class ConnectionsController extends WP_REST_Controller {
 			return new WP_Error(
 				'connection_test_failed',
 				$e->getMessage(),
-				array( 'status' => 400 )
+				[ 'status' => 400 ]
 			);
 		} catch ( \Zaplane\Framework\Exceptions\IntegrationException $e ) {
 			return new WP_Error(
 				'integration_not_found',
 				$e->getMessage(),
-				array( 'status' => 404 )
+				[ 'status' => 404 ]
 			);
 		}
 
@@ -233,13 +234,13 @@ class ConnectionsController extends WP_REST_Controller {
 		$connection = $manager->get( $connection_id );
 
 		return rest_ensure_response(
-			array(
+			[
 				'id'          => $connection_id,
 				'app'         => $connection['app'],
 				'name'        => $connection['name'],
 				'status'      => $connection['status'],
 				'test_result' => $result['test_result'],
-			)
+			]
 		);
 	}
 
@@ -253,7 +254,7 @@ class ConnectionsController extends WP_REST_Controller {
 			return new WP_Error(
 				'not_found',
 				'Connection not found',
-				array( 'status' => 404 )
+				[ 'status' => 404 ]
 			);
 		}
 
@@ -264,24 +265,22 @@ class ConnectionsController extends WP_REST_Controller {
 		$connection_id = (int) $request->get_param( 'id' );
 		$manager = $this->get_connection_manager();
 
-		$update_data = array();
+		$update_data = [];
 
 		$name = $request->get_param( 'name' );
-		if ( $name !== null ) {
+		if ( null !== $name ) {
 			$update_data['name'] = $name;
 		}
 
 		$status = $request->get_param( 'status' );
-		if ( $status !== null ) {
+		if ( null !== $status ) {
 			$update_data['status'] = $status;
 		}
 
-		// Update metadata
 		if ( ! empty( $update_data ) ) {
 			$manager->update( $connection_id, $update_data );
 		}
 
-		// Update credentials if provided
 		$credentials = $request->get_param( 'credentials' );
 		if ( is_array( $credentials ) && ! empty( $credentials ) ) {
 			$manager->update_credentials( $connection_id, $credentials );
@@ -302,15 +301,15 @@ class ConnectionsController extends WP_REST_Controller {
 			return new WP_Error(
 				'delete_failed',
 				'Failed to delete connection',
-				array( 'status' => 500 )
+				[ 'status' => 500 ]
 			);
 		}
 
 		return rest_ensure_response(
-			array(
+			[
 				'deleted' => true,
 				'id'      => $connection_id,
-			)
+			]
 		);
 	}
 
@@ -327,7 +326,7 @@ class ConnectionsController extends WP_REST_Controller {
 		$user_id = get_current_user_id();
 		$app = $request->get_param( 'app' );
 		$name = $request->get_param( 'name' );
-		$credentials = $request->get_param( 'credentials' ) ?? array();
+		$credentials = $request->get_param( 'credentials' ) ?? [];
 
 		$oauth = $this->get_oauth_handler();
 
@@ -338,13 +337,13 @@ class ConnectionsController extends WP_REST_Controller {
 			return new WP_Error(
 				'oauth_init_failed',
 				$e->getMessage(),
-				array( 'status' => 400 )
+				[ 'status' => 400 ]
 			);
 		}
 	}
 
 	public function oauth_callback( $request ) {
-		// Check for OAuth error from provider
+
 		$error = $request->get_param( 'error' );
 		if ( $error ) {
 			$error_description = $request->get_param( 'error_description' ) ?? 'OAuth authorization was denied';
@@ -378,19 +377,18 @@ class ConnectionsController extends WP_REST_Controller {
 			return new WP_Error(
 				'not_found',
 				'Integration not found',
-				array( 'status' => 404 )
+				[ 'status' => 404 ]
 			);
 		}
 
 		$main_auth_type = $integration::get_auth_type();
-		$response = array(
+		$response = [
 			'app'                 => $app,
 			'auth_type'           => $main_auth_type,
 			'requires_connection' => $integration::requires_connection(),
-		);
+		];
 
-		// If integration supports multiple auth types
-		if ( $main_auth_type === 'both' ) {
+		if ( 'both' === $main_auth_type ) {
 			$response['available_auth_types'] = $integration::get_available_auth_types();
 			$response['auth_fields'] = $integration::get_auth_fields( $auth_type );
 		} else {
@@ -401,47 +399,43 @@ class ConnectionsController extends WP_REST_Controller {
 	}
 
 	private function oauth_redirect_response( bool $success, string $message, ?int $connection_id = null ): WP_REST_Response {
-		$data = array(
+		$data = [
 			'success'       => $success,
 			'message'       => $message,
 			'connection_id' => $connection_id,
-		);
+		];
 
 		$json_data = wp_json_encode( $data );
 
-		// Return HTML that communicates with opener window
-		$html = <<<HTML
-<!DOCTYPE html>
-<html>
-<head>
-    <title>OAuth Callback</title>
-</head>
-<body>
-    <p>{$message}</p>
-    <script>
-        (function() {
-            var data = {$json_data};
-            if (window.opener) {
-                window.opener.postMessage({ type: 'zaplane_oauth_callback', data: data }, '*');
-                window.close();
-            } else {
-                // Fallback: redirect to admin with query params
-                var adminUrl = '/wp-admin/admin.php?page=zaplane';
-                adminUrl += '&oauth_success=' + (data.success ? '1' : '0');
-                adminUrl += '&oauth_message=' + encodeURIComponent(data.message);
-                if (data.connection_id) {
-                    adminUrl += '&connection_id=' + data.connection_id;
-                }
-                window.location.href = adminUrl;
-            }
-        })();
-    </script>
-</body>
-</html>
-HTML;
+		$html = "<!DOCTYPE html>\n"
+			. "<html>\n"
+			. "<head>\n"
+			. "\t<title>OAuth Callback</title>\n"
+			. "</head>\n"
+			. "<body>\n"
+			. "\t<p>{$message}</p>\n"
+			. "\t<script>\n"
+			. "\t\t(function() {\n"
+			. "\t\t\tvar data = {$json_data};\n"
+			. "\t\t\tif (window.opener) {\n"
+			. "\t\t\t\twindow.opener.postMessage({ type: 'zaplane_oauth_callback', data: data }, '*');\n"
+			. "\t\t\t\twindow.close();\n"
+			. "\t\t\t} else {\n"
+			. "\t\t\t\tvar adminUrl = '/wp-admin/admin.php?page=zaplane';\n"
+			. "\t\t\t\tadminUrl += '&oauth_success=' + (data.success ? '1' : '0');\n"
+			. "\t\t\t\tadminUrl += '&oauth_message=' + encodeURIComponent(data.message);\n"
+			. "\t\t\t\tif (data.connection_id) {\n"
+			. "\t\t\t\t\tadminUrl += '&connection_id=' + data.connection_id;\n"
+			. "\t\t\t\t}\n"
+			. "\t\t\t\twindow.location.href = adminUrl;\n"
+			. "\t\t\t}\n"
+			. "\t\t})();\n"
+			. "\t</script>\n"
+			. "</body>\n"
+			. '</html>';
 
 		$response = new WP_REST_Response( $html );
-		$response->set_headers( array( 'Content-Type' => 'text/html; charset=utf-8' ) );
+		$response->set_headers( [ 'Content-Type' => 'text/html; charset=utf-8' ] );
 
 		return $response;
 	}
@@ -455,44 +449,44 @@ HTML;
 	}
 
 	private function get_create_args(): array {
-		return array(
-			'app'         => array(
+		return [
+			'app'         => [
 				'required'          => true,
 				'type'              => 'string',
 				'sanitize_callback' => 'sanitize_text_field',
-			),
-			'name'        => array(
+			],
+			'name'        => [
 				'required'          => true,
 				'type'              => 'string',
 				'sanitize_callback' => 'sanitize_text_field',
-			),
-			'auth_type'   => array(
+			],
+			'auth_type'   => [
 				'required'          => true,
 				'type'              => 'string',
-				'enum'              => array( 'api_key', 'oauth2', 'basic' ),
+				'enum'              => [ 'api_key', 'oauth2', 'basic' ],
 				'sanitize_callback' => 'sanitize_text_field',
-			),
-			'credentials' => array(
+			],
+			'credentials' => [
 				'required' => true,
 				'type'     => 'object',
-			),
-		);
+			],
+		];
 	}
 
 	private function get_update_args(): array {
-		return array(
-			'name'        => array(
+		return [
+			'name'        => [
 				'type'              => 'string',
 				'sanitize_callback' => 'sanitize_text_field',
-			),
-			'status'      => array(
+			],
+			'status'      => [
 				'type'              => 'string',
-				'enum'              => array( 'active', 'inactive' ),
+				'enum'              => [ 'active', 'inactive' ],
 				'sanitize_callback' => 'sanitize_text_field',
-			),
-			'credentials' => array(
+			],
+			'credentials' => [
 				'type' => 'object',
-			),
-		);
+			],
+		];
 	}
 }

@@ -1,7 +1,12 @@
+import {  useRef,  } from "react";
+import {  useSelector } from "react-redux";
 import ZAPInput from "@ZAPComponents/ZAPInput";
 import ZAPSelect from "@ZAPComponents/ZAPSelect";
-import ConditionGroupField from "../ConditionGroupField/ConditionGroupField";
 import ZAPDatePicker from "@ZAPComponents/ZAPDatePicker";
+import ConditionGroupField from "../ConditionGroupField/ConditionGroupField";
+import './styles.scss'
+import { __ } from "@wordpress/i18n";
+import VariableEditor from "@ZAPComponents/VariableEditor/index.js";
 
 const ActionFieldRenderer = ({
   field,
@@ -11,32 +16,44 @@ const ActionFieldRenderer = ({
   dynamicOptions,
   loadingFields,
   fetchDynamicOptions,
-  nodeId,
-  workFlow,
-  nodes,
-  edges
 }) => {
-  const handleChange = (val) => setFieldValue(field.key, val);
-  const commonProps = {
-    label: field.label,
-    placeholder: field.placeholder || "",
-    value: value || "",
-    onChange: (e) => handleChange(e.target.value),
-  };
 
+  const inputRef = useRef(null);
+  const { workflowVariables } = useSelector(
+    (state) => state.workflows
+  );
   switch (field.type) {
-    case "text":
-    case "expression":
+
     case "number":
     case "email":
     case "url":
+
+      return <>
+        <ZAPInput
+          type={field.type}
+          label={field.label}
+          value={value || ""}
+          inputRef={inputRef}
+          onChange={(e) => setFieldValue(field.key, e.target.value)}
+        /></>
+    case "text":
+    case "expression":
+
     case "textarea":
       return (
-        <ZAPInput
-          {...commonProps}
-          type={field.type === "expression" ? "text" : field.type}
-        />
+        <>
+          <VariableEditor
+            label={field.label}
+            value={value || ""}
+            setValue={(val) => setFieldValue(field.key, val)}
+            variables={workflowVariables?.data || []}
+            field={field}
+            setFieldValue={setFieldValue}
+            placeholder={__('Type "@" here to add dynamic', "zaplane")}
+          />
+        </>
       );
+
     case "date":
       return (
         <ZAPDatePicker
@@ -46,11 +63,16 @@ const ActionFieldRenderer = ({
             setFieldValue(field.key, date?.toISOString().split("T")[0])
           }
           placeholder={field.placeholder}
-        />);
+        />
+      );
+
     case "select": {
       const key = getKey?.(field);
       const options = field.options
-        ? field.options.map((opt) => ({ label: opt.label, value: opt.value }))
+        ? field.options.map((opt) => ({
+          label: opt.label,
+          value: opt.value
+        }))
         : dynamicOptions[key] || [];
 
       return (
@@ -58,17 +80,33 @@ const ActionFieldRenderer = ({
           label={field.label}
           options={options}
           value={value}
-          onChange={(opt) => setFieldValue(field.key, opt?.value)}
-          placeholder={field.placeholder || `Select ${field.label}`}
+          onChange={(opt) =>
+            setFieldValue(field.key, opt?.value)
+          }
+          placeholder={
+            field.placeholder || `Select ${field.label}`
+          }
           isClearable
-          isLoading={field.dynamic ? loadingFields[key] : false}
-          onMenuOpen={field.dynamic ? () => fetchDynamicOptions(field) : undefined}
+          isLoading={
+            field.dynamic ? loadingFields[key] : false
+          }
+          onMenuOpen={
+            field.dynamic
+              ? () => fetchDynamicOptions(field)
+              : undefined
+          }
         />
       );
     }
 
     case "condition_group":
-      return <ConditionGroupField value={value} field={field} nodeId={nodeId} workFlow={workFlow} nodes={nodes} edges={edges}/>;
+      return (
+        <ConditionGroupField
+          value={value}
+          field={field}
+          variables={workflowVariables?.data}
+        />
+      );
 
     default:
       return null;

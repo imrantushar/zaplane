@@ -2,21 +2,21 @@ import React, { useEffect, useState } from 'react';
 import WPPopover from "@ZAPComponents/Popaver/WPPopover";
 import { __ } from "@wordpress/i18n";
 import { useDispatch, useSelector } from 'react-redux';
-import { createTokenConnection, fetchAuthFields, fetchConnections, initOAuth } from '@ZAPRedux/Slices/connectionsSlice/connectionsSlice';
-import { Button, Flex, Input, Text, VStack } from '@chakra-ui/react';
+import { createTokenConnection, fetchAuthFields, initOAuth } from '@ZAPRedux/Slices/connectionsSlice/connectionsSlice';
+import { Button, Flex,Text, VStack } from '@chakra-ui/react';
 import { primaryBtn } from '../../../../../../../../../assets/scss/chakra/recipe';
-import ZAPLabel from '@ZAPComponents/Labels/ZAPLabel';
 import './styles.scss'
 import { formatLabel } from '@ZAPUtils/helper';
+import ZAPInput from '@ZAPComponents/ZAPInput';
 
 const ConnectionPopaver = (props) => {
-    const { isOpen, onClose, appSlug, selectedIntegration } = props
+    const { isOpen, onClose, appSlug, onConnected  } = props
     const dispatch = useDispatch()
     const { authFields } = useSelector(
         (state) => state.connections || []
     )
     const [loadingOAuth, setLoadingOAuth] = useState(false);
-    const [selectedAuthType, setSelectedAuthType] = useState(null);
+    const [selectedAuthType, setSelectedAuthType] = useState("oauth2");
     const [credentials, setCredentials] = useState({});
     useEffect(() => {
         dispatch(
@@ -51,7 +51,7 @@ const ConnectionPopaver = (props) => {
                         popup?.close();
 
                         if (event.data.data?.success) {
-                            dispatch(fetchConnections());
+                            onConnected?.(res);
                             onclose()
                         }
                     }
@@ -77,6 +77,7 @@ const ConnectionPopaver = (props) => {
                     if (action.type === "connections/createTokenConnection/fulfilled") {
                         setCredentials({});
                         onClose();
+                         onConnected?.(action);
                     }
                     setLoadingOAuth(false);
 
@@ -113,8 +114,9 @@ const ConnectionPopaver = (props) => {
 
                             return (
                                 <Flex flexDirection="column" gap={"4px"} key={fieldKey}>
-                                    <ZAPLabel label={field.label} type={"simple"} />
-                                    <Input
+
+                                    <ZAPInput
+                                        label={field.label}
                                         type={field.type === "password" ? "password" : "text"}
                                         placeholder={field.placeholder || ""}
                                         value={value}
@@ -126,7 +128,7 @@ const ConnectionPopaver = (props) => {
                                         }
                                     />
                                     {field.help && (
-                                        <Text fontSize="sm" m='7px 0' className="zaplane-sub-title" color="var(--zaplane-text-muted)">
+                                        <Text fontSize="sm" mt='7px' className="zaplane-sub-title" color="var(--zaplane-text-muted)">
 
                                             {__(field.help, "zaplane")}
                                         </Text>
@@ -141,9 +143,10 @@ const ConnectionPopaver = (props) => {
             {selectedAuthType && (
                 <Button
                     {...primaryBtn}
+                    mt='16px'
                     width="220px"
                     onClick={handleConnect}
-                    loading={loadingOAuth}        // ✅ text এর পরিবর্তে spinner দেখাবে
+                    loading={loadingOAuth}       
                     loadingText={selectedAuthType === "oauth2"
                         ? __("Connecting...", "zaplane")
                         : __("Saving...", "zaplane")}

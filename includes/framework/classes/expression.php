@@ -1,62 +1,67 @@
 <?php
 namespace Zaplane\Framework\Classes;
 
-if (!defined('ABSPATH')) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 class Expression {
 
-    /**
-     * Evaluate a Zaplane expression
-     */
-    public static function evaluate($expr, array $data) {
 
-        if ($expr === null || $expr === '') {
-            return null;
-        }
 
-        // If not expression, return raw
-        if (!str_contains($expr, '{{')) {
-            return $expr;
-        }
 
-        return preg_replace_callback('/{{(.*?)}}/', function($m) use ($data) {
-            return self::compute(trim($m[1]), $data);
-        }, $expr);
-    }
+	public static function evaluate( $expr, array $data ) {
 
-    /**
-     * Compute inside {{ }}
-     */
-    private static function compute(string $code, array $data) {
+		if ( null === $expr || '' === $expr ) {
+			return null;
+		}
 
-        // Replace dot syntax with PHP array access
-        // user.email → $data["user"]["email"]
-        $php = preg_replace_callback('/[a-zA-Z_][a-zA-Z0-9_.]*/', function($m) use ($data) {
+		if ( ! is_string( $expr ) || ! str_contains( $expr, '{{' ) ) {
+			return $expr;
+		}
 
-            $key = $m[0];
+		if ( preg_match( '/^\{\{([^}]+)\}\}$/', trim( $expr ), $m ) ) {
+			return self::compute( trim( $m[1] ), $data );
+		}
 
-            // allow true, false, null, numbers
-            if (in_array($key, ['true','false','null']) || is_numeric($key)) {
-                return $key;
-            }
+		return preg_replace_callback('/\{\{(.*?)\}\}/', function ( $m ) use ( $data ) {
+			$val = self::compute( trim( $m[1] ), $data );
+			if ( is_array( $val ) ) {
+				return implode( ', ', array_filter( $val, 'is_scalar' ) );
+			}
+			return null !== $val ? (string) $val : '';
+		}, $expr);
+	}
 
-            // Convert foo.bar.baz → $data["foo"]["bar"]["baz"]
-            $parts = explode('.', $key);
-            $php = '$data';
 
-            foreach ($parts as $p) {
-                $php .= '["'.$p.'"]';
-            }
 
-            return $php;
+	private static function compute( string $code, array $data ) {
+		$php = preg_replace_callback('/[a-zA-Z0-9_][a-zA-Z0-9_.]*/', function ( $m ) use ( $data ) {
 
-        }, $code);
+			$key = $m[0];
 
-        try {
-            // Evaluate safely
-            return eval("return {$php};");
-        } catch (\Throwable $e) {
-            return null;
-        }
-    }
+			if ( in_array( $key, [ 'true', 'false', 'null' ], true ) || is_numeric( $key ) ) {
+				return $key;
+			}
+
+			$parts = explode( '.', $key );
+			$php = '$data';
+
+			foreach ( $parts as $p ) {
+				$php .= '["' . $p . '"]';
+			}
+
+			return $php;
+		}, $code);
+
+		// Prevent fatal compilation errors if the user's expression has trailing empty brackets (e.g `array[]`)
+		$php = str_replace( '[]', '', $php );
+
+		try {
+			// phpcs:ignore Generic.PHP.ForbiddenFunctions.Found -- eval() is intentional for expression evaluation engine.
+			return eval( "return {$php};" ); // phpcs:ignore Squiz.PHP.Eval.Discouraged
+		} catch ( \Throwable $e ) {
+			return null;
+		}
+	}
 }

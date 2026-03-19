@@ -5,12 +5,11 @@ import { useFormikContext } from "formik";
 import { useEffect, useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
 import ZAPTab from "@ZAPComponents/Tab";
-import { __, sprintf } from "@wordpress/i18n";
+import { __ } from "@wordpress/i18n";
 import { primaryBtn } from "../../../../../../../assets/scss/chakra/recipe";
 import { useActionDrawer } from "@ZAPHooks/useActionDrawer/useActionDrawer";
 import { TOOLS } from "@ZAPHooks/useActionDrawer/helper";
 import { getIntegration } from "./helper";
-import { fetchDynamic } from "@ZAPRedux/Slices/workFlowSlice/helper";
 import SelectTab from "./SelectTab/SelectTab";
 import TestRun from "./TestRun/TestRun";
 import DrawerSearchList from "./DrawerSearchList/DrawerSearchList";
@@ -19,14 +18,16 @@ import DrawerItemList from "./DrawerItemList";
 import ActionFieldRenderer from "./ActionFieldRenderer/ActionFieldRenderer";
 import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
 import { useDynamicFields } from "@ZAPHooks/useActionDrawer/useDynamicFields";
+import { mapEdgesForBackend, mapNodesForBackend } from "../helper";
+import { conditionVariables } from "@ZAPRedux/Slices/workFlowSlice/actions/conditonVariales";
+import './styles.scss'
 
 const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode, workFlow, isFullscreen, nodes, edges }) => {
   const { source, node } = context;
   const dispatch = useDispatch();
-  const { values, setFieldValue, resetForm } = useFormikContext();
+  const { values, setFieldValue, resetForm} = useFormikContext();
   const [step, setStep] = useState("select");
   const isTrigger = node?.data?.action === "trigger" && source === "node";
-  const [showWarning, setShowWarning] = useState(false);
 
   const { mode, setMode, selectedItem, setSelectedItem, search, setSearch, list, searchList } =
     useActionDrawer(open, node, source, setFieldValue, isTrigger);
@@ -83,7 +84,6 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
     setSearch("");
     resetForm();
     onClose();
-    setShowWarning(false)
   };
 
   const handleContinue = () => {
@@ -93,13 +93,15 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
     if (step === "configure") {
 
       const payload = {
-        app: selectedItem.name,
+        icon:selectedItem.icon,
+        app: selectedItem.id,
         name: selectedItem.name,
         event: values.actionType,
         config: selectedActionFields.reduce((acc, f) => {
           acc[f.key] = values[f.key];
           return acc;
         }, {}),
+         ...(selectedItem.mode && { mode: selectedItem.mode }),
         ...(values.hook && { hook: values.hook }),
         ...(values.connection_id && { connection_id: values.connection_id }),
       };
@@ -116,17 +118,36 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
     if (step === "test") {
       resetAll();
     }
+   
   };
   // seleted intregation
   const selectedIntegration = useMemo(() => {
     return getIntegration(mode, selectedItem);
   }, [mode, selectedItem]);
+
+  // get global variable
+  useEffect(() => {
+    if (!node?.id || !workFlow?.version?.hash) return;
+    const payload = {
+      workflow_id: workFlow.workflow?.id,
+      workflow_hash: workFlow.version?.hash,
+      workflow_version_id: workFlow.version?.id,
+      target_node_key: node?.id,
+      graph: {
+        nodes: mapNodesForBackend(nodes),
+        edges: mapEdgesForBackend(edges),
+      },
+    };
+
+    dispatch(conditionVariables(payload));
+  }, [node?.id]);
   return (
     <ZAPDrawer
       open={open}
       isFullscreen={isFullscreen}
       onClose={resetAll}
-      arrowClose={mode === 'app'}
+      arrowClose={['tools', 'app'].includes(mode)}
+      maxWidth='700px'
       arrowOnClick={() => {
         setSelectedItem(null);
         setMode(null);
@@ -136,7 +157,7 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
       // closeOnOverlayClick
       title={!mode ? "Add Action" : selectedItem?.name || __('App', 'zaplane')}
       placement="end"
-      size={["filter", "condition"].includes(values?.actionType) ? "xl" : "md"}
+      // size={["filter", "condition"].includes(values?.actionType) ? "xl" : "md"}
       footer={
         <HStack justify="space-between">
           <Button variant="outline" onClick={resetAll}>{__("Cancel", "zaplane")}</Button>
@@ -202,7 +223,7 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
             },
             {
               value: "configure", label: "Configure", content: <>
-                <Flex direction="column" gap={4}>
+                <Flex direction="column" className="action-drowar-lists" gap={4}>
                   {selectedActionFields?.length > 0 ? (
                     selectedActionFields.map((field) => (
                       <ActionFieldRenderer
