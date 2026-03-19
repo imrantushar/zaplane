@@ -1,9 +1,9 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { __ } from '@wordpress/i18n';
 import TopBar from '@ZAPComponents/TopBar';
 import ZAPLabel from '@ZAPComponents/Labels/ZAPLabel';
-import { Box, Button, Flex } from '@chakra-ui/react';
-import { outlineBtn } from '../../../../../assets/scss/chakra/recipe';
+import { Box, Button, Flex, Text } from '@chakra-ui/react';
+import { outlineBtn, primaryBtn } from '../../../../../assets/scss/chakra/recipe';
 import { FiHelpCircle } from 'react-icons/fi';
 import { useDispatch, useSelector } from 'react-redux';
 import RecentLogs from './RecentLogs';
@@ -12,10 +12,14 @@ import { getRunsList } from '@ZAPRedux/Slices/logsSlice/logsSlice';
 import TotalExecutions from './TotalExecutions';
 import { topExecutedFlows } from '@ZAPRedux/Slices/dashboardSlice/dashboardSlice';
 import OverviewSection from './OverviewSection/OverviewSection';
+import { useNavigate } from 'react-router-dom';
+import CreateWorkflowModal from '@ZAPComponents/CreateWorkflowModal';
 
 export default function Dashboard() {
     const dispatch = useDispatch();
     const { data = [] } = useSelector((state) => state.logs || {});
+    const navigate = useNavigate()
+    const [isModalOpen, setIsModalOpen] = useState(false);
     useEffect(() => {
         dispatch(getRunsList());
         dispatch(topExecutedFlows());
@@ -51,6 +55,14 @@ export default function Dashboard() {
                 )}
             />
             <Flex flexDirection='column' gap="24px" className="zaplane-page-content">
+                <Flex justifyContent="space-between" alignItems="center">
+                    <Text fontSize='20px' className="zaplane-heading">
+                        {__("Dashboard", "zaplane")}
+                    </Text>
+                    <Button  onClick={() => setIsModalOpen(true)} {...primaryBtn}>
+                        {__("Create Workflow", "zaplane")}
+                    </Button>
+                </Flex>
                 <OverviewSection />
                 <TotalExecutions data={data} />
                 <Flex gap="24px">
@@ -65,6 +77,10 @@ export default function Dashboard() {
                 </Flex>
 
             </Flex>
+            <CreateWorkflowModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+            />
 
         </React.Fragment>
     );
