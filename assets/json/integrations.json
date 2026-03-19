@@ -1,11 +1,11 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-03-12 08:55:08",
+    "generated_at": "2026-03-19 07:51:37",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
             "name": "WordPress",
-            "icon": "wordpress.svg",
+            "icon": "WordPress.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -853,7 +853,7 @@
                         {
                             "key": "user_email",
                             "label": "Email",
-                            "type": "text",
+                            "type": "email",
                             "required": true
                         },
                         {
@@ -915,7 +915,7 @@
                         {
                             "key": "user_email",
                             "label": "Email",
-                            "type": "text"
+                            "type": "email"
                         },
                         {
                             "key": "user_pass",
@@ -1072,7 +1072,7 @@
                         {
                             "key": "email",
                             "label": "User Email",
-                            "type": "text",
+                            "type": "email",
                             "required": true
                         }
                     ],
@@ -1213,7 +1213,7 @@
                         {
                             "key": "user_login_or_email",
                             "label": "Username or Email",
-                            "type": "text",
+                            "type": "email",
                             "required": true
                         }
                     ],
@@ -1228,7 +1228,7 @@
                         {
                             "key": "user_login",
                             "label": "Username or Email",
-                            "type": "text",
+                            "type": "email",
                             "required": true
                         },
                         {
@@ -2580,7 +2580,7 @@
                         {
                             "key": "user_email",
                             "label": "User Email",
-                            "type": "expression",
+                            "type": "email",
                             "required": true
                         }
                     ],
@@ -2643,7 +2643,7 @@
                         {
                             "key": "author_email",
                             "label": "Author Email",
-                            "type": "expression",
+                            "type": "email",
                             "required": true
                         },
                         {
@@ -2676,7 +2676,7 @@
                         {
                             "key": "author_email",
                             "label": "Author Email",
-                            "type": "expression",
+                            "type": "email",
                             "required": true
                         },
                         {
@@ -10514,7 +10514,7 @@
                         {
                             "key": "email",
                             "label": "Email Address",
-                            "type": "expression",
+                            "type": "email",
                             "required": true
                         },
                         {
@@ -10673,7 +10673,7 @@
                         {
                             "key": "email",
                             "label": "Email Address",
-                            "type": "expression",
+                            "type": "email",
                             "required": true
                         }
                     ],
@@ -11031,7 +11031,7 @@
                         {
                             "key": "email",
                             "label": "Email Address",
-                            "type": "expression",
+                            "type": "email",
                             "required": true
                         },
                         {
@@ -11249,7 +11249,7 @@
                         {
                             "key": "email",
                             "label": "Email Address",
-                            "type": "expression",
+                            "type": "email",
                             "required": true
                         },
                         {
@@ -12480,6 +12480,42 @@
                             "key": "target_percentage",
                             "label": "Target Percentage (%)",
                             "type": "number",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": []
+        },
+        "jetengine": {
+            "slug": "jetengine",
+            "name": "JetEngine",
+            "icon": "jetengine-icon.svg",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": {
+                "post_type_field_update": {
+                    "key": "post_type_field_update",
+                    "label": "Updated JetEngine field on post type",
+                    "hook": "updated_post_meta",
+                    "schema": [
+                        {
+                            "key": "post_type",
+                            "label": "Post Type",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "jetengine",
+                                "query": "post_type",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],

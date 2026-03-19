@@ -156,5 +156,9 @@ return [
 			'file' => 'academy.php',
 			'class' => \Zaplane\Integrations\Academy::class
 		],
+		'jetengine'            => [
+			'file' => 'jetengine.php',
+			'class' => \Zaplane\Integrations\Jetengine::class
+		],
 	],
 ];
