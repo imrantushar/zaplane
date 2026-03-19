@@ -1,77 +1,113 @@
 <?php
+
 namespace Zaplane\Integrations;
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 use Zaplane\Framework\Classes\IntegrationBase;
 
-class Profilebuilder extends IntegrationBase {
+class Profilebuilder extends IntegrationBase
+{
 
-    public static function get_slug(): string {
+    public static function get_slug(): string
+    {
         return 'profilebuilder';
     }
 
-    public static function get_triggers(): array {
+    public static function get_triggers(): array
+    {
         return [
+
             'user_registration' => [
-                'label' => 'User Registration', 
-                'hook'  => 'wppb_register_success'
+                'label' => 'User Registration',
+                'hook' => 'wppb_register_success'
             ],
             'user_profile_update' => [
-                'label' => 'User Profile Update', 
-                'hook'  => 'wppb_edit_profile_success'
+                'label' => 'User Profile Update',
+                'hook' => 'wppb_edit_profile_success'
             ],
-            'user_email_conformation' => [
-                'label' => 'User Email Conformation', 
-                'hook'  => 'wppb_activate_user'
+            'user_email_confirmation' => [
+                'label' => 'User Email Confirmation',
+                'hook' => 'wppb_activate_user'
             ],
-            'emailSendByProfileBuilder' => [
-                'label' => 'Email Send By Profile Builder', 
-                'hook'  => 'wppb_after_sending_email'
+            'email_send_by_profile_builder' => [
+                'label' => 'Email Send By Profile Builder',
+                'hook' => 'wppb_after_sending_email'
             ],
-            'userApprovedByAdmin' => [
-                'label' => 'User Approved By Admin', 
-                'hook'  => 'wppb_after_user_approval'
+            'user_approved_by_admin' => [
+                'label' => 'User Approved By Admin',
+                'hook' => 'wppb_after_user_approval'
             ],
-            'userUnApprovedByAdmin' => [
-                'label' => 'User Un Approved By Admin', 
-                'hook'  => 'wppb_after_user_unapproval'
+            'user_unapproved_by_admin' => [
+                'label' => 'User UnApproved By Admin',
+                'hook' => 'wppb_after_user_unapproval'
             ],
-        ]; 
+
+        ];
     }
 
-    public static function get_trigger_config_schema( string $trigger ): array {
-        if ( in_array( $trigger, ['user_enroll_course','course_complete'], true ) ) {
-            $options = [ 
-                ['label' => 'Any course', 'value' => 'any'],
-            ];
-            if ( function_exists( 'tutor' ) ) {
-                $courses = get_posts([
-                    'post_type'      => 'courses',
-                    'post_status'    => 'publish',
-                    'posts_per_page' => -1,
-                ]);
-                
-                foreach ( $courses as $course ) {
-                    $options[] = [
-                        'label' => $course->post_title,
-                        'value' => $course->ID
-                    ];
+    public static function resolve_trigger(array $node, array $args)
+    {
+        switch ($node['event']) {
+            case 'user_registration':
+                $form_data = $args[0] ?? [];
+                if (!$form_data) {
+                    return [];
                 }
-            }
-            return [
-                [
-                    'key'      => 'course_id',
-                    'label'    => 'course',
-                    'type'     => 'select',
-                    'options'  => $options,
-                    'required' => true,
-                ],
-            ];
+                $result  = [];
+                foreach ($form_data as $form_field  => $value) {
+                    $result[$form_field]  = $value;
+                }
+                return $result;
+
+            case 'user_profile_update':
+                $form_data = $args[0] ?? [];
+                if (!$form_data) {
+                    return [];
+                }
+                $result  = [];
+                foreach ($form_data as $form_field  => $value) {
+                    $result[$form_field]  = $value;
+                }
+                return $result;
+
+            case 'user_email_confirmation':
+                //need to ceck later
+                $form_fields = $args[0] ?? [];
+                $form_meta = $args[2] ?? [];
+                return [
+
+                    'submitted_at' => current_time('mysql'),
+                ];
+            case 'email_send_by_profile_builder':
+                $email_data = $args ?? [];
+                if (!$email_data) {
+                    return [];
+                }
+                return [
+                    'mail_to' => $email_data[1] ?? '',
+                    'notify_message' => $email_data[2] ?? '',
+                    'message_body' => $email_data[3] ?? '',
+                    'current_time' => current_time('mysql'),
+                ];
+            case 'user_approved_by_admin':
+                $form_fields = $args[0] ?? [];
+                $form_meta = $args[2] ?? [];
+                return [
+
+                    'submitted_at' => current_time('mysql'),
+                ];
+            case 'user_unapproved_by_admin':
+                $form_fields = $args[0] ?? [];
+                $form_meta = $args[2] ?? [];
+                return [
+
+                    'submitted_at' => current_time('mysql'),
+                ];
         }
 
         if ( in_array( $trigger, ['tutor_quiz_course_attempt'], true ) ) {
-            $options = [ 
+            $options = [
                 ['label' => 'Any Quiz', 'value' => 'any'],
             ];
             if ( function_exists( 'tutor' ) ) {
@@ -80,7 +116,7 @@ class Profilebuilder extends IntegrationBase {
                     'post_status'    => 'publish',
                     'posts_per_page' => -1,
                 ]);
-                
+
                 foreach ( $quizzes as $quiz ) {
                     $options[] = [
                         'label' => $quiz->post_title,
@@ -138,7 +174,7 @@ class Profilebuilder extends IntegrationBase {
         }
 
         if ( in_array( $trigger, ['lesson_complete'], true ) ) {
-            $options = [ 
+            $options = [
                 ['label' => 'Any lesson', 'value' => 'any'],
             ];
             if ( function_exists( 'tutor' ) ) {
@@ -147,7 +183,7 @@ class Profilebuilder extends IntegrationBase {
                     'post_status'    => 'publish',
                     'posts_per_page' => -1,
                 ]);
-                
+
                 foreach ( $lessons as $lesson ) {
                     $options[] = [
                         'label' => $lesson->post_title,
@@ -187,7 +223,7 @@ class Profilebuilder extends IntegrationBase {
                     'course_id' => $course_id,
                     'enroll_id' => $enroll_id,
                 ];
-                                
+
             case 'course_complete':
                 $course_id = $args[0] ?? null;
                 $user_id   = $args[1] ?? get_current_user_id();
