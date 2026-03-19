@@ -60,6 +60,7 @@ export default function Dashboard() {
                         <TotalExecutions data={data} />
                     </Box> */}
                 </Flex>
+                <TotalExecutions data={data} />
                 <RecentLogs data={data} />
             </Box>
 

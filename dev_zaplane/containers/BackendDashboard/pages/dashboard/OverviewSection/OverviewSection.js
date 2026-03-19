@@ -17,12 +17,12 @@ const StatCard = ({ title, value, icon }) => {
         >
             <Box w='100%'>
                 <Flex justifyContent='space-between' mb={5}>
-                    <Text className="zaplane-label">
+                    <Text className="zaplane-label" fontSize='16px' fontWeight='400'>
                         {title}
                     </Text>
-                    <Icon as={icon} boxSize="24px" color="gray.400" />
+                    <Icon as={icon} boxSize="24px"  />
                 </Flex>
-                <Text className="zaplane-label">
+                <Text className="zaplane-label" fontSize ='30px'>
                     {value}
                 </Text>
             </Box>
