@@ -50,19 +50,21 @@ export default function Dashboard() {
                     </Flex>
                 )}
             />
-            <Box className="zaplane-page-content">
-                <Flex gap="24px" mb="24px">
-                    <OverviewSection />
-                    {/* <Box width="40%">
+            <Flex flexDirection='column' gap="24px" className="zaplane-page-content">
+                <OverviewSection />
+                <TotalExecutions data={data} />
+                <Flex gap="24px">
+                    <Box width='40%'>
                         <ExecutedFlows />
                     </Box>
-                    <Box width="60%">
-                        <TotalExecutions data={data} />
-                    </Box> */}
+                    <Box width='60%'>
+                        <RecentLogs data={data} />
+                    </Box>
+
+
                 </Flex>
-                <TotalExecutions data={data} />
-                <RecentLogs data={data} />
-            </Box>
+
+            </Flex>
 
         </React.Fragment>
     );

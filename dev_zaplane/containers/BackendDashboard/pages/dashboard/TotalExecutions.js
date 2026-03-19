@@ -10,7 +10,6 @@ import {
     ResponsiveContainer,
 } from "recharts";
 import { __ } from "@wordpress/i18n";
-import ZAPDivider from "@ZAPComponents/ZAPDivider";
 
 const TotalExecutions = ({ data }) => {
     const chartData = useMemo(() => {
