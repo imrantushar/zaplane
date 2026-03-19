@@ -1,11 +1,11 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-03-12 08:55:08",
+    "generated_at": "2026-03-19 08:06:41",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
             "name": "WordPress",
-            "icon": "wordpress.svg",
+            "icon": "WordPress.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -853,7 +853,7 @@
                         {
                             "key": "user_email",
                             "label": "Email",
-                            "type": "text",
+                            "type": "email",
                             "required": true
                         },
                         {
@@ -915,7 +915,7 @@
                         {
                             "key": "user_email",
                             "label": "Email",
-                            "type": "text"
+                            "type": "email"
                         },
                         {
                             "key": "user_pass",
@@ -1072,7 +1072,7 @@
                         {
                             "key": "email",
                             "label": "User Email",
-                            "type": "text",
+                            "type": "email",
                             "required": true
                         }
                     ],
@@ -1213,7 +1213,7 @@
                         {
                             "key": "user_login_or_email",
                             "label": "Username or Email",
-                            "type": "text",
+                            "type": "email",
                             "required": true
                         }
                     ],
@@ -1228,7 +1228,7 @@
                         {
                             "key": "user_login",
                             "label": "Username or Email",
-                            "type": "text",
+                            "type": "email",
                             "required": true
                         },
                         {
@@ -2580,7 +2580,7 @@
                         {
                             "key": "user_email",
                             "label": "User Email",
-                            "type": "expression",
+                            "type": "email",
                             "required": true
                         }
                     ],
@@ -2643,7 +2643,7 @@
                         {
                             "key": "author_email",
                             "label": "Author Email",
-                            "type": "expression",
+                            "type": "email",
                             "required": true
                         },
                         {
@@ -2676,7 +2676,7 @@
                         {
                             "key": "author_email",
                             "label": "Author Email",
-                            "type": "expression",
+                            "type": "email",
                             "required": true
                         },
                         {
@@ -7597,6 +7597,131 @@
                 }
             }
         },
+        "hubspot": {
+            "slug": "hubspot",
+            "name": "HubSpot",
+            "icon": "hubspot.svg",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": [],
+            "actions": {
+                "submit_form": {
+                    "key": "submit_form",
+                    "label": "Submit Form",
+                    "schema": [
+                        {
+                            "key": "portal_id",
+                            "label": "Portal ID",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "hubspot",
+                                "query": "portals",
+                                "select": [
+                                    "id",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "form_guid",
+                            "label": "Form GUID",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "hubspot",
+                                "query": "forms",
+                                "select": [
+                                    "id",
+                                    "label"
+                                ]
+                            },
+                            "required": true,
+                            "help": "Shows HubSpot forms already embedded on this WordPress site through the official HubSpot plugin."
+                        },
+                        {
+                            "key": "email",
+                            "label": "Email",
+                            "type": "text",
+                            "placeholder": "name@example.com or {{email}}",
+                            "help": "Optional. Used to auto-build fields if Fields (JSON) is empty."
+                        },
+                        {
+                            "key": "firstname",
+                            "label": "First Name",
+                            "type": "text",
+                            "placeholder": "John or {{first_name}}",
+                            "help": "Optional. Used to auto-build fields if Fields (JSON) is empty."
+                        },
+                        {
+                            "key": "lastname",
+                            "label": "Last Name",
+                            "type": "text",
+                            "placeholder": "Doe or {{last_name}}",
+                            "help": "Optional. Used to auto-build fields if Fields (JSON) is empty."
+                        },
+                        {
+                            "key": "phone",
+                            "label": "Phone",
+                            "type": "text",
+                            "placeholder": "+18884827768 or {{phone}}",
+                            "help": "Optional. Used to auto-build fields if Fields (JSON) is empty."
+                        },
+                        {
+                            "key": "fields",
+                            "label": "Fields (JSON)",
+                            "type": "textarea",
+                            "placeholder": "{\"email\":\"name@example.com\",\"firstname\":\"John\"}",
+                            "help": "Optional. JSON object (field name to value) or array of field objects. If empty, simple fields above will be used."
+                        },
+                        {
+                            "key": "context",
+                            "label": "Context (JSON)",
+                            "type": "textarea",
+                            "placeholder": "{\"pageUri\":\"https://example.com\",\"pageName\":\"Landing\"}",
+                            "help": "Optional. Include hutk, pageUri, pageName, ipAddress, etc."
+                        },
+                        {
+                            "key": "legal_consent_options",
+                            "label": "Legal Consent (JSON)",
+                            "type": "textarea",
+                            "placeholder": "{\"consent\":{\"consentToProcess\":true,\"text\":\"...\",\"communications\":[{\"value\":true,\"subscriptionTypeId\":123,\"text\":\"...\"}]}}",
+                            "help": "Optional. GDPR/consent data."
+                        },
+                        {
+                            "key": "submitted_at",
+                            "label": "Submitted At (ms)",
+                            "type": "text",
+                            "placeholder": "1700000000000",
+                            "help": "Optional timestamp in milliseconds."
+                        },
+                        {
+                            "key": "skip_validation",
+                            "label": "Skip Validation",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "value": "",
+                                    "label": "Default"
+                                },
+                                {
+                                    "value": "true",
+                                    "label": "True"
+                                },
+                                {
+                                    "value": "false",
+                                    "label": "False"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
+        },
         "surecart": {
             "slug": "surecart",
             "name": "Surecart",
@@ -10514,7 +10639,7 @@
                         {
                             "key": "email",
                             "label": "Email Address",
-                            "type": "expression",
+                            "type": "email",
                             "required": true
                         },
                         {
@@ -10673,7 +10798,7 @@
                         {
                             "key": "email",
                             "label": "Email Address",
-                            "type": "expression",
+                            "type": "email",
                             "required": true
                         }
                     ],
@@ -11031,7 +11156,7 @@
                         {
                             "key": "email",
                             "label": "Email Address",
-                            "type": "expression",
+                            "type": "email",
                             "required": true
                         },
                         {
@@ -11249,7 +11374,7 @@
                         {
                             "key": "email",
                             "label": "Email Address",
-                            "type": "expression",
+                            "type": "email",
                             "required": true
                         },
                         {
