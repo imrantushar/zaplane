@@ -9953,7 +9953,7 @@ const TopBar = ({
         base: 'flex-start',
         md: 'center'
       },
-      height: "80px",
+      height: "72px",
       px: 6,
       py: 4,
       top: "32px",
