@@ -6,6 +6,7 @@ import WorkflowTable from "./WorkflowTable";
 import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
 import CreateWorkflowModal from "@ZAPComponents/CreateWorkflowModal";
 import { primaryBtn } from "../../../../../assets/scss/chakra/recipe";
+import { IoIosArrowForward } from "react-icons/io";
 
 
 const CreateWorkflows = () => {
@@ -15,14 +16,18 @@ const CreateWorkflows = () => {
   return (
     <>
       <TopBar
-        render={() => (
-          <Box>
+        leftContent={() => (
+          <>
+            <span className="zaplane-topbar-logo zaplane-icon zaplane-icon--zaplane" />
+            <IoIosArrowForward />
             <ZAPLabel
+              as="h2"
+              color="var(--zapplane-font-color)"
+              type="subtitle"
+              fontWeight="medium"
               label={__('Flows', 'zaplane')}
-              variant="bold"
             />
-
-          </Box>
+          </>
         )}
         rightContent={() => (
           // <ZAPMenu

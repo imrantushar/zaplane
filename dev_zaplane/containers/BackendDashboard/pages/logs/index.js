@@ -16,15 +16,14 @@ import {
 import { nodeLogsRunDetails } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlowLogs";
 
 import LogDetails from "@ZAPComponents/LogDetails";
-import ZAPLoading from "@ZAPComponents/Loading";
 import TopBar from "@ZAPComponents/TopBar";
 import ZAPDrawer from "@ZAPComponents/Drawer";
 import ListTable from "@ZAPComponents/ListTable";
 import { formatDateTime, formatLabel, getDuration } from "@ZAPUtils/helper";
-import { statusStyle } from "../workflows/helper";
-import { HistoryIcon, TableArrow } from "@ZAPUtils/icons";
+import { HistoryIcon } from "@ZAPUtils/icons";
 import ZAPTooltip from "@ZAPComponents/ZAPTooltip";
 import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
+import { IoIosArrowForward } from "react-icons/io";
 
 const Logs = () => {
     const dispatch = useDispatch();
@@ -190,12 +189,18 @@ const Logs = () => {
     return (
         <>
             <TopBar
-                render={() => (
-                    <Box>
-                        <Text fontSize="lg" fontWeight="600">
-                            {__("Workflow Logs", "zaplane")}
-                        </Text>
-                    </Box>
+                leftContent={() => (
+                    <>
+                        <span className="zaplane-topbar-logo zaplane-icon zaplane-icon--zaplane" />
+                        <IoIosArrowForward />
+                        <ZAPLabel
+                            as="h2"
+                            color="var(--zapplane-font-color)"
+                            type="subtitle"
+                            fontWeight="medium"
+                            label={__('Wokflows Logs', 'zaplane')}
+                        />
+                    </>
                 )}
             />
 

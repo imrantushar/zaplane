@@ -14,6 +14,7 @@ import { topExecutedFlows } from '@ZAPRedux/Slices/dashboardSlice/dashboardSlice
 import OverviewSection from './OverviewSection/OverviewSection';
 import { useNavigate } from 'react-router-dom';
 import CreateWorkflowModal from '@ZAPComponents/CreateWorkflowModal';
+import { IoIosArrowForward } from 'react-icons/io';
 
 export default function Dashboard() {
     const dispatch = useDispatch();
@@ -29,10 +30,17 @@ export default function Dashboard() {
         <React.Fragment>
             <TopBar
                 leftContent={() => (
-                    <ZAPLabel
-                        label={__('Dashboard', 'zaplane')}
-                        variant="bold"
-                    />
+                    <>
+                        <span className="zaplane-topbar-logo zaplane-icon zaplane-icon--zaplane" />
+                        <IoIosArrowForward />
+                        <ZAPLabel
+                            as="h2"
+                            color="var(--zapplane-font-color)"
+                            type="subtitle"
+                            fontWeight="medium"
+                            label={__('Dashboard', 'zaplane')}
+                        />
+                    </>
                 )}
                 rightContent={() => (
                     <Flex gap={3} alignItems="center">
@@ -59,7 +67,7 @@ export default function Dashboard() {
                     <Text fontSize='20px' className="zaplane-heading">
                         {__("Dashboard", "zaplane")}
                     </Text>
-                    <Button  onClick={() => setIsModalOpen(true)} {...primaryBtn}>
+                    <Button onClick={() => setIsModalOpen(true)} {...primaryBtn}>
                         {__("Create Workflow", "zaplane")}
                     </Button>
                 </Flex>
