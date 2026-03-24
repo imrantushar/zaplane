@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, FileUpload } from "@chakra-ui/react";
+import { Button, FileUpload, Flex } from "@chakra-ui/react";
 import WPModal from "@ZAPComponents/Modal/WPModal";
 import { HiUpload } from "react-icons/hi";
 import { primaryBtn } from "../../../../../../../../assets/scss/chakra/recipe";
@@ -35,16 +35,21 @@ export default function ImportJSONModal({ isOpen, onClose, file, setFile, handle
       >
         <FileUpload.HiddenInput />
         <FileUpload.Trigger asChild>
-          <Button variant="outline" size="sm">
-            <HiUpload /> Upload file
+          <Button variant="outline" width='100%'>
+            <HiUpload /> {__("Select JSON File", "zaplane")}
           </Button>
         </FileUpload.Trigger>
         <FileUpload.List showSize clearable />
       </FileUpload.Root>
+      <Flex justify="flex-end" mt="24px" gap="12px">
+        <Button mt="16px" variant={'outline'}  onClick={onClose}>
+          {__("cancel", "zaplane")}
+        </Button>
+        <Button mt="16px" {...primaryBtn} onClick={handleImport}>
+          {__("Import", "zaplane")}
+        </Button>
+      </Flex>
 
-      <Button mt="16px" {...primaryBtn} width="220px" onClick={handleImport}>
-        {__("Import", "zaplane")}
-      </Button>
     </WPModal>
   );
 }
