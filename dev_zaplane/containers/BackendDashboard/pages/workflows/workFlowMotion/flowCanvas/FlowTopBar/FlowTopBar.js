@@ -14,7 +14,7 @@ import { primaryBtn, secondPrimaryBtn } from "../../../../../../../../assets/scs
 import { getRunWorkFlow } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlowRuns";
 import { useDispatch, useSelector } from "react-redux";
 import { formatTime } from "../helper";
-import { statusOptions } from "../../../helper";
+import { downloadJSON, statusOptions } from "../../../helper";
 import { workflowNodeListiner, workflowNodeListinerStop } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlowListiner";
 import { startApiCountdown } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
 import { workFLowExction } from "@ZAPRedux/Slices/workFlowSlice/actions/workflowExctions";
@@ -27,7 +27,6 @@ import { useNavigate } from "react-router-dom";
 import { route_path } from "@ZAPUtils/helper";
 import ZAPMenu from "@ZAPComponents/ZapMenu";
 import { exportWorkflows, importWorkflows } from "@ZAPRedux/Slices/workFlowSlice/actions/ExportImport";
-import { downloadJSON } from "./helper";
 import ImportJSONModal from "./ImportJSONModal";
 
 export default function FlowTopBar({
@@ -107,11 +106,9 @@ export default function FlowTopBar({
     try {
       const text = await file.text();
       const json = JSON.parse(text);
-
-      // dispatch import API
       await dispatch(
         importWorkflows(
-          json,
+          json
         )
       );
 
