@@ -1,7 +1,6 @@
 import {
   Badge,
   HStack,
-  Button,
   Text,
   Icon,
   Box
@@ -9,9 +8,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import LogDetails from "@ZAPComponents/LogDetails";
-import ZAPLoading from "@ZAPComponents/Loading";
 import { getDuration } from "@ZAPUtils/helper";
-import ZAPTable from "@ZAPComponents/Table";
 import { __ } from "@wordpress/i18n";
 import ZAPDrawer from "@ZAPComponents/Drawer";
 import { statusStyle } from "../../../helper";

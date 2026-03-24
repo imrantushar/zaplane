@@ -2,15 +2,14 @@ import { Button, Flex, HStack, Input, } from "@chakra-ui/react";
 import ZAPDrawer from "@ZAPComponents/Drawer";
 import { integrations } from "@ZAPUtils/helper";
 import { useFormikContext } from "formik";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
 import ZAPTab from "@ZAPComponents/Tab";
-import { __, sprintf } from "@wordpress/i18n";
+import { __ } from "@wordpress/i18n";
 import { primaryBtn } from "../../../../../../../assets/scss/chakra/recipe";
 import { useActionDrawer } from "@ZAPHooks/useActionDrawer/useActionDrawer";
 import { TOOLS } from "@ZAPHooks/useActionDrawer/helper";
 import { getIntegration } from "./helper";
-import { fetchDynamic } from "@ZAPRedux/Slices/workFlowSlice/helper";
 import SelectTab from "./SelectTab/SelectTab";
 import TestRun from "./TestRun/TestRun";
 import DrawerSearchList from "./DrawerSearchList/DrawerSearchList";
@@ -26,10 +25,9 @@ import './styles.scss'
 const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode, workFlow, isFullscreen, nodes, edges }) => {
   const { source, node } = context;
   const dispatch = useDispatch();
-  const { values, setFieldValue, resetForm ,initialValues} = useFormikContext();
+  const { values, setFieldValue, resetForm} = useFormikContext();
   const [step, setStep] = useState("select");
   const isTrigger = node?.data?.action === "trigger" && source === "node";
-  const [showWarning, setShowWarning] = useState(false);
 
   const { mode, setMode, selectedItem, setSelectedItem, search, setSearch, list, searchList } =
     useActionDrawer(open, node, source, setFieldValue, isTrigger);
@@ -86,7 +84,6 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
     setSearch("");
     resetForm();
     onClose();
-    setShowWarning(false)
   };
 
   const handleContinue = () => {
@@ -149,7 +146,7 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
       open={open}
       isFullscreen={isFullscreen}
       onClose={resetAll}
-      arrowClose={mode === 'app'}
+      arrowClose={['tools', 'app'].includes(mode)}
       maxWidth='700px'
       arrowOnClick={() => {
         setSelectedItem(null);

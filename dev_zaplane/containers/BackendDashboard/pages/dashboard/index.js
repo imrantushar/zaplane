@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { __ } from '@wordpress/i18n';
 import TopBar from '@ZAPComponents/TopBar';
 import ZAPLabel from '@ZAPComponents/Labels/ZAPLabel';
-import { Box, Button, Flex, Text, VStack } from '@chakra-ui/react';
+import { Box, Button, Flex} from '@chakra-ui/react';
 import { outlineBtn } from '../../../../../assets/scss/chakra/recipe';
 import { FiHelpCircle } from 'react-icons/fi';
 import { useDispatch, useSelector } from 'react-redux';
