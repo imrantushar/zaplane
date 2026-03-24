@@ -26,6 +26,8 @@ import { updateWorkFlowStatus, updateWorkFlowTitle } from "@ZAPRedux/Slices/work
 import { useNavigate } from "react-router-dom";
 import { route_path } from "@ZAPUtils/helper";
 import ZAPMenu from "@ZAPComponents/ZapMenu";
+import { exportWorkflows } from "@ZAPRedux/Slices/workFlowSlice/actions/ExportImport";
+import { downloadJSON } from "./helper";
 
 export default function FlowTopBar({
   workFlow,
@@ -75,6 +77,23 @@ export default function FlowTopBar({
 
     return () => clearInterval(interval);
   }, [activeDrawer, dispatch, id]);
+
+  // export work folw
+ const handleExport = async () => {
+  try {
+    const res = await dispatch(
+      exportWorkflows({
+        workflow_ids: [id],
+        versions: "all",
+        include_runs: true,
+      })
+    );
+
+    downloadJSON(res?.payload, values?.title || "workflow");
+  } catch (err) {
+    console.error("Export failed:", err);
+  }
+};
 
   return (
     <TopBar
@@ -264,7 +283,7 @@ export default function FlowTopBar({
               },
               {
                 label: "Export",
-                onClick: () => console.log("Export"),
+                onClick: handleExport,
               },
             ]}
           />
