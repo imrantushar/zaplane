@@ -28,6 +28,7 @@ import { useFormikContext } from "formik";
 import { updateWorkFlowStatus, updateWorkFlowTitle } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow";
 import { useNavigate } from "react-router-dom";
 import { route_path } from "@ZAPUtils/helper";
+import ZAPMenu from "@ZAPComponents/ZapMenu";
 
 export default function FlowTopBar({
   workFlow,
@@ -257,6 +258,19 @@ export default function FlowTopBar({
           <Button {...primaryBtn} disabled={!isFlowDirty} size="sm" onClick={handleSubmit}>
             {__("Update", "zaplane")}
           </Button>
+          <ZAPMenu
+            isIcon
+            items={[
+              {
+                label: "Import",
+                onClick: () => console.log("Import"),
+              },
+              {
+                label: "Export",
+                onClick: () => console.log("Export"),
+              },
+            ]}
+          />
         </Flex>
       )}
     />

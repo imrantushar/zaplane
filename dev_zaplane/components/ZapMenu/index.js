@@ -1,14 +1,27 @@
 import React from "react";
-import { Menu } from "@chakra-ui/react"
+import { Icon, IconButton, Menu } from "@chakra-ui/react"
 import { Button, Portal } from "@chakra-ui/react";
 import { __, sprintf } from "@wordpress/i18n";
-import { primaryBtn } from "../../../assets/scss/chakra/recipe";
+import { BsThreeDotsVertical } from "react-icons/bs";
 
-const ZAPMenu = ({ triggerLabel, items = [] }) => {
+
+const ZAPMenu = ({ triggerLabel, items = [], isIcon = false, variant = "outline" }) => {
   return (
     <Menu.Root>
       <Menu.Trigger asChild>
-        <Button {...primaryBtn}>{__(triggerLabel, "zaplane")}</Button>
+        {isIcon ? (
+          <IconButton
+            size="sm"
+            variant={variant}
+            aria-label="More options"
+          >
+            <BsThreeDotsVertical />
+          </IconButton>
+        ) : (
+          <Button variant={variant}>
+            {__(triggerLabel, "zaplane")}
+          </Button>
+        )}
       </Menu.Trigger>
 
       <Portal>
