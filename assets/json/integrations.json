@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-03-19 07:51:37",
+    "generated_at": "2026-03-29 06:38:16",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -12493,7 +12493,7 @@
         "jetengine": {
             "slug": "jetengine",
             "name": "JetEngine",
-            "icon": "jetengine-icon.svg",
+            "icon": "Jetengine.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
