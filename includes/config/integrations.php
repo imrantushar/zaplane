@@ -156,5 +156,9 @@ return [
 			'file' => 'academy.php',
 			'class' => \Zaplane\Integrations\Academy::class
 		],
+		'profilebuilder'            => [
+			'file' => 'profilebuilder.php',
+			'class' => \Zaplane\Integrations\Profilebuilder::class
+		],
 	],
 ];
