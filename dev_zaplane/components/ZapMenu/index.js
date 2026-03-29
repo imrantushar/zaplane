@@ -1,5 +1,5 @@
 import React from "react";
-import { Icon, IconButton, Menu } from "@chakra-ui/react"
+import { HStack, Icon, IconButton, Menu, Text } from "@chakra-ui/react"
 import { Button, Portal } from "@chakra-ui/react";
 import { __, sprintf } from "@wordpress/i18n";
 import { BsThreeDotsVertical } from "react-icons/bs";
@@ -32,8 +32,16 @@ const ZAPMenu = ({ triggerLabel, items = [], isIcon = false, variant = "outline"
                 key={index}
                 onClick={item.onClick}
                 cursor="pointer"
+                 _hover={{
+                  bg: "var(--zaplane-gray)",
+                }}
               >
-                {sprintf(__('%s', 'zaplane'), item.label)}
+                 <HStack gap={2}>
+                  {item.icon && <Icon as={item.icon} boxSize={4} />}
+                  <Text m='0'>
+                    {sprintf(__('%s', 'zaplane'), item.label)}
+                  </Text>
+                </HStack>
               </Menu.Item>
             ))}
           </Menu.Content>

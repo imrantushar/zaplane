@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Button, Text, Flex, Input, Box, FileUpload } from "@chakra-ui/react";
 import TopBar from "@ZAPComponents/TopBar";
-import { FiArrowLeft } from "react-icons/fi";
+import { FiArrowLeft, FiDownload, FiUpload } from "react-icons/fi";
 import { TfiReload } from "react-icons/tfi";
 import { LuFullscreen, LuMinimize, LuSquarePlay } from "react-icons/lu";
 import { LucideHistory } from "lucide-react";
@@ -305,10 +305,12 @@ export default function FlowTopBar({
               items={[
                 {
                   label: "Import",
+                  icon: FiUpload,
                   onClick: () => setIsModalOpen(true),
                 },
                 {
                   label: "Export",
+                  icon: FiDownload,
                   onClick: handleExport,
                 },
               ]}
