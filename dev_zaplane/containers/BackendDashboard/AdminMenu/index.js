@@ -1,11 +1,8 @@
 import React, { useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { __ } from '@wordpress/i18n';
 import {
 	route_path,
-	toplevel_menu_icon_url,
-	toplevel_menu_title,
-	is_pro,
 	plugin_root_url,
 	useQuery,
 } from '@ZAPUtils/helper';
@@ -35,10 +32,7 @@ const AdminMenu = () => {
 				<div
 					className="wp-menu-image svg"
 					style={ {
-						backgroundImage: `url('${
-							toplevel_menu_icon_url ??
-							plugin_root_url + 'assets/images/logo_black_white.svg'
-						}')`,
+						backgroundImage: `url(${plugin_root_url}assets/images/zaplane.svg)`,
 					} }
 					aria-hidden="true"
 				>
