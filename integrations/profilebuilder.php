@@ -14,6 +14,16 @@ class Profilebuilder extends IntegrationBase
         return 'profilebuilder';
     }
 
+    public static function get_name(): string
+    {
+        return 'Profile Builder';
+    }
+
+    public static function get_icon(): string
+    {
+        return 'profilebuilder.svg';
+    }
+
     public static function get_triggers(): array
     {
         return [
