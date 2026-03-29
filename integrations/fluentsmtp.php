@@ -30,7 +30,7 @@ class Fluentsmtp extends IntegrationBase {
 			],
 			'email_sent_failed' => [
 				'label' => 'Failed to send email',
-				'hook'  => ['fluentmail_email_sending_failed', 'fluentmail_email_sending_failed_no_fallback'],
+				'hook'  => 'fluentmail_email_sending_failed',
 			],
 		];
 	}
@@ -38,35 +38,25 @@ class Fluentsmtp extends IntegrationBase {
 	public static function resolve_trigger( array $node, array $args ) {
 		switch ( $node['event'] ) {
 			case 'email_sent_success':
-                $to         = $args[0] ?? [];
-                $subject    = $args[1] ?? '';
-                $message    = $args[2] ?? '';
-                $headers    = $args[3] ?? [];
-                $attachments= $args[4] ?? [];
+				$email_data = $args[0] ?? [];
 
-                return [
-                    'success'     => true,
-                    'to'          => $to,
-                    'subject'     => $subject,
-                    'message'     => $message,
-                    'headers'     => $headers,
-                    'attachments' => $attachments,
-                ];
+				return [
+					'success' => true,
+					'data'    => $email_data,
+				];
 
-            case 'email_sent_failed':
-                $email_data = $args[0] ?? [];
-                $error_msg  = $args[1] ?? '';
+			case 'email_sent_failed':
+				$log_id  = $args[1] ?? false;
+				$handler = $args[2] ?? null;
+				$data    = $args[3] ?? [];
 
-                return [
-                    'success'     => false,
-                    'log_id'      => $email_data['log_id'] ?? false,
-                    'to'          => $email_data['to'] ?? [],
-                    'subject'     => $email_data['subject'] ?? '',
-                    'message'     => $email_data['message'] ?? '',
-                    'headers'     => $email_data['headers'] ?? [],
-                    'attachments' => $email_data['attachments'] ?? [],
-                    'error'       => $error_msg,
-                ];
+				return [
+					'success' => false,
+					'log_id'  => $log_id,
+					'handler' => is_object( $handler ) ? get_class( $handler ) : $handler,
+					'data'    => $data,
+					'error'   => $data['response']['message'] ?? 'Unknown error',
+				];
 		}//end switch
 
 		return false;
