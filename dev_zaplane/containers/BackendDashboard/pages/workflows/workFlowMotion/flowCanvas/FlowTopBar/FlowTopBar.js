@@ -87,7 +87,7 @@ export default function FlowTopBar({
         exportWorkflows({
           workflow_ids: [id],
           versions: "all",
-          include_runs: true,
+          include_runs: false,
         })
       );
 

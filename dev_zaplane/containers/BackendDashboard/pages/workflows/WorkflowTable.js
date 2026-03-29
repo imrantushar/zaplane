@@ -63,7 +63,7 @@ const WorkflowTable = () => {
         exportWorkflows({
           workflow_ids: [row.id],
           versions: "all",
-          include_runs: true,
+          include_runs: false,
         })
       );
       downloadJSON(res?.payload, row.title || "workflow");
