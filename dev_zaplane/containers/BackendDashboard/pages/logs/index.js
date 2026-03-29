@@ -4,6 +4,8 @@ import {
     Box,
     HStack,
     Icon,
+    Flex,
+    Image,
 
 } from "@chakra-ui/react";
 import { useDispatch, useSelector } from "react-redux";
@@ -19,7 +21,7 @@ import LogDetails from "@ZAPComponents/LogDetails";
 import TopBar from "@ZAPComponents/TopBar";
 import ZAPDrawer from "@ZAPComponents/Drawer";
 import ListTable from "@ZAPComponents/ListTable";
-import { formatDateTime, formatLabel, getDuration } from "@ZAPUtils/helper";
+import { formatDateTime, formatLabel, getDuration, plugin_root_url } from "@ZAPUtils/helper";
 import { HistoryIcon } from "@ZAPUtils/icons";
 import ZAPTooltip from "@ZAPComponents/ZAPTooltip";
 import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
@@ -191,7 +193,12 @@ const Logs = () => {
             <TopBar
                 leftContent={() => (
                     <>
-                        <span className="zaplane-topbar-logo zaplane-icon zaplane-icon--zaplane" />
+                        <Flex height='40px' width='40px' borderRadius='20px' gap='10px' background='var(--zaplane-second-primary)' alignItems='center' justifyContent='center'>
+                            <Image
+                                src={`${plugin_root_url}assets/images/zaplane.svg`}
+                                boxSize="20px"
+                            />
+                        </Flex>
                         <IoIosArrowForward />
                         <ZAPLabel
                             as="h2"

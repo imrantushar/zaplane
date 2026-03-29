@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { __ } from '@wordpress/i18n';
 import TopBar from '@ZAPComponents/TopBar';
 import ZAPLabel from '@ZAPComponents/Labels/ZAPLabel';
-import { Box, Button, Flex, Text } from '@chakra-ui/react';
+import { Box, Button, Flex, Image, Text } from '@chakra-ui/react';
 import { outlineBtn, primaryBtn } from '../../../../../assets/scss/chakra/recipe';
 import { FiHelpCircle } from 'react-icons/fi';
 import { useDispatch, useSelector } from 'react-redux';
@@ -15,6 +15,7 @@ import OverviewSection from './OverviewSection/OverviewSection';
 import { useNavigate } from 'react-router-dom';
 import CreateWorkflowModal from '@ZAPComponents/CreateWorkflowModal';
 import { IoIosArrowForward } from 'react-icons/io';
+import { plugin_root_url } from '@ZAPUtils/helper';
 
 export default function Dashboard() {
     const dispatch = useDispatch();
@@ -31,7 +32,12 @@ export default function Dashboard() {
             <TopBar
                 leftContent={() => (
                     <>
-                        <span className="zaplane-topbar-logo zaplane-icon zaplane-icon--zaplane" />
+                        <Flex height='40px' width='40px' borderRadius='20px' gap='10px' background='var(--zaplane-second-primary)' alignItems='center' justifyContent='center'>
+                            <Image
+                            src={`${plugin_root_url}assets/images/zaplane.svg`}
+                            boxSize="20px"
+                        />
+                        </Flex>
                         <IoIosArrowForward />
                         <ZAPLabel
                             as="h2"
