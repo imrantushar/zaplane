@@ -11003,7 +11003,7 @@ const AdminMenu = () => {
       }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("div", {
         className: "wp-menu-image svg",
         style: {
-          backgroundImage: `url(${_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_3__.plugin_root_url}assets/images/zaplane.svg)`
+          backgroundImage: `url(${_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_3__.plugin_root_url}/images/menu-icon.svg)`
         },
         "aria-hidden": "true",
         children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("br", {})

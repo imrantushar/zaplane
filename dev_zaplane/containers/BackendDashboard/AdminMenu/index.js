@@ -32,7 +32,7 @@ const AdminMenu = () => {
 				<div
 					className="wp-menu-image svg"
 					style={ {
-						backgroundImage: `url(${plugin_root_url}assets/images/zaplane.svg)`,
+						backgroundImage: `url(${plugin_root_url}/images/menu-icon.svg)`,
 					} }
 					aria-hidden="true"
 				>

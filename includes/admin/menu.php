@@ -13,7 +13,7 @@ class Menu {
 		add_action( 'admin_menu', [ $this, 'admin_menu' ] );
 	}
 	public function admin_menu() {
-		$icon_url = ZAPLANE_ASSETS_URI . 'assets/images/zaplane.svg';
+		$icon_url = ZAPLANE_ASSETS_URI . '/images/menu-icon.svg';
 		$page_title = 'Zaplane';
 		add_menu_page( $page_title, $page_title, 'manage_options', ZAPLANE_PLUGIN_SLUG, [ $this, 'load_main_template' ], $icon_url, 30 );
 		foreach ( Helper::get_admin_menu_list() as $item_key => $item ) {
