@@ -156,5 +156,9 @@ return [
 			'file' => 'academy.php',
 			'class' => \Zaplane\Integrations\Academy::class
 		],
+		'fluentsmtp'            => [
+			'file' => 'fluentsmtp.php',
+			'class' => \Zaplane\Integrations\Fluentsmtp::class
+		],
 	],
 ];
