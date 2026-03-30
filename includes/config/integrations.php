@@ -156,5 +156,9 @@ return [
 			'file' => 'academy.php',
 			'class' => \Zaplane\Integrations\Academy::class
 		],
+		'wpuserfrontend'            => [
+			'file' => 'wpuserfrontend.php',
+			'class' => \Zaplane\Integrations\Wpuserfrontend::class
+		],
 	],
 ];
