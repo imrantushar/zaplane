@@ -17,18 +17,17 @@ import {
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { toggleFullscreenMode, mapGraphFromBackend, formatTime } from "./helper";
+import { toggleFullscreenMode, mapGraphFromBackend } from "./helper";
 import ZAPLoading from "@ZAPComponents/Loading";
-import { statusOptions } from "../../helper";
 import { useFlowActions } from "@ZAPHooks/useFlowActions/useFlowActions";
-import CustomNode from "../customNode/CustomNode";
+import CustomNode from "../CustomNode/CustomNode";
 import './styles.scss'
 import { IoSwapHorizontal, IoSwapVerticalOutline } from "react-icons/io5";
 import ZAPTooltip from "@ZAPComponents/ZAPTooltip";
-import { getSingleWorkFlow } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow";
+import { getSingleWorkFlow} from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow";
 import FlowTopBar from "./FlowTopBar/FlowTopBar";
 
-export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdgesChange, onNodesChange, getNewNodeId, workFlow }) {
+export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdgesChange, onNodesChange, getNewNodeId, workFlow,isFlowDirty,canvasLayout,setCanvasLayOut}) {
     const dispatch = useDispatch();
     const navigate = useNavigate()
     const [drawerOpen, setDrawerOpen] = useState(false);
@@ -38,9 +37,6 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [activeDrawer, setActiveDrawer] = useState(null);
     const { versions } = useSelector((state) => state.workflows);
-    //if we menage layout syestem then we need to save databse this value
-    const [canvasLayout, setCanvasLayout] = useState("LR")
-
     useEffect(() => {
         if (!workFlow?.graph) return;
         const { nodes, edges } = mapGraphFromBackend(workFlow.graph);
@@ -54,7 +50,9 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
         node: null,
         edge: null,
     });
+
     const activeVersionId = versions?.find(v => v.is_active)?.id;
+
     useEffect(() => {
         setLoading(true);
         dispatch(getSingleWorkFlow(id)).finally(() => setLoading(false));
@@ -67,7 +65,7 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
         openDrawerForNode,
         openDrawerFromAdd,
         onLayout
-    } = useFlowActions({ nodes, setNodes, edges, setEdges, drawerContext, getNewNodeId, setDrawerContext, setDrawerOpen, setCanvasLayout, canvasLayout });
+    } = useFlowActions({ nodes, setNodes, edges, setEdges, drawerContext, getNewNodeId, setDrawerContext, setDrawerOpen, setFieldValue, canvasLayout,setCanvasLayOut });
 
     const onAddNode = (edgeId) => {
         const edge = edges.find((e) => e.id === edgeId);
@@ -93,10 +91,10 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
         setEdges((eds) => eds.filter((e) => e.id !== edgeId));
     };
 
-    console.log(nodes, 'all nodes',);
-    console.log(edges, 'all edges');
+    
     const nodeTypes = {
         custom: (props) => (
+        
             <CustomNode
                 {...props}
                 data={{
@@ -107,6 +105,7 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
 
                 }}
                 canvasLayout={canvasLayout}
+                nodes={nodes}
             />
         ),
     };
@@ -119,15 +118,9 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
             />
         ),
     };
-    //listiner
 
-    // useEffect(() => {
-    //     const interval = setInterval(() => {
-    //         dispatch(getRunWorkFlow());
-    //     }, 5000);
-
-    //     return () => clearInterval(interval);
-    // }, []);  
+    // console.log(nodes, 'all nodes',);
+    // console.log(edges, 'all edges');
     return (
         <Box
             ref={containerRef}
@@ -139,7 +132,6 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
         >
 
             <FlowTopBar
-                navigate={navigate}
                 workFlow={workFlow}
                 isFullscreen={isFullscreen}
                 toggleFullscreen={() =>
@@ -151,6 +143,7 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
                 handleSubmit={handleSubmit}
                 activeDrawer={activeDrawer}
                 setActiveDrawer={setActiveDrawer}
+                isFlowDirty={isFlowDirty}
             />
 
             {
@@ -196,7 +189,7 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
                             </ControlButton>
                         </ZAPTooltip>
                         <ZAPTooltip content={__("Horizontal layout", "zaplane")}
-                         positioning={{
+                            positioning={{
                                 placement: "top",
                                 offset: {
                                     mainAxis: 8,
@@ -231,6 +224,8 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
                 createActionNode={createActionNode}
                 updateNodeData={updateNodeData}
                 workFlow={workFlow}
+                nodes={nodes}
+                edges={edges}
 
             />
 

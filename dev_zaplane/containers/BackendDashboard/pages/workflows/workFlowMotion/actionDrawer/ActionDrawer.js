@@ -1,31 +1,33 @@
-import {Button,HStack, Input,} from "@chakra-ui/react";
+import { Button, Flex, HStack, Input, } from "@chakra-ui/react";
 import ZAPDrawer from "@ZAPComponents/Drawer";
 import { integrations } from "@ZAPUtils/helper";
 import { useFormikContext } from "formik";
 import { useEffect, useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
 import ZAPTab from "@ZAPComponents/Tab";
-import { __, sprintf } from "@wordpress/i18n";
+import { __ } from "@wordpress/i18n";
 import { primaryBtn } from "../../../../../../../assets/scss/chakra/recipe";
 import { useActionDrawer } from "@ZAPHooks/useActionDrawer/useActionDrawer";
 import { TOOLS } from "@ZAPHooks/useActionDrawer/helper";
 import { getIntegration } from "./helper";
-import { fetchDynamic } from "@ZAPRedux/Slices/workFlowSlice/helper";
 import SelectTab from "./SelectTab/SelectTab";
-import TestTab from "./TestTab/TestTab";
+import TestRun from "./TestRun/TestRun";
 import DrawerSearchList from "./DrawerSearchList/DrawerSearchList";
 import DrawerModeList from "./DrawerItemList/DrawerModeList";
 import DrawerItemList from "./DrawerItemList";
+import ActionFieldRenderer from "./ActionFieldRenderer/ActionFieldRenderer";
+import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
+import { useDynamicFields } from "@ZAPHooks/useActionDrawer/useDynamicFields";
+import { mapEdgesForBackend, mapNodesForBackend } from "../helper";
+import { conditionVariables } from "@ZAPRedux/Slices/workFlowSlice/actions/conditonVariales";
+import './styles.scss'
 
- const  ActionDrawer=({ open, context, onClose, updateNodeData, createActionNode, workFlow, isFullscreen }) =>{
+const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode, workFlow, isFullscreen, nodes, edges }) => {
   const { source, node } = context;
   const dispatch = useDispatch();
-  const { values, setFieldValue, resetForm } = useFormikContext();
+  const { values, setFieldValue, resetForm} = useFormikContext();
   const [step, setStep] = useState("select");
-  const [dynamicOptions, setDynamicOptions] = useState({});
-  const [loadingFields, setLoadingFields] = useState({});
   const isTrigger = node?.data?.action === "trigger" && source === "node";
-  const [showWarning, setShowWarning] = useState(false);
 
   const { mode, setMode, selectedItem, setSelectedItem, search, setSearch, list, searchList } =
     useActionDrawer(open, node, source, setFieldValue, isTrigger);
@@ -52,7 +54,6 @@ import DrawerItemList from "./DrawerItemList";
         : Object.values(integration.actions || {});
     return list.map(i => ({ label: i.label, value: i.key, hook: i.hook }));
   }, [mode, selectedItem, isTrigger]);
-
   //Get schema fields for the selected action
 
   const selectedActionFields = useMemo(() => {
@@ -63,26 +64,18 @@ import DrawerItemList from "./DrawerItemList";
     return integration.actions?.[values.actionType]?.schema || [];
   }, [mode, selectedItem, values?.actionType, isTrigger]);
 
-  const getKey = (field) => `${mode}:${selectedItem?.id}:${field.key}`;
-
-  //Generate dynamic keys and fetch dynamic options
-
-  const fetchDynamicOptions = async (field) => {
-    if (!field.dynamic) return;
-    const key = getKey(field);
-    if (dynamicOptions[key]) return;
-
-    setLoadingFields(p => ({ ...p, [key]: true }));
-    const res = await fetchDynamic(field.dynamic);
-    setDynamicOptions(p => ({
-      ...p,
-      [key]: Object.values(res).map(i => ({
-        value: i[field.dynamic.select[0]],
-        label: i[field.dynamic.select[1]],
-      })),
-    }));
-    setLoadingFields(p => ({ ...p, [key]: false }));
-  };
+  // NOW call dynamic hook
+  const {
+    dynamicOptions,
+    loadingFields,
+    fetchDynamicOptions,
+    getKey,
+  } = useDynamicFields({
+    selectedItem,
+    mode,
+    selectedActionFields,
+    values,
+  });
 
   const resetAll = () => {
     setMode(null);
@@ -91,38 +84,83 @@ import DrawerItemList from "./DrawerItemList";
     setSearch("");
     resetForm();
     onClose();
-    setShowWarning(false)
   };
 
   const handleContinue = () => {
-    if (step === "select") return setStep("test");
-    // if (step === "configure") return setStep("test");
+    if (step === "select") {
+      return setStep("configure");
+    }
+    if (step === "configure") {
 
-    const payload = {
-      app: selectedItem.name,
-      name: selectedItem.name,
-      event: values.actionType,
-      hook: values.hook,
-      config: selectedActionFields.reduce((acc, f) => {
-        acc[f.key] = values[f.key];
-        return acc;
-      }, {}),
-    };
-    context?.source === "node" ? updateNodeData(payload) : createActionNode(payload);
-    resetAll();
+      const payload = {
+        icon:selectedItem.icon,
+        app: selectedItem.id,
+        name: selectedItem.name,
+        event: values.actionType,
+        config: selectedActionFields.reduce((acc, f) => {
+          acc[f.key] = values[f.key];
+          return acc;
+        }, {}),
+         ...(selectedItem.mode && { mode: selectedItem.mode }),
+        ...(values.hook && { hook: values.hook }),
+        ...(values.connection_id && { connection_id: values.connection_id }),
+      };
+      if (context?.source !== "node") {
+        createActionNode(payload);
+      }
+      else {
+        updateNodeData(payload);
+      }
+
+      return setStep("test");
+    }
+
+    if (step === "test") {
+      resetAll();
+    }
+   
   };
+  // seleted intregation
+  const selectedIntegration = useMemo(() => {
+    return getIntegration(mode, selectedItem);
+  }, [mode, selectedItem]);
+
+  // get global variable
+  useEffect(() => {
+    if (!node?.id || !workFlow?.version?.hash) return;
+    const payload = {
+      workflow_id: workFlow.workflow?.id,
+      workflow_hash: workFlow.version?.hash,
+      workflow_version_id: workFlow.version?.id,
+      target_node_key: node?.id,
+      graph: {
+        nodes: mapNodesForBackend(nodes),
+        edges: mapEdgesForBackend(edges),
+      },
+    };
+
+    dispatch(conditionVariables(payload));
+  }, [node?.id]);
   return (
     <ZAPDrawer
       open={open}
       isFullscreen={isFullscreen}
       onClose={resetAll}
+      arrowClose={['tools', 'app'].includes(mode)}
+      maxWidth='700px'
+      arrowOnClick={() => {
+        setSelectedItem(null);
+        setMode(null);
+        setStep("select");
+        setFieldValue("actionType", "");
+      }}
       // closeOnOverlayClick
       title={!mode ? "Add Action" : selectedItem?.name || __('App', 'zaplane')}
       placement="end"
-      size={["filter", "condition"].includes(values?.actionType) ? "xl" : "md"}
+      // size={["filter", "condition"].includes(values?.actionType) ? "xl" : "md"}
       footer={
         <HStack justify="space-between">
-          <Button variant="ghost" onClick={resetAll}>{__("Cancel", "zaplane")}</Button>
+          <Button variant="outline" onClick={resetAll}>{__("Cancel", "zaplane")}</Button>
           <Button {...primaryBtn}
             disabled={!values.actionType}
             onClick={handleContinue}>{step === 'test' ? __('Submit', 'zaplane') : __('Continue', 'zaplane')}
@@ -178,15 +216,44 @@ import DrawerItemList from "./DrawerItemList";
                   getKey={getKey}
                   node={node}
                   workFlow={workFlow}
+                  selectedIntegration={selectedIntegration}
+                  appSlug={selectedItem?.id}
                 />
               )
             },
-            // { value: "configure", label: "Configure", content: <Text fontSize="sm">{__("Configure step", "zaplane")}</Text> },
+            {
+              value: "configure", label: "Configure", content: <>
+                <Flex direction="column" className="action-drowar-lists" gap={4}>
+                  {selectedActionFields?.length > 0 ? (
+                    selectedActionFields.map((field) => (
+                      <ActionFieldRenderer
+                        key={field.key}
+                        field={field}
+                        value={values?.[field.key]}
+                        setFieldValue={setFieldValue}
+                        getKey={getKey}
+                        dynamicOptions={dynamicOptions}
+                        loadingFields={loadingFields}
+                        fetchDynamicOptions={fetchDynamicOptions}
+                        nodeId={node?.id}
+                        workFlow={workFlow}
+                        nodes={nodes}
+                        edges={edges}
+                      />
+                    ))
+                  ) : (
+                    <ZAPLabel label={__("No configuration required for this action.", "zaplane")} type="simple" />
+                  )}
+                </Flex>
+              </>
+            },
             {
               value: "test",
               label: "Test",
               content: (
-                <TestTab
+                <TestRun
+                  nodes={nodes}
+                  edges={edges}
                   source={source}
                   node={node}
                   workFlow={workFlow}

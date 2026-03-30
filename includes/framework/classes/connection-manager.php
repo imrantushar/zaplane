@@ -2,8 +2,8 @@
 
 namespace Zaplane\Framework\Classes;
 
-if (!defined('ABSPATH')) {
-    exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
 use Zaplane\Framework\Core\IntegrationLoader;
@@ -12,228 +12,253 @@ use Zaplane\Framework\Exceptions\EncryptionException;
 use Zaplane\Framework\Exceptions\IntegrationException;
 use Zaplane\Models\Connection;
 
-class ConnectionManager
-{
-    /**
-     * @throws ConnectionException
-     * @throws IntegrationException
-     */
-    public function create(int $user_id, string $app, string $name, string $auth_type, array $credentials)
-    {
-        $integration = IntegrationLoader::get($app);
-        if (!$integration) {
-            throw IntegrationException::notFound($app);
-        }
+class ConnectionManager {
 
-        try {
-            $encrypted = Encryption::encrypt($credentials);
-        } catch (EncryptionException $e) {
-            throw ConnectionException::createFailed($app, $e->getMessage());
-        }
 
-        $connection = Connection::create([
-            'user_id' => $user_id,
-            'app' => $app,
-            'name' => $name,
-            'auth_type' => $auth_type,
-            'encrypted_credentials' => $encrypted,
-            'status' => 'active',
-        ]);
 
-        return $connection->id;
-    }
+	public function create( int $user_id, string $app, string $name, string $auth_type, array $credentials ): array {
+		$integration = IntegrationLoader::get( $app );
+		if ( ! $integration ) {
+			throw IntegrationException::notFound( esc_html( $app ) );
+		}
 
-    public function get(int $id, bool $decrypt = false): ?array
-    {
-        $connection = Connection::find($id);
+		$test_result = null;
+		if ( 'oauth2' !== $auth_type ) {
+			$class = get_class( $integration );
+			$test_result = $class::test_connection( $credentials );
+			if ( ! ( $test_result['success'] ?? false ) ) {
+				throw ConnectionException::invalidCredentials(
+					esc_html( $app ),
+					esc_html( $test_result['message'] ?? 'Connection test failed' )
+				);
+			}
+		}
 
-        if (!$connection) {
-            return null;
-        }
+		try {
+			$encrypted = Encryption::encrypt( $credentials );
+		} catch ( EncryptionException $e ) {
+			throw ConnectionException::createFailed( esc_html( $app ), esc_html( $e->getMessage() ) );
+		}
 
-        $data = $connection->toArray();
+		$connection = Connection::create([
+			'user_id' => $user_id,
+			'app' => $app,
+			'name' => $name,
+			'auth_type' => $auth_type,
+			'encrypted_credentials' => $encrypted,
+			'status' => 'active',
+		]);
 
-        if ($decrypt && !empty($connection->encrypted_credentials)) {
-            try {
-                $data['credentials'] = Encryption::decrypt($connection->encrypted_credentials);
-            } catch (EncryptionException $e) {
-                $data['credentials'] = [];
-                $data['decrypt_error'] = $e->getMessage();
-            } catch (\Exception $e) {
-            }
-        }
+		if ( null !== $test_result ) {
+			$connection->markAsTested( true );
+		}
 
-        return $data;
-    }
+		return [
+			'id' => $connection->id,
+			'test_result' => $test_result
+		];
+	}
 
-    public function get_user_connections(int $user_id, ?string $app = null): array
-    {
-        $connections = Connection::forUser($user_id, $app);
+	public function get( int $id, bool $decrypt = false ): ?array {
+		$connection = Connection::find( $id );
 
-        return $connections->toArray();
-    }
+		if ( ! $connection ) {
+			return null;
+		}
 
-    public function update(int $id, array $data): bool
-    {
-        $connection = Connection::find($id);
+		$data = $connection->toArray();
 
-        if (!$connection) {
-            return false;
-        }
+		if ( $decrypt && ! empty( $connection->encrypted_credentials ) ) {
+			try {
+				$data['credentials'] = Encryption::decrypt( $connection->encrypted_credentials );
+			} catch ( EncryptionException $e ) {
+				$data['credentials'] = [];
+				$data['decrypt_error'] = $e->getMessage();
+			// phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
+			} catch ( \Exception $e ) {
+				// Silently ignore non-encryption exceptions for credential decryption.
+			}
+		}
 
-        $allowed_fields = ['name', 'status'];
-        $update_data = array_intersect_key($data, array_flip($allowed_fields));
+		return $data;
+	}
 
-        if (empty($update_data)) {
-            return false;
-        }
+	public function get_user_connections( int $user_id, ?string $app = null, int $page = 1, int $perPage = 20 ): array {
+		$query = Connection::where( 'user_id', $user_id );
 
-        foreach ($update_data as $key => $value) {
-            $connection->{$key} = $value;
-        }
+		if ( null !== $app ) {
+			$query->where( 'app', $app );
+		}
 
-        return $connection->save();
-    }
+		$total = ( clone $query )->count();
 
-    public function update_credentials(int $id, array $credentials): bool
-    {
-        $connection = Connection::find($id);
+		$connections = $query->orderBy( 'name', 'asc' )
+			->forPage( $page, $perPage )
+			->get();
 
-        if (!$connection) {
-            return false;
-        }
+		return [
+			'data' => $connections->toArray(),
+			'pagination' => [
+				'page' => $page,
+				'per_page' => $perPage,
+				'total' => $total,
+				'total_pages' => (int) ceil( $total / $perPage ),
+			],
+		];
+	}
 
-        try {
-            $encrypted = Encryption::encrypt($credentials);
-        } catch (EncryptionException $e) {
-            return false;
-        }
+	public function update( int $id, array $data ): bool {
+		$connection = Connection::find( $id );
 
-        $connection->encrypted_credentials = $encrypted;
-        return $connection->save();
-    }
+		if ( ! $connection ) {
+			return false;
+		}
 
-    public function delete(int $id): bool
-    {
-        $connection = Connection::find($id);
+		$allowed_fields = [ 'name', 'status' ];
+		$update_data = array_intersect_key( $data, array_flip( $allowed_fields ) );
 
-        if (!$connection) {
-            return false;
-        }
+		if ( empty( $update_data ) ) {
+			return false;
+		}
 
-        return $connection->delete();
-    }
+		foreach ( $update_data as $key => $value ) {
+			$connection->{$key} = $value;
+		}
 
-    public function user_owns_connection(int $connection_id, int $user_id): bool
-    {
-        $connection = Connection::find($connection_id);
+		return $connection->save();
+	}
 
-        if (!$connection) {
-            return false;
-        }
+	public function update_credentials( int $id, array $credentials ): bool {
+		$connection = Connection::find( $id );
 
-        return $connection->isOwnedBy($user_id);
-    }
+		if ( ! $connection ) {
+			return false;
+		}
 
-    public function test(int $id): array
-    {
-        $connection = Connection::find($id);
+		try {
+			$encrypted = Encryption::encrypt( $credentials );
+		} catch ( EncryptionException $e ) {
+			return false;
+		}
 
-        if (!$connection) {
-            throw ConnectionException::notFound($id);
-        }
+		$connection->encrypted_credentials = $encrypted;
+		return $connection->save();
+	}
 
-        $credentials = $connection->getCredentials();
+	public function delete( int $id ): bool {
+		$connection = Connection::find( $id );
 
-        if (empty($credentials) && !empty($connection->encrypted_credentials)) {
-            throw ConnectionException::testFailed($id, 'Failed to decrypt credentials');
-        }
+		if ( ! $connection ) {
+			return false;
+		}
 
-        if (!IntegrationLoader::has($connection->app)) {
-            throw IntegrationException::notFound($connection->app);
-        }
+		return $connection->delete();
+	}
 
-        $integration = IntegrationLoader::get($connection->app);
-        $class = get_class($integration);
+	public function user_owns_connection( int $connection_id, int $user_id ): bool {
+		$connection = Connection::find( $connection_id );
 
-        $result = $class::test_connection($credentials);
+		if ( ! $connection ) {
+			return false;
+		}
 
-        $connection->markAsTested($result['success'] ?? false);
+		return $connection->isOwnedBy( $user_id );
+	}
 
-        return $result;
-    }
+	public function test( int $id ): array {
+		$connection = Connection::find( $id );
 
-    public function get_execution_credentials(int $id): array
-    {
-        $connection = Connection::find($id);
+		if ( ! $connection ) {
+			throw ConnectionException::notFound( esc_html( (string) $id ) );
+		}
 
-        if (!$connection) {
-            throw ConnectionException::notFound($id);
-        }
+		$credentials = $connection->getCredentials();
 
-        $credentials = $connection->getCredentials();
+		if ( empty( $credentials ) && ! empty( $connection->encrypted_credentials ) ) {
+			throw ConnectionException::testFailed( esc_html( (string) $id ), 'Failed to decrypt credentials' );
+		}
 
-        if (empty($credentials) && !empty($connection->encrypted_credentials)) {
-            throw EncryptionException::decryptionFailed('Failed to decrypt credentials');
-        }
+		if ( ! IntegrationLoader::has( $connection->app ) ) {
+			throw IntegrationException::notFound( esc_html( $connection->app ) );
+		}
 
-        if ($connection->auth_type === 'oauth2') {
-            $credentials = $this->refresh_oauth_if_needed($connection, $credentials);
-        }
+		$integration = IntegrationLoader::get( $connection->app );
+		$class = get_class( $integration );
 
-        $connection->markAsUsed();
+		$result = $class::test_connection( $credentials );
 
-        return $credentials;
-    }
+		$connection->markAsTested( $result['success'] ?? false );
 
-    private function refresh_oauth_if_needed(Connection $connection, array $credentials): array
-    {
-        if (!$connection->oauth_expires_at) {
-            return $credentials;
-        }
+		return $result;
+	}
 
-        // Check if token expires within 5 minutes
-        if (!$connection->isOAuthExpiringSoon(5)) {
-            return $credentials;
-        }
+	public function get_execution_credentials( int $id ): array {
+		$connection = Connection::find( $id );
 
-        $refresh_token = $credentials['refresh_token'] ?? null;
+		if ( ! $connection ) {
+			throw ConnectionException::notFound( esc_html( (string) $id ) );
+		}
 
-        if (!$refresh_token) {
-            return $credentials;
-        }
+		$credentials = $connection->getCredentials();
 
-        if (!IntegrationLoader::has($connection->app)) {
-            return $credentials;
-        }
+		if ( empty( $credentials ) && ! empty( $connection->encrypted_credentials ) ) {
+			throw EncryptionException::decryptionFailed( 'Failed to decrypt credentials' );
+		}
 
-        $integration = IntegrationLoader::get($connection->app);
-        $class = get_class($integration);
+		if ( 'oauth2' === $connection->auth_type ) {
+			$credentials = $this->refresh_oauth_if_needed( $connection, $credentials );
+		}
 
-        try {
-            $new_tokens = $class::refresh_oauth_token($refresh_token);
-            $credentials = array_merge($credentials, $new_tokens);
+		$connection->markAsUsed();
 
-            $connection->setCredentials($credentials);
+		return $credentials;
+	}
 
-            if (isset($new_tokens['expires_in'])) {
-                $connection->setOAuthExpiry((int) $new_tokens['expires_in']);
-            }
-        } catch (\Throwable $e) {
-            error_log('Zaplane OAuth refresh failed for connection ' . $connection->id . ': ' . $e->getMessage());
-        }
+	private function refresh_oauth_if_needed( Connection $connection, array $credentials ): array {
+		if ( ! $connection->oauth_expires_at ) {
+			return $credentials;
+		}
 
-        return $credentials;
-    }
+		if ( ! $connection->isOAuthExpiringSoon( 5 ) ) {
+			return $credentials;
+		}
 
-    public function set_oauth_expiry(int $id, int $expires_in): bool
-    {
-        $connection = Connection::find($id);
+		$refresh_token = $credentials['refresh_token'] ?? null;
 
-        if (!$connection) {
-            return false;
-        }
+		if ( ! $refresh_token ) {
+			return $credentials;
+		}
 
-        return $connection->setOAuthExpiry($expires_in);
-    }
+		if ( ! IntegrationLoader::has( $connection->app ) ) {
+			return $credentials;
+		}
+
+		$integration = IntegrationLoader::get( $connection->app );
+		$class = get_class( $integration );
+
+		try {
+			$new_tokens = $class::refresh_oauth_token( $refresh_token );
+			$credentials = array_merge( $credentials, $new_tokens );
+
+			$connection->setCredentials( $credentials );
+
+			if ( isset( $new_tokens['expires_in'] ) ) {
+				$connection->setOAuthExpiry( (int) $new_tokens['expires_in'] );
+			}
+		} catch ( \Throwable $e ) {
+			$e->getMessage();
+		}
+
+		return $credentials;
+	}
+
+	public function set_oauth_expiry( int $id, int $expires_in ): bool {
+		$connection = Connection::find( $id );
+
+		if ( ! $connection ) {
+			return false;
+		}
+
+		return $connection->setOAuthExpiry( $expires_in );
+	}
 }

@@ -14,8 +14,15 @@
     margin: 0 auto 100px auto;
     padding: 0 15px;
     box-sizing: border-box;
-    min-height: 100vh;
+    // min-height: 100vh;
 
+}
+.zaplane-icon{
+    font-size: 20px;
+}
+.zaplane-button-actve{
+    background: var(--zaplane-second-primary);
+    color: var(--zaplane-primary) !important;
 }
 .react-flow {
     position: fixed !important;
@@ -168,8 +175,9 @@
     }
     &-label {
         color: var(--zaplane-font-color);
+        font-size: 14px;
         font-weight: 500;
-        line-height: 28px;
+        line-height: 20px;
         margin: 0;
     }
     &-border {
@@ -201,7 +209,7 @@
         color: var(--zaplane-font-color);
         font-size: 12px;
         font-weight: 400;
-        line-height: 18px;
+        line-height: 16px;
         margin: 0;
     }
     &-sub-title-muted {
@@ -273,7 +281,7 @@
 
     &-textarea {
         border: 1px solid var(--zaplane-border-color);
-        height: 100px;
+        height: 100%;
         width: 100%;
         padding: 7px;
         border-radius: 4px;

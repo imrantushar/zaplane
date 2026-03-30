@@ -2,13 +2,14 @@
 
 namespace Zaplane\Framework\Database\ORM;
 
-if (!defined('ABSPATH')) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
-abstract class Migration
-{
-    abstract public function up(): void;
+abstract class Migration {
 
-    public function down(): void
-    {
-    }
+	abstract public function up(): void;
+
+	public function down(): void {
+	}
 }

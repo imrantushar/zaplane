@@ -1,9 +1,10 @@
-import { VStack, Button, Text } from "@chakra-ui/react";
+import { VStack, Button, Text, Flex} from "@chakra-ui/react";
 import { sprintf, __ } from "@wordpress/i18n";
+import ZAPIcon from "@ZAPComponents/ZAPIcon";
 
-const DrawerSearchList=({ searchList, setMode, setSelectedItem, setSearch })=> {
-  if (!searchList?.length) return null;
 
+const DrawerSearchList = ({ searchList, setMode, setSelectedItem, setSearch }) => {
+  if (!searchList?.length) return <Text className="zaplane-label" textAlign='center'>{__("No results found", "zaplane")}</Text>;
   return (
     <VStack spacing={2} align="stretch">
       {searchList.map(item => (
@@ -15,10 +16,17 @@ const DrawerSearchList=({ searchList, setMode, setSelectedItem, setSearch })=> {
             setSelectedItem(item);
             setSearch("");
           }}
+          height='50px'
+          p="4px"
+          color="var(--zaplane-font-color)"
           background="var(--zaplane-background)"
-          _hover={{ bg: "var(--zaplane-body-background)" }}
+          _hover={{ bg: "#F6F7F8" }}
         >
-          <Text className="zaplane-label">{sprintf(__("%s", "zaplane"), item.name)}</Text>
+          <Flex gap='12px' alignItems='center'>
+              <ZAPIcon icon={item.icon}  name={item.name} />
+            <Text className="zaplane-label" fontWeight='400' >{sprintf(__("%s", "zaplane"), item.name)}</Text>
+          </Flex>
+
           <Text fontSize="xs" className="zaplane-label">
             {item.type === 'tools' ? __('Tool', 'zaplane') : __('App', 'zaplane')}
           </Text>

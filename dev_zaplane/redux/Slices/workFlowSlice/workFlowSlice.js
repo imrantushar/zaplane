@@ -7,27 +7,34 @@ import { nodeLogsRunDetails, getNodeLogDetails } from './actions/workFlowLogs';
 import { workFLowSingeNodeExction } from './actions/workflowExctions';
 import { workflowNodeListiner, workflowNodeListinerStop } from './actions/workFlowListiner';
 import { conditionVariables } from './actions/conditonVariales';
+import { fetchConnectionsByApp } from './actions/connectionsSlice';
 
 
 const workflowsSlice = createSlice({
 	name: 'workflows',
 	initialState: {
+		appConnections: [],
 		allWorkFlows: [],
 		workFlow: {},
 		runs: [],
 		versions: [],
 		nodeDetails: [],
 		isLoading: true,
-		singleNodeExecution: null,
+		singleNodeExecution: {
+			
+		},
 		apiCountdown: 0,
 		apiRequestRunning: false,
-		workflowVariables: []
+		workflowVariables: [],
+		itemPerPage: 10,
+		currentPage: 1,
+		totalItems: 0,
 
 
 	},
 	reducers: {
 		resetSingleNodeExecution(state) {
-			state.singleNodeExecution = null;
+			// state.singleNodeExecution = null;
 			state.isLoading = false;
 		},
 		startApiCountdown(state, action) {
@@ -47,7 +54,13 @@ const workflowsSlice = createSlice({
 				state.allWorkFlows = action.payload;
 			})
 			.addCase(getWorkFlow.fulfilled, (state, action) => {
-				state.allWorkFlows = [...action.payload].reverse();
+				const { data, totalItems, currentPage, itemPerPage } =
+					action.payload;
+				state.allWorkFlows = data;
+				state.totalItems = totalItems;
+				state.currentPage = currentPage;
+				state.itemPerPage = itemPerPage;
+
 				state.isLoading = false
 			})
 
@@ -77,8 +90,14 @@ const workflowsSlice = createSlice({
 					: [];
 			})
 			.addCase(getRunWorkFlow.fulfilled, (state, action) => {
-				state.runs = action.payload;
-				state.isLoading = false
+				// action.payload now has { data, currentPage, itemPerPage, totalItems, totalPages }
+				const { data, currentPage, itemPerPage, totalItems, totalPages } = action.payload;
+				state.runs = data || [];
+				state.currentPage = currentPage;
+				state.itemPerPage = itemPerPage;
+				state.totalItems = totalItems;
+				state.totalPages = totalPages;
+				state.isLoading = false;
 			})
 			.addCase(getPreviewOldVersion.fulfilled, (state, action) => {
 				if (!state.workFlow || Object.keys(state.workFlow).length === 0) return;
@@ -92,8 +111,14 @@ const workflowsSlice = createSlice({
 			})
 
 			.addCase(getAllVersion.fulfilled, (state, action) => {
-				state.versions = action.payload;
-				state.isLoading = false
+				const { data, totalItems, currentPage, itemPerPage, totalPages } =
+					action.payload;
+				state.versions = data || [];
+				state.totalItems = totalItems;
+				state.currentPage = currentPage;
+				state.itemPerPage = itemPerPage;
+				state.totalPages = totalPages;
+				state.isLoading = false;
 			})
 			.addCase(versionActive.fulfilled, (state, action) => {
 				const activeVersionId = action.meta.arg.versionID;
@@ -111,7 +136,11 @@ const workflowsSlice = createSlice({
 			})
 			.addCase(workFLowSingeNodeExction.fulfilled, (state, action) => {
 				state.isLoading = false;
-				state.singleNodeExecution = action.payload?.data || null;
+				const node_id=action?.payload?.data?.node?.id
+				if (!state.singleNodeExecution[node_id]) {
+					state.singleNodeExecution[node_id] = {}
+				}
+				state.singleNodeExecution[node_id] = action.payload.data
 			})
 
 
@@ -133,6 +162,10 @@ const workflowsSlice = createSlice({
 			.addCase(conditionVariables.fulfilled, (state, action) => {
 				if (!action.payload) return;
 				state.workflowVariables = action.payload;
+			})
+			.addCase(fetchConnectionsByApp.fulfilled, (state, action) => {
+				state.isLoading = false;
+				state.appConnections = action.payload;
 			})
 	},
 });

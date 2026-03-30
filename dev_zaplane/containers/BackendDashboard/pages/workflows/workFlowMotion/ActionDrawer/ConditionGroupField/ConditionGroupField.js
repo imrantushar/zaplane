@@ -1,38 +1,17 @@
-import { Box, Button, Flex, Text, Accordion } from "@chakra-ui/react";
+import { Box, Button, Flex, Text } from "@chakra-ui/react";
 import { FieldArray } from "formik";
 import { FiTrash2 } from "react-icons/fi";
-import ZAPInput from "@ZAPComponents/ZAPInput";
 import ZAPSelect from "@ZAPComponents/ZAPSelect";
 import { __ } from "@wordpress/i18n";
-import { buildEmptyRule, insertVariableIntoGroup } from "./helper";
-import WPPopover from "@ZAPComponents/Popaver/WPPopover";
-import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { conditionVariables } from "@ZAPRedux/Slices/workFlowSlice/actions/conditonVariales";
-import VariablePopover from "./VariablePopover";
+import { buildEmptyRule } from "./helper";
+import VariableEditor from "@ZAPComponents/VariableEditor";
 
-export default function ConditionGroupField({ value, field, nodeId, workFlow }) {
+
+
+export default function ConditionGroupField({ value, field, variables }) {
     const ruleFields = field?.fields;
     const EMPTY_RULE = buildEmptyRule(ruleFields);
-
-    const [isPopoverOpen, setPopoverOpen] = useState(false);
-    const [activeInput, setActiveInput] = useState(null);
-
-    const { data } = useSelector((state) => state.workflows?.workflowVariables);
-
-    const dispatch = useDispatch();
-
-    useEffect(() => {
-        if (!nodeId || !workFlow?.version?.hash) return;
-
-        dispatch(
-            conditionVariables({
-                targetNodeKey: nodeId,
-                workflowHash: workFlow.version.hash,
-            })
-        );
-    }, [dispatch, nodeId, workFlow?.version?.hash]);
-
+   
     return (
         <FieldArray name={field.key}>
             {(groupHelpers) => {
@@ -78,27 +57,24 @@ export default function ConditionGroupField({ value, field, nodeId, workFlow }) 
                                                         }
 
                                                         return (
-                                                            <ZAPInput
-                                                                key={f.key}
-                                                                type="textarea"
+                                                            <VariableEditor
+                                                                containerStyle={{ width: '30%' }}
                                                                 label={f.label}
+                                                                placeholder={__('Type "@" here to...', "zaplane")}
                                                                 value={rule[f.key]}
-                                                                placeholder={__('Type "@" here to add dynamic', 'zaplane')}
-                                                                onChange={(e) => {
-                                                                    const val = e.target.value;
-                                                                    ruleHelpers.replace(rIndex, { ...rule, [f.key]: val });
-
-                                                                    if (val.endsWith("@")) {
-                                                                        setActiveInput({ gIndex, rIndex, fieldKey: f.key });
-                                                                        setPopoverOpen(true);
-                                                                    }
+                                                                variables={variables}
+                                                                field={{ key: `${field.key}.${gIndex}.${rIndex}.${f.key}` }}
+                                                                setFieldValue={(key, val) => {
+                                                                    ruleHelpers.replace(rIndex, {
+                                                                        ...rule,
+                                                                        [f.key]: val
+                                                                    });
                                                                 }}
-                                                                containerStyle={{ width: "30%" }}
                                                             />
                                                         );
                                                     })}
 
-                                                    <Flex gap={2} mt="34px" align="center" minH="30px">
+                                                    <Flex gap={2} mt="27px" align="center" minH="30px">
                                                         <Button
                                                             type="button"
                                                             height="34px"
@@ -133,23 +109,9 @@ export default function ConditionGroupField({ value, field, nodeId, workFlow }) 
                         ))}
 
                         <Button bg={"var(--zaplane-secondary)"} color="var(--zaplane-font-color)" size="sm" width="140px" fontWeight="500"
-                         onClick={() => groupHelpers.push([{ ...EMPTY_RULE }])}>
+                            onClick={() => groupHelpers.push([{ ...EMPTY_RULE }])}>
                             {__("OR Group", "zaplane")}
                         </Button>
-
-                        <VariablePopover
-                            isOpen={isPopoverOpen}
-                            onClose={() => {
-                                setPopoverOpen(false);
-                                setActiveInput(null);
-                            }}
-                            data={data}
-                            activeInput={activeInput}
-                            groups={groups}
-                            groupHelpers={groupHelpers}
-                            setPopoverOpen={setPopoverOpen}
-                            setActiveInput={setActiveInput}
-                        />
                     </Flex>
                 );
             }}

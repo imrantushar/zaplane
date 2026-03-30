@@ -6,225 +6,181 @@ use Zaplane\Framework\Classes\AbstractAjaxHandler;
 use Zaplane\Models\Workflow;
 use Zaplane\Models\WorkflowVersion;
 
-if (!defined('ABSPATH')) {
-    exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
-class Workflows extends AbstractAjaxHandler
-{
-    public function __construct()
-    {
-        $this->actions = [
-            // Update workflow status
-            'update_workflow_status' => [
-                'callback' => [$this, 'updateStatus'],
-                'capability' => 'manage_options',
-                'fields' => [
-                    'id' => 'absint',
-                    'status' => 'string',
-                ],
-            ],
+class Workflows extends AbstractAjaxHandler {
 
-            // Delete workflow
-            'delete_workflow' => [
-                'callback' => [$this, 'deleteWorkflow'],
-                'capability' => 'manage_options',
-                'fields' => [
-                    'id' => 'absint',
-                ],
-            ],
+	public function __construct() {
+		$this->actions = [
+			'update_workflow_status' => [
+				'callback' => [ $this, 'updateStatus' ],
+				'capability' => 'manage_options',
+				'fields' => [
+					'id' => 'absint',
+					'status' => 'string',
+				],
+			],
 
-            // Duplicate workflow
-            'duplicate_workflow' => [
-                'callback' => [$this, 'duplicateWorkflow'],
-                'capability' => 'manage_options',
-                'fields' => [
-                    'id' => 'absint',
-                    'new_title' => 'string',
-                ],
-            ],
+			'duplicate_workflow' => [
+				'callback' => [ $this, 'duplicateWorkflow' ],
+				'capability' => 'manage_options',
+				'fields' => [
+					'id' => 'absint',
+					'new_title' => 'string',
+				],
+			],
 
-            // Update workflow settings (editor role)
-            'update_workflow_settings' => [
-                'callback' => [$this, 'updateSettings'],
-                'capability' => 'edit_posts',
-                'fields' => [
-                    'id' => 'absint',
-                    'settings' => 'json',
-                ],
-            ],
+			'update_workflow_title' => [
+				'callback' => [ $this, 'updateWorkflowTitle' ],
+				'capability' => 'manage_options',
+				'fields' => [
+					'id' => 'absint',
+					'title' => 'string',
+				],
+			],
 
-            // Get workflow stats (public endpoint)
-            'get_workflow_stats' => [
-                'callback' => [$this, 'getStats'],
-                'capability' => '',
-                'allow_visitor_action' => true,
-                'fields' => [
-                    'workflow_id' => 'absint',
-                ],
-            ],
-        ];
-    }
+			'get_workflow_stats' => [
+				'callback' => [ $this, 'getStats' ],
+				'capability' => '',
+				'allow_visitor_action' => true,
+				'fields' => [
+					'workflow_id' => 'absint',
+				],
+			],
+		];
+	}
 
-    /**
-     * Update workflow status.
-     */
-    public function updateStatus(array $payload)
-    {
-        $id = $payload['id'] ?? 0;
-        $status = $payload['status'] ?? '';
+	public function updateStatus( array $payload ) {
+		$id     = $payload['id'] ?? 0;
+		$status = $payload['status'] ?? '';
 
-        if (!$id || empty($status)) {
-            return new \WP_Error('missing_params', __('ID and status are required', 'zaplane'), ['code' => 400]);
-        }
+		if ( ! $id || empty( $status ) ) {
+			return new \WP_Error( 'missing_params', __( 'ID and status are required', 'zaplane' ), [ 'code' => 400 ] );
+		}
 
-        if (!in_array($status, ['active', 'draft', 'paused'])) {
-            return new \WP_Error('invalid_status', __('Invalid status value', 'zaplane'), ['code' => 400]);
-        }
+		if ( ! in_array( $status, [ 'active', 'draft', 'paused' ], true ) ) {
+			return new \WP_Error( 'invalid_status', __( 'Invalid status value', 'zaplane' ), [ 'code' => 400 ] );
+		}
 
-        $workflow = Workflow::find($id);
+		$workflow = Workflow::find( $id );
 
-        if (!$workflow) {
-            return new \WP_Error('not_found', __('Workflow not found', 'zaplane'), ['code' => 404]);
-        }
+		if ( ! $workflow ) {
+			return new \WP_Error( 'not_found', __( 'Workflow not found', 'zaplane' ), [ 'code' => 404 ] );
+		}
 
-        $workflow->status = $status;
-        $workflow->save();
+		$previousStatus  = $workflow->status;
+		$workflow->status = $status;
+		$workflow->save();
 
-        return [
-            'id' => $workflow->id,
-            'status' => $workflow->status,
-            'message' => __('Status updated successfully', 'zaplane'),
-        ];
-    }
+		if ( 'draft' === $previousStatus && 'active' === $status ) {
+			$draftVersion = WorkflowVersion::where( 'workflow_id', $id )->where( 'is_active', 1 )->first();
 
-    /**
-     * Delete a workflow.
-     */
-    public function deleteWorkflow(array $payload)
-    {
-        $id = $payload['id'] ?? 0;
+			if ( $draftVersion ) {
+				$graph = $draftVersion->getGraph();
+				$hash  = hash( 'sha256', wp_json_encode( $graph ) );
 
-        if (!$id) {
-            return new \WP_Error('missing_id', __('Workflow ID is required', 'zaplane'), ['code' => 400]);
-        }
+				$draftVersion->is_active = 0;
+				$draftVersion->save();
 
-        $workflow = Workflow::find($id);
+				WorkflowVersion::create([
+					'workflow_id'    => $id,
+					'graph_json'     => $graph,
+					'graph_hash'     => $hash,
+					'is_active'      => 1,
+					'version_number' => 1,
+				]);
+			}
+		}
 
-        if (!$workflow) {
-            return new \WP_Error('not_found', __('Workflow not found', 'zaplane'), ['code' => 404]);
-        }
+		return [
+			'id'      => $workflow->id,
+			'status'  => $workflow->status,
+			'message' => __( 'Status updated successfully', 'zaplane' ),
+		];
+	}
 
-        $workflowId = $workflow->id;
-        $workflow->delete();
+	public function duplicateWorkflow( array $payload ) {
+		$id = $payload['id'] ?? 0;
 
-        // Also delete versions
-        WorkflowVersion::where('workflow_id', $workflowId)
-            ->delete();
+		if ( ! $id ) {
+			return new \WP_Error( 'missing_id', __( 'Workflow ID is required', 'zaplane' ), [ 'code' => 400 ] );
+		}
 
-        return [
-            'deleted' => true,
-            'id' => $workflowId,
-            'message' => __('Workflow deleted successfully', 'zaplane'),
-        ];
-    }
+		$original = Workflow::find( $id );
 
-    /**
-     * Duplicate a workflow.
-     */
-    public function duplicateWorkflow(array $payload)
-    {
-        $id = $payload['id'] ?? 0;
+		if ( ! $original ) {
+			return new \WP_Error( 'not_found', __( 'Workflow not found', 'zaplane' ), [ 'code' => 404 ] );
+		}
 
-        if (!$id) {
-            return new \WP_Error('missing_id', __('Workflow ID is required', 'zaplane'), ['code' => 400]);
-        }
+		$newTitle = ! empty( $payload['new_title'] ) ? $payload['new_title'] : $original->title . ' (Copy)';
 
-        $original = Workflow::find($id);
+		$duplicate = Workflow::create([
+			'user_id' => get_current_user_id(),
+			'title' => $newTitle,
+			'name' => sanitize_title( $newTitle ),
+			'status' => 'draft',
+		]);
 
-        if (!$original) {
-            return new \WP_Error('not_found', __('Workflow not found', 'zaplane'), ['code' => 404]);
-        }
+		$activeVersion = $original->activeVersion();
+		if ( $activeVersion ) {
+			WorkflowVersion::create([
+				'workflow_id' => $duplicate->id,
+				'graph_json' => $activeVersion->graph_json,
+				'graph_hash' => hash( 'sha256', wp_json_encode( $activeVersion->graph_json ) ),
+				'is_active' => 1,
+			]);
+		}
 
-        // Create new workflow
-        $newTitle = !empty($payload['new_title']) ? $payload['new_title'] : $original->title . ' (Copy)';
+		return [
+			'id' => $duplicate->id,
+			'title' => $duplicate->title,
+			'message' => __( 'Workflow duplicated successfully', 'zaplane' ),
+		];
+	}
 
-        $duplicate = Workflow::create([
-            'user_id' => get_current_user_id(),
-            'title' => $newTitle,
-            'name' => sanitize_title($newTitle),
-            'status' => 'draft',
-        ]);
+	public function updateWorkflowTitle( array $payload ) {
+		$id = $payload['id'] ?? 0;
+		$title = $payload['title'] ?? '';
 
-        // Copy active version if exists
-        $activeVersion = $original->activeVersion();
-        if ($activeVersion) {
-            WorkflowVersion::create([
-                'workflow_id' => $duplicate->id,
-                'graph_json' => $activeVersion->graph_json,
-                'graph_hash' => hash('sha256', wp_json_encode($activeVersion->graph_json)),
-                'is_active' => 1,
-            ]);
-        }
+		if ( ! $id || empty( $title ) ) {
+			return new \WP_Error( 'missing_params', __( 'ID and title are required', 'zaplane' ), [ 'code' => 400 ] );
+		}
 
-        return [
-            'id' => $duplicate->id,
-            'title' => $duplicate->title,
-            'message' => __('Workflow duplicated successfully', 'zaplane'),
-        ];
-    }
+		$workflow = Workflow::find( $id );
 
-    /**
-     * Update workflow settings.
-     */
-    public function updateSettings(array $payload)
-    {
-        $id = $payload['id'] ?? 0;
-        $settings = $payload['settings'] ?? [];
+		if ( ! $workflow ) {
+			return new \WP_Error( 'not_found', __( 'Workflow not found', 'zaplane' ), [ 'code' => 404 ] );
+		}
 
-        if (!$id) {
-            return new \WP_Error('missing_id', __('Workflow ID is required', 'zaplane'), ['code' => 400]);
-        }
+		$workflow->title = $title;
+		$workflow->save();
 
-        $workflow = Workflow::find($id);
+		return [
+			'id' => $workflow->id,
+			'title' => $workflow->title,
+			'message' => __( 'Title updated successfully', 'zaplane' ),
+		];
+	}
+	public function getStats( array $payload ) {
+		$workflowId = $payload['workflow_id'] ?? 0;
 
-        if (!$workflow) {
-            return new \WP_Error('not_found', __('Workflow not found', 'zaplane'), ['code' => 404]);
-        }
+		if ( ! $workflowId ) {
+			return new \WP_Error( 'missing_id', __( 'Workflow ID is required', 'zaplane' ), [ 'code' => 400 ] );
+		}
 
-        // Update settings (assuming you have a settings column)
-        // $workflow->settings = $settings;
-        // $workflow->save();
+		$workflow = Workflow::find( $workflowId );
 
-        return [
-            'id' => $workflow->id,
-            'message' => __('Settings updated successfully', 'zaplane'),
-        ];
-    }
+		if ( ! $workflow ) {
+			return new \WP_Error( 'not_found', __( 'Workflow not found', 'zaplane' ), [ 'code' => 404 ] );
+		}
 
-    /**
-     * Get workflow statistics (public endpoint).
-     */
-    public function getStats(array $payload)
-    {
-        $workflowId = $payload['workflow_id'] ?? 0;
-
-        if (!$workflowId) {
-            return new \WP_Error('missing_id', __('Workflow ID is required', 'zaplane'), ['code' => 400]);
-        }
-
-        $workflow = Workflow::find($workflowId);
-
-        if (!$workflow) {
-            return new \WP_Error('not_found', __('Workflow not found', 'zaplane'), ['code' => 404]);
-        }
-
-        // Return basic public stats only
-        return [
-            'id' => $workflow->id,
-            'title' => $workflow->title,
-            'status' => $workflow->status,
-            'created_at' => $workflow->created_at,
-        ];
-    }
+		return [
+			'id' => $workflow->id,
+			'title' => $workflow->title,
+			'status' => $workflow->status,
+			'created_at' => $workflow->created_at,
+		];
+	}
 }

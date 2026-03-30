@@ -2,14 +2,15 @@ import { VStack } from "@chakra-ui/react";
 import DrawerItemButton from "./DrawerItemButton";
 import { IoIosArrowForward } from "react-icons/io";
 
-const DrawerModeList=({ setMode, setSelectedItem, isTrigger, source, TOOLS })=> {
+const DrawerModeList = ({ setMode, setSelectedItem, isTrigger, source, TOOLS }) => {
   return (
-    <VStack spacing={4}>
+    <VStack gap="16px">
       <DrawerItemButton
         item={{ name: "Apps" }}
         onClick={() => setMode("app")}
-        icon={<IoIosArrowForward />}
+        arrowIcon={<IoIosArrowForward />}
         showType={false}
+        icon={'apps'}
       />
 
       {(!isTrigger || source === "add") &&
@@ -19,8 +20,11 @@ const DrawerModeList=({ setMode, setSelectedItem, isTrigger, source, TOOLS })=> 
             item={{ ...tool, type: "tools" }}
             onClick={() => {
               setMode("tools");
-              setSelectedItem(tool);
+              setSelectedItem({
+                ...tool,
+               mode: "tools"});
             }}
+            icon={tool?.icon}
           />
         ))}
     </VStack>

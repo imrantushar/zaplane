@@ -1,254 +1,238 @@
 <?php
 namespace Zaplane\Integrations;
 
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 use Zaplane\Framework\Classes\IntegrationBase;
 
 class Storeengine extends IntegrationBase {
 
-    public static function get_slug(): string {
-        return 'storeengine';
-    }
+	public static function get_slug(): string {
+		return 'storeengine';
+	}
 
-    public static function get_triggers(): array {
-        return [
-            'product_purchased'            => ['label' => 'Product Purchased',                   'hook' => 'storeengine/checkout/after_place_order'],
-            'created_product'            => ['label' => 'Created Product',                   'hook' => 'storeengine/product/created'],
-            'updated_product'            => ['label' => 'Updated Product',                   'hook' => 'storeengine/product/updated'],
-            'order_status_update'          => ['label' => 'Order Status Updated',                'hook' => 'storeengine/order/status_changed'],
-            'order_status_on_hold'         => ['label' => 'Order Status Set To On Hold',         'hook' => 'storeengine/order_status_on_hold'],
-            'order_status_pending_payment' => ['label' => 'Order Status Set To Pending Payment', 'hook' => 'storeengine/order_status_pending_payment'],
-            'order_status_processing'      => ['label' => 'Order Status Set To Processing',      'hook' => 'storeengine/order_status_processing'],
-            'order_status_completed'       => ['label' => 'Order Status Set To Completed',       'hook' => 'storeengine/order_status_completed'],
-            'order_status_cancelled'       => ['label' => 'Order Status Set To Cancelled',       'hook' => 'storeengine/order_status_cancelled'],
-            'order_status_draft'           => ['label' => 'Order Status Set To Draft',           'hook' => 'storeengine/order_status_auto-draft'],
-            'order_status_trash'           => ['label' => 'Order Status Set To Trash',           'hook' => 'storeengine/order_status_trash'],
-            'order_customer_note_added'    => ['label' => 'Customer Note Added to Order',        'hook' => 'storeengine/order/new_customer_note'],
-            'order_customer_note_deleted'  => ['label' => 'Customer Note Deleted From Order',    'hook' => 'storeengine/order/note_deleted'],
-            'order_restored'               => ['label' => 'Order Restored',                      'hook' => 'storeengine/order/status_changed'],
-            // 'payment_initiated'            => ['label' => 'Payment Initiated',                   'hook' => 'payment_initiated'],
-            // 'payment_successful'           => ['label' => 'Payment Successful',                  'hook' => 'payment_successful'],
-            // 'payment_failed'               => ['label' => 'Payment Failed',                      'hook' => 'payment_failed'],
-            // 'payment_refunded'             => ['label' => 'Payment Refunded',                    'hook' => 'payment_refunded'],
-            // 'customer_created'             => ['label' => 'Customer Created',                    'hook' => 'customer_created'],
-            // 'customer_updated'             => ['label' => 'Customer Updated',                    'hook' => 'customer_updated'],
-        ]; 
-    }
+	public static function get_name(): string {
+		return 'StoreEngine';
+	}
 
-    public static function get_trigger_config_schema( string $trigger ): array {
-        if ( $trigger === 'updated_product' ) {
-            return [
-                [
-                    'key'      => 'product_id',
-                    'label'    => 'ID',
-                    'type'     => 'expression',
-                    'required' => true,
-                ],
-            ];
-        }
-        return [];
-    }
-    
-    private static function resolve_order_payload( int $order_id , array $extra= [] ) {
-        $order = storeengine_get_order( $order_id );
-                if ( ! $order) return false;
-                return array_merge([
-                    'order_id'       => $order_id,
-                    'order_number'   => $order->get_order_number(),
-                    'order_status'   => $order->get_status(),
-                    'total'          => $order->get_total(),
-                    'currency'       => $order->get_currency(),
-                    'payment_method' => $order->get_payment_method(),
-                    'customer_email' => $order->get_customer_email(),
-                    'customer_name'  => $order->get_customer_name(),
-                    'items'          => $order->get_items(),
-                ], $extra);
-    }
+	public static function get_icon(): string {
+		return 'storeengine.svg';
+	}
 
-    public static function resolve_trigger( array $node, array $args ) {
+	public static function get_triggers(): array {
+		return [
+			'product_purchased' => [
+				'label' => 'Product Purchased',
+				'hook'  => 'storeengine/checkout/after_place_order'
+			],
+			'order_status_update' => [
+				'label' => 'Order Status Updated',
+				'hook'  => 'storeengine/order/status_changed'
+			],
+			'order_status_on_hold' => [
+				'label' => 'Order Status Set To On Hold',
+				'hook'  => 'storeengine/order_status_on_hold'
+			],
+			'order_status_pending_payment' => [
+				'label' => 'Order Status Set To Pending Payment',
+				'hook'  => 'storeengine/order_status_pending_payment'
+			],
+			'order_status_processing' => [
+				'label' => 'Order Status Set To Processing',
+				'hook'  => 'storeengine/order_status_processing'
+			],
+			'order_status_completed' => [
+				'label' => 'Order Status Set To Completed',
+				'hook'  => 'storeengine/order_status_completed'
+			],
+			'order_status_cancelled' => [
+				'label' => 'Order Status Set To Cancelled',
+				'hook'  => 'storeengine/order_status_cancelled'
+			],
+			'order_status_draft' => [
+				'label' => 'Order Status Set To Draft',
+				'hook'  => 'storeengine/order_status_auto-draft'
+			],
+			'order_status_trash' => [
+				'label' => 'Order Status Set To Trash',
+				'hook'  => 'storeengine/order_status_trash'
+			],
+			'order_restored' => [
+				'label' => 'Order Restored',
+				'hook'  => 'storeengine/order/status_changed'
+			],
+			'payment_refunded' => [
+				'label' => 'Payment Refunded',
+				'hook'  => 'storeengine/subscription/payment_refunded'
+			],
+			'order_customer_note_added' => [
+				'label' => 'Customer Note Added to Order',
+				'hook'  => 'storeengine/order/new_customer_note'
+			],
+			'order_customer_note_deleted' => [
+				'label' => 'Customer Note Deleted From Order',
+				'hook'  => 'storeengine/order/note_deleted'
+			],
+		];
+	}
 
-        switch ( $node['event'] ) {
+	private static function resolve_order_payload( $order, array $extra = [] ) {
+		if ( is_object( $order ) && method_exists( $order, 'get_id' ) ) {
+			$order_id = (int) $order->get_id();
+		} elseif ( is_int( $order ) ) {
+			$order_id = $order;
+		} else {
+			return false;
+		}
 
-            case 'product_purchased':
-                $order_id = $args[0] ?? 0;
-                if ( ! $order_id ) return false;
-                return self::resolve_order_payload( $order_id);
+		if ( ! $order_id ) {
+			return false;
+		}
 
-            case 'created_product':
-                $product_id = $args[0] ?? 0;
-                if ( ! $product_id ) return false;
-                $product = storeengine_get_product( $product_id );
-                return [
-                    'product_id'   => $product_id,
-                    'product_name' => $product->get_name(),
-                    'price'        => $product->get_price(),
-                    'description'  => $product->get_description(),
-                    'status'       => $product->get_status(),
-                ];
+		$order_obj = storeengine_get_order( $order_id );
 
-            case 'order_status_update':
-            case 'order_status_on_hold':
-            case 'order_status_pending_payment':
-            case 'order_status_processing':
-            case 'order_status_completed':
-            case 'order_status_cancelled':
-            case 'order_status_draft':
-            case 'order_status_trash':
-                $order_id   = $args[0] ?? 0;
-                $old_status = $args[1] ?? '';
-                $new_status = $args[2] ?? '';
-                if ( ! $order_id || ! $new_status ) return false;
-                return self::resolve_order_payload( $order_id, [
-                    'old_status' => $old_status, 
-                    'new_status' => $new_status,
-                ]);
+		if ( ! $order_obj ) {
+			return false;
+		}
 
-            case 'order_restored':
-                $order_id   = $args[0] ?? 0;
-                $old_status = $args[1] ?? '';
-                $restored_status = $args[2] ?? '';
-                if ( ! $order_id ||  $old_status !== 'trash') return false;
-                return self::resolve_order_payload( $order_id, [
-                    'old_status'        => $old_status,
-                    'restored_status'   => $restored_status,
-                ]);
+		$items = array_map( function ( $item ) {
+			if ( is_array( $item ) ) {
+				return [
+					'product_id' => $item['product_id'] ?? '',
+					'name'       => $item['name'] ?? '',
+					'quantity'   => $item['quantity'] ?? '',
+					'total'      => $item['total'] ?? '',
+				];
+			}
 
-            case 'order_customer_note_added':
-                $order_id   = $args[0] ?? 0;
-                $note       = $args[1] ?? '';
-                $customer   = $args[2] ?? '';
-                if ( ! $order_id || ! $note ) return false;
-                return self::resolve_order_payload( $order_id, [
-                    'note'           => $note,
-                    'note_author'    => $customer,
-                ]);
+			if ( is_object( $item ) ) {
+				return [
+					'product_id' => method_exists( $item, 'get_product_id' ) ? $item->get_product_id() : '',
+					'name'       => method_exists( $item, 'get_name' ) ? $item->get_name() : '',
+					'quantity'   => method_exists( $item, 'get_quantity' ) ? $item->get_quantity() : '',
+					'total'      => method_exists( $item, 'get_total' ) ? $item->get_total() : '',
+				];
+			}
 
-            case 'order_customer_note_deleted':
-                $order_id   = $args[0] ?? 0;
-                $note       = $args[1] ?? '';
-                $admin   = $args[2] ?? '';
-                if (! $order_id || ! $note ) return false;
-                return self::resolve_order_payload( $order_id, [
-                    'deleted_note'   => $note,
-                    'deleted_by'     => $admin,
-                ]);
+			return [];
+		}, array_values( $order_obj->get_items() ) );
 
-            case 'payment_initiated':
-                $order_id = $args[0] ?? 0;
-                $payment_method = $args[1] ?? '';
-                if ( ! $order_id ) return false;
-                return self::resolve_order_payload( $order_id, [
-                    'payment_method'   => $payment_method,
-                ]);
-              
-            case 'payment_successful':
-            case 'payment_failed':
-                $order_id = $args[0] ?? 0;
-                $payment_method = $args[1] ?? '';
-                $transaction_id = $args[2] ?? '';
-                if ( ! $order_id ) return false;
-                return self::resolve_order_payload( $order_id, [
-                    'payment_method' => $payment_method,
-                    'transaction_id' => $transaction_id,
-                ]);
-        
-            case 'payment_refunded':
-                $order_id = $args[0] ?? 0;
-                $refunded_amount = $args[1] ?? 0;
-                $refunded_reason = $args[2] ?? '';
-                if ( ! $order_id ) return false;
-                return self::resolve_order_payload( $order_id, [
-                    'refunded_amount' => $refunded_amount,
-                    'refunded_reason' => $refunded_reason,
-                ]);
+		return array_merge( [
+			'order_id'       => $order_id,
+			'order_number'   => $order_obj->get_order_number(),
+			'order_status'   => $order_obj->get_status(),
+			'total'          => $order_obj->get_total(),
+			'currency'       => $order_obj->get_currency(),
+			'payment_method' => $order_obj->get_payment_method(),
+			'customer_email' => method_exists( $order_obj, 'get_billing_email' )
+				? $order_obj->get_billing_email() : '',
+			'customer_name'  => method_exists( $order_obj, 'get_billing_first_name' )
+				? trim(
+					$order_obj->get_billing_first_name() . ' ' .
+					$order_obj->get_billing_last_name()
+				)
+				: '',
+			'items'          => $items,
+		], $extra );
+	}
 
-            case 'customer_created':
-                $customer_id = $args[0] ?? 0;
-                $customer_name = $args[1] ?? '';
-                $customer_email = $args[2] ?? '';
-                if ( ! $customer_id ) return false;
-                return [
-                    'customer_id'    => $customer_id,
-                    'customer_name'  => $customer_name,
-                    'customer_email' => $customer_email,
-                ];
+	public static function resolve_trigger( array $node, array $args ) {
 
-            case 'customer_updated':
-                $customer_id = $args[0] ?? 0;
-                $change = $args[1] ?? [];
-                if ( ! $customer_id ) return false;
-                return [
-                    'customer_id'    => $customer_id,
-                    'change'  => $change,
-                ];
+		switch ( $node['event'] ) {
 
-        }
-        return false;
-    }
+			case 'product_purchased':
+				$order_id = $args[0] ?? 0;
 
-    public static function get_actions(): array {
-        return [
-            'create_product'   => ['label'=>'Create Product'],
-            'update_product'   => ['label'=>'Update Product'],
-            'create_order'   => ['label'=>'Create Order'],
-        ];
-    }
+				if ( ! $order_id ) {
+					return false;
+				}
 
-    public static function get_action_config_schema( string $action ): array {
+				return self::resolve_order_payload( $order_id );
 
-        $schemas = [
-            'create_product' => [
-                ['key'=>'product_name','label'=>'Product Name','type'=>'text','required'=>true],
-                ['key'=>'price','label'=>'Price','type'=>'number','required'=>true],
-                ['key'=>'description','label'=>'Description','type'=>'textarea',],
-                ['key'=>'status','label'=>'Status','type'=>'select','options'=>[
-                    ['label'=>'Draft','value'=>'draft'],
-                    ['label'=>'Publish','value'=>'publish'],
-                ]],
-            ],
-        ];
+			case 'order_status_update':
+			case 'order_status_on_hold':
+			case 'order_status_pending_payment':
+			case 'order_status_processing':
+			case 'order_status_completed':
+			case 'order_status_cancelled':
+			case 'order_status_draft':
+			case 'order_status_trash':
+				$order   = $args[1] ?? null;
+				$transition = $args[2] ?? [];
 
-        return $schemas[$action] ?? [];
-    }
+				if ( ! $order || ! is_array( $transition ) ) {
+					return false;
+				}
 
-    public static function execute_node( array $node, array $input ): array {
+				$old_status = $transition['from'] ?? '';
+				$new_status = $transition['to'] ?? '';
 
-        $config = $node['data']['config'] ?? [];
+				return self::resolve_order_payload( $order, [
+					'old_status' => $old_status,
+					'new_status' => $new_status,
+				]);
 
-        switch ( $node['data']['event'] ?? '' ) {
+			case 'order_restored':
+				$order_id        = $args[0] ?? 0;
+				$old_status      = $args[1] ?? '';
+				$restored_status = $args[2] ?? '';
 
-            case 'create_product':
+				if ( ! $order_id || 'trash' !== $old_status ) {
+					return false;
+				}
 
-                $name        = $config['product_name'] ?? '';
-                $price       = $config['price'] ?? '';
-                $description = $config['description'] ?? '';
-                $status      = $config['status'] ?? 'publish';
+				return self::resolve_order_payload( $order_id, [
+					'old_status'        => $old_status,
+					'restored_status'   => $restored_status,
+				]);
 
-                if ( ! $name || $price === '' ) {
-                    return ['success' => false, 'message' => 'Product name and price required'];
-                }
+			case 'payment_refunded':
+				$order_id        = $args[0] ?? 0;
+				$refunded_amount = $args[1] ?? 0;
+				$refunded_reason = $args[2] ?? '';
 
-                $product_id = storeengine_create_product([
-                    'name'        => $name,
-                    'price'       => $price,
-                    'description' => $description,
-                    'status'      => $status,
-                ]);
+				if ( ! $order_id ) {
+					return false;
+				}
 
-                if ( ! $product_id ) {
-                    return ['success' => false];
-                }
+				return self::resolve_order_payload( $order_id, [
+					'refunded_amount' => $refunded_amount,
+					'refunded_reason' => $refunded_reason,
+				]);
 
-                return [
-                    'success'    => true,
-                    'product_id' => $product_id,
-                    'product_name' =>$name,
-                    'price'      => $price,
-                    'status'     => $status,
-                ];
+			case 'order_customer_note_added':
+				$note  = $args[0] ?? '';
+				$order = $args[1] ?? null;
 
-        }
-        return ['port'=>'main','data'=>$input];
-    }
+				if ( ! $order || ! is_object( $order ) ) {
+					return false;
+				}
+
+				return self::resolve_order_payload( $order, [
+					'note' => $note,
+				]);
+
+			case 'order_customer_note_deleted':
+				$note_id  = $args[0] ?? 0;
+				$note_obj = $args[1] ?? null;
+
+				if ( ! $note_obj || ! is_object( $note_obj ) ) {
+					return false;
+				}
+
+				$order_id = $note_obj->order_id ?? 0;
+
+				if ( ! $order_id ) {
+					return false;
+				}
+
+				return self::resolve_order_payload( $order_id, [
+					'deleted_note_id' => $note_id,
+					'deleted_note'    => $note_obj->content ?? '',
+				]);
+		}//end switch
+		return false;
+	}
 }

@@ -2,126 +2,127 @@
 
 namespace Zaplane\Framework\Database\ORM;
 
-if (!defined('ABSPATH')) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
-class DB
-{
-    public static function table(string $table): QueryBuilder
-    {
-        return new QueryBuilder(Schema::getTable($table));
-    }
+class DB {
 
-    public static function raw(string $value): RawExpression
-    {
-        return new RawExpression($value);
-    }
+	public static function table( string $table ): QueryBuilder {
+		return new QueryBuilder( Schema::getTable( $table ) );
+	}
 
-    public static function select(string $query, array $bindings = []): array
-    {
-        global $wpdb;
+	public static function raw( string $value ): RawExpression {
+		return new RawExpression( $value );
+	}
 
-        if (!empty($bindings)) {
-            $query = $wpdb->prepare($query, ...$bindings);
-        }
+	public static function select( string $query, array $bindings = [] ): array {
+		global $wpdb;
 
-        return $wpdb->get_results($query, ARRAY_A) ?: [];
-    }
+		if ( ! empty( $bindings ) ) {
+			// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- $query is prepared here with bindings.
+			$query = $wpdb->prepare( $query, ...$bindings );
+		}
 
-    public static function selectOne(string $query, array $bindings = [])
-    {
-        global $wpdb;
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$results = $wpdb->get_results( $query, ARRAY_A );
+		return $results ? $results : [];
+	}
 
-        if (!empty($bindings)) {
-            $query = $wpdb->prepare($query, ...$bindings);
-        }
+	public static function selectOne( string $query, array $bindings = [] ) {
+		global $wpdb;
 
-        return $wpdb->get_row($query, ARRAY_A);
-    }
+		if ( ! empty( $bindings ) ) {
+			// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- $query is prepared here with bindings.
+			$query = $wpdb->prepare( $query, ...$bindings );
+		}
 
-    public static function insert(string $query, array $bindings = []): bool
-    {
-        global $wpdb;
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		return $wpdb->get_row( $query, ARRAY_A );
+	}
 
-        if (!empty($bindings)) {
-            $query = $wpdb->prepare($query, ...$bindings);
-        }
+	public static function insert( string $query, array $bindings = [] ): bool {
+		global $wpdb;
 
-        return $wpdb->query($query) !== false;
-    }
+		if ( ! empty( $bindings ) ) {
+			// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- $query is prepared here with bindings.
+			$query = $wpdb->prepare( $query, ...$bindings );
+		}
 
-    public static function update(string $query, array $bindings = []): int
-    {
-        global $wpdb;
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		return $wpdb->query( $query ) !== false;
+	}
 
-        if (!empty($bindings)) {
-            $query = $wpdb->prepare($query, ...$bindings);
-        }
+	public static function update( string $query, array $bindings = [] ): int {
+		global $wpdb;
 
-        return (int) $wpdb->query($query);
-    }
+		if ( ! empty( $bindings ) ) {
+			// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- $query is prepared here with bindings.
+			$query = $wpdb->prepare( $query, ...$bindings );
+		}
 
-    public static function delete(string $query, array $bindings = []): int
-    {
-        return self::update($query, $bindings);
-    }
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		return (int) $wpdb->query( $query );
+	}
 
-    public static function statement(string $query, array $bindings = []): bool
-    {
-        global $wpdb;
+	public static function delete( string $query, array $bindings = [] ): int {
+		return self::update( $query, $bindings );
+	}
 
-        if (!empty($bindings)) {
-            $query = $wpdb->prepare($query, ...$bindings);
-        }
+	public static function statement( string $query, array $bindings = [] ): bool {
+		global $wpdb;
 
-        return $wpdb->query($query) !== false;
-    }
+		if ( ! empty( $bindings ) ) {
+			// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- $query is prepared here with bindings.
+			$query = $wpdb->prepare( $query, ...$bindings );
+		}
 
-    public static function lastInsertId(): int
-    {
-        global $wpdb;
-        return (int) $wpdb->insert_id;
-    }
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		return $wpdb->query( $query ) !== false;
+	}
 
-    public static function getLastError(): string
-    {
-        global $wpdb;
-        return $wpdb->last_error;
-    }
+	public static function lastInsertId(): int {
+		global $wpdb;
+		return (int) $wpdb->insert_id;
+	}
 
-    public static function beginTransaction(): void
-    {
-        global $wpdb;
-        $wpdb->query('START TRANSACTION');
-    }
+	public static function getLastError(): string {
+		global $wpdb;
+		return $wpdb->last_error;
+	}
 
-    public static function commit(): void
-    {
-        global $wpdb;
-        $wpdb->query('COMMIT');
-    }
+	public static function beginTransaction(): void {
+		global $wpdb;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$wpdb->query( 'START TRANSACTION' );
+	}
 
-    public static function rollBack(): void
-    {
-        global $wpdb;
-        $wpdb->query('ROLLBACK');
-    }
+	public static function commit(): void {
+		global $wpdb;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$wpdb->query( 'COMMIT' );
+	}
 
-    public static function transaction(callable $callback)
-    {
-        self::beginTransaction();
+	public static function rollBack(): void {
+		global $wpdb;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$wpdb->query( 'ROLLBACK' );
+	}
 
-        try {
-            $result = $callback();
-            self::commit();
-            return $result;
-        } catch (\Exception $e) {
-            self::rollBack();
-            throw $e;
-        }
-    }
+	public static function transaction( callable $callback ) {
+		self::beginTransaction();
 
-    public static function getPrefix(): string
-    {
-        return Schema::getPrefix();
-    }
+		try {
+			$result = $callback();
+			self::commit();
+			return $result;
+		} catch ( \Exception $e ) {
+			self::rollBack();
+			throw $e;
+		}
+	}
+
+	public static function getPrefix(): string {
+		return Schema::getPrefix();
+	}
 }

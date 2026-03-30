@@ -1,136 +1,102 @@
 <?php
 namespace Zaplane\Framework\Core;
 
-if (!defined('ABSPATH')) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
-/**
- * Integration Loader
- *
- * Manages registration and lazy loading of integrations.
- * Uses automatic initialization - no need to call init() manually.
- */
 class IntegrationLoader {
 
-    protected static array $registry = [];
-    protected static array $instances = [];
-    protected static bool $initialized = false;
 
-    /**
-     * Initialize the integration registry
-     * Called automatically on first use - no need to call manually
-     */
-    protected static function ensureInitialized(): void {
-        if (self::$initialized) {
-            return;
-        }
+	protected static array $registry = [];
+	protected static array $instances = [];
+	protected static bool $initialized = false;
 
-        self::$registry = require ZAPLANE_INCLUDES_DIR_PATH . 'framework/core/integration-registry.php';
-        do_action('zaplane_register_integrations_registry', self::$registry);
-        self::$initialized = true;
-    }
 
-    /**
-     * Get an integration instance by slug
-     * Automatically initializes registry if needed
-     *
-     * @param string $slug Integration slug (e.g., 'slack', 'wordpress')
-     * @return object|null Integration instance or null if not found
-     */
-    public static function get(string $slug): ?object {
-        self::ensureInitialized();
 
-        // Return cached instance if exists
-        if (!empty(self::$instances[$slug])) {
-            return self::$instances[$slug];
-        }
+	protected static function ensureInitialized(): void {
+		if ( self::$initialized ) {
+			return;
+		}
 
-        // Check if integration is registered
-        if (empty(self::$registry[$slug])) {
-            return null;
-        }
+		self::$registry = zaplane_config( 'integrations.registry', [] );
+		self::$registry = apply_filters( 'zaplane_integrations', self::$registry );
+		self::$initialized = true;
+	}
 
-        // Load integration file
-        $file = ZAPLANE_INTEGRATION_DIR_PATH . '/' . basename(self::$registry[$slug]['file']);
-        $class = self::$registry[$slug]['class'];
 
-        if (!class_exists($class) && file_exists($file)) {
-            require_once $file;
-        }
 
-        if (!class_exists($class)) {
-            return null;
-        }
+	public static function get( string $slug ): ?object {
+		self::ensureInitialized();
 
-        // Create and cache instance
-        $instance = new $class();
-        self::$instances[$slug] = $instance;
+		if ( ! empty( self::$instances[ $slug ] ) ) {
+			return self::$instances[ $slug ];
+		}
 
-        return $instance;
-    }
+		if ( empty( self::$registry[ $slug ] ) ) {
+			return null;
+		}
 
-    /**
-     * Get all registered integration slugs (without loading instances)
-     * Automatically initializes registry if needed
-     *
-     * @return array Array of integration slugs
-     */
-    public static function getAllSlugs(): array {
-        self::ensureInitialized();
-        return array_keys(self::$registry);
-    }
+		$meta  = self::$registry[ $slug ];
+		$file  = ( ! empty( $meta['path'] ) )
+			? $meta['path']
+			: ZAPLANE_INTEGRATION_DIR_PATH . '/' . basename( $meta['file'] );
+		$class = $meta['class'];
 
-    /**
-     * Get registry metadata without loading instances
-     * Automatically initializes registry if needed
-     *
-     * @return array Registry metadata
-     */
-    public static function getRegistry(): array {
-        self::ensureInitialized();
-        return self::$registry;
-    }
+		if ( ! class_exists( $class ) && file_exists( $file ) ) {
+			require_once $file;
+		}
 
-    /**
-     * Load ALL integration instances
-     * Only used for WP-CLI JSON generator
-     * Most code should use get() or getRegistry() instead
-     *
-     * @return array All integration instances keyed by slug
-     */
-    public static function all(): array {
-        self::ensureInitialized();
+		if ( ! class_exists( $class ) ) {
+			return null;
+		}
 
-        $all = [];
-        foreach (self::$registry as $slug => $meta) {
-            $instance = self::get($slug);
-            if ($instance) {
-                $all[$slug] = $instance;
-            }
-        }
-        return $all;
-    }
+		$instance = new $class();
+		self::$instances[ $slug ] = $instance;
 
-    /**
-     * Check if an integration is registered
-     * Automatically initializes registry if needed
-     *
-     * @param string $slug Integration slug
-     * @return bool True if integration exists
-     */
-    public static function has(string $slug): bool {
-        self::ensureInitialized();
-        return isset(self::$registry[$slug]);
-    }
+		return $instance;
+	}
 
-    /**
-     * For container compatibility - returns self
-     * Container calls this during boot, but automatic initialization
-     * means it's not actually needed anymore
-     *
-     * @deprecated Use static methods directly instead
-     */
-    public static function init(): self {
-        self::ensureInitialized();
-        return new self();
-    }
+
+
+	public static function getAllSlugs(): array {
+		self::ensureInitialized();
+		return array_keys( self::$registry );
+	}
+
+
+
+	public static function getRegistry(): array {
+		self::ensureInitialized();
+		return self::$registry;
+	}
+
+
+
+	public static function all(): array {
+		self::ensureInitialized();
+
+		$all = [];
+		foreach ( self::$registry as $slug => $meta ) {
+			$instance = self::get( $slug );
+			if ( $instance ) {
+				$all[ $slug ] = $instance;
+			}
+		}
+		return $all;
+	}
+
+
+
+	public static function has( string $slug ): bool {
+		self::ensureInitialized();
+		return isset( self::$registry[ $slug ] );
+	}
+
+
+
+	public static function init(): self {
+		self::ensureInitialized();
+		return new self();
+	}
 }
