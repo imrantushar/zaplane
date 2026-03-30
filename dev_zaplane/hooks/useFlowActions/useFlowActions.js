@@ -154,6 +154,7 @@ export const useFlowActions = ({
                     y: layoutLR ? newY - 60 - 30: newY + TBGap,
                 },
                 data: {
+                    icon:'plus',
                     action: "action",
                     app: "Select an app",
 
@@ -170,6 +171,7 @@ export const useFlowActions = ({
                     y: layoutLR ? newY + 60 + 30: newY + TBGap * 2,
                 },
                 data: {
+                    icon:'plus',
                     action: "action",
                     app: "Select an app",
                 },
