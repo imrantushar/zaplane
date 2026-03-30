@@ -23,7 +23,7 @@ import { conditionVariables } from "@ZAPRedux/Slices/workFlowSlice/actions/condi
 import './styles.scss'
 import Search from "@ZAPComponents/Search";
 
-const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode, workFlow, isFullscreen, nodes, edges }) => {
+const ActionDrawer = ({ open, context, onClose, updateNodeData, handleAddAction, workFlow, isFullscreen, nodes, edges }) => {
   const { source, node } = context;
   const dispatch = useDispatch();
   const { values, setFieldValue, resetForm } = useFormikContext();
@@ -107,7 +107,7 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
         ...(values.connection_id && { connection_id: values.connection_id }),
       };
       if (context?.source !== "node") {
-        createActionNode(payload);
+        handleAddAction(payload);
       }
       else {
         updateNodeData(payload);

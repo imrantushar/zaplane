@@ -11077,7 +11077,7 @@ const AdminMenu = () => {
       }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("div", {
         className: "wp-menu-image svg",
         style: {
-          backgroundImage: `url(${_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_3__.plugin_root_url}/images/menu-icon.svg)`
+          backgroundImage: `url(${_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_3__.plugin_root_url}/assets/images/menu-icon.svg)`
         },
         "aria-hidden": "true",
         children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("br", {})
@@ -13227,7 +13227,7 @@ const ActionDrawer = ({
   context,
   onClose,
   updateNodeData,
-  createActionNode,
+  handleAddAction,
   workFlow,
   isFullscreen,
   nodes,
@@ -13332,7 +13332,7 @@ const ActionDrawer = ({
         })
       };
       if (context?.source !== "node") {
-        createActionNode(payload);
+        handleAddAction(payload);
       } else {
         updateNodeData(payload);
       }
@@ -15091,7 +15091,7 @@ function FlowCanvas({
   const {
     updateNodeData,
     deleteNode,
-    createActionNode,
+    handleAddAction,
     openDrawerForNode,
     openDrawerFromAdd,
     onLayout
@@ -15237,7 +15237,7 @@ function FlowCanvas({
         });
       },
       context: drawerContext,
-      createActionNode: createActionNode,
+      handleAddAction: handleAddAction,
       updateNodeData: updateNodeData,
       workFlow: workFlow,
       nodes: nodes,
@@ -16492,143 +16492,19 @@ const useFlowActions = ({
     setNodes(nds => nds.filter(n => !allDeleteIds.includes(n.id)));
     setEdges(eds => eds.filter(e => !allDeleteIds.includes(e.source) && !allDeleteIds.includes(e.target)));
   };
-  const createActionNode = actionData => {
-    const layoutLR = canvasLayout === "LR";
-    const LRGap = 250;
-    const TBGap = 98;
-    const {
-      edge,
-      node
-    } = drawerContext;
-    let sourceNode = null;
-    let targetNode = null;
-    if (edge) {
-      sourceNode = nodes.find(n => n.id === edge.source);
-      targetNode = nodes.find(n => n.id === edge.target);
-      if (!sourceNode || !targetNode) return;
-    } else if (node) {
-      sourceNode = nodes.find(n => n.id === node.id);
-      if (!sourceNode) return;
-    }
-    const newNodeId = getNewNodeId();
-    const newX = layoutLR ? sourceNode.position.x + LRGap : sourceNode.position.x;
-    const newY = layoutLR ? sourceNode.position.y : sourceNode.position.y + TBGap;
-    const isTools = actionData?.mode === 'tools';
-    const newNode = {
-      id: newNodeId,
-      type: "custom",
-      position: {
-        x: newX,
-        y: newY
-      },
-      data: {
-        action: isTools ? actionData.app : "action",
-        ...actionData
-      }
-    };
-    const branchNodes = edge?.sourceHandle ? (0,_utils_helper__WEBPACK_IMPORTED_MODULE_3__.getBranchNodes)(edge.target, edges) : null;
-    const updatedNodes = nodes.map(n => {
-      if (!branchNodes || !branchNodes.has(n.id)) return n;
-      if (layoutLR) {
-        return {
-          ...n,
-          position: {
-            ...n.position,
-            x: n.position.x + LRGap
-          }
-        };
-      }
-      return {
-        ...n,
-        position: {
-          ...n.position,
-          y: n.position.y + TBGap
-        }
-      };
+  const handleAddAction = actionData => {
+    (0,_utils_helper__WEBPACK_IMPORTED_MODULE_3__.createActionNode)({
+      nodes,
+      edges,
+      drawerContext,
+      canvasLayout,
+      getNewNodeId,
+      setNodes,
+      setEdges,
+      setDrawerContext,
+      setDrawerOpen,
+      actionData
     });
-    let newEdges = [...edges];
-    if (edge) {
-      newEdges = [...edges.filter(e => e.id !== edge.id), {
-        id: `e${edge.source}-${newNodeId}`,
-        source: edge.source,
-        target: newNodeId,
-        type: "custom"
-      }, {
-        id: `e${newNodeId}-${edge.target}`,
-        source: newNodeId,
-        target: edge.target,
-        type: "custom"
-      }];
-    } else {
-      newEdges.push({
-        id: `e${sourceNode.id}-${newNodeId}`,
-        source: sourceNode.id,
-        target: newNodeId,
-        type: "custom"
-      });
-    }
-
-    //CONDITION NODE SUPPORT
-
-    if (actionData.app === "condition") {
-      const trueNodeId = getNewNodeId();
-      const falseNodeId = getNewNodeId();
-      const extraLRSpace = 80;
-      const trueNode = {
-        id: trueNodeId,
-        parentNodeId: newNodeId,
-        type: "custom",
-        port: true,
-        position: {
-          x: layoutLR ? newX + LRGap + extraLRSpace : newX,
-          y: layoutLR ? newY - 60 - 30 : newY + TBGap
-        },
-        data: {
-          icon: 'plus',
-          action: "action",
-          app: "Select an app"
-        }
-      };
-      const falseNode = {
-        id: falseNodeId,
-        parentNodeId: newNodeId,
-        type: "custom",
-        port: false,
-        position: {
-          x: layoutLR ? newX + LRGap + extraLRSpace : newX,
-          y: layoutLR ? newY + 60 + 30 : newY + TBGap * 2
-        },
-        data: {
-          icon: 'plus',
-          action: "action",
-          app: "Select an app"
-        }
-      };
-      newEdges.push({
-        id: `e${newNodeId}-${trueNodeId}`,
-        source: newNodeId,
-        target: trueNodeId,
-        sourceHandle: "true",
-        type: "custom"
-      }, {
-        id: `e${newNodeId}-${falseNodeId}`,
-        source: newNodeId,
-        target: falseNodeId,
-        sourceHandle: "false",
-        type: "custom"
-      });
-      setNodes([...updatedNodes, newNode, trueNode, falseNode]);
-      setEdges(newEdges);
-    } else {
-      setNodes([...updatedNodes, newNode]);
-      setEdges(newEdges);
-    }
-    setDrawerContext({
-      source: "node",
-      node: newNode,
-      edge: null
-    });
-    setDrawerOpen(true);
   };
   const onAddNode = edgeId => {
     const edge = edges.find(e => e.id === edgeId);
@@ -16675,7 +16551,7 @@ const useFlowActions = ({
   return {
     updateNodeData,
     deleteNode,
-    createActionNode,
+    handleAddAction,
     onAddNode,
     openDrawerForNode,
     openDrawerFromAdd,
@@ -16750,6 +16626,7 @@ const getLayoutedElements = (nodes, edges, direction = "TB") => {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   createActionNode: () => (/* binding */ createActionNode),
 /* harmony export */   getBranchNodes: () => (/* binding */ getBranchNodes)
 /* harmony export */ });
 const getBranchNodes = (startId, edges) => {
@@ -16765,6 +16642,154 @@ const getBranchNodes = (startId, edges) => {
     });
   }
   return branch;
+};
+const createActionNode = ({
+  nodes,
+  edges,
+  drawerContext,
+  canvasLayout,
+  getNewNodeId,
+  setNodes,
+  setEdges,
+  setDrawerContext,
+  setDrawerOpen,
+  actionData
+}) => {
+  const layoutLR = canvasLayout === "LR";
+  const LRGap = 250;
+  const TBGap = 98;
+  const {
+    edge,
+    node
+  } = drawerContext;
+  let sourceNode = null;
+  let targetNode = null;
+  if (edge) {
+    sourceNode = nodes.find(n => n.id === edge.source);
+    targetNode = nodes.find(n => n.id === edge.target);
+    if (!sourceNode || !targetNode) return;
+  } else if (node) {
+    sourceNode = nodes.find(n => n.id === node.id);
+    if (!sourceNode) return;
+  }
+  const newNodeId = getNewNodeId();
+  const newX = layoutLR ? sourceNode.position.x + LRGap : sourceNode.position.x;
+  const newY = layoutLR ? sourceNode.position.y : sourceNode.position.y + TBGap;
+  const isTools = actionData?.mode === "tools";
+  const newNode = {
+    id: newNodeId,
+    type: "custom",
+    position: {
+      x: newX,
+      y: newY
+    },
+    data: {
+      action: isTools ? actionData.app : "action",
+      ...actionData
+    }
+  };
+  const branchNodes = edge?.sourceHandle ? getBranchNodes(edge.target, edges) : null;
+  const updatedNodes = nodes.map(n => {
+    if (!branchNodes || !branchNodes.has(n.id)) return n;
+    if (layoutLR) {
+      return {
+        ...n,
+        position: {
+          ...n.position,
+          x: n.position.x + LRGap
+        }
+      };
+    }
+    return {
+      ...n,
+      position: {
+        ...n.position,
+        y: n.position.y + TBGap
+      }
+    };
+  });
+  let newEdges = [...edges];
+  if (edge) {
+    newEdges = [...edges.filter(e => e.id !== edge.id), {
+      id: `e${edge.source}-${newNodeId}`,
+      source: edge.source,
+      target: newNodeId,
+      type: "custom"
+    }, {
+      id: `e${newNodeId}-${edge.target}`,
+      source: newNodeId,
+      target: edge.target,
+      type: "custom"
+    }];
+  } else {
+    newEdges.push({
+      id: `e${sourceNode.id}-${newNodeId}`,
+      source: sourceNode.id,
+      target: newNodeId,
+      type: "custom"
+    });
+  }
+
+  // Condition node support
+  if (actionData.app === "condition") {
+    const trueNodeId = getNewNodeId();
+    const falseNodeId = getNewNodeId();
+    const extraLRSpace = 80;
+    const trueNode = {
+      id: trueNodeId,
+      parentNodeId: newNodeId,
+      type: "custom",
+      port: true,
+      position: {
+        x: layoutLR ? newX + LRGap + extraLRSpace : newX,
+        y: layoutLR ? newY - 90 : newY + TBGap
+      },
+      data: {
+        action: "action",
+        app: "Select an app",
+        icon: 'plus'
+      }
+    };
+    const falseNode = {
+      id: falseNodeId,
+      parentNodeId: newNodeId,
+      type: "custom",
+      port: false,
+      position: {
+        x: layoutLR ? newX + LRGap + extraLRSpace : newX,
+        y: layoutLR ? newY + 90 : newY + TBGap * 2
+      },
+      data: {
+        action: "action",
+        app: "Select an app",
+        icon: 'plus'
+      }
+    };
+    newEdges.push({
+      id: `e${newNodeId}-${trueNodeId}`,
+      source: newNodeId,
+      target: trueNodeId,
+      sourceHandle: "true",
+      type: "custom"
+    }, {
+      id: `e${newNodeId}-${falseNodeId}`,
+      source: newNodeId,
+      target: falseNodeId,
+      sourceHandle: "false",
+      type: "custom"
+    });
+    setNodes([...updatedNodes, newNode, trueNode, falseNode]);
+    setEdges(newEdges);
+  } else {
+    setNodes([...updatedNodes, newNode]);
+    setEdges(newEdges);
+  }
+  setDrawerContext({
+    source: "node",
+    node: newNode,
+    edge: null
+  });
+  setDrawerOpen(true);
 };
 
 /***/ },
