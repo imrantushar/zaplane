@@ -32,26 +32,19 @@ const AdminMenu = () => {
 				<div
 					className="wp-menu-image svg"
 					style={ {
-<<<<<<< HEAD
 						backgroundImage: `url(${plugin_root_url}assets/images/menu-icon.svg)`,
-=======
-						backgroundImage: `url('${
-							toplevel_menu_icon_url ??
-							plugin_root_url + 'assets/images/logo.svg'
-						}')`,
->>>>>>> beta-version
 					} }
 					aria-hidden="true"
 				>
 					<br />
 				</div>
 				<div className="wp-menu-name">
-					{ __( 'Zaplane', 'zaplane' ) }
+					{ __( 'zaplane', 'zaplane' ) }
 				</div>
 			</Link>
 			<ul className="wp-submenu wp-submenu-wrap">
 				<li className="wp-submenu-head" aria-hidden="true">
-					{ __( 'Zaplane', 'zaplane' ) }
+					{ __( 'zaplane', 'zaplane' ) }
 				</li>
 				{ Object.entries( adminmenu ).map( ( [ key, item ], index ) => {
 					if (

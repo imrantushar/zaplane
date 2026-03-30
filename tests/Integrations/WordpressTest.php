@@ -116,7 +116,7 @@ class WordpressTest extends IntegrationTestCase {
 			// --- Post ---
 			'publish_post'              => [ 1 ],
 			'post_updated'              => [ 1 ],
-			'transition_post_status'    => [ 'publish', 'draft', 1 ],
+			'transition_post_status'    => [ 'publish', 'draft', (object) [ 'ID' => 1 ] ],
 			'wp_insert_post'            => [ 1 ],
 			'wp_after_insert_post'      => [ 1, false ],
 			'wp_trash_post'             => [ 1 ],
@@ -222,7 +222,7 @@ class WordpressTest extends IntegrationTestCase {
 			'schedule_post'             => [ 'post_id' => 1, 'date' => '2025-12-01 10:00:00' ],
 			'duplicate_post'            => [ 'post_id' => 1 ],
 			'update_post_feature_image' => [ 'post_id' => 1, 'media_id' => 10 ],
-			'set_featured_image'        => [ 'post_id' => 1, 'attachment_id' => 10 ],
+			'set_featured_image'        => [ 'post_id' => 1, 'media_id' => 10 ],
 
 			'get_post_single'           => [ 'post_id' => 1 ],
 			'get_posts_metadata_all'    => [ 'post_id' => 1 ],
@@ -315,7 +315,7 @@ class WordpressTest extends IntegrationTestCase {
 	public function test_trigger_transition_post_status_returns_status_fields(): void {
 		$result = Wordpress::resolve_trigger(
 			$this->makeTriggerNode( 'transition_post_status' ),
-			[ 'publish', 'draft', 1 ]
+			[ 'publish', 'draft', (object) [ 'ID' => 1 ] ]
 		);
 
 		$this->assertIsArray( $result );
@@ -326,7 +326,7 @@ class WordpressTest extends IntegrationTestCase {
 	public function test_trigger_transition_post_status_returns_false_for_new_status(): void {
 		$result = Wordpress::resolve_trigger(
 			$this->makeTriggerNode( 'transition_post_status' ),
-			[ 'publish', 'new', 1 ]
+			[ 'publish', 'new', (object) [ 'ID' => 1 ] ]
 		);
 
 		$this->assertFalse( $result );
@@ -1060,7 +1060,7 @@ class WordpressTest extends IntegrationTestCase {
 
 	public function test_action_set_featured_image_succeeds(): void {
 		$result = Wordpress::execute_node(
-			$this->makeActionNode( 'set_featured_image', [ 'post_id' => 1, 'attachment_id' => 10 ] ),
+			$this->makeActionNode( 'set_featured_image', [ 'post_id' => 1, 'media_id' => 10 ] ),
 			[]
 		);
 		$this->assertContains( $result['port'], [ 'main', 'error' ] );
