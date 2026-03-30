@@ -12464,11 +12464,27 @@ const Logs = () => {
   const [drawerOpen, setDrawerOpen] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
   const {
     data = [],
-    isLoading
+    currentPage,
+    perPage
   } = (0,react_redux__WEBPACK_IMPORTED_MODULE_7__.useSelector)(state => state.logs || {});
+  const [loading, setLoading] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(data.length === 0);
+  const handleRefresh = async (page = 1, per_page = 20) => {
+    setLoading(true);
+    await dispatch((0,_ZAPRedux_Slices_logsSlice_logsSlice__WEBPACK_IMPORTED_MODULE_9__.getRunsList)({
+      page,
+      per_page
+    }));
+    setLoading(false);
+  };
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
-    dispatch((0,_ZAPRedux_Slices_logsSlice_logsSlice__WEBPACK_IMPORTED_MODULE_9__.getRunsList)());
-  }, [dispatch]);
+    handleRefresh();
+  }, []);
+  const handlePageChange = newPage => {
+    handleRefresh(newPage, perPage);
+  };
+  const handlePerPageChange = itemsPerPage => {
+    handleRefresh(currentPage, itemsPerPage);
+  };
   const columns = [{
     name: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_20__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
       className: "zaplane-label",
@@ -12644,14 +12660,18 @@ const Logs = () => {
       children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_20__.jsx)(_ZAPComponents_ListTable__WEBPACK_IMPORTED_MODULE_14__["default"], {
         columns: columns,
         isRowSelectable: false,
-        data: data?.runs || [],
+        data: data || [],
         showSubHeader: false,
         showColumnFilter: false,
-        showPagination: data?.runs?.length >= 10,
+        showPagination: data?.length >= 20,
         noDataText: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_8__.__)("No logs found", "zaplane"),
         totalItems: data.length,
-        dataFetchingStatus: isLoading,
-        suffix: "logs-table"
+        dataFetchingStatus: loading,
+        suffix: "logs-table",
+        currentPageNumber: currentPage,
+        perPage: perPage,
+        onChangePage: handlePageChange,
+        onChangeItemsPerPage: handlePerPageChange
       })
     }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_20__.jsx)(_ZAPComponents_Drawer__WEBPACK_IMPORTED_MODULE_13__["default"], {
       open: drawerOpen,
@@ -17167,12 +17187,28 @@ const getSingleRunDetails = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.cre
   }
 });
 const getRunsList = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyncThunk)('zaplane/getRunsList', async ({
-  limit = 50,
-  offset = 0
+  page = 1,
+  per_page = 20
 } = {}, thunkAPI) => {
   try {
-    const res = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.get(_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.namespace + `runs`);
-    return res.data;
+    const res = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.get(_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.namespace + `runs`, {
+      params: {
+        page,
+        per_page
+      }
+    });
+    const {
+      runs = [],
+      pagination = {}
+    } = res.data;
+    console.log(runs, 'runs');
+    return {
+      data: runs,
+      currentPage: pagination.page || 1,
+      itemPerPage: pagination.per_page || 20,
+      totalItems: pagination.total || 0,
+      totalPages: pagination.total_pages || 0
+    };
   } catch (e) {
     return (0,_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.handleSliceError)(thunkAPI, e);
   }
@@ -17197,12 +17233,27 @@ const logSlice = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createSlice)({
   name: 'logs',
   initialState: {
     data: [],
-    isLoading: true
+    isLoading: true,
+    itemPerPage: 10,
+    currentPage: 1,
+    totalItems: 0
   },
   reducers: {},
   extraReducers: builder => {
     builder.addCase(getRunsList.fulfilled, (state, action) => {
-      state.data = action.payload;
+      const {
+        data,
+        currentPage,
+        itemPerPage,
+        totalItems,
+        totalPages
+      } = action.payload;
+      console.log(action.payload, 'pay');
+      state.data = data || [];
+      state.currentPage = currentPage;
+      state.itemPerPage = itemPerPage;
+      state.totalItems = totalItems;
+      state.totalPages = totalPages;
       state.isLoading = false;
     });
   }

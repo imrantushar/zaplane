@@ -37,12 +37,22 @@ export const getSingleRunDetails = createAsyncThunk(
 );
 export const getRunsList = createAsyncThunk(
 	'zaplane/getRunsList',
-	async ({ limit = 50, offset = 0 } = {}, thunkAPI) => {
+	async ({ page = 1, per_page = 20 } = {}, thunkAPI) => {
 		try {
 			const res = await API.get(
-				namespace + `runs`
+				namespace + `runs`,{
+					params: { page, per_page },
+				}
 			);
-			return res.data; 
+			const { runs = [], pagination = {} } = res.data;
+			console.log(runs,'runs');
+			return {
+				data: runs,
+				currentPage: pagination.page || 1,
+				itemPerPage: pagination.per_page || 20,
+				totalItems: pagination.total || 0,
+				totalPages: pagination.total_pages || 0,
+			}; 
 		} catch (e) {
 			return handleSliceError(thunkAPI, e);
 		}
@@ -80,7 +90,10 @@ const logSlice = createSlice({
 	name: 'logs',
 	initialState: {
 		data: [],
-		isLoading:true
+		isLoading:true,
+		itemPerPage: 10,
+		currentPage: 1,
+		totalItems: 0,
 
 	},
 	reducers: {
@@ -89,8 +102,14 @@ const logSlice = createSlice({
 	extraReducers: (builder) => {
 		builder
 			.addCase(getRunsList.fulfilled, (state, action) => {
-				state.data = action.payload;
-				state.isLoading =false
+				const { data, currentPage, itemPerPage, totalItems, totalPages } = action.payload;
+				console.log(action.payload,'pay');
+				state.data = data || [];
+				state.currentPage = currentPage;
+				state.itemPerPage = itemPerPage;
+				state.totalItems = totalItems;
+				state.totalPages = totalPages;
+				state.isLoading = false;
 			})
 			
 

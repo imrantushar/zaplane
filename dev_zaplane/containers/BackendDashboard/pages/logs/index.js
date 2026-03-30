@@ -31,11 +31,26 @@ const Logs = () => {
     const dispatch = useDispatch();
     const [activeRunId, setActiveRunId] = useState(null);
     const [drawerOpen, setDrawerOpen] = useState(false);
-    const { data = [], isLoading } = useSelector((state) => state.logs || {});
+    const { data = [], currentPage, perPage } = useSelector((state) => state.logs || {});
+    const [loading, setLoading] = useState(data.length === 0);
+
+    const handleRefresh = async (page = 1, per_page = 20) => {
+        setLoading(true)
+        await dispatch(getRunsList({ page, per_page }));
+        setLoading(false)
+    };
 
     useEffect(() => {
-        dispatch(getRunsList());
-    }, [dispatch]);
+        handleRefresh()
+    }, []);
+
+    const handlePageChange = (newPage) => {
+        handleRefresh(newPage, perPage)
+    };
+
+    const handlePerPageChange = (itemsPerPage) => {
+        handleRefresh(currentPage, itemsPerPage)
+    };
 
     const columns = [
         {
@@ -215,14 +230,18 @@ const Logs = () => {
                 <ListTable
                     columns={columns}
                     isRowSelectable={false}
-                    data={data?.runs || []}
+                    data={data || []}
                     showSubHeader={false}
                     showColumnFilter={false}
-                    showPagination={data?.runs?.length >= 10}
+                    showPagination={data?.length >= 20}
                     noDataText={__("No logs found", "zaplane")}
                     totalItems={data.length}
-                    dataFetchingStatus={isLoading}
+                    dataFetchingStatus={loading}
                     suffix="logs-table"
+                    currentPageNumber={currentPage}
+                    perPage={perPage}
+                    onChangePage={handlePageChange}
+                    onChangeItemsPerPage={handlePerPageChange}
                 />
             </div>
 
