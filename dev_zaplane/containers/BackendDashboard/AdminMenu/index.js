@@ -1,11 +1,8 @@
 import React, { useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { __ } from '@wordpress/i18n';
 import {
 	route_path,
-	toplevel_menu_icon_url,
-	toplevel_menu_title,
-	is_pro,
 	plugin_root_url,
 	useQuery,
 } from '@ZAPUtils/helper';
@@ -35,22 +32,19 @@ const AdminMenu = () => {
 				<div
 					className="wp-menu-image svg"
 					style={ {
-						backgroundImage: `url('${
-							toplevel_menu_icon_url ??
-							plugin_root_url + 'assets/images/logo.svg'
-						}')`,
+						backgroundImage: `url(${plugin_root_url}assets/images/menu-icon.svg)`,
 					} }
 					aria-hidden="true"
 				>
 					<br />
 				</div>
 				<div className="wp-menu-name">
-					{ __( 'Zaplane', 'zaplane' ) }
+					{ __( 'zaplane', 'zaplane' ) }
 				</div>
 			</Link>
 			<ul className="wp-submenu wp-submenu-wrap">
 				<li className="wp-submenu-head" aria-hidden="true">
-					{ __( 'Zaplane', 'zaplane' ) }
+					{ __( 'zaplane', 'zaplane' ) }
 				</li>
 				{ Object.entries( adminmenu ).map( ( [ key, item ], index ) => {
 					if (

@@ -61,7 +61,7 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
     const {
         updateNodeData,
         deleteNode,
-        createActionNode,
+        handleAddAction,
         openDrawerForNode,
         openDrawerFromAdd,
         onLayout
@@ -221,7 +221,7 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
                     setDrawerContext({ source: null, node: null, edge: null });
                 }}
                 context={drawerContext}
-                createActionNode={createActionNode}
+                handleAddAction={handleAddAction}
                 updateNodeData={updateNodeData}
                 workFlow={workFlow}
                 nodes={nodes}
