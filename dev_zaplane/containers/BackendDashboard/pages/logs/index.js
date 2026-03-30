@@ -31,7 +31,7 @@ const Logs = () => {
     const dispatch = useDispatch();
     const [activeRunId, setActiveRunId] = useState(null);
     const [drawerOpen, setDrawerOpen] = useState(false);
-    const { data = [], currentPage, perPage } = useSelector((state) => state.logs || {});
+    const { data = [], currentPage, perPage,itemPerPage,totalItems } = useSelector((state) => state.logs || {});
     const [loading, setLoading] = useState(data.length === 0);
 
     const handleRefresh = async (page = 1, per_page = 20) => {
@@ -235,11 +235,12 @@ const Logs = () => {
                     showColumnFilter={false}
                     showPagination={data?.length >= 20}
                     noDataText={__("No logs found", "zaplane")}
-                    totalItems={data.length}
+                    totalItems={totalItems}
                     dataFetchingStatus={loading}
                     suffix="logs-table"
                     currentPageNumber={currentPage}
                     perPage={perPage}
+                    rowsPerPage={itemPerPage}
                     onChangePage={handlePageChange}
                     onChangeItemsPerPage={handlePerPageChange}
                 />

@@ -12465,7 +12465,9 @@ const Logs = () => {
   const {
     data = [],
     currentPage,
-    perPage
+    perPage,
+    itemPerPage,
+    totalItems
   } = (0,react_redux__WEBPACK_IMPORTED_MODULE_7__.useSelector)(state => state.logs || {});
   const [loading, setLoading] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(data.length === 0);
   const handleRefresh = async (page = 1, per_page = 20) => {
@@ -12665,11 +12667,12 @@ const Logs = () => {
         showColumnFilter: false,
         showPagination: data?.length >= 20,
         noDataText: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_8__.__)("No logs found", "zaplane"),
-        totalItems: data.length,
+        totalItems: totalItems,
         dataFetchingStatus: loading,
         suffix: "logs-table",
         currentPageNumber: currentPage,
         perPage: perPage,
+        rowsPerPage: itemPerPage,
         onChangePage: handlePageChange,
         onChangeItemsPerPage: handlePerPageChange
       })
@@ -15384,18 +15387,6 @@ function FlowTopBar({
     };
     updateStatusAndTitle();
   }, [values?.status, values?.title, workFlow, dispatch, id]);
-  //listiner
-  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
-    if (activeDrawer !== "logs") return;
-    const interval = setInterval(async () => {
-      setRefreshing(true);
-      await dispatch((0,_ZAPRedux_Slices_workFlowSlice_actions_workFlowRuns__WEBPACK_IMPORTED_MODULE_17__.getRunWorkFlow)({
-        id
-      }));
-      setRefreshing(false);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [activeDrawer, dispatch, id]);
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_31__.jsx)(_ZAPComponents_TopBar__WEBPACK_IMPORTED_MODULE_6__["default"], {
     leftContent: () => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_31__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_31__.Fragment, {
       children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_31__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Button, {
@@ -15505,7 +15496,9 @@ function FlowTopBar({
             children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_31__.jsx)(react_icons_lu__WEBPACK_IMPORTED_MODULE_9__.LuSquarePlay, {}), " ", (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_12__.__)("Replay", "zaplane")]
           })]
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_31__.jsx)(_RunsTable_RunsTable__WEBPACK_IMPORTED_MODULE_14__["default"], {
-          id: id
+          id: id,
+          activeDrawer: activeDrawer,
+          setRefreshing: setRefreshing
         })]
       }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_31__.jsx)(_ZAPComponents_Drawer__WEBPACK_IMPORTED_MODULE_13__["default"], {
         title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_12__.__)("Version History", "zaplane"),
@@ -15602,29 +15595,40 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const RunsTable = ({
-  id
+  id,
+  activeDrawer,
+  setRefreshing
 }) => {
   const dispatch = (0,react_redux__WEBPACK_IMPORTED_MODULE_5__.useDispatch)();
   const [activeRunId, setActiveRunId] = (0,react__WEBPACK_IMPORTED_MODULE_6__.useState)(null);
   const {
     runs = [],
     currentPage,
-    perPage
+    perPage,
+    totalItems,
+    itemPerPage
   } = (0,react_redux__WEBPACK_IMPORTED_MODULE_5__.useSelector)(state => state.workflows);
   const [drawerOpen, setDrawerOpen] = (0,react__WEBPACK_IMPORTED_MODULE_6__.useState)(false);
   const [loading, setLoading] = (0,react__WEBPACK_IMPORTED_MODULE_6__.useState)(runs.length === 0);
   const handleRefresh = async (page = 1, per_page = 10) => {
     setLoading(true);
+    setRefreshing(true);
     await dispatch((0,_ZAPRedux_Slices_workFlowSlice_actions_workFlowRuns__WEBPACK_IMPORTED_MODULE_13__.getRunWorkFlow)({
       id,
       page,
       per_page
     }));
+    setRefreshing(false);
     setLoading(false);
   };
   (0,react__WEBPACK_IMPORTED_MODULE_6__.useEffect)(() => {
-    handleRefresh();
-  }, []);
+    if (activeDrawer !== "logs") return;
+    handleRefresh(currentPage, itemPerPage);
+    const interval = setInterval(() => {
+      handleRefresh(currentPage, itemPerPage);
+    }, 8000);
+    return () => clearInterval(interval);
+  }, [currentPage, itemPerPage, activeDrawer]);
   const handlePageChange = newPage => {
     handleRefresh(newPage, perPage);
   };
@@ -15721,11 +15725,12 @@ const RunsTable = ({
       showColumnFilter: false,
       showPagination: runs.length >= 10,
       noDataText: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_9__.__)("No history found", "zaplane"),
-      totalItems: runs.length,
+      totalItems: totalItems,
       dataFetchingStatus: loading,
       suffix: "history-table",
       currentPageNumber: currentPage,
       perPage: perPage,
+      rowsPerPage: itemPerPage,
       onChangePage: handlePageChange,
       onChangeItemsPerPage: handlePerPageChange
     }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_17__.jsx)(_ZAPComponents_Drawer__WEBPACK_IMPORTED_MODULE_10__["default"], {
@@ -15803,7 +15808,9 @@ const VersionHistoryTable = ({
   const {
     isLoading,
     currentPage,
-    perPage
+    perPage,
+    itemPerPage,
+    totalItems
   } = (0,react_redux__WEBPACK_IMPORTED_MODULE_14__.useSelector)(state => state.workflows);
   const [loading, setLoading] = (0,react__WEBPACK_IMPORTED_MODULE_13__.useState)(versions.length === 0);
   const handleRefresh = async (page = 1, per_page = 10) => {
@@ -15909,11 +15916,12 @@ const VersionHistoryTable = ({
     showColumnFilter: false,
     showPagination: versions.length >= 10,
     noDataText: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_5__.__)("No history found", "zaplane"),
-    totalItems: versions?.length,
+    totalItems: totalItems,
     dataFetchingStatus: loading,
     suffix: "version-table",
     currentPageNumber: currentPage,
     perPage: perPage,
+    rowsPerPage: itemPerPage,
     onChangePage: handlePageChange,
     onChangeItemsPerPage: handlePerPageChange
   });
@@ -17714,8 +17722,8 @@ __webpack_require__.r(__webpack_exports__);
 
 const getRunWorkFlow = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAsyncThunk)('zaplane/getRunWorkFlow', async ({
   id,
-  page = 1,
-  per_page = 20
+  page,
+  per_page
 } = {}, thunkAPI) => {
   try {
     const res = await _ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.API.get(_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_2__.namespace + `workflows/${id}/runs`, {
@@ -17731,7 +17739,7 @@ const getRunWorkFlow = (0,_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_0__.createAs
     return {
       data: data || [],
       currentPage: pagination.page || 1,
-      itemPerPage: pagination.per_page || 20,
+      itemPerPage: pagination.per_page,
       totalItems: pagination.total || 0,
       totalPages: pagination.total_pages || 0
     };
