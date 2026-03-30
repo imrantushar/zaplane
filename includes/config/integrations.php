@@ -156,5 +156,9 @@ return [
 			'file' => 'academy.php',
 			'class' => \Zaplane\Integrations\Academy::class
 		],
+		'lifter'            => [
+			'file' => 'lifter.php',
+			'class' => \Zaplane\Integrations\Lifter::class
+		],
 	],
 ];
