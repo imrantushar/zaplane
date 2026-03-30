@@ -19,7 +19,7 @@ class WpuserfrontendTest extends IntegrationTestCase
         $this->assertIsArray($result);
         $this->assertTrue($result['success']);
         $this->assertEquals(101, $result['post_id']);
-        $this->assertEquals('Test Post 101', $result['post_data']->post_title);
+        $this->assertEquals('Test Post 101', $result['post_data']['post_title']);
         $this->assertEquals('John Doe', $result['user_data']['user']['data']['display_name']);
     }
 
