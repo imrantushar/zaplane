@@ -1,6 +1,6 @@
 <?php
 
-if (!class_exists('WP_Post')) {
+if ( ! class_exists('WP_Post') ) {
     class WP_Post {
         public $ID;
         public $post_author;
@@ -23,7 +23,7 @@ if (!class_exists('WP_Post')) {
         public $post_mime_type;
         public $comment_count;
 
-        public function __construct($id, $author = 1, $type = 'wpuf_post') {
+        public function __construct( $id, $author = 1, $type = 'wpuf_post' ) {
             $this->ID = $id;
             $this->post_author = $author;
             $this->post_type = $type;
@@ -46,15 +46,15 @@ if (!class_exists('WP_Post')) {
     }
 }
 
-if (!function_exists('get_post')) {
-    function get_post($id) {
-        if ($id === 999) return null; // Non-existent post
-        return new WP_Post($id, 1, $id === 200 ? 'wpuf_coupon' : 'wpuf_post');
+if ( ! function_exists( 'get_post' ) ) {
+    function get_post( $id ) {
+        if ( $id === 999 ) return null;
+        return new WP_Post( $id, 1, $id === 200 ? 'wpuf_coupon' : 'wpuf_post' );
     }
 }
 
-if (!function_exists('get_post_meta')) {
-    function get_post_meta($post_id) {
+if ( ! function_exists( 'get_post_meta' ) ) {
+    function get_post_meta( $post_id ) {
         return [
             'meta_key_1' => ['meta_value_1'],
             'meta_key_2' => ['meta_value_2'],
@@ -62,8 +62,8 @@ if (!function_exists('get_post_meta')) {
     }
 }
 
-if (!function_exists('get_userdata')) {
-    function get_userdata($user_id) {
+if ( ! function_exists( 'get_userdata' ) ) {
+    function get_userdata( $user_id ) {
         return (object)[
             'ID' => $user_id,
             'user_login' => 'johndoe',
@@ -77,18 +77,18 @@ if (!function_exists('get_userdata')) {
     }
 }
 
-if (!function_exists('get_user_meta')) {
-    function get_user_meta($user_id, $key) {
+if ( ! function_exists( 'get_user_meta' ) ) {
+    function get_user_meta( $user_id, $key ) {
         $data = [
             'first_name' => 'John',
             'last_name' => 'Doe',
         ];
-        return $data[$key] ?? '';
+        return $data[ $key ] ?? '';
     }
 }
 
-if (!function_exists('get_avatar_url')) {
-    function get_avatar_url($user_id) {
+if ( ! function_exists( 'get_avatar_url' ) ) {
+    function get_avatar_url( $user_id ) {
         return "http://example.com/avatar/{$user_id}.png";
     }
 }
