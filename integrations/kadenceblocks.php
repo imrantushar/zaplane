@@ -25,10 +25,10 @@ class Kadenceblocks extends IntegrationBase {
     }
 
     public static function resolve_trigger(array $node, array $args) {
+       
         switch ($node['event']) {
+            
             case 'kadence_blocks_advanced_form_submission':
-                // $args: ($form_args, $processed_fields, $post_id)
-                // $processed_fields is array of ['label','type','value','uniqueID','name',...]
                 $fields = $args[1] ?? [];
                 $result = [];
                 foreach ($fields as $field) {
