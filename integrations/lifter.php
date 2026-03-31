@@ -24,10 +24,6 @@ class Lifter extends IntegrationBase
         return 'lifter.svg';
     }
 
-    /**
-     * Define triggers with hook names and accepted arguments count.
-     * Your IntegrationBase must use 'accepted_args' when registering hooks.
-     */
     public static function get_triggers(): array
     {
         return [
@@ -67,7 +63,7 @@ class Lifter extends IntegrationBase
                     'type'     => 'select',
                     'dynamic' => [
                             'integration' => 'lifter',
-                            'query'       => 'acourse',
+                            'query'       => 'course',
                             'select'      => ['name', 'label'],
                         ],
                     'required' => true,
@@ -99,7 +95,7 @@ class Lifter extends IntegrationBase
                     'type'     => 'select',
                     'dynamic' => [
                             'integration' => 'lifter',
-                            'query'       => 'quiz',
+                            'query'       => 'lesson',
                             'select'      => ['name', 'label'],
                         ],
                     'required' => true,
@@ -119,10 +115,6 @@ class Lifter extends IntegrationBase
                 $course_id  = $args[1] ?? null;
 
                 if (! $user_id || ! $course_id) {
-                    return false;
-                }
-
-                if (!in_array(get_post_type($course_id), ['course', 'llms_course'], true)) {
                     return false;
                 }
 
@@ -286,7 +278,7 @@ class Lifter extends IntegrationBase
     public static function get_dynamic_queries(): array
     {
         return [
-            'acourse' => [self::class, 'query_courses'],
+            'course' => [self::class, 'query_courses'],
             'quiz' => [self::class, 'query_quiz'],
             'lesson' => [self::class, 'query_lesson'],
         ];

@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-03-31 09:43:49",
+    "generated_at": "2026-03-31 10:57:47",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -12508,16 +12508,14 @@
                             "key": "course_id",
                             "label": "Course",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any course",
-                                    "value": "any"
-                                },
-                                {
-                                    "label": "New Course",
-                                    "value": "21"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "lifter",
+                                "query": "course",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -12534,16 +12532,14 @@
                             "key": "quiz_id",
                             "label": "Quiz",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any Quiz",
-                                    "value": "any"
-                                },
-                                {
-                                    "label": "dfgsgfs Quiz",
-                                    "value": "25"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "lifter",
+                                "query": "quiz",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -12560,16 +12556,14 @@
                             "key": "lesson_id",
                             "label": "Lesson",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any lesson",
-                                    "value": "any"
-                                },
-                                {
-                                    "label": "dfgsgfs",
-                                    "value": "24"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "lifter",
+                                "query": "lesson",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],
@@ -12586,16 +12580,14 @@
                             "key": "course_id",
                             "label": "Course",
                             "type": "select",
-                            "options": [
-                                {
-                                    "label": "Any course",
-                                    "value": "any"
-                                },
-                                {
-                                    "label": "New Course",
-                                    "value": "21"
-                                }
-                            ],
+                            "dynamic": {
+                                "integration": "lifter",
+                                "query": "course",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
                             "required": true
                         }
                     ],
