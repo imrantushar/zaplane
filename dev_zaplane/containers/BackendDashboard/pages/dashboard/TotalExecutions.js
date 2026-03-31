@@ -38,7 +38,7 @@ const TotalExecutions = ({ data }) => {
     return (
         <Box
             bg="var(--zaplane-background)"
-            borderRadius="lg"
+            borderRadius="4px"
             boxShadow="md"
             w="100%"
             h="388px"

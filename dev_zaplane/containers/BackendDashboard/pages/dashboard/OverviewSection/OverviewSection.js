@@ -8,7 +8,7 @@ const StatCard = ({ title, value, icon }) => {
             flex="1"
             bg="white"
             p={6}
-            borderRadius="12px"
+            borderRadius="4px"
             boxShadow="sm"
             align="center"
             justify="space-between"

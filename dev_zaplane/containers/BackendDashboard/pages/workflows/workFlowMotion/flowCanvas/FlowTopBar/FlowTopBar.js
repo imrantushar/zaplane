@@ -60,20 +60,7 @@ export default function FlowTopBar({
 
     updateStatusAndTitle();
   }, [values?.status, values?.title, workFlow, dispatch, id]);
-  //listiner
-  useEffect(() => {
-    if (activeDrawer !== "logs") return;
-
-    const interval = setInterval(async () => {
-      setRefreshing(true);
-
-      await dispatch(getRunWorkFlow({ id }));
-
-      setRefreshing(false);
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, [activeDrawer, dispatch, id]);
+  
 
   return (
     <TopBar
@@ -199,7 +186,7 @@ export default function FlowTopBar({
               </Button>
             </Flex>
 
-            <RunsTable id={id} />
+            <RunsTable id={id} activeDrawer={activeDrawer} setRefreshing={setRefreshing} />
           </ZAPDrawer>
 
           {/* Version Drawer */}
