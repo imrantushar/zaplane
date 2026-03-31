@@ -50,10 +50,99 @@ class Metabox extends IntegrationBase {
 		return [];
 	}
 
+	private static function extract_form_fields( $form_id ) {
+		if ( ! function_exists( 'rwmb_meta' ) ) {
+			return [];
+		}
+
+		$meta_box = rwmb_get_registry( 'meta_box' );
+		$form     = $meta_box->get( $form_id );
+
+		if ( ! $form || ! isset( $form->meta_box['fields'] ) ) {
+			return [];
+		}
+
+		$upload_file  = [ 'file_upload', 'single_image', 'file' ];
+		$field_detail = $form->meta_box['fields'];
+		$fields       = [];
+
+		foreach ( $field_detail as $field ) {
+
+			if ( ! empty( $field['id'] ) && 'submit' !== $field['type'] ) {
+				$fields[] = [
+					'name'  => $field['id'],
+					'type'  => in_array( $field['type'], $upload_file, true ) ? 'file' : $field['type'],
+					'label' => $field['name'] ?? '',
+				];
+			}
+		}
+
+		return $fields;
+	}
+
 	public static function resolve_trigger( array $node, array $args ) {
 
 		switch ( $node['event'] ) {
 			case 'form_submission':
+				$post_id = $args[0] ?? null;
+				$config  = $args[1] ?? [];
+
+				if ( ! $post_id || empty( $config['id'] ) ) {
+					return false;
+				}
+
+				$form_id        = $config['id'];
+				$select_form_id = $node['config']['form_id'] ?? 'any';
+
+				if ( 'any' !== $select_form_id && $select_form_id !== $form_id ) {
+					return false;
+				}
+
+				$fields      = self::extract_form_fields( $form_id );
+				$field_value = [];
+
+				foreach ( $fields as $field ) {
+					$value = rwmb_meta( $field['name'], [], $post_id );
+
+					if ( ! $value ) {
+						continue;
+					}
+
+					if ( 'file' === $field['type'] ) {
+
+						if ( isset( $value['path'] ) ) {
+							$field_value[ $field['name'] ] = $value['path'];
+						} elseif ( is_array( $value ) ) {
+							$field_value[ $field['name'] ] = array_map( fn( $f ) => $f['path'] ?? null, $value );
+						}
+					} else {
+						$field_value[ $field['name'] ] = $value;
+					}
+				}
+
+				$post             = get_post( $post_id );
+				$post_field_value = $post ? get_object_vars( $post ) : [];
+				unset( $post_field_value['ID'] );
+
+				$all_meta    = get_post_meta( $post_id );
+				$meta_values = [];
+
+				foreach ( $all_meta as $key => $val ) {
+					$meta_values[ $key ] = maybe_unserialize( $val[0] );
+				}
+
+				$data = array_merge(
+					[ 'id' => $form_id ],
+					$field_value,
+					$meta_values,
+					[ 'post_id' => $post_id ],
+					$post_field_value
+				);
+
+				return [
+					'success' => true,
+					'data'    => $data,
+				];
 
 		}//end switch
 		return false;
@@ -65,41 +154,38 @@ class Metabox extends IntegrationBase {
 		];
 	}
 
-	public static function form_query_types($q) {
-    // যদি Meta Box বা Frontend Submission প্লাগইন না থাকে
-    if (!function_exists('rwmb_meta') || !function_exists('mb_frontend_submission_load')) {
-        return [
-            [
-                'label' => 'MetaBox is not installed or activated',
-                'name'  => '',
-            ],
-        ];
-    }
+	public static function form_query_types( $q ) {
+		if ( ! function_exists( 'rwmb_meta' ) || ! function_exists( 'mb_frontend_submission_load' ) ) {
+			return [
+				[
+					'label' => 'MetaBox is not installed or activated',
+					'name'  => '',
+				],
+			];
+		}
 
-    // সব Meta Box ফর্ম নেওয়া
-    $meta_box_registry = rwmb_get_registry('meta_box');
-    $forms = array_values($meta_box_registry->all());
+		$meta_box = rwmb_get_registry( 'meta_box' );
+		$forms    = array_values( $meta_box->all() );
+		$options  = [];
 
-    $options = [];
+		foreach ( $forms as $form ) {
 
-    foreach ($forms as $form) {
-        if (isset($form->meta_box['id'], $form->meta_box['title'])) {
-            $options[] = [
-                'label' => $form->meta_box['title'], // দেখানোর নাম
-                'name'  => $form->meta_box['id'],    // value/ID
-            ];
-        }
-    }
+			if ( isset( $form->meta_box['id'], $form->meta_box['title'] ) ) {
+				$options[] = [
+					'name'  => $form->meta_box['id'],
+					'label' => $form->meta_box['title'],
+				];
+			}
+		}
 
-    // প্রথমে "Any Form" যুক্ত করা
-    array_unshift(
-        $options,
-        [
-            'label' => 'Any Form',
-            'name'  => 'any',
-        ]
-    );
+		array_unshift(
+			$options,
+			[
+				'label' => 'Any Form',
+				'name'  => 'any',
+			]
+		);
 
-    return $options;
-}
+		return $options;
+	}
 }
