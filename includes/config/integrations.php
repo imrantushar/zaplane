@@ -156,9 +156,10 @@ return [
 			'file' => 'academy.php',
 			'class' => \Zaplane\Integrations\Academy::class
 		],
-		'kadenceblocks'      => [
-			'file' => 'kadenceblocks.php', 
-			'class' => \Zaplane\Integrations\Kadenceblocks::class],
+		'advancecustomfields'      => [
+			'file'  => 'advance-custom-fields.php',
+			'class' => \Zaplane\Integrations\AdvanceCustomFields::class
+		],
 
 	],
 ];

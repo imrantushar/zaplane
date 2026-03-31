@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-03-31 09:27:36",
+    "generated_at": "2026-03-31 11:59:37",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -12490,26 +12490,255 @@
             },
             "actions": []
         },
-        "kadenceblocks": {
-            "slug": "kadenceblocks",
-            "name": "Kadence Block",
-            "icon": "kadence-block.svg",
+        "advancecustomfields": {
+            "slug": "advancecustomfields",
+            "name": "Advanced Custom Fields",
+            "icon": "acf.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
             "triggers": {
-                "kadence_blocks_advanced_form_submission": {
-                    "key": "kadence_blocks_advanced_form_submission",
-                    "label": "Advanced Form Submission",
-                    "hook": "kadence_blocks_advanced_form_submission",
-                    "schema": [],
+                "acf_save_post": {
+                    "key": "acf_save_post",
+                    "label": "ACF Fields Saved",
+                    "hook": "acf/save_post",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "Post ID (leave empty for any)",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "acf_post_field_updated": {
+                    "key": "acf_post_field_updated",
+                    "label": "ACF Post Field Value Updated",
+                    "hook": "updated_post_meta",
+                    "schema": [
+                        {
+                            "key": "field_name",
+                            "label": "Field Name (leave empty for any)",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "acf_user_field_updated": {
+                    "key": "acf_user_field_updated",
+                    "label": "ACF User Field Value Updated",
+                    "hook": [
+                        "updated_user_meta",
+                        "added_user_meta"
+                    ],
+                    "schema": [
+                        {
+                            "key": "field_name",
+                            "label": "Field Name (leave empty for any)",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
                 }
             },
-            "actions": []
+            "actions": {
+                "get_post_field": {
+                    "key": "get_post_field",
+                    "label": "Get Post Custom Field Value",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "Post ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "field_name",
+                            "label": "Field Name",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_user_field": {
+                    "key": "get_user_field",
+                    "label": "Get User Custom Field Value",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "field_name",
+                            "label": "Field Name",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_options_field": {
+                    "key": "get_options_field",
+                    "label": "Get Options Page Field Value",
+                    "schema": [
+                        {
+                            "key": "field_name",
+                            "label": "Field Name",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_post_field": {
+                    "key": "update_post_field",
+                    "label": "Update Post Custom Field Value",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "Post ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "field_name",
+                            "label": "Field Name",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "value",
+                            "label": "Value",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_user_field": {
+                    "key": "update_user_field",
+                    "label": "Update User Custom Field Value",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "field_name",
+                            "label": "Field Name",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "value",
+                            "label": "Value",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_options_field": {
+                    "key": "update_options_field",
+                    "label": "Update Options Page Field Value",
+                    "schema": [
+                        {
+                            "key": "field_name",
+                            "label": "Field Name",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "value",
+                            "label": "Value",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_repeater_field": {
+                    "key": "update_repeater_field",
+                    "label": "Update Repeater Field Value",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "Post ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "field_name",
+                            "label": "Field Name",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "rows",
+                            "label": "Rows (JSON array of objects)",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_group_field": {
+                    "key": "update_group_field",
+                    "label": "Update Group Field Value",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "Post ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "field_name",
+                            "label": "Field Name",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "sub_fields",
+                            "label": "Sub Fields (JSON object)",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
         }
     },
     "tools": {
