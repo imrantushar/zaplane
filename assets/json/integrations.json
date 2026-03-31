@@ -1,11 +1,11 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-03-12 08:55:08",
+    "generated_at": "2026-03-30 09:37:48",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
             "name": "WordPress",
-            "icon": "wordpress.svg",
+            "icon": "WordPress.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -853,7 +853,7 @@
                         {
                             "key": "user_email",
                             "label": "Email",
-                            "type": "text",
+                            "type": "email",
                             "required": true
                         },
                         {
@@ -915,7 +915,7 @@
                         {
                             "key": "user_email",
                             "label": "Email",
-                            "type": "text"
+                            "type": "email"
                         },
                         {
                             "key": "user_pass",
@@ -1072,7 +1072,7 @@
                         {
                             "key": "email",
                             "label": "User Email",
-                            "type": "text",
+                            "type": "email",
                             "required": true
                         }
                     ],
@@ -1213,7 +1213,7 @@
                         {
                             "key": "user_login_or_email",
                             "label": "Username or Email",
-                            "type": "text",
+                            "type": "email",
                             "required": true
                         }
                     ],
@@ -1228,7 +1228,7 @@
                         {
                             "key": "user_login",
                             "label": "Username or Email",
-                            "type": "text",
+                            "type": "email",
                             "required": true
                         },
                         {
@@ -2580,7 +2580,7 @@
                         {
                             "key": "user_email",
                             "label": "User Email",
-                            "type": "expression",
+                            "type": "email",
                             "required": true
                         }
                     ],
@@ -2643,7 +2643,7 @@
                         {
                             "key": "author_email",
                             "label": "Author Email",
-                            "type": "expression",
+                            "type": "email",
                             "required": true
                         },
                         {
@@ -2676,7 +2676,7 @@
                         {
                             "key": "author_email",
                             "label": "Author Email",
-                            "type": "expression",
+                            "type": "email",
                             "required": true
                         },
                         {
@@ -7597,6 +7597,303 @@
                 }
             }
         },
+        "activecampaign": {
+            "slug": "activecampaign",
+            "name": "ActiveCampaign",
+            "icon": "activecampaign.svg",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": {
+                "form_submitted": {
+                    "key": "form_submitted",
+                    "label": "Form Submitted",
+                    "hook": "wp_loaded",
+                    "schema": [
+                        {
+                            "key": "form_id",
+                            "label": "Form",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "activecampaign",
+                                "query": "forms",
+                                "select": [
+                                    "id",
+                                    "name"
+                                ]
+                            },
+                            "help": "Optional. Only continue when the submitted ActiveCampaign form matches this value."
+                        },
+                        {
+                            "key": "email",
+                            "label": "Contact Email",
+                            "type": "text",
+                            "placeholder": "name@example.com",
+                            "help": "Optional. Only continue when the submitted contact email matches this value."
+                        },
+                        {
+                            "key": "list_id",
+                            "label": "List ID",
+                            "type": "text",
+                            "placeholder": "12",
+                            "help": "Optional. Only continue when the submitted form includes this list ID."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "contact_subscribed": {
+                    "key": "contact_subscribed",
+                    "label": "Contact Subscribed",
+                    "hook": "wp_loaded",
+                    "schema": [
+                        {
+                            "key": "form_id",
+                            "label": "Form",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "activecampaign",
+                                "query": "forms",
+                                "select": [
+                                    "id",
+                                    "name"
+                                ]
+                            },
+                            "help": "Optional. Only continue when the submitted ActiveCampaign form matches this value."
+                        },
+                        {
+                            "key": "email",
+                            "label": "Contact Email",
+                            "type": "text",
+                            "placeholder": "name@example.com",
+                            "help": "Optional. Only continue when the submitted contact email matches this value."
+                        },
+                        {
+                            "key": "list_id",
+                            "label": "List ID",
+                            "type": "text",
+                            "placeholder": "12",
+                            "help": "Optional. Only continue when the submitted form includes this list ID."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "contact_unsubscribed": {
+                    "key": "contact_unsubscribed",
+                    "label": "Contact Unsubscribed",
+                    "hook": "wp_loaded",
+                    "schema": [
+                        {
+                            "key": "form_id",
+                            "label": "Form",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "activecampaign",
+                                "query": "forms",
+                                "select": [
+                                    "id",
+                                    "name"
+                                ]
+                            },
+                            "help": "Optional. Only continue when the submitted ActiveCampaign form matches this value."
+                        },
+                        {
+                            "key": "email",
+                            "label": "Contact Email",
+                            "type": "text",
+                            "placeholder": "name@example.com",
+                            "help": "Optional. Only continue when the submitted contact email matches this value."
+                        },
+                        {
+                            "key": "list_id",
+                            "label": "List ID",
+                            "type": "text",
+                            "placeholder": "12",
+                            "help": "Optional. Only continue when the submitted form includes this list ID."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": {
+                "upsert_contact": {
+                    "key": "upsert_contact",
+                    "label": "Add/Update Contact",
+                    "schema": [
+                        {
+                            "key": "email",
+                            "label": "Email Address",
+                            "type": "text",
+                            "placeholder": "name@example.com or {{email}}",
+                            "required": true
+                        },
+                        {
+                            "key": "first_name",
+                            "label": "First Name",
+                            "type": "text",
+                            "placeholder": "John or {{first_name}}"
+                        },
+                        {
+                            "key": "last_name",
+                            "label": "Last Name",
+                            "type": "text",
+                            "placeholder": "Doe or {{last_name}}"
+                        },
+                        {
+                            "key": "phone",
+                            "label": "Phone",
+                            "type": "text",
+                            "placeholder": "+8801XXXXXXXXX or {{phone}}"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add_contact_to_list": {
+                    "key": "add_contact_to_list",
+                    "label": "Add Contact To List",
+                    "schema": [
+                        {
+                            "key": "email",
+                            "label": "Email Address",
+                            "type": "text",
+                            "placeholder": "name@example.com or {{email}}",
+                            "required": true
+                        },
+                        {
+                            "key": "list_id",
+                            "label": "List",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "activecampaign",
+                                "query": "lists",
+                                "select": [
+                                    "id",
+                                    "name"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "status",
+                            "label": "List Status",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "value": "subscribed",
+                                    "label": "Subscribed"
+                                },
+                                {
+                                    "value": "unsubscribed",
+                                    "label": "Unsubscribed"
+                                }
+                            ],
+                            "help": "Subscribed creates an active membership. Unsubscribed removes the active list status."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add_tag_to_contact": {
+                    "key": "add_tag_to_contact",
+                    "label": "Add Tag To Contact",
+                    "schema": [
+                        {
+                            "key": "email",
+                            "label": "Email Address",
+                            "type": "text",
+                            "placeholder": "name@example.com or {{email}}",
+                            "required": true
+                        },
+                        {
+                            "key": "tag_id",
+                            "label": "Tag",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "activecampaign",
+                                "query": "tags",
+                                "select": [
+                                    "id",
+                                    "name"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "remove_tag_from_contact": {
+                    "key": "remove_tag_from_contact",
+                    "label": "Remove Tag From Contact",
+                    "schema": [
+                        {
+                            "key": "email",
+                            "label": "Email Address",
+                            "type": "text",
+                            "placeholder": "name@example.com or {{email}}",
+                            "required": true
+                        },
+                        {
+                            "key": "tag_id",
+                            "label": "Tag",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "activecampaign",
+                                "query": "tags",
+                                "select": [
+                                    "id",
+                                    "name"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add_contact_to_automation": {
+                    "key": "add_contact_to_automation",
+                    "label": "Add Contact To Automation",
+                    "schema": [
+                        {
+                            "key": "email",
+                            "label": "Email Address",
+                            "type": "text",
+                            "placeholder": "name@example.com or {{email}}",
+                            "required": true
+                        },
+                        {
+                            "key": "automation_id",
+                            "label": "Automation",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "activecampaign",
+                                "query": "automations",
+                                "select": [
+                                    "id",
+                                    "name"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
+        },
         "surecart": {
             "slug": "surecart",
             "name": "Surecart",
@@ -10514,7 +10811,7 @@
                         {
                             "key": "email",
                             "label": "Email Address",
-                            "type": "expression",
+                            "type": "email",
                             "required": true
                         },
                         {
@@ -10673,7 +10970,7 @@
                         {
                             "key": "email",
                             "label": "Email Address",
-                            "type": "expression",
+                            "type": "email",
                             "required": true
                         }
                     ],
@@ -11031,7 +11328,7 @@
                         {
                             "key": "email",
                             "label": "Email Address",
-                            "type": "expression",
+                            "type": "email",
                             "required": true
                         },
                         {
@@ -11249,7 +11546,7 @@
                         {
                             "key": "email",
                             "label": "Email Address",
-                            "type": "expression",
+                            "type": "email",
                             "required": true
                         },
                         {

@@ -11,6 +11,9 @@ class IntegrationLoader {
 	protected static array $registry = [];
 	protected static array $instances = [];
 	protected static bool $initialized = false;
+	protected static array $legacySlugs = [
+		'activehosted' => 'activecampaign',
+	];
 
 
 
@@ -28,6 +31,7 @@ class IntegrationLoader {
 
 	public static function get( string $slug ): ?object {
 		self::ensureInitialized();
+		$slug = self::normalizeSlug( $slug );
 
 		if ( ! empty( self::$instances[ $slug ] ) ) {
 			return self::$instances[ $slug ];
@@ -90,7 +94,13 @@ class IntegrationLoader {
 
 	public static function has( string $slug ): bool {
 		self::ensureInitialized();
+		$slug = self::normalizeSlug( $slug );
 		return isset( self::$registry[ $slug ] );
+	}
+
+	protected static function normalizeSlug( string $slug ): string {
+		$slug = strtolower( trim( $slug ) );
+		return self::$legacySlugs[ $slug ] ?? $slug;
 	}
 
 

@@ -56,6 +56,10 @@ return [
 			'file' => 'mailchimp.php',
 			'class' => \Zaplane\Integrations\Mailchimp::class
 		],
+		'activecampaign'         => [
+			'file' => 'active-campaign.php',
+			'class' => \Zaplane\Integrations\ActiveCampaign::class
+		],
 		'surecart'             => [
 			'file' => 'surecart.php',
 			'class' => \Zaplane\Integrations\Surecart::class
