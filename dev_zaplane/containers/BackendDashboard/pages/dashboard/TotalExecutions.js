@@ -11,7 +11,7 @@ import {
 } from "recharts";
 import { __ } from "@wordpress/i18n";
 
-const TotalExecutions = ({ data }) => {
+const TotalExecutions = ({ data} ) => {
     const chartData = useMemo(() => {
         const months = [
             "Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -23,7 +23,7 @@ const TotalExecutions = ({ data }) => {
             value: 0,
         }));
 
-        data?.runs?.forEach((item) => {
+        data?.forEach((item) => {
             if (!item.started_at) return;
 
             const date = new Date(item.started_at);

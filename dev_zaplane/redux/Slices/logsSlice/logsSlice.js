@@ -45,7 +45,6 @@ export const getRunsList = createAsyncThunk(
 				}
 			);
 			const { runs = [], pagination = {} } = res.data;
-			console.log(runs,'runs');
 			return {
 				data: runs,
 				currentPage: pagination.page || 1,
@@ -103,7 +102,6 @@ const logSlice = createSlice({
 		builder
 			.addCase(getRunsList.fulfilled, (state, action) => {
 				const { data, currentPage, itemPerPage, totalItems, totalPages } = action.payload;
-				console.log(action.payload,'pay');
 				state.data = data || [];
 				state.currentPage = currentPage;
 				state.itemPerPage = itemPerPage;
