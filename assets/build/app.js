@@ -12202,23 +12202,44 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-const TotalExecutions = ({
-  data
-}) => {
-  const chartData = (0,react__WEBPACK_IMPORTED_MODULE_0__.useMemo)(() => {
-    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-    const result = months.map(month => ({
-      month,
-      value: 0
-    }));
-    data?.forEach(item => {
-      if (!item.started_at) return;
-      const date = new Date(item.started_at);
-      const monthIndex = date.getMonth();
-      result[monthIndex].value += 1;
-    });
-    return result;
-  }, [data]);
+const TotalExecutions = () => {
+  const chartData = [{
+    month: "Jan",
+    runs: 12
+  }, {
+    month: "Feb",
+    runs: 8
+  }, {
+    month: "Mar",
+    runs: 20
+  }, {
+    month: "Apr",
+    runs: 15
+  }, {
+    month: "May",
+    runs: 10
+  }, {
+    month: "Jun",
+    runs: 18
+  }, {
+    month: "Jul",
+    runs: 22
+  }, {
+    month: "Aug",
+    runs: 17
+  }, {
+    month: "Sep",
+    runs: 9
+  }, {
+    month: "Oct",
+    runs: 14
+  }, {
+    month: "Nov",
+    runs: 11
+  }, {
+    month: "Dec",
+    runs: 19
+  }];
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Box, {
     bg: "var(--zaplane-background)",
     borderRadius: "4px",
@@ -12276,7 +12297,7 @@ const TotalExecutions = ({
             tickLine: false
           }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(recharts__WEBPACK_IMPORTED_MODULE_3__.Tooltip, {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(recharts__WEBPACK_IMPORTED_MODULE_6__.Area, {
             type: "monotone",
-            dataKey: "value",
+            dataKey: "runs",
             name: "Runs",
             stroke: "#63B3ED",
             fill: "url(#colorValue)",
@@ -12432,9 +12453,7 @@ function Dashboard() {
           ..._assets_scss_chakra_recipe__WEBPACK_IMPORTED_MODULE_9__.primaryBtn,
           children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)("Create Workflow", "zaplane")
         })]
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)(_OverviewSection_OverviewSection__WEBPACK_IMPORTED_MODULE_17__["default"], {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)(_TotalExecutions__WEBPACK_IMPORTED_MODULE_15__["default"], {
-        data: data
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_7__.Flex, {
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)(_OverviewSection_OverviewSection__WEBPACK_IMPORTED_MODULE_17__["default"], {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)(_TotalExecutions__WEBPACK_IMPORTED_MODULE_15__["default"], {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_7__.Flex, {
         gap: "24px",
         children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_4__.Box, {
           width: "40%",

@@ -77,7 +77,7 @@ export default function Dashboard() {
                     </Button>
                 </Flex>
                 <OverviewSection />
-                <TotalExecutions data={data} />
+                <TotalExecutions  />
                 <Flex gap="24px">
                     <Box width='40%'>
                         <ExecutedFlows />
