@@ -229,7 +229,7 @@ const ConnectionTable = () => {
                 isRowSelectable={true}
                 showSubHeader={false}
                 showColumnFilter={false}
-                showPagination={allConnection.length >= 10}
+                showPagination={totalItems>= 10}
                 noDataText={__("No connections found", "zaplane")}
                 totalItems={totalItems}
                 dataFetchingStatus={loading}
