@@ -83,6 +83,7 @@ const TotalExecutions = ({ data} ) => {
                         <Area
                             type="monotone"
                             dataKey="value"
+                            name="Runs"
                             stroke="#63B3ED"
                             fill="url(#colorValue)"
                             strokeWidth={2}

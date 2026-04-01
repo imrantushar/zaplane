@@ -12277,6 +12277,7 @@ const TotalExecutions = ({
           }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(recharts__WEBPACK_IMPORTED_MODULE_3__.Tooltip, {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(recharts__WEBPACK_IMPORTED_MODULE_6__.Area, {
             type: "monotone",
             dataKey: "value",
+            name: "Runs",
             stroke: "#63B3ED",
             fill: "url(#colorValue)",
             strokeWidth: 2,
