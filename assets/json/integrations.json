@@ -1,11 +1,11 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-03-12 08:55:08",
+    "generated_at": "2026-04-01 06:45:47",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
             "name": "WordPress",
-            "icon": "wordpress.svg",
+            "icon": "WordPress.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -853,7 +853,7 @@
                         {
                             "key": "user_email",
                             "label": "Email",
-                            "type": "text",
+                            "type": "email",
                             "required": true
                         },
                         {
@@ -915,7 +915,7 @@
                         {
                             "key": "user_email",
                             "label": "Email",
-                            "type": "text"
+                            "type": "email"
                         },
                         {
                             "key": "user_pass",
@@ -1072,7 +1072,7 @@
                         {
                             "key": "email",
                             "label": "User Email",
-                            "type": "text",
+                            "type": "email",
                             "required": true
                         }
                     ],
@@ -1213,7 +1213,7 @@
                         {
                             "key": "user_login_or_email",
                             "label": "Username or Email",
-                            "type": "text",
+                            "type": "email",
                             "required": true
                         }
                     ],
@@ -1228,7 +1228,7 @@
                         {
                             "key": "user_login",
                             "label": "Username or Email",
-                            "type": "text",
+                            "type": "email",
                             "required": true
                         },
                         {
@@ -2580,7 +2580,7 @@
                         {
                             "key": "user_email",
                             "label": "User Email",
-                            "type": "expression",
+                            "type": "email",
                             "required": true
                         }
                     ],
@@ -2643,7 +2643,7 @@
                         {
                             "key": "author_email",
                             "label": "Author Email",
-                            "type": "expression",
+                            "type": "email",
                             "required": true
                         },
                         {
@@ -2676,7 +2676,7 @@
                         {
                             "key": "author_email",
                             "label": "Author Email",
-                            "type": "expression",
+                            "type": "email",
                             "required": true
                         },
                         {
@@ -10514,7 +10514,7 @@
                         {
                             "key": "email",
                             "label": "Email Address",
-                            "type": "expression",
+                            "type": "email",
                             "required": true
                         },
                         {
@@ -10673,7 +10673,7 @@
                         {
                             "key": "email",
                             "label": "Email Address",
-                            "type": "expression",
+                            "type": "email",
                             "required": true
                         }
                     ],
@@ -11031,7 +11031,7 @@
                         {
                             "key": "email",
                             "label": "Email Address",
-                            "type": "expression",
+                            "type": "email",
                             "required": true
                         },
                         {
@@ -11249,7 +11249,7 @@
                         {
                             "key": "email",
                             "label": "Email Address",
-                            "type": "expression",
+                            "type": "email",
                             "required": true
                         },
                         {
@@ -12302,6 +12302,226 @@
                 }
             },
             "actions": []
+        },
+        "wpfusion": {
+            "slug": "wpfusion",
+            "name": "WP Fusion",
+            "icon": "wpfusion.svg",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": {
+                "tags_applied": {
+                    "key": "tags_applied",
+                    "label": "Tags Applied",
+                    "hook": "wpf_tags_applied",
+                    "schema": [
+                        {
+                            "key": "tag_id",
+                            "label": "Tag",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wpfusion",
+                                "query": "tags_query",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "tags_removed": {
+                    "key": "tags_removed",
+                    "label": "Tags Removed",
+                    "hook": "wpf_tags_removed",
+                    "schema": [
+                        {
+                            "key": "tag_id",
+                            "label": "Tag",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wpfusion",
+                                "query": "tags_query",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "user_imported": {
+                    "key": "user_imported",
+                    "label": "User Imported",
+                    "hook": "wpf_user_imported",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "guest_contact_created": {
+                    "key": "guest_contact_created",
+                    "label": "Guest Contact Created",
+                    "hook": "wpf_guest_contact_created",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "guest_contact_updated": {
+                    "key": "guest_contact_updated",
+                    "label": "Guest Contact Updated",
+                    "hook": "wpf_guest_contact_updated",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": {
+                "apply_tags": {
+                    "key": "apply_tags",
+                    "label": "Apply Tags",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "tags",
+                            "label": "Tags",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "remove_tags": {
+                    "key": "remove_tags",
+                    "label": "Remove Tags",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "tags",
+                            "label": "Tags",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_contact_id": {
+                    "key": "get_contact_id",
+                    "label": "Get Contact ID",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_user_id": {
+                    "key": "get_user_id",
+                    "label": "Get User ID",
+                    "schema": [
+                        {
+                            "key": "contact_id",
+                            "label": "Contact ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "import_user": {
+                    "key": "import_user",
+                    "label": "Import User",
+                    "schema": [
+                        {
+                            "key": "contact_id",
+                            "label": "Contact ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "role",
+                            "label": "Role",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "send_notification",
+                            "label": "Send Notification",
+                            "type": "boolean",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_or_update_contact": {
+                    "key": "create_or_update_contact",
+                    "label": "Create Or Update Contact",
+                    "schema": [
+                        {
+                            "key": "email",
+                            "label": "Email",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "first_name",
+                            "label": "First Name",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "last_name",
+                            "label": "Last Name",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "phone",
+                            "label": "Phone",
+                            "type": "expression",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
         },
         "bricks": {
             "slug": "bricks",
