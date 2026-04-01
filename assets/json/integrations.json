@@ -1,11 +1,11 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-03-12 08:55:08",
+    "generated_at": "2026-04-01 08:19:19",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
             "name": "WordPress",
-            "icon": "wordpress.svg",
+            "icon": "WordPress.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -853,7 +853,7 @@
                         {
                             "key": "user_email",
                             "label": "Email",
-                            "type": "text",
+                            "type": "email",
                             "required": true
                         },
                         {
@@ -915,7 +915,7 @@
                         {
                             "key": "user_email",
                             "label": "Email",
-                            "type": "text"
+                            "type": "email"
                         },
                         {
                             "key": "user_pass",
@@ -1072,7 +1072,7 @@
                         {
                             "key": "email",
                             "label": "User Email",
-                            "type": "text",
+                            "type": "email",
                             "required": true
                         }
                     ],
@@ -1213,7 +1213,7 @@
                         {
                             "key": "user_login_or_email",
                             "label": "Username or Email",
-                            "type": "text",
+                            "type": "email",
                             "required": true
                         }
                     ],
@@ -1228,7 +1228,7 @@
                         {
                             "key": "user_login",
                             "label": "Username or Email",
-                            "type": "text",
+                            "type": "email",
                             "required": true
                         },
                         {
@@ -2580,7 +2580,7 @@
                         {
                             "key": "user_email",
                             "label": "User Email",
-                            "type": "expression",
+                            "type": "email",
                             "required": true
                         }
                     ],
@@ -2643,7 +2643,7 @@
                         {
                             "key": "author_email",
                             "label": "Author Email",
-                            "type": "expression",
+                            "type": "email",
                             "required": true
                         },
                         {
@@ -2676,7 +2676,7 @@
                         {
                             "key": "author_email",
                             "label": "Author Email",
-                            "type": "expression",
+                            "type": "email",
                             "required": true
                         },
                         {
@@ -10514,7 +10514,7 @@
                         {
                             "key": "email",
                             "label": "Email Address",
-                            "type": "expression",
+                            "type": "email",
                             "required": true
                         },
                         {
@@ -10673,7 +10673,7 @@
                         {
                             "key": "email",
                             "label": "Email Address",
-                            "type": "expression",
+                            "type": "email",
                             "required": true
                         }
                     ],
@@ -11031,7 +11031,7 @@
                         {
                             "key": "email",
                             "label": "Email Address",
-                            "type": "expression",
+                            "type": "email",
                             "required": true
                         },
                         {
@@ -11249,7 +11249,7 @@
                         {
                             "key": "email",
                             "label": "Email Address",
-                            "type": "expression",
+                            "type": "email",
                             "required": true
                         },
                         {
@@ -12481,6 +12481,95 @@
                             "label": "Target Percentage (%)",
                             "type": "number",
                             "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": []
+        },
+        "gemcrm": {
+            "slug": "gemcrm",
+            "name": "GemCRM",
+            "icon": "gemcrm-logo-icon.svg",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": {
+                "contact_created": {
+                    "key": "contact_created",
+                    "label": "Contact Created",
+                    "hook": "gemcrm/contact/created",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "contact_tag_attached": {
+                    "key": "contact_tag_attached",
+                    "label": "Tag Added To Contact",
+                    "hook": "gemcrm/contact/tag/attached",
+                    "schema": [
+                        {
+                            "key": "tag_id",
+                            "label": "Tag ID (optional)",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "Leave empty to trigger for any tag"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "contact_tag_removed": {
+                    "key": "contact_tag_removed",
+                    "label": "Tag Removed From Contact",
+                    "hook": "gemcrm/contact/tag/removed",
+                    "schema": [
+                        {
+                            "key": "tag_id",
+                            "label": "Tag ID (optional)",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "Leave empty to trigger for any tag"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "contact_list_attached": {
+                    "key": "contact_list_attached",
+                    "label": "Contact Added To List",
+                    "hook": "gemcrm/contact/list/attached",
+                    "schema": [
+                        {
+                            "key": "list_id",
+                            "label": "List ID (optional)",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "Leave empty to trigger for any list"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "contact_list_removed": {
+                    "key": "contact_list_removed",
+                    "label": "Contact Removed From List",
+                    "hook": "gemcrm/contact/list/removed",
+                    "schema": [
+                        {
+                            "key": "list_id",
+                            "label": "List ID (optional)",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "Leave empty to trigger for any list"
                         }
                     ],
                     "outputs": [

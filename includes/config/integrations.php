@@ -156,5 +156,9 @@ return [
 			'file' => 'academy.php',
 			'class' => \Zaplane\Integrations\Academy::class
 		],
+		'gemcrm'             => [
+			'file' => 'gemcrm.php',
+			'class' => \Zaplane\Integrations\Gemcrm::class
+		],
 	],
 ];
