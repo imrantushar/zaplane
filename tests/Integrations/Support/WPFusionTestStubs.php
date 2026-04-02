@@ -60,6 +60,8 @@ namespace {
 			public array $contacts_by_email = [];
 			public array $contacts = [];
 			public int $next_contact_id = 1000;
+			public array $last_add_data = [];
+			public array $last_update = [];
 
 			public function get_contact_id( $email ) {
 				return $this->contacts_by_email[ strtolower( (string) $email ) ] ?? false;
@@ -67,7 +69,8 @@ namespace {
 
 			public function add_contact( $data ) {
 				$contact_id = 'cid_' . ++$this->next_contact_id;
-				$email      = strtolower( (string) ( $data['email'] ?? '' ) );
+				$email      = strtolower( (string) ( $data['user_email'] ?? $data['email'] ?? '' ) );
+				$this->last_add_data = $data;
 
 				$this->contacts[ $contact_id ] = $data;
 				if ( '' !== $email ) {
@@ -80,7 +83,11 @@ namespace {
 			public function update_contact( $contact_id, $data ) {
 				$current = $this->contacts[ (string) $contact_id ] ?? [];
 				$updated = array_merge( $current, $data );
-				$email   = strtolower( (string) ( $updated['email'] ?? '' ) );
+				$email   = strtolower( (string) ( $updated['user_email'] ?? $updated['email'] ?? '' ) );
+				$this->last_update = [
+					'contact_id' => (string) $contact_id,
+					'data'       => $data,
+				];
 
 				$this->contacts[ (string) $contact_id ] = $updated;
 				if ( '' !== $email ) {

@@ -48,19 +48,7 @@ class WpFusion extends IntegrationBase {
 
 	public static function get_trigger_config_schema( string $trigger ): array {
 		if ( in_array( $trigger, [ 'tags_applied', 'tags_removed' ], true ) ) {
-			return [
-				[
-					'key'      => 'tag_id',
-					'label'    => 'Tag',
-					'type'     => 'select',
-					'dynamic'  => [
-						'integration' => 'wpfusion',
-						'query'       => 'tags_query',
-						'select'      => [ 'name', 'label' ],
-					],
-					'required' => false,
-				],
-			];
+			return [ self::field_tag_filter() ];
 		}
 
 		return [];
@@ -100,12 +88,7 @@ class WpFusion extends IntegrationBase {
 						'type'     => 'expression',
 						'required' => true,
 					],
-					[
-						'key'      => 'tags',
-						'label'    => 'Tags',
-						'type'     => 'expression',
-						'required' => true,
-					],
+					self::field_tags(),
 				];
 
 			case 'get_contact_id':
@@ -153,10 +136,22 @@ class WpFusion extends IntegrationBase {
 			case 'create_or_update_contact':
 				return [
 					[
+						'key'      => 'contact_id',
+						'label'    => 'Contact ID',
+						'type'     => 'expression',
+						'required' => false,
+					],
+					[
+						'key'      => 'user_id',
+						'label'    => 'User ID',
+						'type'     => 'expression',
+						'required' => false,
+					],
+					[
 						'key'      => 'email',
 						'label'    => 'Email',
 						'type'     => 'expression',
-						'required' => true,
+						'required' => false,
 					],
 					[
 						'key'      => 'first_name',
@@ -192,7 +187,7 @@ class WpFusion extends IntegrationBase {
 		$search  = strtolower( trim( (string) ( $query['search'] ?? '' ) ) );
 		$options = [
 			[
-				'name'  => 'any',
+				'value' => 'any',
 				'label' => 'Any Tag',
 			],
 		];
@@ -204,12 +199,41 @@ class WpFusion extends IntegrationBase {
 			}
 
 			$options[] = [
-				'name'  => (string) $tag_id,
+				'value' => (string) $tag_id,
 				'label' => (string) $label,
 			];
 		}
 
 		return $options;
+	}
+
+	private static function field_tag_filter(): array {
+		return [
+			'key'      => 'tag_id',
+			'label'    => 'Tag',
+			'type'     => 'select',
+			'dynamic'  => [
+				'integration' => 'wpfusion',
+				'query'       => 'tags_query',
+				'select'      => [ 'value', 'label' ],
+			],
+			'required' => false,
+		];
+	}
+
+	private static function field_tags(): array {
+		return [
+			'key'      => 'tags',
+			'label'    => 'Tags',
+			'type'     => 'select',
+			'dynamic'  => [
+				'integration' => 'wpfusion',
+				'query'       => 'tags_query',
+				'select'      => [ 'value', 'label' ],
+			],
+			'required' => true,
+			'multiple' => true,
+		];
 	}
 
 	public static function resolve_trigger( array $node, array $args ) {
@@ -300,7 +324,7 @@ class WpFusion extends IntegrationBase {
 
 				return self::output( [
 					'user_id'    => $user_id,
-					'contact_id' => self::require_user_service()->get_contact_id( $user_id ),
+					'contact_id' => self::resolve_contact_id_action( $user_id ),
 				] );
 
 			case 'get_user_id':
@@ -308,7 +332,7 @@ class WpFusion extends IntegrationBase {
 
 				return self::output( [
 					'contact_id' => $contact_id,
-					'user_id'    => self::require_user_service()->get_user_id( $contact_id ),
+					'user_id'    => self::resolve_user_id_action( $contact_id ),
 				] );
 
 			case 'import_user':
@@ -358,25 +382,9 @@ class WpFusion extends IntegrationBase {
 	}
 
 	private static function handle_create_or_update_contact( array $config ): array {
-		$email = trim( (string) ( $config['email'] ?? '' ) );
-		if ( ! filter_var( $email, FILTER_VALIDATE_EMAIL ) ) {
-			throw new \Exception( 'A valid email address is required' );
-		}
-
-		$data = array_filter(
-			[
-				'email'      => $email,
-				'first_name' => trim( (string) ( $config['first_name'] ?? '' ) ),
-				'last_name'  => trim( (string) ( $config['last_name'] ?? '' ) ),
-				'phone'      => trim( (string) ( $config['phone'] ?? '' ) ),
-			],
-			static function ( $value ) {
-				return '' !== $value && null !== $value;
-			}
-		);
-
+		$data       = self::build_contact_payload( $config );
 		$crm        = self::require_crm_service();
-		$contact_id = method_exists( $crm, 'get_contact_id' ) ? $crm->get_contact_id( $email ) : false;
+		$contact_id = self::resolve_action_contact_id( $crm, $config, $data );
 		$mode       = $contact_id ? 'updated' : 'created';
 		$result     = $contact_id ? $crm->update_contact( $contact_id, $data ) : $crm->add_contact( $data );
 
@@ -385,19 +393,92 @@ class WpFusion extends IntegrationBase {
 		}
 
 		if ( ! $contact_id ) {
-			if ( is_scalar( $result ) && '' !== (string) $result ) {
-				$contact_id = $result;
-			} elseif ( is_array( $result ) && ! empty( $result['id'] ) ) {
-				$contact_id = $result['id'];
-			}
+			$contact_id = self::extract_contact_id_from_result( $result );
 		}
 
 		return self::output( [
 			'contact_id' => $contact_id,
-			'email'      => $email,
+			'email'      => $data['user_email'] ?? '',
 			'mode'       => $mode,
-			'contact'    => $data,
+			'contact'    => [
+				'email'      => $data['user_email'] ?? '',
+				'first_name' => $data['first_name'] ?? '',
+				'last_name'  => $data['last_name'] ?? '',
+				'phone'      => $data['phone'] ?? '',
+			],
 		] );
+	}
+
+	private static function build_contact_payload( array $config ): array {
+		$user_id = (int) ( $config['user_id'] ?? 0 );
+		$email   = trim( (string) ( $config['email'] ?? '' ) );
+
+		if ( '' === $email && $user_id > 0 ) {
+			$user  = get_userdata( $user_id );
+			$email = $user && ! empty( $user->user_email ) ? trim( (string) $user->user_email ) : '';
+		}
+
+		if ( '' !== $email && ! filter_var( $email, FILTER_VALIDATE_EMAIL ) ) {
+			throw new \Exception( 'A valid email address is required' );
+		}
+
+		$data = [
+			'user_email' => $email,
+			'first_name' => trim( (string) ( $config['first_name'] ?? '' ) ),
+			'last_name'  => trim( (string) ( $config['last_name'] ?? '' ) ),
+			'phone'      => trim( (string) ( $config['phone'] ?? '' ) ),
+		];
+
+		$data = array_filter(
+			$data,
+			static function ( $value ) {
+				return '' !== $value && null !== $value;
+			}
+		);
+
+		if ( empty( $data ) ) {
+			throw new \Exception( 'At least one contact field is required' );
+		}
+
+		return $data;
+	}
+
+	private static function resolve_action_contact_id( $crm, array $config, array $data ) {
+		$contact_id = trim( (string) ( $config['contact_id'] ?? '' ) );
+		if ( '' !== $contact_id ) {
+			return $contact_id;
+		}
+
+		$user_id = (int) ( $config['user_id'] ?? 0 );
+		if ( $user_id > 0 ) {
+			$contact_id = self::get_contact_id_for_user( $user_id );
+			if ( false !== $contact_id && null !== $contact_id && '' !== $contact_id ) {
+				return $contact_id;
+			}
+		}
+
+		$email = $data['user_email'] ?? '';
+		if ( '' === $email ) {
+			throw new \Exception( 'Email is required when no Contact ID or User ID is provided' );
+		}
+
+		return method_exists( $crm, 'get_contact_id' ) ? $crm->get_contact_id( $email ) : false;
+	}
+
+	private static function extract_contact_id_from_result( $result ) {
+		if ( is_scalar( $result ) && '' !== (string) $result ) {
+			return $result;
+		}
+
+		if ( is_array( $result ) && ! empty( $result['id'] ) ) {
+			return $result['id'];
+		}
+
+		if ( is_object( $result ) && ! empty( $result->id ) ) {
+			return $result->id;
+		}
+
+		return false;
 	}
 
 	private static function resolve_user_payload( int $user_id ): array {
@@ -545,7 +626,7 @@ class WpFusion extends IntegrationBase {
 	private static function require_user_service() {
 		$user = self::get_user_service();
 		if ( ! $user ) {
-			throw new \Exception( 'WP Fusion user service is not available' );
+			throw new \Exception( 'WP Fusion is installed but not fully configured. The user service is unavailable.' );
 		}
 
 		return $user;
@@ -554,10 +635,128 @@ class WpFusion extends IntegrationBase {
 	private static function require_crm_service() {
 		$crm = self::get_crm_service();
 		if ( ! $crm ) {
-			throw new \Exception( 'WP Fusion CRM service is not available' );
+			throw new \Exception( 'WP Fusion is installed but not fully configured. The CRM service is unavailable.' );
 		}
 
 		return $crm;
+	}
+
+	private static function resolve_contact_id_action( int $user_id ) {
+		$user = self::get_user_service();
+		if ( $user && method_exists( $user, 'get_contact_id' ) ) {
+			return $user->get_contact_id( $user_id );
+		}
+
+		$contact_id = self::find_contact_id_in_user_meta( $user_id );
+		if ( false !== $contact_id && '' !== $contact_id ) {
+			return $contact_id;
+		}
+
+		throw new \Exception( 'WP Fusion is not fully configured, and no saved contact ID mapping was found for this user.' );
+	}
+
+	private static function resolve_user_id_action( string $contact_id ) {
+		$user = self::get_user_service();
+		if ( $user && method_exists( $user, 'get_user_id' ) ) {
+			return $user->get_user_id( $contact_id );
+		}
+
+		$user_id = self::find_user_id_by_contact_meta( $contact_id );
+		if ( false !== $user_id ) {
+			return $user_id;
+		}
+
+		throw new \Exception( 'WP Fusion is not fully configured, and no saved user mapping was found for this contact ID.' );
+	}
+
+	private static function find_contact_id_in_user_meta( int $user_id ) {
+		global $wpdb;
+
+		$meta_keys = self::get_possible_contact_meta_keys();
+		foreach ( $meta_keys as $meta_key ) {
+			$contact_id = get_user_meta( $user_id, $meta_key, true );
+			if ( '' !== $contact_id && false !== $contact_id && null !== $contact_id ) {
+				return $contact_id;
+			}
+		}
+
+		if ( ! isset( $wpdb ) || ! is_object( $wpdb ) || ! isset( $wpdb->usermeta ) || ! method_exists( $wpdb, 'prepare' ) || ! method_exists( $wpdb, 'get_var' ) ) {
+			return false;
+		}
+
+		$query = $wpdb->prepare(
+			"SELECT meta_value FROM {$wpdb->usermeta} WHERE user_id = %d AND meta_key LIKE %s LIMIT 1",
+			$user_id,
+			'%\_contact_id'
+		);
+
+		$contact_id = $wpdb->get_var( $query );
+		return null === $contact_id ? false : $contact_id;
+	}
+
+	private static function find_user_id_by_contact_meta( string $contact_id ) {
+		global $wpdb;
+
+		if ( ! isset( $wpdb ) || ! is_object( $wpdb ) || ! isset( $wpdb->usermeta ) || ! method_exists( $wpdb, 'prepare' ) || ! method_exists( $wpdb, 'get_var' ) ) {
+			return false;
+		}
+
+		$meta_keys = self::get_possible_contact_meta_keys();
+		foreach ( $meta_keys as $meta_key ) {
+			$query = $wpdb->prepare(
+				"SELECT user_id FROM {$wpdb->usermeta} WHERE meta_key = %s AND meta_value = %s LIMIT 1",
+				$meta_key,
+				$contact_id
+			);
+			$user_id = $wpdb->get_var( $query );
+			if ( null !== $user_id && false !== $user_id && '' !== $user_id ) {
+				return (int) $user_id;
+			}
+		}
+
+		$query = $wpdb->prepare(
+			"SELECT user_id FROM {$wpdb->usermeta} WHERE meta_key LIKE %s AND meta_value = %s LIMIT 1",
+			'%\_contact_id',
+			$contact_id
+		);
+		$user_id = $wpdb->get_var( $query );
+
+		if ( null === $user_id || false === $user_id || '' === $user_id ) {
+			return false;
+		}
+
+		return (int) $user_id;
+	}
+
+	private static function get_possible_contact_meta_keys(): array {
+		$keys    = [];
+		$crm     = self::get_current_crm_slug();
+
+		if ( '' !== $crm ) {
+			$keys[] = $crm . '_contact_id';
+		}
+
+		return array_values( array_unique( array_filter( $keys ) ) );
+	}
+
+	private static function get_current_crm_slug(): string {
+		$options = get_option( 'wpf_options', [] );
+		$crm     = is_array( $options ) ? (string) ( $options['crm'] ?? '' ) : '';
+
+		if ( '' !== $crm ) {
+			return $crm;
+		}
+
+		$service = self::get_crm_service();
+		if ( is_object( $service ) && ! empty( $service->slug ) ) {
+			return (string) $service->slug;
+		}
+
+		if ( is_object( $service ) && isset( $service->crm ) && is_object( $service->crm ) && ! empty( $service->crm->slug ) ) {
+			return (string) $service->crm->slug;
+		}
+
+		return '';
 	}
 
 	private static function require_positive_int( $value, string $message ): int {

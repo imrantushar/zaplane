@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-04-01 06:45:47",
+    "generated_at": "2026-04-01 12:43:07",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -12325,7 +12325,7 @@
                                 "integration": "wpfusion",
                                 "query": "tags_query",
                                 "select": [
-                                    "name",
+                                    "value",
                                     "label"
                                 ]
                             },
@@ -12349,7 +12349,7 @@
                                 "integration": "wpfusion",
                                 "query": "tags_query",
                                 "select": [
-                                    "name",
+                                    "value",
                                     "label"
                                 ]
                             },
@@ -12402,8 +12402,17 @@
                         {
                             "key": "tags",
                             "label": "Tags",
-                            "type": "expression",
-                            "required": true
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wpfusion",
+                                "query": "tags_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": true,
+                            "multiple": true
                         }
                     ],
                     "outputs": [
@@ -12423,8 +12432,17 @@
                         {
                             "key": "tags",
                             "label": "Tags",
-                            "type": "expression",
-                            "required": true
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wpfusion",
+                                "query": "tags_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": true,
+                            "multiple": true
                         }
                     ],
                     "outputs": [
@@ -12493,10 +12511,22 @@
                     "label": "Create Or Update Contact",
                     "schema": [
                         {
+                            "key": "contact_id",
+                            "label": "Contact ID",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
                             "key": "email",
                             "label": "Email",
                             "type": "expression",
-                            "required": true
+                            "required": false
                         },
                         {
                             "key": "first_name",

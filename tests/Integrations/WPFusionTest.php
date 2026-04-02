@@ -39,7 +39,7 @@ class WPFusionTest extends IntegrationTestCase {
 
 		$instance->crm->contacts = [
 			'cid_2' => [
-				'email'      => 'test@example.com',
+				'user_email' => 'test@example.com',
 				'first_name' => 'Test',
 				'last_name'  => 'User',
 			],
@@ -121,7 +121,20 @@ class WPFusionTest extends IntegrationTestCase {
 		$this->assertEquals( [ 'VIP', 'Customer' ], $result['data']['tag_labels'] );
 	}
 
+	public function test_tag_actions_use_dynamic_multi_select_schema(): void {
+		$schema = WpFusion::get_action_config_schema( 'apply_tags' );
+
+		$this->assertSame( 'tags', $schema[1]['key'] );
+		$this->assertSame( 'select', $schema[1]['type'] );
+		$this->assertTrue( $schema[1]['multiple'] );
+		$this->assertSame( 'wpfusion', $schema[1]['dynamic']['integration'] );
+		$this->assertSame( 'tags_query', $schema[1]['dynamic']['query'] );
+		$this->assertSame( [ 'value', 'label' ], $schema[1]['dynamic']['select'] );
+	}
+
 	public function test_create_or_update_contact_updates_existing_contact(): void {
+		$instance = \WPFusionTestDouble::instance();
+
 		$result = WpFusion::execute_node(
 			$this->makeActionNode( 'create_or_update_contact', [
 				'email'      => 'test@example.com',
@@ -132,14 +145,67 @@ class WPFusionTest extends IntegrationTestCase {
 
 		$this->assertEquals( 'updated', $result['data']['mode'] );
 		$this->assertEquals( 'cid_2', $result['data']['contact_id'] );
+		$this->assertSame( 'cid_2', $instance->crm->last_update['contact_id'] );
+		$this->assertSame( 'test@example.com', $instance->crm->last_update['data']['user_email'] );
+		$this->assertArrayNotHasKey( 'email', $instance->crm->last_update['data'] );
+	}
+
+	public function test_create_or_update_contact_can_resolve_existing_contact_from_user_id(): void {
+		$instance = \WPFusionTestDouble::instance();
+
+		$result = WpFusion::execute_node(
+			$this->makeActionNode( 'create_or_update_contact', [
+				'user_id'    => 2,
+				'first_name' => 'Updated',
+			] ),
+			[]
+		);
+
+		$this->assertEquals( 'updated', $result['data']['mode'] );
+		$this->assertEquals( 'cid_2', $result['data']['contact_id'] );
+		$this->assertSame( 'cid_2', $instance->crm->last_update['contact_id'] );
+		$this->assertSame( 'test@example.com', $instance->crm->last_update['data']['user_email'] );
 	}
 
 	public function test_query_tags_returns_any_option_and_matches_search(): void {
 		$result = WpFusion::query_tags( [ 'search' => 'vip' ] );
 
-		$this->assertEquals( 'any', $result[0]['name'] );
+		$this->assertEquals( 'any', $result[0]['value'] );
 		$this->assertCount( 2, $result );
-		$this->assertEquals( '101', $result[1]['name'] );
+		$this->assertEquals( '101', $result[1]['value'] );
+	}
+
+	public function test_get_user_id_action_falls_back_to_saved_contact_mapping(): void {
+		$instance = \WPFusionTestDouble::instance();
+		unset( $instance->user );
+
+		global $wpdb;
+		$wpdb->usermeta = 'wp_usermeta';
+		$wpdb->tables['var'] = 25;
+
+		$result = WpFusion::execute_node(
+			$this->makeActionNode( 'get_user_id', [ 'contact_id' => 'cid_lookup' ] ),
+			[]
+		);
+
+		$this->assertSame( 25, $result['data']['user_id'] );
+	}
+
+	public function test_get_contact_id_action_fails_with_clear_message_when_no_mapping_exists(): void {
+		$instance = \WPFusionTestDouble::instance();
+		unset( $instance->user );
+
+		global $wpdb;
+		$wpdb->usermeta = 'wp_usermeta';
+		$wpdb->tables['var'] = null;
+
+		$this->expectException( \Exception::class );
+		$this->expectExceptionMessage( 'WP Fusion is not fully configured, and no saved contact ID mapping was found for this user.' );
+
+		WpFusion::execute_node(
+			$this->makeActionNode( 'get_contact_id', [ 'user_id' => 2 ] ),
+			[]
+		);
 	}
 }
 }
