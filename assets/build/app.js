@@ -11861,7 +11861,13 @@ const ExecutedFlows = () => {
         flexDirection: "column",
         gap: "6px",
         p: "24px",
-        children: flows.map(f => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.Fragment, {
+        children: !flows.length ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
+          className: "zaplane-label",
+          textAlign: "center",
+          fontSize: "12px",
+          color: "var(--zaplane-text-secondary) ",
+          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_5__.__)('No executed flows found.', 'zaplane')
+        }) : flows?.map(f => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.Fragment, {
           children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_3__.Flex, {
             justifyContent: "space-between",
             children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_ZAPComponents_Labels_ZAPLabel__WEBPACK_IMPORTED_MODULE_8__["default"], {
@@ -12195,107 +12201,76 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var recharts__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! recharts */ "./node_modules/recharts/es6/chart/AreaChart.js");
 /* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
 /* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_10___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_10__);
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__);
+/* harmony import */ var react_redux__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/dist/react-redux.mjs");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__);
+
 
 
 
 
 
 const TotalExecutions = () => {
-  const chartData = [{
-    month: "Jan",
-    runs: 12
-  }, {
-    month: "Feb",
-    runs: 8
-  }, {
-    month: "Mar",
-    runs: 20
-  }, {
-    month: "Apr",
-    runs: 15
-  }, {
-    month: "May",
-    runs: 10
-  }, {
-    month: "Jun",
-    runs: 18
-  }, {
-    month: "Jul",
-    runs: 22
-  }, {
-    month: "Aug",
-    runs: 17
-  }, {
-    month: "Sep",
-    runs: 9
-  }, {
-    month: "Oct",
-    runs: 14
-  }, {
-    month: "Nov",
-    runs: 11
-  }, {
-    month: "Dec",
-    runs: 19
-  }];
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Box, {
+  const {
+    summary
+  } = (0,react_redux__WEBPACK_IMPORTED_MODULE_11__.useSelector)(state => state.dashboard);
+  const monthly_executions = summary?.monthly_executions || [];
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Box, {
     bg: "var(--zaplane-background)",
     borderRadius: "4px",
     boxShadow: "md",
     w: "100%",
     h: "388px",
-    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
       className: "zaplane-label",
       fontSize: "14px",
       p: "24px",
       children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_10__.__)("Total Executions", "zaplane")
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Box, {
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Box, {
       h: "315px",
       px: "16px",
       pb: "16px",
-      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(recharts__WEBPACK_IMPORTED_MODULE_4__.ResponsiveContainer, {
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(recharts__WEBPACK_IMPORTED_MODULE_4__.ResponsiveContainer, {
         width: "100%",
         height: "100%",
-        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsxs)(recharts__WEBPACK_IMPORTED_MODULE_9__.AreaChart, {
-          data: chartData,
-          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)("defs", {
-            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsxs)("linearGradient", {
+        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsxs)(recharts__WEBPACK_IMPORTED_MODULE_9__.AreaChart, {
+          data: monthly_executions,
+          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)("defs", {
+            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsxs)("linearGradient", {
               id: "colorValue",
               x1: "0",
               y1: "0",
               x2: "0",
               y2: "1",
-              children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)("stop", {
+              children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)("stop", {
                 offset: "5%",
                 stopColor: "#90CDF4",
                 stopOpacity: 0.6
-              }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)("stop", {
+              }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)("stop", {
                 offset: "95%",
                 stopColor: "#90CDF4",
                 stopOpacity: 0
               })]
             })
-          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(recharts__WEBPACK_IMPORTED_MODULE_5__.CartesianGrid, {
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(recharts__WEBPACK_IMPORTED_MODULE_5__.CartesianGrid, {
             strokeDasharray: "3 3",
             vertical: false,
             stroke: "#E2E8F0"
-          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(recharts__WEBPACK_IMPORTED_MODULE_7__.XAxis, {
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(recharts__WEBPACK_IMPORTED_MODULE_7__.XAxis, {
             dataKey: "month",
             tick: {
               fontSize: 12
             },
             axisLine: false,
             tickLine: false
-          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(recharts__WEBPACK_IMPORTED_MODULE_8__.YAxis, {
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(recharts__WEBPACK_IMPORTED_MODULE_8__.YAxis, {
             allowDecimals: false,
             tick: {
               fontSize: 12
             },
             axisLine: false,
             tickLine: false
-          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(recharts__WEBPACK_IMPORTED_MODULE_3__.Tooltip, {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(recharts__WEBPACK_IMPORTED_MODULE_6__.Area, {
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(recharts__WEBPACK_IMPORTED_MODULE_3__.Tooltip, {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(recharts__WEBPACK_IMPORTED_MODULE_6__.Area, {
             type: "monotone",
             dataKey: "runs",
             name: "Runs",

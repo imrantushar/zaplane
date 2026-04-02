@@ -10,23 +10,11 @@ import {
     ResponsiveContainer,
 } from "recharts";
 import { __ } from "@wordpress/i18n";
+import { useSelector } from "react-redux";
 
 const TotalExecutions = () => {
-
-    const chartData = [
-        { month: "Jan", runs: 12 },
-        { month: "Feb", runs: 8 },
-        { month: "Mar", runs: 20 },
-        { month: "Apr", runs: 15 },
-        { month: "May", runs: 10 },
-        { month: "Jun", runs: 18 },
-        { month: "Jul", runs: 22 },
-        { month: "Aug", runs: 17 },
-        { month: "Sep", runs: 9 },
-        { month: "Oct", runs: 14 },
-        { month: "Nov", runs: 11 },
-        { month: "Dec", runs: 19 },
-    ];
+    const { summary } = useSelector((state) => state.dashboard)
+    const monthly_executions = summary?.monthly_executions || [];
 
     return (
         <Box
@@ -42,7 +30,7 @@ const TotalExecutions = () => {
 
             <Box h="315px" px="16px" pb="16px">
                 <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={chartData}>
+                    <AreaChart data={monthly_executions}>
 
                         <defs>
                             <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
