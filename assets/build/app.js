@@ -16320,14 +16320,14 @@ __webpack_require__.r(__webpack_exports__);
 
 
 // Preprocess apps
-const APPS = Object.entries(_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_0__.integrations.apps || {}).map(([key, value]) => ({
+const APPS = Object.entries(_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_0__.integrations?.apps || {}).map(([key, value]) => ({
   id: value.slug || key,
   name: value.name,
   icon: value.icon
 }));
 
 // Preprocess tools
-const TOOLS = Object.entries(_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_0__.integrations.tools || {}).map(([key, value]) => ({
+const TOOLS = Object.entries(_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_0__.integrations?.tools || {}).map(([key, value]) => ({
   id: value.slug || key,
   name: value.name,
   icon: value.icon
