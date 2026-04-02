@@ -27,6 +27,20 @@ export const topExecutedFlows = createAsyncThunk(
         }
     }
 );
+export const deshboardSumary  = createAsyncThunk(
+    'zaplane/deshboardSumary',
+    async ( thunkAPI) => {
+        try {
+            const res = await API.get(
+                namespace + `dashboard/summary`
+            );
+            return res.data;
+    
+        } catch (e) {
+            return handleSliceError(thunkAPI, e);
+        }
+    }
+);
 
 
 
@@ -34,6 +48,7 @@ const dashboardSlice = createSlice({
     name: 'dashboard',
     initialState: {
         topExecutedFlows:[],
+        summary:{},
         isLoading:true
 
     },
@@ -46,7 +61,10 @@ const dashboardSlice = createSlice({
                 state.topExecutedFlows = action.payload;
                 state.isLoading =false
             })
-            
+            .addCase(deshboardSumary.fulfilled, (state, action) => { 
+                state.summary = action.payload;
+                state.isLoading =false
+            })
 
 
 
