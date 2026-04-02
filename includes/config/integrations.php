@@ -160,6 +160,10 @@ return [
 			'file' => 'academy.php',
 			'class' => \Zaplane\Integrations\Academy::class
 		],
+		'advancecustomfields'      => [
+			'file'  => 'advance-custom-fields.php',
+			'class' => \Zaplane\Integrations\AdvanceCustomFields::class
+		],
 		'profilebuilder'            => [
 			'file' => 'profilebuilder.php',
 			'class' => \Zaplane\Integrations\Profilebuilder::class
