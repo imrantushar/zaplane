@@ -160,5 +160,9 @@ return [
 			'file' => 'academy.php',
 			'class' => \Zaplane\Integrations\Academy::class
 		],
+		'kadenceblocks'      => [
+			'file' => 'kadenceblocks.php', 
+			'class' => \Zaplane\Integrations\Kadenceblocks::class],
+
 	],
 ];

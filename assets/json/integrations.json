@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-03-29 06:39:38",
+    "generated_at": "2026-03-31 09:27:36",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -12625,6 +12625,27 @@
                             "required": true
                         }
                     ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": []
+        },
+        "kadenceblocks": {
+            "slug": "kadenceblocks",
+            "name": "Kadence Block",
+            "icon": "kadence-block.svg",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": {
+                "kadence_blocks_advanced_form_submission": {
+                    "key": "kadence_blocks_advanced_form_submission",
+                    "label": "Advanced Form Submission",
+                    "hook": "kadence_blocks_advanced_form_submission",
+                    "schema": [],
                     "outputs": [
                         "main"
                     ]
