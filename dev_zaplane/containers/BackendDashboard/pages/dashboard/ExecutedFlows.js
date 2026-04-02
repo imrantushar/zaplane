@@ -13,7 +13,7 @@ const ExecutedFlows = () => {
   return (
     <Box
       bg="var(--zaplane-background)"
-      borderRadius="lg"
+      borderRadius="4px"
       boxShadow="md"
       // p={"24px"}
       w="100%"

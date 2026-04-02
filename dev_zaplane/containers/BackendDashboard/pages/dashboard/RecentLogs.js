@@ -103,8 +103,8 @@ const RecentLogs = ({ data = [] }) => {
   ]
 
   return (
-    <Box width="100%">
-      <Text className="zaplane-heading" mb="16px">
+    <Box width="100%" background='#fff' borderRadius='4px' boxShadow='md'>
+      <Text className="zaplane-heading" p='24px 24px 0 24px'>
         {__("Recent Logs", "zaplane")}
       </Text>
 

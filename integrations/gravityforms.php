@@ -103,7 +103,7 @@ class Gravityforms extends IntegrationBase {
 		$options = [
 			[
 				'label' => 'Any Form',
-				'name' => 'any'
+				'name'  => 'any'
 			],
 		];
 

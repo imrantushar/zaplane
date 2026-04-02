@@ -1,6 +1,6 @@
 <?php
 
-if (!class_exists('WPCF7_ContactForm')) {
+if ( ! class_exists('WPCF7_ContactForm')) {
     class WPCF7_ContactForm {
 
         public $id;
@@ -8,7 +8,7 @@ if (!class_exists('WPCF7_ContactForm')) {
             'status' => 'publish'
         ];
 
-        public function __construct($id = 0) {
+        public function __construct( $id = 0 ) {
             $this->id = $id;
         }
 
@@ -20,8 +20,8 @@ if (!class_exists('WPCF7_ContactForm')) {
             return "Test Form";
         }
 
-        public function prop($key) {
-            return $this->properties[$key] ?? null;
+        public function prop( $key ) {
+            return $this->properties[ $key ] ?? null;
         }
 
         public function locale() {
@@ -30,7 +30,7 @@ if (!class_exists('WPCF7_ContactForm')) {
     }
 }
 
-if (!class_exists('WPCF7_Submission')) {
+if ( ! class_exists('WPCF7_Submission' )) {
     class WPCF7_Submission {
 
         private static $instance;

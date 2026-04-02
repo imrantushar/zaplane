@@ -61,7 +61,7 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
     const {
         updateNodeData,
         deleteNode,
-        createActionNode,
+        handleAddAction,
         openDrawerForNode,
         openDrawerFromAdd,
         onLayout
@@ -127,7 +127,7 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
             className="zaplane_flowcanvas"
             flex="1"
             height="100vh"
-            marginRight={activeDrawer ? "497px" : "0px"}
+            marginRight={activeDrawer ? "600px" : "0px"}
             transition="margin-right 0.4s ease"
         >
 
@@ -221,7 +221,7 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
                     setDrawerContext({ source: null, node: null, edge: null });
                 }}
                 context={drawerContext}
-                createActionNode={createActionNode}
+                handleAddAction={handleAddAction}
                 updateNodeData={updateNodeData}
                 workFlow={workFlow}
                 nodes={nodes}
