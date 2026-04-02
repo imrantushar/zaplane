@@ -50,94 +50,48 @@ class Metabox extends IntegrationBase {
 		return [];
 	}
 
-	private static function extract_form_fields( $form_id ) {
-		if ( ! function_exists( 'rwmb_meta' ) ) {
-			return [];
-		}
-
-		$meta_box = rwmb_get_registry( 'meta_box' );
-		$form     = $meta_box->get( $form_id );
-
-		if ( ! $form || ! isset( $form->meta_box['fields'] ) ) {
-			return [];
-		}
-
-		$upload_file  = [ 'file_upload', 'single_image', 'file' ];
-		$field_detail = $form->meta_box['fields'];
-		$fields       = [];
-
-		foreach ( $field_detail as $field ) {
-
-			if ( ! empty( $field['id'] ) && 'submit' !== $field['type'] ) {
-				$fields[] = [
-					'name'  => $field['id'],
-					'type'  => in_array( $field['type'], $upload_file, true ) ? 'file' : $field['type'],
-					'label' => $field['name'] ?? '',
-				];
-			}
-		}
-
-		return $fields;
-	}
-
 	public static function resolve_trigger( array $node, array $args ) {
 
 		switch ( $node['event'] ) {
 			case 'form_submission':
-				$post_id = $args[0] ?? null;
-				$config  = $args[1] ?? [];
+				$object = $args[0] ?? null;
 
-				if ( ! $post_id || empty( $config['id'] ) ) {
+				if ( ! $object || ! isset( $object->post_id ) ) {
 					return false;
 				}
 
-				$form_id        = $config['id'];
-				$select_form_id = $node['config']['form_id'] ?? 'any';
+				$post_id       = $object->post_id;
+				$config        = $object->config ?? [];
+				$form_id       = $config['id'] ?? null;
+				$selected_form = $node['config']['form_id'] ?? 'any';
 
-				if ( 'any' !== $select_form_id && $select_form_id !== $form_id ) {
-					return false;
+				if ( 'any' !== $selected_form && $form_id ) {
+					if ( (string) $selected_form !== (string) $form_id ) {
+						return false;
+					}
 				}
 
-				$fields      = self::extract_form_fields( $form_id );
-				$field_value = [];
+				$all_meta     = get_post_meta( $post_id );
+				$field_values = [];
 
-				foreach ( $fields as $field ) {
-					$value = rwmb_meta( $field['name'], [], $post_id );
+				foreach ( $all_meta as $key => $val ) {
 
-					if ( ! $value ) {
+					if ( strpos( $key, '_' ) === 0 ) {
 						continue;
 					}
 
-					if ( 'file' === $field['type'] ) {
-
-						if ( isset( $value['path'] ) ) {
-							$field_value[ $field['name'] ] = $value['path'];
-						} elseif ( is_array( $value ) ) {
-							$field_value[ $field['name'] ] = array_map( fn( $f ) => $f['path'] ?? null, $value );
-						}
-					} else {
-						$field_value[ $field['name'] ] = $value;
+					if ( ! is_array( $val ) || ! isset( $val[0] ) ) {
+						continue;
 					}
+
+					$value = maybe_unserialize( $val[0] );
+					$field_values[ $key ] = $value;
 				}
 
-				$post             = get_post( $post_id );
-				$post_field_value = $post ? get_object_vars( $post ) : [];
-				unset( $post_field_value['ID'] );
-
-				$all_meta    = get_post_meta( $post_id );
-				$meta_values = [];
-
-				foreach ( $all_meta as $key => $val ) {
-					$meta_values[ $key ] = maybe_unserialize( $val[0] );
-				}
-
-				$data = array_merge(
-					[ 'id' => $form_id ],
-					$field_value,
-					$meta_values,
-					[ 'post_id' => $post_id ],
-					$post_field_value
-				);
+				$post      = get_post( $post_id );
+				$post_data = $post ? get_object_vars( $post ) : [];
+				unset( $post_data['ID'] );
+				$data = array_merge( [ 'id' => $form_id ], $field_values, [ 'post_id' => $post_id ], $post_data );
 
 				return [
 					'success' => true,
