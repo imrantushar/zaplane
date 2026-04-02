@@ -67,7 +67,6 @@ class DashboardController extends WP_REST_Controller {
 			->orderBy( 'month_num', 'asc' )
 			->get();
 
-		// Index results by month number for quick lookup.
 		$indexed = [];
 		foreach ( $rows as $row ) {
 			$indexed[ (int) $row['month_num'] ] = (int) $row['runs'];

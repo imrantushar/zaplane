@@ -19,10 +19,6 @@ return [
 			'file' => 'delay.php',
 			'class' => \Zaplane\Integrations\Delay::class
 		],
-		'pause'                => [
-			'file' => 'pause.php',
-			'class' => \Zaplane\Integrations\Pause::class
-		],
 		'iterator'             => [
 			'file' => 'iterator.php',
 			'class' => \Zaplane\Integrations\Iterator::class
