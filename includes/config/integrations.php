@@ -56,6 +56,10 @@ return [
 			'file' => 'mailchimp.php',
 			'class' => \Zaplane\Integrations\Mailchimp::class
 		],
+		'hubspot'              => [
+			'file' => 'hubspot.php',
+			'class' => \Zaplane\Integrations\Hubspot::class
+		],
 		'surecart'             => [
 			'file' => 'surecart.php',
 			'class' => \Zaplane\Integrations\Surecart::class
