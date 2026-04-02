@@ -124,7 +124,7 @@ const VersionHistoryTable = ({
       data={versions}
       showSubHeader={false}
       showColumnFilter={false}
-      showPagination={ versions.length >= 10 }
+      showPagination={ totalItems >= 10 }
       noDataText={__("No history found", "zaplane")}
       totalItems={totalItems}
       dataFetchingStatus={loading}
