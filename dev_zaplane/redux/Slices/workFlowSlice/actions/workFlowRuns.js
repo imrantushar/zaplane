@@ -15,7 +15,7 @@ import {
 
 export const getRunWorkFlow = createAsyncThunk(
 	'zaplane/getRunWorkFlow',
-	async ({ id, page = 1, per_page = 20 } = {}, thunkAPI) => {
+	async ({ id, page , per_page } = {}, thunkAPI) => {
 		try {
 			const res = await API.get(namespace + `workflows/${id}/runs`, {
 				params: { page, per_page },
@@ -26,7 +26,7 @@ export const getRunWorkFlow = createAsyncThunk(
 			return {
 				data: data || [],
 				currentPage: pagination.page || 1,
-				itemPerPage: pagination.per_page || 20,
+				itemPerPage: pagination.per_page ,
 				totalItems: pagination.total || 0,
 				totalPages: pagination.total_pages || 0,
 			};
