@@ -4,6 +4,8 @@ import {
     Box,
     HStack,
     Icon,
+    Flex,
+    Image,
 
 } from "@chakra-ui/react";
 import { useDispatch, useSelector } from "react-redux";
@@ -16,25 +18,39 @@ import {
 import { nodeLogsRunDetails } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlowLogs";
 
 import LogDetails from "@ZAPComponents/LogDetails";
-import ZAPLoading from "@ZAPComponents/Loading";
 import TopBar from "@ZAPComponents/TopBar";
 import ZAPDrawer from "@ZAPComponents/Drawer";
 import ListTable from "@ZAPComponents/ListTable";
-import { formatDateTime, formatLabel, getDuration } from "@ZAPUtils/helper";
-import { statusStyle } from "../workflows/helper";
-import { HistoryIcon, TableArrow } from "@ZAPUtils/icons";
+import { formatDateTime, formatLabel, getDuration, plugin_root_url } from "@ZAPUtils/helper";
+import { HistoryIcon } from "@ZAPUtils/icons";
 import ZAPTooltip from "@ZAPComponents/ZAPTooltip";
 import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
+import { IoIosArrowForward } from "react-icons/io";
 
 const Logs = () => {
     const dispatch = useDispatch();
     const [activeRunId, setActiveRunId] = useState(null);
     const [drawerOpen, setDrawerOpen] = useState(false);
-    const { data = [], isLoading } = useSelector((state) => state.logs || {});
+    const { data = [], currentPage, perPage,itemPerPage,totalItems } = useSelector((state) => state.logs || {});
+    const [loading, setLoading] = useState(data.length === 0);
+
+    const handleRefresh = async (page = 1, per_page = 20) => {
+        setLoading(true)
+        await dispatch(getRunsList({ page, per_page }));
+        setLoading(false)
+    };
 
     useEffect(() => {
-        dispatch(getRunsList());
-    }, [dispatch]);
+        handleRefresh()
+    }, []);
+
+    const handlePageChange = (newPage) => {
+        handleRefresh(newPage, perPage)
+    };
+
+    const handlePerPageChange = (itemsPerPage) => {
+        handleRefresh(currentPage, itemsPerPage)
+    };
 
     const columns = [
         {
@@ -190,12 +206,23 @@ const Logs = () => {
     return (
         <>
             <TopBar
-                render={() => (
-                    <Box>
-                        <Text fontSize="lg" fontWeight="600">
-                            {__("Workflow Logs", "zaplane")}
-                        </Text>
-                    </Box>
+                leftContent={() => (
+                    <>
+                        <Flex height='40px' width='40px' borderRadius='20px' gap='10px' background='var(--zaplane-second-primary)' alignItems='center' justifyContent='center'>
+                            <Image
+                                src={`${plugin_root_url}assets/images/zaplane.svg`}
+                                boxSize="20px"
+                            />
+                        </Flex>
+                        <IoIosArrowForward />
+                        <ZAPLabel
+                            as="h2"
+                            color="var(--zapplane-font-color)"
+                            type="subtitle"
+                            fontWeight="medium"
+                            label={__('Wokflows Logs', 'zaplane')}
+                        />
+                    </>
                 )}
             />
 
@@ -203,14 +230,19 @@ const Logs = () => {
                 <ListTable
                     columns={columns}
                     isRowSelectable={false}
-                    data={data?.runs || []}
+                    data={data || []}
                     showSubHeader={false}
                     showColumnFilter={false}
-                    showPagination={data?.runs?.length >= 10}
+                    showPagination={totalItems >= 20}
                     noDataText={__("No logs found", "zaplane")}
-                    totalItems={data.length}
-                    dataFetchingStatus={isLoading}
+                    totalItems={totalItems}
+                    dataFetchingStatus={loading}
                     suffix="logs-table"
+                    currentPageNumber={currentPage}
+                    perPage={perPage}
+                    rowsPerPage={itemPerPage}
+                    onChangePage={handlePageChange}
+                    onChangeItemsPerPage={handlePerPageChange}
                 />
             </div>
 
