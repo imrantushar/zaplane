@@ -11316,6 +11316,148 @@
                 }
             }
         },
+        "fluentsmtp": {
+            "slug": "fluentsmtp",
+            "name": "FluentSMTP",
+            "icon": "fluentsmtp.svg",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": {
+                "email_sent": {
+                    "key": "email_sent",
+                    "label": "Email Sent",
+                    "hook": "wp_mail_succeeded",
+                    "schema": [
+                        {
+                            "key": "recipient_email",
+                            "label": "Recipient Email",
+                            "type": "text",
+                            "placeholder": "user@example.com",
+                            "help": "Optional. Trigger only when this email address is one of the recipients."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "email_failed": {
+                    "key": "email_failed",
+                    "label": "Email Failed",
+                    "hook": "wp_mail_failed",
+                    "schema": [
+                        {
+                            "key": "recipient_email",
+                            "label": "Recipient Email",
+                            "type": "text",
+                            "placeholder": "user@example.com",
+                            "help": "Optional. Trigger only when this email address is one of the recipients."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delivery_failed_no_fallback": {
+                    "key": "delivery_failed_no_fallback",
+                    "label": "Delivery Failed Without Fallback",
+                    "hook": "fluentmail_email_sending_failed_no_fallback",
+                    "schema": [
+                        {
+                            "key": "recipient_email",
+                            "label": "Recipient Email",
+                            "type": "text",
+                            "placeholder": "user@example.com",
+                            "help": "Optional. Trigger only when this email address is one of the recipients."
+                        },
+                        {
+                            "key": "provider",
+                            "label": "Provider",
+                            "type": "text",
+                            "placeholder": "smtp, gmail, mailgun",
+                            "help": "Optional. Trigger only when the failed provider matches this value."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": {
+                "send_email": {
+                    "key": "send_email",
+                    "label": "Send Email",
+                    "schema": [
+                        {
+                            "key": "to",
+                            "label": "To",
+                            "type": "text",
+                            "placeholder": "user@example.com, team@example.com",
+                            "required": true,
+                            "help": "Use comma-separated email addresses or dynamic values."
+                        },
+                        {
+                            "key": "subject",
+                            "label": "Subject",
+                            "type": "text",
+                            "placeholder": "Your email subject",
+                            "required": true
+                        },
+                        {
+                            "key": "message",
+                            "label": "Message",
+                            "type": "textarea",
+                            "placeholder": "Write your email body here",
+                            "required": true
+                        },
+                        {
+                            "key": "content_type",
+                            "label": "Content Type",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "HTML",
+                                    "value": "text/html"
+                                },
+                                {
+                                    "label": "Plain Text",
+                                    "value": "text/plain"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "cc",
+                            "label": "CC",
+                            "type": "text",
+                            "placeholder": "manager@example.com, support@example.com"
+                        },
+                        {
+                            "key": "bcc",
+                            "label": "BCC",
+                            "type": "text",
+                            "placeholder": "audit@example.com"
+                        },
+                        {
+                            "key": "reply_to",
+                            "label": "Reply-To",
+                            "type": "text",
+                            "placeholder": "reply@example.com"
+                        },
+                        {
+                            "key": "attachments",
+                            "label": "Attachments",
+                            "type": "textarea",
+                            "placeholder": "/absolute/path/to/file.pdf\n/absolute/path/to/file-2.pdf",
+                            "help": "Optional. One file path per line or comma-separated."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
+        },
         "gravityforms": {
             "slug": "gravityforms",
             "name": "Gravity Forms",

@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React from "react";
 import { Box, Text } from "@chakra-ui/react";
 import {
     AreaChart,
@@ -11,29 +11,22 @@ import {
 } from "recharts";
 import { __ } from "@wordpress/i18n";
 
-const TotalExecutions = ({ data }) => {
-    const chartData = useMemo(() => {
-        const months = [
-            "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-            "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-        ];
+const TotalExecutions = () => {
 
-        const result = months.map((month) => ({
-            month,
-            value: 0,
-        }));
-
-        data?.runs?.forEach((item) => {
-            if (!item.started_at) return;
-
-            const date = new Date(item.started_at);
-            const monthIndex = date.getMonth();
-
-            result[monthIndex].value += 1;
-        });
-
-        return result;
-    }, [data]);
+    const chartData = [
+        { month: "Jan", runs: 12 },
+        { month: "Feb", runs: 8 },
+        { month: "Mar", runs: 20 },
+        { month: "Apr", runs: 15 },
+        { month: "May", runs: 10 },
+        { month: "Jun", runs: 18 },
+        { month: "Jul", runs: 22 },
+        { month: "Aug", runs: 17 },
+        { month: "Sep", runs: 9 },
+        { month: "Oct", runs: 14 },
+        { month: "Nov", runs: 11 },
+        { month: "Dec", runs: 19 },
+    ];
 
     return (
         <Box
@@ -82,7 +75,8 @@ const TotalExecutions = ({ data }) => {
 
                         <Area
                             type="monotone"
-                            dataKey="value"
+                            dataKey="runs"
+                            name="Runs"
                             stroke="#63B3ED"
                             fill="url(#colorValue)"
                             strokeWidth={2}
