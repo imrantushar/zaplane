@@ -23,7 +23,7 @@ const LogDetails = ({ runId, onBack }) => {
   //after the  response I’ll add translation support.
   return (
     <Box>
-      <ZAPLabel label={__(`Run ID: ${runId}`, 'zaplane')} type={"inputLabel"}/> 
+      <ZAPLabel  label={sprintf(__('Run ID: %s', 'zaplane'), runId)} type={"inputLabel"} />
       <Accordion.Root collapsible>
         {nodeDetails?.nodes?.map((log) => {
           const input = log?.input_json || {};
@@ -31,17 +31,17 @@ const LogDetails = ({ runId, onBack }) => {
 
           return (
             <Accordion.Item key={log.id} value={log.id} border='1px solid var(--zaplane-border-color)'
-            p='10px' borderRadius='8px' m='10px 0'>
+              p='10px' borderRadius='8px' m='10px 0'>
               <Accordion.ItemTrigger p='0' >
                 <HStack flex="1" justify="space-between">
                   <VStack gap={0}>
                     <Text fontWeight="medium" className="zaplane-label">
                       {sprintf(
-                        __('%s', 'zaplane'),log?.node?.app)}
+                        __('%s', 'zaplane'), log?.node?.app)}
                     </Text>
                     <Text className="zaplane-sub-title">
                       {sprintf(
-                        __('%s', 'zaplane'),log?.node?.event)}
+                        __('%s', 'zaplane'), log?.node?.event)}
                     </Text>
                   </VStack>
 
@@ -73,7 +73,7 @@ const LogDetails = ({ runId, onBack }) => {
                       <Text className="zaplane-label" fontWeight="bold" mb="2">
                         {__('Input', 'zaplane')}
                       </Text>
-                     <ReactJson
+                      <ReactJson
                         src={input}
                         name="root"
                         collapsed={1}

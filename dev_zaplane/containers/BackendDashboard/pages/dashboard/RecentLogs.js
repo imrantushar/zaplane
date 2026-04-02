@@ -1,6 +1,5 @@
-import { useMemo } from "react";
 import { Box, HStack, Text } from "@chakra-ui/react";
-import { __, sprintf } from "@wordpress/i18n";
+import { __ } from "@wordpress/i18n";
 import ListTable from "@ZAPComponents/ListTable";
 import { formatDateTime, formatLabel, getDuration } from "@ZAPUtils/helper";
 import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
@@ -104,8 +103,8 @@ const RecentLogs = ({ data = [] }) => {
   ]
 
   return (
-    <Box width="100%">
-      <Text className="zaplane-heading" mb="16px">
+    <Box width="100%" background='#fff' borderRadius='4px' boxShadow='md'>
+      <Text className="zaplane-heading" p='24px 24px 0 24px'>
         {__("Recent Logs", "zaplane")}
       </Text>
 

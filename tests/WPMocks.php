@@ -616,6 +616,58 @@ namespace {
 		}
 	}
 
+	if ( ! class_exists( 'WP_REST_Request' ) ) {
+		class WP_REST_Request {
+			protected array $params = [];
+			protected array $headers = [];
+			protected array $body_params = [];
+			protected array $json_params = [];
+			protected string $body = '';
+
+			public function __construct( string $method = 'GET', string $route = '' ) {}
+
+			public function set_param( string $key, $value ): void {
+				$this->params[ $key ] = $value;
+			}
+
+			public function get_param( string $key ) {
+				return $this->params[ $key ] ?? null;
+			}
+
+			public function set_header( string $key, $value ): void {
+				$this->headers[ strtolower( $key ) ] = $value;
+			}
+
+			public function get_header( string $key ) {
+				return $this->headers[ strtolower( $key ) ] ?? '';
+			}
+
+			public function set_body( string $body ): void {
+				$this->body = $body;
+			}
+
+			public function get_body(): string {
+				return $this->body;
+			}
+
+			public function set_body_params( array $params ): void {
+				$this->body_params = $params;
+			}
+
+			public function get_body_params(): array {
+				return $this->body_params;
+			}
+
+			public function set_json_params( array $params ): void {
+				$this->json_params = $params;
+			}
+
+			public function get_json_params(): array {
+				return $this->json_params;
+			}
+		}
+	}
+
 	if ( ! class_exists( 'WP_REST_Server' ) ) {
 		class WP_REST_Server {
 			public const READABLE  = 'GET';

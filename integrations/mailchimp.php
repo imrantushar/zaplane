@@ -25,6 +25,35 @@ class Mailchimp extends IntegrationBase {
 		return 'mailchimp';
 	}
 
+	public static function get_triggers(): array {
+		return [
+			'subscribed'      => [
+				'label' => 'Subscriber Added',
+				'hook'  => 'mailchimp_webhook_subscribed',
+			],
+			'unsubscribed'    => [
+				'label' => 'Subscriber Unsubscribed',
+				'hook'  => 'mailchimp_webhook_unsubscribed',
+			],
+			'profile_updated' => [
+				'label' => 'Subscriber Profile Updated',
+				'hook'  => 'mailchimp_webhook_profile_updated',
+			],
+			'cleaned'         => [
+				'label' => 'Email Cleaned',
+				'hook'  => 'mailchimp_webhook_cleaned',
+			],
+			'email_changed'   => [
+				'label' => 'Subscriber Email Changed',
+				'hook'  => 'mailchimp_webhook_email_changed',
+			],
+			'campaign_sent'   => [
+				'label' => 'Campaign Sent',
+				'hook'  => 'mailchimp_webhook_campaign_sent',
+			],
+		];
+	}
+
 	public static function get_actions(): array {
 		return [
 			'upsert_subscriber'     => [ 'label' => 'Add/Update Subscriber' ],
@@ -116,6 +145,18 @@ class Mailchimp extends IntegrationBase {
 		return [];
 	}
 
+	public static function get_trigger_config_schema( string $trigger ): array {
+		return [
+			[
+				'key'         => 'list_id',
+				'label'       => 'Audience/List ID',
+				'type'        => 'text',
+				'placeholder' => 'a6b5da1054',
+				'help'        => 'Optional. Only continue if the webhook came from this Mailchimp audience.',
+			],
+		];
+	}
+
 	/**
 	 * =====================================================
 	 * DYNAMIC DATA QUERIES (API)
@@ -143,6 +184,26 @@ class Mailchimp extends IntegrationBase {
 			'port' => 'main',
 			'data' => $input,
 		];
+	}
+
+	public static function resolve_trigger( array $node, array $args ) {
+		$payload = $args[0] ?? null;
+
+		if ( ! is_array( $payload ) || empty( $payload ) ) {
+			return false;
+		}
+
+		$config = self::get_node_config_data( $node );
+		$list_id_filter = trim( (string) ( $config['list_id'] ?? '' ) );
+
+		if ( '' !== $list_id_filter ) {
+			$list_id = (string) ( $payload['mailchimp_list_id'] ?? ( $payload['data']['list_id'] ?? '' ) );
+			if ( $list_id_filter !== $list_id ) {
+				return false;
+			}
+		}
+
+		return $payload;
 	}
 
 	public static function query_lists( $q ): array {
@@ -231,6 +292,79 @@ class Mailchimp extends IntegrationBase {
 			'success' => 200 === $status,
 			'message' => 200 === $status ? 'Connected to ' . $account : 'Connection failed',
 			'details' => $body,
+		];
+	}
+
+	public static function supports_webhook(): bool {
+		return true;
+	}
+
+	public static function verify_webhook_signature( \WP_REST_Request $request ): bool {
+		$secret = trim( (string) get_option( 'zaplane_mailchimp_webhook_secret', '' ) );
+
+		if ( '' === $secret ) {
+			return true;
+		}
+
+		$provided = trim( (string) ( $request->get_param( 'secret' ) ?: $request->get_header( 'x-zaplane-secret' ) ) );
+
+		if ( '' === $provided ) {
+			return false;
+		}
+
+		return hash_equals( $secret, $provided );
+	}
+
+	public static function parse_webhook_event( \WP_REST_Request $request ): ?array {
+		$body = self::get_webhook_body( $request );
+		$type = sanitize_key( (string) ( $body['type'] ?? '' ) );
+
+		$map = [
+			'subscribe'   => 'subscribed',
+			'unsubscribe' => 'unsubscribed',
+			'profile'     => 'profile_updated',
+			'cleaned'     => 'cleaned',
+			'upemail'     => 'email_changed',
+			'campaign'    => 'campaign_sent',
+		];
+
+		$event = $map[ $type ] ?? null;
+
+		if ( ! $event ) {
+			return null;
+		}
+
+		$data = $body['data'] ?? [];
+		if ( is_string( $data ) ) {
+			$decoded = json_decode( $data, true );
+			$data = is_array( $decoded ) ? $decoded : [];
+		}
+
+		if ( ! is_array( $data ) ) {
+			$data = [];
+		}
+
+		$payload = [
+			'type'                  => $type,
+			'fired_at'              => (string) ( $body['fired_at'] ?? '' ),
+			'data'                  => $data,
+			'mailchimp_event'       => $type,
+			'mailchimp_event_name'  => $event,
+			'mailchimp_member_id'   => (string) ( $data['id'] ?? '' ),
+			'mailchimp_list_id'     => (string) ( $data['list_id'] ?? '' ),
+			'mailchimp_email'       => (string) ( $data['email'] ?? '' ),
+			'mailchimp_old_email'   => (string) ( $data['old_email'] ?? '' ),
+			'mailchimp_new_email'   => (string) ( $data['new_email'] ?? ( $data['email'] ?? '' ) ),
+			'mailchimp_email_type'  => (string) ( $data['email_type'] ?? '' ),
+			'mailchimp_reason'      => (string) ( $data['reason'] ?? '' ),
+			'mailchimp_action'      => (string) ( $data['action'] ?? '' ),
+			'mailchimp_campaign_id' => (string) ( $data['campaign_id'] ?? '' ),
+			'mailchimp_merges'      => is_array( $data['merges'] ?? null ) ? $data['merges'] : [],
+		];
+
+		return [
+			'event'   => $event,
+			'payload' => $payload,
 		];
 	}
 
@@ -686,6 +820,26 @@ class Mailchimp extends IntegrationBase {
 		}
 
 		return '';
+	}
+
+	private static function get_webhook_body( \WP_REST_Request $request ): array {
+		$body = $request->get_body_params();
+
+		if ( empty( $body ) ) {
+			$raw = $request->get_body();
+			if ( is_string( $raw ) && '' !== $raw ) {
+				parse_str( $raw, $body );
+			}
+		}
+
+		if ( empty( $body ) ) {
+			$json = $request->get_json_params();
+			if ( is_array( $json ) ) {
+				$body = $json;
+			}
+		}
+
+		return is_array( $body ) ? $body : [];
 	}
 
 	private static function get_node_config_data( array $node ): array {

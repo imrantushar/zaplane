@@ -1,61 +1,39 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { __ } from "@wordpress/i18n";
-import { Box, Flex, Heading, Button } from "@chakra-ui/react";
-import { useDispatch, useSelector } from "react-redux";
-import ZAPMenu from "@ZAPComponents/ZapMenu";
+import { Box, Button, Flex, Image } from "@chakra-ui/react";
 import TopBar from "@ZAPComponents/TopBar";
-import ZAPInput from "@ZAPComponents/ZAPInput";
-import WPModal from "@ZAPComponents/Modal/WPModal";
-import { primaryBtn } from "../../../../../assets/scss/chakra/recipe";
-
-import {
-  createWorkflows,
-  getWorkFlow,
-} from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow";
 import WorkflowTable from "./WorkflowTable";
-import { useNavigate } from "react-router-dom";
-import { route_path } from "@ZAPUtils/helper";
 import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
+import CreateWorkflowModal from "@ZAPComponents/CreateWorkflowModal";
+import { primaryBtn } from "../../../../../assets/scss/chakra/recipe";
+import { IoIosArrowForward } from "react-icons/io";
+import { plugin_root_url } from "@ZAPUtils/helper";
 
 
 const CreateWorkflows = () => {
-  const dispatch = useDispatch();
-  const navigate =useNavigate()
+
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [workflowName, setWorkflowName] = useState("");
-
-;
-
-   const handleCreate = async () => {
-    if (!workflowName.trim()) return;
-    const res = await dispatch(
-      createWorkflows({
-        title: workflowName
-      })
-    )
-    if (res?.payload.id) {
-      navigate(
-        `${route_path}admin.php?page=zaplane-workflows&action=edit&id=${res.payload.id}`
-      );
-    }
-
-    setWorkflowName("");
-    setIsModalOpen(false);
-  };
-
-
 
   return (
     <>
       <TopBar
-        render={() => (
-          <Box>
+        leftContent={() => (
+          <>
+            <Flex height='40px' width='40px' borderRadius='20px' gap='10px' background='var(--zaplane-second-primary)' alignItems='center' justifyContent='center'>
+              <Image
+                src={`${plugin_root_url}assets/images/zaplane.svg`}
+                boxSize="20px"
+              />
+            </Flex>
+            <IoIosArrowForward />
             <ZAPLabel
+              as="h2"
+              color="var(--zapplane-font-color)"
+              type="subtitle"
+              fontWeight="medium"
               label={__('Flows', 'zaplane')}
-              variant="bold"
             />
-
-          </Box>
+          </>
         )}
         rightContent={() => (
           // <ZAPMenu
@@ -78,38 +56,10 @@ const CreateWorkflows = () => {
         />
       </div>
 
-      <WPModal
-        title={__("Create Workflow", "zaplane")}
+      <CreateWorkflowModal
         isOpen={isModalOpen}
-        onRequestClose={() => setIsModalOpen(false)}
-        size="medium"
-      >
-        <Box px={4}>
-          <ZAPInput
-            label={__("Workflow Name", "zaplane")}
-            placeholder={__("Enter workflow name", "zaplane")}
-            value={workflowName}
-            onChange={(e) => setWorkflowName(e.target.value)}
-          />
-
-          <Flex justify="flex-end" mt={5}>
-            <Button
-              variant="outline"
-              mr={3}
-              onClick={() => setIsModalOpen(false)}
-            >
-              {__("Cancel", "zaplane")}
-            </Button>
-            <Button
-              {...primaryBtn}
-              onClick={handleCreate}
-              isDisabled={!workflowName.trim()}
-            >
-              {__("Create", "zaplane")}
-            </Button>
-          </Flex>
-        </Box>
-      </WPModal>
+        onClose={() => setIsModalOpen(false)}
+      />
     </>
   );
 };

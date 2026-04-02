@@ -1,4 +1,4 @@
-import { Text, Icon, Box, Flex } from "@chakra-ui/react";
+import { Text, Icon, Box } from "@chakra-ui/react";
 import { __ } from "@wordpress/i18n";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
@@ -229,7 +229,7 @@ const ConnectionTable = () => {
                 isRowSelectable={true}
                 showSubHeader={false}
                 showColumnFilter={false}
-                showPagination={allConnection.length >= 10}
+                showPagination={totalItems>= 10}
                 noDataText={__("No connections found", "zaplane")}
                 totalItems={totalItems}
                 dataFetchingStatus={loading}
