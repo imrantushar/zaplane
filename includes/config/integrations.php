@@ -160,9 +160,13 @@ return [
 			'file' => 'elementor.php',
 			'class' => \Zaplane\Integrations\Elementor::class
 		],
-		'academy'            => [
-			'file' => 'academy.php',
-			'class' => \Zaplane\Integrations\Academy::class
+		'masterstudy'          => [ 
+			'file' => 'masterstudy.php',          
+			'class' => \Zaplane\Integrations\Masterstudy::class 
+		],
+		'academy'          => [ 
+			'file' => 'academy.php',          
+			'class' => \Zaplane\Integrations\Academy::class 
 		],
 		'jetengine'            => [
 			'file' => 'jetengine.php',
