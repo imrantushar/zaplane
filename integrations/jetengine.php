@@ -18,7 +18,7 @@ class Jetengine extends IntegrationBase {
 	}
 
 	public static function get_icon(): string {
-		return 'Jetengine.svg';
+		return 'jetengine.svg';
 	}
 
 	public static function get_triggers(): array {
