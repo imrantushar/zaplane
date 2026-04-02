@@ -186,7 +186,7 @@ return [
 		],
 		'kadenceblocks'      => [
 			'file' => 'kadenceblocks.php', 
-			'class' => \Zaplane\Integrations\Kadenceblocks::class],
-
+			'class' => \Zaplane\Integrations\Kadenceblocks::class
+			],
 	],
 ];
