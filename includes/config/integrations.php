@@ -144,6 +144,10 @@ return [
 			'file' => 'groundhogg.php',
 			'class' => \Zaplane\Integrations\Groundhogg::class
 		],
+		'wpfusion'             => [
+			'file' => 'wp-fusion.php',
+			'class' => \Zaplane\Integrations\WpFusion::class
+		],
 		'bricks'               => [
 			'file' => 'bricks.php',
 			'class' => \Zaplane\Integrations\Bricks::class
