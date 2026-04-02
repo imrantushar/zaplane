@@ -1,7 +1,6 @@
 import {
   Badge,
   HStack,
-  Button,
   Text,
   Icon,
   Box
@@ -9,9 +8,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import LogDetails from "@ZAPComponents/LogDetails";
-import ZAPLoading from "@ZAPComponents/Loading";
 import { getDuration } from "@ZAPUtils/helper";
-import ZAPTable from "@ZAPComponents/Table";
 import { __ } from "@wordpress/i18n";
 import ZAPDrawer from "@ZAPComponents/Drawer";
 import { statusStyle } from "../../../helper";
@@ -24,21 +21,30 @@ import ZAPTooltip from "@ZAPComponents/ZAPTooltip";
 
 
 
-const RunsTable = ({ id }) => {
+const RunsTable = ({ id, activeDrawer, setRefreshing }) => {
   const dispatch = useDispatch();
   const [activeRunId, setActiveRunId] = useState(null);
-  const { runs = [], currentPage, perPage } = useSelector((state) => state.workflows);
+  const { runs = [], currentPage, perPage, totalItems, itemPerPage } = useSelector((state) => state.workflows);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [loading, setLoading] = useState(runs.length === 0);
   const handleRefresh = async (page = 1, per_page = 10) => {
     setLoading(true)
+    setRefreshing(true);
     await dispatch(getRunWorkFlow({ id, page, per_page }));
+    setRefreshing(false);
     setLoading(false)
   };
 
   useEffect(() => {
-    handleRefresh()
-  }, []);
+    if (activeDrawer !== "logs") return;
+    handleRefresh(currentPage, itemPerPage);
+    const interval = setInterval(() => {
+      handleRefresh(currentPage, itemPerPage);
+    }, 8000);
+
+    return () => clearInterval(interval);
+
+  }, [currentPage, itemPerPage, activeDrawer]);
 
   const handlePageChange = (newPage) => {
     handleRefresh(newPage, perPage)
@@ -150,13 +156,14 @@ const RunsTable = ({ id }) => {
         data={runs}
         showSubHeader={false}
         showColumnFilter={false}
-        showPagination={runs.length >= 10}
+        showPagination={totalItems >= 10}
         noDataText={__("No history found", "zaplane")}
-        totalItems={runs.length}
+        totalItems={totalItems}
         dataFetchingStatus={loading}
         suffix="history-table"
         currentPageNumber={currentPage}
         perPage={perPage}
+        rowsPerPage={itemPerPage}
         onChangePage={handlePageChange}
         onChangeItemsPerPage={handlePerPageChange}
       />

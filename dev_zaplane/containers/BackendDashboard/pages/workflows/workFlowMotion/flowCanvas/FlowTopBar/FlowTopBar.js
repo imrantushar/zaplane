@@ -13,7 +13,6 @@ import VersionHistoryTable from "../VersionHistoryTable/VersionHistoryTable";
 import { primaryBtn, secondPrimaryBtn } from "../../../../../../../../assets/scss/chakra/recipe";
 import { getRunWorkFlow } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlowRuns";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllVersion } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlowVersion";
 import { formatTime } from "../helper";
 import { statusOptions } from "../../../helper";
 import { workflowNodeListiner, workflowNodeListinerStop } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlowListiner";
@@ -23,8 +22,6 @@ import { useApiCountdown } from "@ZAPHooks/useApiCountdown/useApiCountdown";
 import '../styles.scss'
 import { LiaStopCircleSolid } from "react-icons/lia";
 import { CiPlay1 } from "react-icons/ci";
-import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
-import { useFormikContext } from "formik";
 import { updateWorkFlowStatus, updateWorkFlowTitle } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow";
 import { useNavigate } from "react-router-dom";
 import { route_path } from "@ZAPUtils/helper";
@@ -63,20 +60,7 @@ export default function FlowTopBar({
 
     updateStatusAndTitle();
   }, [values?.status, values?.title, workFlow, dispatch, id]);
-  //listiner
-  useEffect(() => {
-    if (activeDrawer !== "logs") return;
-
-    const interval = setInterval(async () => {
-      setRefreshing(true);
-
-      await dispatch(getRunWorkFlow({ id }));
-
-      setRefreshing(false);
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, [activeDrawer, dispatch, id]);
+  
 
   return (
     <TopBar
@@ -157,7 +141,7 @@ export default function FlowTopBar({
           {/* Logs Drawer */}
           <ZAPDrawer
             title={__("Log History", "zaplane")}
-            size="md"
+            maxWidth='600px'
             isFullscreen={isFullscreen}
             open={activeDrawer === "logs"}
             onClose={() => setActiveDrawer(null)}
@@ -202,13 +186,14 @@ export default function FlowTopBar({
               </Button>
             </Flex>
 
-            <RunsTable id={id} />
+            <RunsTable id={id} activeDrawer={activeDrawer} setRefreshing={setRefreshing} />
           </ZAPDrawer>
 
           {/* Version Drawer */}
           <ZAPDrawer
             title={__("Version History", "zaplane")}
             open={activeDrawer === "history"}
+            maxWidth='600px'
             isFullscreen={isFullscreen}
             onClose={() => setActiveDrawer(null)}
             trigger={

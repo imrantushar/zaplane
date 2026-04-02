@@ -1,14 +1,9 @@
-import { useMemo, useCallback, useState, useEffect } from "react";
+import {  useState, useEffect } from "react";
 import { __ } from "@wordpress/i18n";
-import { Text, Box, Icon, HStack, Flex, Button, ActionBar, Portal, CloseButton } from "@chakra-ui/react";
-import Select from "react-select";
+import { Text, Box, Icon, HStack} from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-
 import ListTable from "@ZAPComponents/ListTable";
-import OptionMenu from "@ZAPComponents/OptionMenu";
-
-import { FiEdit, FiTrash2 } from "react-icons/fi";
 import { formatDateTime, route_path } from "@ZAPUtils/helper";
 import { statusOptions } from "./helper";
 
@@ -19,14 +14,13 @@ import {
 } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow";
 import StatusOptions from "@ZAPComponents/StatusOptions";
 import ZAPTooltip from "@ZAPComponents/ZAPTooltip";
-import { FaRegEdit } from "react-icons/fa";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { LiaEditSolid } from "react-icons/lia";
 import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
 import ZAPDrawer from "@ZAPComponents/Drawer";
 import LogDetails from "@ZAPComponents/LogDetails";
 import { nodeLogsRunDetails } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlowLogs";
-import { HistoryIcon, TableArrow } from "@ZAPUtils/icons";
+import { HistoryIcon } from "@ZAPUtils/icons";
 import ZAPActionBar from "@ZAPComponents/ZAPActionBar";
 
 const WorkflowTable = () => {

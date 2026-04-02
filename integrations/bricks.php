@@ -94,4 +94,11 @@ class Bricks extends IntegrationBase {
 			'data' => $input
 		];
 	}
+
+	public static function get_output_ports(): array
+	{
+		return [
+			'main' => 'Main output',
+		];
+	}
 }

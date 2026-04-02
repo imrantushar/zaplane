@@ -1,16 +1,15 @@
-import { Button, Flex, HStack, Input, } from "@chakra-ui/react";
+import {  Button, Flex, HStack,  } from "@chakra-ui/react";
 import ZAPDrawer from "@ZAPComponents/Drawer";
 import { integrations } from "@ZAPUtils/helper";
 import { useFormikContext } from "formik";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
 import ZAPTab from "@ZAPComponents/Tab";
-import { __, sprintf } from "@wordpress/i18n";
+import { __ } from "@wordpress/i18n";
 import { primaryBtn } from "../../../../../../../assets/scss/chakra/recipe";
 import { useActionDrawer } from "@ZAPHooks/useActionDrawer/useActionDrawer";
 import { TOOLS } from "@ZAPHooks/useActionDrawer/helper";
 import { getIntegration } from "./helper";
-import { fetchDynamic } from "@ZAPRedux/Slices/workFlowSlice/helper";
 import SelectTab from "./SelectTab/SelectTab";
 import TestRun from "./TestRun/TestRun";
 import DrawerSearchList from "./DrawerSearchList/DrawerSearchList";
@@ -22,14 +21,14 @@ import { useDynamicFields } from "@ZAPHooks/useActionDrawer/useDynamicFields";
 import { mapEdgesForBackend, mapNodesForBackend } from "../helper";
 import { conditionVariables } from "@ZAPRedux/Slices/workFlowSlice/actions/conditonVariales";
 import './styles.scss'
+import Search from "@ZAPComponents/Search";
 
-const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode, workFlow, isFullscreen, nodes, edges }) => {
+const ActionDrawer = ({ open, context, onClose, updateNodeData, handleAddAction, workFlow, isFullscreen, nodes, edges }) => {
   const { source, node } = context;
   const dispatch = useDispatch();
-  const { values, setFieldValue, resetForm ,initialValues} = useFormikContext();
+  const { values, setFieldValue, resetForm } = useFormikContext();
   const [step, setStep] = useState("select");
   const isTrigger = node?.data?.action === "trigger" && source === "node";
-  const [showWarning, setShowWarning] = useState(false);
 
   const { mode, setMode, selectedItem, setSelectedItem, search, setSearch, list, searchList } =
     useActionDrawer(open, node, source, setFieldValue, isTrigger);
@@ -86,7 +85,6 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
     setSearch("");
     resetForm();
     onClose();
-    setShowWarning(false)
   };
 
   const handleContinue = () => {
@@ -96,7 +94,7 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
     if (step === "configure") {
 
       const payload = {
-        icon:selectedItem.icon,
+        icon: selectedItem.icon,
         app: selectedItem.id,
         name: selectedItem.name,
         event: values.actionType,
@@ -104,12 +102,12 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
           acc[f.key] = values[f.key];
           return acc;
         }, {}),
-         ...(selectedItem.mode && { mode: selectedItem.mode }),
+        ...(selectedItem.mode && { mode: selectedItem.mode }),
         ...(values.hook && { hook: values.hook }),
         ...(values.connection_id && { connection_id: values.connection_id }),
       };
       if (context?.source !== "node") {
-        createActionNode(payload);
+        handleAddAction(payload);
       }
       else {
         updateNodeData(payload);
@@ -121,7 +119,7 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
     if (step === "test") {
       resetAll();
     }
-   
+
   };
   // seleted intregation
   const selectedIntegration = useMemo(() => {
@@ -149,7 +147,7 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
       open={open}
       isFullscreen={isFullscreen}
       onClose={resetAll}
-      arrowClose={mode === 'app'}
+      arrowClose={['tools', 'app'].includes(mode)}
       maxWidth='700px'
       arrowOnClick={() => {
         setSelectedItem(null);
@@ -171,7 +169,12 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
         </HStack>
       }
     >
-      <Input placeholder={__("Search apps or tools...", "zaplane")} value={search} onChange={e => setSearch(e.target.value)} />
+    
+        <Search
+          placeholder={__("Search apps or tools...", "zaplane")}
+          defaultValue={search}
+          onSearchHandler={(value) => setSearch(value)}
+        />
       {search &&
         <DrawerSearchList
           searchList={searchList}
