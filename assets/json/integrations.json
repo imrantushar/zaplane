@@ -1,11 +1,11 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-03-12 08:55:08",
+    "generated_at": "2026-03-31 09:27:36",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
             "name": "WordPress",
-            "icon": "wordpress.svg",
+            "icon": "WordPress.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -853,7 +853,7 @@
                         {
                             "key": "user_email",
                             "label": "Email",
-                            "type": "text",
+                            "type": "email",
                             "required": true
                         },
                         {
@@ -915,7 +915,7 @@
                         {
                             "key": "user_email",
                             "label": "Email",
-                            "type": "text"
+                            "type": "email"
                         },
                         {
                             "key": "user_pass",
@@ -1072,7 +1072,7 @@
                         {
                             "key": "email",
                             "label": "User Email",
-                            "type": "text",
+                            "type": "email",
                             "required": true
                         }
                     ],
@@ -1213,7 +1213,7 @@
                         {
                             "key": "user_login_or_email",
                             "label": "Username or Email",
-                            "type": "text",
+                            "type": "email",
                             "required": true
                         }
                     ],
@@ -1228,7 +1228,7 @@
                         {
                             "key": "user_login",
                             "label": "Username or Email",
-                            "type": "text",
+                            "type": "email",
                             "required": true
                         },
                         {
@@ -2580,7 +2580,7 @@
                         {
                             "key": "user_email",
                             "label": "User Email",
-                            "type": "expression",
+                            "type": "email",
                             "required": true
                         }
                     ],
@@ -2643,7 +2643,7 @@
                         {
                             "key": "author_email",
                             "label": "Author Email",
-                            "type": "expression",
+                            "type": "email",
                             "required": true
                         },
                         {
@@ -2676,7 +2676,7 @@
                         {
                             "key": "author_email",
                             "label": "Author Email",
-                            "type": "expression",
+                            "type": "email",
                             "required": true
                         },
                         {
@@ -10514,7 +10514,7 @@
                         {
                             "key": "email",
                             "label": "Email Address",
-                            "type": "expression",
+                            "type": "email",
                             "required": true
                         },
                         {
@@ -10673,7 +10673,7 @@
                         {
                             "key": "email",
                             "label": "Email Address",
-                            "type": "expression",
+                            "type": "email",
                             "required": true
                         }
                     ],
@@ -11031,7 +11031,7 @@
                         {
                             "key": "email",
                             "label": "Email Address",
-                            "type": "expression",
+                            "type": "email",
                             "required": true
                         },
                         {
@@ -11249,7 +11249,7 @@
                         {
                             "key": "email",
                             "label": "Email Address",
-                            "type": "expression",
+                            "type": "email",
                             "required": true
                         },
                         {
@@ -11308,6 +11308,148 @@
                             "label": "Description",
                             "type": "text",
                             "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
+        },
+        "fluentsmtp": {
+            "slug": "fluentsmtp",
+            "name": "FluentSMTP",
+            "icon": "fluentsmtp.svg",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": {
+                "email_sent": {
+                    "key": "email_sent",
+                    "label": "Email Sent",
+                    "hook": "wp_mail_succeeded",
+                    "schema": [
+                        {
+                            "key": "recipient_email",
+                            "label": "Recipient Email",
+                            "type": "text",
+                            "placeholder": "user@example.com",
+                            "help": "Optional. Trigger only when this email address is one of the recipients."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "email_failed": {
+                    "key": "email_failed",
+                    "label": "Email Failed",
+                    "hook": "wp_mail_failed",
+                    "schema": [
+                        {
+                            "key": "recipient_email",
+                            "label": "Recipient Email",
+                            "type": "text",
+                            "placeholder": "user@example.com",
+                            "help": "Optional. Trigger only when this email address is one of the recipients."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delivery_failed_no_fallback": {
+                    "key": "delivery_failed_no_fallback",
+                    "label": "Delivery Failed Without Fallback",
+                    "hook": "fluentmail_email_sending_failed_no_fallback",
+                    "schema": [
+                        {
+                            "key": "recipient_email",
+                            "label": "Recipient Email",
+                            "type": "text",
+                            "placeholder": "user@example.com",
+                            "help": "Optional. Trigger only when this email address is one of the recipients."
+                        },
+                        {
+                            "key": "provider",
+                            "label": "Provider",
+                            "type": "text",
+                            "placeholder": "smtp, gmail, mailgun",
+                            "help": "Optional. Trigger only when the failed provider matches this value."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": {
+                "send_email": {
+                    "key": "send_email",
+                    "label": "Send Email",
+                    "schema": [
+                        {
+                            "key": "to",
+                            "label": "To",
+                            "type": "text",
+                            "placeholder": "user@example.com, team@example.com",
+                            "required": true,
+                            "help": "Use comma-separated email addresses or dynamic values."
+                        },
+                        {
+                            "key": "subject",
+                            "label": "Subject",
+                            "type": "text",
+                            "placeholder": "Your email subject",
+                            "required": true
+                        },
+                        {
+                            "key": "message",
+                            "label": "Message",
+                            "type": "textarea",
+                            "placeholder": "Write your email body here",
+                            "required": true
+                        },
+                        {
+                            "key": "content_type",
+                            "label": "Content Type",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "HTML",
+                                    "value": "text/html"
+                                },
+                                {
+                                    "label": "Plain Text",
+                                    "value": "text/plain"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "cc",
+                            "label": "CC",
+                            "type": "text",
+                            "placeholder": "manager@example.com, support@example.com"
+                        },
+                        {
+                            "key": "bcc",
+                            "label": "BCC",
+                            "type": "text",
+                            "placeholder": "audit@example.com"
+                        },
+                        {
+                            "key": "reply_to",
+                            "label": "Reply-To",
+                            "type": "text",
+                            "placeholder": "reply@example.com"
+                        },
+                        {
+                            "key": "attachments",
+                            "label": "Attachments",
+                            "type": "textarea",
+                            "placeholder": "/absolute/path/to/file.pdf\n/absolute/path/to/file-2.pdf",
+                            "help": "Optional. One file path per line or comma-separated."
                         }
                     ],
                     "outputs": [
@@ -12483,6 +12625,27 @@
                             "required": true
                         }
                     ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": []
+        },
+        "kadenceblocks": {
+            "slug": "kadenceblocks",
+            "name": "Kadence Block",
+            "icon": "kadence-block.svg",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": {
+                "kadence_blocks_advanced_form_submission": {
+                    "key": "kadence_blocks_advanced_form_submission",
+                    "label": "Advanced Form Submission",
+                    "hook": "kadence_blocks_advanced_form_submission",
+                    "schema": [],
                     "outputs": [
                         "main"
                     ]

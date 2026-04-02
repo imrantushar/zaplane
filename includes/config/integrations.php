@@ -88,6 +88,10 @@ return [
 			'file' => 'fluent-crm.php',
 			'class' => \Zaplane\Integrations\FluentCrm::class
 		],
+		'fluentsmtp'           => [
+			'file' => 'fluent-smtp.php',
+			'class' => \Zaplane\Integrations\FluentSmtp::class
+		],
 		'gravityforms'         => [
 			'file' => 'gravityforms.php',
 			'class' => \Zaplane\Integrations\Gravityforms::class
@@ -156,5 +160,9 @@ return [
 			'file' => 'academy.php',
 			'class' => \Zaplane\Integrations\Academy::class
 		],
+		'kadenceblocks'      => [
+			'file' => 'kadenceblocks.php', 
+			'class' => \Zaplane\Integrations\Kadenceblocks::class],
+
 	],
 ];

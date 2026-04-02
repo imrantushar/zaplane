@@ -21,7 +21,7 @@ const VersionHistoryTable = ({
   const dispatch = useDispatch()
   const { versions } = useSelector((state) => state.workflows);
   const { isLoading, currentPage,
-    perPage, } = useSelector((state) => state.workflows);
+    perPage, itemPerPage,totalItems} = useSelector((state) => state.workflows);
   const [loading, setLoading] = useState(versions.length === 0);
   const handleRefresh = async (page = 1, per_page = 10) => {
     setLoading(true)
@@ -124,13 +124,14 @@ const VersionHistoryTable = ({
       data={versions}
       showSubHeader={false}
       showColumnFilter={false}
-      showPagination={ versions.length >= 10 }
+      showPagination={ totalItems >= 10 }
       noDataText={__("No history found", "zaplane")}
-      totalItems={versions?.length}
+      totalItems={totalItems}
       dataFetchingStatus={loading}
       suffix="version-table"
       currentPageNumber={currentPage}
       perPage={perPage}
+      rowsPerPage={itemPerPage}
       onChangePage={handlePageChange}
       onChangeItemsPerPage={handlePerPageChange}
     />
