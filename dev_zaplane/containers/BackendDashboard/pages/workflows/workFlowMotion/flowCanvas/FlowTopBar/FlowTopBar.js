@@ -60,20 +60,7 @@ export default function FlowTopBar({
 
     updateStatusAndTitle();
   }, [values?.status, values?.title, workFlow, dispatch, id]);
-  //listiner
-  useEffect(() => {
-    if (activeDrawer !== "logs") return;
-
-    const interval = setInterval(async () => {
-      setRefreshing(true);
-
-      await dispatch(getRunWorkFlow({ id }));
-
-      setRefreshing(false);
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, [activeDrawer, dispatch, id]);
+  
 
   return (
     <TopBar
@@ -154,7 +141,7 @@ export default function FlowTopBar({
           {/* Logs Drawer */}
           <ZAPDrawer
             title={__("Log History", "zaplane")}
-            size="md"
+            maxWidth='600px'
             isFullscreen={isFullscreen}
             open={activeDrawer === "logs"}
             onClose={() => setActiveDrawer(null)}
@@ -199,13 +186,14 @@ export default function FlowTopBar({
               </Button>
             </Flex>
 
-            <RunsTable id={id} />
+            <RunsTable id={id} activeDrawer={activeDrawer} setRefreshing={setRefreshing} />
           </ZAPDrawer>
 
           {/* Version Drawer */}
           <ZAPDrawer
             title={__("Version History", "zaplane")}
             open={activeDrawer === "history"}
+            maxWidth='600px'
             isFullscreen={isFullscreen}
             onClose={() => setActiveDrawer(null)}
             trigger={
