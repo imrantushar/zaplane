@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-04-02 10:38:05",
+    "generated_at": "2026-04-05 09:02:07",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -13009,7 +13009,7 @@
         "jetengine": {
             "slug": "jetengine",
             "name": "JetEngine",
-            "icon": "Jetengine.svg",
+            "icon": "jetengine.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -13489,6 +13489,92 @@
                 }
             },
             "actions": []
+        },
+        "ultimatemember": {
+            "slug": "ultimatemember",
+            "name": "Ultimate Member",
+            "icon": "ultimatemember.svg",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": {
+                "user_login": {
+                    "key": "user_login",
+                    "label": "User Login",
+                    "hook": "um_user_login",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "user_registration": {
+                    "key": "user_registration",
+                    "label": "User Registration",
+                    "hook": "um_registration_complete",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "inactive_user": {
+                    "key": "inactive_user",
+                    "label": "Inactive User",
+                    "hook": "um_after_user_is_inactive",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "change_user_role": {
+                    "key": "change_user_role",
+                    "label": "Change User Role",
+                    "hook": "set_user_role",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": {
+                "um_set_user_role": {
+                    "key": "um_set_user_role",
+                    "label": "Change User Role",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "ultimatemember",
+                                "query": "user_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "role",
+                            "label": "Role",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "ultimatemember",
+                                "query": "user_role_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
         }
     },
     "tools": {

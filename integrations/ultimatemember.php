@@ -6,9 +6,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use Zaplane\Framework\Classes\IntegrationBase;
-
+use Zaplane\Traits\ActionResponseTrait;
 class Ultimatemember extends IntegrationBase {
 
+    use ActionResponseTrait;
 
 	public static function get_slug(): string {
 		return 'ultimatemember';
@@ -24,50 +25,214 @@ class Ultimatemember extends IntegrationBase {
 
 	public static function get_triggers(): array {
 		return [
-			'form_submitted' => [
+			'user_login' => [
 				'label' => 'User Login',
 				'hook'  => 'um_user_login'
 			],
-			'form_submitted' => [
+			'user_registration' => [
 				'label' => 'User Registration',
 				'hook'  => 'um_registration_complete'
 			],
-			'form_submitted' => [
+			'inactive_user' => [
+				'label' => 'Inactive User',
+				'hook'  => 'um_after_user_is_inactive'
+			],
+			'change_user_role' => [
 				'label' => 'Change User Role',
 				'hook'  => 'set_user_role'
 			],
 		];
 	}
 
+    private static function get_user_data( $user_id ) {
+
+        $user = get_userdata( $user_id );
+
+        if ( ! $user ) {
+            return [];
+        }
+
+        return [
+            'user_id'      => (string) $user_id,
+            'first_name'   => get_user_meta( $user_id, 'first_name', true ),
+            'last_name'    => get_user_meta( $user_id, 'last_name', true ),
+            'user_login'   => $user->user_login,
+            'user_email'   => $user->user_email,
+            'nickname'     => $user->nickname,
+            'avatar_url'   => get_avatar_url( $user_id ),
+            'display_name' => $user->display_name,
+            'user_roles'   => $user->roles,
+            'role'         => $user->roles[0] ?? '',
+        ];
+    }
+
 	public static function resolve_trigger( array $node, array $args ) {
 
 		switch ( $node['event'] ) {
-			case 'form_submitted':
-				$entry = $args[0] ?? null;
-				$form  = $args[1] ?? null;
+			case 'user_login':
+            $um_args = $args[0] ?? [];
 
-				if ( ! $entry || ! $form ) {
-					return false;
-				}
+            if ( empty( $um_args['username'] ) ) return false;
 
-				$form_id = $form['id'] ?? 0;
+            $user = get_user_by( 'login', sanitize_text_field( $um_args['username'] ) );
 
-				if ( ! empty( $node['form_id'] ) && 'any' !== $node['form_id'] ) {
-					if ( (int) $form_id !== (int) $node['form_id'] ) {
-						return false;
-					}
-				}
+            if ( ! $user ) {
+                $user = get_user_by( 'email', sanitize_text_field( $um_args['username'] ) );
+            }
 
-				$enter_entry = self::convertkey( $entry );
-				$enter_entry['title'] = $form['title'] ?? '';
+            if ( ! $user ) return false;
 
-				return [
-					'success'  => true,
-					'form_id'  => $form_id,
-					'entry_id' => $entry['id'] ?? 0,
-					'data'     => $enter_entry,
+            $data = self::get_user_data( $user->ID );
+            $data['form_username'] = $um_args['username'];
+
+            return [
+                'success' => true,
+                'data'    => $data,
+            ];
+
+            case 'user_registration':
+                $user_id = $args[0] ?? 0;
+                $um_args = $args[1] ?? [];
+
+                if ( ! $user_id ) return false;
+
+                $data = self::get_user_data( $user_id );
+
+                if ( ! empty( $um_args['submitted'] ) ) {
+                    $data['form_data'] = $um_args['submitted'];
+                }
+
+                return [
+                    'success' => true,
+                    'data'    => $data,
+                ];
+
+            case 'inactive_user':
+                $user_id = $args[0] ?? 0;
+
+                if ( ! $user_id ) return false;
+
+                $data = self::get_user_data( $user_id );
+                $data['status'] = 'inactive';
+
+                return [
+                    'success' => true,
+                    'data'    => $data,
+                ];
+
+			case 'change_user_role':
+                $user_id = $args[0] ?? 0;
+                $new_role = $args[1] ?? '';
+
+                if ( ! $user_id ) return false;
+
+                $data = self::get_user_data( $user_id );
+                $data['role'] = $new_role;
+
+                return [
+					'success'   => true,
+					'data'   => $data,
 				];
+				
 		}//end switch
 		return false;
+	}
+
+    public static function get_actions(): array {
+		return [
+			'um_set_user_role' => [ 'label' => 'Change User Role' ],
+		];
+	}
+
+    public static function get_action_config_schema( string $action ): array {
+		$schemas = [
+            'um_set_user_role' => [
+                [
+                    'key'     => 'user_id',
+                    'label'   => 'User',
+                    'type'    => 'select',
+                    'dynamic' => [
+                        'integration' => 'ultimatemember',
+                        'query'       => 'user_query',
+                        'select'      => [ 'value', 'label' ],
+                    ],
+                    'required' => true,
+                ],
+                [
+                    'key'     => 'role',
+                    'label'   => 'Role',
+                    'type'    => 'select',
+                    'dynamic' => [
+                        'integration' => 'ultimatemember',
+                        'query'       => 'user_role_query',
+                        'select'      => [ 'value', 'label' ],
+                    ],
+                    'required' => true,
+                ],
+            ],
+		];
+
+		return $schemas[ $action ] ?? [];
+	}
+
+    public static function execute_node( array $node, array $input ): array {
+		$config = $node['data']['config'] ?? [];
+
+		switch ( $node['data']['event'] ?? '' ) {
+
+            case 'um_set_user_role':
+                $role = $config['role'] ?? '';
+                $user_id = $config['user_id'] ?? $input['user_id'] ?? 0;
+
+                if ( $user_id && $role ) {
+                    $user = new \WP_User( $user_id );
+                    $user->set_role( $role );
+                }
+
+                return static::success([
+                    'user_id' => $user_id,
+                    'role'    => $role,
+                ]);
+
+
+		}
+		return [
+			'port' => 'main',
+			'data' => $input
+		];
+	}
+
+    public static function get_dynamic_queries(): array {
+		return [
+			'user_query'      => [ self::class, 'query_user' ],
+			'user_role_query' => [ self::class, 'query_user_role' ],
+		];
+	}
+
+	public static function query_user( $query ) {
+		$all_user = [];
+		$users   = get_users();
+
+        foreach ( $users as $user ) {
+            $all_user[] = [
+                'value' => $user->ID,
+                'label' => $user->display_name . ' (' . $user->user_email . ')',
+            ];
+        }
+
+		return $all_user;
+	}
+
+	public static function query_user_role( $query ) {
+		$all_role = [];
+
+		foreach ( wp_roles()->roles as $role_key => $role ) {
+			$all_role[] = [
+				'value' => $role_key,
+				'label' => $role['name'],
+			];
+		}
+
+		return $all_role;
 	}
 }
