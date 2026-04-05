@@ -4,7 +4,7 @@ import axios from 'axios';
 import { showNotification } from '@ZAPRedux/Slices/notificationSlice/notificationSlice';
 
 export const {
-	// plugin_root_url,
+	plugin_root_url,
 	nonce,
 	ajaxurl,
 	menu,
@@ -94,3 +94,60 @@ export const makeRequest = async (
 
     return data;
 };
+
+export const sliceString = ( text, length = 20, more = '...' ) => {
+	if ( ! text || text.length < length ) {
+		return text;
+	}
+
+	return text.slice( 0, length ).replace( /(^[\s]+|[\s]+$)/g, '' ) + more;
+};
+
+export const getDuration = (start, end) => {
+  if (!start || !end) return "--";
+
+  const startTime = new Date(start.replace(" ", "T"));
+  const endTime = new Date(end.replace(" ", "T"));
+
+  if (isNaN(startTime) || isNaN(endTime)) return "--";
+
+  const diffMs = endTime - startTime;
+  const seconds = Math.floor(diffMs / 1000);
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+
+  if (mins > 0) {
+    return `${mins}m ${secs}s`;
+  }
+
+  return `${secs}s`;
+};
+export const formatDateTime = (dateString) => {
+  if (!dateString) return { date: "", time: "" };
+
+  const safeDate = dateString.replace(" ", "T");
+  const dateObj = new Date(safeDate);
+
+  if (isNaN(dateObj)) return { date: "", time: "" };
+
+  return {
+    date: dateObj.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "2-digit",
+    }),
+    time: dateObj.toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    }),
+  };
+};
+export function formatLabel(value = "") {
+  if(!value) return "..."
+
+  return value
+    .replace(/_/g, " ")
+    .toLowerCase()
+    .replace(/\b\w/g, char => char.toUpperCase());
+}

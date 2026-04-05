@@ -1,17 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button, Flex, Box, Span, Text } from '@chakra-ui/react';
+import { Button, Flex, Text } from '@chakra-ui/react';
 import { __ } from '@wordpress/i18n';
 // import { isPlainPermalink } from '@Utils/helper';
 import './styles.scss';
 import ZAPLabel from '@ZAPComponents/Labels/ZAPLabel';
 
-const propTypes = {
-	title: PropTypes.string,
-	render: PropTypes.func,
-	rightContent: PropTypes.func,
-	leftContent: PropTypes.func,
-};
 
 const TopBar = ({
 	title = '',
@@ -25,6 +19,7 @@ const TopBar = ({
 	return (
 		<React.Fragment>
 			<Flex
+			   className='zaplane-topbar'
 				style={topBarStyles}
 				direction={{ base: 'column', md: 'row' }}
 				justifyContent="space-between"
@@ -32,8 +27,8 @@ const TopBar = ({
 				height='80px'
 				px={6}
 				py={4}
-				mb={6}
 				top="32px"
+				mb="32px"
 				borderBottomWidth="1px"
 				borderColor="var(--zaplane-border-color)"
 				boxShadowColor={'var(--zaplane-shadow)'}
@@ -80,5 +75,5 @@ const TopBar = ({
 	);
 };
 
-TopBar.propTypes = propTypes;
+
 export default TopBar;

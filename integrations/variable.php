@@ -1,49 +1,62 @@
 <?php
 namespace Zaplane\Integrations;
 
-use Zaplane\Classes\IntegrationBase;
-use Zaplane\Classes\Expression;
+use Zaplane\Framework\Classes\IntegrationBase;
+use Zaplane\Framework\Classes\Expression;
 
 class Variable extends IntegrationBase {
 
-    public static function get_slug(): string {
-        return 'variable';
-    }
 
-    public static function get_name(): string {
-        return 'Set Variable';
-    }
+	public static function get_slug(): string {
+		return 'variable';
+	}
 
-    public static function get_category(): string {
-        return 'tool';
-    }
+	public static function get_name(): string {
+		return 'Set Variable';
+	}
 
-    public static function get_actions(): array {
-        return [
-            'set' => ['label'=>'Set Variable'],
-        ];
-    }
+	public static function get_category(): string {
+		return 'tool';
+	}
 
-    public static function get_action_config_schema(string $action): array {
-        return [
-            ['key'=>'name','label'=>'Variable Name','type'=>'text','required'=>true],
-            ['key'=>'value','label'=>'Value','type'=>'expression'],
-        ];
-    }
+	public static function get_icon(): string {
+		return 'variable';
+	}
 
-    public static function execute_node(array $node, array $input): array {
+	public static function get_actions(): array {
+		return [
+			'set' => [ 'label' => 'Set Variable' ],
+		];
+	}
 
-        $name = $node['data']['config']['name'];
-        $value = Expression::evaluate(
-            $node['data']['config']['value'], 
-            $input
-        );
+	public static function get_action_config_schema( string $action ): array {
+		return [
+			[
+				'key' => 'name',
+				'label' => 'Variable Name (e.g. my_custom_var)',
+				'type' => 'text',
+				'required' => true
+			],
+			[
+				'key' => 'value',
+				'label' => 'Value',
+				'type' => 'expression'
+			],
+		];
+	}
 
-        $input[$name] = $value;
+	public static function execute_node( array $node, array $input ): array {
 
-        return [
-            'port'=>'main',
-            'data'=>$input
-        ];
-    }
+		$name = $node['data']['config']['name'] ?? '';
+		$value = $node['data']['config']['value'] ?? null;
+
+		if ( ! empty( $name ) ) {
+			$input[ $name ] = $value;
+		}
+
+		return [
+			'port' => 'main',
+			'data' => $input
+		];
+	}
 }

@@ -1,0 +1,44 @@
+.zaplane-popover {
+  max-width: 500px;
+  width: 500px;
+  background: var(--zaplane-background);
+  border: 1px solid var(--zaplane-border-color);
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 9999;
+  right: 720px !important;
+  left: unset !important;
+  position: fixed !important;
+  top: 110px !important;
+  transform: unset !important;
+  z-index: 9999;
+
+  .components-popover__content {
+    padding: 24px;
+    width: 100%;
+    max-height: fit-content !important;
+  }
+
+  .zaplane-popover-inner {
+    width: 100%;
+  }
+
+
+  .zaplane-popover-title {
+    font-size: 20px;
+    padding-bottom: 24px;
+    font-weight: 500;
+    color: var(--zaplane-font-color);
+  }
+
+  .zaplane-popover-content {
+    font-size: 14px;
+    color: var(--zaplane-font-color);
+    max-height: 400px;
+    overflow-y: auto;
+
+    // p {
+    //   margin: 0;
+    // }
+  }
+}

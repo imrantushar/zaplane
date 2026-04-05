@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<phpunit
+    bootstrap="tests/bootstrap.php"
+    backupGlobals="false"
+    colors="true"
+    convertErrorsToExceptions="true"
+    convertNoticesToExceptions="true"
+    convertWarningsToExceptions="true"
+>
+    <testsuites>
+        <testsuite name="Integrations">
+            <directory suffix="Test.php">./tests/Integrations</directory>
+        </testsuite>
+        <testsuite name="Utils">
+            <directory suffix="Test.php">./tests/Utils</directory>
+        </testsuite>
+    </testsuites>
+    <filter>
+        <whitelist processUncoveredFilesFromWhitelist="true">
+            <directory suffix=".php">./includes</directory>
+            <directory suffix=".php">./integrations</directory>
+            <exclude>
+                <directory suffix=".php">./vendor</directory>
+                <directory suffix=".php">./tests</directory>
+            </exclude>
+        </whitelist>
+    </filter>
+    <php>
+        <const name="ZAPLANE_TESTING" value="true"/>
+    </php>
+</phpunit>

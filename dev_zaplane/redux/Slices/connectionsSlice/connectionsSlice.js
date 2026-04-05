@@ -6,10 +6,21 @@ import { showNotification } from '../notificationSlice/notificationSlice';
 
 export const fetchConnections = createAsyncThunk(
   'connections/fetchConnections',
-  async (_, thunkAPI) => {
+  async ({ app, page = 1, per_page = 20 } = {}, thunkAPI) => {
     try {
-      const res = await API.get(namespace + 'connections');
-      return res.data.connections || [];
+      const res = await API.get(namespace + 'connections', {
+        params: { app, page, per_page },
+      });
+
+      const { data, pagination } = res.data;
+
+      return {
+        data: data || [],
+        currentPage: pagination.page ,
+        itemPerPage: pagination.per_page ,
+        totalItems: pagination.total ,
+        totalPages: pagination.total_pages ,
+      };
     } catch (e) {
       return handleSliceError(thunkAPI, e);
     }
@@ -149,12 +160,16 @@ export const updateConnection = createAsyncThunk(
 const connectionsSlice = createSlice({
   name: 'connections',
   initialState: {
-    list: [],
+    allConnection: [],
     authFields: {},
     oauthData: null,
     loading: false,
     error: null,
-    singleData:[],
+    connection: {},
+    itemPerPage: 10,
+    currentPage: 1,
+    totalItems: 0,
+    totalPages: 0,
   },
   reducers: {
     resetAuthFields: (state) => {
@@ -167,8 +182,13 @@ const connectionsSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(fetchConnections.fulfilled, (state, action) => {
+       const { data, currentPage, itemPerPage, totalItems, totalPages } = action.payload;
+        state.allConnection = data;
+        state.currentPage = currentPage;
+        state.itemPerPage = itemPerPage;
+        state.totalItems = totalItems;
+        state.totalPages = totalPages;
         state.loading = false;
-        state.list = action.payload;
       })
       .addCase(fetchAuthFields.fulfilled, (state, action) => {
         state.authFields = action.payload || {};
@@ -179,33 +199,33 @@ const connectionsSlice = createSlice({
       })
 
       .addCase(createTokenConnection.fulfilled, (state, action) => {
-        state.list.push(action.payload);
+        state.allConnection.push(action.payload);
       })
       .addCase(testConnection.fulfilled, (state, action) => {
-        const index = state.list.findIndex(c => c.id === action.payload.id);
+        const index = state.allConnection.findIndex(c => c.id === action.payload.id);
         if (index !== -1) {
-          state.list[index].last_tested_at = new Date().toISOString();
-          state.list[index].last_test_status = action.payload.result.success ? 'success' : 'failed';
+          state.allConnection[index].last_tested_at = new Date().toISOString();
+          state.allConnection[index].last_test_status = action.payload.result.success ? 'success' : 'failed';
         }
       })
       .addCase(deleteConnection.fulfilled, (state, action) => {
-        state.list = state.list.filter(c => c.id !== action.payload);
+        state.allConnection = state.allConnection.filter(c => c.id !== action.payload);
       })
       .addCase(fetchSingleConnection.fulfilled, (state, action) => {
-      state.loading = false;
-      state.singleData = action.payload;
-    })
-    .addCase(updateConnection.fulfilled, (state, action) => {
-      const index = state.list.findIndex(
-        (c) => c.id === action.payload.id
-      );
-      if (index !== -1) {
-        state.list[index] = action.payload;
-      }
-      if (state.singleData?.id === action.payload.id) {
-        state.singleData = action.payload;
-      }
-    })
+        state.loading = false;
+        state.connection = action.payload;
+      })
+      .addCase(updateConnection.fulfilled, (state, action) => {
+        const index = state.allConnection.findIndex(
+          (c) => c.id === action.payload.id
+        );
+        if (index !== -1) {
+          state.allConnection[index] = action.payload;
+        }
+        if (state.connection?.id === action.payload.id) {
+          state.connection = action.payload;
+        }
+      })
   },
 });
 
