@@ -1,17 +1,17 @@
 import { Image, Text, Flex } from "@chakra-ui/react";
 import { plugin_root_url } from "@ZAPUtils/helper";
 
-const ZAPIcon = ({ icon, name }) => {
+const ZAPIcon = ({ icon, name,isAction=false }) => {
   const isSvg = icon?.endsWith(".svg");
 
   return (
     <Flex
-      w="32px"
-      h="32px"
+      w={isAction ? '40px': "32px"}
+      h={isAction ? '40px': "32px"}
       justifyContent="center"
       alignItems="center"
-      bg="#F6F7F8"
-      p="8px"
+      bg={!isAction && "#F6F7F8"}
+      p='8px'
       borderRadius="4px"
       border="1px solid var(--zaplane-border-color)"
     >
@@ -19,7 +19,7 @@ const ZAPIcon = ({ icon, name }) => {
         <Image
           src={`${plugin_root_url}assets/images/icons/${icon}`}
           alt={name}
-          boxSize="20px"
+          boxSize={isAction ? '20px': "16px"}
         />
       ) : (
         <Text

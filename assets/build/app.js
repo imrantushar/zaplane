@@ -10872,22 +10872,23 @@ __webpack_require__.r(__webpack_exports__);
 
 const ZAPIcon = ({
   icon,
-  name
+  name,
+  isAction = false
 }) => {
   const isSvg = icon?.endsWith(".svg");
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Flex, {
-    w: "32px",
-    h: "32px",
+    w: isAction ? '40px' : "32px",
+    h: isAction ? '40px' : "32px",
     justifyContent: "center",
     alignItems: "center",
-    bg: "#F6F7F8",
+    bg: !isAction && "#F6F7F8",
     p: "8px",
     borderRadius: "4px",
     border: "1px solid var(--zaplane-border-color)",
     children: isSvg ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Image, {
       src: `${_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_3__.plugin_root_url}assets/images/icons/${icon}`,
       alt: name,
-      boxSize: "20px"
+      boxSize: isAction ? '20px' : "16px"
     }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Text, {
       as: "span",
       m: "0",
@@ -14101,7 +14102,8 @@ const DrawerItemButton = ({
       gap: "8px",
       children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(_ZAPComponents_ZAPIcon__WEBPACK_IMPORTED_MODULE_4__["default"], {
         icon: icon,
-        name: item.name
+        name: item.name,
+        isAction: true
       }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Text, {
         className: "zaplane-label",
         fontWeight: "400",
@@ -14276,7 +14278,8 @@ const DrawerSearchList = ({
         alignItems: "center",
         children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_ZAPComponents_ZAPIcon__WEBPACK_IMPORTED_MODULE_5__["default"], {
           icon: item.icon,
-          name: item.name
+          name: item.name,
+          isAction: true
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_0__.Text, {
           className: "zaplane-label",
           fontWeight: "400",
