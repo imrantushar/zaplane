@@ -10883,6 +10883,8 @@ const ZAPSelect = ({
       value: options.find(o => o.value === value) || null,
       onMenuOpen: onMenuOpen,
       onChange: opt => onChange?.(opt),
+      menuPortalTarget: document.body,
+      menuPosition: "fixed",
       styles: {
         menuPortal: base => ({
           ...base,
@@ -10890,7 +10892,7 @@ const ZAPSelect = ({
         }),
         menuList: base => ({
           ...base,
-          maxHeight: 500,
+          maxHeight: 250,
           overflowY: "auto"
         })
       }
