@@ -187,6 +187,10 @@ return [
 		'kadenceblocks'      => [
 			'file' => 'kadenceblocks.php', 
 			'class' => \Zaplane\Integrations\Kadenceblocks::class
-			],
+		],
+		'ultimatemember'      => [
+			'file' => 'ultimatemember.php', 
+			'class' => \Zaplane\Integrations\Ultimatemember::class
+		],
 	],
 ];
