@@ -36,6 +36,10 @@ return [
 			'file' => 'woocommerce.php',
 			'class' => \Zaplane\Integrations\Woocommerce::class
 		],
+		'woosubscriptions'     => [
+			'file' => 'woo-subscriptions.php',
+			'class' => \Zaplane\Integrations\WooSubscriptions::class
+		],
 		'slack'                => [
 			'file' => 'Slack.php',
 			'class' => \Zaplane\Integrations\Slack::class

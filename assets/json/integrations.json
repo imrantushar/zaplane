@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-04-02 10:38:05",
+    "generated_at": "2026-04-05 08:45:48",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -7049,6 +7049,386 @@
                 }
             }
         },
+        "woosubscriptions": {
+            "slug": "woosubscriptions",
+            "name": "WooCommerce Subscriptions",
+            "icon": "woo.svg",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": {
+                "subscription_created": {
+                    "key": "subscription_created",
+                    "label": "Subscription Created",
+                    "hook": "woocommerce_new_subscription",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "subscription_status_updated": {
+                    "key": "subscription_status_updated",
+                    "label": "Subscription Status Updated",
+                    "hook": "woocommerce_subscription_status_updated",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "subscription_payment_complete": {
+                    "key": "subscription_payment_complete",
+                    "label": "Subscription Payment Complete",
+                    "hook": "woocommerce_subscription_payment_complete",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "subscription_payment_failed": {
+                    "key": "subscription_payment_failed",
+                    "label": "Subscription Payment Failed",
+                    "hook": "woocommerce_subscription_payment_failed",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "renewal_payment_complete": {
+                    "key": "renewal_payment_complete",
+                    "label": "Renewal Payment Complete",
+                    "hook": "woocommerce_subscription_renewal_payment_complete",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "renewal_payment_failed": {
+                    "key": "renewal_payment_failed",
+                    "label": "Renewal Payment Failed",
+                    "hook": "woocommerce_subscription_renewal_payment_failed",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": {
+                "create_subscription": {
+                    "key": "create_subscription",
+                    "label": "Create Subscription",
+                    "schema": [
+                        {
+                            "key": "customer_id",
+                            "label": "Customer ID",
+                            "type": "number"
+                        },
+                        {
+                            "key": "parent_order_id",
+                            "label": "Parent Order ID",
+                            "type": "number"
+                        },
+                        {
+                            "key": "subscription_status",
+                            "label": "Subscription Status",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Active",
+                                    "value": "wc_subscription_active"
+                                },
+                                {
+                                    "label": "Pending",
+                                    "value": "wc_subscription_pending"
+                                },
+                                {
+                                    "label": "On Hold",
+                                    "value": "wc_subscription_on-hold"
+                                },
+                                {
+                                    "label": "Cancelled",
+                                    "value": "wc_subscription_cancelled"
+                                },
+                                {
+                                    "label": "Pending Cancel",
+                                    "value": "wc_subscription_pending-cancel"
+                                },
+                                {
+                                    "label": "Expired",
+                                    "value": "wc_subscription_expired"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "billing_period",
+                            "label": "Billing Period",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Day",
+                                    "value": "day"
+                                },
+                                {
+                                    "label": "Week",
+                                    "value": "week"
+                                },
+                                {
+                                    "label": "Month",
+                                    "value": "month"
+                                },
+                                {
+                                    "label": "Year",
+                                    "value": "year"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "billing_interval",
+                            "label": "Billing Interval",
+                            "type": "number"
+                        },
+                        {
+                            "key": "total",
+                            "label": "Total",
+                            "type": "expression"
+                        },
+                        {
+                            "key": "currency",
+                            "label": "Currency",
+                            "type": "text"
+                        },
+                        {
+                            "key": "start_date",
+                            "label": "Start Date (Y-m-d H:i:s)",
+                            "type": "expression"
+                        },
+                        {
+                            "key": "trial_end_date",
+                            "label": "Trial End Date (Y-m-d H:i:s)",
+                            "type": "expression"
+                        },
+                        {
+                            "key": "next_payment_date",
+                            "label": "Next Payment Date (Y-m-d H:i:s)",
+                            "type": "expression"
+                        },
+                        {
+                            "key": "end_date",
+                            "label": "End Date (Y-m-d H:i:s)",
+                            "type": "expression"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_subscriptions_all": {
+                    "key": "get_subscriptions_all",
+                    "label": "Get Subscriptions (All)",
+                    "schema": [
+                        {
+                            "key": "limit",
+                            "label": "Limit",
+                            "type": "number",
+                            "default": 20
+                        },
+                        {
+                            "key": "page",
+                            "label": "Page",
+                            "type": "number",
+                            "default": 1
+                        },
+                        {
+                            "key": "subscription_status",
+                            "label": "Subscription Status",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Active",
+                                    "value": "wc_subscription_active"
+                                },
+                                {
+                                    "label": "Pending",
+                                    "value": "wc_subscription_pending"
+                                },
+                                {
+                                    "label": "On Hold",
+                                    "value": "wc_subscription_on-hold"
+                                },
+                                {
+                                    "label": "Cancelled",
+                                    "value": "wc_subscription_cancelled"
+                                },
+                                {
+                                    "label": "Pending Cancel",
+                                    "value": "wc_subscription_pending-cancel"
+                                },
+                                {
+                                    "label": "Expired",
+                                    "value": "wc_subscription_expired"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_subscription_single": {
+                    "key": "get_subscription_single",
+                    "label": "Get Subscription (Single)",
+                    "schema": [
+                        {
+                            "key": "subscription_id",
+                            "label": "Subscription ID",
+                            "type": "number",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_subscription_status": {
+                    "key": "update_subscription_status",
+                    "label": "Update Subscription Status",
+                    "schema": [
+                        {
+                            "key": "subscription_id",
+                            "label": "Subscription ID",
+                            "type": "number",
+                            "required": true
+                        },
+                        {
+                            "key": "subscription_status",
+                            "label": "Subscription Status",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Active",
+                                    "value": "wc_subscription_active"
+                                },
+                                {
+                                    "label": "Pending",
+                                    "value": "wc_subscription_pending"
+                                },
+                                {
+                                    "label": "On Hold",
+                                    "value": "wc_subscription_on-hold"
+                                },
+                                {
+                                    "label": "Cancelled",
+                                    "value": "wc_subscription_cancelled"
+                                },
+                                {
+                                    "label": "Pending Cancel",
+                                    "value": "wc_subscription_pending-cancel"
+                                },
+                                {
+                                    "label": "Expired",
+                                    "value": "wc_subscription_expired"
+                                }
+                            ],
+                            "required": true
+                        },
+                        {
+                            "key": "note",
+                            "label": "Note",
+                            "type": "text"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "cancel_subscription": {
+                    "key": "cancel_subscription",
+                    "label": "Cancel Subscription",
+                    "schema": [
+                        {
+                            "key": "subscription_id",
+                            "label": "Subscription ID",
+                            "type": "number",
+                            "required": true
+                        },
+                        {
+                            "key": "note",
+                            "label": "Note",
+                            "type": "text"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "suspend_subscription": {
+                    "key": "suspend_subscription",
+                    "label": "Suspend Subscription",
+                    "schema": [
+                        {
+                            "key": "subscription_id",
+                            "label": "Subscription ID",
+                            "type": "number",
+                            "required": true
+                        },
+                        {
+                            "key": "note",
+                            "label": "Note",
+                            "type": "text"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "reactivate_subscription": {
+                    "key": "reactivate_subscription",
+                    "label": "Reactivate Subscription",
+                    "schema": [
+                        {
+                            "key": "subscription_id",
+                            "label": "Subscription ID",
+                            "type": "number",
+                            "required": true
+                        },
+                        {
+                            "key": "note",
+                            "label": "Note",
+                            "type": "text"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add_subscription_note": {
+                    "key": "add_subscription_note",
+                    "label": "Add Subscription Note",
+                    "schema": [
+                        {
+                            "key": "subscription_id",
+                            "label": "Subscription ID",
+                            "type": "number",
+                            "required": true
+                        },
+                        {
+                            "key": "note",
+                            "label": "Note",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "is_customer_note",
+                            "label": "Customer Note",
+                            "type": "boolean"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
+        },
         "slack": {
             "slug": "slack",
             "name": "Slack",
@@ -13009,7 +13389,7 @@
         "jetengine": {
             "slug": "jetengine",
             "name": "JetEngine",
-            "icon": "Jetengine.svg",
+            "icon": "jetengine.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
