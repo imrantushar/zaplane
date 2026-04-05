@@ -9,6 +9,7 @@ import ZAPInput from "@ZAPComponents/ZAPInput";
 import { createWorkflows } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow";
 import { route_path } from "@ZAPUtils/helper";
 import { primaryBtn } from "../../../assets/scss/chakra/recipe";
+import ZAPDivider from "@ZAPComponents/ZAPDivider";
 
 const CreateWorkflowModal = ({ isOpen, onClose }) => {
   const dispatch = useDispatch();
@@ -39,6 +40,7 @@ const CreateWorkflowModal = ({ isOpen, onClose }) => {
       onRequestClose={onClose}
       size="medium"
     >
+      <ZAPDivider mb='24px'/>
       <Box>
         <ZAPInput
           label={__("Workflow Name", "zaplane")}
@@ -46,8 +48,8 @@ const CreateWorkflowModal = ({ isOpen, onClose }) => {
           value={workflowName}
           onChange={(e) => setWorkflowName(e.target.value)}
         />
-
-        <Flex justify="flex-end" mt={5}>
+        <ZAPDivider mt='24px'/>
+        <Flex justify="flex-start" mt={5}>
           <Button variant="outline" mr={3} onClick={onClose}>
             {__("Cancel", "zaplane")}
           </Button>

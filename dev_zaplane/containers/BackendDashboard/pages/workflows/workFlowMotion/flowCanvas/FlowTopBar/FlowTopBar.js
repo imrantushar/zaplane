@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from "react";
-import { Button, Text, Flex, Input, Box } from "@chakra-ui/react";
+import React, { useEffect, useState, useRef } from "react";
+import { Button, Text, Flex, Input, Box, Image } from "@chakra-ui/react";
 import TopBar from "@ZAPComponents/TopBar";
-import { FiArrowLeft } from "react-icons/fi";
 import { TfiReload } from "react-icons/tfi";
 import { LuFullscreen, LuMinimize, LuSquarePlay } from "react-icons/lu";
 import { LucideHistory } from "lucide-react";
@@ -23,9 +22,9 @@ import '../styles.scss'
 import { LiaStopCircleSolid } from "react-icons/lia";
 import { CiPlay1 } from "react-icons/ci";
 import { updateWorkFlowStatus, updateWorkFlowTitle } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow";
-import { useNavigate } from "react-router-dom";
-import { route_path } from "@ZAPUtils/helper";
-import ZAPTooltip from "@ZAPComponents/ZAPTooltip";
+import { plugin_root_url, route_path } from "@ZAPUtils/helper";
+import { IoIosArrowForward } from "react-icons/io";
+import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
 
 export default function FlowTopBar({
   workFlow,
@@ -41,9 +40,17 @@ export default function FlowTopBar({
 }) {
   const { apiCountdown, apiRequestRunning } = useSelector((state) => state.workflows);
   const [refreshing, setRefreshing] = useState(false);
-  const dispatch = useDispatch()
-  const navigate = useNavigate()
-  useApiCountdown()
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const titleInputRef = useRef(null);
+  const dispatch = useDispatch();
+  useApiCountdown();
+  useEffect(() => {
+    if (isEditingTitle && titleInputRef.current) {
+      titleInputRef.current.focus();
+      titleInputRef.current.select();
+    }
+  }, [isEditingTitle]);
+
   useEffect(() => {
     if (!workFlow?.workflow) return;
     const updateStatusAndTitle = async () => {
@@ -62,61 +69,63 @@ export default function FlowTopBar({
     updateStatusAndTitle();
   }, [values?.status, values?.title, workFlow, dispatch, id]);
 
+  const currentTitle = values?.title ?? workFlow?.workflow?.title ?? "Untitled Flow";
 
   return (
     <TopBar
       leftContent={() => (
         <>
-
-          <Button variant="outline" height="36px" width="36px"
-            onClick={() => {
-              if (isFullscreen) {
-                toggleFullscreen();
-                return;
-              }
-
-              if (isFlowDirty) {
-                const confirmLeave = window.confirm(
-                  "You have unsaved changes. Are you sure you want to leave?"
-                );
-                if (!confirmLeave) return;
-              }
-
-              navigate(`${route_path}admin.php?page=zaplane-workflows`);
-            }}>
-            <FiArrowLeft />
-          </Button>
-          <ZAPTooltip content={__("Rename", "zaplane")}
-            positioning={{
-              placement: "bottom",
-              // offset: {
-              //   mainAxis: 10,
-              //   crossAxis: 25,
-              // }
-            }}>
-            <Box w="120px">
-              <Input
-                height='36px'
-                fontSize='14px'
-                fontWeight='500'
-                value={
-                  values?.title ?? workFlow?.workflow?.title ?? "Untitled Flow"
+          <Image
+            src={`${plugin_root_url}assets/images/zaplane.svg`}
+            boxSize="20px"
+          />
+          <IoIosArrowForward />
+          <ZAPLabel
+            as="h2"
+            color="var(--zapplane-font-color)"
+            type="subtitle"
+            fontWeight="medium"
+            href={`${route_path}admin.php?page=zaplane-workflows`}
+            label={__('Flows', 'zaplane')}
+          />
+          <IoIosArrowForward />
+          {isEditingTitle ? (
+            <Input
+              ref={titleInputRef}
+              height="28px"
+              fontSize="14px"
+              fontWeight="500"
+              value={currentTitle}
+              onChange={(e) => setFieldValue("title", e.target.value)}
+              onBlur={() => setIsEditingTitle(false)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === "Escape") {
+                  setIsEditingTitle(false);
                 }
-                onChange={(e) => setFieldValue("title", e.target.value)}
-                variant="outline"
-                border="1px solid transparent"
-                _hover={{
-                  borderColor: "var(--zaplane-border-color)",
-                }}
-              // maxW="250px"
-
-              />
-            </Box>
-          </ZAPTooltip>
-
-
-
-
+              }}
+              variant="outline"
+              border="1px solid var(--zaplane-border-color)"
+              borderRadius="4px"
+              px="6px"
+              w="auto"
+              minW="80px"
+              maxW="200px"
+            />
+          ) : (
+            <Text
+              as="h2"
+              m='0'
+              fontSize="14px"
+              fontWeight="500"
+              color="var(--zapplane-font-color)"
+              cursor="pointer"
+              onClick={() => setIsEditingTitle(true)}
+              noOfLines={1}
+              maxW="200px"
+            >
+              {currentTitle}
+            </Text>
+          )}
         </>
       )}
       rightContent={() => (
@@ -144,6 +153,7 @@ export default function FlowTopBar({
               </Text>
             </Flex>
           )}
+
           <Button size="sm" variant="outline"
             className={`${isFullscreen && "zaplane-button-actve"}`} onClick={toggleFullscreen}>
             {isFullscreen ? <LuMinimize /> : <LuFullscreen />}
@@ -162,41 +172,22 @@ export default function FlowTopBar({
                 color='#454F59'
                 size="sm"
                 variant="outline"
-                onClick={() => {
-                  setActiveDrawer("logs");
-                }}
+                onClick={() => setActiveDrawer("logs")}
               >
                 {__("Logs", "zaplane")}
               </Button>
             }
           >
             <Flex gap="5px">
-              <Button
-                size="sm"
-                variant="outline"
-                color='#454F59'
-                fontWeight="500"
-                border={"none"}
-                onClick={() => dispatch(getRunWorkFlow({ id }))}
-              >
+              <Button size="sm" variant="outline" color='#454F59' fontWeight="500" border={"none"}
+                onClick={() => dispatch(getRunWorkFlow({ id }))}>
                 <TfiReload className={refreshing ? "zaplane-refresh-spin" : ""} />{__("Refresh", "zaplane")}
               </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                color='#454F59'
-                fontWeight="500"
-                border={"none"}
-                onClick={() =>
-                  dispatch(workFLowExction({
-                    workflow_hash: workFlow?.version?.hash,
-                  }))
-                }
-              >
+              <Button size="sm" variant="outline" color='#454F59' fontWeight="500" border={"none"}
+                onClick={() => dispatch(workFLowExction({ workflow_hash: workFlow?.version?.hash }))}>
                 <LuSquarePlay /> {__("Replay", "zaplane")}
               </Button>
             </Flex>
-
             <RunsTable id={id} activeDrawer={activeDrawer} setRefreshing={setRefreshing} />
           </ZAPDrawer>
 
@@ -208,22 +199,11 @@ export default function FlowTopBar({
             isFullscreen={isFullscreen}
             onClose={() => setActiveDrawer(null)}
             trigger={
-              // <Text
-              //   m="0"
-              //   cursor="pointer"
-              //   onClick={() => {
-              //     setActiveDrawer("history");
-              //   }}
-              // >
-              //   <LucideHistory />
-              // </Text>
               <Button
                 className={`${activeDrawer === 'history' && 'zaplane-button-actve'}`}
                 size="sm"
                 variant="outline"
-                onClick={() => {
-                  setActiveDrawer("history");
-                }}
+                onClick={() => setActiveDrawer("history")}
               >
                 <LucideHistory />
               </Button>
@@ -238,13 +218,9 @@ export default function FlowTopBar({
             value={
               values?.status
                 ? statusOptions.find((opt) => opt.value === values.status)
-                : statusOptions.find(
-                  (opt) => opt.value === workFlow?.workflow?.status
-                )
+                : statusOptions.find((opt) => opt.value === workFlow?.workflow?.status)
             }
-            onChange={(selected) =>
-              setFieldValue("status", selected.value)
-            }
+            onChange={(selected) => setFieldValue("status", selected.value)}
             isClearable={false}
             isSearchable={false}
             placeholder="Select status"

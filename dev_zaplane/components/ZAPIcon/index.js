@@ -6,11 +6,11 @@ const ZAPIcon = ({ icon, name }) => {
 
   return (
     <Flex
-      w="40px"
-      h="40px"
+      w="32px"
+      h="32px"
       justifyContent="center"
       alignItems="center"
-      bg="var(--zaplane-background)"
+      bg="#F6F7F8"
       p="8px"
       borderRadius="4px"
       border="1px solid var(--zaplane-border-color)"

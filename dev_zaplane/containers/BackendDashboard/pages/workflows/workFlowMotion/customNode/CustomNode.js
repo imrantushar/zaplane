@@ -87,9 +87,10 @@ export default function CustomNode({ id, data, canvasLayout, nodes }) {
       <Box
         bg="var(--zaplane-body-background)"
         borderRadius="md"
-        px={4}
-        py={2}
+        padding="16px 28px 16px 14px"
         width="180px"
+        display="flex"
+        height="60px"
         textAlign="center"
         boxShadow="sm"
         onClick={data.onOpenDrawer}

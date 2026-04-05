@@ -159,7 +159,7 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
                     fitView
                     fitViewOnInit
                     //  defaultViewport={{ x: 0, y: 0, zoom: 1 }}
-                    fitViewOptions={{ minZoom: 0.5, maxZoom: 1.5 }}
+                    fitViewOptions={{ minZoom: 0.5, maxZoom: 1 }}
                     panOnDrag
                     zoomOnScroll
                     zoomOnDoubleClick
