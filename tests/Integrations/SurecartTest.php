@@ -1,7 +1,7 @@
 <?php
 
 namespace {
-	require_once __DIR__ . '/Support/SurecartTestStubs.php';
+	require_once dirname( __DIR__ ) . '/mocks/SurecartTestStubs.php';
 }
 
 namespace Zaplane\Tests\Integrations {
