@@ -142,7 +142,7 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, handleAddAction,
 
     dispatch(conditionVariables(payload));
   }, [node?.id]);
-  console.log(values.actionType,'action type');
+  
   return (
     <ZAPDrawer
       open={open}

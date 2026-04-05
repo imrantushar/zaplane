@@ -13516,7 +13516,6 @@ const ActionDrawer = ({
     };
     dispatch((0,_ZAPRedux_Slices_workFlowSlice_actions_conditonVariales__WEBPACK_IMPORTED_MODULE_23__.conditionVariables)(payload));
   }, [node?.id]);
-  console.log(values.actionType, 'action type');
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_26__.jsxs)(_ZAPComponents_Drawer__WEBPACK_IMPORTED_MODULE_3__["default"], {
     open: open,
     isFullscreen: isFullscreen,
@@ -15337,14 +15336,19 @@ function FlowCanvas({
       onEdgesChange: onEdgesChange,
       onConnect: onConnect,
       fitView: true,
-      fitViewOnInit: true,
+      fitViewOnInit: true
+      //  defaultViewport={{ x: 0, y: 0, zoom: 1 }}
+      ,
+      fitViewOptions: {
+        minZoom: 0.5,
+        maxZoom: 1.5
+      },
       panOnDrag: true,
       zoomOnScroll: true,
       zoomOnDoubleClick: true,
       nodesDraggable: true,
       nodesConnectable: true,
       elementsSelectable: true,
-      minZoom: 0.5,
       children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.Background, {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_9__.Flex, {
         className: "zaplane-canvas-layout-icon",
         children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)(_ZAPComponents_ZAPTooltip__WEBPACK_IMPORTED_MODULE_18__["default"], {
