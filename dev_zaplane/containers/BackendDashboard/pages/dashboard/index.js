@@ -49,20 +49,6 @@ export default function Dashboard() {
                         />
                     </>
                 )}
-                rightContent={() => (
-                    <Flex gap={3} alignItems="center">
-                       <WhatsNew />
-                        <Button
-                            {...outlineBtn}
-                            onClick={() => {
-                                window.open('https://zaplane.com/', '_blank');
-                            }}
-                        >
-                            <FiHelpCircle color='var(--zaplane-font-color)' />
-                            {__("Help")}
-                        </Button>
-                    </Flex>
-                )}
             />
             <SubTopBar heading={__("Dashboard", "zaplane")}>
                 <Button onClick={() => setIsModalOpen(true)} {...primaryBtn}>
