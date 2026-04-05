@@ -25,6 +25,7 @@ import { CiPlay1 } from "react-icons/ci";
 import { updateWorkFlowStatus, updateWorkFlowTitle } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow";
 import { useNavigate } from "react-router-dom";
 import { route_path } from "@ZAPUtils/helper";
+import ZAPTooltip from "@ZAPComponents/ZAPTooltip";
 
 export default function FlowTopBar({
   workFlow,
@@ -60,7 +61,7 @@ export default function FlowTopBar({
 
     updateStatusAndTitle();
   }, [values?.status, values?.title, workFlow, dispatch, id]);
-  
+
 
   return (
     <TopBar
@@ -85,25 +86,35 @@ export default function FlowTopBar({
             }}>
             <FiArrowLeft />
           </Button>
+          <ZAPTooltip content={__("Rename", "zaplane")}
+            positioning={{
+              placement: "bottom",
+              // offset: {
+              //   mainAxis: 10,
+              //   crossAxis: 25,
+              // }
+            }}>
+            <Box w="120px">
+              <Input
+                height='36px'
+                fontSize='14px'
+                fontWeight='500'
+                value={
+                  values?.title ?? workFlow?.workflow?.title ?? "Untitled Flow"
+                }
+                onChange={(e) => setFieldValue("title", e.target.value)}
+                variant="outline"
+                border="1px solid transparent"
+                _hover={{
+                  borderColor: "var(--zaplane-border-color)",
+                }}
+              // maxW="250px"
 
-          <Box w="120px">
-            <Input
-              height='36px'
-              fontSize='14px'
-              fontWeight='500'
-              value={
-                values?.title ?? workFlow?.workflow?.title ?? "Untitled Flow"
-              }
-              onChange={(e) => setFieldValue("title", e.target.value)}
-              variant="outline"
-              border="1px solid transparent"
-              _hover={{
-                borderColor: "var(--zaplane-border-color)",
-              }}
-            // maxW="250px"
+              />
+            </Box>
+          </ZAPTooltip>
 
-            />
-          </Box>
+
 
 
         </>
