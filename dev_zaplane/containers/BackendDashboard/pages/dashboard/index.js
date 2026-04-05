@@ -15,6 +15,7 @@ import OverviewSection from './OverviewSection/OverviewSection';
 import CreateWorkflowModal from '@ZAPComponents/CreateWorkflowModal';
 import { IoIosArrowForward } from 'react-icons/io';
 import { plugin_root_url } from '@ZAPUtils/helper';
+import SubTopBar from '@ZAPComponents/SubTopBar';
 
 export default function Dashboard() {
     const dispatch = useDispatch();
@@ -33,9 +34,9 @@ export default function Dashboard() {
                     <>
                         <Flex height='40px' width='40px' borderRadius='20px' gap='10px' background='var(--zaplane-second-primary)' alignItems='center' justifyContent='center'>
                             <Image
-                            src={`${plugin_root_url}assets/images/zaplane.svg`}
-                            boxSize="20px"
-                        />
+                                src={`${plugin_root_url}assets/images/zaplane.svg`}
+                                boxSize="20px"
+                            />
                         </Flex>
                         <IoIosArrowForward />
                         <ZAPLabel
@@ -67,17 +68,14 @@ export default function Dashboard() {
                     </Flex>
                 )}
             />
+            <SubTopBar heading={__("Dashboard", "zaplane")}>
+                <Button onClick={() => setIsModalOpen(true)} {...primaryBtn}>
+                    {__("Create Workflow", "zaplane")}
+                </Button>
+            </SubTopBar>
             <Flex flexDirection='column' gap="24px" className="zaplane-page-content">
-                <Flex justifyContent="space-between" alignItems="center">
-                    <Text fontSize='20px' className="zaplane-heading">
-                        {__("Dashboard", "zaplane")}
-                    </Text>
-                    <Button onClick={() => setIsModalOpen(true)} {...primaryBtn}>
-                        {__("Create Workflow", "zaplane")}
-                    </Button>
-                </Flex>
                 <OverviewSection />
-                <TotalExecutions  />
+                <TotalExecutions />
                 <Flex gap="24px">
                     <Box width='40%'>
                         <ExecutedFlows />

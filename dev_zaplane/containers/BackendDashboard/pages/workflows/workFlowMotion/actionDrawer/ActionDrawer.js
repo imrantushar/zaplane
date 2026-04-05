@@ -142,13 +142,14 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, handleAddAction,
 
     dispatch(conditionVariables(payload));
   }, [node?.id]);
+  console.log(values.actionType,'action type');
   return (
     <ZAPDrawer
       open={open}
       isFullscreen={isFullscreen}
       onClose={resetAll}
       arrowClose={['tools', 'app'].includes(mode)}
-      maxWidth='700px'
+      maxWidth='500px' {...(['filter', 'if'].includes(values?.actionType) && { maxWidth: '700px' })}
       arrowOnClick={() => {
         setSelectedItem(null);
         setMode(null);
