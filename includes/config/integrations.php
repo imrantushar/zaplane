@@ -188,5 +188,9 @@ return [
 			'file' => 'kadenceblocks.php', 
 			'class' => \Zaplane\Integrations\Kadenceblocks::class
 			],
+		'paidmembershippro'      => [
+			'file' => 'paidmembershippro.php', 
+			'class' => \Zaplane\Integrations\Paidmembershippro::class
+		],
 	],
 ];

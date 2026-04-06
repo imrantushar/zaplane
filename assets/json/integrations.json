@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-04-02 10:38:05",
+    "generated_at": "2026-04-06 06:36:37",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -13009,7 +13009,7 @@
         "jetengine": {
             "slug": "jetengine",
             "name": "JetEngine",
-            "icon": "Jetengine.svg",
+            "icon": "jetengine.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -13489,6 +13489,238 @@
                 }
             },
             "actions": []
+        },
+        "paidmembershippro": {
+            "slug": "paidmembershippro",
+            "name": "Paid Memberships Pro",
+            "icon": "paidmembershippro.svg",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": {
+                "admin_assigns_membership": {
+                    "key": "admin_assigns_membership",
+                    "label": "Admin Assigns a Membership Level to a User",
+                    "hook": "pmpro_after_change_membership_level",
+                    "schema": [
+                        {
+                            "key": "membership_id",
+                            "label": "Membership Level",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "paidmembershippro",
+                                "query": "membership_level_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "user_cancels_membership": {
+                    "key": "user_cancels_membership",
+                    "label": "User Cancels a Membership",
+                    "hook": "pmpro_after_change_membership_level",
+                    "schema": [
+                        {
+                            "key": "membership_id",
+                            "label": "Membership Level",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "paidmembershippro",
+                                "query": "membership_level_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "user_purchases_membership": {
+                    "key": "user_purchases_membership",
+                    "label": "User Purchases a Membership",
+                    "hook": "pmpro_after_checkout",
+                    "schema": [
+                        {
+                            "key": "membership_id",
+                            "label": "Membership Level",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "paidmembershippro",
+                                "query": "membership_level_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "user_membership_expires": {
+                    "key": "user_membership_expires",
+                    "label": "User Membership Expires",
+                    "hook": "pmpro_membership_post_membership_expiry",
+                    "schema": [
+                        {
+                            "key": "membership_id",
+                            "label": "Membership Level",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "paidmembershippro",
+                                "query": "membership_level_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "membership_level_changed": {
+                    "key": "membership_level_changed",
+                    "label": "Any Membership Level Changed",
+                    "hook": "pmpro_after_all_membership_level_changes",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "user_renews_expired_membership": {
+                    "key": "user_renews_expired_membership",
+                    "label": "User Renews an Expired Membership",
+                    "hook": "pmpro_before_change_membership_level",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": {
+                "get_all_membership_levels": {
+                    "key": "get_all_membership_levels",
+                    "label": "Get All Membership Levels",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_membership_level": {
+                    "key": "get_membership_level",
+                    "label": "Get a Membership Level by ID",
+                    "schema": [
+                        {
+                            "key": "level_id",
+                            "label": "Membership Level ID",
+                            "type": "number",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add_user_to_membership_level": {
+                    "key": "add_user_to_membership_level",
+                    "label": "Add User to a Membership Level",
+                    "schema": [
+                        {
+                            "key": "user_email",
+                            "label": "User Email",
+                            "type": "email",
+                            "required": true
+                        },
+                        {
+                            "key": "membership_id",
+                            "label": "Membership Level",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "paidmembershippro",
+                                "query": "membership_level_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "remove_user_from_membership_level": {
+                    "key": "remove_user_from_membership_level",
+                    "label": "Remove User from a Membership Level",
+                    "schema": [
+                        {
+                            "key": "user_email",
+                            "label": "User Email",
+                            "type": "email",
+                            "required": true
+                        },
+                        {
+                            "key": "membership_id",
+                            "label": "Membership Level",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "paidmembershippro",
+                                "query": "membership_level_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "list_members_by_membership_level": {
+                    "key": "list_members_by_membership_level",
+                    "label": "List Members by Membership Level",
+                    "schema": [
+                        {
+                            "key": "membership_id",
+                            "label": "Membership Level",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "paidmembershippro",
+                                "query": "membership_level_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": false,
+                            "placeholder": "Leave empty to list all active members"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
         }
     },
     "tools": {
