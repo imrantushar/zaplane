@@ -10882,7 +10882,7 @@ const ZAPIcon = ({
     justifyContent: "center",
     alignItems: "center",
     bg: !isAction && "#F6F7F8",
-    p: "8px",
+    p: "7px",
     borderRadius: "4px",
     border: "1px solid var(--zaplane-border-color)",
     children: isSvg ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Image, {

@@ -11,7 +11,7 @@ const ZAPIcon = ({ icon, name,isAction=false }) => {
       justifyContent="center"
       alignItems="center"
       bg={!isAction && "#F6F7F8"}
-      p='8px'
+      p='7px'
       borderRadius="4px"
       border="1px solid var(--zaplane-border-color)"
     >
