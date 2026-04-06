@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-04-05 09:02:07",
+    "generated_at": "2026-04-06 12:47:47",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -13502,7 +13502,7 @@
                 "user_login": {
                     "key": "user_login",
                     "label": "User Login",
-                    "hook": "um_user_login",
+                    "hook": "wp_login",
                     "schema": [],
                     "outputs": [
                         "main"
