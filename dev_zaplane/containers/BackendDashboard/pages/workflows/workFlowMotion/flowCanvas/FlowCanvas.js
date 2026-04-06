@@ -156,8 +156,8 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
                     onNodesChange={onNodesChange}
                     onEdgesChange={onEdgesChange}
                     onConnect={onConnect}
-                    fitView
-                    fitViewOnInit
+                    // fitView
+                    // fitViewOnInit
                     //  defaultViewport={{ x: 0, y: 0, zoom: 1 }}
                     fitViewOptions={{ minZoom: 0.5, maxZoom: 1 }}
                     panOnDrag

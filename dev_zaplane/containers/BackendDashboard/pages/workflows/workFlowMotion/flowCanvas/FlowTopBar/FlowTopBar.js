@@ -25,6 +25,7 @@ import { updateWorkFlowStatus, updateWorkFlowTitle } from "@ZAPRedux/Slices/work
 import { plugin_root_url, route_path } from "@ZAPUtils/helper";
 import { IoIosArrowForward } from "react-icons/io";
 import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
+import ZAPTooltip from "@ZAPComponents/ZAPTooltip";
 
 export default function FlowTopBar({
   workFlow,
@@ -199,14 +200,17 @@ export default function FlowTopBar({
             isFullscreen={isFullscreen}
             onClose={() => setActiveDrawer(null)}
             trigger={
-              <Button
-                className={`${activeDrawer === 'history' && 'zaplane-button-actve'}`}
-                size="sm"
-                variant="outline"
-                onClick={() => setActiveDrawer("history")}
-              >
-                <LucideHistory />
-              </Button>
+              <ZAPTooltip content={__("Version History", 'zaplane')}>
+                  <Button
+                  className={`${activeDrawer === 'history' && 'zaplane-button-actve'}`}
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setActiveDrawer("history")}
+                >
+                  <LucideHistory />
+                </Button>
+              </ZAPTooltip>
+
             }
           >
             <VersionHistoryTable id={id} />
