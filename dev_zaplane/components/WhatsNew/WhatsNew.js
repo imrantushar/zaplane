@@ -8,7 +8,7 @@ const whatsNewContent = [
     {
         version: 'v2.1.0',
         age: '1 week ago',
-        title: "Fresh Out of zaplane",
+        title: "Fresh Out of OttoKit",
         sections: [
             {
                 label: 'New Triggers',
@@ -36,7 +36,7 @@ const whatsNewContent = [
                 label: 'Improvements',
                 tag: 'improvement',
                 items: [
-                    { bold: '', text: 'Added RTL text direction support across the zaplane plugin UI.' },
+                    { bold: '', text: 'Added RTL text direction support across the OttoKit plugin UI.' },
                 ]
             },
         ],
@@ -45,8 +45,8 @@ const whatsNewContent = [
 ];
 
 const TAG_STYLES = {
-    trigger: { bg: 'rgba(59,196,143,0.12)', color: '#0b8f5e', label: 'Trigger' },
-    action: { bg: 'rgba(59,130,246,0.12)', color: '#1a61c4', label: 'Action' },
+    trigger:     { bg: 'rgba(59,196,143,0.12)', color: '#0b8f5e', label: 'Trigger' },
+    action:      { bg: 'rgba(59,130,246,0.12)', color: '#1a61c4', label: 'Action' },
     integration: { bg: 'rgba(249,168,37,0.12)', color: '#a06000', label: 'Integration' },
     improvement: { bg: 'rgba(148,163,184,0.12)', color: '#526070', label: 'UI' },
 };
@@ -101,12 +101,12 @@ const WhatsNew = () => {
                     <Box
                         key={i}
                         borderBottom="1px solid"
-                        borderColor="var(--zaplane-border-color)"
+                        borderColor="var( --zaplane-border-color)"
                         _last={{ borderBottom: 'none' }}
                     >
                         {/* Meta row */}
                         <Box display="flex" alignItems="center" gap="8px" mb="10px">
-                            <Text m='0' fontSize="11px" fontWeight="500" color='var(--zaplane-gray)' textTransform="uppercase" letterSpacing="0.06em">
+                            <Text fontSize="11px" m='0' fontWeight="500" color="gray.400" textTransform="uppercase" letterSpacing="0.06em">
                                 {entry.age}
                             </Text>
                             <Box w="4px" h="4px" bg="gray.300" borderRadius="full" />
@@ -115,7 +115,7 @@ const WhatsNew = () => {
                                 fontSize="11px"
                                 fontWeight="600"
                                 color="var(--zaplane-primary)"
-                                bg="purple.50"
+                                // bg="var(--zaplane-primary)"
                                 px="8px"
                                 py="2px"
                                 borderRadius="full"
@@ -126,7 +126,6 @@ const WhatsNew = () => {
 
                         {/* Title */}
                         <Text
-                            m='0'
                             fontSize="22px"
                             fontWeight="400"
                             lineHeight="1.25"
@@ -149,12 +148,12 @@ const WhatsNew = () => {
                                     fontWeight="600"
                                     textTransform="uppercase"
                                     letterSpacing="0.08em"
-                                    color="var(--zaplane-gray)"
+                                    color="gray.400"
                                     _after={{
                                         content: '""',
                                         flex: 1,
                                         height: '1px',
-                                        bg: 'var(--zaplane-gray)',
+                                        bg: 'gray.100',
                                     }}
                                 >
                                     {section.label}
@@ -168,7 +167,7 @@ const WhatsNew = () => {
                                             key={ii}
                                             fontSize="13.5px"
                                             lineHeight="1.55"
-                                            color="var(--zaplane-gray)"
+                                            color="gray.600"
                                             pl="14px"
                                             position="relative"
                                             _before={{
@@ -177,25 +176,25 @@ const WhatsNew = () => {
                                                 left: 0, top: '8px',
                                                 w: '5px', h: '5px',
                                                 borderRadius: 'full',
-                                                bg: "var(--zaplane-primary)",
+                                                bg: 'purple.300',
                                             }}
                                         >
                                             <SectionTag type={section.tag} />
-                                            {item.bold && <Text as="strong" color="var(--zaplane-gray)" fontWeight="600">{item.bold} </Text>}
+                                            {item.bold && <Text as="strong" color="gray.700" fontWeight="600">{item.bold} </Text>}
                                             {item.text}
-                                            {item.note && <Text as="em" fontStyle="normal" fontSize="12.5px" color="var(--zaplane-gray)"> {item.note}</Text>}
+                                            {item.note && <Text as="em" fontStyle="normal" fontSize="12.5px" color="gray.400"> {item.note}</Text>}
                                         </Box>
                                     ))}
                                 </Box>
                             </Box>
                         ))}
 
-    
+                        {/* Read more */}
                         {entry.readMoreUrl && (
                             <Box mt="14px" fontSize="12.5px">
                                 Read more at{' '}
                                 <Box as="a" href={entry.readMoreUrl} target="_blank" color="var(--zaplane-primary)" fontWeight="500" _hover={{ textDecoration: 'underline' }}>
-                                   {__("Zaplane",'zaplane')}
+                                  {__('zaplane','zaplane')}
                                 </Box>
                             </Box>
                         )}

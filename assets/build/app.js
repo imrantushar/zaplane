@@ -10604,7 +10604,7 @@ __webpack_require__.r(__webpack_exports__);
 const whatsNewContent = [{
   version: 'v2.1.0',
   age: '1 week ago',
-  title: "Fresh Out of zaplane",
+  title: "Fresh Out of OttoKit",
   sections: [{
     label: 'New Triggers',
     tag: 'trigger',
@@ -10635,7 +10635,7 @@ const whatsNewContent = [{
     tag: 'improvement',
     items: [{
       bold: '',
-      text: 'Added RTL text direction support across the zaplane plugin UI.'
+      text: 'Added RTL text direction support across the OttoKit plugin UI.'
     }]
   }],
   readMoreUrl: 'https://zaplane.com'
@@ -10718,7 +10718,7 @@ const WhatsNew = () => {
     children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Box, {
       children: whatsNewContent.map((entry, i) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Box, {
         borderBottom: "1px solid",
-        borderColor: "var(--zaplane-border-color)",
+        borderColor: "var( --zaplane-border-color)",
         _last: {
           borderBottom: 'none'
         },
@@ -10728,10 +10728,10 @@ const WhatsNew = () => {
           gap: "8px",
           mb: "10px",
           children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
-            m: "0",
             fontSize: "11px",
+            m: "0",
             fontWeight: "500",
-            color: "var(--zaplane-gray)",
+            color: "gray.400",
             textTransform: "uppercase",
             letterSpacing: "0.06em",
             children: entry.age
@@ -10744,15 +10744,15 @@ const WhatsNew = () => {
             as: "span",
             fontSize: "11px",
             fontWeight: "600",
-            color: "var(--zaplane-primary)",
-            bg: "purple.50",
+            color: "var(--zaplane-primary)"
+            // bg="var(--zaplane-primary)"
+            ,
             px: "8px",
             py: "2px",
             borderRadius: "full",
             children: entry.version
           })]
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
-          m: "0",
           fontSize: "22px",
           fontWeight: "400",
           lineHeight: "1.25",
@@ -10769,12 +10769,12 @@ const WhatsNew = () => {
             fontWeight: "600",
             textTransform: "uppercase",
             letterSpacing: "0.08em",
-            color: "var(--zaplane-gray)",
+            color: "gray.400",
             _after: {
               content: '""',
               flex: 1,
               height: '1px',
-              bg: 'var(--zaplane-gray)'
+              bg: 'gray.100'
             },
             children: section.label
           }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Box, {
@@ -10789,7 +10789,7 @@ const WhatsNew = () => {
               as: "li",
               fontSize: "13.5px",
               lineHeight: "1.55",
-              color: "var(--zaplane-gray)",
+              color: "gray.600",
               pl: "14px",
               position: "relative",
               _before: {
@@ -10800,20 +10800,20 @@ const WhatsNew = () => {
                 w: '5px',
                 h: '5px',
                 borderRadius: 'full',
-                bg: "var(--zaplane-primary)"
+                bg: 'purple.300'
               },
               children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(SectionTag, {
                 type: section.tag
               }), item.bold && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
                 as: "strong",
-                color: "var(--zaplane-gray)",
+                color: "gray.700",
                 fontWeight: "600",
                 children: [item.bold, " "]
               }), item.text, item.note && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Text, {
                 as: "em",
                 fontStyle: "normal",
                 fontSize: "12.5px",
-                color: "var(--zaplane-gray)",
+                color: "gray.400",
                 children: [" ", item.note]
               })]
             }, ii))
@@ -10830,7 +10830,7 @@ const WhatsNew = () => {
             _hover: {
               textDecoration: 'underline'
             },
-            children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_5__.__)("Zaplane", 'zaplane')
+            children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_5__.__)('zaplane', 'zaplane')
           })]
         })]
       }, i))
@@ -13861,7 +13861,7 @@ const ActionDrawer = ({
         ..._assets_scss_chakra_recipe__WEBPACK_IMPORTED_MODULE_10__.primaryBtn,
         disabled: !values.actionType,
         onClick: handleContinue,
-        children: step === 'test' ? (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_9__.__)('Submit', 'zaplane') : (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_9__.__)('Continue', 'zaplane')
+        children: step === 'test' ? (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_9__.__)('Save', 'zaplane') : (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_9__.__)('Continue', 'zaplane')
       })]
     }),
     children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_26__.jsx)(_ZAPComponents_Search__WEBPACK_IMPORTED_MODULE_25__["default"], {
