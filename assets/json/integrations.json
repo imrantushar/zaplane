@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-04-05 12:10:12",
+    "generated_at": "2026-04-06 10:13:58",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -13503,6 +13503,30 @@
                     "key": "submit_form",
                     "label": "Form Submit",
                     "hook": "arfliteentryexecute",
+                    "schema": [
+                        {
+                            "key": "form_id",
+                            "label": "Form",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "arform",
+                                "query": "forms",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": {
+                        "main": "Main output"
+                    }
+                },
+                "submit_form_full": {
+                    "key": "submit_form_full",
+                    "label": "Form Submit (Full Version)",
+                    "hook": "arfentryexecute",
                     "schema": [
                         {
                             "key": "form_id",
