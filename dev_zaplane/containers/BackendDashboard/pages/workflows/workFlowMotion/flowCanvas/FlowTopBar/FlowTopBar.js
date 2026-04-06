@@ -200,8 +200,14 @@ export default function FlowTopBar({
             isFullscreen={isFullscreen}
             onClose={() => setActiveDrawer(null)}
             trigger={
-              <ZAPTooltip content={__("Version History", 'zaplane')}>
-                  <Button
+              <ZAPTooltip positioning={{
+                placement: "buttom",
+                offset: {
+                  mainAxis: 50,
+                  crossAxis: -20,
+                }
+              }} content={__("Version History", 'zaplane')}>
+                <Button
                   className={`${activeDrawer === 'history' && 'zaplane-button-actve'}`}
                   size="sm"
                   variant="outline"
