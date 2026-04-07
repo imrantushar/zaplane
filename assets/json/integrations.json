@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-04-06 12:40:38",
+    "generated_at": "2026-04-07 20:19:11",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -13486,6 +13486,42 @@
                     "outputs": [
                         "main"
                     ]
+                }
+            },
+            "actions": []
+        },
+        "bitform": {
+            "slug": "bitform",
+            "name": "Bit Form",
+            "icon": "bitform.svg",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": {
+                "submit_form": {
+                    "key": "submit_form",
+                    "label": "Form Submit",
+                    "hook": "bitform_submit_success",
+                    "schema": [
+                        {
+                            "key": "form_id",
+                            "label": "Form",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "bitform",
+                                "query": "forms",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": {
+                        "main": "Main output"
+                    }
                 }
             },
             "actions": []

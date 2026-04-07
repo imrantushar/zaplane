@@ -8,7 +8,7 @@ if (! defined('ABSPATH')) {
 
 use Zaplane\Framework\Classes\IntegrationBase;
 
-class BitForm extends IntegrationBase
+class Bitform extends IntegrationBase
 {
 
 
@@ -65,7 +65,6 @@ class BitForm extends IntegrationBase
             return null;
         }
 
-        // Validate required hook arguments (4 parameters: formId, entryId, formData, files)
         if (count($args) < 4) {
             return null;
         }
@@ -79,7 +78,6 @@ class BitForm extends IntegrationBase
             return null;
         }
 
-        // Check if trigger is configured for a specific form
         $config            = $node['config'] ?? [];
         $configured_form_id = $config['form_id'] ?? 'any';
 
@@ -87,25 +85,14 @@ class BitForm extends IntegrationBase
             return null;
         }
 
-        // Build and return the payload
         return [
             'form_id'   => $formId,
             'entry_id'  => $entryId,
-            'form_data' => self::sanitizeFormData($formData),
             'files'     => $files, // Files array structure depends on BitForm
         ];
     }
 
-    private static function sanitizeFormData($data)
-    {
-        if (is_string($data)) {
-            return sanitize_text_field($data);
-        }
-        if (is_array($data)) {
-            return array_map([self::class, 'sanitizeFormData'], $data);
-        }
-        return $data;
-    }
+
 
     public static function get_actions(): array
     {
@@ -135,54 +122,27 @@ class BitForm extends IntegrationBase
         ];
     }
 
-    public static function query_forms()
+    public static function query_forms(): array
     {
-        // Attempt to retrieve from cache
-        $cache_key = self::CACHE_KEY_FORMS;
-        $options   = wp_cache_get($cache_key, 'zaplane_integrations');
-
-        if (false !== $options) {
-            return $options;
+        if (! class_exists('BitCode\BitForm\API\BitForm_Public\BitForm_Public')) {
+            return [];
         }
 
-        // Base option: "Any Form"
         $options = [
             [
-                'label' => 'Any Form',
+                'label' => 'Any form',
                 'value' => 'any',
             ],
         ];
 
-        // Check if BitForm is active
-        if (self::isBitFormActive()) {
-            // Use BitForm's public API to get forms
-            if (class_exists('BitCode\\BitForm\\API\\BitForm_Public\\BitForm_Public')) {
-                $forms = \BitCode\BitForm\API\BitForm_Public\BitForm_Public::getForms();
-                if (!empty($forms) && is_array($forms)) {
-                    foreach ($forms as $form) {
-                        // Ensure we have stdClass with id and form_name
-                        $formId   = isset($form->id) ? (int) $form->id : 0;
-                        $formName = isset($form->form_name) ? sanitize_text_field($form->form_name) : 'Untitled';
-                        if ($formId) {
-                            $options[] = [
-                                'label' => esc_html($formName),
-                                'value' => $formId,
-                            ];
-                        }
-                    }
-                }
-            }
+        foreach (\BitCode\BitForm\API\BitForm_Public\BitForm_Public::getForms() as $form) {
+            $options[] = [
+                'label' => $form->form_name,
+                'value' => (string) $form->id,
+            ];
         }
 
-        // Store in cache for 1 hour
-        wp_cache_set($cache_key, $options, 'zaplane_integrations', self::CACHE_EXPIRATION);
-
         return $options;
-    }
-
-        private static function isBitFormActive(): bool
-    {
-        return class_exists(self::BITFORM_PLUGIN_CLASS);
     }
 
     public static function get_output_ports(): array

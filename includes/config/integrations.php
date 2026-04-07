@@ -190,7 +190,7 @@ return [
 		],
 		'bitform'      => [
 			'file' => 'bitform.php',
-			'class' => \Zaplane\Integrations\BitForm::class
+			'class' => \Zaplane\Integrations\Bitform::class
 		],
 	],
 ];
