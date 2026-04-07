@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-04-02 10:38:05",
+    "generated_at": "2026-04-06 05:07:49",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -7049,6 +7049,266 @@
                 }
             }
         },
+        "woobookings": {
+            "slug": "woobookings",
+            "name": "WooCommerce Bookings",
+            "icon": "woo.svg",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": {
+                "booking_created": {
+                    "key": "booking_created",
+                    "label": "Booking Created",
+                    "hook": "woocommerce_new_booking",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "booking_confirmed": {
+                    "key": "booking_confirmed",
+                    "label": "Booking Confirmed",
+                    "hook": "woocommerce_booking_confirmed",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "booking_paid": {
+                    "key": "booking_paid",
+                    "label": "Booking Paid",
+                    "hook": "woocommerce_booking_paid",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "booking_cancelled": {
+                    "key": "booking_cancelled",
+                    "label": "Booking Cancelled",
+                    "hook": "woocommerce_booking_cancelled",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "booking_unpaid": {
+                    "key": "booking_unpaid",
+                    "label": "Booking Unpaid",
+                    "hook": "woocommerce_booking_unpaid",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "booking_status_changed": {
+                    "key": "booking_status_changed",
+                    "label": "Booking Status Updated",
+                    "hook": "woocommerce_booking_status_changed",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": {
+                "get_bookings_all": {
+                    "key": "get_bookings_all",
+                    "label": "Get Bookings (All)",
+                    "schema": [
+                        {
+                            "key": "limit",
+                            "label": "Limit",
+                            "type": "number",
+                            "default": 20
+                        },
+                        {
+                            "key": "page",
+                            "label": "Page",
+                            "type": "number",
+                            "default": 1
+                        },
+                        {
+                            "key": "booking_status",
+                            "label": "Booking Status",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Pending Confirmation",
+                                    "value": "wc-booking-pending-confirmation"
+                                },
+                                {
+                                    "label": "Confirmed",
+                                    "value": "wc-booking-confirmed"
+                                },
+                                {
+                                    "label": "Paid",
+                                    "value": "wc-booking-paid"
+                                },
+                                {
+                                    "label": "Unpaid",
+                                    "value": "wc-booking-unpaid"
+                                },
+                                {
+                                    "label": "Cancelled",
+                                    "value": "wc-booking-cancelled"
+                                },
+                                {
+                                    "label": "Complete",
+                                    "value": "wc-booking-complete"
+                                },
+                                {
+                                    "label": "In Cart",
+                                    "value": "wc-booking-in-cart"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_booking_single": {
+                    "key": "get_booking_single",
+                    "label": "Get Booking (Single)",
+                    "schema": [
+                        {
+                            "key": "booking_id",
+                            "label": "Booking ID",
+                            "type": "number",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_booking_status": {
+                    "key": "update_booking_status",
+                    "label": "Update Booking Status",
+                    "schema": [
+                        {
+                            "key": "booking_id",
+                            "label": "Booking ID",
+                            "type": "number",
+                            "required": true
+                        },
+                        {
+                            "key": "booking_status",
+                            "label": "Booking Status",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Pending Confirmation",
+                                    "value": "wc-booking-pending-confirmation"
+                                },
+                                {
+                                    "label": "Confirmed",
+                                    "value": "wc-booking-confirmed"
+                                },
+                                {
+                                    "label": "Paid",
+                                    "value": "wc-booking-paid"
+                                },
+                                {
+                                    "label": "Unpaid",
+                                    "value": "wc-booking-unpaid"
+                                },
+                                {
+                                    "label": "Cancelled",
+                                    "value": "wc-booking-cancelled"
+                                },
+                                {
+                                    "label": "Complete",
+                                    "value": "wc-booking-complete"
+                                },
+                                {
+                                    "label": "In Cart",
+                                    "value": "wc-booking-in-cart"
+                                }
+                            ],
+                            "required": true
+                        },
+                        {
+                            "key": "note",
+                            "label": "Note",
+                            "type": "text"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "cancel_booking": {
+                    "key": "cancel_booking",
+                    "label": "Cancel Booking",
+                    "schema": [
+                        {
+                            "key": "booking_id",
+                            "label": "Booking ID",
+                            "type": "number",
+                            "required": true
+                        },
+                        {
+                            "key": "note",
+                            "label": "Note",
+                            "type": "text"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "confirm_booking": {
+                    "key": "confirm_booking",
+                    "label": "Confirm Booking",
+                    "schema": [
+                        {
+                            "key": "booking_id",
+                            "label": "Booking ID",
+                            "type": "number",
+                            "required": true
+                        },
+                        {
+                            "key": "note",
+                            "label": "Note",
+                            "type": "text"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add_booking_note": {
+                    "key": "add_booking_note",
+                    "label": "Add Booking Note",
+                    "schema": [
+                        {
+                            "key": "booking_id",
+                            "label": "Booking ID",
+                            "type": "number",
+                            "required": true
+                        },
+                        {
+                            "key": "note",
+                            "label": "Note",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "is_customer_note",
+                            "label": "Customer Note",
+                            "type": "boolean"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
+        },
         "slack": {
             "slug": "slack",
             "name": "Slack",
@@ -13009,7 +13269,7 @@
         "jetengine": {
             "slug": "jetengine",
             "name": "JetEngine",
-            "icon": "Jetengine.svg",
+            "icon": "jetengine.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
