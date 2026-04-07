@@ -188,5 +188,9 @@ return [
 			'file' => 'kadenceblocks.php', 
 			'class' => \Zaplane\Integrations\Kadenceblocks::class
 			],
+		'bookingcalendar'      => [
+			'file' => 'bookingcalendar.php', 
+			'class' => \Zaplane\Integrations\BookingCalendar::class
+			],
 	],
 ];
