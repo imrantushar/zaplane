@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-04-02 10:38:05",
+    "generated_at": "2026-04-07 09:02:17",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -7049,6 +7049,324 @@
                 }
             }
         },
+        "woomemberships": {
+            "slug": "woomemberships",
+            "name": "WooCommerce Memberships",
+            "icon": "woocommerce-membership.svg",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": {
+                "membership_saved": {
+                    "key": "membership_saved",
+                    "label": "Membership Saved",
+                    "hook": "wc_memberships_user_membership_saved",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "membership_created": {
+                    "key": "membership_created",
+                    "label": "Membership Created",
+                    "hook": "wc_memberships_user_membership_created",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "membership_cancelled": {
+                    "key": "membership_cancelled",
+                    "label": "Membership Cancelled",
+                    "hook": "wc_memberships_cancelled_user_membership",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "membership_status_changed": {
+                    "key": "membership_status_changed",
+                    "label": "Membership Status Updated",
+                    "hook": "wc_memberships_user_membership_status_changed",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "membership_note_added": {
+                    "key": "membership_note_added",
+                    "label": "Membership Note Added",
+                    "hook": "wc_memberships_new_user_membership_note",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": {
+                "create_membership": {
+                    "key": "create_membership",
+                    "label": "Create Membership",
+                    "schema": [
+                        {
+                            "key": "plan_id",
+                            "label": "Plan ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "product_id",
+                            "label": "Product ID",
+                            "type": "expression"
+                        },
+                        {
+                            "key": "order_id",
+                            "label": "Order ID",
+                            "type": "expression"
+                        },
+                        {
+                            "key": "membership_status",
+                            "label": "Membership Status",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Active",
+                                    "value": "wcm-active"
+                                },
+                                {
+                                    "label": "Complimentary",
+                                    "value": "wcm-complimentary"
+                                },
+                                {
+                                    "label": "Pending",
+                                    "value": "wcm-pending"
+                                },
+                                {
+                                    "label": "Paused",
+                                    "value": "wcm-paused"
+                                },
+                                {
+                                    "label": "Cancelled",
+                                    "value": "wcm-cancelled"
+                                },
+                                {
+                                    "label": "Expired",
+                                    "value": "wcm-expired"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_memberships_all": {
+                    "key": "get_memberships_all",
+                    "label": "Get Memberships (All)",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "expression"
+                        },
+                        {
+                            "key": "membership_status",
+                            "label": "Membership Status",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Active",
+                                    "value": "wcm-active"
+                                },
+                                {
+                                    "label": "Complimentary",
+                                    "value": "wcm-complimentary"
+                                },
+                                {
+                                    "label": "Pending",
+                                    "value": "wcm-pending"
+                                },
+                                {
+                                    "label": "Paused",
+                                    "value": "wcm-paused"
+                                },
+                                {
+                                    "label": "Cancelled",
+                                    "value": "wcm-cancelled"
+                                },
+                                {
+                                    "label": "Expired",
+                                    "value": "wcm-expired"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_membership_single": {
+                    "key": "get_membership_single",
+                    "label": "Get Membership (Single)",
+                    "schema": [
+                        {
+                            "key": "membership_id",
+                            "label": "Membership ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_membership_status": {
+                    "key": "update_membership_status",
+                    "label": "Update Membership Status",
+                    "schema": [
+                        {
+                            "key": "membership_id",
+                            "label": "Membership ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "membership_status",
+                            "label": "Membership Status",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Active",
+                                    "value": "wcm-active"
+                                },
+                                {
+                                    "label": "Complimentary",
+                                    "value": "wcm-complimentary"
+                                },
+                                {
+                                    "label": "Pending",
+                                    "value": "wcm-pending"
+                                },
+                                {
+                                    "label": "Paused",
+                                    "value": "wcm-paused"
+                                },
+                                {
+                                    "label": "Cancelled",
+                                    "value": "wcm-cancelled"
+                                },
+                                {
+                                    "label": "Expired",
+                                    "value": "wcm-expired"
+                                }
+                            ],
+                            "required": true
+                        },
+                        {
+                            "key": "note",
+                            "label": "Note",
+                            "type": "text"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "cancel_membership": {
+                    "key": "cancel_membership",
+                    "label": "Cancel Membership",
+                    "schema": [
+                        {
+                            "key": "membership_id",
+                            "label": "Membership ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "note",
+                            "label": "Note",
+                            "type": "text"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "pause_membership": {
+                    "key": "pause_membership",
+                    "label": "Pause Membership",
+                    "schema": [
+                        {
+                            "key": "membership_id",
+                            "label": "Membership ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "note",
+                            "label": "Note",
+                            "type": "text"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "activate_membership": {
+                    "key": "activate_membership",
+                    "label": "Activate Membership",
+                    "schema": [
+                        {
+                            "key": "membership_id",
+                            "label": "Membership ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "note",
+                            "label": "Note",
+                            "type": "text"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add_membership_note": {
+                    "key": "add_membership_note",
+                    "label": "Add Membership Note",
+                    "schema": [
+                        {
+                            "key": "membership_id",
+                            "label": "Membership ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "note",
+                            "label": "Note",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "notify_member",
+                            "label": "Notify Member",
+                            "type": "boolean"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
+        },
         "slack": {
             "slug": "slack",
             "name": "Slack",
@@ -13009,7 +13327,7 @@
         "jetengine": {
             "slug": "jetengine",
             "name": "JetEngine",
-            "icon": "Jetengine.svg",
+            "icon": "jetengine.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
