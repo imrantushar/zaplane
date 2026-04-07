@@ -18,10 +18,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 class RecipeController extends WP_REST_Controller {
 
 	protected ?Container $container;
-	protected string $namespace = 'zaplane/v1';
 
 	public function __construct( ?Container $container = null ) {
 		$this->container = $container;
+		$this->namespace = 'zaplane/v1';
 	}
 
 	public function register_routes(): void {

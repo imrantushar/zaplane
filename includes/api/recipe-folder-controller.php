@@ -16,11 +16,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 class RecipeFolderController extends WP_REST_Controller {
 
 	protected ?Container $container;
-	protected string $namespace = 'zaplane/v1';
-	protected string $rest_base = 'recipe-folders';
 
 	public function __construct( ?Container $container = null ) {
-		$this->container = $container;
+		$this->container  = $container;
+		$this->namespace  = 'zaplane/v1';
+		$this->rest_base  = 'recipe-folders';
 	}
 
 	public function register_routes(): void {
