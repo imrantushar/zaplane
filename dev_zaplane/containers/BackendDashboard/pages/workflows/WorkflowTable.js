@@ -1,11 +1,11 @@
-import {  useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { __ } from "@wordpress/i18n";
-import { Text, Box, Icon, HStack} from "@chakra-ui/react";
+import { Text, Box, Icon, HStack } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import ListTable from "@ZAPComponents/ListTable";
 import { formatDateTime, route_path } from "@ZAPUtils/helper";
-import { statusOptions } from "./helper";
+import { downloadJSON, statusOptions } from "./helper";
 
 import {
   deleteWorkFlow,
@@ -22,6 +22,8 @@ import LogDetails from "@ZAPComponents/LogDetails";
 import { nodeLogsRunDetails } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlowLogs";
 import { HistoryIcon } from "@ZAPUtils/icons";
 import ZAPActionBar from "@ZAPComponents/ZAPActionBar";
+import { TbFileExport } from "react-icons/tb";
+import { exportWorkflows } from "@ZAPRedux/Slices/workFlowSlice/actions/ExportImport";
 
 const WorkflowTable = () => {
   const navigate = useNavigate();
@@ -52,6 +54,22 @@ const WorkflowTable = () => {
 
   const handlePerPageChange = (itemsPerPage) => {
     handleRefresh(currentPage, itemsPerPage)
+  };
+  //export handler for export functionality
+
+  const handleExport = async (row) => {
+    try {
+      const res = await dispatch(
+        exportWorkflows({
+          workflow_ids: [row.id],
+          versions: "all",
+          include_runs: false,
+        })
+      );
+      downloadJSON(res?.payload, row.title || "workflow");
+    } catch (err) {
+      console.error("Export failed:", err);
+    }
   };
   const columns = [
     {
@@ -223,6 +241,24 @@ const WorkflowTable = () => {
                 height="15px"
                 width="15px"
                 as={RiDeleteBin6Line}
+
+              />
+            </Box>
+          </ZAPTooltip>
+          <ZAPTooltip content={__("Export", 'zaplane')}>
+            <Box
+              display="flex"
+              p={"5px 6px"}
+              justifyContent="center"
+              alignItems="center"
+              borderRadius="2.917px"
+              border="1px solid var(--zaplane-border-color)"
+              onClick={() => handleExport(row)}
+            >
+              <Icon
+                height="15px"
+                width="15px"
+                as={TbFileExport}
 
               />
             </Box>

@@ -1,14 +1,27 @@
 import React from "react";
-import { Menu } from "@chakra-ui/react"
+import { HStack, Icon, IconButton, Menu, Text } from "@chakra-ui/react"
 import { Button, Portal } from "@chakra-ui/react";
 import { __, sprintf } from "@wordpress/i18n";
-import { primaryBtn } from "../../../assets/scss/chakra/recipe";
+import { BsThreeDotsVertical } from "react-icons/bs";
 
-const ZAPMenu = ({ triggerLabel, items = [] }) => {
+
+const ZAPMenu = ({ triggerLabel, items = [], isIcon = false, variant = "outline" }) => {
   return (
     <Menu.Root>
       <Menu.Trigger asChild>
-        <Button {...primaryBtn}>{__(triggerLabel, "zaplane")}</Button>
+        {isIcon ? (
+          <IconButton
+            size="sm"
+            variant={variant}
+            aria-label="More options"
+          >
+            <BsThreeDotsVertical />
+          </IconButton>
+        ) : (
+          <Button variant={variant}>
+            {__(triggerLabel, "zaplane")}
+          </Button>
+        )}
       </Menu.Trigger>
 
       <Portal>
@@ -19,8 +32,16 @@ const ZAPMenu = ({ triggerLabel, items = [] }) => {
                 key={index}
                 onClick={item.onClick}
                 cursor="pointer"
+                 _hover={{
+                  bg: "var(--zaplane-gray)",
+                }}
               >
-                {sprintf(__('%s', 'zaplane'), item.label)}
+                 <HStack gap={2}>
+                  {item.icon && <Icon as={item.icon} boxSize={4} />}
+                  <Text m='0'>
+                    {sprintf(__('%s', 'zaplane'), item.label)}
+                  </Text>
+                </HStack>
               </Menu.Item>
             ))}
           </Menu.Content>
