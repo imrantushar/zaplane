@@ -399,6 +399,12 @@ namespace {
 		}
 	}
 
+	if ( ! function_exists( 'is_email' ) ) {
+		function is_email( $email ) {
+			return filter_var( $email, FILTER_VALIDATE_EMAIL ) !== false ? $email : false;
+		}
+	}
+
 	if ( ! function_exists( 'sanitize_title' ) ) {
 		function sanitize_title( $title, $fallback_title = '', $context = 'save' ) {
 			return strtolower( preg_replace( '/[^a-z0-9-]/', '-', strtolower( $title ) ) );

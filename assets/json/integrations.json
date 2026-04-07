@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-04-01 08:19:19",
+    "generated_at": "2026-04-07 05:36:44",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -12515,10 +12515,18 @@
                     "schema": [
                         {
                             "key": "tag_id",
-                            "label": "Tag ID (optional)",
-                            "type": "expression",
+                            "label": "Tag (optional)",
+                            "type": "select",
                             "required": false,
-                            "placeholder": "Leave empty to trigger for any tag"
+                            "placeholder": "Leave empty to trigger for any tag",
+                            "dynamic": {
+                                "integration": "gemcrm",
+                                "query": "gemcrm_tag_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
                         }
                     ],
                     "outputs": [
@@ -12532,10 +12540,18 @@
                     "schema": [
                         {
                             "key": "tag_id",
-                            "label": "Tag ID (optional)",
-                            "type": "expression",
+                            "label": "Tag (optional)",
+                            "type": "select",
                             "required": false,
-                            "placeholder": "Leave empty to trigger for any tag"
+                            "placeholder": "Leave empty to trigger for any tag",
+                            "dynamic": {
+                                "integration": "gemcrm",
+                                "query": "gemcrm_tag_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
                         }
                     ],
                     "outputs": [
@@ -12549,10 +12565,18 @@
                     "schema": [
                         {
                             "key": "list_id",
-                            "label": "List ID (optional)",
-                            "type": "expression",
+                            "label": "List (optional)",
+                            "type": "select",
                             "required": false,
-                            "placeholder": "Leave empty to trigger for any list"
+                            "placeholder": "Leave empty to trigger for any list",
+                            "dynamic": {
+                                "integration": "gemcrm",
+                                "query": "gemcrm_list_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
                         }
                     ],
                     "outputs": [
@@ -12566,10 +12590,18 @@
                     "schema": [
                         {
                             "key": "list_id",
-                            "label": "List ID (optional)",
-                            "type": "expression",
+                            "label": "List (optional)",
+                            "type": "select",
                             "required": false,
-                            "placeholder": "Leave empty to trigger for any list"
+                            "placeholder": "Leave empty to trigger for any list",
+                            "dynamic": {
+                                "integration": "gemcrm",
+                                "query": "gemcrm_list_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
                         }
                     ],
                     "outputs": [
@@ -12577,7 +12609,371 @@
                     ]
                 }
             },
-            "actions": []
+            "actions": {
+                "create_contact": {
+                    "key": "create_contact",
+                    "label": "Create Contact",
+                    "schema": [
+                        {
+                            "key": "first_name",
+                            "label": "First Name",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "last_name",
+                            "label": "Last Name",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "email",
+                            "label": "Email",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "phone",
+                            "label": "Phone",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "status",
+                            "label": "Status",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "e.g. active"
+                        },
+                        {
+                            "key": "type",
+                            "label": "Type",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "e.g. customer"
+                        },
+                        {
+                            "key": "linked_id",
+                            "label": "Linked ID",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "photo_id",
+                            "label": "Photo ID",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "company_ids",
+                            "label": "Company IDs (comma-separated)",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "tag_ids",
+                            "label": "Tag IDs (comma-separated)",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "list_ids",
+                            "label": "List IDs (comma-separated)",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "addr_line_1",
+                            "label": "Address Line 1",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "addr_line_2",
+                            "label": "Address Line 2",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "city",
+                            "label": "City",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "state",
+                            "label": "State",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "zip",
+                            "label": "ZIP",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "country",
+                            "label": "Country",
+                            "type": "expression",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_contact": {
+                    "key": "update_contact",
+                    "label": "Update Contact",
+                    "schema": [
+                        {
+                            "key": "contact_id",
+                            "label": "Contact ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "first_name",
+                            "label": "First Name",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "last_name",
+                            "label": "Last Name",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "email",
+                            "label": "Email",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "phone",
+                            "label": "Phone",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "status",
+                            "label": "Status",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "e.g. active"
+                        },
+                        {
+                            "key": "type",
+                            "label": "Type",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "e.g. customer"
+                        },
+                        {
+                            "key": "linked_id",
+                            "label": "Linked ID",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "photo_id",
+                            "label": "Photo ID",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "company_ids",
+                            "label": "Company IDs (comma-separated)",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "tag_ids",
+                            "label": "Tag IDs (comma-separated)",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "list_ids",
+                            "label": "List IDs (comma-separated)",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "addr_line_1",
+                            "label": "Address Line 1",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "addr_line_2",
+                            "label": "Address Line 2",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "city",
+                            "label": "City",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "state",
+                            "label": "State",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "zip",
+                            "label": "ZIP",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "country",
+                            "label": "Country",
+                            "type": "expression",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_contact": {
+                    "key": "delete_contact",
+                    "label": "Delete Contact",
+                    "schema": [
+                        {
+                            "key": "contact_id",
+                            "label": "Contact ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "apply_tag": {
+                    "key": "apply_tag",
+                    "label": "Apply Tag To Contact",
+                    "schema": [
+                        {
+                            "key": "contact_id",
+                            "label": "Contact ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "tag_id",
+                            "label": "Tag",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "gemcrm",
+                                "query": "gemcrm_tag_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "apply_list": {
+                    "key": "apply_list",
+                    "label": "Add Contact To List",
+                    "schema": [
+                        {
+                            "key": "contact_id",
+                            "label": "Contact ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "list_id",
+                            "label": "List",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "gemcrm",
+                                "query": "gemcrm_list_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "remove_from_tag": {
+                    "key": "remove_from_tag",
+                    "label": "Remove Tag From Contact",
+                    "schema": [
+                        {
+                            "key": "contact_id",
+                            "label": "Contact ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "tag_id",
+                            "label": "Tag",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "gemcrm",
+                                "query": "gemcrm_tag_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "remove_from_list": {
+                    "key": "remove_from_list",
+                    "label": "Remove Contact From List",
+                    "schema": [
+                        {
+                            "key": "contact_id",
+                            "label": "Contact ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "list_id",
+                            "label": "List",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "gemcrm",
+                                "query": "gemcrm_list_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
         }
     },
     "tools": {
