@@ -7,7 +7,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 use Zaplane\Framework\Classes\IntegrationBase;
 
-class BookingCalendar extends IntegrationBase {
+class Bookingcalendar extends IntegrationBase {
 
 	public static function get_slug(): string {
 		return 'bookingcalendar';

@@ -190,7 +190,7 @@ return [
 			],
 		'bookingcalendar'      => [
 			'file' => 'bookingcalendar.php', 
-			'class' => \Zaplane\Integrations\BookingCalendar::class
-			],
+			'class' => \Zaplane\Integrations\Bookingcalendar::class
+		],
 	],
 ];

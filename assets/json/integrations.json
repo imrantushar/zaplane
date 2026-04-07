@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-04-07 07:02:11",
+    "generated_at": "2026-04-07 07:42:27",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -13482,6 +13482,27 @@
                     "key": "kadence_blocks_advanced_form_submission",
                     "label": "Advanced Form Submission",
                     "hook": "kadence_blocks_advanced_form_submission",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": []
+        },
+        "bookingcalendar": {
+            "slug": "bookingcalendar",
+            "name": "Booking Calendar",
+            "icon": "booking-calendar.svg",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": {
+                "dexbccf_process_data": {
+                    "key": "dexbccf_process_data",
+                    "label": "Booking Calendar Contact Form",
+                    "hook": "dexbccf_process_data",
                     "schema": [],
                     "outputs": [
                         "main"
