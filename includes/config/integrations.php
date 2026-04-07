@@ -188,5 +188,9 @@ return [
 			'file' => 'kadenceblocks.php', 
 			'class' => \Zaplane\Integrations\Kadenceblocks::class
 			],
+		'suremembers'      => [
+			'file' => 'suremembers.php', 
+			'class' => \Zaplane\Integrations\Suremembers::class
+		],
 	],
 ];

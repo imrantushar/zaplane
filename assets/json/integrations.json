@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-04-02 10:38:05",
+    "generated_at": "2026-04-07 09:26:44",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -13009,7 +13009,7 @@
         "jetengine": {
             "slug": "jetengine",
             "name": "JetEngine",
-            "icon": "Jetengine.svg",
+            "icon": "jetengine.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -13489,6 +13489,149 @@
                 }
             },
             "actions": []
+        },
+        "suremembers": {
+            "slug": "suremembers",
+            "name": "SureMembers",
+            "icon": "suremembers.svg",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": {
+                "access_group": {
+                    "key": "access_group",
+                    "label": "User Added To Access Group",
+                    "hook": "suremembers_after_access_grant",
+                    "schema": [
+                        {
+                            "key": "member_id",
+                            "label": "Group",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "suremembers",
+                                "query": "group_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "remove_group": {
+                    "key": "remove_group",
+                    "label": "User Removed From Access Group",
+                    "hook": "suremembers_after_access_revoke",
+                    "schema": [
+                        {
+                            "key": "member_id",
+                            "label": "Group",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "suremembers",
+                                "query": "group_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "updated_group": {
+                    "key": "updated_group",
+                    "label": "Access Group Updated",
+                    "hook": "suremembers_after_submit_form",
+                    "schema": [
+                        {
+                            "key": "member_id",
+                            "label": "Group",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "suremembers",
+                                "query": "group_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": {
+                "add_user": {
+                    "key": "add_user",
+                    "label": "Add User To Access Group",
+                    "schema": [
+                        {
+                            "key": "email",
+                            "label": "User Email",
+                            "type": "email",
+                            "required": true
+                        },
+                        {
+                            "key": "member_id",
+                            "label": "Group",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "suremembers",
+                                "query": "group_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "remove_user": {
+                    "key": "remove_user",
+                    "label": "Remove User From Access Group",
+                    "schema": [
+                        {
+                            "key": "email",
+                            "label": "User Email",
+                            "type": "email",
+                            "required": true
+                        },
+                        {
+                            "key": "member_id",
+                            "label": "Group",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "suremembers",
+                                "query": "group_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
         }
     },
     "tools": {
