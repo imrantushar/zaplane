@@ -31,16 +31,10 @@ class Bookingcalendar extends IntegrationBase {
 	}
 
 	public static function resolve_trigger( array $node, array $args ) {
-
 		switch ( $node['event'] ) {
+			
 			case 'dexbccf_process_data':
-				$fields = $args[1] ?? [];
-				$result = [];
-				foreach ( $fields as $field ) {
-					$label          = $field['label'] ?? $field['name'] ?? '';
-					$result[$label] = $field['value'] ?? '';
-				}
-				return $result;
+				return $args[0] ?? [];
 		}//end switch
 
 		return false;
