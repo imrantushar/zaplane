@@ -200,13 +200,13 @@ class Suremembers extends IntegrationBase {
 				}
 
 				$user_payload  = self::resolve_user_payload( (int) $user->ID );
-				$group_payload = get_post( (int) $group_id) ? self::resolve_group_payload( get_post( (int) $group_id ) ) : [];
+				$group_payload = get_post( (int) $group_id ) ? self::resolve_group_payload( get_post( (int) $group_id ) ) : [];
 
 				return self::success( array_merge( $input, [
 					'user' => $user_payload,
 					'data' => $group_payload,
 				] ) );
-				
+
 		}//end switch
 
 		return [

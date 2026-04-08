@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-04-08 05:14:46",
+    "generated_at": "2026-04-08 05:44:14",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
