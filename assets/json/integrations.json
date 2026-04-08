@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-04-02 10:38:05",
+    "generated_at": "2026-04-08 12:25:26",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -13009,7 +13009,7 @@
         "jetengine": {
             "slug": "jetengine",
             "name": "JetEngine",
-            "icon": "Jetengine.svg",
+            "icon": "jetengine.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -13482,6 +13482,157 @@
                     "key": "kadence_blocks_advanced_form_submission",
                     "label": "Advanced Form Submission",
                     "hook": "kadence_blocks_advanced_form_submission",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": []
+        },
+        "gamipress": {
+            "slug": "gamipress",
+            "name": "GamiPress",
+            "icon": "gamipress.svg",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": {
+                "user_earns_rank": {
+                    "key": "user_earns_rank",
+                    "label": "User Earns Rank",
+                    "hook": "gamipress_update_user_rank",
+                    "schema": [
+                        {
+                            "key": "rank_type",
+                            "label": "Rank Type",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "gamipress",
+                                "query": "rank_type_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "rank_id",
+                            "label": "Rank",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "gamipress",
+                                "query": "rank_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ],
+                                "depends_on": [
+                                    "rank_type"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "user_earns_points": {
+                    "key": "user_earns_points",
+                    "label": "User Earns Points",
+                    "hook": "gamipress_update_user_points",
+                    "schema": [
+                        {
+                            "key": "achievement_type",
+                            "label": "Achievement Type",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "gamipress",
+                                "query": "achievement_type_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "user_earns_specific_achievement_type": {
+                    "key": "user_earns_specific_achievement_type",
+                    "label": "User Earns Specific Achievement Type",
+                    "hook": "gamipress_award_achievement",
+                    "schema": [
+                        {
+                            "key": "achievement_type",
+                            "label": "Achievement Type",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "gamipress",
+                                "query": "achievement_type_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "user_gains_achievement": {
+                    "key": "user_gains_achievement",
+                    "label": "User Gains Achievement",
+                    "hook": "gamipress_award_achievement",
+                    "schema": [
+                        {
+                            "key": "achievement_type",
+                            "label": "Achievement Type",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "gamipress",
+                                "query": "achievement_type_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "achievement_id",
+                            "label": "Achievement",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "gamipress",
+                                "query": "achievement_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ],
+                                "depends_on": [
+                                    "achievement_type"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "user_achievement_revoked": {
+                    "key": "user_achievement_revoked",
+                    "label": "User Achievement Was Revoked.",
+                    "hook": "gamipress_revoke_achievement_to_user",
                     "schema": [],
                     "outputs": [
                         "main"

@@ -188,5 +188,9 @@ return [
 			'file' => 'kadenceblocks.php', 
 			'class' => \Zaplane\Integrations\Kadenceblocks::class
 			],
+		'gamipress'      => [
+			'file' => 'gamipress.php', 
+			'class' => \Zaplane\Integrations\Gamipress::class
+		],
 	],
 ];
