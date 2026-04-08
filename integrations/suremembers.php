@@ -80,7 +80,7 @@ class Suremembers extends IntegrationBase {
 				$matched        = false;
 
 				foreach ( $group_id as $group ) {
-					if ( 'any' !== $selected_group || (string) $selected_group !== (string) $group ) {
+					if ( 'any' === $selected_group || (string) $selected_group === (string) $group ) {
 						$matched = true;
 						break;
 					}
@@ -90,7 +90,7 @@ class Suremembers extends IntegrationBase {
 					return false;
 				}
 
-				$user = self::resolve_user_payload( $user_id );
+				$user = self::resolve_user_payload( (int) $user_id );
 				if ( ! $user ) {
 					return false;
 				}
@@ -194,18 +194,19 @@ class Suremembers extends IntegrationBase {
 				}
 
 				if ( 'add_user' === $event ) {
-					Access::grant( $user->ID, [ $group_id ] );
+					Access::grant( (int) $user->ID, [ $group_id ] );
 				} else {
-					Access::revoke( $user->ID, [ $group_id ] );
+					Access::revoke( (int) $user->ID, [ $group_id ] );
 				}
 
-				$user_payload  = self::resolve_user_payload( $user->ID );
-				$group_payload = get_post( $group_id ) ? self::resolve_group_payload( get_post( $group_id ) ) : [];
+				$user_payload  = self::resolve_user_payload( (int) $user->ID );
+				$group_payload = get_post( (int) $group_id) ? self::resolve_group_payload( get_post( (int) $group_id ) ) : [];
 
 				return self::success( array_merge( $input, [
 					'user' => $user_payload,
 					'data' => $group_payload,
 				] ) );
+				
 		}//end switch
 
 		return [
@@ -240,8 +241,8 @@ class Suremembers extends IntegrationBase {
 		return $all_group;
 	}
 
-	public static function resolve_user_payload( int $user_id ): array|false {
-		$user = get_userdata( $user_id );
+	public static function resolve_user_payload( int|string $user_id ): array|false {
+		$user = get_userdata( (int) $user_id );
 
 		if ( ! $user ) {
 			return false;
