@@ -28,18 +28,22 @@ return [
 			'class' => \Zaplane\Integrations\Variable::class
 		],
 
-		'wordpress'            => [
-			'file' => 'wordpress.php',
-			'class' => \Zaplane\Integrations\Wordpress::class
-		],
-		'woocommerce'          => [
-			'file' => 'woocommerce.php',
-			'class' => \Zaplane\Integrations\Woocommerce::class
-		],
-		'slack'                => [
-			'file' => 'Slack.php',
-			'class' => \Zaplane\Integrations\Slack::class
-		],
+			'wordpress'            => [
+				'file' => 'wordpress.php',
+				'class' => \Zaplane\Integrations\Wordpress::class
+			],
+			'woocommerce'          => [
+				'file' => 'woocommerce.php',
+				'class' => \Zaplane\Integrations\Woocommerce::class
+			],
+			'cartflows'            => [
+				'file' => 'cartflows.php',
+				'class' => \Zaplane\Integrations\Cartflows::class
+			],
+			'slack'                => [
+				'file' => 'Slack.php',
+				'class' => \Zaplane\Integrations\Slack::class
+			],
 		'trello'               => [
 			'file' => 'Trello.php',
 			'class' => \Zaplane\Integrations\Trello::class

@@ -1,7 +1,7 @@
 <?php
 
 namespace {
-	require_once __DIR__ . '/Support/MemberpressTestStubs.php';
+	require_once __DIR__ . '/../mocks/stubs/MemberpressTestStubs.php';
 }
 
 namespace Zaplane\Tests\Integrations {

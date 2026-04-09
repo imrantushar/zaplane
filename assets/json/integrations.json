@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-04-02 10:38:05",
+    "generated_at": "2026-04-08 09:04:33",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -7049,6 +7049,736 @@
                 }
             }
         },
+        "cartflows": {
+            "slug": "cartflows",
+            "name": "CartFlows",
+            "icon": "cartflows.svg",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": {
+                "cartflows_init": {
+                    "key": "cartflows_init",
+                    "label": "CartFlows Initialized",
+                    "hook": "cartflows_init",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "cartflows_body_top": {
+                    "key": "cartflows_body_top",
+                    "label": "CartFlows Body Top",
+                    "hook": "cartflows_body_top",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "cartflows_container_top": {
+                    "key": "cartflows_container_top",
+                    "label": "CartFlows Container Top",
+                    "hook": "cartflows_container_top",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "cartflows_container_bottom": {
+                    "key": "cartflows_container_bottom",
+                    "label": "CartFlows Container Bottom",
+                    "hook": "cartflows_container_bottom",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "cartflows_wp_footer": {
+                    "key": "cartflows_wp_footer",
+                    "label": "CartFlows Footer",
+                    "hook": "cartflows_wp_footer",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "cartflows_import_complete": {
+                    "key": "cartflows_import_complete",
+                    "label": "CartFlows Import Complete",
+                    "hook": "cartflows_import_complete",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "step_viewed": {
+                    "key": "step_viewed",
+                    "label": "CartFlows Step Viewed",
+                    "hook": "cartflows_wp",
+                    "schema": [
+                        {
+                            "key": "step_id",
+                            "label": "Checkout Step",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "cartflows",
+                                "query": "checkout_steps",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "checkout_before_shortcode": {
+                    "key": "checkout_before_shortcode",
+                    "label": "Checkout Before Shortcode",
+                    "hook": "cartflows_checkout_before_shortcode",
+                    "schema": [
+                        {
+                            "key": "step_id",
+                            "label": "Checkout Step",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "cartflows",
+                                "query": "checkout_steps",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "optin_before_shortcode": {
+                    "key": "optin_before_shortcode",
+                    "label": "Opt-in Before Shortcode",
+                    "hook": "cartflows_optin_before_shortcode",
+                    "schema": [
+                        {
+                            "key": "step_id",
+                            "label": "Checkout Step",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "cartflows",
+                                "query": "checkout_steps",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "gutenberg_before_checkout_shortcode": {
+                    "key": "gutenberg_before_checkout_shortcode",
+                    "label": "Gutenberg Before Checkout Shortcode",
+                    "hook": "cartflows_gutenberg_before_checkout_shortcode",
+                    "schema": [
+                        {
+                            "key": "step_id",
+                            "label": "Checkout Step",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "cartflows",
+                                "query": "checkout_steps",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "gutenberg_checkout_options_filters": {
+                    "key": "gutenberg_checkout_options_filters",
+                    "label": "Gutenberg Checkout Options Filters",
+                    "hook": "cartflows_gutenberg_checkout_options_filters",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "gutenberg_optin_options_filters": {
+                    "key": "gutenberg_optin_options_filters",
+                    "label": "Gutenberg Opt-in Options Filters",
+                    "hook": "cartflows_gutenberg_optin_options_filters",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "checkout_review_init": {
+                    "key": "checkout_review_init",
+                    "label": "Checkout Review Init",
+                    "hook": "cartflows_woo_checkout_update_order_review_init",
+                    "schema": [
+                        {
+                            "key": "step_id",
+                            "label": "Checkout Step",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "cartflows",
+                                "query": "checkout_steps",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "checkout_review_updated": {
+                    "key": "checkout_review_updated",
+                    "label": "Checkout Review Updated",
+                    "hook": "cartflows_woo_checkout_update_order_review",
+                    "schema": [
+                        {
+                            "key": "step_id",
+                            "label": "Checkout Step",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "cartflows",
+                                "query": "checkout_steps",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "template_imported": {
+                    "key": "template_imported",
+                    "label": "Template Imported",
+                    "hook": "cartflows_after_template_import",
+                    "schema": [
+                        {
+                            "key": "step_id",
+                            "label": "Checkout Step",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "cartflows",
+                                "query": "checkout_steps",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "instant_thankyou_before": {
+                    "key": "instant_thankyou_before",
+                    "label": "Instant Thank You Before",
+                    "hook": "cartflows_instant_thankyou_before",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "instant_thankyou_after": {
+                    "key": "instant_thankyou_after",
+                    "label": "Instant Thank You After",
+                    "hook": "cartflows_instant_thankyou_after",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "order_overview_cancelled": {
+                    "key": "order_overview_cancelled",
+                    "label": "Order Overview Cancelled",
+                    "hook": "cartflows_woocommerce_order_overview_cancelled",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "order_create_wc": {
+                    "key": "order_create_wc",
+                    "label": "WooCommerce Order Creation",
+                    "hook": "woocommerce_checkout_order_processed",
+                    "schema": [
+                        {
+                            "key": "step_id",
+                            "label": "Checkout Step",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "cartflows",
+                                "query": "checkout_steps",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "pro_loaded": {
+                    "key": "pro_loaded",
+                    "label": "CartFlows Pro Loaded",
+                    "hook": "cartflows_pro_loaded",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "pro_init": {
+                    "key": "pro_init",
+                    "label": "CartFlows Pro Init",
+                    "hook": "cartflows_pro_init",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "order_started": {
+                    "key": "order_started",
+                    "label": "Order Started",
+                    "hook": "cartflows_order_started",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "order_status_change_to_main_order": {
+                    "key": "order_status_change_to_main_order",
+                    "label": "Order Status Change To Main Order",
+                    "hook": "cartflows_order_status_change_to_main_order",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "offer_accepted": {
+                    "key": "offer_accepted",
+                    "label": "Offer Accepted",
+                    "hook": "cartflows_offer_accepted",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "offer_rejected": {
+                    "key": "offer_rejected",
+                    "label": "Offer Rejected",
+                    "hook": "cartflows_offer_rejected",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "offer_child_order_created": {
+                    "key": "offer_child_order_created",
+                    "label": "Offer Child Order Created",
+                    "hook": "cartflows_offer_child_order_created",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "offer_subscription_created": {
+                    "key": "offer_subscription_created",
+                    "label": "Offer Subscription Created",
+                    "hook": "cartflows_offer_subscription_created",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "checkout_before_multistep_layout": {
+                    "key": "checkout_before_multistep_layout",
+                    "label": "Checkout Before Multistep Layout",
+                    "hook": "cartflows_checkout_before_multistep_checkout_layout",
+                    "schema": [
+                        {
+                            "key": "step_id",
+                            "label": "Checkout Step",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "cartflows",
+                                "query": "checkout_steps",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "checkout_after_multistep_layout": {
+                    "key": "checkout_after_multistep_layout",
+                    "label": "Checkout After Multistep Layout",
+                    "hook": "cartflows_checkout_after_multistep_checkout_layout",
+                    "schema": [
+                        {
+                            "key": "step_id",
+                            "label": "Checkout Step",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "cartflows",
+                                "query": "checkout_steps",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "pre_checkout_offer_item_added": {
+                    "key": "pre_checkout_offer_item_added",
+                    "label": "Pre Checkout Offer Item Added",
+                    "hook": "wcf_pre_checkout_offer_item_added",
+                    "schema": [
+                        {
+                            "key": "step_id",
+                            "label": "Checkout Step",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "cartflows",
+                                "query": "checkout_steps",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "after_quantity_update": {
+                    "key": "after_quantity_update",
+                    "label": "After Quantity Update",
+                    "hook": "wcf_after_quantity_update",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "after_single_selection": {
+                    "key": "after_single_selection",
+                    "label": "After Single Selection",
+                    "hook": "wcf_after_single_selection",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "after_multiple_selection": {
+                    "key": "after_multiple_selection",
+                    "label": "After Multiple Selection",
+                    "hook": "wcf_after_multiple_selection",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "order_bump_item_added": {
+                    "key": "order_bump_item_added",
+                    "label": "Order Bump Item Added",
+                    "hook": "wcf_order_bump_item_added",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "order_bump_item_removed": {
+                    "key": "order_bump_item_removed",
+                    "label": "Order Bump Item Removed",
+                    "hook": "wcf_order_bump_item_removed",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "after_order_bump_process": {
+                    "key": "after_order_bump_process",
+                    "label": "After Order Bump Process",
+                    "hook": "wcf_after_order_bump_process",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "quick_view_selection": {
+                    "key": "quick_view_selection",
+                    "label": "Quick View Selection",
+                    "hook": "wcf_after_quick_view_selection",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "quick_view_title_before": {
+                    "key": "quick_view_title_before",
+                    "label": "Quick View Title Before",
+                    "hook": "cartflows_quick_view_title_before",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "quick_view_title_after": {
+                    "key": "quick_view_title_after",
+                    "label": "Quick View Title After",
+                    "hook": "cartflows_quick_view_title_after",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "quick_view_price_before": {
+                    "key": "quick_view_price_before",
+                    "label": "Quick View Price Before",
+                    "hook": "cartflows_quick_view_price_before",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "quick_view_price_after": {
+                    "key": "quick_view_price_after",
+                    "label": "Quick View Price After",
+                    "hook": "cartflows_quick_view_price_after",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": {
+                "get_flow_single": {
+                    "key": "get_flow_single",
+                    "label": "Get Flow (Single)",
+                    "schema": [
+                        {
+                            "key": "flow_id",
+                            "label": "Flow ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_step_single": {
+                    "key": "get_step_single",
+                    "label": "Get Step (Single)",
+                    "schema": [
+                        {
+                            "key": "step_id",
+                            "label": "Step ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_next_step": {
+                    "key": "get_next_step",
+                    "label": "Get Next Step",
+                    "schema": [
+                        {
+                            "key": "step_id",
+                            "label": "Current Step ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add_action": {
+                    "key": "add_action",
+                    "label": "Add Action Hook",
+                    "schema": [
+                        {
+                            "key": "hook_name",
+                            "label": "Hook Name",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "accepted_args",
+                            "label": "Accepted Args",
+                            "type": "number"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "do_action": {
+                    "key": "do_action",
+                    "label": "Do Action Hook",
+                    "schema": [
+                        {
+                            "key": "hook_name",
+                            "label": "Hook Name",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "arg_1",
+                            "label": "Argument 1",
+                            "type": "expression"
+                        },
+                        {
+                            "key": "arg_2",
+                            "label": "Argument 2",
+                            "type": "expression"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add_filter": {
+                    "key": "add_filter",
+                    "label": "Add Filter Hook",
+                    "schema": [
+                        {
+                            "key": "hook_name",
+                            "label": "Hook Name",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "return_value",
+                            "label": "Return Value",
+                            "type": "expression"
+                        },
+                        {
+                            "key": "accepted_args",
+                            "label": "Accepted Args",
+                            "type": "number"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "apply_filters": {
+                    "key": "apply_filters",
+                    "label": "Apply Filters Hook",
+                    "schema": [
+                        {
+                            "key": "hook_name",
+                            "label": "Hook Name",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "value",
+                            "label": "Value",
+                            "type": "expression"
+                        },
+                        {
+                            "key": "arg_1",
+                            "label": "Argument 1",
+                            "type": "expression"
+                        },
+                        {
+                            "key": "arg_2",
+                            "label": "Argument 2",
+                            "type": "expression"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "remove_action": {
+                    "key": "remove_action",
+                    "label": "Remove All Hook Callbacks",
+                    "schema": [
+                        {
+                            "key": "hook_name",
+                            "label": "Hook Name",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "has_action": {
+                    "key": "has_action",
+                    "label": "Has Hook Callback",
+                    "schema": [
+                        {
+                            "key": "hook_name",
+                            "label": "Hook Name",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "current_filter": {
+                    "key": "current_filter",
+                    "label": "Get Current Filter",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
+        },
         "slack": {
             "slug": "slack",
             "name": "Slack",
@@ -13009,7 +13739,7 @@
         "jetengine": {
             "slug": "jetengine",
             "name": "JetEngine",
-            "icon": "Jetengine.svg",
+            "icon": "jetengine.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",

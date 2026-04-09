@@ -1,7 +1,7 @@
 <?php
 
 namespace {
-	require_once __DIR__ . '/Support/EasyDigitalDownloadTestStubs.php';
+	require_once __DIR__ . '/../mocks/stubs/EasyDigitalDownloadTestStubs.php';
 }
 
 namespace Zaplane\Tests\Integrations {
