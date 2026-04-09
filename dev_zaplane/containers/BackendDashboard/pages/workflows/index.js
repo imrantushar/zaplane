@@ -37,14 +37,6 @@ const CreateWorkflows = () => {
         )}
         rightContent={() => (
           <>
-            <Button
-              variant="outline"
-              onClick={() => {
-                window.location.href = `${route_path}admin.php?page=zaplane-recipes`;
-              }}
-            >
-              {__('Recipe Library', 'zaplane')}
-            </Button>
             <Button {...primaryBtn} onClick={() => setIsModalOpen(true)}>
               {__('Create Workflow', 'zaplane')}
             </Button>
