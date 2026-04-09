@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-04-02 10:38:05",
+    "generated_at": "2026-04-09 08:47:20",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -13009,7 +13009,7 @@
         "jetengine": {
             "slug": "jetengine",
             "name": "JetEngine",
-            "icon": "Jetengine.svg",
+            "icon": "jetengine.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -13482,6 +13482,54 @@
                     "key": "kadence_blocks_advanced_form_submission",
                     "label": "Advanced Form Submission",
                     "hook": "kadence_blocks_advanced_form_submission",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": []
+        },
+        "eventscalendar": {
+            "slug": "eventscalendar",
+            "name": "Events Calendar",
+            "icon": "events-calendar.svg",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": {
+                "attendEvent": {
+                    "key": "attendEvent",
+                    "label": "User attended an event",
+                    "hook": "event_tickets_checkin",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "attendeeRegistered": {
+                    "key": "attendeeRegistered",
+                    "label": "Attendee registered for an event",
+                    "hook": "event_tickets_rsvp_attendee_created",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "newAttendee": {
+                    "key": "newAttendee",
+                    "label": "New attendee registered",
+                    "hook": "event_tickets_rsvp_tickets_generated_for_product",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "attendeeRegisteredWc": {
+                    "key": "attendeeRegisteredWc",
+                    "label": "Attendee registered via WooCommerce",
+                    "hook": "tribe_tickets_attendee_repository_create_attendee_for_ticket_after_create",
                     "schema": [],
                     "outputs": [
                         "main"
