@@ -6,7 +6,6 @@ import { useDispatch, useSelector } from "react-redux";
 import ListTable from "@ZAPComponents/ListTable";
 import { formatDateTime, route_path } from "@ZAPUtils/helper";
 import { downloadJSON, statusOptions } from "./helper";
-import Select from "react-select";
 
 import {
   deleteWorkFlow,
@@ -104,50 +103,30 @@ const WorkflowTable = () => {
     },
     {
       name: (
-        <Text className="zaplane-label">
+        <Text className="zaplane-label" ml='-33px'>
           {__("Folders", "zaplane")}
         </Text>
+
       ),
       cell: (row) => {
-        const options = [
-          { label: "Dfdf", value: 1 },
-          { label: "Hhh", value: 2 },
-          { label: "Hiu", value: 3 },
-          { label: "Jhhh", value: 4 },
-          { label: "Mixan", value: 5 },
-          { label: __("+ Create New", "zaplane"), value: "__create__" },
-        ];
-
+        const handleClick = () => {
+          setSaveAsRecipeRow(row)
+        }
         return (
-          <Box minW="180px">
-            <Select
-              options={options}
-              placeholder={__("Select Folder", "zaplane")}
-              menuPortalTarget={document.body}
-              onChange={(option) => {
-                if (option?.value === "__create__") {
-                  setSaveAsRecipeRow(row);
-                }
-              }}
-              styles={{
-                menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-                control: (base) => ({
-                  ...base,
-                  fontSize: "13px",
-                  borderColor: "var(--zaplane-border-color)",
-                }),
-                option: (base, state) => ({
-                  ...base,
-                  fontSize: "13px",
-                  color: state.data.value === "__create__" ? "var(--zaplane-primary)" : "inherit",
-                  fontWeight: state.data.value === "__create__" ? "600" : "400",
-                  backgroundColor: state.isFocused ? "var(--zaplane-gray)" : "white",
-                }),
-              }}
+          <Box>
+            <ZAPMenu
+              triggerLabel={__("Add", "zaplane")}
+              items={[
+                {
+                  label: __("Create Folder", "zaplane"),
+                  onClick: () => handleClick(),
+                },
+              ]}
             />
           </Box>
         );
       },
+      // columnWidth: "160px",
       textAlign: "center",
     },
 
@@ -295,6 +274,25 @@ const WorkflowTable = () => {
               />
             </Box>
           </ZAPTooltip>
+          <ZAPTooltip content={__("Save as Recipe", 'zaplane')}>
+            <Box
+              display="flex"
+              p={"5px 6px"}
+              justifyContent="center"
+              alignItems="center"
+              borderRadius="2.917px"
+              border="1px solid var(--zaplane-border-color)"
+              onClick={() => setSaveAsRecipeRow(row)}
+            >
+              <Icon
+                height="15px"
+                width="15px"
+                as={TbTemplate}
+              />
+            </Box>
+          </ZAPTooltip>
+
+
         </HStack>
       ),
       // columnWidth: "90px",
