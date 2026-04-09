@@ -8,17 +8,19 @@ import { IoIosArrowForward } from 'react-icons/io';
 import WorkflowTable from '../../workflows/WorkflowTable';
 import { useDispatch, useSelector } from 'react-redux';
 import { getRecipes } from '@ZAPRedux/Slices/recipeSlice/actions/recipe';
+import RecipeCard from './RecipeCard';
 
-const ShowRecipes = ({ id }) => {
-    const dispatch=useDispatch()
-    const {recipes}=useSelector((state)=>state.recipes)
-    useEffect(async()=>{
-   await getRecipes()
-    },[dispatch])
-    console.log(recipes,'recipe');
+const ShowRecipes = () => {
+    const dispatch = useDispatch();
+    const { recipes } = useSelector((state) => state.recipes);
+
+    useEffect(() => {
+        dispatch(getRecipes());
+    }, [dispatch]);
+
     return (
         <div>
-            <TopBar
+          <TopBar
                 leftContent={() => (
                     <>
                         <Flex
@@ -46,11 +48,14 @@ const ShowRecipes = ({ id }) => {
                     </>
                 )}
             />
+
             <div className="zaplane-page-content">
-                
-
+                <Flex gap="16px" wrap="wrap">
+                    {recipes?.map((recipe) => (
+                        <RecipeCard key={recipe.id} recipe={recipe} />
+                    ))}
+                </Flex>
             </div>
-
         </div>
     );
 };

@@ -95,12 +95,28 @@ export const deleteRecipe = createAsyncThunk(
   }
 );
 
+
+
 export const workflowToRecipe = createAsyncThunk(
   "zaplane/workflowToRecipe",
-  async ({ workflowId, payload }, thunkAPI) => {
+  async ({ workflowId, title, description, thumbnail_id, folder_id }, thunkAPI) => {
     try {
-      const res = await API.post(`${namespace}workflows/${workflowId}/to-recipe`, payload);
-      handleSliceSuccess(thunkAPI, __("Recipe created successfully.", "zaplane"));
+      const payload = {
+        title,           
+        description,        
+        thumbnail_id,     
+        folder_id 
+      };
+      const res = await API.post(
+        `${namespace}workflows/${workflowId}/to-recipe`,
+        payload
+      );
+
+      handleSliceSuccess(
+        thunkAPI,
+        __("Recipe created successfully.", "zaplane")
+      );
+
       return res?.data;
     } catch (error) {
       return handleSliceError(thunkAPI, error);
@@ -111,6 +127,7 @@ export const workflowToRecipe = createAsyncThunk(
 export const recipeToWorkflow = createAsyncThunk(
   "zaplane/recipeToWorkflow",
   async ({ recipeId, payload }, thunkAPI) => {
+
     try {
       const res = await API.post(`${namespace}recipes/${recipeId}/to-workflow`, payload);
       handleSliceSuccess(thunkAPI, __("Workflow created successfully.", "zaplane"));
