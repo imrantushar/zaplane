@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { __ } from "@wordpress/i18n";
-import { Text, Box, Icon, HStack } from "@chakra-ui/react";
+import { Text, Box, Icon, HStack, Button, Menu, Portal } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import ListTable from "@ZAPComponents/ListTable";
@@ -26,7 +26,21 @@ import { TbFileExport } from "react-icons/tb";
 import { TbTemplate } from "react-icons/tb";
 import { exportWorkflows } from "@ZAPRedux/Slices/workFlowSlice/actions/ExportImport";
 import SaveAsRecipeModal from "@ZAPComponents/SaveAsRecipeModal";
-import ZAPMenu from "@ZAPComponents/ZapMenu";
+import { getRecipeFolders } from "@ZAPRedux/Slices/recipeSlice/actions/recipe";
+import { FiCheck, FiChevronDown, FiFolder } from "react-icons/fi";
+
+const flattenRecipeFolders = (nodes = [], acc = []) => {
+  (nodes || []).forEach((node) => {
+    acc.push({ id: node.id, title: node.title });
+    flattenRecipeFolders(node.children || [], acc);
+  });
+  return acc;
+};
+
+const DEFAULT_WORKFLOW_RECIPE_FOLDER = () => ({
+  folderId: null,
+  label: __("Default", "zaplane"),
+});
 
 const WorkflowTable = () => {
   const navigate = useNavigate();
@@ -39,9 +53,13 @@ const WorkflowTable = () => {
     currentPage,
     perPage,
   } = useSelector((state) => state.workflows);
+  const { folders: recipeFolders = [] } = useSelector((state) => state.recipes || {});
   const [selection, setSelection] = useState([]);
   const [loading, setLoading] = useState(allWorkFlows.length === 0);
   const [saveAsRecipeRow, setSaveAsRecipeRow] = useState(null);
+  /** Per-workflow target folder when saving as recipe (static default + user picks). */
+  const [recipeTargetFolderByWorkflow, setRecipeTargetFolderByWorkflow] = useState({});
+
   const handleRefresh = async (page = 1, per_page = 10) => {
     setLoading(true)
     await dispatch(getWorkFlow({ page, per_page }));
@@ -49,8 +67,12 @@ const WorkflowTable = () => {
   };
 
   useEffect(() => {
-    handleRefresh()
+    handleRefresh();
   }, []);
+
+  useEffect(() => {
+    dispatch(getRecipeFolders());
+  }, [dispatch]);
 
   const handlePageChange = (newPage) => {
     handleRefresh(newPage, perPage)
@@ -109,20 +131,80 @@ const WorkflowTable = () => {
 
       ),
       cell: (row) => {
-        const handleClick = () => {
-          setSaveAsRecipeRow(row)
-        }
+        const rowKey = String(row.id);
+        const flatFolders = flattenRecipeFolders(recipeFolders);
+        const defaultFolder = DEFAULT_WORKFLOW_RECIPE_FOLDER();
+        const selected = recipeTargetFolderByWorkflow[rowKey] ?? defaultFolder;
+
         return (
-          <Box>
-            <ZAPMenu
-              triggerLabel={__("Add", "zaplane")}
-              items={[
-                {
-                  label: __("Create Folder", "zaplane"),
-                  onClick: () => handleClick(),
-                },
-              ]}
-            />
+          <Box display="flex" justifyContent="center">
+            <Menu.Root>
+              <Menu.Trigger asChild>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  maxW="220px"
+                  borderRadius="md"
+                  px={3}
+                >
+                  <HStack spacing={2} w="100%" justify="space-between" flex={1}>
+                    <HStack spacing={2} minW={0} flex={1}>
+                      <Icon as={FiFolder} boxSize={4} flexShrink={0} />
+                      <Text m={0} fontSize="sm" fontWeight="500" noOfLines={1}>
+                        {selected.label}
+                      </Text>
+                    </HStack>
+                    <Icon as={FiChevronDown} boxSize={3} flexShrink={0} opacity={0.7} />
+                  </HStack>
+                </Button>
+              </Menu.Trigger>
+              <Portal>
+                <Menu.Positioner>
+                  <Menu.Content minW="200px">
+                    <Menu.Item
+                      value={`default-${rowKey}`}
+                      onClick={() =>
+                        setRecipeTargetFolderByWorkflow((prev) => ({
+                          ...prev,
+                          [rowKey]: defaultFolder,
+                        }))
+                      }
+                    >
+                      <HStack justify="space-between" w="100%">
+                        <Text m={0}>{defaultFolder.label}</Text>
+                        {selected.folderId === null ? <Icon as={FiCheck} boxSize={4} /> : null}
+                      </HStack>
+                    </Menu.Item>
+                    {flatFolders.map((folder) => (
+                      <Menu.Item
+                        key={`${row.id}-f-${folder.id}`}
+                        value={`folder-${folder.id}-${row.id}`}
+                        onClick={() =>
+                          setRecipeTargetFolderByWorkflow((prev) => ({
+                            ...prev,
+                            [row.id]: { folderId: folder.id, label: folder.title },
+                          }))
+                        }
+                      >
+                        <HStack justify="space-between" w="100%">
+                          <Text m={0}>{folder.title}</Text>
+                          {Number(selected.folderId) === Number(folder.id) ? (
+                            <Icon as={FiCheck} boxSize={4} />
+                          ) : null}
+                        </HStack>
+                      </Menu.Item>
+                    ))}
+                    <Menu.Separator />
+                    <Menu.Item
+                      value={`save-recipe-${row.id}`}
+                      onClick={() => setSaveAsRecipeRow(row)}
+                    >
+                      {__("Create Folder", "zaplane")}
+                    </Menu.Item>
+                  </Menu.Content>
+                </Menu.Positioner>
+              </Portal>
+            </Menu.Root>
           </Box>
         );
       },
@@ -368,6 +450,11 @@ const WorkflowTable = () => {
         onClose={() => setSaveAsRecipeRow(null)}
         workflowId={saveAsRecipeRow?.id}
         defaultTitle={saveAsRecipeRow?.title}
+        initialFolderId={
+          saveAsRecipeRow?.id != null
+            ? recipeTargetFolderByWorkflow[saveAsRecipeRow.id]?.folderId ?? null
+            : null
+        }
       />
     </>
 
