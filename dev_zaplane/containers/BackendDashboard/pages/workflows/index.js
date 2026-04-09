@@ -7,7 +7,7 @@ import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
 import CreateWorkflowModal from "@ZAPComponents/CreateWorkflowModal";
 import { primaryBtn } from "../../../../../assets/scss/chakra/recipe";
 import { IoIosArrowForward } from "react-icons/io";
-import { plugin_root_url } from "@ZAPUtils/helper";
+import { plugin_root_url, route_path } from "@ZAPUtils/helper";
 
 
 const CreateWorkflows = () => {
@@ -36,18 +36,19 @@ const CreateWorkflows = () => {
           </>
         )}
         rightContent={() => (
-          // <ZAPMenu
-          //   triggerLabel="Create Workflow"
-          //   items={[
-          //     {
-          //       label: "Create from Scratch",
-          //       onClick: () => setIsModalOpen(true),
-          //     },
-          //   ]}
-          // />
-          <Button {...primaryBtn} onClick={() => setIsModalOpen(true)}>
-            {__('Create Workflow', 'zaplane')}
-          </Button>
+          <>
+            <Button
+              variant="outline"
+              onClick={() => {
+                window.location.href = `${route_path}admin.php?page=zaplane-recipes`;
+              }}
+            >
+              {__('Recipe Library', 'zaplane')}
+            </Button>
+            <Button {...primaryBtn} onClick={() => setIsModalOpen(true)}>
+              {__('Create Workflow', 'zaplane')}
+            </Button>
+          </>
         )}
       />
 

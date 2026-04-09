@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import ListTable from "@ZAPComponents/ListTable";
 import { formatDateTime, route_path } from "@ZAPUtils/helper";
 import { downloadJSON, statusOptions } from "./helper";
+import Select from "react-select";
 
 import {
   deleteWorkFlow,
@@ -23,7 +24,10 @@ import { nodeLogsRunDetails } from "@ZAPRedux/Slices/workFlowSlice/actions/workF
 import { HistoryIcon } from "@ZAPUtils/icons";
 import ZAPActionBar from "@ZAPComponents/ZAPActionBar";
 import { TbFileExport } from "react-icons/tb";
+import { TbTemplate } from "react-icons/tb";
 import { exportWorkflows } from "@ZAPRedux/Slices/workFlowSlice/actions/ExportImport";
+import SaveAsRecipeModal from "@ZAPComponents/SaveAsRecipeModal";
+import ZAPMenu from "@ZAPComponents/ZapMenu";
 
 const WorkflowTable = () => {
   const navigate = useNavigate();
@@ -38,6 +42,7 @@ const WorkflowTable = () => {
   } = useSelector((state) => state.workflows);
   const [selection, setSelection] = useState([]);
   const [loading, setLoading] = useState(allWorkFlows.length === 0);
+  const [saveAsRecipeRow, setSaveAsRecipeRow] = useState(null);
   const handleRefresh = async (page = 1, per_page = 10) => {
     setLoading(true)
     await dispatch(getWorkFlow({ page, per_page }));
@@ -99,23 +104,50 @@ const WorkflowTable = () => {
     },
     {
       name: (
-        <Text className="zaplane-label" ml='-33px'>
-          {__("Created At", "zaplane")}
+        <Text className="zaplane-label">
+          {__("Folders", "zaplane")}
         </Text>
-
       ),
       cell: (row) => {
-        const { date, time } = formatDateTime(row.created_at);
+        const options = [
+          { label: "Dfdf", value: 1 },
+          { label: "Hhh", value: 2 },
+          { label: "Hiu", value: 3 },
+          { label: "Jhhh", value: 4 },
+          { label: "Mixan", value: 5 },
+          { label: __("+ Create New", "zaplane"), value: "__create__" },
+        ];
+
         return (
-          <Box>
-            <ZAPLabel label={date} type={"simple"} />
-            <Text className="zaplane-sub-title" ml='-45px' color="var(--zaplane-text-muted)">
-              {__(time, 'zaplane')}
-            </Text>
+          <Box minW="180px">
+            <Select
+              options={options}
+              placeholder={__("Select Folder", "zaplane")}
+              menuPortalTarget={document.body}
+              onChange={(option) => {
+                if (option?.value === "__create__") {
+                  setSaveAsRecipeRow(row);
+                }
+              }}
+              styles={{
+                menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                control: (base) => ({
+                  ...base,
+                  fontSize: "13px",
+                  borderColor: "var(--zaplane-border-color)",
+                }),
+                option: (base, state) => ({
+                  ...base,
+                  fontSize: "13px",
+                  color: state.data.value === "__create__" ? "var(--zaplane-primary)" : "inherit",
+                  fontWeight: state.data.value === "__create__" ? "600" : "400",
+                  backgroundColor: state.isFocused ? "var(--zaplane-gray)" : "white",
+                }),
+              }}
+            />
           </Box>
         );
       },
-      // columnWidth: "160px",
       textAlign: "center",
     },
 
@@ -263,8 +295,6 @@ const WorkflowTable = () => {
               />
             </Box>
           </ZAPTooltip>
-
-
         </HStack>
       ),
       // columnWidth: "90px",
@@ -334,7 +364,14 @@ const WorkflowTable = () => {
             }}
           />
         )}
-      </ZAPDrawer></>
+      </ZAPDrawer>
+      <SaveAsRecipeModal
+        isOpen={!!saveAsRecipeRow}
+        onClose={() => setSaveAsRecipeRow(null)}
+        workflowId={saveAsRecipeRow?.id}
+        defaultTitle={saveAsRecipeRow?.title}
+      />
+    </>
 
   );
 };
