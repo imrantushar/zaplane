@@ -30,7 +30,7 @@ class Avadaform extends IntegrationBase
         return [
             'submit_form' => [
                 'label' => 'Form Submit',
-                'hook'  => 'fusion_form_submission', // Adjust to actual hook name if different
+                'hook'  => 'fusion_form_submission_data',
             ],
         ];
     }
@@ -67,13 +67,14 @@ class Avadaform extends IntegrationBase
             return null;
         }
 
-        $formSubmission = $args[0]; // array with 'data' key and maybe others
+        $formSubmission = $args[0]; // array with 'data' key
         $formId         = (int) $args[1];
 
         if ($formId === 0) {
             return null;
         }
 
+        // Check if form data exists
         $formData = $formSubmission['data'] ?? [];
 
         if (empty($formData)) {
@@ -87,11 +88,7 @@ class Avadaform extends IntegrationBase
             return null;
         }
 
-        return [
-            'form_id'    => $formId,
-            'form_data'  => $formData,
-            'raw_payload' => $formSubmission, // optional, for advanced use
-        ];
+        return array_merge(['form_id' => $formId], $formData);
     }
 
     public static function get_actions(): array
@@ -121,7 +118,7 @@ class Avadaform extends IntegrationBase
 
     public static function query_forms(): array
     {
-        // Check if Avada (Fusion Builder) is active and forms exist
+        // Check if Avada (Fusion Builder) is active
         if (! class_exists('Fusion_Builder_Form_Helper')) {
             return [];
         }

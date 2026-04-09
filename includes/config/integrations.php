@@ -187,10 +187,10 @@ return [
 		'kadenceblocks'      => [
 			'file' => 'kadenceblocks.php',
 			'class' => \Zaplane\Integrations\Kadenceblocks::class
-			],
+		],
 		'avadaform'      => [
 			'file' => 'avadaform.php',
 			'class' => \Zaplane\Integrations\Avadaform::class
-			],
+		],
 	],
 ];
