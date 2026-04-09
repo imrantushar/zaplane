@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-04-02 10:38:05",
+    "generated_at": "2026-04-09 10:51:06",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -13009,7 +13009,7 @@
         "jetengine": {
             "slug": "jetengine",
             "name": "JetEngine",
-            "icon": "Jetengine.svg",
+            "icon": "jetengine.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -13489,6 +13489,899 @@
                 }
             },
             "actions": []
+        },
+        "buddyboss": {
+            "slug": "buddyboss",
+            "name": "BuddyBoss",
+            "icon": "buddyboss.svg",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": {
+                "account_activated": {
+                    "key": "account_activated",
+                    "label": "Account Activated",
+                    "hook": "bp_core_activated_user",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "follower_gained": {
+                    "key": "follower_gained",
+                    "label": "New Follower Gained",
+                    "hook": "bp_start_following",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "sent_friend_request": {
+                    "key": "sent_friend_request",
+                    "label": "Sent Friend Request",
+                    "hook": "friends_friendship_requested",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "accepted_friend_request": {
+                    "key": "accepted_friend_request",
+                    "label": "Accepted Friend Request",
+                    "hook": "friends_friendship_accepted",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_group": {
+                    "key": "create_group",
+                    "label": "Create Group",
+                    "hook": "groups_group_create_complete",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "access_requested_private_group": {
+                    "key": "access_requested_private_group",
+                    "label": "Access Requested Private Group",
+                    "hook": "groups_membership_requested",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "joined_public_group": {
+                    "key": "joined_public_group",
+                    "label": "Joined Public Group",
+                    "hook": "groups_join_group",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "joined_private_group": {
+                    "key": "joined_private_group",
+                    "label": "Joined Private Group",
+                    "hook": "groups_membership_accepted",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "joined_specific_group": {
+                    "key": "joined_specific_group",
+                    "label": "Joined Specific Group",
+                    "hook": "groups_join_group",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "left_group": {
+                    "key": "left_group",
+                    "label": "Left Group",
+                    "hook": "groups_leave_group",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "left_private_group": {
+                    "key": "left_private_group",
+                    "label": "Left Private Group",
+                    "hook": "groups_leave_group",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "received_private_message": {
+                    "key": "received_private_message",
+                    "label": "Received Private Message",
+                    "hook": "messages_message_sent",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "profile_type_change": {
+                    "key": "profile_type_change",
+                    "label": "Profile Type Change",
+                    "hook": "bp_set_member_type",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "updated_profile": {
+                    "key": "updated_profile",
+                    "label": "Updated Profile",
+                    "hook": "xprofile_updated_profile",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": {
+                "create_activity_post": {
+                    "key": "create_activity_post",
+                    "label": "Create Activity Post",
+                    "schema": [
+                        {
+                            "key": "email",
+                            "label": "Author Email",
+                            "type": "email",
+                            "required": true,
+                            "placeholder": "Enter the email address of the user who will post the activity."
+                        },
+                        {
+                            "key": "content",
+                            "label": "Activity Content",
+                            "type": "textarea",
+                            "required": true,
+                            "placeholder": "Enter the content of the activity post."
+                        },
+                        {
+                            "key": "action",
+                            "label": "Activity Action",
+                            "type": "text",
+                            "required": false,
+                            "placeholder": "Enter the action text for the activity (optional)."
+                        },
+                        {
+                            "key": "action_link",
+                            "label": "Activity Action Link",
+                            "type": "url",
+                            "required": false,
+                            "placeholder": "Enter the primary link URL for the activity (optional)."
+                        },
+                        {
+                            "key": "hide_sitewide",
+                            "label": "Hide Sitewide",
+                            "type": "checkbox",
+                            "required": false,
+                            "description": "Hide this activity from the sitewide activity feed."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_group_post": {
+                    "key": "create_group_post",
+                    "label": "Create Group Post",
+                    "schema": [
+                        {
+                            "key": "group_id",
+                            "label": "Select Group",
+                            "type": "select",
+                            "required": true,
+                            "options": {
+                                "dynamic": {
+                                    "integration": "buddypress",
+                                    "query": "groups_query",
+                                    "select": [
+                                        "value",
+                                        "label"
+                                    ]
+                                }
+                            },
+                            "placeholder": "Select the group where you want to add the post."
+                        },
+                        {
+                            "key": "email",
+                            "label": "Author Email",
+                            "type": "email",
+                            "required": true,
+                            "placeholder": "Enter the email address of the user who will post the activity."
+                        },
+                        {
+                            "key": "content",
+                            "label": "Activity Content",
+                            "type": "textarea",
+                            "required": true,
+                            "placeholder": "Enter the content of the activity post."
+                        },
+                        {
+                            "key": "action",
+                            "label": "Activity Action",
+                            "type": "text",
+                            "required": false,
+                            "placeholder": "Enter the action text for the activity (optional)."
+                        },
+                        {
+                            "key": "action_link",
+                            "label": "Activity Action Link",
+                            "type": "url",
+                            "required": false,
+                            "placeholder": "Enter the primary link URL for the activity (optional)."
+                        },
+                        {
+                            "key": "hide_sitewide",
+                            "label": "Hide Sitewide",
+                            "type": "checkbox",
+                            "required": false,
+                            "description": "Hide this activity from the sitewide activity feed."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_user_activity_post": {
+                    "key": "create_user_activity_post",
+                    "label": "Create User Activity Post",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User Activity ID",
+                            "type": "number",
+                            "required": true,
+                            "placeholder": "Enter the user ID whose activity feed you want to post to."
+                        },
+                        {
+                            "key": "email",
+                            "label": "Author Email",
+                            "type": "email",
+                            "required": true,
+                            "placeholder": "Enter the email address of the user who will post the activity."
+                        },
+                        {
+                            "key": "content",
+                            "label": "Activity Content",
+                            "type": "textarea",
+                            "required": true,
+                            "placeholder": "Enter the content of the activity post."
+                        },
+                        {
+                            "key": "action",
+                            "label": "Activity Action",
+                            "type": "text",
+                            "required": false,
+                            "placeholder": "Enter the action text for the activity (optional)."
+                        },
+                        {
+                            "key": "action_link",
+                            "label": "Activity Action Link",
+                            "type": "url",
+                            "required": false,
+                            "placeholder": "Enter the primary link URL for the activity (optional)."
+                        },
+                        {
+                            "key": "hide_sitewide",
+                            "label": "Hide Sitewide",
+                            "type": "checkbox",
+                            "required": false,
+                            "description": "Hide this activity from the sitewide activity feed."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add_user_to_group": {
+                    "key": "add_user_to_group",
+                    "label": "Add User To Group",
+                    "schema": [
+                        {
+                            "key": "user_email",
+                            "label": "User Email",
+                            "type": "email",
+                            "required": true,
+                            "placeholder": "Enter the email address of the user you want to add to the group."
+                        },
+                        {
+                            "key": "group_ids",
+                            "label": "Select Group(s)",
+                            "type": "select",
+                            "multiple": true,
+                            "required": true,
+                            "options": [],
+                            "placeholder": "Select the group(s) to which you want to add the user.",
+                            "dynamic": {
+                                "integration": "buddypress",
+                                "query": "groups_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_member_profile_type": {
+                    "key": "update_member_profile_type",
+                    "label": "Update Member Profile Type",
+                    "schema": [
+                        {
+                            "key": "user_email",
+                            "label": "User Email",
+                            "type": "email",
+                            "required": true,
+                            "placeholder": "Enter the email address of the user whose member type you want to change."
+                        },
+                        {
+                            "key": "profile_type",
+                            "label": "Profile Type",
+                            "type": "select",
+                            "required": true,
+                            "options": [],
+                            "placeholder": "Select the profile type to assign to the user.",
+                            "dynamic": {
+                                "integration": "buddypress",
+                                "query": "member_types_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_group": {
+                    "key": "create_group",
+                    "label": "Create Group",
+                    "schema": [
+                        {
+                            "key": "group_name",
+                            "label": "Group Name",
+                            "type": "text",
+                            "required": true,
+                            "placeholder": "Enter the name of the group you want to create."
+                        },
+                        {
+                            "key": "group_status",
+                            "label": "Group Privacy Status",
+                            "type": "select",
+                            "required": true,
+                            "options": [
+                                {
+                                    "value": "public",
+                                    "label": "Public"
+                                },
+                                {
+                                    "value": "private",
+                                    "label": "Private"
+                                },
+                                {
+                                    "value": "hidden",
+                                    "label": "Hidden"
+                                }
+                            ],
+                            "placeholder": "Select the privacy status of the group."
+                        },
+                        {
+                            "key": "creator_email",
+                            "label": "Group Creator Email",
+                            "type": "email",
+                            "required": true,
+                            "placeholder": "Enter the email address of the user who will be the group creator."
+                        },
+                        {
+                            "key": "group_type",
+                            "label": "Group Type",
+                            "type": "select",
+                            "required": false,
+                            "options": [],
+                            "placeholder": "Select the group type.",
+                            "dynamic": {
+                                "integration": "buddypress",
+                                "query": "group_types_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "remove_friend_connection": {
+                    "key": "remove_friend_connection",
+                    "label": "Remove Friend Connection",
+                    "schema": [
+                        {
+                            "key": "user_email",
+                            "label": "User Email",
+                            "type": "email",
+                            "required": true,
+                            "placeholder": "Enter the email address of the user who will end the friendship."
+                        },
+                        {
+                            "key": "friend_email",
+                            "label": "Friend Email",
+                            "type": "email",
+                            "required": true,
+                            "placeholder": "Enter the email address of the friend to remove."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "follow_user": {
+                    "key": "follow_user",
+                    "label": "Follow User",
+                    "schema": [
+                        {
+                            "key": "follower_email",
+                            "label": "Follower Email",
+                            "type": "email",
+                            "required": true,
+                            "placeholder": "Enter the email address of the user who will follow (follower)."
+                        },
+                        {
+                            "key": "leader_email",
+                            "label": "User to Follow Email",
+                            "type": "email",
+                            "required": true,
+                            "placeholder": "Enter the email address of the user to be followed (leader)."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_forum_subscribers": {
+                    "key": "get_forum_subscribers",
+                    "label": "Get Forum Subscribers",
+                    "schema": [
+                        {
+                            "key": "forum_id",
+                            "label": "Forum ID",
+                            "type": "number",
+                            "required": true,
+                            "placeholder": "Enter the ID of the forum to get subscribers from."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_forum_topic_reply": {
+                    "key": "create_forum_topic_reply",
+                    "label": "Create Forum Topic Reply",
+                    "schema": [
+                        {
+                            "key": "forum_id",
+                            "label": "Select Forum",
+                            "type": "select",
+                            "required": true,
+                            "options": [],
+                            "placeholder": "Select the forum containing the topic.",
+                            "dynamic": {
+                                "integration": "bbpress",
+                                "query": "forums_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "topic_id",
+                            "label": "Topic ID",
+                            "type": "number",
+                            "required": true,
+                            "placeholder": "Enter the topic ID to reply to."
+                        },
+                        {
+                            "key": "reply_title",
+                            "label": "Reply Title",
+                            "type": "text",
+                            "required": true,
+                            "placeholder": "Enter the title of the reply."
+                        },
+                        {
+                            "key": "reply_content",
+                            "label": "Reply Content",
+                            "type": "textarea",
+                            "required": true,
+                            "placeholder": "Enter the content of the reply."
+                        },
+                        {
+                            "key": "author_email",
+                            "label": "Reply Author Email",
+                            "type": "email",
+                            "required": true,
+                            "placeholder": "Enter the email address of the user who will create the reply."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_forum_topic": {
+                    "key": "create_forum_topic",
+                    "label": "Create Forum Topic",
+                    "schema": [
+                        {
+                            "key": "forum_id",
+                            "label": "Select Forum",
+                            "type": "select",
+                            "required": true,
+                            "options": [],
+                            "placeholder": "Select the forum where you want to post the topic.",
+                            "dynamic": {
+                                "integration": "bbpress",
+                                "query": "forums_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "topic_title",
+                            "label": "Topic Title",
+                            "type": "text",
+                            "required": true,
+                            "placeholder": "Enter the title of the topic."
+                        },
+                        {
+                            "key": "topic_content",
+                            "label": "Topic Content",
+                            "type": "textarea",
+                            "required": true,
+                            "placeholder": "Enter the content of the topic."
+                        },
+                        {
+                            "key": "creator_email",
+                            "label": "Topic Creator Email",
+                            "type": "email",
+                            "required": true,
+                            "placeholder": "Enter the email address of the user who will create the topic."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "remove_user_form_group": {
+                    "key": "remove_user_form_group",
+                    "label": "Remove User Form Group",
+                    "schema": [
+                        {
+                            "key": "user_email",
+                            "label": "User Email",
+                            "type": "email",
+                            "required": true,
+                            "placeholder": "Enter the email address of the user you want to remove from the group."
+                        },
+                        {
+                            "key": "group_ids",
+                            "label": "Select Group(s)",
+                            "type": "select",
+                            "multiple": true,
+                            "required": true,
+                            "options": [],
+                            "placeholder": "Select the group(s) to remove the user from, or select \"all\" to remove from all groups.",
+                            "dynamic": {
+                                "integration": "buddypress",
+                                "query": "groups_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "send_friend_request": {
+                    "key": "send_friend_request",
+                    "label": "Send Friend Request",
+                    "schema": [
+                        {
+                            "key": "sender_email",
+                            "label": "Sender Email",
+                            "type": "email",
+                            "required": true,
+                            "placeholder": "Enter the email address of the user who will send the friendship request."
+                        },
+                        {
+                            "key": "receiver_email",
+                            "label": "Receiver Email",
+                            "type": "email",
+                            "required": true,
+                            "placeholder": "Enter the email address of the user who will receive the friendship request."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "send_group_message": {
+                    "key": "send_group_message",
+                    "label": "Send Group Message",
+                    "schema": [
+                        {
+                            "key": "group_id",
+                            "label": "Select Group",
+                            "type": "select",
+                            "required": true,
+                            "options": [],
+                            "placeholder": "Select the group whose members will receive the message.",
+                            "dynamic": {
+                                "integration": "buddypress",
+                                "query": "groups_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "sender_email",
+                            "label": "Sender Email",
+                            "type": "email",
+                            "required": true,
+                            "placeholder": "Enter the email address of the user who will send the message."
+                        },
+                        {
+                            "key": "message_subject",
+                            "label": "Message Subject",
+                            "type": "text",
+                            "required": true,
+                            "placeholder": "Enter the subject of the message."
+                        },
+                        {
+                            "key": "message_content",
+                            "label": "Message Content",
+                            "type": "textarea",
+                            "required": true,
+                            "placeholder": "Enter the content of the message."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "send_private_message": {
+                    "key": "send_private_message",
+                    "label": "Send Private Message",
+                    "schema": [
+                        {
+                            "key": "sender_email",
+                            "label": "Sender Email",
+                            "type": "email",
+                            "required": true,
+                            "placeholder": "Enter the email address of the user who will send the message."
+                        },
+                        {
+                            "key": "receiver_emails",
+                            "label": "Receiver Email(s)",
+                            "type": "text",
+                            "required": true,
+                            "placeholder": "Enter the email address(es) of the user(s) who will receive the message. Separate multiple emails with commas."
+                        },
+                        {
+                            "key": "message_subject",
+                            "label": "Message Subject",
+                            "type": "text",
+                            "required": true,
+                            "placeholder": "Enter the subject of the message."
+                        },
+                        {
+                            "key": "message_content",
+                            "label": "Message Content",
+                            "type": "textarea",
+                            "required": true,
+                            "placeholder": "Enter the content of the message."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "send_group_notification": {
+                    "key": "send_group_notification",
+                    "label": "Send Group Notification",
+                    "schema": [
+                        {
+                            "key": "group_id",
+                            "label": "Select Group",
+                            "type": "select",
+                            "required": true,
+                            "options": [],
+                            "placeholder": "Select the group whose members will receive the notification.",
+                            "dynamic": {
+                                "integration": "buddypress",
+                                "query": "groups_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "sender_email",
+                            "label": "Sender Email",
+                            "type": "email",
+                            "required": true,
+                            "placeholder": "Enter the email address of the user who will send the message."
+                        },
+                        {
+                            "key": "notification_content",
+                            "label": "Notification Content",
+                            "type": "textarea",
+                            "required": true,
+                            "placeholder": "Enter the content of the notification."
+                        },
+                        {
+                            "key": "notification_link",
+                            "label": "Notification Link",
+                            "type": "url",
+                            "required": false,
+                            "placeholder": "Enter the link of the notification (optional)."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_extended_profile": {
+                    "key": "update_extended_profile",
+                    "label": "Update Extended Profile",
+                    "schema": [
+                        {
+                            "key": "user_email",
+                            "label": "User Email",
+                            "type": "email",
+                            "required": true,
+                            "placeholder": "Enter the email address of the user whose extended profile you want to update."
+                        },
+                        {
+                            "key": "profile_fields",
+                            "label": "Extended Profile Field Map",
+                            "type": "repeater",
+                            "required": true,
+                            "sub_fields": [
+                                {
+                                    "key": "field_name",
+                                    "label": "Field",
+                                    "type": "text",
+                                    "required": true,
+                                    "placeholder": "Select or enter the extended profile field name."
+                                },
+                                {
+                                    "key": "field_value",
+                                    "label": "Value",
+                                    "type": "text",
+                                    "required": false,
+                                    "placeholder": "Enter the value for this field."
+                                }
+                            ],
+                            "add_button_label": "+ Add Extended Profile Field"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_user_status": {
+                    "key": "update_user_status",
+                    "label": "Update User Status",
+                    "schema": [
+                        {
+                            "key": "user_email",
+                            "label": "User Email",
+                            "type": "email",
+                            "required": true,
+                            "placeholder": "Enter the email address of the user whose status you want to change."
+                        },
+                        {
+                            "key": "status",
+                            "label": "Status",
+                            "type": "select",
+                            "required": true,
+                            "options": [
+                                {
+                                    "value": "suspend",
+                                    "label": "Suspend"
+                                },
+                                {
+                                    "value": "unsuspend",
+                                    "label": "Unsuspend"
+                                }
+                            ],
+                            "placeholder": "Select the status to set for the user."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "stop_following_user": {
+                    "key": "stop_following_user",
+                    "label": "Stop Following User",
+                    "schema": [
+                        {
+                            "key": "follower_email",
+                            "label": "Follower Email",
+                            "type": "email",
+                            "required": true,
+                            "placeholder": "Enter the email address of the user who will stop following (follower)."
+                        },
+                        {
+                            "key": "leader_email",
+                            "label": "User to Stop Following Email",
+                            "type": "email",
+                            "required": true,
+                            "placeholder": "Enter the email address of the user to stop following (leader)."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "subscribe_to_forum": {
+                    "key": "subscribe_to_forum",
+                    "label": "Subscriber To Forum",
+                    "schema": [
+                        {
+                            "key": "user_email",
+                            "label": "User Email",
+                            "type": "email",
+                            "required": true,
+                            "placeholder": "Enter the email address of the user you want to subscribe to the forum."
+                        },
+                        {
+                            "key": "forum_id",
+                            "label": "Select Forum",
+                            "type": "select",
+                            "required": true,
+                            "options": [],
+                            "placeholder": "Select the forum to subscribe the user to.",
+                            "dynamic": {
+                                "integration": "bbpress",
+                                "query": "forums_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
         }
     },
     "tools": {
