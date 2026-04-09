@@ -14,12 +14,13 @@ import {
 import { __, sprintf } from "@wordpress/i18n";
 import { useDispatch } from "react-redux";
 import TopBar from "@ZAPComponents/TopBar";
-import { plugin_root_url } from "@ZAPUtils/helper";
+import { plugin_root_url, route_path } from "@ZAPUtils/helper";
 import { FiEye, FiFolder } from "react-icons/fi";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { IoIosArrowForward } from "react-icons/io";
 import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
 import { getRecipeFolders, getRecipes } from "@ZAPRedux/Slices/recipeSlice/actions/recipe";
+import { useNavigate } from "react-router-dom";
 
 /** Static folder cards (matches design reference). */
 const STATIC_FOLDER_CARDS = [
@@ -48,6 +49,7 @@ const miniBtn = {
 };
 
 const FolderCard = ({ folder, onView }) => {
+  const navigate =useNavigate()
   const countLabel =
     folder.recipeCount === 1
       ? __("1 Recipe", "zaplane")
@@ -71,7 +73,9 @@ const FolderCard = ({ folder, onView }) => {
           <Portal>
             <Menu.Positioner>
               <Menu.Content minW="160px">
-                <Menu.Item value="view" onClick={() => onView(folder)}>
+                <Menu.Item value="view" onClick={() => {navigate(
+                        `${route_path}admin.php?page=zaplane-recipes&action=edit&id=${5}`
+                      );}}>
                   {__("View", "zaplane")}
                 </Menu.Item>
                 <Menu.Item
