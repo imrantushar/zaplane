@@ -5,6 +5,7 @@ import TopBar from '@ZAPComponents/TopBar';
 import { plugin_root_url } from '@ZAPUtils/helper';
 import React from 'react';
 import { IoIosArrowForward } from 'react-icons/io';
+import WorkflowTable from '../../workflows/WorkflowTable';
 
 const ShowRecipes = ({ id }) => {
     return (
@@ -37,7 +38,11 @@ const ShowRecipes = ({ id }) => {
                     </>
                 )}
             />
-            
+            <div className="zaplane-page-content">
+                <WorkflowTable
+                />
+            </div>
+
         </div>
     );
 };
