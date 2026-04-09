@@ -3,11 +3,19 @@ import { __ } from '@wordpress/i18n';
 import ZAPLabel from '@ZAPComponents/Labels/ZAPLabel';
 import TopBar from '@ZAPComponents/TopBar';
 import { plugin_root_url } from '@ZAPUtils/helper';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { IoIosArrowForward } from 'react-icons/io';
 import WorkflowTable from '../../workflows/WorkflowTable';
+import { useDispatch, useSelector } from 'react-redux';
+import { getRecipes } from '@ZAPRedux/Slices/recipeSlice/actions/recipe';
 
 const ShowRecipes = ({ id }) => {
+    const dispatch=useDispatch()
+    const {recipes}=useSelector((state)=>state.recipes)
+    useEffect(async()=>{
+   await getRecipes()
+    },[dispatch])
+    console.log(recipes,'recipe');
     return (
         <div>
             <TopBar
@@ -39,8 +47,8 @@ const ShowRecipes = ({ id }) => {
                 )}
             />
             <div className="zaplane-page-content">
-                <WorkflowTable
-                />
+                
+
             </div>
 
         </div>
