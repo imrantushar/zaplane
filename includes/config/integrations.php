@@ -156,13 +156,13 @@ return [
 			'file' => 'elementor.php',
 			'class' => \Zaplane\Integrations\Elementor::class
 		],
-		'masterstudy'          => [ 
-			'file' => 'masterstudy.php',          
-			'class' => \Zaplane\Integrations\Masterstudy::class 
+		'masterstudy'          => [
+			'file' => 'masterstudy.php',
+			'class' => \Zaplane\Integrations\Masterstudy::class
 		],
-		'academy'          => [ 
-			'file' => 'academy.php',          
-			'class' => \Zaplane\Integrations\Academy::class 
+		'academy'          => [
+			'file' => 'academy.php',
+			'class' => \Zaplane\Integrations\Academy::class
 		],
 		'jetengine'            => [
 			'file' => 'jetengine.php',
@@ -185,8 +185,12 @@ return [
 			'class' => \Zaplane\Integrations\Profilebuilder::class
 		],
 		'kadenceblocks'      => [
-			'file' => 'kadenceblocks.php', 
+			'file' => 'kadenceblocks.php',
 			'class' => \Zaplane\Integrations\Kadenceblocks::class
 			],
+		'suremail'      => [
+			'file' => 'suremail.php',
+			'class' => \Zaplane\Integrations\Suremail::class
+		],
 	],
 ];

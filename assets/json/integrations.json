@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-04-02 10:38:05",
+    "generated_at": "2026-04-09 10:35:05",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -13009,7 +13009,7 @@
         "jetengine": {
             "slug": "jetengine",
             "name": "JetEngine",
-            "icon": "Jetengine.svg",
+            "icon": "jetengine.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -13486,6 +13486,36 @@
                     "outputs": [
                         "main"
                     ]
+                }
+            },
+            "actions": []
+        },
+        "suremail": {
+            "slug": "suremail",
+            "name": "SureMail",
+            "icon": "suremail.svg",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": {
+                "email_sent_successfully": {
+                    "key": "email_sent_successfully",
+                    "label": "Email Sent Successfully",
+                    "hook": "wp_mail_succeeded",
+                    "schema": [],
+                    "outputs": {
+                        "main": "Main output"
+                    }
+                },
+                "email_sent_failed": {
+                    "key": "email_sent_failed",
+                    "label": "Email Sent Failed",
+                    "hook": "wp_mail_failed",
+                    "schema": [],
+                    "outputs": {
+                        "main": "Main output"
+                    }
                 }
             },
             "actions": []
