@@ -73,14 +73,21 @@ class RecipeFolder extends Model {
 	 * Each node has a 'children' key with its sub-folders (recursive).
 	 */
 	public static function tree(): array {
-		$all = static::orderBy( 'title', 'asc' )->get()->toArray();
+		// fresh() bypasses the in-process query cache so we always see the
+		// current database state (important in long-lived FPM workers).
+		$all = static::orderBy( 'title', 'asc' )->fresh()->get()->toArray();
 		return self::build_tree( $all, null );
 	}
 
 	private static function build_tree( array $all, ?int $parentId ): array {
 		$branch = [];
 		foreach ( $all as $item ) {
-			$itemParent = isset( $item['parent_id'] ) ? (int) $item['parent_id'] : null;
+			// Normalize parent_id: treat null, "", "0", 0 all as "no parent".
+			$raw        = $item['parent_id'] ?? null;
+			$itemParent = ( $raw !== null && $raw !== '' && (int) $raw !== 0 )
+				? (int) $raw
+				: null;
+
 			if ( $itemParent === $parentId ) {
 				$item['children'] = self::build_tree( $all, (int) $item['id'] );
 				$branch[]         = $item;
