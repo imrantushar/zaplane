@@ -5,7 +5,6 @@ import TopBar from '@ZAPComponents/TopBar';
 import { plugin_root_url } from '@ZAPUtils/helper';
 import React, { useEffect } from 'react';
 import { IoIosArrowForward } from 'react-icons/io';
-import WorkflowTable from '../../workflows/WorkflowTable';
 import { useDispatch, useSelector } from 'react-redux';
 import { getRecipes } from '@ZAPRedux/Slices/recipeSlice/actions/recipe';
 import RecipeCard from './RecipeCard';

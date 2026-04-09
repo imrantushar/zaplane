@@ -27,6 +27,7 @@ import { exportWorkflows } from "@ZAPRedux/Slices/workFlowSlice/actions/ExportIm
 import SaveAsRecipeModal from "@ZAPComponents/SaveAsRecipeModal";
 import { getRecipeFolders } from "@ZAPRedux/Slices/recipeSlice/actions/recipe";
 import { FiCheck, FiChevronDown, FiFolder } from "react-icons/fi";
+import ZAPMenu from "@ZAPComponents/ZapMenu";
 
 const flattenRecipeFolders = (nodes = [], acc = []) => {
   (nodes || []).forEach((node) => {
@@ -133,61 +134,53 @@ const WorkflowTable = () => {
         const defaultFolder = DEFAULT_WORKFLOW_RECIPE_FOLDER();
         const selected = recipeTargetFolderByWorkflow[rowKey] ?? defaultFolder;
 
+        const menuItems = [
+          {
+            label: defaultFolder.label,
+            icon: FiFolder,
+            onClick: () =>
+              setRecipeTargetFolderByWorkflow((prev) => ({
+                ...prev,
+                [row.id]: DEFAULT_WORKFLOW_RECIPE_FOLDER(),
+              })),
+            rightIcon: selected.folderId === null ? FiCheck : null,
+          },
+          ...flatFolders.map((folder) => ({
+            label: folder.title,
+            icon: FiFolder,
+            onClick: () =>
+              setRecipeTargetFolderByWorkflow((prev) => ({
+                ...prev,
+                [row.id]: { folderId: folder.id, label: folder.title },
+              })),
+            rightIcon:
+              Number(selected.folderId) === Number(folder.id) ? FiCheck : null,
+          })),
+          { type: "divider" },
+          {
+            label: __("Save as Recipe", "zaplane"),
+            onClick: () => setSaveAsRecipeRow(row),
+          },
+        ];
+
         return (
           <Box display="flex" justifyContent="center">
-            <Menu.Root>
-              <Menu.Trigger asChild>
+            <ZAPMenu
+              items={menuItems}
+              trigger={
                 <Button size="sm" variant="outline" maxW="220px">
-                  <HStack justify="space-between">
+                  <HStack justify="space-between" w="full">
                     <HStack spacing={2}>
                       <Icon as={FiFolder} />
-                      <Text className="zaplane-label" noOfLines={1}>{selected.label}</Text>
+                      <Text noOfLines={1} className="zaplane-label">
+                        {selected.label}
+                      </Text>
                     </HStack>
                     <Icon as={FiChevronDown} />
                   </HStack>
                 </Button>
-              </Menu.Trigger>
-              <Portal>
-                <Menu.Positioner>
-                  <Menu.Content minW="200px">
-                    <Menu.Item
-                      onClick={() =>
-                        setRecipeTargetFolderByWorkflow((prev) => ({
-                          ...prev,
-                          [row.id]: DEFAULT_WORKFLOW_RECIPE_FOLDER(),
-                        }))
-                      }
-                    >
-                      <HStack justify="space-between">
-                        <Text className="zaplane-label">{DEFAULT_WORKFLOW_RECIPE_FOLDER().label}</Text>
-                        {selected.folderId === null && <Icon as={FiCheck} />}
-                      </HStack>
-                    </Menu.Item>
-                    {flatFolders.map((folder) => (
-                      <Menu.Item
-                      className="zaplane-label"
-                        key={`folder-${folder.id}-${row.id}`}
-                        onClick={() =>
-                          setRecipeTargetFolderByWorkflow((prev) => ({
-                            ...prev,
-                            [row.id]: { folderId: folder.id, label: folder.title },
-                          }))
-                        }
-                      >
-                        <HStack justify="space-between">
-                          <Text className="zaplane-label">{folder.title}</Text>
-                          {Number(selected.folderId) === Number(folder.id) && <Icon as={FiCheck} />}
-                        </HStack>
-                      </Menu.Item>
-                    ))}
-                    <Menu.Separator />
-                    <Menu.Item onClick={() => setSaveAsRecipeRow(row)}>
-                      {__("Save as Recipe", "zaplane")}
-                    </Menu.Item>
-                  </Menu.Content>
-                </Menu.Positioner>
-              </Portal>
-            </Menu.Root>
+              }
+            />
           </Box>
         );
       },

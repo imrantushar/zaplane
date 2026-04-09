@@ -11,6 +11,7 @@ import {
   workflowToRecipe,
 } from "@ZAPRedux/Slices/recipeSlice/actions/recipe";
 import { primaryBtn } from "../../../assets/scss/chakra/recipe";
+import ZAPInput from "@ZAPComponents/ZAPInput";
 
 const SaveAsRecipeModal = ({
   isOpen,
@@ -82,27 +83,22 @@ const SaveAsRecipeModal = ({
       size="large"
     >
       <VStack align="stretch" spacing={4}>
-        {/* Title */}
-        <Box>
-          <Text className="zaplane-label">{__("Title", "zaplane")}</Text>
-          <Input
-            value={title}
+        <ZAPInput
+          label={__("Title", "zaplane")}
+          value={title}
             onChange={(e) => setTitle(e.target.value)}
-            placeholder={__("Recipe title", "zaplane")}
-          />
-        </Box>
+            placeholder={__("Recipe title", "zaplane")
 
-        {/* Description */}
-        <Box>
-          <Text className="zaplane-label">{__("Description", "zaplane")}</Text>
-          <Textarea
-            value={description}
+            }
+        />
+        <ZAPInput
+          label={__("Short description (optional)", "zaplane")}
+           value={description}
+           type="textarea"
             onChange={(e) => setDescription(e.target.value)}
             placeholder={__("Short description (optional)", "zaplane")}
-            rows={3}
-            resize="vertical"
-          />
-        </Box>
+        />
+
 
         {/* Thumbnail */}
         {/* <Box>

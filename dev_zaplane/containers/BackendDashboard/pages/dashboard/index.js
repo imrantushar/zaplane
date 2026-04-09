@@ -12,7 +12,6 @@ import { getRunsList } from '@ZAPRedux/Slices/logsSlice/logsSlice';
 import TotalExecutions from './TotalExecutions';
 import { topExecutedFlows } from '@ZAPRedux/Slices/dashboardSlice/dashboardSlice';
 import OverviewSection from './OverviewSection/OverviewSection';
-import { useNavigate } from 'react-router-dom';
 import CreateWorkflowModal from '@ZAPComponents/CreateWorkflowModal';
 import { IoIosArrowForward } from 'react-icons/io';
 import { plugin_root_url } from '@ZAPUtils/helper';
@@ -20,7 +19,6 @@ import { plugin_root_url } from '@ZAPUtils/helper';
 export default function Dashboard() {
     const dispatch = useDispatch();
     const { data = [] } = useSelector((state) => state.logs || {});
-    const navigate = useNavigate()
     const [isModalOpen, setIsModalOpen] = useState(false);
     useEffect(() => {
         dispatch(getRunsList());

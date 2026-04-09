@@ -11,9 +11,9 @@ const RecipeCard = ({ recipe }) => {
     }
     const createRecipe = () => {
         const payload = {
-            title: recipe.title,
-            description: recipe.description,
-            thumbnail_id: recipe.thumbnail_id,
+            title: recipe?.title,
+            description: recipe?.description,
+            thumbnail_id: recipe?.thumbnail_id,
             folder_id: 0
         };
 
@@ -34,33 +34,28 @@ const RecipeCard = ({ recipe }) => {
             _hover={{ boxShadow: 'md' }}
         >
             <Stack spacing="10px">
-                {/* Title */}
-                <Text fontWeight="600" fontSize="md">
-                    {recipe.title}
+                <Text className='zaplane-label'>
+                    {recipe?.title}
                 </Text>
-
-                {/* Description */}
-                <Text fontSize="sm" color="gray.500" noOfLines={2}>
-                    {recipe.description || __('No description', 'zaplane')}
+                <Text className='zaplane-label'>
+                    {recipe?.description || __('No description', 'zaplane')}
                 </Text>
-
-                {/* Buttons */}
                 <Flex gap="8px" pt="8px" wrap="wrap">
                     <Button
                         size="sm"
                         colorScheme="blue"
                         onClick={createRecipe}
                     >
-                        {__('Convert', 'zaplane')}
+                        {__('Convert To Workflow', 'zaplane')}
                     </Button>
 
-                    <Button
+                    {/* <Button
                         size="sm"
                         variant="outline"
                         onClick={() => onMove(recipe)}
                     >
                         {__('Move', 'zaplane')}
-                    </Button>
+                    </Button> */}
 
                     <Button
                         size="sm"
