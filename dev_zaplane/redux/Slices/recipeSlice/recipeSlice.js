@@ -7,6 +7,7 @@ import {
   getRecipes,
   updateRecipe,
   workflowToRecipe,
+  updateRecipeFolder
 } from "./actions/recipe";
 
 const recipeSlice = createSlice({
@@ -20,26 +21,17 @@ const recipeSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(getRecipeFolders.pending, (state) => {
-        state.loadingFolders = true;
-      })
+     
       .addCase(getRecipeFolders.fulfilled, (state, action) => {
         state.loadingFolders = false;
         state.folders = Array.isArray(action.payload) ? action.payload : [];
       })
-      .addCase(getRecipeFolders.rejected, (state) => {
-        state.loadingFolders = false;
-      })
-      .addCase(getRecipes.pending, (state) => {
-        state.loadingRecipes = true;
-      })
+     
       .addCase(getRecipes.fulfilled, (state, action) => {
         state.loadingRecipes = false;
         state.recipes = Array.isArray(action.payload) ? action.payload : [];
       })
-      .addCase(getRecipes.rejected, (state) => {
-        state.loadingRecipes = false;
-      })
+
       .addCase(updateRecipe.fulfilled, (state, action) => {
         const item = action.payload;
         if (!item?.id) {
@@ -56,14 +48,23 @@ const recipeSlice = createSlice({
       .addCase(createRecipeFolder.fulfilled, (state) => {
         // Collection is re-fetched from UI after create.
       })
-      .addCase(deleteRecipeFolder.fulfilled, (state) => {
-        // Collection is re-fetched from UI after delete.
+      .addCase(deleteRecipeFolder.fulfilled, (state,action) => {
+        const deletedId = action.payload;
+        state.folders = state.folders.filter((item) => Number(item.id) !== Number(deletedId));
       })
       .addCase(workflowToRecipe.fulfilled, (state, action) => {
         if (action.payload?.id) {
           state.recipes = [action.payload, ...state.recipes];
         }
-      });
+      })
+      .addCase(updateRecipeFolder.fulfilled, (state, action) => {
+        const item = action.payload;
+        if (!item?.id) return;
+
+        state.folders = state.folders.map((folder) =>
+          Number(folder.id) === Number(item.id) ? item : folder
+        );
+      })
   },
 });
 

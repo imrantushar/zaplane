@@ -356,25 +356,6 @@ const WorkflowTable = () => {
               />
             </Box>
           </ZAPTooltip>
-          <ZAPTooltip content={__("Save as Recipe", 'zaplane')}>
-            <Box
-              display="flex"
-              p={"5px 6px"}
-              justifyContent="center"
-              alignItems="center"
-              borderRadius="2.917px"
-              border="1px solid var(--zaplane-border-color)"
-              onClick={() => setSaveAsRecipeRow(row)}
-            >
-              <Icon
-                height="15px"
-                width="15px"
-                as={TbTemplate}
-              />
-            </Box>
-          </ZAPTooltip>
-
-
         </HStack>
       ),
       // columnWidth: "90px",

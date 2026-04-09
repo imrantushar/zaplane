@@ -6,30 +6,27 @@ import {
   Icon,
   IconButton,
   Image,
-  Menu,
-  Portal,
   SimpleGrid,
   Text,
+  Button,
+  Input,
 } from "@chakra-ui/react";
 import { __, sprintf } from "@wordpress/i18n";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import TopBar from "@ZAPComponents/TopBar";
 import { plugin_root_url, route_path } from "@ZAPUtils/helper";
 import { FiEye, FiFolder } from "react-icons/fi";
-import { BsThreeDotsVertical } from "react-icons/bs";
 import { IoIosArrowForward } from "react-icons/io";
 import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
-import { getRecipeFolders, getRecipes } from "@ZAPRedux/Slices/recipeSlice/actions/recipe";
+import {
+  deleteRecipeFolder,
+  getRecipeFolders,
+  getRecipes,
+  updateRecipeFolder,
+} from "@ZAPRedux/Slices/recipeSlice/actions/recipe";
 import { useNavigate } from "react-router-dom";
-
-/** Static folder cards (matches design reference). */
-const STATIC_FOLDER_CARDS = [
-  { id: "static-1", name: "dfdf", recipeCount: 0 },
-  { id: "static-2", name: "hhh", recipeCount: 1 },
-  { id: "static-3", name: "hiu", recipeCount: 0 },
-  { id: "static-4", name: "jhhh", recipeCount: 0 },
-  { id: "static-5", name: "mixan", recipeCount: 0 },
-];
+import ZAPMenu from "@ZAPComponents/ZapMenu";
+import WPModal from "@ZAPComponents/Modal/WPModal";
 
 const cardShell = {
   bg: "var(--zaplane-background)",
@@ -48,89 +45,133 @@ const miniBtn = {
   borderRadius: "6px",
 };
 
-const FolderCard = ({ folder, onView }) => {
-  const navigate =useNavigate()
-  const countLabel =
-    folder.recipeCount === 1
-      ? __("1 Recipe", "zaplane")
-      : sprintf(__("%d Recipes", "zaplane"), folder.recipeCount);
+const FolderCard = ({ folder }) => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const [title, setTitle] = useState(folder?.title || "");
+  const [isOpen, setIsOpen] = useState(false);
+
+  const onOpen = () => setIsOpen(true);
+  const onClose = () => setIsOpen(false);
+
+  const deletedFolderHandle = () => {
+    dispatch(deleteRecipeFolder(folder.id));
+  };
+
+  const updateFolderName = async () => {
+    if (!title?.trim()) return;
+
+    const payload = {
+      title: title,
+    };
+
+    await dispatch(
+      updateRecipeFolder({
+        id: folder?.id,
+        payload,
+      })
+    );
+
+    onClose();
+  };
 
   return (
-    <Box {...cardShell}>
-      <Flex justify="space-between" align="flex-start" gap={3} mb={3}>
-        <HStack spacing={2} minW={0} align="flex-start">
-          <Icon as={FiFolder} boxSize={5}  flexShrink={0} mt={0.5} />
-          <Text fontWeight="600" fontSize="15px" lineHeight="1.3" noOfLines={2} m={0}>
-            {folder.name}
-          </Text>
-        </HStack>
-        <Menu.Root>
-          <Menu.Trigger asChild>
-            <IconButton aria-label={__("Folder options", "zaplane")} {...miniBtn} flexShrink={0}>
-              <Icon as={BsThreeDotsVertical} boxSize={4} />
-            </IconButton>
-          </Menu.Trigger>
-          <Portal>
-            <Menu.Positioner>
-              <Menu.Content minW="160px">
-                <Menu.Item value="view" onClick={() => {navigate(
-                        `${route_path}admin.php?page=zaplane-recipes&action=edit&id=${5}`
-                      );}}>
-                  {__("View", "zaplane")}
-                </Menu.Item>
-                <Menu.Item
-                  value="rename"
-                  onClick={() =>
-                    window.alert(
-                      sprintf(
-                        /* translators: folder name */
-                        __("Rename “%s” (static demo).", "zaplane"),
-                        folder.name
-                      )
-                    )
-                  }
-                >
-                  {__("Rename", "zaplane")}
-                </Menu.Item>
-                <Menu.Item
-                  value="delete"
-                  onClick={() =>
-                    window.alert(
-                      sprintf(
-                        /* translators: folder name */
-                        __("Delete “%s” (static demo).", "zaplane"),
-                        folder.name
-                      )
-                    )
-                  }
-                >
-                  {__("Delete folder", "zaplane")}
-                </Menu.Item>
-              </Menu.Content>
-            </Menu.Positioner>
-          </Portal>
-        </Menu.Root>
-      </Flex>
+    <>
+      <Box {...cardShell}>
+        <Flex justify="space-between" align="flex-start" gap={3} mb={3}>
+          <HStack spacing={2} minW={0} align="flex-start">
+            <Icon as={FiFolder} boxSize={5} flexShrink={0} mt={0.5} />
+            <Text
+              fontWeight="600"
+              fontSize="15px"
+              m={0}
+              noOfLines={2}
+              cursor="pointer"
+              onClick={() =>
+                navigate(
+                  `${route_path}admin.php?page=zaplane-recipes&action=edit&id=${folder?.id}`
+                )
+              }
+            >
+              {folder.title}
+            </Text>
+          </HStack>
 
-      <Flex justify="space-between" align="flex-end">
-        <Text fontSize="13px" color="var(--zaplane-text-muted)" m={0}>
-          {countLabel}
-        </Text>
-        <IconButton
-          aria-label={sprintf(__("View recipes in %s", "zaplane"), folder.name)}
-          {...miniBtn}
-          onClick={() => onView(folder)}
-        >
-          <Icon as={FiEye} boxSize={4} />
-        </IconButton>
-      </Flex>
-    </Box>
+          <ZAPMenu
+            isIcon
+            items={[
+              {
+                label: "Edit",
+                onClick: onOpen,
+              },
+              {
+                label: "Delete",
+                onClick: deletedFolderHandle,
+              },
+            ]}
+          />
+        </Flex>
+
+        <Flex justify="space-between" align="flex-end">
+          <Text fontSize="13px" color="var(--zaplane-text-muted)">
+            {__("0 Workflows", "zaplane")}
+          </Text>
+
+          <IconButton
+            aria-label={sprintf(
+              __("View recipes in %s", "zaplane"),
+              folder.title
+            )}
+            {...miniBtn}
+            onClick={() =>
+              navigate(
+                `${route_path}admin.php?page=zaplane-recipes&action=edit&id=${folder?.id}`
+              )
+            }
+          >
+            <Icon as={FiEye} boxSize={4} />
+          </IconButton>
+        </Flex>
+      </Box>
+
+      {/* Modal */}
+      <WPModal
+        title={__("Rename Folder", "zaplane")}
+        isOpen={isOpen}
+        onRequestClose={onClose}
+        size="large"
+      >
+        <Input
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="Enter folder name"
+          mb={4}
+        />
+
+        <Flex justify="flex-end" gap={3}>
+          <Button variant="outline" onClick={onClose}>
+            {__("Cancel", "zaplane")}
+          </Button>
+
+          <Button
+            colorScheme="blue"
+            onClick={updateFolderName}
+            isDisabled={!title.trim()}
+          >
+            {__("Update", "zaplane")}
+          </Button>
+        </Flex>
+      </WPModal>
+    </>
   );
 };
 
 const RecipesPage = () => {
   const dispatch = useDispatch();
-  const [activeFolder, setActiveFolder] = useState(null);
+  const { folders: recipeFolders = [] } = useSelector(
+    (state) => state.recipes || {}
+  );
 
   useEffect(() => {
     dispatch(getRecipeFolders());
@@ -146,7 +187,6 @@ const RecipesPage = () => {
               height="40px"
               width="40px"
               borderRadius="20px"
-              gap="10px"
               background="var(--zaplane-second-primary)"
               alignItems="center"
               justifyContent="center"
@@ -156,10 +196,11 @@ const RecipesPage = () => {
                 boxSize="20px"
               />
             </Flex>
+
             <IoIosArrowForward />
+
             <ZAPLabel
               as="h2"
-              color="var(--zapplane-font-color)"
               type="subtitle"
               fontWeight="medium"
               label={__("Recipe Library", "zaplane")}
@@ -169,14 +210,9 @@ const RecipesPage = () => {
       />
 
       <div className="zaplane-page-content">
-     
-        <SimpleGrid columns={{ base: 1, sm: 2, lg: 3 }} spacing={4} gap='16px'>
-          {STATIC_FOLDER_CARDS.map((folder) => (
-            <FolderCard
-              key={folder.id}
-              folder={folder}
-              onView={(f) => setActiveFolder(f)}
-            />
+        <SimpleGrid columns={{ base: 1, sm: 2, lg: 3 }} spacing={4} gap='20px'>
+          {recipeFolders?.map((folder) => (
+            <FolderCard key={folder.id} folder={folder} />
           ))}
         </SimpleGrid>
       </div>

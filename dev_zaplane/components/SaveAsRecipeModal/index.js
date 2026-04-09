@@ -17,9 +17,9 @@ const SaveAsRecipeModal = ({ isOpen, onClose, workflowId,}) => {
   const [title, setTitle] = useState( "");
   const [folderId, setFolderId] = useState(null);
 
-  useEffect(() => {
-    dispatch(getRecipeFolders());
-  }, []);
+  // useEffect(() => {
+  //   dispatch(getRecipeFolders());
+  // }, []);
 
   const handleCreateFolder = async () => {
     if(!title.length)return
