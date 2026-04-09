@@ -130,34 +130,6 @@ class Gamipress extends IntegrationBase {
 		return false;
 	}
 
-	public static function get_actions(): array {
-		return [
-		];
-	}
-
-	public static function get_action_config_schema( string $action ): array {
-		$schemas = [
-
-		];
-
-		return $schemas[ $action ] ?? [];
-	}
-
-	public static function execute_node( array $node, array $input ): array {
-		$config = $node['data']['config'] ?? [];
-		$event  = $node['data']['event'] ?? '';
-
-		switch ( $event ) {
-
-
-		}//end switch
-
-		return [
-			'port' => 'main',
-			'data' => $input
-		];
-	}
-
 	public static function get_dynamic_queries(): array {
 		return [
 			'rank_type_query'        => [ self::class, 'query_rank_type' ],
@@ -165,6 +137,27 @@ class Gamipress extends IntegrationBase {
 			'achievement_type_query' => [ self::class, 'query_achievement_type' ],
 			'achievement_query'      => [ self::class, 'query_achievement' ],
 		];
+	}
+
+	private static function get_value( $query, $key ) {
+
+		if ( isset( $query['where'][ $key ] ) ) {
+			return $query['where'][ $key ];
+		}
+
+		if ( isset( $query[ $key ] ) ) {
+			return $query[ $key ];
+		}
+
+		if ( isset( $query['values'][ $key ] ) ) {
+			return $query['values'][ $key ];
+		}
+
+		if ( isset( $query['data'][ $key ] ) ) {
+			return $query['data'][ $key ];
+		}
+
+		return '';
 	}
 
 	public static function query_rank_type( $query ) {
@@ -195,36 +188,57 @@ class Gamipress extends IntegrationBase {
 	}
 
 	public static function query_rank( $query ) {
+		global $wpdb;
 
-        global $wpdb;
+		$rank_type = self::get_value( $query, 'rank_type' );
+		$rank_type = sanitize_text_field( $rank_type );
 
-        $rank_type = isset($query['rank_type']) 
-            ? sanitize_text_field($query['rank_type']) 
-            : '';
+		$all_rank = [
+			[	'value' => 'any', 
+				'label' => 'Any Rank' 
+			],
+		];
 
-        $all_rank = [
-            [
-                'value' => 'any',
-                'label' => 'Any Rank'
-            ],
-        ];
+		if ( empty( $rank_type ) || $rank_type === 'any' ) {
 
-        $ranks = $wpdb->get_results(
-            $wpdb->prepare(
-                "SELECT ID, post_name, post_title, post_type FROM {$wpdb->posts} where post_type like %s AND post_status = %s",
-                [$rank_type, 'publish']
-            )
-        );
+			$all_rank_types = $wpdb->get_results(
+				"SELECT post_name FROM {$wpdb->posts} WHERE post_type LIKE 'rank_type' AND post_status = 'publish'"
+			);
 
-        foreach ( $ranks as $rank ) {
-            $all_rank[] = [
-                'value' => $rank->post_name,
-                'label' => $rank->post_title,
-            ];
-        }
+			foreach ( $all_rank_types as $rt ) {
+				$ranks = $wpdb->get_results(
+					$wpdb->prepare(
+						"SELECT post_name, post_title FROM {$wpdb->posts} WHERE post_type = %s AND post_status = 'publish'",
+						$rt->post_name
+					)
+				);
+				foreach ( $ranks as $rank ) {
+					$all_rank[] = [
+						'value' => $rank->post_name,
+						'label' => $rank->post_title,
+					];
+				}
+			}
 
-        return $all_rank;
-    }
+			return $all_rank;
+		}
+
+		$ranks = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT post_name, post_title FROM {$wpdb->posts} WHERE post_type = %s AND post_status = 'publish'",
+				$rank_type
+			)
+		);
+
+		foreach ( $ranks as $rank ) {
+			$all_rank[] = [
+				'value' => $rank->post_name,
+				'label' => $rank->post_title,
+			];
+		}
+
+		return $all_rank;
+	}
 
     public static function query_achievement_type( $query ) {
 		$all_achievement_type = [
@@ -256,25 +270,49 @@ class Gamipress extends IntegrationBase {
     public static function query_achievement( $query ) {
 		global $wpdb;
 
-        $achievement_type = isset($query['achievement_type']) 
-            ? sanitize_text_field($query['achievement_type']) 
-            : '';
+		$achievement_type = self::get_value( $query, 'achievement_type' );
+		$achievement_type = sanitize_text_field( $achievement_type );
 
-        $all_achievement = [
-            [
-                'value' => 'any',
-                'label' => 'Any Achievement'
-            ],
-        ];
+		$all_achievement = [
+			[ 'value' => 'any', 'label' => 'Any Achievement' ],
+		];
 
-        $achievements = $wpdb->get_results(
-            $wpdb->prepare("SELECT ID, post_name, post_title, post_type FROM {$wpdb->posts} where post_type like %s AND post_status = %s", [$achievement_type, 'publish'])
-        );
+		if ( empty( $achievement_type ) || $achievement_type === 'any' ) {
+
+			$all_types = $wpdb->get_results(
+				"SELECT post_name FROM {$wpdb->posts} WHERE post_type LIKE 'achievement-type' AND post_status = 'publish'"
+			);
+
+			foreach ( $all_types as $type ) {
+				$achievements = $wpdb->get_results(
+					$wpdb->prepare(
+						"SELECT ID, post_title FROM {$wpdb->posts} WHERE post_type = %s AND post_status = 'publish'",
+						$type->post_name
+					)
+				);
+
+				foreach ( $achievements as $achievement ) {
+					$all_achievement[] = [
+						'value' => (string) $achievement->ID,
+						'label' => $achievement->post_title,
+					];
+				}
+			}
+
+			return $all_achievement;
+		}
+
+		$achievements = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT ID, post_title FROM {$wpdb->posts} WHERE post_type = %s AND post_status = 'publish'",
+				$achievement_type
+			)
+		);
 
 		foreach ( $achievements as $achievement ) {
 			$all_achievement[] = [
-				'value' => $achievement->post_name,
-				'label' => $achievement->ID,
+				'value' => (string) $achievement->ID,
+				'label' => $achievement->post_title,
 			];
 		}
 
