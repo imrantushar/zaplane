@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-04-02 10:38:05",
+    "generated_at": "2026-04-11 12:41:52",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -13009,7 +13009,7 @@
         "jetengine": {
             "slug": "jetengine",
             "name": "JetEngine",
-            "icon": "Jetengine.svg",
+            "icon": "jetengine.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -13482,6 +13482,27 @@
                     "key": "kadence_blocks_advanced_form_submission",
                     "label": "Advanced Form Submission",
                     "hook": "kadence_blocks_advanced_form_submission",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": []
+        },
+        "weforms": {
+            "slug": "weforms",
+            "name": "We Forms",
+            "icon": "we-forms.svg",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": {
+                "weforms_entry_submission": {
+                    "key": "weforms_entry_submission",
+                    "label": "We Form Submission",
+                    "hook": "weforms_entry_submission",
                     "schema": [],
                     "outputs": [
                         "main"

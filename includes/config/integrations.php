@@ -188,5 +188,9 @@ return [
 			'file' => 'kadenceblocks.php', 
 			'class' => \Zaplane\Integrations\Kadenceblocks::class
 			],
+		'weforms'      => [
+			'file' => 'weforms.php', 
+			'class' => \Zaplane\Integrations\Weforms::class
+			],
 	],
 ];
