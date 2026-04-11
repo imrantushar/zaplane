@@ -45,6 +45,7 @@ class RecipeFolderController extends WP_REST_Controller {
 						'type'     => 'integer',
 						'required' => false,
 						'default'  => null,
+						'nullable' => true,
 					],
 				],
 			],
@@ -65,6 +66,7 @@ class RecipeFolderController extends WP_REST_Controller {
 					'parent_id' => [
 						'type'    => 'integer',
 						'required' => false,
+						'nullable' => true,
 					],
 				],
 			],

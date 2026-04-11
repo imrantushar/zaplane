@@ -29,6 +29,7 @@ const SaveAsRecipeModal = ({
   const [thumbnailUrl, setThumbnailUrl] = useState(null); // for preview
   const [folderId, setFolderId] = useState(initialFolderId);
   const [creating, setCreating] = useState(false);
+  const [creatingFolder, setCreatingFolder] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -54,7 +55,7 @@ const SaveAsRecipeModal = ({
           description: description.trim() || undefined,
           thumbnail_id: thumbnailId || undefined,
         })
-      );
+      ).unwrap();
 
       await dispatch(getRecipeFolders());
       onClose();
@@ -62,6 +63,22 @@ const SaveAsRecipeModal = ({
       console.error("Failed to create recipe:", err);
     }
     setCreating(false);
+  };
+
+  const handleCreateFolder = async (payload) => {
+    setCreatingFolder(true);
+
+    try {
+      const result = await dispatch(createRecipeFolder(payload)).unwrap();
+      if (result?.id) {
+        setFolderId(result.id);
+      }
+      await dispatch(getRecipeFolders());
+    } catch (err) {
+      console.error("Failed to create recipe folder:", err);
+    }
+
+    setCreatingFolder(false);
   };
 
   // Handler for WP media uploader selection
@@ -135,6 +152,7 @@ const SaveAsRecipeModal = ({
           folders={folders}
           selectedFolderId={folderId}
           onSelectFolder={(id) => setFolderId(id)}
+          onCreateFolder={handleCreateFolder}
           loading={loadingFolders}
         />
 

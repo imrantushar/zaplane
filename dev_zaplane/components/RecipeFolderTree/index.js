@@ -120,7 +120,11 @@ const RecipeFolderTree = ({
                 if (!title) {
                   return;
                 }
-                onCreateFolder({ title, parent_id: selectedFolderId });
+                const payload = { title };
+                if (selectedFolderId !== null) {
+                  payload.parent_id = selectedFolderId;
+                }
+                onCreateFolder(payload);
                 setNewFolderName("");
               }}
               isDisabled={!newFolderName.trim()}
