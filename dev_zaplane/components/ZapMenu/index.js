@@ -9,15 +9,17 @@ const ZAPMenu = ({
   items = [],
   isIcon = false,
   variant = "outline",
-  trigger, 
+  trigger,
 }) => {
   return (
     <Menu.Root>
       <Menu.Trigger asChild>
         {trigger ? (
-          trigger 
+          trigger
         ) : isIcon ? (
-          <IconButton size="sm" variant={variant} aria-label="More options">
+          <IconButton onClick={e=>{
+             e.stopPropagation();
+          }} size="sm" variant={variant} aria-label="More options">
             <BsThreeDotsVertical />
           </IconButton>
         ) : (
@@ -38,7 +40,10 @@ const ZAPMenu = ({
               return (
                 <Menu.Item
                   key={index}
-                  onClick={item.onClick}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    item.onClick(e);
+                  }}
                   cursor="pointer"
                   _hover={{ bg: "var(--zaplane-gray)" }}
                 >

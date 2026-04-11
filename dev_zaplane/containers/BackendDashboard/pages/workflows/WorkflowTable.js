@@ -127,60 +127,13 @@ const WorkflowTable = () => {
       textAlign: "start",
     },
     {
-      name: <Text className="zaplane-label">{__("Folders", "zaplane")}</Text>,
+      name: <Text className="zaplane-label">{__("Recipes", "zaplane")}</Text>,
       cell: (row) => {
-        const rowKey = String(row.id);
-        const flatFolders = flattenRecipeFolders(recipeFolders);
-        const defaultFolder = DEFAULT_WORKFLOW_RECIPE_FOLDER();
-        const selected = recipeTargetFolderByWorkflow[rowKey] ?? defaultFolder;
-
-        const menuItems = [
-          {
-            label: defaultFolder.label,
-            icon: FiFolder,
-            onClick: () =>
-              setRecipeTargetFolderByWorkflow((prev) => ({
-                ...prev,
-                [row.id]: DEFAULT_WORKFLOW_RECIPE_FOLDER(),
-              })),
-            rightIcon: selected.folderId === null ? FiCheck : null,
-          },
-          ...flatFolders.map((folder) => ({
-            label: folder.title,
-            icon: FiFolder,
-            onClick: () =>
-              setRecipeTargetFolderByWorkflow((prev) => ({
-                ...prev,
-                [row.id]: { folderId: folder.id, label: folder.title },
-              })),
-            rightIcon:
-              Number(selected.folderId) === Number(folder.id) ? FiCheck : null,
-          })),
-          { type: "divider" },
-          {
-            label: __("Save as Recipe", "zaplane"),
-            onClick: () => setSaveAsRecipeRow(row),
-          },
-        ];
-
         return (
           <Box display="flex" justifyContent="center">
-            <ZAPMenu
-              items={menuItems}
-              trigger={
-                <Button size="sm" variant="outline" maxW="220px">
-                  <HStack justify="space-between" w="full">
-                    <HStack spacing={2}>
-                      <Icon as={FiFolder} />
-                      <Text noOfLines={1} className="zaplane-label">
-                        {selected.label}
-                      </Text>
-                    </HStack>
-                    <Icon as={FiChevronDown} />
-                  </HStack>
-                </Button>
-              }
-            />
+            <Button variant={'outline'} onClick={() => setSaveAsRecipeRow(row)}>
+              {__('Save Us Recipes')}
+            </Button>
           </Box>
         );
       },

@@ -11,6 +11,7 @@ import { useNavigate } from 'react-router-dom';
 import { route_path } from '@ZAPUtils/helper';
 import WPModal from '@ZAPComponents/Modal/WPModal';
 import RecipeFolderTree from '@ZAPComponents/RecipeFolderTree';
+import { primaryBtn } from '../../../../../../assets/scss/chakra/recipe';
 
 const RecipeCard = ({ recipe }) => {
     const dispatch = useDispatch();
@@ -73,25 +74,6 @@ const RecipeCard = ({ recipe }) => {
         }
         setLoading(false);
     };
-
-    const handleMove = async () => {
-        setLoading(true);
-        try {
-            await dispatch(
-                updateRecipe({
-                    id: recipe.id,
-                    payload: {
-                        folder_id: selectedFolderId,
-                    },
-                })
-            ).unwrap();
-            setIsMoveOpen(false);
-        } catch (err) {
-            console.error('Failed to move recipe:', err);
-        }
-        setLoading(false);
-    };
-
     return (
         <>
             <Box
@@ -111,22 +93,13 @@ const RecipeCard = ({ recipe }) => {
                     </Text>
                     <Flex gap="8px" pt="8px" wrap="wrap">
                         <Button
-                            size="sm"
-                            colorScheme="blue"
+                            {...primaryBtn}
                             onClick={() => setIsConvertOpen(true)}
                         >
                             {__('Convert To Workflow', 'zaplane')}
                         </Button>
                         <Button
                             size="sm"
-                            variant="outline"
-                            onClick={() => setIsMoveOpen(true)}
-                        >
-                            {__('Move', 'zaplane')}
-                        </Button>
-                        <Button
-                            size="sm"
-                            colorScheme="red"
                             variant="outline"
                             onClick={deletedRecipe}
                         >
@@ -165,34 +138,6 @@ const RecipeCard = ({ recipe }) => {
                             isLoading={loading}
                         >
                             {__('Convert', 'zaplane')}
-                        </Button>
-                    </Flex>
-                </VStack>
-            </WPModal>
-
-            <WPModal
-                title={__('Move Recipe', 'zaplane')}
-                isOpen={isMoveOpen}
-                onRequestClose={() => setIsMoveOpen(false)}
-                size="large"
-            >
-                <VStack align="stretch" spacing={4}>
-                    <RecipeFolderTree
-                        folders={recipe?.folders || []}
-                        selectedFolderId={selectedFolderId}
-                        onSelectFolder={setSelectedFolderId}
-                        rootLabel={__('Unfiled', 'zaplane')}
-                    />
-                    <Flex justify="flex-end" gap={3}>
-                        <Button variant="outline" onClick={() => setIsMoveOpen(false)}>
-                            {__('Cancel', 'zaplane')}
-                        </Button>
-                        <Button
-                            colorScheme="blue"
-                            onClick={handleMove}
-                            isLoading={loading}
-                        >
-                            {__('Move', 'zaplane')}
                         </Button>
                     </Flex>
                 </VStack>
