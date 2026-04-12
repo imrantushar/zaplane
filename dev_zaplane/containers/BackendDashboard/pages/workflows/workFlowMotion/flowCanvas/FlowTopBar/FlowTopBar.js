@@ -1,6 +1,7 @@
-import React, { useEffect, useState, useRef } from "react";
-import { Button, Text, Flex, Input, Box, Image } from "@chakra-ui/react";
+import React, { useEffect, useRef, useState } from "react";
+import { Button, Text, Flex, Input, Box, FileUpload,Image} from "@chakra-ui/react";
 import TopBar from "@ZAPComponents/TopBar";
+import { FiArrowLeft, FiDownload, FiUpload } from "react-icons/fi";
 import { TfiReload } from "react-icons/tfi";
 import { LuFullscreen, LuMinimize, LuSquarePlay } from "react-icons/lu";
 import { LucideHistory } from "lucide-react";
@@ -22,10 +23,13 @@ import '../styles.scss'
 import { LiaStopCircleSolid } from "react-icons/lia";
 import { CiPlay1 } from "react-icons/ci";
 import { updateWorkFlowStatus, updateWorkFlowTitle } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow";
+import { useNavigate } from "react-router-dom";
 import { plugin_root_url, route_path } from "@ZAPUtils/helper";
+import ZAPMenu from "@ZAPComponents/ZapMenu";
+import { exportWorkflows, importWorkflows } from "@ZAPRedux/Slices/workFlowSlice/actions/ExportImport";
+import ImportJSONModal from "./ImportJSONModal";
 import { IoIosArrowForward } from "react-icons/io";
 import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
-import ZAPTooltip from "@ZAPComponents/ZAPTooltip";
 
 export default function FlowTopBar({
   workFlow,
@@ -41,9 +45,12 @@ export default function FlowTopBar({
 }) {
   const { apiCountdown, apiRequestRunning } = useSelector((state) => state.workflows);
   const [refreshing, setRefreshing] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [file, setFile] = useState(null);
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const titleInputRef = useRef(null);
-  const dispatch = useDispatch();
   useApiCountdown();
   useEffect(() => {
     if (isEditingTitle && titleInputRef.current) {
@@ -51,7 +58,7 @@ export default function FlowTopBar({
       titleInputRef.current.select();
     }
   }, [isEditingTitle]);
-
+  useApiCountdown()
   useEffect(() => {
     if (!workFlow?.workflow) return;
     const updateStatusAndTitle = async () => {
@@ -123,52 +130,63 @@ export default function FlowTopBar({
       alert("Invalid JSON file");
     }
   };
-
+const currentTitle = values?.title ?? workFlow?.workflow?.title ?? "Untitled Flow";
   return (
     <>
       <TopBar
         leftContent={() => (
           <>
-
-            <Button variant="outline" height="36px" width="36px"
-              onClick={() => {
-                if (isFullscreen) {
-                  toggleFullscreen();
-                  return;
-                }
-
-                if (isFlowDirty) {
-                  const confirmLeave = window.confirm(
-                    "You have unsaved changes. Are you sure you want to leave?"
-                  );
-                  if (!confirmLeave) return;
-                }
-
-                navigate(`${route_path}admin.php?page=zaplane-workflows`);
-              }}>
-              <FiArrowLeft />
-            </Button>
-
-            <Box w="120px">
+            <Image
+              src={`${plugin_root_url}assets/images/zaplane.svg`}
+              boxSize="20px"
+            />
+            <IoIosArrowForward />
+            <ZAPLabel
+              as="h2"
+              color="var(--zapplane-font-color)"
+              type="subtitle"
+              fontWeight="medium"
+              href={`${route_path}admin.php?page=zaplane-workflows`}
+              label={__('Flows', 'zaplane')}
+            />
+            <IoIosArrowForward />
+            {isEditingTitle ? (
               <Input
-                height='36px'
-                fontSize='14px'
-                fontWeight='500'
-                value={
-                  values?.title ?? workFlow?.workflow?.title ?? "Untitled Flow"
-                }
+                ref={titleInputRef}
+                height="28px"
+                fontSize="14px"
+                fontWeight="500"
+                value={currentTitle}
                 onChange={(e) => setFieldValue("title", e.target.value)}
-                variant="outline"
-                border="1px solid transparent"
-                _hover={{
-                  borderColor: "var(--zaplane-border-color)",
+                onBlur={() => setIsEditingTitle(false)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === "Escape") {
+                    setIsEditingTitle(false);
+                  }
                 }}
-              // maxW="250px"
-
+                variant="outline"
+                border="1px solid var(--zaplane-border-color)"
+                borderRadius="4px"
+                px="6px"
+                w="auto"
+                minW="80px"
+                maxW="200px"
               />
-            </Box>
-
-
+            ) : (
+              <Text
+                as="h2"
+                m='0'
+                fontSize="14px"
+                fontWeight="500"
+                color="var(--zapplane-font-color)"
+                cursor="pointer"
+                onClick={() => setIsEditingTitle(true)}
+                noOfLines={1}
+                maxW="200px"
+              >
+                {currentTitle}
+              </Text>
+            )}
           </>
         )}
         rightContent={() => (
