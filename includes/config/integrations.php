@@ -39,6 +39,7 @@ return [
 		'woosubscriptions'     => [
 			'file' => 'woo-subscriptions.php',
 			'class' => \Zaplane\Integrations\WooSubscriptions::class
+		],
 		'woobookings'          => [
 			'file' => 'woo-bookings.php',
 			'class' => \Zaplane\Integrations\WooBookings::class
@@ -58,6 +59,10 @@ return [
 		'mailchimp'            => [
 			'file' => 'mailchimp.php',
 			'class' => \Zaplane\Integrations\Mailchimp::class
+		],
+		'activecampaign'         => [
+			'file' => 'active-campaign.php',
+			'class' => \Zaplane\Integrations\ActiveCampaign::class
 		],
 		'hubspot'              => [
 			'file' => 'hubspot.php',
