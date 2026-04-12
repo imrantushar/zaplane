@@ -1,7 +1,7 @@
 <?php
 
 namespace {
-	require_once dirname( __DIR__ ) . '/mocks/WoocommerceTestStubs.php';
+	require_once __DIR__ . '/../mocks/woocommerce.php';
 }
 
 namespace Zaplane\Tests\Integrations {
