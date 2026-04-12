@@ -23,7 +23,7 @@ const DrawerSearchList = ({ searchList, setMode, setSelectedItem, setSearch }) =
           _hover={{ bg: "#F6F7F8" }}
         >
           <Flex gap='12px' alignItems='center'>
-              <ZAPIcon icon={item.icon}  name={item.name} />
+              <ZAPIcon icon={item.icon}  name={item.name} isAction={true} />
             <Text className="zaplane-label" fontWeight='400' >{sprintf(__("%s", "zaplane"), item.name)}</Text>
           </Flex>
 
