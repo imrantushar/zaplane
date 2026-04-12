@@ -206,6 +206,10 @@ return [
 			'file' => 'kadenceblocks.php', 
 			'class' => \Zaplane\Integrations\Kadenceblocks::class
 			],
+		'bookingcalendar'      => [
+			'file' => 'bookingcalendar.php', 
+			'class' => \Zaplane\Integrations\Bookingcalendar::class
+		],
 		'weforms'      => [
 			'file' => 'weforms.php', 
 			'class' => \Zaplane\Integrations\Weforms::class
