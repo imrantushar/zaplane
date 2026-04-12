@@ -36,6 +36,9 @@ return [
 			'file' => 'woocommerce.php',
 			'class' => \Zaplane\Integrations\Woocommerce::class
 		],
+		'woosubscriptions'     => [
+			'file' => 'woo-subscriptions.php',
+			'class' => \Zaplane\Integrations\WooSubscriptions::class
 		'woobookings'          => [
 			'file' => 'woo-bookings.php',
 			'class' => \Zaplane\Integrations\WooBookings::class
