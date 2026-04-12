@@ -127,7 +127,7 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
             className="zaplane_flowcanvas"
             flex="1"
             height="100vh"
-            marginRight={activeDrawer ? "600px" : "0px"}
+            // marginRight={activeDrawer ? "600px" : "0px"}
             transition="margin-right 0.4s ease"
         >
 
@@ -156,15 +156,16 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
                     onNodesChange={onNodesChange}
                     onEdgesChange={onEdgesChange}
                     onConnect={onConnect}
-                    fitView
-                    fitViewOnInit
+                    // fitView
+                    // fitViewOnInit
+                    //  defaultViewport={{ x: 0, y: 0, zoom: 1 }}
+                    fitViewOptions={{ minZoom: 0.5, maxZoom: 1 }}
                     panOnDrag
                     zoomOnScroll
                     zoomOnDoubleClick
                     nodesDraggable
                     nodesConnectable
                     elementsSelectable
-                    minZoom={0.5}
                 >
 
                     <Background />

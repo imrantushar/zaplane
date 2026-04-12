@@ -122,7 +122,7 @@ const ConnectionTable = () => {
                 return (
                     <Box textAlign="center">
                         <ZAPLabel label={date} type={"simple"} />
-                        <Text className="zaplane-sub-title" ml='-45px' color="var(--zaplane-text-muted)">
+                        <Text className="zaplane-sub-title" ml='-38px' color="var(--zaplane-text-muted)">
                             {__(time, 'zaplane')}
                         </Text>
                     </Box>
@@ -144,7 +144,7 @@ const ConnectionTable = () => {
                 return (
                     <Box textAlign="center">
                         <ZAPLabel label={date} type={"simple"} />
-                        <Text className="zaplane-sub-title" ml='-45px' color="var(--zaplane-text-muted)">
+                        <Text className="zaplane-sub-title" ml='-38px' color="var(--zaplane-text-muted)">
                             {__(time, 'zaplane')}
                         </Text>
                     </Box>

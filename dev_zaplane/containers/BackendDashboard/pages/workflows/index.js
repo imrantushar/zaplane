@@ -5,9 +5,11 @@ import TopBar from "@ZAPComponents/TopBar";
 import WorkflowTable from "./WorkflowTable";
 import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
 import CreateWorkflowModal from "@ZAPComponents/CreateWorkflowModal";
-import { primaryBtn } from "../../../../../assets/scss/chakra/recipe";
+import { outlineBtn, primaryBtn } from "../../../../../assets/scss/chakra/recipe";
 import { IoIosArrowForward } from "react-icons/io";
 import { plugin_root_url } from "@ZAPUtils/helper";
+import SubTopBar from "@ZAPComponents/SubTopBar";
+import { FiHelpCircle } from "react-icons/fi";
 
 
 const CreateWorkflows = () => {
@@ -35,21 +37,24 @@ const CreateWorkflows = () => {
             />
           </>
         )}
-        rightContent={() => (
-          // <ZAPMenu
-          //   triggerLabel="Create Workflow"
-          //   items={[
-          //     {
-          //       label: "Create from Scratch",
-          //       onClick: () => setIsModalOpen(true),
-          //     },
-          //   ]}
-          // />
-          <Button {...primaryBtn} onClick={() => setIsModalOpen(true)}>
-            {__('Create Workflow', 'zaplane')}
-          </Button>
-        )}
+        // rightContent={() => (
+        //   <ZAPMenu
+        //     triggerLabel="Create Workflow"
+        //     items={[
+        //       {
+        //         label: "Create from Scratch",
+        //         onClick: () => setIsModalOpen(true),
+        //       },
+        //     ]}
+        //   />
+        
+        // )}
       />
+      <SubTopBar heading={__("Workflows", "zaplane")}>
+        <Button onClick={() => setIsModalOpen(true)} {...primaryBtn}>
+          {__("Create Workflow", "zaplane")}
+        </Button>
+      </SubTopBar>
 
       <div className="zaplane-page-content">
         <WorkflowTable
