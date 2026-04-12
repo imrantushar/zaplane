@@ -27,7 +27,10 @@ return [
 			'file' => 'variable.php',
 			'class' => \Zaplane\Integrations\Variable::class
 		],
-
+    'cartflows'            => [
+      'file' => 'cartflows.php',
+      'class' => \Zaplane\Integrations\Cartflows::class
+    ],
 		'wordpress'            => [
 			'file' => 'wordpress.php',
 			'class' => \Zaplane\Integrations\Wordpress::class
@@ -39,6 +42,13 @@ return [
 		'woomemberships'       => [
 			'file' => 'woo-memberships.php',
 			'class' => \Zaplane\Integrations\WooMemberships::class
+		'woosubscriptions'     => [
+			'file' => 'woo-subscriptions.php',
+			'class' => \Zaplane\Integrations\WooSubscriptions::class
+		],
+		'woobookings'          => [
+			'file' => 'woo-bookings.php',
+			'class' => \Zaplane\Integrations\WooBookings::class
 		],
 		'slack'                => [
 			'file' => 'Slack.php',
@@ -55,6 +65,10 @@ return [
 		'mailchimp'            => [
 			'file' => 'mailchimp.php',
 			'class' => \Zaplane\Integrations\Mailchimp::class
+		],
+		'activecampaign'         => [
+			'file' => 'active-campaign.php',
+			'class' => \Zaplane\Integrations\ActiveCampaign::class
 		],
 		'hubspot'              => [
 			'file' => 'hubspot.php',
