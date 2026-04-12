@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-04-09 10:51:06",
+    "generated_at": "2026-04-12 09:00:27",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -13632,39 +13632,34 @@
                     "label": "Create Activity Post",
                     "schema": [
                         {
-                            "key": "email",
+                            "key": "author_email",
                             "label": "Author Email",
                             "type": "email",
-                            "required": true,
-                            "placeholder": "Enter the email address of the user who will post the activity."
+                            "required": true
                         },
                         {
                             "key": "content",
                             "label": "Activity Content",
                             "type": "textarea",
-                            "required": true,
-                            "placeholder": "Enter the content of the activity post."
+                            "required": true
                         },
                         {
                             "key": "action",
                             "label": "Activity Action",
                             "type": "text",
-                            "required": false,
-                            "placeholder": "Enter the action text for the activity (optional)."
+                            "required": false
                         },
                         {
                             "key": "action_link",
                             "label": "Activity Action Link",
                             "type": "url",
-                            "required": false,
-                            "placeholder": "Enter the primary link URL for the activity (optional)."
+                            "required": false
                         },
                         {
                             "key": "hide_sitewide",
                             "label": "Hide Sitewide",
                             "type": "checkbox",
-                            "required": false,
-                            "description": "Hide this activity from the sitewide activity feed."
+                            "required": false
                         }
                     ],
                     "outputs": [
@@ -13679,53 +13674,45 @@
                             "key": "group_id",
                             "label": "Select Group",
                             "type": "select",
-                            "required": true,
-                            "options": {
-                                "dynamic": {
-                                    "integration": "buddypress",
-                                    "query": "groups_query",
-                                    "select": [
-                                        "value",
-                                        "label"
-                                    ]
-                                }
+                            "dynamic": {
+                                "integration": "buddyboss",
+                                "query": "group_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
                             },
-                            "placeholder": "Select the group where you want to add the post."
+                            "required": true
                         },
                         {
-                            "key": "email",
+                            "key": "author_email",
                             "label": "Author Email",
                             "type": "email",
-                            "required": true,
-                            "placeholder": "Enter the email address of the user who will post the activity."
+                            "required": true
                         },
                         {
                             "key": "content",
                             "label": "Activity Content",
                             "type": "textarea",
-                            "required": true,
-                            "placeholder": "Enter the content of the activity post."
+                            "required": true
                         },
                         {
                             "key": "action",
                             "label": "Activity Action",
                             "type": "text",
-                            "required": false,
-                            "placeholder": "Enter the action text for the activity (optional)."
+                            "required": false
                         },
                         {
                             "key": "action_link",
                             "label": "Activity Action Link",
                             "type": "url",
-                            "required": false,
-                            "placeholder": "Enter the primary link URL for the activity (optional)."
+                            "required": false
                         },
                         {
                             "key": "hide_sitewide",
                             "label": "Hide Sitewide",
                             "type": "checkbox",
-                            "required": false,
-                            "description": "Hide this activity from the sitewide activity feed."
+                            "required": false
                         }
                     ],
                     "outputs": [
@@ -13740,43 +13727,37 @@
                             "key": "user_id",
                             "label": "User Activity ID",
                             "type": "number",
-                            "required": true,
-                            "placeholder": "Enter the user ID whose activity feed you want to post to."
+                            "required": true
                         },
                         {
-                            "key": "email",
+                            "key": "author_email",
                             "label": "Author Email",
                             "type": "email",
-                            "required": true,
-                            "placeholder": "Enter the email address of the user who will post the activity."
+                            "required": true
                         },
                         {
                             "key": "content",
                             "label": "Activity Content",
                             "type": "textarea",
-                            "required": true,
-                            "placeholder": "Enter the content of the activity post."
+                            "required": true
                         },
                         {
                             "key": "action",
                             "label": "Activity Action",
                             "type": "text",
-                            "required": false,
-                            "placeholder": "Enter the action text for the activity (optional)."
+                            "required": false
                         },
                         {
                             "key": "action_link",
                             "label": "Activity Action Link",
                             "type": "url",
-                            "required": false,
-                            "placeholder": "Enter the primary link URL for the activity (optional)."
+                            "required": false
                         },
                         {
                             "key": "hide_sitewide",
                             "label": "Hide Sitewide",
                             "type": "checkbox",
-                            "required": false,
-                            "description": "Hide this activity from the sitewide activity feed."
+                            "required": false
                         }
                     ],
                     "outputs": [
@@ -13791,25 +13772,21 @@
                             "key": "user_email",
                             "label": "User Email",
                             "type": "email",
-                            "required": true,
-                            "placeholder": "Enter the email address of the user you want to add to the group."
+                            "required": true
                         },
                         {
-                            "key": "group_ids",
-                            "label": "Select Group(s)",
+                            "key": "group_id",
+                            "label": "Select Group",
                             "type": "select",
-                            "multiple": true,
-                            "required": true,
-                            "options": [],
-                            "placeholder": "Select the group(s) to which you want to add the user.",
                             "dynamic": {
-                                "integration": "buddypress",
-                                "query": "groups_query",
+                                "integration": "buddyboss",
+                                "query": "group_query",
                                 "select": [
                                     "value",
                                     "label"
                                 ]
-                            }
+                            },
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -13824,18 +13801,15 @@
                             "key": "user_email",
                             "label": "User Email",
                             "type": "email",
-                            "required": true,
-                            "placeholder": "Enter the email address of the user whose member type you want to change."
+                            "required": true
                         },
                         {
                             "key": "profile_type",
                             "label": "Profile Type",
                             "type": "select",
                             "required": true,
-                            "options": [],
-                            "placeholder": "Select the profile type to assign to the user.",
                             "dynamic": {
-                                "integration": "buddypress",
+                                "integration": "buddyboss",
                                 "query": "member_types_query",
                                 "select": [
                                     "value",
@@ -13856,8 +13830,7 @@
                             "key": "group_name",
                             "label": "Group Name",
                             "type": "text",
-                            "required": true,
-                            "placeholder": "Enter the name of the group you want to create."
+                            "required": true
                         },
                         {
                             "key": "group_status",
@@ -13877,25 +13850,22 @@
                                     "value": "hidden",
                                     "label": "Hidden"
                                 }
-                            ],
-                            "placeholder": "Select the privacy status of the group."
+                            ]
                         },
-                        {
-                            "key": "creator_email",
-                            "label": "Group Creator Email",
-                            "type": "email",
-                            "required": true,
-                            "placeholder": "Enter the email address of the user who will be the group creator."
-                        },
+                        [
+                            {
+                                "key": "creator_email",
+                                "label": "Topic Creator Email",
+                                "type": "email",
+                                "required": true
+                            }
+                        ],
                         {
                             "key": "group_type",
                             "label": "Group Type",
                             "type": "select",
-                            "required": false,
-                            "options": [],
-                            "placeholder": "Select the group type.",
                             "dynamic": {
-                                "integration": "buddypress",
+                                "integration": "buddyboss",
                                 "query": "group_types_query",
                                 "select": [
                                     "value",
@@ -13916,15 +13886,13 @@
                             "key": "user_email",
                             "label": "User Email",
                             "type": "email",
-                            "required": true,
-                            "placeholder": "Enter the email address of the user who will end the friendship."
+                            "required": true
                         },
                         {
                             "key": "friend_email",
                             "label": "Friend Email",
                             "type": "email",
-                            "required": true,
-                            "placeholder": "Enter the email address of the friend to remove."
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -13939,15 +13907,13 @@
                             "key": "follower_email",
                             "label": "Follower Email",
                             "type": "email",
-                            "required": true,
-                            "placeholder": "Enter the email address of the user who will follow (follower)."
+                            "required": true
                         },
                         {
                             "key": "leader_email",
-                            "label": "User to Follow Email",
+                            "label": "Leader Email",
                             "type": "email",
-                            "required": true,
-                            "placeholder": "Enter the email address of the user to be followed (leader)."
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -13962,8 +13928,7 @@
                             "key": "forum_id",
                             "label": "Forum ID",
                             "type": "number",
-                            "required": true,
-                            "placeholder": "Enter the ID of the forum to get subscribers from."
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -13978,45 +13943,39 @@
                             "key": "forum_id",
                             "label": "Select Forum",
                             "type": "select",
-                            "required": true,
-                            "options": [],
-                            "placeholder": "Select the forum containing the topic.",
                             "dynamic": {
-                                "integration": "bbpress",
+                                "integration": "buddyboss",
                                 "query": "forums_query",
                                 "select": [
                                     "value",
                                     "label"
                                 ]
-                            }
+                            },
+                            "required": true
                         },
                         {
                             "key": "topic_id",
                             "label": "Topic ID",
                             "type": "number",
-                            "required": true,
-                            "placeholder": "Enter the topic ID to reply to."
+                            "required": true
                         },
                         {
                             "key": "reply_title",
                             "label": "Reply Title",
                             "type": "text",
-                            "required": true,
-                            "placeholder": "Enter the title of the reply."
+                            "required": true
                         },
                         {
                             "key": "reply_content",
                             "label": "Reply Content",
                             "type": "textarea",
-                            "required": true,
-                            "placeholder": "Enter the content of the reply."
+                            "required": true
                         },
                         {
                             "key": "author_email",
-                            "label": "Reply Author Email",
+                            "label": "Author Email",
                             "type": "email",
-                            "required": true,
-                            "placeholder": "Enter the email address of the user who will create the reply."
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -14031,38 +13990,33 @@
                             "key": "forum_id",
                             "label": "Select Forum",
                             "type": "select",
-                            "required": true,
-                            "options": [],
-                            "placeholder": "Select the forum where you want to post the topic.",
                             "dynamic": {
-                                "integration": "bbpress",
+                                "integration": "buddyboss",
                                 "query": "forums_query",
                                 "select": [
                                     "value",
                                     "label"
                                 ]
-                            }
+                            },
+                            "required": true
                         },
                         {
                             "key": "topic_title",
                             "label": "Topic Title",
                             "type": "text",
-                            "required": true,
-                            "placeholder": "Enter the title of the topic."
+                            "required": true
                         },
                         {
                             "key": "topic_content",
                             "label": "Topic Content",
                             "type": "textarea",
-                            "required": true,
-                            "placeholder": "Enter the content of the topic."
+                            "required": true
                         },
                         {
                             "key": "creator_email",
                             "label": "Topic Creator Email",
                             "type": "email",
-                            "required": true,
-                            "placeholder": "Enter the email address of the user who will create the topic."
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -14077,25 +14031,21 @@
                             "key": "user_email",
                             "label": "User Email",
                             "type": "email",
-                            "required": true,
-                            "placeholder": "Enter the email address of the user you want to remove from the group."
+                            "required": true
                         },
                         {
-                            "key": "group_ids",
-                            "label": "Select Group(s)",
+                            "key": "group_id",
+                            "label": "Select Group",
                             "type": "select",
-                            "multiple": true,
-                            "required": true,
-                            "options": [],
-                            "placeholder": "Select the group(s) to remove the user from, or select \"all\" to remove from all groups.",
                             "dynamic": {
-                                "integration": "buddypress",
-                                "query": "groups_query",
+                                "integration": "buddyboss",
+                                "query": "group_query",
                                 "select": [
                                     "value",
                                     "label"
                                 ]
-                            }
+                            },
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -14110,15 +14060,13 @@
                             "key": "sender_email",
                             "label": "Sender Email",
                             "type": "email",
-                            "required": true,
-                            "placeholder": "Enter the email address of the user who will send the friendship request."
+                            "required": true
                         },
                         {
                             "key": "receiver_email",
                             "label": "Receiver Email",
                             "type": "email",
-                            "required": true,
-                            "placeholder": "Enter the email address of the user who will receive the friendship request."
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -14133,38 +14081,33 @@
                             "key": "group_id",
                             "label": "Select Group",
                             "type": "select",
-                            "required": true,
-                            "options": [],
-                            "placeholder": "Select the group whose members will receive the message.",
                             "dynamic": {
-                                "integration": "buddypress",
-                                "query": "groups_query",
+                                "integration": "buddyboss",
+                                "query": "group_query",
                                 "select": [
                                     "value",
                                     "label"
                                 ]
-                            }
+                            },
+                            "required": true
                         },
                         {
                             "key": "sender_email",
                             "label": "Sender Email",
                             "type": "email",
-                            "required": true,
-                            "placeholder": "Enter the email address of the user who will send the message."
+                            "required": true
                         },
                         {
                             "key": "message_subject",
                             "label": "Message Subject",
                             "type": "text",
-                            "required": true,
-                            "placeholder": "Enter the subject of the message."
+                            "required": true
                         },
                         {
                             "key": "message_content",
                             "label": "Message Content",
                             "type": "textarea",
-                            "required": true,
-                            "placeholder": "Enter the content of the message."
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -14179,29 +14122,25 @@
                             "key": "sender_email",
                             "label": "Sender Email",
                             "type": "email",
-                            "required": true,
-                            "placeholder": "Enter the email address of the user who will send the message."
+                            "required": true
                         },
                         {
-                            "key": "receiver_emails",
-                            "label": "Receiver Email(s)",
-                            "type": "text",
-                            "required": true,
-                            "placeholder": "Enter the email address(es) of the user(s) who will receive the message. Separate multiple emails with commas."
+                            "key": "receiver_email",
+                            "label": "Receiver Email",
+                            "type": "email",
+                            "required": true
                         },
                         {
                             "key": "message_subject",
                             "label": "Message Subject",
                             "type": "text",
-                            "required": true,
-                            "placeholder": "Enter the subject of the message."
+                            "required": true
                         },
                         {
                             "key": "message_content",
                             "label": "Message Content",
                             "type": "textarea",
-                            "required": true,
-                            "placeholder": "Enter the content of the message."
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -14216,38 +14155,33 @@
                             "key": "group_id",
                             "label": "Select Group",
                             "type": "select",
-                            "required": true,
-                            "options": [],
-                            "placeholder": "Select the group whose members will receive the notification.",
                             "dynamic": {
-                                "integration": "buddypress",
-                                "query": "groups_query",
+                                "integration": "buddyboss",
+                                "query": "group_query",
                                 "select": [
                                     "value",
                                     "label"
                                 ]
-                            }
+                            },
+                            "required": true
                         },
                         {
                             "key": "sender_email",
                             "label": "Sender Email",
                             "type": "email",
-                            "required": true,
-                            "placeholder": "Enter the email address of the user who will send the message."
+                            "required": true
                         },
                         {
                             "key": "notification_content",
                             "label": "Notification Content",
                             "type": "textarea",
-                            "required": true,
-                            "placeholder": "Enter the content of the notification."
+                            "required": true
                         },
                         {
                             "key": "notification_link",
                             "label": "Notification Link",
                             "type": "url",
-                            "required": false,
-                            "placeholder": "Enter the link of the notification (optional)."
+                            "required": false
                         }
                     ],
                     "outputs": [
@@ -14262,8 +14196,7 @@
                             "key": "user_email",
                             "label": "User Email",
                             "type": "email",
-                            "required": true,
-                            "placeholder": "Enter the email address of the user whose extended profile you want to update."
+                            "required": true
                         },
                         {
                             "key": "profile_fields",
@@ -14275,15 +14208,13 @@
                                     "key": "field_name",
                                     "label": "Field",
                                     "type": "text",
-                                    "required": true,
-                                    "placeholder": "Select or enter the extended profile field name."
+                                    "required": true
                                 },
                                 {
                                     "key": "field_value",
                                     "label": "Value",
                                     "type": "text",
-                                    "required": false,
-                                    "placeholder": "Enter the value for this field."
+                                    "required": false
                                 }
                             ],
                             "add_button_label": "+ Add Extended Profile Field"
@@ -14301,8 +14232,7 @@
                             "key": "user_email",
                             "label": "User Email",
                             "type": "email",
-                            "required": true,
-                            "placeholder": "Enter the email address of the user whose status you want to change."
+                            "required": true
                         },
                         {
                             "key": "status",
@@ -14318,8 +14248,7 @@
                                     "value": "unsuspend",
                                     "label": "Unsuspend"
                                 }
-                            ],
-                            "placeholder": "Select the status to set for the user."
+                            ]
                         }
                     ],
                     "outputs": [
@@ -14334,15 +14263,13 @@
                             "key": "follower_email",
                             "label": "Follower Email",
                             "type": "email",
-                            "required": true,
-                            "placeholder": "Enter the email address of the user who will stop following (follower)."
+                            "required": true
                         },
                         {
                             "key": "leader_email",
-                            "label": "User to Stop Following Email",
+                            "label": "Leader Email",
                             "type": "email",
-                            "required": true,
-                            "placeholder": "Enter the email address of the user to stop following (leader)."
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -14357,24 +14284,21 @@
                             "key": "user_email",
                             "label": "User Email",
                             "type": "email",
-                            "required": true,
-                            "placeholder": "Enter the email address of the user you want to subscribe to the forum."
+                            "required": true
                         },
                         {
                             "key": "forum_id",
                             "label": "Select Forum",
                             "type": "select",
-                            "required": true,
-                            "options": [],
-                            "placeholder": "Select the forum to subscribe the user to.",
                             "dynamic": {
-                                "integration": "bbpress",
+                                "integration": "buddyboss",
                                 "query": "forums_query",
                                 "select": [
                                     "value",
                                     "label"
                                 ]
-                            }
+                            },
+                            "required": true
                         }
                     ],
                     "outputs": [

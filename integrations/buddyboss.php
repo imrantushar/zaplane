@@ -42,7 +42,7 @@ class Buddyboss extends IntegrationBase {
 				'label' => 'Accepted Friend Request',
 				'hook'  => 'friends_friendship_accepted'
 			],
-            'create_group' => [
+            'create_groups' => [
 				'label' => 'Create Group',
 				'hook'  => 'groups_group_create_complete'
 			],
@@ -89,19 +89,266 @@ class Buddyboss extends IntegrationBase {
 
 		switch ( $node['event'] ) {
 			case 'account_activated':
+				$user_id = $args[0] ?? 0;
+
+				if ( ! $user_id ) {
+					return false;
+				}
+
+				return [
+					'success' => true,
+					'data'    => self::resolve_user_payload( $user_id ),
+				];
+
 			case 'follower_gained':
+				$follower_id = $args[0] ?? 0;
+				$leader_id   = $args[1] ?? 0;
+
+				if ( ! $follower_id || ! $leader_id ) {
+					return false;
+				}
+
+				return [
+					'success' => true,
+					'data' => [
+						'follower' => self::resolve_user_payload($follower_id),
+						'leader'   => self::resolve_user_payload($leader_id),
+					],
+				];
+
 			case 'sent_friend_request':
+				$friendship_id    = $args[0] ?? 0;
+				$initiator_user_id = $args[1] ?? 0;
+				$friend_user_id   = $args[2] ?? 0;
+
+				if ( ! $friendship_id ) {
+					return false;
+				}
+
+				return [
+					'success' => true,
+					'data'    => [
+						'friendship_id' => $friendship_id,
+						'initiator'     => self::resolve_user_payload( $initiator_user_id ),
+						'friend'        => self::resolve_user_payload( $friend_user_id ),
+					],
+				];
 			case 'accepted_friend_request':
-			case 'create_group':
+				$friendship_id    = $args[0] ?? 0;
+				$initiator_user_id = $args[1] ?? 0;
+				$friend_user_id   = $args[2] ?? 0;
+				$friendship       = $args[3] ?? null;
+
+				$data = [
+					'friendship_id' => $friendship_id,
+					'initiator'     => self::resolve_user_payload( $initiator_user_id ),
+					'friend'        => self::resolve_user_payload( $friend_user_id ),
+				];
+
+				if ( $friendship !== null ) {
+					$data['friendship'] = self::object_to_array( $friendship );
+				}
+
+				return [ 
+					'success' => true, 
+					'data' => $data 
+				];
+
+			case 'create_groups':
+				$group_id = $args[0] ?? 0;
+
+				if ( ! $group_id || ! function_exists( 'groups_get_group' ) ) {
+					return false;
+				}
+
+				$group = groups_get_group( $group_id );
+				$data  = self::object_to_array( $group );
+
+				if ( function_exists( 'bp_groups_get_group_type' ) ) {
+					$data['type'] = bp_groups_get_group_type( $group_id, false );
+				}
+
+				if ( function_exists( 'bp_get_group_cover_url' ) ) {
+					$data['cover_url'] = bp_get_group_cover_url( $group );
+				}
+
+				if ( function_exists( 'bp_get_group_avatar_url' ) ) {
+					$data['avatar_url'] = bp_get_group_avatar_url( $group );
+				}
+
+				if ( isset( $group->creator_id ) ) {
+					$data['creator_data'] = self::resolve_user_payload( $group->creator_id );
+				}
+
+				return [ 
+					'success' => true,
+					'data' => $data 
+				];
+
 			case 'access_requested_private_group':
-			case 'joined_public_group':
-			case 'joined_private_group':
 			case 'joined_specific_group':
 			case 'left_group':
+				$group_id = $args[0] ?? 0;
+				$user_id  = $args[1] ?? 0;
+
+				if ( ! $group_id || ! function_exists( 'groups_get_group' ) ) {
+					return false;
+				}
+
+				$group = groups_get_group( $group_id );
+
+				$group_data = self::object_to_array( $group );
+
+				if ( empty( $group_data['type'] ) && function_exists( 'bp_groups_get_group_type' ) ) {
+					$group_data['type'] = bp_groups_get_group_type( $group_id, false );
+				}
+
+				return [
+					'success' => true,
+					'data'    => [
+						'user'  => self::resolve_user_payload( $user_id ),
+						'group' => $group_data,
+					],
+				];
+
+			case 'joined_public_group':
+				$group_id = $args[0] ?? 0;
+				$user_id  = $args[1] ?? 0;
+
+				if ( ! $group_id || ! function_exists( 'groups_get_group' ) ) {
+					return false;
+				}
+
+				$group = groups_get_group( $group_id );
+
+				if ( isset($group->status) && $group->status !== 'public' ) {
+					return false;
+				}
+
+				$group_data = self::object_to_array( $group );
+
+				if ( empty( $group_data['type'] ) && function_exists( 'bp_groups_get_group_type' ) ) {
+					$group_data['type'] = bp_groups_get_group_type( $group_id, false );
+				}
+
+				return [
+					'success' => true,
+					'data'    => [
+						'user'  => self::resolve_user_payload( $user_id ),
+						'group' => $group_data,
+					],
+				];
+			case 'joined_private_group':
 			case 'left_private_group':
+				$group_id = $args[0] ?? 0;
+				$user_id  = $args[1] ?? 0;
+
+				if ( ! $group_id || ! function_exists( 'groups_get_group' ) ) {
+					return false;
+				}
+
+				$group = groups_get_group( $group_id );
+
+				if ( isset($group->status) && $group->status !== 'private' ) {
+					return false;
+				}
+
+				$group_data = self::object_to_array( $group );
+
+				if ( empty( $group_data['type'] ) && function_exists( 'bp_groups_get_group_type' ) ) {
+					$group_data['type'] = bp_groups_get_group_type( $group_id, false );
+				}
+
+				return [
+					'success' => true,
+					'data'    => [
+						'user'  => self::resolve_user_payload( $user_id ),
+						'group' => $group_data,
+					],
+				];	
+			
 			case 'received_private_message':
+				$message = $args[0] ?? null;
+
+				if (
+					! is_object( $message )
+					|| ! property_exists( $message, 'id' )
+					|| ! property_exists( $message, 'sender_id' )
+					|| ! property_exists( $message, 'recipients' )
+				) {
+					return false;
+				}
+
+				$data = [
+					'message' => self::object_to_array( $message ),
+					'sender'  => self::resolve_user_payload( $message->sender_id ),
+				];
+
+				if ( ! empty( $message->recipients ) ) {
+					foreach ( $message->recipients as $recipient ) {
+						if ( empty( $recipient->user_id ) || $recipient->user_id === $message->sender_id ) {
+							continue;
+						}
+
+						$data['recipients'][] = self::resolve_user_payload( $recipient->user_id );
+					}
+				}
+
+				return [
+					'success' => true,
+					'data' => $data
+				];
+
 			case 'profile_type_change':
+				$user_id     = $args[0] ?? 0;
+				$member_type = $args[1] ?? '';
+				$append      = $args[2] ?? false;
+
+				if ( ! $user_id ) {
+					return false;
+				}
+
+				$data                = self::resolve_user_payload( $user_id );
+				$data['member_type'] = $member_type;
+				$data['append']      = $append;
+
+				return [
+					'success' => true,
+					'data' => $data
+					];
+
 			case 'updated_profile':
+				$user_id          = $args[0] ?? 0;
+				$posted_field_ids = $args[1] ?? [];
+				$errors           = $args[2] ?? [];
+				$old_values       = $args[3] ?? [];
+				$new_values       = $args[4] ?? [];
+
+				if ( ! $user_id ) {
+					return false;
+				}
+
+				$data = [
+					'user'             => self::resolve_user_payload( $user_id ),
+					'posted_field_ids' => $posted_field_ids,
+					'errors'           => $errors,
+					'old_values'       => $old_values,
+					'new_values'       => $new_values,
+				];
+
+				if ( function_exists( 'xprofile_get_field' ) ) {
+					foreach ( $posted_field_ids as $field_id ) {
+						$field = xprofile_get_field( $field_id );
+						if ( $field && isset( $field->data->value ) ) {
+							$data['posted_fields'][ $field->name ] = $field->data->value;
+						}
+					}
+				}
+
+				return [
+					'success' => true,
+					'data' => $data
+				];
 
 		}//end switch
 		return false;
@@ -187,6 +434,33 @@ class Buddyboss extends IntegrationBase {
 		];
 	}
 
+	private static function message_subject(): array {
+		return [
+			[
+				'key'       => 'message_subject',
+				'label'     => 'Message Subject',
+				'type'      => 'text',
+				'required'  => true,
+			],
+		];
+	}
+
+	public static function forum_id(): array {
+		return [
+			[
+				'key'       => 'forum_id',
+				'label'     => 'Select Forum',
+				'type'      => 'select',
+				'dynamic' => [
+					'integration' => 'buddyboss',
+					'query'       => 'forums_query',
+					'select'      => [ 'value', 'label' ],
+				],
+				'required' => true,
+			],
+		];
+	}
+
 	public static function group_id(): array {
 		return [
 			[
@@ -194,7 +468,7 @@ class Buddyboss extends IntegrationBase {
 				'label'     => 'Select Group',
 				'type'      => 'select',
 				'dynamic' => [
-					'integration' => 'buddypress',
+					'integration' => 'buddyboss',
 					'query'       => 'group_query',
 					'select'      => [ 'value', 'label' ],
 				],
@@ -216,7 +490,7 @@ class Buddyboss extends IntegrationBase {
 			'create_group_post' => [
 				...self::group_id(),
 				...self::email('Author Email', 'author_email'),
-				...self::content('Activity Content', 'content'),,
+				...self::content('Activity Content', 'content'),
 				...self::action(),
 				...self::action_link(),
 				...self::hide_sitewide(),
@@ -227,10 +501,9 @@ class Buddyboss extends IntegrationBase {
 					'label'     => 'User Activity ID',
 					'type'      => 'number',
 					'required'  => true,
-					'placeholder' => 'Enter the user ID whose activity feed you want to post to.',
 				],
 				...self::email('Author Email', 'author_email'),
-				...self::content('Activity Content', 'content'),,
+				...self::content('Activity Content', 'content'),
 				...self::action(),
 				...self::action_link(),
 				...self::hide_sitewide(),
@@ -240,18 +513,14 @@ class Buddyboss extends IntegrationBase {
 				...self::group_id(),
 			],
 			'update_member_profile_type' => [
-				...self::email('User Email', 'user_email')
+				...self::email('User Email', 'user_email'),
 				[
 					'key'       => 'profile_type',
 					'label'     => 'Profile Type',
 					'type'      => 'select',
 					'required'  => true,
-					'options'   => [], // dynamic profile types load হবে
-					'placeholder' => 'Select the profile type to assign to the user.',
-
-					// dynamic loading (BuddyBoss / BuddyPress Member Types)
 					'dynamic' => [
-						'integration' => 'buddypress',
+						'integration' => 'buddyboss',
 						'query'       => 'member_types_query',
 						'select'      => [ 'value', 'label' ],
 					],
@@ -263,7 +532,6 @@ class Buddyboss extends IntegrationBase {
 					'label'     => 'Group Name',
 					'type'      => 'text',
 					'required'  => true,
-					'placeholder' => 'Enter the name of the group you want to create.',
 				],
 				[
 					'key'       => 'group_status',
@@ -275,20 +543,14 @@ class Buddyboss extends IntegrationBase {
 						[ 'value' => 'private', 'label' => 'Private' ],
 						[ 'value' => 'hidden',  'label' => 'Hidden' ],
 					],
-					'placeholder' => 'Select the privacy status of the group.',
 				],
 				self::email('Topic Creator Email', 'creator_email'),
 				[
 					'key'       => 'group_type',
 					'label'     => 'Group Type',
 					'type'      => 'select',
-					'required'  => false,
-					'options'   => [], // dynamic group types load হবে
-					'placeholder' => 'Select the group type.',
-
-					// dynamic loading (BuddyBoss Group Types)
 					'dynamic' => [
-						'integration' => 'buddypress',
+						'integration' => 'buddyboss',
 						'query'       => 'group_types_query',
 						'select'      => [ 'value', 'label' ],
 					],
@@ -296,13 +558,7 @@ class Buddyboss extends IntegrationBase {
 			],
 			'remove_friend_connection' => [
 				...self::email('User Email', 'user_email'),
-				[
-					'key'       => 'friend_email',
-					'label'     => 'Friend Email',
-					'type'      => 'email',
-					'required'  => true,
-					'placeholder' => 'Enter the email address of the friend to remove.',
-				],
+				...self::email('Friend Email', 'friend_email'),
 			],
 			'follow_user' => [
 				...self::email('Follower Email', 'follower_email'),
@@ -314,70 +570,38 @@ class Buddyboss extends IntegrationBase {
 					'label'     => 'Forum ID',
 					'type'      => 'number',
 					'required'  => true,
-					'placeholder' => 'Enter the ID of the forum to get subscribers from.',
 				],
 			],
 			'create_forum_topic_reply' => [
-				[
-					'key'       => 'forum_id',
-					'label'     => 'Select Forum',
-					'type'      => 'select',
-					'required'  => true,
-					'options'   => [], // dynamic forum list load হবে
-					'placeholder' => 'Select the forum containing the topic.',
-
-					// dynamic loading (bbPress forums)
-					'dynamic' => [
-						'integration' => 'bbpress',
-						'query'       => 'forums_query',
-						'select'      => [ 'value', 'label' ],
-					],
-				],
+				...self::forum_id(),
 				[
 					'key'       => 'topic_id',
 					'label'     => 'Topic ID',
 					'type'      => 'number',
 					'required'  => true,
-					'placeholder' => 'Enter the topic ID to reply to.',
 				],
 				[
 					'key'       => 'reply_title',
 					'label'     => 'Reply Title',
 					'type'      => 'text',
 					'required'  => true,
-					'placeholder' => 'Enter the title of the reply.',
 				],
 				...self::content('Reply Content', 'reply_content'),
 				...self::email('Author Email', 'author_email'),
 			],
 			'create_forum_topic' => [
-				[
-					'key'       => 'forum_id',
-					'label'     => 'Select Forum',
-					'type'      => 'select',
-					'required'  => true,
-					'options'   => [], // dynamic forum list load হবে
-					'placeholder' => 'Select the forum where you want to post the topic.',
-
-					// dynamic loading (bbPress forums)
-					'dynamic' => [
-						'integration' => 'bbpress',
-						'query'       => 'forums_query',
-						'select'      => [ 'value', 'label' ],
-					],
-				],
+				...self::forum_id(),
 				[
 					'key'       => 'topic_title',
 					'label'     => 'Topic Title',
 					'type'      => 'text',
 					'required'  => true,
-					'placeholder' => 'Enter the title of the topic.',
 				],
 				...self::content('Topic Content', 'topic_content'),
 				...self::email('Topic Creator Email', 'creator_email'),
 			],
 			'remove_user_form_group' => [
-				...self::email('User Email', 'user_email')
+				...self::email('User Email', 'user_email'),
 				...self::group_id(),
 			],
 			'send_friend_request' => [
@@ -387,25 +611,13 @@ class Buddyboss extends IntegrationBase {
 			'send_group_message' => [
 				...self::group_id(),
 				...self::email('Sender Email', 'sender_email'),
-				[
-					'key'       => 'message_subject',
-					'label'     => 'Message Subject',
-					'type'      => 'text',
-					'required'  => true,
-					'placeholder' => 'Enter the subject of the message.',
-				],
+				...self::message_subject(),
 				...self::content('Message Content', 'message_content'),
 			],
 			'send_private_message' => [
 				...self::email('Sender Email', 'sender_email'),
-				...sself::email('Receiver Email', 'receiver_email'),
-				[
-					'key'       => 'message_subject',
-					'label'     => 'Message Subject',
-					'type'      => 'text',
-					'required'  => true,
-					'placeholder' => 'Enter the subject of the message.',
-				],
+				...self::email('Receiver Email', 'receiver_email'),
+				...self::message_subject(),
 				...self::content('Message Content', 'message_content'),
 			],
 			'send_group_notification' => [
@@ -417,33 +629,30 @@ class Buddyboss extends IntegrationBase {
 					'label'     => 'Notification Link',
 					'type'      => 'url',
 					'required'  => false,
-					'placeholder' => 'Enter the link of the notification (optional).',
 				],
 			],
 			'update_extended_profile' => [
 				...self::email('User Email', 'user_email'),
 				[
-					'key'       => 'profile_fields',
-					'label'     => 'Extended Profile Field Map',
-					'type'      => 'repeater', // multiple fields
-					'required'  => true,
-					'sub_fields' => [
+					'key'              => 'profile_fields',
+					'label'            => 'Extended Profile Field Map',
+					'type'             => 'repeater',
+					'required'         => true,
+					'add_button_label' => '+ Add Extended Profile Field',
+					'sub_fields'       => [
 						[
-							'key'       => 'field_name',
-							'label'     => 'Field',
-							'type'      => 'text', // or select if you want to limit to existing fields
-							'required'  => true,
-							'placeholder' => 'Select or enter the extended profile field name.',
+							'key'      => 'field_name',
+							'label'    => 'Field',
+							'type'     => 'text',
+							'required' => true,
 						],
 						[
-							'key'       => 'field_value',
-							'label'     => 'Value',
-							'type'      => 'text',
-							'required'  => false,
-							'placeholder' => 'Enter the value for this field.',
+							'key'      => 'field_value',
+							'label'    => 'Value',
+							'type'     => 'text',
+							'required' => false,
 						],
 					],
-					'add_button_label' => '+ Add Extended Profile Field',
 				],
 			],
 			'update_user_status' => [
@@ -457,7 +666,6 @@ class Buddyboss extends IntegrationBase {
 						[ 'value' => 'suspend',   'label' => 'Suspend' ],
 						[ 'value' => 'unsuspend', 'label' => 'Unsuspend' ],
 					],
-					'placeholder' => 'Select the status to set for the user.',
 				],
 			],
 			'stop_following_user' => [
@@ -466,213 +674,257 @@ class Buddyboss extends IntegrationBase {
 			],
 			'subscribe_to_forum' => [
 				...self::email('User Email', 'user_email'),
-				[
-					'key'       => 'forum_id',
-					'label'     => 'Select Forum',
-					'type'      => 'select',
-					'required'  => true,
-					'options'   => [], // dynamic forum list load হবে
-					'placeholder' => 'Select the forum to subscribe the user to.',
-
-					// dynamic loading (bbPress forums)
-					'dynamic' => [
-						'integration' => 'bbpress',
-						'query'       => 'forums_query',
-						'select'      => [ 'value', 'label' ],
-					],
-				],
+				...self::forum_id(),
 			],
 		];
 
 		return $schemas[ $action ] ?? [];
 	}
 
+	public static function execute_node( array $node, array $input ): array {
+		$config = $node['data']['config'] ?? [];
+		$event  = $node['data']['event'] ?? '';
+
+		switch ( $event ) {
+
+			case 'create_activity_post':
+				$required = [ 'author_email', 'content' ];
+				if ( $err = self::require_fields( $data, $required ) ) return $err;
+
+				return self::handle_activity_post( $data );
+
+			case 'create_group_post':
+			case 'create_user_activity_post':
+			case 'add_user_to_group':
+			case 'update_member_profile_type':
+			case 'create_group':
+			case 'remove_friend_connection':
+			case 'follow_user':
+			case 'get_forum_subscribers':
+			case 'create_forum_topic_reply':
+			case 'create_forum_topic':
+			case 'remove_user_form_group':
+			case 'send_friend_request':
+			case 'send_group_message':
+			case 'send_private_message':
+			case 'send_group_notification':
+			case 'update_extended_profile':
+			case 'update_user_status':
+			case 'stop_following_user':
+			case 'subscribe_to_forum':
+				
+
+		}//end switch
+
+		return [
+			'port' => 'main',
+			'data' => $input
+		];
+	}
+
 	public static function get_dynamic_queries(): array {
 		return [
-			'rank_type_query'        => [ self::class, 'query_rank_type' ],
-			'rank_query'             => [ self::class, 'query_rank' ],
-			'achievement_type_query' => [ self::class, 'query_achievement_type' ],
-			'achievement_query'      => [ self::class, 'query_achievement' ],
+			'forums_query'       => [ self::class, 'query_forums' ],
+			'group_query'        => [ self::class, 'query_group' ],
+			'group_types_query'  => [ self::class, 'query_group_types' ],
+			'member_types_query' => [ self::class, 'query_member_types' ],
 		];
 	}
 
-	private static function get_value( $query, $key ) {
+	public static function query_forums( $query ) {
+		$all_forums = [];
 
-		if ( isset( $query['where'][ $key ] ) ) {
-			return $query['where'][ $key ];
+		if ( ! function_exists( 'bbp_get_forum_post_type' ) ) {
+			$forums = get_posts( [
+				'post_type'      => bbp_get_forum_post_type(),
+				'posts_per_page' => -1,
+				'post_status'    => 'publish',
+			] );
 		}
 
-		if ( isset( $query[ $key ] ) ) {
-			return $query[ $key ];
-		}
-
-		if ( isset( $query['values'][ $key ] ) ) {
-			return $query['values'][ $key ];
-		}
-
-		if ( isset( $query['data'][ $key ] ) ) {
-			return $query['data'][ $key ];
-		}
-
-		return '';
-	}
-
-	public static function query_rank_type( $query ) {
-		$all_rank_type = [
-			[
-				'value' => 'any',
-				'label' => 'Any Rank Type'
-			],
-		];
-
-		global $wpdb;
-
-        $rank_types = $wpdb->get_results(
-            $wpdb->prepare(
-                "SELECT ID, post_name, post_title, post_type FROM {$wpdb->posts} where post_type like %s AND post_status = %s",
-                ['rank_type', 'publish']
-            )
-        );
-
-		foreach ( $rank_types as $rank_type ) {
-			$all_rank_type[] = [
-				'value' => $rank_type->post_name,
-				'label' => $rank_type->post_title,
+		foreach ( $forums as $forum ) {
+			$all_forums[] = [
+				'value' => $forum->ID,
+				'label' => $forum->post_title,
 			];
 		}
 
-		return $all_rank_type;
+		return $all_forums;
 	}
 
-	public static function query_rank( $query ) {
-		global $wpdb;
-
-		$rank_type = self::get_value( $query, 'rank_type' );
-		$rank_type = sanitize_text_field( $rank_type );
-
-		$all_rank = [
+	public static function query_group( $query ) {
+		$all_group = [
 			[	'value' => 'any', 
 				'label' => 'Any Rank' 
 			],
 		];
 
-		if ( empty( $rank_type ) || $rank_type === 'any' ) {
-
-			$all_rank_types = $wpdb->get_results(
-				"SELECT post_name FROM {$wpdb->posts} WHERE post_type LIKE 'rank_type' AND post_status = 'publish'"
-			);
-
-			foreach ( $all_rank_types as $rt ) {
-				$ranks = $wpdb->get_results(
-					$wpdb->prepare(
-						"SELECT post_name, post_title FROM {$wpdb->posts} WHERE post_type = %s AND post_status = 'publish'",
-						$rt->post_name
-					)
-				);
-				foreach ( $ranks as $rank ) {
-					$all_rank[] = [
-						'value' => $rank->post_name,
-						'label' => $rank->post_title,
-					];
-				}
-			}
-
-			return $all_rank;
+		if ( ! function_exists( 'groups_get_groups' ) ) {
+			$groups = groups_get_groups();
 		}
 
-		$ranks = $wpdb->get_results(
-			$wpdb->prepare(
-				"SELECT post_name, post_title FROM {$wpdb->posts} WHERE post_type = %s AND post_status = 'publish'",
-				$rank_type
-			)
-		);
-
-		foreach ( $ranks as $rank ) {
-			$all_rank[] = [
-				'value' => $rank->post_name,
-				'label' => $rank->post_title,
+		foreach ( $groups as $group ) {
+			$all_group[] = [
+				'value' => $group->id,
+				'label' => $group->post_title,
 			];
 		}
 
-		return $all_rank;
+		return $all_group;
 	}
 
-    public static function query_achievement_type( $query ) {
-		$all_achievement_type = [
+    public static function query_group_types( $query ) {
+		$all_group_types = [
 			[
 				'value' => 'any',
 				'label' => 'Any Achievement Type'
 			],
 		];
 
-		global $wpdb;
+		if ( ! function_exists( 'bp_groups_get_group_types' ) ) {
+			$types = bp_groups_get_group_types();
+		}
 
-        $achievement_types = $wpdb->get_results(
-            $wpdb->prepare(
-                "SELECT ID, post_name, post_title, post_type FROM {$wpdb->posts} WHERE post_type LIKE %s AND post_status = %s ORDER BY post_title ASC",
-                ['achievement-type', 'publish']
-            )
-        );
-
-		foreach ( $achievement_types as $achievement_type ) {
-			$all_achievement_type[] = [
-				'value' => $achievement_type->post_name,
-				'label' => $achievement_type->post_title,
+		foreach ( $types as $key => $type ) {
+			$all_group_types[] = [
+				'value' => $key,
+				'label' => $type,
 			];
 		}
 
-		return $all_achievement_type;
+		return $all_group_types;
 	}
 
-    public static function query_achievement( $query ) {
-		global $wpdb;
-
-		$achievement_type = self::get_value( $query, 'achievement_type' );
-		$achievement_type = sanitize_text_field( $achievement_type );
-
-		$all_achievement = [
-			[ 'value' => 'any', 'label' => 'Any Achievement' ],
+    public static function query_member_types( $query ) {
+		$all_member_types = [
+			[
+				'value' => 'any',
+				'label' => 'Any Achievement Type'
+			],
 		];
 
-		if ( empty( $achievement_type ) || $achievement_type === 'any' ) {
-
-			$all_types = $wpdb->get_results(
-				"SELECT post_name FROM {$wpdb->posts} WHERE post_type LIKE 'achievement-type' AND post_status = 'publish'"
-			);
-
-			foreach ( $all_types as $type ) {
-				$achievements = $wpdb->get_results(
-					$wpdb->prepare(
-						"SELECT ID, post_title FROM {$wpdb->posts} WHERE post_type = %s AND post_status = 'publish'",
-						$type->post_name
-					)
-				);
-
-				foreach ( $achievements as $achievement ) {
-					$all_achievement[] = [
-						'value' => (string) $achievement->ID,
-						'label' => $achievement->post_title,
-					];
-				}
-			}
-
-			return $all_achievement;
+		if ( ! function_exists( 'bp_get_member_types' ) ) {
+			$types = bp_get_member_types( [] );
 		}
 
-		$achievements = $wpdb->get_results(
-			$wpdb->prepare(
-				"SELECT ID, post_title FROM {$wpdb->posts} WHERE post_type = %s AND post_status = 'publish'",
-				$achievement_type
-			)
-		);
-
-		foreach ( $achievements as $achievement ) {
-			$all_achievement[] = [
-				'value' => (string) $achievement->ID,
-				'label' => $achievement->post_title,
+		foreach ( $types as $key => $type ) {
+			$all_member_types[] = [
+				'value' => $key,
+				'label' => $type,
 			];
 		}
 
-		return $all_achievement;
+		return $all_member_types;
+	}
+
+	private static function object_to_array( $object ): array {
+		return json_decode( json_encode( $object ), true ) ?? [];
+	}
+
+	private static function resolve_user_payload( int $user_id ) {
+		$user = get_userdata( $user_id );
+
+		if ( ! $user ) {
+			return false;
+		}
+
+		return [
+			'user_id'      => (string) $user->ID,
+			'first_name'   => get_user_meta( $user_id, 'first_name', true ),
+			'last_name'    => get_user_meta( $user_id, 'last_name', true ),
+			'user_login'   => $user->user_login,
+			'user_email'   => $user->user_email,
+			'nickname'     => $user->nickname,
+			'avatar_url'   => get_avatar_url( $user_id ),
+			'display_name' => $user->display_name,
+			'user_roles'   => $user->roles,
+		];
+	}
+
+	private static function require_fields( array $data, array $fields ): ?array {
+		foreach ( $fields as $field ) {
+			if ( empty( $data[ $field ] ) ) {
+				return self::error( "Field '{$field}' is required." );
+			}
+		}
+
+		return null;
+	}
+
+	private static function resolve_follow_function( string $action ): ?callable {
+		if ( $action === 'start' ) {
+			if ( function_exists( 'bp_follow_start_following' ) && function_exists( 'bp_is_active' ) && bp_is_active( 'follow' ) ) {
+				return 'bp_follow_start_following';
+			}
+			if ( function_exists( 'bp_start_following' ) ) {
+				return 'bp_start_following';
+			}
+		}
+
+		if ( $action === 'stop' ) {
+			if ( function_exists( 'bp_follow_stop_following' ) && function_exists( 'bp_is_active' ) && bp_is_active( 'follow' ) ) {
+				return 'bp_follow_stop_following';
+			}
+			if ( function_exists( 'bp_stop_following' ) ) {
+				return 'bp_stop_following';
+			}
+		}
+
+		return null;
+	}
+
+	private static function handle_activity_post( array $data, string $component = 'activity', ?int $group_id = null, ?int $user_activity_id = null ): array {
+		$author_id = email_exists( $data['author_email'] );
+
+		if ( ! $author_id ) {
+			return self::error( 'User not found with provided email.' );
+		}
+
+		if ( ! function_exists( 'bp_activity_add' ) ) {
+			return self::error( 'BuddyBoss Activity functions not found.' );
+		}
+
+		$payload = [
+			'action'        => $data['action'] ?? '',
+			'content'       => $data['content'] ?? '',
+			'primary_link'  => $data['action_link'] ?? '',
+			'hide_sitewide' => $data['hide_sitewide'] ?? false,
+			'component'     => $component,
+			'type'          => 'activity_update',
+		];
+
+		if ( $group_id !== null ) {
+			$payload['user_id'] = $author_id;
+			$payload['item_id'] = $group_id;
+		}
+
+		if ( $user_activity_id !== null ) {
+			$payload['user_id']           = $author_id;
+			$payload['secondary_item_id'] = $user_activity_id;
+		}
+
+		$activity_id = bp_activity_add( $payload );
+
+		if ( ! $activity_id ) {
+			return self::error( 'Failed to add activity.' );
+		}
+
+		$response = [
+			'activity_id' => $activity_id,
+			'user_id'     => $author_id,
+		];
+
+		if ( $group_id !== null ) {
+			$response['group_id'] = $group_id;
+		}
+
+		if ( function_exists( 'bp_activity_get_specific' ) ) {
+			$activity = bp_activity_get_specific( [ 'activity_ids' => $activity_id ] );
+			if ( ! empty( $activity['activities'] ) ) {
+				$response['activities'] = self::object_to_array( $activity );
+			}
+		}
+
+		return self::success( $response );
 	}
 }
