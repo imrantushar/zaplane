@@ -13,15 +13,15 @@ const FolderNode = ({ node, depth, expandedMap, setExpandedMap, selectedId, onSe
   return (
     <Box>
       <HStack spacing={1} px={2} py="6px" borderRadius="6px" cursor="pointer"
-        bg={isSelected ? "var(--zaplane-bg-secondary)" : "transparent"}
-        _hover={{ bg: "var(--zaplane-bg-secondary)" }}
+        bg={isSelected ? "var(--zaplane-body-background)" : "var(--zaplane-background)"}
+        _hover={{ bg: "var(--zaplane-body-background)" }}
         pl={`${8 + depth * 16}px`} onClick={() => onSelect(node.id)}>
         {hasChildren ? (
-          <Icon as={isExpanded ? FiChevronDown : FiChevronRight} boxSize="14px" color="gray.400"
+          <Icon as={isExpanded ? FiChevronDown : FiChevronRight} boxSize="14px" 
             onClick={(e) => { e.stopPropagation(); setExpandedMap(p => ({ ...p, [node.id]: !isExpanded })); }} />
         ) : <Box w="14px" />}
-        <Icon as={FiFolder} boxSize="15px" color={isSelected ? "gray.700" : "gray.400"} />
-        <Text className="zaplane-label" fontSize="13px" color={isSelected ? "gray.900" : "gray.600"} fontWeight={isSelected ? "500" : "400"}>
+        <Icon as={FiFolder} boxSize="15px"  />
+        <Text className="zaplane-label" fontSize="13px"  fontWeight={isSelected ? "500" : "400"}>
           {node.title}
         </Text>
       </HStack>

@@ -32,10 +32,11 @@ const RecipeFolderTree = ({ folders = [], selectedFolderId = null, onSelectFolde
       {/* Tree */}
       <VStack align="stretch" spacing={0} p={1.5} maxH="360px" overflowY="auto">
         {showRootOption && (
-          <HStack px={2} py={2} borderRadius="6px" bg={selectedFolderId === null ? "gray.900" : "transparent"}
+          <HStack px={2} py={2} borderRadius="6px" 
+          bg={selectedFolderId === null && "var(--zaplane-background)"}
             cursor="pointer" onClick={() => onSelectFolder(null)} spacing={2}>
-            <Icon as={FiFolder} boxSize="15px" color={selectedFolderId === null ? "white" : "gray.500"} />
-            <Text fontSize="13px" className="zaplane-label" fontWeight="500" color={selectedFolderId === null ? "white" : "gray.700"}>{rootLabel}</Text>
+            <Icon as={FiFolder} boxSize="15px"  />
+            <Text fontSize="13px" className="zaplane-label" fontWeight="500" >{rootLabel}</Text>
           </HStack>
         )}
         {folders.map(folder => (
@@ -47,7 +48,7 @@ const RecipeFolderTree = ({ folders = [], selectedFolderId = null, onSelectFolde
       {/* Create footer */}
       {typeof onCreateFolder === "function" && (
         <Box px={3} py={2} borderTop="0.5px solid var(--zaplane-border-color)">
-          <Text fontSize="11px" color="var(--zaplane-text-muted)" mb={1.5}>New folder in selected location</Text>
+          <Text className="zaplane-label" color="var(--zaplane-text-muted)" mb={1.5}>{__('New folder in selected location','zaplane')}</Text>
           <HStack spacing={2}>
             <Input size="sm" value={newFolderName} placeholder="Folder name…"
               onChange={(e) => setNewFolderName(e.target.value)} />
@@ -55,7 +56,7 @@ const RecipeFolderTree = ({ folders = [], selectedFolderId = null, onSelectFolde
               onClick={() => { const title = newFolderName.trim(); if (!title) return;
                 const payload = { title }; if (selectedFolderId !== null) payload.parent_id = selectedFolderId;
                 onCreateFolder(payload); setNewFolderName(""); }}>
-              + New
+             {__(' + New','zaplane')}
             </Button>
           </HStack>
         </Box>
