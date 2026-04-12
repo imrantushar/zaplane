@@ -36,7 +36,7 @@ const whatsNewContent = [
                 label: 'Improvements',
                 tag: 'improvement',
                 items: [
-                    { bold: '', text: 'Added RTL text direction support across the OttoKit plugin UI.' },
+                    { bold: '', text: 'Added RTL text direction support across the zaplane plugin UI.' },
                 ]
             },
         ],

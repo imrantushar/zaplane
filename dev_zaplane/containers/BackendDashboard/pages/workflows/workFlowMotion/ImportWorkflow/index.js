@@ -6,6 +6,8 @@ import { __ } from "@wordpress/i18n";
 import ImportJSONModal from "./ImportJSONModal";
 import { importWorkflows } from "@ZAPRedux/Slices/workFlowSlice/actions/ExportImport";
 import { FiUpload } from "react-icons/fi";
+import { getWorkFlow } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow";
+import ZAPTooltip from "@ZAPComponents/ZAPTooltip";
 
 const ImportWorkflow = () => {
     const dispatch = useDispatch();
@@ -24,6 +26,7 @@ const ImportWorkflow = () => {
             const json = JSON.parse(text);
 
             await dispatch(importWorkflows(json));
+            await dispatch(getWorkFlow({ page: 1, per_page: 20 }));
 
             setIsOpen(false);
             setFile(null);
@@ -35,9 +38,12 @@ const ImportWorkflow = () => {
 
     return (
         <>
-            <Button variant='outline' onClick={() => setIsOpen(true)}>
-                <FiUpload />
-            </Button>
+            <ZAPTooltip content={__("Import Workflow", "zaplane")}>
+                <Button variant='outline' onClick={() => setIsOpen(true)}>
+                    <FiUpload />
+                </Button>
+            </ZAPTooltip>
+
 
             <ImportJSONModal
                 isOpen={isOpen}
