@@ -27,7 +27,10 @@ return [
 			'file' => 'variable.php',
 			'class' => \Zaplane\Integrations\Variable::class
 		],
-
+    'cartflows'            => [
+      'file' => 'cartflows.php',
+      'class' => \Zaplane\Integrations\Cartflows::class
+    ],
 		'wordpress'            => [
 			'file' => 'wordpress.php',
 			'class' => \Zaplane\Integrations\Wordpress::class
