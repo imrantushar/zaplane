@@ -2,64 +2,11 @@ import { useEffect, useState } from "react";
 import { Box, Button, HStack, Input, Text, VStack } from "@chakra-ui/react";
 import { __ } from "@wordpress/i18n";
 import { FiChevronDown, FiChevronRight, FiFolder } from "react-icons/fi";
+import { collectExpandableIds } from "./helper";
+import { primaryBtn } from "../../../assets/scss/chakra/recipe";
+import FolderNode from "./FolderNode";
 
-const collectExpandableIds = (nodes = [], ids = {}) => {
-  nodes.forEach((node) => {
-    if (Array.isArray(node.children) && node.children.length > 0) {
-      ids[node.id] = true;
-      collectExpandableIds(node.children, ids);
-    }
-  });
-  return ids;
-};
 
-const FolderNode = ({ node, depth, expandedMap, setExpandedMap, selectedId, onSelect }) => {
-  const hasChildren = Array.isArray(node.children) && node.children.length > 0;
-  const isExpanded = !!expandedMap[node.id];
-
-  return (
-    <Box pl={`${depth * 14}px`}>
-      <HStack spacing={1} py={1}>
-        {hasChildren ? (
-          <Button
-            variant="ghost"
-            minW="18px"
-            h="18px"
-            p="0"
-            onClick={() => setExpandedMap((prev) => ({ ...prev, [node.id]: !isExpanded }))}
-          >
-            {isExpanded ? <FiChevronDown /> : <FiChevronRight />}
-          </Button>
-        ) : (
-          <Box w="18px" />
-        )}
-        <Button
-          variant={Number(selectedId) === Number(node.id) ? "solid" : "ghost"}
-          size="sm"
-          leftIcon={<FiFolder />}
-          onClick={() => onSelect(node.id)}
-          justifyContent="flex-start"
-          w="100%"
-        >
-          {node.title}
-        </Button>
-      </HStack>
-      {hasChildren && isExpanded
-        ? node.children.map((child) => (
-            <FolderNode
-              key={child.id}
-              node={child}
-              depth={depth + 1}
-              expandedMap={expandedMap}
-              setExpandedMap={setExpandedMap}
-              selectedId={selectedId}
-              onSelect={onSelect}
-            />
-          ))
-        : null}
-    </Box>
-  );
-};
 
 const RecipeFolderTree = ({
   folders = [],
@@ -114,7 +61,7 @@ const RecipeFolderTree = ({
               onChange={(e) => setNewFolderName(e.target.value)}
             />
             <Button
-              size="sm"
+              {...primaryBtn}
               onClick={() => {
                 const title = newFolderName.trim();
                 if (!title) {
