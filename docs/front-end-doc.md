@@ -31,7 +31,7 @@ Workflow management interface.
       - `DrawerSearchList.js` - Searchable filtered list
       - `DrawerItemButton.js` - Individual node type button
     - **SelectTab/** - Tabbed configuration interface
-      - `SelectTab.js` - Tab management
+      - `SelectTab.js` - here have nested file here i mange api releted node intregation https://prnt.sc/VUdCU4bJPoFc
       - **ConnectionSelector/** - Connection third party api intregation part is here https://prnt.sc/CHH5OLyUVRIS
         - `ConnectionSelector.js` - Dropdown for credentials
         - `ConnectionPopaver.js` - Tooltip/popper for connections
