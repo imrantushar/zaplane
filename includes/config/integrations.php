@@ -39,6 +39,9 @@ return [
 		'woosubscriptions'     => [
 			'file' => 'woo-subscriptions.php',
 			'class' => \Zaplane\Integrations\WooSubscriptions::class
+		'woobookings'          => [
+			'file' => 'woo-bookings.php',
+			'class' => \Zaplane\Integrations\WooBookings::class
 		],
 		'slack'                => [
 			'file' => 'Slack.php',

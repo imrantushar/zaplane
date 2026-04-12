@@ -23,13 +23,14 @@ import {
 
 import WPModal from "@ZAPComponents/Modal/WPModal";
 import TopBar from "@ZAPComponents/TopBar";
-import { primaryBtn } from "../../../../../assets/scss/chakra/recipe";
+import { outlineBtn, primaryBtn } from "../../../../../assets/scss/chakra/recipe";
 import ConnectionTable from "./ConnectionTable";
 import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
 import { formatLabel, plugin_root_url } from "@ZAPUtils/helper";
 import ZAPInput from "@ZAPComponents/ZAPInput";
 import { IoIosArrowForward } from "react-icons/io";
 import SubTopBar from "@ZAPComponents/SubTopBar";
+import { FiHelpCircle } from "react-icons/fi";
 
 
 const Connections = () => {
@@ -144,9 +145,6 @@ const Connections = () => {
                     </>
 
                 )}
-            // rightContent={() => (
-
-            // )}
             />
             <SubTopBar heading={__("Dashboard", "zaplane")}>
                 <Button
