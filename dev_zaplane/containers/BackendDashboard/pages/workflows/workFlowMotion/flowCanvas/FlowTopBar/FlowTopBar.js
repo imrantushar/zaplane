@@ -267,7 +267,7 @@ const currentTitle = values?.title ?? workFlow?.workflow?.title ?? "Untitled Flo
                 </Button>
               </Flex>
 
-              <RunsTable id={id} />
+              <RunsTable id={id} activeDrawer={activeDrawer} setRefreshing={setRefreshing}/>
             </ZAPDrawer>
 
             {/* Version Drawer */}
