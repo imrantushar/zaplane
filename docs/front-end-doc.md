@@ -18,29 +18,29 @@ Workflow management interface.
 - **workFlowMotion/** - workflow  (the core feature is here)
   - `index.js` - Workflow editor container also have formik parent point
   - **FlowCanvas/** - Main graph 
-    - `FlowCanvas.js` - react flow mainly show hare its parent point
+    - `FlowCanvas.js` - react flow mainly show hare its parent point https://prnt.sc/ocDGIQKfKz3q
     - **FlowTopBar/** - Toolbar with save, test, publish, history buttons,title name export 
       - `FlowTopBar.js` - Main toolbar component
     - **RunsTable/** - Workflow execution history table is here
-    - **FloatingEdge/** - Custom edge last adding node connect ui show from here i made id using custom logic becuse its pro feated react flow pacage
+    - **FloatingEdge/** - Custom edge last adding node connect ui show from here i made id using custom logic becuse its pro feated react flow pacage https://prnt.sc/TUkLN6IVoMZr
     - `helper.js` - Canvas utilities and configuration
   - **ActionDrawer/** - Right-side panel for when node add click
-    - `ActionDrawer.js` - Main drawer component with tabs
-    - **DrawerItemList/** - List of action/trigger nodes to add
+    - `ActionDrawer.js` - Main drawer component with tabs https://prnt.sc/PMnJF0NFVazx
+    - **DrawerItemList/** - List of action/trigger nodes to add all list ar here https://prnt.sc/xxsRqdCYWqoY
       - `DrawerModeList.js` - Display modes (triggers vs actions)
       - `DrawerSearchList.js` - Searchable filtered list
       - `DrawerItemButton.js` - Individual node type button
     - **SelectTab/** - Tabbed configuration interface
       - `SelectTab.js` - Tab management
-      - **ConnectionSelector/** - Connection third party api intregation part is here
+      - **ConnectionSelector/** - Connection third party api intregation part is here https://prnt.sc/CHH5OLyUVRIS
         - `ConnectionSelector.js` - Dropdown for credentials
         - `ConnectionPopaver.js` - Tooltip/popper for connections
       - `TestRun.js` - Test execution component
       - `TestDetails.js` - Test results display
-    - **ActionFieldRenderer/** - Dynamic form field renderer
+    - **ActionFieldRenderer/** - Dynamic form field renderer https://prnt.sc/SHThrBFpFQWN
       - `ActionFieldRenderer.js` - Renders config fields for nodes
-    - **ConditionGroupField/** - Conditional logic builder also filter logice builder
-      - `ConditionGroupField.js` - Nested condition groups
+    - **ConditionGroupField/** - Conditional logic builder also filter logice builder https://prnt.sc/JHXFjRHUzJQ4
+      - `ConditionGroupField.js` - Nested condition groups https://prnt.sc/i_BiN9JxLC4d
     - `helper.js` - Drawer utilities
   - **CustomNode/** - Custom node components for the graph
     - `CustomNode.js` - Main node wrapper with header/body
@@ -63,6 +63,12 @@ Connection management for external integrations.
 Workflow execution logs viewer.
 
 - `index.js` - Logs page with filtering and table
+
+##### recipes/
+
+
+- `index.js` - recipes releted all file is here https://prnt.sc/53epKfk7iztM
+create recipy from workflowTable file .here is use componet create nested folder https://prnt.sc/ez7-kBd8KAWr
 
 
 
