@@ -26,8 +26,7 @@ import { updateWorkFlowStatus, updateWorkFlowTitle } from "@ZAPRedux/Slices/work
 import { useNavigate } from "react-router-dom";
 import { plugin_root_url, route_path } from "@ZAPUtils/helper";
 import ZAPMenu from "@ZAPComponents/ZapMenu";
-import { exportWorkflows, importWorkflows } from "@ZAPRedux/Slices/workFlowSlice/actions/ExportImport";
-import ImportJSONModal from "./ImportJSONModal";
+import { exportWorkflows } from "@ZAPRedux/Slices/workFlowSlice/actions/ExportImport";
 import { IoIosArrowForward } from "react-icons/io";
 import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
 
@@ -45,8 +44,6 @@ export default function FlowTopBar({
 }) {
   const { apiCountdown, apiRequestRunning } = useSelector((state) => state.workflows);
   const [refreshing, setRefreshing] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [file, setFile] = useState(null);
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const [isEditingTitle, setIsEditingTitle] = useState(false);
@@ -107,29 +104,7 @@ export default function FlowTopBar({
       console.error("Export failed:", err);
     }
   };
-  //import work flow will be handle in next update
-  const handleImport = async () => {
-    if (!file) {
-      alert("Please select a JSON file");
-      return;
-    }
 
-    try {
-      const text = await file.text();
-      const json = JSON.parse(text);
-      await dispatch(
-        importWorkflows(
-          json
-        )
-      );
-
-      setIsModalOpen(false);
-      setFile(null);
-    } catch (err) {
-      console.error("Import failed:", err);
-      alert("Invalid JSON file");
-    }
-  };
 const currentTitle = values?.title ?? workFlow?.workflow?.title ?? "Untitled Flow";
   return (
     <>
@@ -326,11 +301,6 @@ const currentTitle = values?.title ?? workFlow?.workflow?.title ?? "Untitled Flo
               isIcon
               items={[
                 {
-                  label: "Import",
-                  icon: FiUpload,
-                  onClick: () => setIsModalOpen(true),
-                },
-                {
                   label: "Export",
                   icon: FiDownload,
                   onClick: handleExport,
@@ -339,13 +309,6 @@ const currentTitle = values?.title ?? workFlow?.workflow?.title ?? "Untitled Flo
             />
           </Flex>
         )}
-      />
-      <ImportJSONModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        file={file}
-        setFile={setFile}
-        handleImport={handleImport}
       />
     </>
 
