@@ -1,10 +1,6 @@
 {
     "version": "0.0.1",
-<<<<<<< HEAD
-    "generated_at": "2026-04-07 05:36:44",
-=======
     "generated_at": "2026-04-02 10:38:05",
->>>>>>> beta-version
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -13010,28 +13006,15 @@
             },
             "actions": []
         },
-<<<<<<< HEAD
-        "gemcrm": {
-            "slug": "gemcrm",
-            "name": "GemCRM",
-            "icon": "gemcrm-logo-icon.svg",
-=======
         "jetengine": {
             "slug": "jetengine",
             "name": "JetEngine",
             "icon": "Jetengine.svg",
->>>>>>> beta-version
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
             "triggers": {
-<<<<<<< HEAD
-                "contact_created": {
-                    "key": "contact_created",
-                    "label": "Contact Created",
-                    "hook": "gemcrm/contact/created",
-=======
                 "post_type_field_update": {
                     "key": "post_type_field_update",
                     "label": "Updated JetEngine field on post type",
@@ -13072,33 +13055,11 @@
                     "key": "post_form_submission",
                     "label": "Post Form Submission",
                     "hook": "wpuf_add_post_after_insert",
->>>>>>> beta-version
                     "schema": [],
                     "outputs": [
                         "main"
                     ]
                 },
-<<<<<<< HEAD
-                "contact_tag_attached": {
-                    "key": "contact_tag_attached",
-                    "label": "Tag Added To Contact",
-                    "hook": "gemcrm/contact/tag/attached",
-                    "schema": [
-                        {
-                            "key": "tag_id",
-                            "label": "Tag (optional)",
-                            "type": "select",
-                            "required": false,
-                            "placeholder": "Leave empty to trigger for any tag",
-                            "dynamic": {
-                                "integration": "gemcrm",
-                                "query": "gemcrm_tag_query",
-                                "select": [
-                                    "value",
-                                    "label"
-                                ]
-                            }
-=======
                 "registration_form_submission": {
                     "key": "registration_form_submission",
                     "label": "Registration Form Submission",
@@ -13211,34 +13172,12 @@
                             "label": "Post ID (leave empty for any)",
                             "type": "text",
                             "required": false
->>>>>>> beta-version
                         }
                     ],
                     "outputs": [
                         "main"
                     ]
                 },
-<<<<<<< HEAD
-                "contact_tag_removed": {
-                    "key": "contact_tag_removed",
-                    "label": "Tag Removed From Contact",
-                    "hook": "gemcrm/contact/tag/removed",
-                    "schema": [
-                        {
-                            "key": "tag_id",
-                            "label": "Tag (optional)",
-                            "type": "select",
-                            "required": false,
-                            "placeholder": "Leave empty to trigger for any tag",
-                            "dynamic": {
-                                "integration": "gemcrm",
-                                "query": "gemcrm_tag_query",
-                                "select": [
-                                    "value",
-                                    "label"
-                                ]
-                            }
-=======
                 "acf_post_field_updated": {
                     "key": "acf_post_field_updated",
                     "label": "ACF Post Field Value Updated",
@@ -13249,59 +13188,12 @@
                             "label": "Field Name (leave empty for any)",
                             "type": "text",
                             "required": false
->>>>>>> beta-version
                         }
                     ],
                     "outputs": [
                         "main"
                     ]
                 },
-<<<<<<< HEAD
-                "contact_list_attached": {
-                    "key": "contact_list_attached",
-                    "label": "Contact Added To List",
-                    "hook": "gemcrm/contact/list/attached",
-                    "schema": [
-                        {
-                            "key": "list_id",
-                            "label": "List (optional)",
-                            "type": "select",
-                            "required": false,
-                            "placeholder": "Leave empty to trigger for any list",
-                            "dynamic": {
-                                "integration": "gemcrm",
-                                "query": "gemcrm_list_query",
-                                "select": [
-                                    "value",
-                                    "label"
-                                ]
-                            }
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "contact_list_removed": {
-                    "key": "contact_list_removed",
-                    "label": "Contact Removed From List",
-                    "hook": "gemcrm/contact/list/removed",
-                    "schema": [
-                        {
-                            "key": "list_id",
-                            "label": "List (optional)",
-                            "type": "select",
-                            "required": false,
-                            "placeholder": "Leave empty to trigger for any list",
-                            "dynamic": {
-                                "integration": "gemcrm",
-                                "query": "gemcrm_list_query",
-                                "select": [
-                                    "value",
-                                    "label"
-                                ]
-                            }
-=======
                 "acf_user_field_updated": {
                     "key": "acf_user_field_updated",
                     "label": "ACF User Field Value Updated",
@@ -13315,7 +13207,6 @@
                             "label": "Field Name (leave empty for any)",
                             "type": "text",
                             "required": false
->>>>>>> beta-version
                         }
                     ],
                     "outputs": [
@@ -13324,15 +13215,6 @@
                 }
             },
             "actions": {
-<<<<<<< HEAD
-                "create_contact": {
-                    "key": "create_contact",
-                    "label": "Create Contact",
-                    "schema": [
-                        {
-                            "key": "first_name",
-                            "label": "First Name",
-=======
                 "get_post_field": {
                     "key": "get_post_field",
                     "label": "Get Post Custom Field Value",
@@ -13340,129 +13222,20 @@
                         {
                             "key": "post_id",
                             "label": "Post ID",
->>>>>>> beta-version
                             "type": "expression",
                             "required": true
                         },
                         {
-<<<<<<< HEAD
-                            "key": "last_name",
-                            "label": "Last Name",
-                            "type": "expression",
-                            "required": false
-                        },
-                        {
-                            "key": "email",
-                            "label": "Email",
-                            "type": "expression",
-                            "required": true
-                        },
-                        {
-                            "key": "phone",
-                            "label": "Phone",
-                            "type": "expression",
-                            "required": false
-                        },
-                        {
-                            "key": "status",
-                            "label": "Status",
-                            "type": "expression",
-                            "required": false,
-                            "placeholder": "e.g. active"
-                        },
-                        {
-                            "key": "type",
-                            "label": "Type",
-                            "type": "expression",
-                            "required": false,
-                            "placeholder": "e.g. customer"
-                        },
-                        {
-                            "key": "linked_id",
-                            "label": "Linked ID",
-                            "type": "expression",
-                            "required": false
-                        },
-                        {
-                            "key": "photo_id",
-                            "label": "Photo ID",
-                            "type": "expression",
-                            "required": false
-                        },
-                        {
-                            "key": "company_ids",
-                            "label": "Company IDs (comma-separated)",
-                            "type": "expression",
-                            "required": false
-                        },
-                        {
-                            "key": "tag_ids",
-                            "label": "Tag IDs (comma-separated)",
-                            "type": "expression",
-                            "required": false
-                        },
-                        {
-                            "key": "list_ids",
-                            "label": "List IDs (comma-separated)",
-                            "type": "expression",
-                            "required": false
-                        },
-                        {
-                            "key": "addr_line_1",
-                            "label": "Address Line 1",
-                            "type": "expression",
-                            "required": false
-                        },
-                        {
-                            "key": "addr_line_2",
-                            "label": "Address Line 2",
-                            "type": "expression",
-                            "required": false
-                        },
-                        {
-                            "key": "city",
-                            "label": "City",
-                            "type": "expression",
-                            "required": false
-                        },
-                        {
-                            "key": "state",
-                            "label": "State",
-                            "type": "expression",
-                            "required": false
-                        },
-                        {
-                            "key": "zip",
-                            "label": "ZIP",
-                            "type": "expression",
-                            "required": false
-                        },
-                        {
-                            "key": "country",
-                            "label": "Country",
-                            "type": "expression",
-                            "required": false
-=======
                             "key": "field_name",
                             "label": "Field Name",
                             "type": "text",
                             "required": true
->>>>>>> beta-version
                         }
                     ],
                     "outputs": [
                         "main"
                     ]
                 },
-<<<<<<< HEAD
-                "update_contact": {
-                    "key": "update_contact",
-                    "label": "Update Contact",
-                    "schema": [
-                        {
-                            "key": "contact_id",
-                            "label": "Contact ID",
-=======
                 "get_user_field": {
                     "key": "get_user_field",
                     "label": "Get User Custom Field Value",
@@ -13470,135 +13243,20 @@
                         {
                             "key": "user_id",
                             "label": "User ID",
->>>>>>> beta-version
                             "type": "expression",
                             "required": true
                         },
                         {
-<<<<<<< HEAD
-                            "key": "first_name",
-                            "label": "First Name",
-                            "type": "expression",
-                            "required": false
-                        },
-                        {
-                            "key": "last_name",
-                            "label": "Last Name",
-                            "type": "expression",
-                            "required": false
-                        },
-                        {
-                            "key": "email",
-                            "label": "Email",
-                            "type": "expression",
-                            "required": false
-                        },
-                        {
-                            "key": "phone",
-                            "label": "Phone",
-                            "type": "expression",
-                            "required": false
-                        },
-                        {
-                            "key": "status",
-                            "label": "Status",
-                            "type": "expression",
-                            "required": false,
-                            "placeholder": "e.g. active"
-                        },
-                        {
-                            "key": "type",
-                            "label": "Type",
-                            "type": "expression",
-                            "required": false,
-                            "placeholder": "e.g. customer"
-                        },
-                        {
-                            "key": "linked_id",
-                            "label": "Linked ID",
-                            "type": "expression",
-                            "required": false
-                        },
-                        {
-                            "key": "photo_id",
-                            "label": "Photo ID",
-                            "type": "expression",
-                            "required": false
-                        },
-                        {
-                            "key": "company_ids",
-                            "label": "Company IDs (comma-separated)",
-                            "type": "expression",
-                            "required": false
-                        },
-                        {
-                            "key": "tag_ids",
-                            "label": "Tag IDs (comma-separated)",
-                            "type": "expression",
-                            "required": false
-                        },
-                        {
-                            "key": "list_ids",
-                            "label": "List IDs (comma-separated)",
-                            "type": "expression",
-                            "required": false
-                        },
-                        {
-                            "key": "addr_line_1",
-                            "label": "Address Line 1",
-                            "type": "expression",
-                            "required": false
-                        },
-                        {
-                            "key": "addr_line_2",
-                            "label": "Address Line 2",
-                            "type": "expression",
-                            "required": false
-                        },
-                        {
-                            "key": "city",
-                            "label": "City",
-                            "type": "expression",
-                            "required": false
-                        },
-                        {
-                            "key": "state",
-                            "label": "State",
-                            "type": "expression",
-                            "required": false
-                        },
-                        {
-                            "key": "zip",
-                            "label": "ZIP",
-                            "type": "expression",
-                            "required": false
-                        },
-                        {
-                            "key": "country",
-                            "label": "Country",
-                            "type": "expression",
-                            "required": false
-=======
                             "key": "field_name",
                             "label": "Field Name",
                             "type": "text",
                             "required": true
->>>>>>> beta-version
                         }
                     ],
                     "outputs": [
                         "main"
                     ]
                 },
-<<<<<<< HEAD
-                "delete_contact": {
-                    "key": "delete_contact",
-                    "label": "Delete Contact",
-                    "schema": [
-                        {
-                            "key": "contact_id",
-                            "label": "Contact ID",
-=======
                 "get_options_field": {
                     "key": "get_options_field",
                     "label": "Get Options Page Field Value",
@@ -13633,7 +13291,6 @@
                         {
                             "key": "value",
                             "label": "Value",
->>>>>>> beta-version
                             "type": "expression",
                             "required": true
                         }
@@ -13642,15 +13299,6 @@
                         "main"
                     ]
                 },
-<<<<<<< HEAD
-                "apply_tag": {
-                    "key": "apply_tag",
-                    "label": "Apply Tag To Contact",
-                    "schema": [
-                        {
-                            "key": "contact_id",
-                            "label": "Contact ID",
-=======
                 "update_user_field": {
                     "key": "update_user_field",
                     "label": "Update User Custom Field Value",
@@ -13658,25 +13306,10 @@
                         {
                             "key": "user_id",
                             "label": "User ID",
->>>>>>> beta-version
                             "type": "expression",
                             "required": true
                         },
                         {
-<<<<<<< HEAD
-                            "key": "tag_id",
-                            "label": "Tag",
-                            "type": "select",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "gemcrm",
-                                "query": "gemcrm_tag_query",
-                                "select": [
-                                    "value",
-                                    "label"
-                                ]
-                            }
-=======
                             "key": "field_name",
                             "label": "Field Name",
                             "type": "text",
@@ -13687,38 +13320,12 @@
                             "label": "Value",
                             "type": "expression",
                             "required": true
->>>>>>> beta-version
                         }
                     ],
                     "outputs": [
                         "main"
                     ]
                 },
-<<<<<<< HEAD
-                "apply_list": {
-                    "key": "apply_list",
-                    "label": "Add Contact To List",
-                    "schema": [
-                        {
-                            "key": "contact_id",
-                            "label": "Contact ID",
-                            "type": "expression",
-                            "required": true
-                        },
-                        {
-                            "key": "list_id",
-                            "label": "List",
-                            "type": "select",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "gemcrm",
-                                "query": "gemcrm_list_query",
-                                "select": [
-                                    "value",
-                                    "label"
-                                ]
-                            }
-=======
                 "update_options_field": {
                     "key": "update_options_field",
                     "label": "Update Options Page Field Value",
@@ -13734,22 +13341,12 @@
                             "label": "Value",
                             "type": "expression",
                             "required": true
->>>>>>> beta-version
                         }
                     ],
                     "outputs": [
                         "main"
                     ]
                 },
-<<<<<<< HEAD
-                "remove_from_tag": {
-                    "key": "remove_from_tag",
-                    "label": "Remove Tag From Contact",
-                    "schema": [
-                        {
-                            "key": "contact_id",
-                            "label": "Contact ID",
-=======
                 "update_repeater_field": {
                     "key": "update_repeater_field",
                     "label": "Update Repeater Field Value",
@@ -13757,25 +13354,10 @@
                         {
                             "key": "post_id",
                             "label": "Post ID",
->>>>>>> beta-version
                             "type": "expression",
                             "required": true
                         },
                         {
-<<<<<<< HEAD
-                            "key": "tag_id",
-                            "label": "Tag",
-                            "type": "select",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "gemcrm",
-                                "query": "gemcrm_tag_query",
-                                "select": [
-                                    "value",
-                                    "label"
-                                ]
-                            }
-=======
                             "key": "field_name",
                             "label": "Field Name",
                             "type": "text",
@@ -13786,22 +13368,12 @@
                             "label": "Rows (JSON array of objects)",
                             "type": "expression",
                             "required": true
->>>>>>> beta-version
                         }
                     ],
                     "outputs": [
                         "main"
                     ]
                 },
-<<<<<<< HEAD
-                "remove_from_list": {
-                    "key": "remove_from_list",
-                    "label": "Remove Contact From List",
-                    "schema": [
-                        {
-                            "key": "contact_id",
-                            "label": "Contact ID",
-=======
                 "update_group_field": {
                     "key": "update_group_field",
                     "label": "Update Group Field Value",
@@ -13809,25 +13381,10 @@
                         {
                             "key": "post_id",
                             "label": "Post ID",
->>>>>>> beta-version
                             "type": "expression",
                             "required": true
                         },
                         {
-<<<<<<< HEAD
-                            "key": "list_id",
-                            "label": "List",
-                            "type": "select",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "gemcrm",
-                                "query": "gemcrm_list_query",
-                                "select": [
-                                    "value",
-                                    "label"
-                                ]
-                            }
-=======
                             "key": "field_name",
                             "label": "Field Name",
                             "type": "text",
@@ -13838,7 +13395,6 @@
                             "label": "Sub Fields (JSON object)",
                             "type": "expression",
                             "required": true
->>>>>>> beta-version
                         }
                     ],
                     "outputs": [
@@ -13846,8 +13402,6 @@
                     ]
                 }
             }
-<<<<<<< HEAD
-=======
         },
         "profilebuilder": {
             "slug": "profilebuilder",
@@ -13935,7 +13489,6 @@
                 }
             },
             "actions": []
->>>>>>> beta-version
         }
     },
     "tools": {
