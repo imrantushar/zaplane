@@ -9,6 +9,8 @@ import Setting from './pages/setting';
 import Connections from './pages/connections';
 import Dashboard from './pages/dashboard';
 import { __ } from '@wordpress/i18n';
+import ShowRecipes from './pages/recipes/ShowRecipes';
+import RecipesPage from './pages/recipes';
 
 
 
@@ -26,6 +28,11 @@ const renderSwitch = (page, id, action, path) => {
 			return <Logs />;
 		case 'zaplane-connections':
 			return <Connections />;
+			case 'zaplane-recipes':
+			if(action || id){
+				return <ShowRecipes id={id} />
+			}
+			return <RecipesPage />;
 		case 'zaplane-settings':
 			return <Setting />;
 
