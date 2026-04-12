@@ -157,7 +157,6 @@ class ImportExportController extends WP_REST_Controller {
 
 		return [
 			'title'       => $workflow->title,
-			'name'        => $workflow->name,
 			'status'      => $workflow->status,
 			'layout'      => $workflow->layout,
 			'versions'    => $exportedVersions,
@@ -304,8 +303,7 @@ class ImportExportController extends WP_REST_Controller {
 		$workflow = Workflow::create( [
 			'user_id' => get_current_user_id(),
 			'title'   => sanitize_text_field( $data['title'] ),
-			'name'    => sanitize_text_field( $data['name'] ?? $data['title'] ),
-			'status'  => 'draft',  // always import as draft; user activates when ready
+			'status'  => 'draft',
 			'layout'  => sanitize_text_field( $data['layout'] ?? 'LR' ),
 		] );
 

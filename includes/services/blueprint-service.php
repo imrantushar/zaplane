@@ -89,7 +89,6 @@ class BlueprintService {
 
 		return [
 			'title'       => $workflow->title,
-			'name'        => $workflow->name,
 			'status'      => $workflow->status,
 			'layout'      => $workflow->layout,
 			'versions'    => $exportedVersions,
@@ -161,7 +160,6 @@ class BlueprintService {
 		$workflow = Workflow::create( [
 			'user_id' => get_current_user_id(),
 			'title'   => $title,
-			'name'    => sanitize_text_field( $data['name'] ?? $title ),
 			'status'  => 'draft',
 			'layout'  => sanitize_text_field( $data['layout'] ?? 'LR' ),
 		] );
