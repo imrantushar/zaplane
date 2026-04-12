@@ -2478,7 +2478,7 @@ class Wordpress extends IntegrationBase {
 	public static function execute_node( array $node, array $input ): array {
 
 		$config = $node['data']['config'] ?? [];
-		$event = $node['data']['event'];
+		$event = $node['data']['event'] ?? '';
 
 		$method = 'action_' . $event;
 

@@ -142,13 +142,14 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, handleAddAction,
 
     dispatch(conditionVariables(payload));
   }, [node?.id]);
+  
   return (
     <ZAPDrawer
       open={open}
       isFullscreen={isFullscreen}
       onClose={resetAll}
       arrowClose={['tools', 'app'].includes(mode)}
-      maxWidth='700px'
+      maxWidth='500px' {...(['filter', 'if'].includes(values?.actionType) && { maxWidth: '700px' })}
       arrowOnClick={() => {
         setSelectedItem(null);
         setMode(null);
@@ -164,7 +165,7 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, handleAddAction,
           <Button variant="outline" onClick={resetAll}>{__("Cancel", "zaplane")}</Button>
           <Button {...primaryBtn}
             disabled={!values.actionType}
-            onClick={handleContinue}>{step === 'test' ? __('Submit', 'zaplane') : __('Continue', 'zaplane')}
+            onClick={handleContinue}>{step === 'test' ? __('Save', 'zaplane') : __('Continue', 'zaplane')}
           </Button>
         </HStack>
       }

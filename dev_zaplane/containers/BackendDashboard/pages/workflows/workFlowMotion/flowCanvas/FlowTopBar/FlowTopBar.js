@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from "react";
-import { Button, Text, Flex, Input, Box, FileUpload } from "@chakra-ui/react";
+import React, { useEffect, useState, useRef } from "react";
+import { Button, Text, Flex, Input, Box, Image } from "@chakra-ui/react";
 import TopBar from "@ZAPComponents/TopBar";
-import { FiArrowLeft, FiDownload, FiUpload } from "react-icons/fi";
 import { TfiReload } from "react-icons/tfi";
 import { LuFullscreen, LuMinimize, LuSquarePlay } from "react-icons/lu";
 import { LucideHistory } from "lucide-react";
@@ -23,11 +22,10 @@ import '../styles.scss'
 import { LiaStopCircleSolid } from "react-icons/lia";
 import { CiPlay1 } from "react-icons/ci";
 import { updateWorkFlowStatus, updateWorkFlowTitle } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow";
-import { useNavigate } from "react-router-dom";
-import { route_path } from "@ZAPUtils/helper";
-import ZAPMenu from "@ZAPComponents/ZapMenu";
-import { exportWorkflows, importWorkflows } from "@ZAPRedux/Slices/workFlowSlice/actions/ExportImport";
-import ImportJSONModal from "./ImportJSONModal";
+import { plugin_root_url, route_path } from "@ZAPUtils/helper";
+import { IoIosArrowForward } from "react-icons/io";
+import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
+import ZAPTooltip from "@ZAPComponents/ZAPTooltip";
 
 export default function FlowTopBar({
   workFlow,
@@ -43,11 +41,17 @@ export default function FlowTopBar({
 }) {
   const { apiCountdown, apiRequestRunning } = useSelector((state) => state.workflows);
   const [refreshing, setRefreshing] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [file, setFile] = useState(null);
-  const dispatch = useDispatch()
-  const navigate = useNavigate()
-  useApiCountdown()
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const titleInputRef = useRef(null);
+  const dispatch = useDispatch();
+  useApiCountdown();
+  useEffect(() => {
+    if (isEditingTitle && titleInputRef.current) {
+      titleInputRef.current.focus();
+      titleInputRef.current.select();
+    }
+  }, [isEditingTitle]);
+
   useEffect(() => {
     if (!workFlow?.workflow) return;
     const updateStatusAndTitle = async () => {

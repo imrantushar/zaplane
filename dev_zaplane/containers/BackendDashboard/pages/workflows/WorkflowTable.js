@@ -107,9 +107,9 @@ const WorkflowTable = () => {
       cell: (row) => {
         const { date, time } = formatDateTime(row.created_at);
         return (
-          <Box>
+          <Box ml='-12px'>
             <ZAPLabel label={date} type={"simple"} />
-            <Text className="zaplane-sub-title" ml='-45px' color="var(--zaplane-text-muted)">
+            <Text className="zaplane-sub-title" ml='-38px' color="var(--zaplane-text-muted)">
               {__(time, 'zaplane')}
             </Text>
           </Box>

@@ -1,6 +1,10 @@
 {
     "version": "0.0.1",
+<<<<<<< HEAD
     "generated_at": "2026-04-07 05:36:44",
+=======
+    "generated_at": "2026-04-02 10:38:05",
+>>>>>>> beta-version
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -7347,8 +7351,111 @@
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
-            "supports_webhook": false,
-            "triggers": [],
+            "supports_webhook": true,
+            "triggers": {
+                "subscribed": {
+                    "key": "subscribed",
+                    "label": "Subscriber Added",
+                    "hook": "mailchimp_webhook_subscribed",
+                    "schema": [
+                        {
+                            "key": "list_id",
+                            "label": "Audience/List ID",
+                            "type": "text",
+                            "placeholder": "a6b5da1054",
+                            "help": "Optional. Only continue if the webhook came from this Mailchimp audience."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "unsubscribed": {
+                    "key": "unsubscribed",
+                    "label": "Subscriber Unsubscribed",
+                    "hook": "mailchimp_webhook_unsubscribed",
+                    "schema": [
+                        {
+                            "key": "list_id",
+                            "label": "Audience/List ID",
+                            "type": "text",
+                            "placeholder": "a6b5da1054",
+                            "help": "Optional. Only continue if the webhook came from this Mailchimp audience."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "profile_updated": {
+                    "key": "profile_updated",
+                    "label": "Subscriber Profile Updated",
+                    "hook": "mailchimp_webhook_profile_updated",
+                    "schema": [
+                        {
+                            "key": "list_id",
+                            "label": "Audience/List ID",
+                            "type": "text",
+                            "placeholder": "a6b5da1054",
+                            "help": "Optional. Only continue if the webhook came from this Mailchimp audience."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "cleaned": {
+                    "key": "cleaned",
+                    "label": "Email Cleaned",
+                    "hook": "mailchimp_webhook_cleaned",
+                    "schema": [
+                        {
+                            "key": "list_id",
+                            "label": "Audience/List ID",
+                            "type": "text",
+                            "placeholder": "a6b5da1054",
+                            "help": "Optional. Only continue if the webhook came from this Mailchimp audience."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "email_changed": {
+                    "key": "email_changed",
+                    "label": "Subscriber Email Changed",
+                    "hook": "mailchimp_webhook_email_changed",
+                    "schema": [
+                        {
+                            "key": "list_id",
+                            "label": "Audience/List ID",
+                            "type": "text",
+                            "placeholder": "a6b5da1054",
+                            "help": "Optional. Only continue if the webhook came from this Mailchimp audience."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "campaign_sent": {
+                    "key": "campaign_sent",
+                    "label": "Campaign Sent",
+                    "hook": "mailchimp_webhook_campaign_sent",
+                    "schema": [
+                        {
+                            "key": "list_id",
+                            "label": "Audience/List ID",
+                            "type": "text",
+                            "placeholder": "a6b5da1054",
+                            "help": "Optional. Only continue if the webhook came from this Mailchimp audience."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
             "actions": {
                 "upsert_subscriber": {
                     "key": "upsert_subscriber",
@@ -7589,6 +7696,131 @@
                             "type": "text",
                             "placeholder": "name@example.com or {{email}}",
                             "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
+        },
+        "hubspot": {
+            "slug": "hubspot",
+            "name": "HubSpot",
+            "icon": "hubspot.svg",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": [],
+            "actions": {
+                "submit_form": {
+                    "key": "submit_form",
+                    "label": "Submit Form",
+                    "schema": [
+                        {
+                            "key": "portal_id",
+                            "label": "Portal ID",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "hubspot",
+                                "query": "portals",
+                                "select": [
+                                    "id",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "form_guid",
+                            "label": "Form GUID",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "hubspot",
+                                "query": "forms",
+                                "select": [
+                                    "id",
+                                    "label"
+                                ]
+                            },
+                            "required": true,
+                            "help": "Shows HubSpot forms already embedded on this WordPress site through the official HubSpot plugin."
+                        },
+                        {
+                            "key": "email",
+                            "label": "Email",
+                            "type": "text",
+                            "placeholder": "name@example.com or {{email}}",
+                            "help": "Optional. Used to auto-build fields if Fields (JSON) is empty."
+                        },
+                        {
+                            "key": "firstname",
+                            "label": "First Name",
+                            "type": "text",
+                            "placeholder": "John or {{first_name}}",
+                            "help": "Optional. Used to auto-build fields if Fields (JSON) is empty."
+                        },
+                        {
+                            "key": "lastname",
+                            "label": "Last Name",
+                            "type": "text",
+                            "placeholder": "Doe or {{last_name}}",
+                            "help": "Optional. Used to auto-build fields if Fields (JSON) is empty."
+                        },
+                        {
+                            "key": "phone",
+                            "label": "Phone",
+                            "type": "text",
+                            "placeholder": "+18884827768 or {{phone}}",
+                            "help": "Optional. Used to auto-build fields if Fields (JSON) is empty."
+                        },
+                        {
+                            "key": "fields",
+                            "label": "Fields (JSON)",
+                            "type": "textarea",
+                            "placeholder": "{\"email\":\"name@example.com\",\"firstname\":\"John\"}",
+                            "help": "Optional. JSON object (field name to value) or array of field objects. If empty, simple fields above will be used."
+                        },
+                        {
+                            "key": "context",
+                            "label": "Context (JSON)",
+                            "type": "textarea",
+                            "placeholder": "{\"pageUri\":\"https://example.com\",\"pageName\":\"Landing\"}",
+                            "help": "Optional. Include hutk, pageUri, pageName, ipAddress, etc."
+                        },
+                        {
+                            "key": "legal_consent_options",
+                            "label": "Legal Consent (JSON)",
+                            "type": "textarea",
+                            "placeholder": "{\"consent\":{\"consentToProcess\":true,\"text\":\"...\",\"communications\":[{\"value\":true,\"subscriptionTypeId\":123,\"text\":\"...\"}]}}",
+                            "help": "Optional. GDPR/consent data."
+                        },
+                        {
+                            "key": "submitted_at",
+                            "label": "Submitted At (ms)",
+                            "type": "text",
+                            "placeholder": "1700000000000",
+                            "help": "Optional timestamp in milliseconds."
+                        },
+                        {
+                            "key": "skip_validation",
+                            "label": "Skip Validation",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "value": "",
+                                    "label": "Default"
+                                },
+                                {
+                                    "value": "true",
+                                    "label": "True"
+                                },
+                                {
+                                    "value": "false",
+                                    "label": "False"
+                                }
+                            ]
                         }
                     ],
                     "outputs": [
@@ -10342,9 +10574,9 @@
                             "required": true
                         }
                     ],
-                    "outputs": [
-                        "main"
-                    ]
+                    "outputs": {
+                        "main": "Main output"
+                    }
                 }
             },
             "actions": []
@@ -11316,6 +11548,148 @@
                 }
             }
         },
+        "fluentsmtp": {
+            "slug": "fluentsmtp",
+            "name": "FluentSMTP",
+            "icon": "fluentsmtp.svg",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": {
+                "email_sent": {
+                    "key": "email_sent",
+                    "label": "Email Sent",
+                    "hook": "wp_mail_succeeded",
+                    "schema": [
+                        {
+                            "key": "recipient_email",
+                            "label": "Recipient Email",
+                            "type": "text",
+                            "placeholder": "user@example.com",
+                            "help": "Optional. Trigger only when this email address is one of the recipients."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "email_failed": {
+                    "key": "email_failed",
+                    "label": "Email Failed",
+                    "hook": "wp_mail_failed",
+                    "schema": [
+                        {
+                            "key": "recipient_email",
+                            "label": "Recipient Email",
+                            "type": "text",
+                            "placeholder": "user@example.com",
+                            "help": "Optional. Trigger only when this email address is one of the recipients."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delivery_failed_no_fallback": {
+                    "key": "delivery_failed_no_fallback",
+                    "label": "Delivery Failed Without Fallback",
+                    "hook": "fluentmail_email_sending_failed_no_fallback",
+                    "schema": [
+                        {
+                            "key": "recipient_email",
+                            "label": "Recipient Email",
+                            "type": "text",
+                            "placeholder": "user@example.com",
+                            "help": "Optional. Trigger only when this email address is one of the recipients."
+                        },
+                        {
+                            "key": "provider",
+                            "label": "Provider",
+                            "type": "text",
+                            "placeholder": "smtp, gmail, mailgun",
+                            "help": "Optional. Trigger only when the failed provider matches this value."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": {
+                "send_email": {
+                    "key": "send_email",
+                    "label": "Send Email",
+                    "schema": [
+                        {
+                            "key": "to",
+                            "label": "To",
+                            "type": "text",
+                            "placeholder": "user@example.com, team@example.com",
+                            "required": true,
+                            "help": "Use comma-separated email addresses or dynamic values."
+                        },
+                        {
+                            "key": "subject",
+                            "label": "Subject",
+                            "type": "text",
+                            "placeholder": "Your email subject",
+                            "required": true
+                        },
+                        {
+                            "key": "message",
+                            "label": "Message",
+                            "type": "textarea",
+                            "placeholder": "Write your email body here",
+                            "required": true
+                        },
+                        {
+                            "key": "content_type",
+                            "label": "Content Type",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "HTML",
+                                    "value": "text/html"
+                                },
+                                {
+                                    "label": "Plain Text",
+                                    "value": "text/plain"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "cc",
+                            "label": "CC",
+                            "type": "text",
+                            "placeholder": "manager@example.com, support@example.com"
+                        },
+                        {
+                            "key": "bcc",
+                            "label": "BCC",
+                            "type": "text",
+                            "placeholder": "audit@example.com"
+                        },
+                        {
+                            "key": "reply_to",
+                            "label": "Reply-To",
+                            "type": "text",
+                            "placeholder": "reply@example.com"
+                        },
+                        {
+                            "key": "attachments",
+                            "label": "Attachments",
+                            "type": "textarea",
+                            "placeholder": "/absolute/path/to/file.pdf\n/absolute/path/to/file-2.pdf",
+                            "help": "Optional. One file path per line or comma-separated."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
+        },
         "gravityforms": {
             "slug": "gravityforms",
             "name": "Gravity Forms",
@@ -11381,9 +11755,9 @@
                             "required": true
                         }
                     ],
-                    "outputs": [
-                        "main"
-                    ]
+                    "outputs": {
+                        "main": "Main output"
+                    }
                 }
             },
             "actions": []
@@ -12149,9 +12523,9 @@
                             "required": true
                         }
                     ],
-                    "outputs": [
-                        "main"
-                    ]
+                    "outputs": {
+                        "main": "Main output port"
+                    }
                 },
                 "tutor_quiz_course_attempt": {
                     "key": "tutor_quiz_course_attempt",
@@ -12173,9 +12547,9 @@
                             "required": true
                         }
                     ],
-                    "outputs": [
-                        "main"
-                    ]
+                    "outputs": {
+                        "main": "Main output port"
+                    }
                 },
                 "lesson_complete": {
                     "key": "lesson_complete",
@@ -12197,9 +12571,9 @@
                             "required": true
                         }
                     ],
-                    "outputs": [
-                        "main"
-                    ]
+                    "outputs": {
+                        "main": "Main output port"
+                    }
                 },
                 "quiz_target": {
                     "key": "quiz_target",
@@ -12227,9 +12601,9 @@
                             "required": true
                         }
                     ],
-                    "outputs": [
-                        "main"
-                    ]
+                    "outputs": {
+                        "main": "Main output port"
+                    }
                 }
             },
             "actions": []
@@ -12324,9 +12698,9 @@
                             "required": true
                         }
                     ],
-                    "outputs": [
-                        "main"
-                    ]
+                    "outputs": {
+                        "main": "Main output"
+                    }
                 }
             },
             "actions": []
@@ -12345,6 +12719,152 @@
                     "label": "Form New Record",
                     "hook": "elementor_pro/forms/new_record",
                     "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": []
+        },
+        "masterstudy": {
+            "slug": "masterstudy",
+            "name": "MasterStudy LMS",
+            "icon": "master-study-lms.svg",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": {
+                "user_enroll_course": {
+                    "key": "user_enroll_course",
+                    "label": "User Is Enrolled In A Course",
+                    "hook": "add_user_course",
+                    "schema": [
+                        {
+                            "key": "course_id",
+                            "label": "Course",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "masterstudy",
+                                "query": "course_query",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "course_complete": {
+                    "key": "course_complete",
+                    "label": "User Completed A Course",
+                    "hook": "stm_lms_progress_updated",
+                    "schema": [
+                        {
+                            "key": "course_id",
+                            "label": "Course",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "masterstudy",
+                                "query": "course_query",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "lesson_complete": {
+                    "key": "lesson_complete",
+                    "label": "User Completed A Lesson",
+                    "hook": "stm_lms_lesson_passed",
+                    "schema": [
+                        {
+                            "key": "course_id",
+                            "label": "Course",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "masterstudy",
+                                "query": "course_query",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "lesson_id",
+                            "label": "Lesson",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "masterstudy",
+                                "query": "lesson_query",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "quiz_passed": {
+                    "key": "quiz_passed",
+                    "label": "Quiz Passed",
+                    "hook": "stm_lms_quiz_passed",
+                    "schema": [
+                        {
+                            "key": "quiz_id",
+                            "label": "Quiz",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "masterstudy",
+                                "query": "quiz_query",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "quiz_failed": {
+                    "key": "quiz_failed",
+                    "label": "Quiz Failed",
+                    "hook": "stm_lms_quiz_failed",
+                    "schema": [
+                        {
+                            "key": "quiz_id",
+                            "label": "Quiz",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "masterstudy",
+                                "query": "quiz_query",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -12490,24 +13010,75 @@
             },
             "actions": []
         },
+<<<<<<< HEAD
         "gemcrm": {
             "slug": "gemcrm",
             "name": "GemCRM",
             "icon": "gemcrm-logo-icon.svg",
+=======
+        "jetengine": {
+            "slug": "jetengine",
+            "name": "JetEngine",
+            "icon": "Jetengine.svg",
+>>>>>>> beta-version
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
             "triggers": {
+<<<<<<< HEAD
                 "contact_created": {
                     "key": "contact_created",
                     "label": "Contact Created",
                     "hook": "gemcrm/contact/created",
+=======
+                "post_type_field_update": {
+                    "key": "post_type_field_update",
+                    "label": "Updated JetEngine field on post type",
+                    "hook": "updated_post_meta",
+                    "schema": [
+                        {
+                            "key": "post_type",
+                            "label": "Post Type",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "jetengine",
+                                "query": "post_type",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": []
+        },
+        "wpuserfrontend": {
+            "slug": "wpuserfrontend",
+            "name": "WP User Frontend",
+            "icon": "wp-user-frontend.svg",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": {
+                "post_form_submission": {
+                    "key": "post_form_submission",
+                    "label": "Post Form Submission",
+                    "hook": "wpuf_add_post_after_insert",
+>>>>>>> beta-version
                     "schema": [],
                     "outputs": [
                         "main"
                     ]
                 },
+<<<<<<< HEAD
                 "contact_tag_attached": {
                     "key": "contact_tag_attached",
                     "label": "Tag Added To Contact",
@@ -12527,12 +13098,127 @@
                                     "label"
                                 ]
                             }
+=======
+                "registration_form_submission": {
+                    "key": "registration_form_submission",
+                    "label": "Registration Form Submission",
+                    "hook": "wpuf_after_register",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "profile_edit_form_submission": {
+                    "key": "profile_edit_form_submission",
+                    "label": "Profile Edit Form Submission",
+                    "hook": "wpuf_update_profile",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "metadata_update_profile_edit_form_submission": {
+                    "key": "metadata_update_profile_edit_form_submission",
+                    "label": "User Metadata updated Profile Form",
+                    "hook": "wpuf_pro_frontend_form_update_user_meta",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "subscription_pack_update": {
+                    "key": "subscription_pack_update",
+                    "label": "Subscription Pack Create/Updated",
+                    "hook": "wpuf_before_update_subscription_pack",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "created_coupon": {
+                    "key": "created_coupon",
+                    "label": "Created Coupon",
+                    "hook": "wp_after_insert_post",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "updated_coupon": {
+                    "key": "updated_coupon",
+                    "label": "Updated Coupon",
+                    "hook": "wpuf_update_coupon",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": []
+        },
+        "metabox": {
+            "slug": "metabox",
+            "name": "MetaBox",
+            "icon": "metabox.svg",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": {
+                "form_submission": {
+                    "key": "form_submission",
+                    "label": "Form Submission",
+                    "hook": "rwmb_frontend_after_save_post",
+                    "schema": [
+                        {
+                            "key": "form_id",
+                            "label": "Forms",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "metabox",
+                                "query": "form_query",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": []
+        },
+        "advancecustomfields": {
+            "slug": "advancecustomfields",
+            "name": "Advanced Custom Fields",
+            "icon": "acf.svg",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": {
+                "acf_save_post": {
+                    "key": "acf_save_post",
+                    "label": "ACF Fields Saved",
+                    "hook": "acf/save_post",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "Post ID (leave empty for any)",
+                            "type": "text",
+                            "required": false
+>>>>>>> beta-version
                         }
                     ],
                     "outputs": [
                         "main"
                     ]
                 },
+<<<<<<< HEAD
                 "contact_tag_removed": {
                     "key": "contact_tag_removed",
                     "label": "Tag Removed From Contact",
@@ -12552,12 +13238,25 @@
                                     "label"
                                 ]
                             }
+=======
+                "acf_post_field_updated": {
+                    "key": "acf_post_field_updated",
+                    "label": "ACF Post Field Value Updated",
+                    "hook": "updated_post_meta",
+                    "schema": [
+                        {
+                            "key": "field_name",
+                            "label": "Field Name (leave empty for any)",
+                            "type": "text",
+                            "required": false
+>>>>>>> beta-version
                         }
                     ],
                     "outputs": [
                         "main"
                     ]
                 },
+<<<<<<< HEAD
                 "contact_list_attached": {
                     "key": "contact_list_attached",
                     "label": "Contact Added To List",
@@ -12602,6 +13301,21 @@
                                     "label"
                                 ]
                             }
+=======
+                "acf_user_field_updated": {
+                    "key": "acf_user_field_updated",
+                    "label": "ACF User Field Value Updated",
+                    "hook": [
+                        "updated_user_meta",
+                        "added_user_meta"
+                    ],
+                    "schema": [
+                        {
+                            "key": "field_name",
+                            "label": "Field Name (leave empty for any)",
+                            "type": "text",
+                            "required": false
+>>>>>>> beta-version
                         }
                     ],
                     "outputs": [
@@ -12610,6 +13324,7 @@
                 }
             },
             "actions": {
+<<<<<<< HEAD
                 "create_contact": {
                     "key": "create_contact",
                     "label": "Create Contact",
@@ -12617,10 +13332,20 @@
                         {
                             "key": "first_name",
                             "label": "First Name",
+=======
+                "get_post_field": {
+                    "key": "get_post_field",
+                    "label": "Get Post Custom Field Value",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "Post ID",
+>>>>>>> beta-version
                             "type": "expression",
                             "required": true
                         },
                         {
+<<<<<<< HEAD
                             "key": "last_name",
                             "label": "Last Name",
                             "type": "expression",
@@ -12717,12 +13442,19 @@
                             "label": "Country",
                             "type": "expression",
                             "required": false
+=======
+                            "key": "field_name",
+                            "label": "Field Name",
+                            "type": "text",
+                            "required": true
+>>>>>>> beta-version
                         }
                     ],
                     "outputs": [
                         "main"
                     ]
                 },
+<<<<<<< HEAD
                 "update_contact": {
                     "key": "update_contact",
                     "label": "Update Contact",
@@ -12730,10 +13462,20 @@
                         {
                             "key": "contact_id",
                             "label": "Contact ID",
+=======
+                "get_user_field": {
+                    "key": "get_user_field",
+                    "label": "Get User Custom Field Value",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+>>>>>>> beta-version
                             "type": "expression",
                             "required": true
                         },
                         {
+<<<<<<< HEAD
                             "key": "first_name",
                             "label": "First Name",
                             "type": "expression",
@@ -12836,12 +13578,19 @@
                             "label": "Country",
                             "type": "expression",
                             "required": false
+=======
+                            "key": "field_name",
+                            "label": "Field Name",
+                            "type": "text",
+                            "required": true
+>>>>>>> beta-version
                         }
                     ],
                     "outputs": [
                         "main"
                     ]
                 },
+<<<<<<< HEAD
                 "delete_contact": {
                     "key": "delete_contact",
                     "label": "Delete Contact",
@@ -12849,6 +13598,42 @@
                         {
                             "key": "contact_id",
                             "label": "Contact ID",
+=======
+                "get_options_field": {
+                    "key": "get_options_field",
+                    "label": "Get Options Page Field Value",
+                    "schema": [
+                        {
+                            "key": "field_name",
+                            "label": "Field Name",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_post_field": {
+                    "key": "update_post_field",
+                    "label": "Update Post Custom Field Value",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "Post ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "field_name",
+                            "label": "Field Name",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "value",
+                            "label": "Value",
+>>>>>>> beta-version
                             "type": "expression",
                             "required": true
                         }
@@ -12857,6 +13642,7 @@
                         "main"
                     ]
                 },
+<<<<<<< HEAD
                 "apply_tag": {
                     "key": "apply_tag",
                     "label": "Apply Tag To Contact",
@@ -12864,10 +13650,20 @@
                         {
                             "key": "contact_id",
                             "label": "Contact ID",
+=======
+                "update_user_field": {
+                    "key": "update_user_field",
+                    "label": "Update User Custom Field Value",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+>>>>>>> beta-version
                             "type": "expression",
                             "required": true
                         },
                         {
+<<<<<<< HEAD
                             "key": "tag_id",
                             "label": "Tag",
                             "type": "select",
@@ -12880,12 +13676,25 @@
                                     "label"
                                 ]
                             }
+=======
+                            "key": "field_name",
+                            "label": "Field Name",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "value",
+                            "label": "Value",
+                            "type": "expression",
+                            "required": true
+>>>>>>> beta-version
                         }
                     ],
                     "outputs": [
                         "main"
                     ]
                 },
+<<<<<<< HEAD
                 "apply_list": {
                     "key": "apply_list",
                     "label": "Add Contact To List",
@@ -12909,12 +13718,30 @@
                                     "label"
                                 ]
                             }
+=======
+                "update_options_field": {
+                    "key": "update_options_field",
+                    "label": "Update Options Page Field Value",
+                    "schema": [
+                        {
+                            "key": "field_name",
+                            "label": "Field Name",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "value",
+                            "label": "Value",
+                            "type": "expression",
+                            "required": true
+>>>>>>> beta-version
                         }
                     ],
                     "outputs": [
                         "main"
                     ]
                 },
+<<<<<<< HEAD
                 "remove_from_tag": {
                     "key": "remove_from_tag",
                     "label": "Remove Tag From Contact",
@@ -12922,10 +13749,20 @@
                         {
                             "key": "contact_id",
                             "label": "Contact ID",
+=======
+                "update_repeater_field": {
+                    "key": "update_repeater_field",
+                    "label": "Update Repeater Field Value",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "Post ID",
+>>>>>>> beta-version
                             "type": "expression",
                             "required": true
                         },
                         {
+<<<<<<< HEAD
                             "key": "tag_id",
                             "label": "Tag",
                             "type": "select",
@@ -12938,12 +13775,25 @@
                                     "label"
                                 ]
                             }
+=======
+                            "key": "field_name",
+                            "label": "Field Name",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "rows",
+                            "label": "Rows (JSON array of objects)",
+                            "type": "expression",
+                            "required": true
+>>>>>>> beta-version
                         }
                     ],
                     "outputs": [
                         "main"
                     ]
                 },
+<<<<<<< HEAD
                 "remove_from_list": {
                     "key": "remove_from_list",
                     "label": "Remove Contact From List",
@@ -12951,10 +13801,20 @@
                         {
                             "key": "contact_id",
                             "label": "Contact ID",
+=======
+                "update_group_field": {
+                    "key": "update_group_field",
+                    "label": "Update Group Field Value",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "Post ID",
+>>>>>>> beta-version
                             "type": "expression",
                             "required": true
                         },
                         {
+<<<<<<< HEAD
                             "key": "list_id",
                             "label": "List",
                             "type": "select",
@@ -12967,6 +13827,18 @@
                                     "label"
                                 ]
                             }
+=======
+                            "key": "field_name",
+                            "label": "Field Name",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "sub_fields",
+                            "label": "Sub Fields (JSON object)",
+                            "type": "expression",
+                            "required": true
+>>>>>>> beta-version
                         }
                     ],
                     "outputs": [
@@ -12974,6 +13846,96 @@
                     ]
                 }
             }
+<<<<<<< HEAD
+=======
+        },
+        "profilebuilder": {
+            "slug": "profilebuilder",
+            "name": "Profile Builder",
+            "icon": "profilebuilder.svg",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": {
+                "user_registration": {
+                    "key": "user_registration",
+                    "label": "User Registration",
+                    "hook": "wppb_register_success",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "user_profile_update": {
+                    "key": "user_profile_update",
+                    "label": "User Profile Update",
+                    "hook": "wppb_edit_profile_success",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "user_email_confirmation": {
+                    "key": "user_email_confirmation",
+                    "label": "User Email Confirmation",
+                    "hook": "wppb_activate_user",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "email_send_by_profile_builder": {
+                    "key": "email_send_by_profile_builder",
+                    "label": "Email Send By Profile Builder",
+                    "hook": "wppb_after_sending_email",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "user_approved_by_admin": {
+                    "key": "user_approved_by_admin",
+                    "label": "User Approved By Admin",
+                    "hook": "wppb_after_user_approval",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "user_unapproved_by_admin": {
+                    "key": "user_unapproved_by_admin",
+                    "label": "User UnApproved By Admin",
+                    "hook": "wppb_after_user_unapproval",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": []
+        },
+        "kadenceblocks": {
+            "slug": "kadenceblocks",
+            "name": "Kadence Block",
+            "icon": "kadence-block.svg",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": {
+                "kadence_blocks_advanced_form_submission": {
+                    "key": "kadence_blocks_advanced_form_submission",
+                    "label": "Advanced Form Submission",
+                    "hook": "kadence_blocks_advanced_form_submission",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": []
+>>>>>>> beta-version
         }
     },
     "tools": {

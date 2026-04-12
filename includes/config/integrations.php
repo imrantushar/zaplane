@@ -19,10 +19,6 @@ return [
 			'file' => 'delay.php',
 			'class' => \Zaplane\Integrations\Delay::class
 		],
-		'pause'                => [
-			'file' => 'pause.php',
-			'class' => \Zaplane\Integrations\Pause::class
-		],
 		'iterator'             => [
 			'file' => 'iterator.php',
 			'class' => \Zaplane\Integrations\Iterator::class
@@ -56,6 +52,10 @@ return [
 			'file' => 'mailchimp.php',
 			'class' => \Zaplane\Integrations\Mailchimp::class
 		],
+		'hubspot'              => [
+			'file' => 'hubspot.php',
+			'class' => \Zaplane\Integrations\Hubspot::class
+		],
 		'surecart'             => [
 			'file' => 'surecart.php',
 			'class' => \Zaplane\Integrations\Surecart::class
@@ -87,6 +87,10 @@ return [
 		'fluentcrm'            => [
 			'file' => 'fluent-crm.php',
 			'class' => \Zaplane\Integrations\FluentCrm::class
+		],
+		'fluentsmtp'           => [
+			'file' => 'fluent-smtp.php',
+			'class' => \Zaplane\Integrations\FluentSmtp::class
 		],
 		'gravityforms'         => [
 			'file' => 'gravityforms.php',
@@ -152,13 +156,41 @@ return [
 			'file' => 'elementor.php',
 			'class' => \Zaplane\Integrations\Elementor::class
 		],
-		'academy'            => [
-			'file' => 'academy.php',
-			'class' => \Zaplane\Integrations\Academy::class
+		'masterstudy'          => [ 
+			'file' => 'masterstudy.php',          
+			'class' => \Zaplane\Integrations\Masterstudy::class 
 		],
 		'gemcrm'             => [
 			'file' => 'gemcrm.php',
 			'class' => \Zaplane\Integrations\Gemcrm::class
 		],
+		'academy'          => [ 
+			'file' => 'academy.php',          
+			'class' => \Zaplane\Integrations\Academy::class 
+		],
+		'jetengine'            => [
+			'file' => 'jetengine.php',
+			'class' => \Zaplane\Integrations\Jetengine::class
+		],
+		'wpuserfrontend'            => [
+			'file' => 'wpuserfrontend.php',
+			'class' => \Zaplane\Integrations\Wpuserfrontend::class
+		],
+		'metabox'            => [
+			'file' => 'metabox.php',
+			'class' => \Zaplane\Integrations\Metabox::class
+		],
+		'advancecustomfields'      => [
+			'file'  => 'advance-custom-fields.php',
+			'class' => \Zaplane\Integrations\AdvanceCustomFields::class
+		],
+		'profilebuilder'            => [
+			'file' => 'profilebuilder.php',
+			'class' => \Zaplane\Integrations\Profilebuilder::class
+		],
+		'kadenceblocks'      => [
+			'file' => 'kadenceblocks.php', 
+			'class' => \Zaplane\Integrations\Kadenceblocks::class
+			],
 	],
 ];
