@@ -13,7 +13,7 @@ const ExecutedFlows = () => {
   return (
     <Box
       bg="var(--zaplane-background)"
-      borderRadius="lg"
+      borderRadius="4px"
       boxShadow="md"
       // p={"24px"}
       w="100%"
@@ -27,7 +27,8 @@ const ExecutedFlows = () => {
       <Stack spacing={2}>
         <Flex flexDirection='column' gap='6px' p="24px" >
           {
-            flows.map((f) => 
+          !flows.length ? <Text className='zaplane-label' textAlign='center' fontSize='12px' color='var(--zaplane-text-secondary) '>{__('No executed flows found.', 'zaplane')}</Text> :
+            flows?.map((f) => 
               <>
               <Flex justifyContent="space-between">
                 <ZAPLabel label={f.title} type='simple'/>

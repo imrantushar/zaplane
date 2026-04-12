@@ -165,7 +165,7 @@ class Tutor extends IntegrationBase {
 					return false;
 				}
 
-				$attempt = tutor_utils()->get_attempt( $attempt_id );
+				$attempt = \tutor_utils()->get_attempt( $attempt_id );
 				if ( ! $attempt ) {
 					return false;
 				}
@@ -347,5 +347,12 @@ class Tutor extends IntegrationBase {
 			}
 
 			return $options;
+	}
+
+	public static function get_output_ports(): array
+	{
+		return [
+			'main' => 'Main output port',
+		];
 	}
 }

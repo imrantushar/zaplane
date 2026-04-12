@@ -1,4 +1,4 @@
-import { Button, Flex, HStack, Input, } from "@chakra-ui/react";
+import {  Button, Flex, HStack,  } from "@chakra-ui/react";
 import ZAPDrawer from "@ZAPComponents/Drawer";
 import { integrations } from "@ZAPUtils/helper";
 import { useFormikContext } from "formik";
@@ -21,11 +21,12 @@ import { useDynamicFields } from "@ZAPHooks/useActionDrawer/useDynamicFields";
 import { mapEdgesForBackend, mapNodesForBackend } from "../helper";
 import { conditionVariables } from "@ZAPRedux/Slices/workFlowSlice/actions/conditonVariales";
 import './styles.scss'
+import Search from "@ZAPComponents/Search";
 
-const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode, workFlow, isFullscreen, nodes, edges }) => {
+const ActionDrawer = ({ open, context, onClose, updateNodeData, handleAddAction, workFlow, isFullscreen, nodes, edges }) => {
   const { source, node } = context;
   const dispatch = useDispatch();
-  const { values, setFieldValue, resetForm} = useFormikContext();
+  const { values, setFieldValue, resetForm } = useFormikContext();
   const [step, setStep] = useState("select");
   const isTrigger = node?.data?.action === "trigger" && source === "node";
 
@@ -93,7 +94,7 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
     if (step === "configure") {
 
       const payload = {
-        icon:selectedItem.icon,
+        icon: selectedItem.icon,
         app: selectedItem.id,
         name: selectedItem.name,
         event: values.actionType,
@@ -101,12 +102,12 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
           acc[f.key] = values[f.key];
           return acc;
         }, {}),
-         ...(selectedItem.mode && { mode: selectedItem.mode }),
+        ...(selectedItem.mode && { mode: selectedItem.mode }),
         ...(values.hook && { hook: values.hook }),
         ...(values.connection_id && { connection_id: values.connection_id }),
       };
       if (context?.source !== "node") {
-        createActionNode(payload);
+        handleAddAction(payload);
       }
       else {
         updateNodeData(payload);
@@ -118,7 +119,7 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
     if (step === "test") {
       resetAll();
     }
-   
+
   };
   // seleted intregation
   const selectedIntegration = useMemo(() => {
@@ -141,13 +142,14 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
 
     dispatch(conditionVariables(payload));
   }, [node?.id]);
+  
   return (
     <ZAPDrawer
       open={open}
       isFullscreen={isFullscreen}
       onClose={resetAll}
       arrowClose={['tools', 'app'].includes(mode)}
-      maxWidth='700px'
+      maxWidth='500px' {...(['filter', 'if'].includes(values?.actionType) && { maxWidth: '700px' })}
       arrowOnClick={() => {
         setSelectedItem(null);
         setMode(null);
@@ -163,12 +165,17 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, createActionNode
           <Button variant="outline" onClick={resetAll}>{__("Cancel", "zaplane")}</Button>
           <Button {...primaryBtn}
             disabled={!values.actionType}
-            onClick={handleContinue}>{step === 'test' ? __('Submit', 'zaplane') : __('Continue', 'zaplane')}
+            onClick={handleContinue}>{step === 'test' ? __('Save', 'zaplane') : __('Continue', 'zaplane')}
           </Button>
         </HStack>
       }
     >
-      <Input placeholder={__("Search apps or tools...", "zaplane")} value={search} onChange={e => setSearch(e.target.value)} />
+    
+        <Search
+          placeholder={__("Search apps or tools...", "zaplane")}
+          defaultValue={search}
+          onSearchHandler={(value) => setSearch(value)}
+        />
       {search &&
         <DrawerSearchList
           searchList={searchList}
