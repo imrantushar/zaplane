@@ -165,7 +165,7 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, handleAddAction,
           <Button variant="outline" onClick={resetAll}>{__("Cancel", "zaplane")}</Button>
           <Button {...primaryBtn}
             disabled={!values.actionType}
-            onClick={handleContinue}>{step === 'test' ? __('Submit', 'zaplane') : __('Continue', 'zaplane')}
+            onClick={handleContinue}>{step === 'test' ? __('Save', 'zaplane') : __('Continue', 'zaplane')}
           </Button>
         </HStack>
       }

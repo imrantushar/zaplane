@@ -57,7 +57,7 @@ const VersionHistoryTable = ({
         return (
           <Box >
             <ZAPLabel label={date} type={"simple"} />
-            <Text className="zaplane-sub-title" ml='-47px' color="var(--zaplane-text-muted)">
+            <Text className="zaplane-sub-title" ml='-40px' color="var(--zaplane-text-muted)">
               {__(time, 'zaplane')}
             </Text>
           </Box>

@@ -27,23 +27,30 @@ return [
 			'file' => 'variable.php',
 			'class' => \Zaplane\Integrations\Variable::class
 		],
-
-			'wordpress'            => [
-				'file' => 'wordpress.php',
-				'class' => \Zaplane\Integrations\Wordpress::class
-			],
-			'woocommerce'          => [
-				'file' => 'woocommerce.php',
-				'class' => \Zaplane\Integrations\Woocommerce::class
-			],
-			'cartflows'            => [
-				'file' => 'cartflows.php',
-				'class' => \Zaplane\Integrations\Cartflows::class
-			],
-			'slack'                => [
-				'file' => 'Slack.php',
-				'class' => \Zaplane\Integrations\Slack::class
-			],
+    'cartflows'            => [
+      'file' => 'cartflows.php',
+      'class' => \Zaplane\Integrations\Cartflows::class
+    ],
+		'wordpress'            => [
+			'file' => 'wordpress.php',
+			'class' => \Zaplane\Integrations\Wordpress::class
+		],
+		'woocommerce'          => [
+			'file' => 'woocommerce.php',
+			'class' => \Zaplane\Integrations\Woocommerce::class
+		],
+		'woosubscriptions'     => [
+			'file' => 'woo-subscriptions.php',
+			'class' => \Zaplane\Integrations\WooSubscriptions::class
+		],
+		'woobookings'          => [
+			'file' => 'woo-bookings.php',
+			'class' => \Zaplane\Integrations\WooBookings::class
+		],
+		'slack'                => [
+			'file' => 'Slack.php',
+			'class' => \Zaplane\Integrations\Slack::class
+		],
 		'trello'               => [
 			'file' => 'Trello.php',
 			'class' => \Zaplane\Integrations\Trello::class
@@ -55,6 +62,10 @@ return [
 		'mailchimp'            => [
 			'file' => 'mailchimp.php',
 			'class' => \Zaplane\Integrations\Mailchimp::class
+		],
+		'activecampaign'         => [
+			'file' => 'active-campaign.php',
+			'class' => \Zaplane\Integrations\ActiveCampaign::class
 		],
 		'hubspot'              => [
 			'file' => 'hubspot.php',
