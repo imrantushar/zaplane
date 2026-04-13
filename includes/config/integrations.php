@@ -27,10 +27,10 @@ return [
 			'file' => 'variable.php',
 			'class' => \Zaplane\Integrations\Variable::class
 		],
-    'cartflows'            => [
-      'file' => 'cartflows.php',
-      'class' => \Zaplane\Integrations\Cartflows::class
-    ],
+		'cartflows'            => [
+			'file' => 'cartflows.php',
+			'class' => \Zaplane\Integrations\Cartflows::class
+		],
 		'wordpress'            => [
 			'file' => 'wordpress.php',
 			'class' => \Zaplane\Integrations\Wordpress::class
@@ -42,6 +42,7 @@ return [
 		'woomemberships'       => [
 			'file' => 'woo-memberships.php',
 			'class' => \Zaplane\Integrations\WooMemberships::class
+		],
 		'woosubscriptions'     => [
 			'file' => 'woo-subscriptions.php',
 			'class' => \Zaplane\Integrations\WooSubscriptions::class
@@ -186,9 +187,6 @@ return [
 			'file' => 'gemcrm.php',
 			'class' => \Zaplane\Integrations\Gemcrm::class
 		],
-		'academy'          => [ 
-			'file' => 'academy.php',          
-			'class' => \Zaplane\Integrations\Academy::class 
 		'lifter'            => [
 			'file' => 'lifter.php',
 			'class' => \Zaplane\Integrations\Lifter::class
@@ -225,10 +223,10 @@ return [
 			'file' => 'bitform.php',
 			'class' => \Zaplane\Integrations\Bitform::class
 		],
-			],
 		'sureform'      => [
 			'file' => 'sureform.php',
 			'class' => \Zaplane\Integrations\Sureform::class
+		],
 		'suremail'      => [
 			'file' => 'suremail.php',
 			'class' => \Zaplane\Integrations\Suremail::class
@@ -240,17 +238,22 @@ return [
 		'weforms'      => [
 			'file' => 'weforms.php', 
 			'class' => \Zaplane\Integrations\Weforms::class
-			],
+		],
 		'suremembers'      => [
 			'file' => 'suremembers.php', 
 			'class' => \Zaplane\Integrations\Suremembers::class
+		],
 		'arform'      => [
 			'file' => 'arform.php',
 			'class' => \Zaplane\Integrations\ARForm::class
-			],
+		],
 		'paidmembershippro'      => [
-			'file' => 'paidmembershippro.php', 
+			'file' => 'paidmembershippro.php',
 			'class' => \Zaplane\Integrations\Paidmembershippro::class
+		],
+		'whatsapp'      => [
+			'file' => 'whatsapp.php',
+			'class' => \Zaplane\Integrations\Whatsapp::class
 		],
 	],
 ];
