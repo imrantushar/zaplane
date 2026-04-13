@@ -226,5 +226,9 @@ return [
 			'file' => 'weforms.php', 
 			'class' => \Zaplane\Integrations\Weforms::class
 			],
+		'arform'      => [
+			'file' => 'arform.php',
+			'class' => \Zaplane\Integrations\ARForm::class
+			],
 	],
 ];
