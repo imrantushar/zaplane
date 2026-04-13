@@ -15,7 +15,6 @@ class CreateRecipesTable extends Migration {
 	public function up(): void {
 		Schema::create( 'recipes', function ( Blueprint $table ) {
 			$table->id();
-			$table->unsignedBigInteger( 'folder_id' )->nullable();
 			$table->string( 'title', 255 );
 			$table->text( 'description' )->nullable();
 			$table->unsignedBigInteger( 'thumbnail_id' )->nullable();
@@ -23,7 +22,6 @@ class CreateRecipesTable extends Migration {
 			$table->unsignedBigInteger( 'created_by' );
 			$table->timestamps();
 
-			$table->index( 'folder_id' );
 			$table->index( 'created_by' );
 		} );
 	}

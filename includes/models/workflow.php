@@ -15,6 +15,7 @@ class Workflow extends Model {
 
 	protected static array $fillable = [
 		'user_id',
+		'folder_id',
 		'title',
 		'name',
 		'status',
@@ -22,8 +23,9 @@ class Workflow extends Model {
 	];
 
 	protected static array $casts = [
-		'id' => 'integer',
-		'user_id' => 'integer',
+		'id'        => 'integer',
+		'user_id'   => 'integer',
+		'folder_id' => 'integer',
 	];
 
 	public function versions(): Collection {

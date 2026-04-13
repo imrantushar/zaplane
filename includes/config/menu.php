@@ -20,6 +20,11 @@ return [
 			'title'       => __( 'Connections', 'zaplane' ),
 			'capability'  => 'manage_options',
 		],
+		ZAPLANE_PLUGIN_SLUG . '-folders' => [
+			'parent_slug' => ZAPLANE_PLUGIN_SLUG,
+			'title'       => __( 'Folders', 'zaplane' ),
+			'capability'  => 'manage_options',
+		],
 		ZAPLANE_PLUGIN_SLUG . '-recipes' => [
 			'parent_slug' => ZAPLANE_PLUGIN_SLUG,
 			'title'       => __( 'Recipes', 'zaplane' ),

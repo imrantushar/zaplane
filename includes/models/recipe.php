@@ -13,7 +13,6 @@ class Recipe extends Model {
 	protected static string $table = 'recipes';
 
 	protected static array $fillable = [
-		'folder_id',
 		'title',
 		'description',
 		'thumbnail_id',
@@ -23,21 +22,9 @@ class Recipe extends Model {
 
 	protected static array $casts = [
 		'id'           => 'integer',
-		'folder_id'    => 'integer',
 		'thumbnail_id' => 'integer',
 		'created_by'   => 'integer',
 	];
-
-	// -------------------------------------------------------------------------
-	// Relationships
-	// -------------------------------------------------------------------------
-
-	public function folder(): ?RecipeFolder {
-		if ( ! $this->folder_id ) {
-			return null;
-		}
-		return RecipeFolder::find( $this->folder_id );
-	}
 
 	// -------------------------------------------------------------------------
 	// Blueprint helpers
@@ -55,9 +42,6 @@ class Recipe extends Model {
 	// Thumbnail helpers
 	// -------------------------------------------------------------------------
 
-	/**
-	 * Returns the URL of the WP attachment used as thumbnail, or null.
-	 */
 	public function thumbnailUrl(): ?string {
 		if ( ! $this->thumbnail_id ) {
 			return null;
@@ -73,7 +57,6 @@ class Recipe extends Model {
 	public function toResponse(): array {
 		return [
 			'id'            => $this->id,
-			'folder_id'     => $this->folder_id,
 			'title'         => $this->title,
 			'description'   => $this->description,
 			'thumbnail_id'  => $this->thumbnail_id,
