@@ -108,7 +108,7 @@ class Metabox extends IntegrationBase {
 		];
 	}
 
-	public static function form_query_types( $q ) {
+	public static function form_query_types( $query ) {
 		if ( ! function_exists( 'rwmb_meta' ) || ! function_exists( 'mb_frontend_submission_load' ) ) {
 			return [
 				[
