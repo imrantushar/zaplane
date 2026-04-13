@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { __ } from "@wordpress/i18n";
 import { Box, Text, Icon, HStack, Input, Button, Spinner } from "@chakra-ui/react";
 import { useDispatch, useSelector } from "react-redux";
@@ -11,23 +11,21 @@ import {
 } from "@ZAPRedux/Slices/folderSlice/folderSlice";
 import WPModal from "@ZAPComponents/Modal/WPModal";
 import { primaryBtn } from "../../../../../assets/scss/chakra/recipe";
+import { getWorkFlow } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow";
+import ZAPMenu from "@ZAPComponents/ZapMenu";
+
 
 const FolderCell = ({ row }) => {
     const dispatch = useDispatch();
     const { folders } = useSelector((state) => state.folder);
     const allFolders = folders?.data || [];
 
-    const [open, setOpen] = useState(false);
     const [modalOpen, setModalOpen] = useState(false);
     const [folderName, setFolderName] = useState("");
     const [creating, setCreating] = useState(false);
     const [assigning, setAssigning] = useState(false);
 
-    const [selectedFolder, setSelectedFolder] = useState(
-        row?.folder_id ? { id: row.folder_id, title: row.folder_title } : null
-    );
-
-    const popoverRef = useRef(null);
+    const selectedFolder = allFolders.find((f) => f.id === row?.folder_id);
 
     useEffect(() => {
         if (!allFolders.length) {
@@ -35,22 +33,11 @@ const FolderCell = ({ row }) => {
         }
     }, []);
 
-    useEffect(() => {
-        const handleOutside = (e) => {
-            if (popoverRef.current && !popoverRef.current.contains(e.target)) {
-                setOpen(false);
-            }
-        };
-        if (open) document.addEventListener("mousedown", handleOutside);
-        return () => document.removeEventListener("mousedown", handleOutside);
-    }, [open]);
-
     const handleSelectFolder = async (folder) => {
-        setOpen(false);
         setAssigning(true);
         try {
             await dispatch(addWorkflowToFolder({ folder_id: folder.id, workflow_id: row.id }));
-            setSelectedFolder(folder);
+            dispatch(getWorkFlow());
         } finally {
             setAssigning(false);
         }
@@ -61,7 +48,7 @@ const FolderCell = ({ row }) => {
         setAssigning(true);
         try {
             await dispatch(removeWorkflowFromFolder({ folder_id: selectedFolder.id, workflow_id: row.id }));
-            setSelectedFolder(null);
+            dispatch(getWorkFlow());
         } finally {
             setAssigning(false);
         }
@@ -75,9 +62,9 @@ const FolderCell = ({ row }) => {
             const res = await dispatch(createFolder({ title: trimmed }));
             const newFolder = res?.payload?.data || res?.payload;
             if (newFolder?.id) {
-                setSelectedFolder({ id: newFolder.id, title: newFolder.title || trimmed });
                 await dispatch(addWorkflowToFolder({ folder_id: newFolder.id, workflow_id: row.id }));
                 dispatch(getFolders());
+                dispatch(getWorkFlow());
             }
         } finally {
             setCreating(false);
@@ -85,6 +72,19 @@ const FolderCell = ({ row }) => {
             setModalOpen(false);
         }
     };
+    const menuItems = [
+        ...allFolders.map((folder) => ({
+            label: folder.title,
+            icon: LuFolderOpen,
+            onClick: () => handleSelectFolder(folder),
+        })),
+        ...(allFolders.length ? [{ type: "divider" }] : []),
+        {
+            label: __("Create New", "zaplane"),
+            icon: LuFolderPlus,
+            onClick: () => setModalOpen(true),
+        },
+    ];
 
     if (assigning) {
         return (
@@ -94,138 +94,76 @@ const FolderCell = ({ row }) => {
         );
     }
 
-    if (selectedFolder) {
-        return (
-            <HStack
-                spacing={1}
-                px={2}
-                py={1}
-                borderRadius="md"
-                border="0.5px solid"
-                borderColor="gray.200"
-                bg="gray.50"
-                display="inline-flex"
-                alignItems="center"
-                maxW="160px"
-            >
-                <Icon as={LuFolderOpen} boxSize="14px" color="gray.500" flexShrink={0} />
-                <Text
-
-                    className="zaplane-label"
-                >
-                    {selectedFolder.title}
-                </Text>
-                <Box
-                    as="button"
-                    onClick={handleRemove}
-                    display="flex"
-                    alignItems="center"
-                    justifyContent="center"
-                    w="16px"
-                    h="16px"
-                    borderRadius="sm"
-                    flexShrink={0}
-                    _hover={{ bg: "gray.200" }}
-                    aria-label={__("Remove from folder", "zaplane")}
-                >
-                    <Icon as={LuMinus} boxSize="11px" color="gray.500" />
-                </Box>
-            </HStack>
-        );
-    }
-
     return (
         <>
-            <Box position="relative" display="inline-block" ref={popoverRef}>
-                <Button
-                    size="sm"
-                    variant="outline"
-                    leftIcon={<Icon as={LuFolderOpen} boxSize="14px" />}
-                    fontSize="13px"
-                    fontWeight="400"
-                    h="30px"
-                    px={3}
-                    onClick={() => setOpen((v) => !v)}
-                    aria-label={__("Add to folder", "zaplane")}
-                >
-                    {__("Add", "zaplane")}
-                </Button>
-
-                {open && (
-                    <Box
-                        position="absolute"
-                        top="calc(100% + 4px)"
-                        left="0"
-                        zIndex={9999}
-                        bg="white"
-                        border="0.5px solid"
-                        borderColor="gray.200"
-                        borderRadius="md"
-                        boxShadow="md"
-                        minW="160px"
-                        maxW="220px"
-                        py={1}
-                        overflow="hidden"
-                    >
-                        {allFolders.length === 0 && (
-                            <Text className="zaplane-label" px={3} py={2}>
-                                {__("No folders yet", "zaplane")}
-                            </Text>
-                        )}
-
-                        {allFolders.map((folder) => (
-                            <Box
-                                key={folder.id}
-                                as="button"
-                                w="100%"
-                                textAlign="left"
-                                px={3}
-                                py="7px"
-                                fontSize="13px"
-                                color="gray.700"
-                                _hover={{ bg: "gray.50" }}
-                                onClick={() => handleSelectFolder(folder)}
-                                display="block"
-                            >
-                                {folder.title}
-                            </Box>
-                        ))}
-
-                        {allFolders.length > 0 && (
-                            <Box borderTop="0.5px solid" borderColor="gray.100" my={1} />
-                        )}
-
-                        <Box
-                            as="button"
-                            w="100%"
-                            textAlign="left"
-                            px={3}
-                            py="7px"
-                            fontSize="13px"
-                            color="gray.600"
-                            _hover={{ bg: "gray.50" }}
-                            display="flex"
+            {selectedFolder ? (
+                <ZAPMenu
+                    items={menuItems}
+                    trigger={
+                        <HStack
+                            spacing={1}
+                            px={2}
+                            py={1}
+                            borderRadius="md"
+                            border="0.5px solid"
+                            borderColor="gray.200"
+                            bg="gray.50"
+                            display="inline-flex"
                             alignItems="center"
-                            gap="6px"
-                            onClick={() => {
-                                setOpen(false);
-                                setModalOpen(true);
-                            }}
+                            maxW="160px"
+                            cursor="pointer"
+                            onClick={(e) => e.stopPropagation()}
                         >
-                            <Icon as={LuFolderPlus} boxSize="14px" />
-                            {__("Create New", "zaplane")}
-                        </Box>
-                    </Box>
-                )}
-            </Box>
+                            <Icon as={LuFolderOpen} boxSize="14px" color="gray.500" flexShrink={0} />
+                            <Text className="zaplane-label" flex={1} isTruncated>
+                                {selectedFolder.title}
+                            </Text>
+                            <Box
+                                as="span"
+                                display="flex"
+                                alignItems="center"
+                                justifyContent="center"
+                                w="16px"
+                                h="16px"
+                                borderRadius="sm"
+                                flexShrink={0}
+                                _hover={{ bg: "gray.200" }}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleRemove();
+                                }}
+                                aria-label={__("Remove from folder", "zaplane")}
+                            >
+                                <Icon as={LuMinus} boxSize="11px" color="gray.500" />
+                            </Box>
+                        </HStack>
+                    }
+                />
+            ) : (
+                <ZAPMenu
+                    items={menuItems}
+                    trigger={
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            fontSize="13px"
+                            fontWeight="400"
+                            h="30px"
+                            px={3}
+                            onClick={(e) => e.stopPropagation()}
+                            aria-label={__("Add to folder", "zaplane")}
+                        >
+                            <Icon as={LuFolderOpen} boxSize="14px" color="gray.500" mr={1} />
+                            {__("Add", "zaplane")}
+                        </Button>
+                    }
+                />
+            )}
 
             <WPModal
                 isOpen={modalOpen}
                 title={__("Create Folder", "zaplane")}
-                onRequestClose={() => {
-                    setModalOpen(false);
-                    setFolderName("");
-                }}
+                onRequestClose={() => { setModalOpen(false); setFolderName(""); }}
                 shouldCloseOnClickOutside
                 size="medium"
                 suffix="create-folder"
@@ -240,24 +178,14 @@ const FolderCell = ({ row }) => {
                     onChange={(e) => setFolderName(e.target.value)}
                     onKeyDown={(e) => {
                         if (e.key === "Enter") handleCreateFolder();
-                        if (e.key === "Escape") {
-                            setModalOpen(false);
-                            setFolderName("");
-                        }
+                        if (e.key === "Escape") { setModalOpen(false); setFolderName(""); }
                     }}
                     autoFocus
                     mb={5}
                 />
 
                 <HStack justifyContent="flex-end" spacing={3}>
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                            setModalOpen(false);
-                            setFolderName("");
-                        }}
-                    >
+                    <Button variant="outline" size="sm" onClick={() => { setModalOpen(false); setFolderName(""); }}>
                         {__("Cancel", "zaplane")}
                     </Button>
                     <Button
