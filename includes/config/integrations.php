@@ -182,6 +182,13 @@ return [
 			'file' => 'academy.php',
 			'class' => \Zaplane\Integrations\Academy::class
 		],
+		'gemcrm'             => [
+			'file' => 'gemcrm.php',
+			'class' => \Zaplane\Integrations\Gemcrm::class
+		],
+		'academy'          => [ 
+			'file' => 'academy.php',          
+			'class' => \Zaplane\Integrations\Academy::class 
 		'lifter'            => [
 			'file' => 'lifter.php',
 			'class' => \Zaplane\Integrations\Lifter::class
