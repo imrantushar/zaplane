@@ -238,5 +238,9 @@ return [
 			'file' => 'arform.php',
 			'class' => \Zaplane\Integrations\ARForm::class
 			],
+		'paidmembershippro'      => [
+			'file' => 'paidmembershippro.php', 
+			'class' => \Zaplane\Integrations\Paidmembershippro::class
+		],
 	],
 ];
