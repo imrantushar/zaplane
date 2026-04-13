@@ -27,7 +27,10 @@ return [
 			'file' => 'variable.php',
 			'class' => \Zaplane\Integrations\Variable::class
 		],
-
+    'cartflows'            => [
+      'file' => 'cartflows.php',
+      'class' => \Zaplane\Integrations\Cartflows::class
+    ],
 		'wordpress'            => [
 			'file' => 'wordpress.php',
 			'class' => \Zaplane\Integrations\Wordpress::class
@@ -35,6 +38,17 @@ return [
 		'woocommerce'          => [
 			'file' => 'woocommerce.php',
 			'class' => \Zaplane\Integrations\Woocommerce::class
+		],
+		'woomemberships'       => [
+			'file' => 'woo-memberships.php',
+			'class' => \Zaplane\Integrations\WooMemberships::class
+		'woosubscriptions'     => [
+			'file' => 'woo-subscriptions.php',
+			'class' => \Zaplane\Integrations\WooSubscriptions::class
+		],
+		'woobookings'          => [
+			'file' => 'woo-bookings.php',
+			'class' => \Zaplane\Integrations\WooBookings::class
 		],
 		'slack'                => [
 			'file' => 'Slack.php',
@@ -51,6 +65,10 @@ return [
 		'mailchimp'            => [
 			'file' => 'mailchimp.php',
 			'class' => \Zaplane\Integrations\Mailchimp::class
+		],
+		'activecampaign'         => [
+			'file' => 'active-campaign.php',
+			'class' => \Zaplane\Integrations\ActiveCampaign::class
 		],
 		'hubspot'              => [
 			'file' => 'hubspot.php',
@@ -156,13 +174,17 @@ return [
 			'file' => 'elementor.php',
 			'class' => \Zaplane\Integrations\Elementor::class
 		],
-		'masterstudy'          => [ 
-			'file' => 'masterstudy.php',          
-			'class' => \Zaplane\Integrations\Masterstudy::class 
+		'masterstudy'          => [
+			'file' => 'masterstudy.php',
+			'class' => \Zaplane\Integrations\Masterstudy::class
 		],
-		'academy'          => [ 
-			'file' => 'academy.php',          
-			'class' => \Zaplane\Integrations\Academy::class 
+		'academy'          => [
+			'file' => 'academy.php',
+			'class' => \Zaplane\Integrations\Academy::class
+		],
+		'lifter'            => [
+			'file' => 'lifter.php',
+			'class' => \Zaplane\Integrations\Lifter::class
 		],
 		'jetengine'            => [
 			'file' => 'jetengine.php',
@@ -185,8 +207,36 @@ return [
 			'class' => \Zaplane\Integrations\Profilebuilder::class
 		],
 		'kadenceblocks'      => [
-			'file' => 'kadenceblocks.php', 
+			'file' => 'kadenceblocks.php',
 			'class' => \Zaplane\Integrations\Kadenceblocks::class
+		],
+		'ultimatemember'      => [
+			'file' => 'ultimatemember.php', 
+			'class' => \Zaplane\Integrations\Ultimatemember::class
+		],
+		'bitform'      => [
+			'file' => 'bitform.php',
+			'class' => \Zaplane\Integrations\Bitform::class
+		],
+			],
+		'sureform'      => [
+			'file' => 'sureform.php',
+			'class' => \Zaplane\Integrations\Sureform::class
+		'suremail'      => [
+			'file' => 'suremail.php',
+			'class' => \Zaplane\Integrations\Suremail::class
+		],
+		'bookingcalendar'      => [
+			'file' => 'bookingcalendar.php', 
+			'class' => \Zaplane\Integrations\Bookingcalendar::class
+		],
+		'weforms'      => [
+			'file' => 'weforms.php', 
+			'class' => \Zaplane\Integrations\Weforms::class
+			],
+		'arform'      => [
+			'file' => 'arform.php',
+			'class' => \Zaplane\Integrations\ARForm::class
 			],
 		'paidmembershippro'      => [
 			'file' => 'paidmembershippro.php', 

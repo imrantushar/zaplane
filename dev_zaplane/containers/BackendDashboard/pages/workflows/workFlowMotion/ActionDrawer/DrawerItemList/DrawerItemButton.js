@@ -17,7 +17,7 @@ const DrawerItemButton = ({ item, onClick, showType = true, arrowIcon, icon, }) 
       onClick={onClick}
     >
       <Flex gap="8px">
-        <ZAPIcon icon={icon} name={item.name} />
+        <ZAPIcon icon={icon} name={item.name} isAction={true}/>
         <Text className="zaplane-label" fontWeight="400" as="span" display='flex' alignItems="center">{sprintf(__("%s", "zaplane"), item.name)}</Text>
       </Flex>
       {arrowIcon && arrowIcon}
