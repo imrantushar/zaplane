@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
     Box,
@@ -26,7 +26,7 @@ import TopBar from "@ZAPComponents/TopBar";
 import { outlineBtn, primaryBtn } from "../../../../../assets/scss/chakra/recipe";
 import ConnectionTable from "./ConnectionTable";
 import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
-import { formatLabel, plugin_root_url } from "@ZAPUtils/helper";
+import { formatLabel, integrations, plugin_root_url } from "@ZAPUtils/helper";
 import ZAPInput from "@ZAPComponents/ZAPInput";
 import { IoIosArrowForward } from "react-icons/io";
 import SubTopBar from "@ZAPComponents/SubTopBar";
@@ -44,6 +44,16 @@ const Connections = () => {
     const [selectedAuthType, setSelectedAuthType] = useState(null);
     const [credentials, setCredentials] = useState({});
     const [loadingOAuth, setLoadingOAuth] = useState(false);
+
+
+    const appOptions = useMemo(() => {
+        return Object.values(integrations.apps)
+            .filter((app) => app.requires_connection === true)
+            .map((app) => ({
+                value: app.slug,
+                label: app.name,
+            }));
+    }, []);
 
 
     useEffect(() => {
@@ -176,7 +186,7 @@ const Connections = () => {
                                 setSelectedAuthType(null);
                                 setCredentials({});
                             }}
-                            options={[{ value: "slack", label: "Slack" }]}
+                            options={appOptions}
 
                         />
                         {Object.keys(authTypes).map((key) => (
