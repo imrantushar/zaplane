@@ -16,7 +16,7 @@ const ListTable = (props) => {
 		data = [],
 		isRowSelectable = true,
 		getSelectRowValue,
-		showSubHeader = true,
+		showSubHeader = false,
 		subHeaderComponent,
 		showColumnFilter = true,
 		showPagination = false,
