@@ -8,12 +8,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 use Zaplane\Framework\Classes\IntegrationBase;
 use Zaplane\Integrations\Buddyboss\ActionsResponseTrait;
 use Zaplane\Integrations\Buddyboss\QueryTrait;
-use Zaplane\Integrations\Buddyboss\ActionsTrait;
+use Zaplane\Integrations\Buddyboss\BuddybossActionsTrait;
 
 class Buddyboss extends IntegrationBase {
 
-	use ActionsTrait;
 	use ActionsResponseTrait;
+	use BuddybossActionsTrait;
 	use QueryTrait;
 
 	public static function get_slug(): string {

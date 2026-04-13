@@ -1,14 +1,13 @@
 <?php
 namespace Zaplane\Integrations\Buddyboss;
 
-
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-trait ActionsTrait {
+trait BuddybossActionsTrait {
 
-	protected static function action_create_activity_post( array $config, array $input ): array {
+    protected static function action_create_activity_post( array $config, array $input ): array {
 		$config = [ 'author_email', 'content' ];
 		if ( $error = self::require_fields( $input, $config ) ) return $error;
 
