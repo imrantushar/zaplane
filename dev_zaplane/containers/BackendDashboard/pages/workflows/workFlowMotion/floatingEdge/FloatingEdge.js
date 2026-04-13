@@ -45,7 +45,7 @@ const FloatingEdge = ({  openDrawerFromAdd, canvasLayout }) => {
         >
           <Box as={FaPlus} fontSize="12px" color="var(--zaplane-primary-color)" />
           <Box as="span"
-            top={isLR ? "11px" : "-49px"}
+            top={isLR ? "13px" : "-49px"}
             left={isLR ? "-45px" : "11px"}
             border="2px dashed var(--zaplane-border-color)"
             width={isLR ? "42px" : "1px"}

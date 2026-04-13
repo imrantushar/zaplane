@@ -6,6 +6,7 @@ import {
     Icon,
     Flex,
     Image,
+    Button,
 
 } from "@chakra-ui/react";
 import { useDispatch, useSelector } from "react-redux";
@@ -26,12 +27,13 @@ import { HistoryIcon } from "@ZAPUtils/icons";
 import ZAPTooltip from "@ZAPComponents/ZAPTooltip";
 import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
 import { IoIosArrowForward } from "react-icons/io";
+import SubTopBar from "@ZAPComponents/SubTopBar";
 
 const Logs = () => {
     const dispatch = useDispatch();
     const [activeRunId, setActiveRunId] = useState(null);
     const [drawerOpen, setDrawerOpen] = useState(false);
-    const { data = [], currentPage, perPage,itemPerPage,totalItems } = useSelector((state) => state.logs || {});
+    const { data = [], currentPage, perPage, itemPerPage, totalItems } = useSelector((state) => state.logs || {});
     const [loading, setLoading] = useState(data.length === 0);
 
     const handleRefresh = async (page = 1, per_page = 20) => {
@@ -83,9 +85,9 @@ const Logs = () => {
                 const { date, time } = formatDateTime(row.started_at);
 
                 return (
-                    <Box >
+                    <Box ml='-12px'>
                         <ZAPLabel label={date} type={"simple"} />
-                        <Text className="zaplane-sub-title" ml='-45px' color="var(--zaplane-text-muted)">
+                        <Text className="zaplane-sub-title" ml='-38px' color="var(--zaplane-text-muted)">
                             {__(time, 'zaplane')}
                         </Text>
                     </Box>
@@ -105,9 +107,9 @@ const Logs = () => {
                 const { date, time } = formatDateTime(row.finished_at);
 
                 return (
-                    <Box>
+                    <Box ml='-12px'>
                         <ZAPLabel label={date} type={"simple"} />
-                        <Text className="zaplane-sub-title" ml='-45px' color="var(--zaplane-text-muted)">
+                        <Text className="zaplane-sub-title" ml='-38px' color="var(--zaplane-text-muted)">
                             {__(time, 'zaplane')}
                         </Text>
                     </Box>
@@ -225,6 +227,7 @@ const Logs = () => {
                     </>
                 )}
             />
+            <SubTopBar heading={__("Workflows Logs", "zaplane")} />
 
             <div className="zaplane-page-content">
                 <ListTable
