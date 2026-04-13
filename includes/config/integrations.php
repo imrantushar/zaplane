@@ -205,6 +205,11 @@ return [
 		'kadenceblocks'      => [
 			'file' => 'kadenceblocks.php',
 			'class' => \Zaplane\Integrations\Kadenceblocks::class
+		],
+		'bitform'      => [
+			'file' => 'bitform.php',
+			'class' => \Zaplane\Integrations\Bitform::class
+		],
 			],
 		'sureform'      => [
 			'file' => 'sureform.php',
