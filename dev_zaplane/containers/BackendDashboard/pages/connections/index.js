@@ -65,6 +65,7 @@ const Connections = () => {
     // Auto-select auth type when authFields loads
     useEffect(() => {
         if (!authFields) return;
+        if (selectedAuthType) return;
         const types = Object.keys(authFields?.available_auth_types || {});
         if (types.length === 1) {
             setSelectedAuthType(types[0]);
