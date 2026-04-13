@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-04-02 10:38:05",
+    "generated_at": "2026-04-12 08:36:27",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -13009,7 +13009,7 @@
         "jetengine": {
             "slug": "jetengine",
             "name": "JetEngine",
-            "icon": "Jetengine.svg",
+            "icon": "jetengine.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -13116,6 +13116,611 @@
                 }
             },
             "actions": []
+        },
+        "wpfunnels": {
+            "slug": "wpfunnels",
+            "name": "WPFunnels",
+            "icon": "wpfunnels.svg",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": {
+                "loaded": {
+                    "key": "loaded",
+                    "label": "WPFunnels Loaded",
+                    "hook": "wpfunnels/loaded",
+                    "schema": [],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "init": {
+                    "key": "init",
+                    "label": "WPFunnels Initialized",
+                    "hook": "wpfunnels/init",
+                    "schema": [],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "pro_init": {
+                    "key": "pro_init",
+                    "label": "WPFunnels Pro Initialized",
+                    "hook": "wpfunnels/pro_init",
+                    "schema": [],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "import_complete": {
+                    "key": "import_complete",
+                    "label": "Import Complete",
+                    "hook": "wpfunnels/wpfnl_import_complete",
+                    "schema": [],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "after_funnel_creation": {
+                    "key": "after_funnel_creation",
+                    "label": "After Funnel Creation",
+                    "hook": "wpfunnels_after_funnel_creation",
+                    "schema": [
+                        {
+                            "key": "funnel_id",
+                            "label": "Funnel",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wpfunnels",
+                                "query": "funnels",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "after_step_creation": {
+                    "key": "after_step_creation",
+                    "label": "After Step Creation",
+                    "hook": "wpfunnels_after_step_creation",
+                    "schema": [],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "after_step_duplicate": {
+                    "key": "after_step_duplicate",
+                    "label": "After Step Duplicate",
+                    "hook": "wpfunnels/after_step_duplicate",
+                    "schema": [
+                        {
+                            "key": "step_id",
+                            "label": "Step",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wpfunnels",
+                                "query": "steps",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "funnel_journey_starts": {
+                    "key": "funnel_journey_starts",
+                    "label": "Funnel Journey Starts",
+                    "hook": "wpfunnels/funnel_journey_starts",
+                    "schema": [
+                        {
+                            "key": "step_id",
+                            "label": "Step",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wpfunnels",
+                                "query": "steps",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "funnel_journey_end": {
+                    "key": "funnel_journey_end",
+                    "label": "Funnel Journey Ends",
+                    "hook": "wpfunnels/funnel_journey_end",
+                    "schema": [
+                        {
+                            "key": "step_id",
+                            "label": "Step",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wpfunnels",
+                                "query": "steps",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "funnel_order_placed": {
+                    "key": "funnel_order_placed",
+                    "label": "Funnel Order Placed",
+                    "hook": "wpfunnels/funnel_order_placed",
+                    "schema": [
+                        {
+                            "key": "step_id",
+                            "label": "Step",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wpfunnels",
+                                "query": "steps",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "order_bump_accepted": {
+                    "key": "order_bump_accepted",
+                    "label": "Order Bump Accepted",
+                    "hook": "wpfunnels/order_bump_accepted",
+                    "schema": [
+                        {
+                            "key": "step_id",
+                            "label": "Step",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wpfunnels",
+                                "query": "steps",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "order_bump_rejected": {
+                    "key": "order_bump_rejected",
+                    "label": "Order Bump Rejected",
+                    "hook": "wpfunnels/order_bump_rejected",
+                    "schema": [
+                        {
+                            "key": "step_id",
+                            "label": "Step",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wpfunnels",
+                                "query": "steps",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "offer_accepted": {
+                    "key": "offer_accepted",
+                    "label": "Offer Accepted",
+                    "hook": "wpfunnels/offer_accepted",
+                    "schema": [
+                        {
+                            "key": "step_id",
+                            "label": "Step",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wpfunnels",
+                                "query": "steps",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "offer_rejected": {
+                    "key": "offer_rejected",
+                    "label": "Offer Rejected",
+                    "hook": "wpfunnels/offer_rejected",
+                    "schema": [
+                        {
+                            "key": "step_id",
+                            "label": "Step",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wpfunnels",
+                                "query": "steps",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "child_order_created": {
+                    "key": "child_order_created",
+                    "label": "Child Order Created",
+                    "hook": "wpfunnels/child_order_created",
+                    "schema": [],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "subscription_created": {
+                    "key": "subscription_created",
+                    "label": "Subscription Created",
+                    "hook": "wpfunnels/subscription_created",
+                    "schema": [
+                        {
+                            "key": "step_id",
+                            "label": "Step",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wpfunnels",
+                                "query": "steps",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "setup_wizard_complete": {
+                    "key": "setup_wizard_complete",
+                    "label": "Setup Wizard Completed",
+                    "hook": "wpfunnels_setup_wizard_complete",
+                    "schema": [
+                        {
+                            "key": "funnel_id",
+                            "label": "Funnel",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wpfunnels",
+                                "query": "funnels",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "template_body_top": {
+                    "key": "template_body_top",
+                    "label": "Template Body Top",
+                    "hook": "wpfunnels/template_body_top",
+                    "schema": [],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "template_container_top": {
+                    "key": "template_container_top",
+                    "label": "Template Container Top",
+                    "hook": "wpfunnels/template_container_top",
+                    "schema": [],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "template_container_bottom": {
+                    "key": "template_container_bottom",
+                    "label": "Template Container Bottom",
+                    "hook": "wpfunnels/template_container_bottom",
+                    "schema": [],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "template_wp_footer": {
+                    "key": "template_wp_footer",
+                    "label": "Template Footer",
+                    "hook": "wpfunnels/template_wp_footer",
+                    "schema": [],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                }
+            },
+            "actions": {
+                "get_funnel_single": {
+                    "key": "get_funnel_single",
+                    "label": "Get Funnel (Single)",
+                    "schema": [
+                        {
+                            "key": "funnel_id",
+                            "label": "Funnel",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wpfunnels",
+                                "query": "funnels",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "get_step_single": {
+                    "key": "get_step_single",
+                    "label": "Get Step (Single)",
+                    "schema": [
+                        {
+                            "key": "step_id",
+                            "label": "Step",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wpfunnels",
+                                "query": "steps",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "get_next_step": {
+                    "key": "get_next_step",
+                    "label": "Get Next Step",
+                    "schema": [
+                        {
+                            "key": "step_id",
+                            "label": "Step",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wpfunnels",
+                                "query": "steps",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "add_action": {
+                    "key": "add_action",
+                    "label": "Add Action",
+                    "schema": [
+                        {
+                            "key": "hook_name",
+                            "label": "Hook Name",
+                            "type": "text",
+                            "placeholder": "wpfunnels/custom_hook",
+                            "required": true
+                        },
+                        {
+                            "key": "accepted_args",
+                            "label": "Accepted Args",
+                            "type": "number",
+                            "placeholder": "1"
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "do_action": {
+                    "key": "do_action",
+                    "label": "Do Action",
+                    "schema": [
+                        {
+                            "key": "hook_name",
+                            "label": "Hook Name",
+                            "type": "text",
+                            "placeholder": "wpfunnels/custom_hook",
+                            "required": true
+                        },
+                        {
+                            "key": "arg_1",
+                            "label": "Argument 1",
+                            "type": "text"
+                        },
+                        {
+                            "key": "arg_2",
+                            "label": "Argument 2",
+                            "type": "text"
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "add_filter": {
+                    "key": "add_filter",
+                    "label": "Add Filter",
+                    "schema": [
+                        {
+                            "key": "hook_name",
+                            "label": "Hook Name",
+                            "type": "text",
+                            "placeholder": "wpfunnels/custom_hook",
+                            "required": true
+                        },
+                        {
+                            "key": "accepted_args",
+                            "label": "Accepted Args",
+                            "type": "number",
+                            "placeholder": "1"
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "apply_filters": {
+                    "key": "apply_filters",
+                    "label": "Apply Filters",
+                    "schema": [
+                        {
+                            "key": "hook_name",
+                            "label": "Hook Name",
+                            "type": "text",
+                            "placeholder": "wpfunnels/custom_hook",
+                            "required": true
+                        },
+                        {
+                            "key": "value",
+                            "label": "Value",
+                            "type": "text"
+                        },
+                        {
+                            "key": "arg_1",
+                            "label": "Argument 1",
+                            "type": "text"
+                        },
+                        {
+                            "key": "arg_2",
+                            "label": "Argument 2",
+                            "type": "text"
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "remove_action": {
+                    "key": "remove_action",
+                    "label": "Remove Action",
+                    "schema": [
+                        {
+                            "key": "hook_name",
+                            "label": "Hook Name",
+                            "type": "text",
+                            "placeholder": "wpfunnels/custom_hook",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "has_action": {
+                    "key": "has_action",
+                    "label": "Has Action",
+                    "schema": [
+                        {
+                            "key": "hook_name",
+                            "label": "Hook Name",
+                            "type": "text",
+                            "placeholder": "wpfunnels/custom_hook",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "current_filter": {
+                    "key": "current_filter",
+                    "label": "Current Filter",
+                    "schema": [
+                        {
+                            "key": "hook_name",
+                            "label": "Hook Name",
+                            "type": "text",
+                            "placeholder": "wpfunnels/custom_hook",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                }
+            }
         },
         "metabox": {
             "slug": "metabox",
