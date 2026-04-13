@@ -118,7 +118,7 @@ const WorkflowTable = () => {
         return (
           <Box display="flex" justifyContent="center">
             <Button variant={'outline'} onClick={() => setSaveAsRecipeRow(row)}>
-              {__('Save Us Recipes')}
+              {__('Save as Recipes')}
             </Button>
           </Box>
         );
