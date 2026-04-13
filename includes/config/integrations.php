@@ -251,9 +251,21 @@ return [
 			'file' => 'paidmembershippro.php',
 			'class' => \Zaplane\Integrations\Paidmembershippro::class
 		],
-		'whatsapp'      => [
-			'file' => 'whatsapp.php',
+		'whatsapp'  => [
+			'file'  => 'whatsapp.php',
 			'class' => \Zaplane\Integrations\Whatsapp::class
+		],
+		'telegram'  => [
+			'file'  => 'telegram.php',
+			'class' => \Zaplane\Integrations\Telegram::class
+		],
+		'gmail'       => [
+			'file'  => 'gmail.php',
+			'class' => \Zaplane\Integrations\Gmail::class
+		],
+		'google-meet' => [
+			'file'  => 'google-meet.php',
+			'class' => \Zaplane\Integrations\GoogleMeet::class
 		],
 	],
 ];
