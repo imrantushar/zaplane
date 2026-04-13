@@ -18,29 +18,16 @@ import { RiDeleteBin6Line } from "react-icons/ri";
 import { LiaEditSolid } from "react-icons/lia";
 import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
 import ZAPDrawer from "@ZAPComponents/Drawer";
-import LogDetails from "@ZAPComponents/LogDetails";
-import { nodeLogsRunDetails } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlowLogs";
 import { HistoryIcon } from "@ZAPUtils/icons";
 import ZAPActionBar from "@ZAPComponents/ZAPActionBar";
 import { TbFileExport } from "react-icons/tb";
 import { exportWorkflows } from "@ZAPRedux/Slices/workFlowSlice/actions/ExportImport";
 import SaveAsRecipeModal from "@ZAPComponents/SaveAsRecipeModal";
 import { getRecipeFolders } from "@ZAPRedux/Slices/recipeSlice/actions/recipe";
-import { FiCheck, FiChevronDown, FiFolder } from "react-icons/fi";
-import ZAPMenu from "@ZAPComponents/ZapMenu";
+import WorkflowsLogs from "./WorkflowsLogs";
 
-const flattenRecipeFolders = (nodes = [], acc = []) => {
-  (nodes || []).forEach((node) => {
-    acc.push({ id: node.id, title: node.title });
-    flattenRecipeFolders(node.children || [], acc);
-  });
-  return acc;
-};
 
-const DEFAULT_WORKFLOW_RECIPE_FOLDER = () => ({
-  folderId: null,
-  label: __("Default", "zaplane"),
-});
+
 
 const WorkflowTable = () => {
   const navigate = useNavigate();
@@ -53,11 +40,10 @@ const WorkflowTable = () => {
     currentPage,
     perPage,
   } = useSelector((state) => state.workflows);
-  const { folders: recipeFolders = [] } = useSelector((state) => state.recipes || {});
   const [selection, setSelection] = useState([]);
   const [loading, setLoading] = useState(allWorkFlows.length === 0);
   const [saveAsRecipeRow, setSaveAsRecipeRow] = useState(null);
-  const [recipeTargetFolderByWorkflow, setRecipeTargetFolderByWorkflow] = useState({});
+
 
   const handleRefresh = async (page = 1, per_page = 10) => {
     setLoading(true);
@@ -181,7 +167,6 @@ const WorkflowTable = () => {
               onClick={() => {
                 setActiveRunId(row.id);
                 setDrawerOpen(true);
-                dispatch(nodeLogsRunDetails(row.id));
               }}
             >
               <Icon as={HistoryIcon} />
@@ -267,7 +252,7 @@ const WorkflowTable = () => {
         placement="end"
         size="md"
       >
-        {activeRunId && <LogDetails runId={activeRunId} onBack={() => setDrawerOpen(false)} />}
+        {activeRunId && <WorkflowsLogs id={activeRunId}/>}
       </ZAPDrawer>
       <SaveAsRecipeModal
         isOpen={!!saveAsRecipeRow}
