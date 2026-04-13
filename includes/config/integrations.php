@@ -267,5 +267,9 @@ return [
 			'file'  => 'google-meet.php',
 			'class' => \Zaplane\Integrations\GoogleMeet::class
 		],
+		'zoom'        => [
+			'file'  => 'zoom.php',
+			'class' => \Zaplane\Integrations\Zoom::class
+		],
 	],
 ];
