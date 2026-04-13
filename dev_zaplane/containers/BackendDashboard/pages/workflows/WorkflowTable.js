@@ -13,7 +13,6 @@ import {
   updateWorkFlowStatus,
 } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow";
 import StatusOptions from "@ZAPComponents/StatusOptions";
-import ZAPTooltip from "@ZAPComponents/ZAPTooltip";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { LiaEditSolid } from "react-icons/lia";
 import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
@@ -25,6 +24,7 @@ import { exportWorkflows } from "@ZAPRedux/Slices/workFlowSlice/actions/ExportIm
 import SaveAsRecipeModal from "@ZAPComponents/SaveAsRecipeModal";
 import { getRecipeFolders } from "@ZAPRedux/Slices/recipeSlice/actions/recipe";
 import WorkflowsLogs from "./WorkflowsLogs";
+import OptionMenu from "@ZAPComponents/OptionMenu";
 
 
 
@@ -155,72 +155,53 @@ const WorkflowTable = () => {
     {
       name: <Text className="zaplane-label">{__("Action", "zaplane")}</Text>,
       cell: (row) => (
-        <HStack justify="flex-end" spacing="1" justifyContent={"center"}>
-          <ZAPTooltip content={__("Details", "zaplane")}>
-            <Box
-              display="flex"
-              p={"5px 6px"}
-              justifyContent="center"
-              alignItems="center"
-              borderRadius="3px"
-              border="1px solid var(--zaplane-border-color)"
-              onClick={() => {
+        <OptionMenu
+          options={[
+            {
+              label: __("Details", "zaplane"),
+              icon: <Icon as={HistoryIcon} />,
+              type: "button",
+              onClick: () => {
                 setActiveRunId(row.id);
                 setDrawerOpen(true);
-              }}
-            >
-              <Icon as={HistoryIcon} />
-            </Box>
-          </ZAPTooltip>
-          <ZAPTooltip content={__("Edit", "zaplane")}>
-            <Box
-              display="flex"
-              p={"5px 6px"}
-              justifyContent="center"
-              alignItems="center"
-              borderRadius="3px"
-              border="1px solid var(--zaplane-border-color)"
-              onClick={() =>
-                navigate(`${route_path}admin.php?page=zaplane-workflows&action=edit&id=${row.id}`)
-              }
-            >
-              <Icon height="15px" width="15px" as={LiaEditSolid} />
-            </Box>
-          </ZAPTooltip>
-          <ZAPTooltip content={__("Delete", "zaplane")}>
-            <Box
-              display="flex"
-              p={"5px 6px"}
-              justifyContent="center"
-              alignItems="center"
-              borderRadius="3px"
-              border="1px solid var(--zaplane-border-color)"
-              onClick={() => {
-                if (window.confirm(__("Are you sure you want to delete?", "zaplane"))) {
+              },
+            },
+            {
+              label: __("Edit", "zaplane"),
+              icon: <Icon as={LiaEditSolid} />,
+              type: "button",
+              onClick: () =>
+                navigate(
+                  `${route_path}admin.php?page=zaplane-workflows&action=edit&id=${row.id}`
+                ),
+            },
+            {
+              label: __("Delete", "zaplane"),
+              icon: <Icon as={RiDeleteBin6Line} />,
+              type: "button",
+              suffix: "trash",
+              onClick: () => {
+                if (
+                  window.confirm(
+                    __("Are you sure you want to delete?", "zaplane")
+                  )
+                ) {
                   dispatch(deleteWorkFlow(row.id));
                 }
-              }}
-            >
-              <Icon height="15px" width="15px" as={RiDeleteBin6Line} />
-            </Box>
-          </ZAPTooltip>
-          <ZAPTooltip content={__("Export", "zaplane")}>
-            <Box
-              display="flex"
-              p={"5px 6px"}
-              justifyContent="center"
-              alignItems="center"
-              borderRadius="3px"
-              border="1px solid var(--zaplane-border-color)"
-              onClick={() => handleExport(row)}
-            >
-              <Icon height="15px" width="15px" as={TbFileExport} />
-            </Box>
-          </ZAPTooltip>
-        </HStack>
+              },
+            },
+            {
+              label: __("Export", "zaplane"),
+              icon: <Icon as={TbFileExport} />,
+              type: "button",
+              hasBorder: false,
+              onClick: () => handleExport(row),
+            },
+          ]}
+        />
       ),
       textAlign: "center",
-    },
+    }
   ];
 
   return (
@@ -252,7 +233,7 @@ const WorkflowTable = () => {
         placement="end"
         size="md"
       >
-        {activeRunId && <WorkflowsLogs id={activeRunId}/>}
+        {activeRunId && <WorkflowsLogs id={activeRunId} />}
       </ZAPDrawer>
       <SaveAsRecipeModal
         isOpen={!!saveAsRecipeRow}

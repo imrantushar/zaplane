@@ -17,6 +17,7 @@ import {
     fetchAuthFields,
     initOAuth,
     createTokenConnection,
+    resetAuthFields,
 } from "@ZAPRedux/Slices/connectionsSlice/connectionsSlice";
 
 import WPModal from "@ZAPComponents/Modal/WPModal";
@@ -130,6 +131,7 @@ const Connections = () => {
     };
 
     const authTypes = authFields?.available_auth_types || {};
+    console.log(authTypes,'auth type');
 
     // Reset state when modal closes
     const handleModalClose = () => {
@@ -137,6 +139,7 @@ const Connections = () => {
         setSelectedApp(null);
         setSelectedAuthType(null);
         setCredentials({});
+        dispatch(resetAuthFields());
     };
 
     return (

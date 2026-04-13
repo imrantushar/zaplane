@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Button, Text, Flex, Input, Box, FileUpload,Image} from "@chakra-ui/react";
+import { Button, Text, Flex, Input, Box, FileUpload, Image } from "@chakra-ui/react";
 import TopBar from "@ZAPComponents/TopBar";
 import { FiArrowLeft, FiDownload, FiUpload } from "react-icons/fi";
 import { TfiReload } from "react-icons/tfi";
@@ -105,7 +105,7 @@ export default function FlowTopBar({
     }
   };
 
-const currentTitle = values?.title ?? workFlow?.workflow?.title ?? "Untitled Flow";
+  const currentTitle = values?.title ?? workFlow?.workflow?.title ?? "Untitled Flow";
   return (
     <>
       <TopBar
@@ -165,7 +165,7 @@ const currentTitle = values?.title ?? workFlow?.workflow?.title ?? "Untitled Flo
           </>
         )}
         rightContent={() => (
-          <Flex gap='12px'>
+          <Flex gap='12px' >
             {!apiRequestRunning ? (
               <Button {...secondPrimaryBtn} h="36px" onClick={() => {
                 dispatch(startApiCountdown(120));
@@ -242,7 +242,7 @@ const currentTitle = values?.title ?? workFlow?.workflow?.title ?? "Untitled Flo
                 </Button>
               </Flex>
 
-              <RunsTable id={id} activeDrawer={activeDrawer} setRefreshing={setRefreshing}/>
+              <RunsTable id={id} activeDrawer={activeDrawer} setRefreshing={setRefreshing} />
             </ZAPDrawer>
 
             {/* Version Drawer */}
@@ -292,9 +292,17 @@ const currentTitle = values?.title ?? workFlow?.workflow?.title ?? "Untitled Flo
               isClearable={false}
               isSearchable={false}
               placeholder="Select status"
+              styles={{
+                control: (provided) => ({
+                  ...provided,
+                  minHeight: "36px",
+                  height:'36px'
+                }),
+              }}
             />
 
-            <Button {...primaryBtn} disabled={!isFlowDirty} size="sm" onClick={handleSubmit}>
+
+            <Button h='36px' {...primaryBtn} disabled={!isFlowDirty} size="sm" onClick={handleSubmit}>
               {__("Update", "zaplane")}
             </Button>
             <ZAPMenu
@@ -307,6 +315,7 @@ const currentTitle = values?.title ?? workFlow?.workflow?.title ?? "Untitled Flo
                 },
               ]}
             />
+
           </Flex>
         )}
       />
