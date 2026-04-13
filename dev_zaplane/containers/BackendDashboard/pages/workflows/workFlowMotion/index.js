@@ -25,7 +25,7 @@ export default function Workflows({ id }) {
         action: 'trigger',
         config: {}
       },
-      position: { x: 125, y: 300 },
+      position: { x: 400, y: 300 },
     }
   ]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
@@ -42,7 +42,7 @@ export default function Workflows({ id }) {
           action: "trigger",
           config: {},
         },
-        position: { x: 125, y: 300 },
+        position: { x: 400, y: 300 },
       },
     ];
 

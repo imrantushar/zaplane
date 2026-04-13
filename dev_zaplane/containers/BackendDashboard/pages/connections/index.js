@@ -8,6 +8,7 @@ import {
     Input,
     Heading,
     Flex,
+    Image,
 } from "@chakra-ui/react";
 import { __ } from "@wordpress/i18n";
 import { FaSlack } from "react-icons/fa";
@@ -22,11 +23,14 @@ import {
 
 import WPModal from "@ZAPComponents/Modal/WPModal";
 import TopBar from "@ZAPComponents/TopBar";
-import { primaryBtn } from "../../../../../assets/scss/chakra/recipe";
+import { outlineBtn, primaryBtn } from "../../../../../assets/scss/chakra/recipe";
 import ConnectionTable from "./ConnectionTable";
 import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
-import { formatLabel } from "@ZAPUtils/helper";
+import { formatLabel, plugin_root_url } from "@ZAPUtils/helper";
 import ZAPInput from "@ZAPComponents/ZAPInput";
+import { IoIosArrowForward } from "react-icons/io";
+import SubTopBar from "@ZAPComponents/SubTopBar";
+import { FiHelpCircle } from "react-icons/fi";
 
 
 const Connections = () => {
@@ -113,27 +117,44 @@ const Connections = () => {
     return (
         <>
             <TopBar
-                render={() => (
-                    <Box>
+                leftContent={() => (
+                    <>
+                        <Flex height='40px' width='40px' borderRadius='20px' gap='10px' background='var(--zaplane-second-primary)' alignItems='center' justifyContent='center'>
+                            <Image
+                                src={`${plugin_root_url}assets/images/zaplane.svg`}
+                                boxSize="20px"
+                            />
+                        </Flex>
+                        <IoIosArrowForward />
                         <ZAPLabel
-                            label={__('Flows', 'zaplane')}
-                            variant="bold"
+                            as="h2"
+                            color="var(--zapplane-font-color)"
+                            type="subtitle"
+                            fontWeight="medium"
+                            label={__('Connections ', 'zaplane')}
                         />
-                        <Text className="zaplane-sub-title" color="var(--zaplane-text-muted)">
-                            {__("Connections between your apps", "zaplane")}
-                        </Text>
-                    </Box>
-                )}
-                rightContent={() => (
-                    <Button
-                        {...primaryBtn}
-                        leftIcon={<FaSlack />}
-                        onClick={() => setIsModalOpen(true)}
-                    >
-                        {__("Create credential", "zaplane")}
-                    </Button>
+                        {/* <Box>
+                            <ZAPLabel
+                                label={__('Flows', 'zaplane')}
+                                variant="bold"
+                            />
+                            <Text className="zaplane-sub-title" color="var(--zaplane-text-muted)">
+                                {__("Connections between your apps", "zaplane")}
+                            </Text>
+                        </Box> */}
+                    </>
+
                 )}
             />
+            <SubTopBar heading={__("Dashboard", "zaplane")}>
+                <Button
+                    {...primaryBtn}
+                    leftIcon={<FaSlack />}
+                    onClick={() => setIsModalOpen(true)}
+                >
+                    {__("Create credential", "zaplane")}
+                </Button>
+            </SubTopBar>
             <div className="zaplane-page-content">
                 <ConnectionTable />
             </div>

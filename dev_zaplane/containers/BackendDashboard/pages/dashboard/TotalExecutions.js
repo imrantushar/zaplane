@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React from "react";
 import { Box, Text } from "@chakra-ui/react";
 import {
     AreaChart,
@@ -10,30 +10,11 @@ import {
     ResponsiveContainer,
 } from "recharts";
 import { __ } from "@wordpress/i18n";
+import { useSelector } from "react-redux";
 
-const TotalExecutions = ({ data }) => {
-    const chartData = useMemo(() => {
-        const months = [
-            "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-            "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-        ];
-
-        const result = months.map((month) => ({
-            month,
-            value: 0,
-        }));
-
-        data?.runs?.forEach((item) => {
-            if (!item.started_at) return;
-
-            const date = new Date(item.started_at);
-            const monthIndex = date.getMonth();
-
-            result[monthIndex].value += 1;
-        });
-
-        return result;
-    }, [data]);
+const TotalExecutions = () => {
+    const { summary } = useSelector((state) => state.dashboard)
+    const monthly_executions = summary?.monthly_executions || [];
 
     return (
         <Box
@@ -49,7 +30,7 @@ const TotalExecutions = ({ data }) => {
 
             <Box h="315px" px="16px" pb="16px">
                 <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={chartData}>
+                    <AreaChart data={monthly_executions}>
 
                         <defs>
                             <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
@@ -82,7 +63,8 @@ const TotalExecutions = ({ data }) => {
 
                         <Area
                             type="monotone"
-                            dataKey="value"
+                            dataKey="runs"
+                            name="Runs"
                             stroke="#63B3ED"
                             fill="url(#colorValue)"
                             strokeWidth={2}

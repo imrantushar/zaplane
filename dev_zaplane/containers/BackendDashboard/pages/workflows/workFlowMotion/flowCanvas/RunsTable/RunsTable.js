@@ -156,7 +156,7 @@ const RunsTable = ({ id, activeDrawer, setRefreshing }) => {
         data={runs}
         showSubHeader={false}
         showColumnFilter={false}
-        showPagination={runs.length >= 10}
+        showPagination={totalItems >= 10}
         noDataText={__("No history found", "zaplane")}
         totalItems={totalItems}
         dataFetchingStatus={loading}
