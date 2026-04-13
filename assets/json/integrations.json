@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-04-13 04:00:09",
+    "generated_at": "2026-04-13 05:14:29",
     "apps": {
         "cartflows": {
             "slug": "cartflows",
@@ -17598,6 +17598,558 @@
                                 ],
                                 "multiple": true
                             }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
+        },
+        "google-meet": {
+            "slug": "google-meet",
+            "name": "Google Meet",
+            "icon": "google-meet.svg",
+            "category": "app",
+            "requires_connection": true,
+            "auth_type": "oauth2",
+            "supports_webhook": false,
+            "triggers": [],
+            "actions": {
+                "create_meeting": {
+                    "key": "create_meeting",
+                    "label": "Create Meeting",
+                    "schema": [
+                        {
+                            "key": "summary",
+                            "type": "text",
+                            "label": "Meeting Title",
+                            "placeholder": "Team Standup",
+                            "required": true
+                        },
+                        {
+                            "key": "description",
+                            "type": "textarea",
+                            "label": "Description",
+                            "placeholder": "Meeting agenda or notes...",
+                            "required": false
+                        },
+                        {
+                            "key": "start_datetime",
+                            "type": "text",
+                            "label": "Start Date & Time",
+                            "placeholder": "2026-05-01T10:00:00",
+                            "required": true,
+                            "help": "ISO 8601 format: YYYY-MM-DDTHH:MM:SS (e.g. 2026-05-01T10:00:00)"
+                        },
+                        {
+                            "key": "end_datetime",
+                            "type": "text",
+                            "label": "End Date & Time",
+                            "placeholder": "2026-05-01T11:00:00",
+                            "required": true,
+                            "help": "ISO 8601 format: YYYY-MM-DDTHH:MM:SS"
+                        },
+                        {
+                            "key": "timezone",
+                            "type": "text",
+                            "label": "Timezone",
+                            "placeholder": "UTC",
+                            "required": false,
+                            "help": "IANA timezone name (e.g. America/New_York, Europe/London). Defaults to UTC."
+                        },
+                        {
+                            "key": "attendees",
+                            "type": "text",
+                            "label": "Attendees",
+                            "placeholder": "alice@example.com,bob@example.com",
+                            "required": false,
+                            "help": "Comma-separated email addresses. Attendees will receive a calendar invite."
+                        },
+                        {
+                            "key": "send_notifications",
+                            "type": "select",
+                            "label": "Send Invites to Attendees",
+                            "required": false,
+                            "options": [
+                                {
+                                    "value": "true",
+                                    "label": "Yes"
+                                },
+                                {
+                                    "value": "false",
+                                    "label": "No"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "calendar_id",
+                            "type": "text",
+                            "label": "Calendar",
+                            "required": false,
+                            "help": "Calendar ID to use (default: primary). Pick from the dynamic dropdown.",
+                            "dynamic": {
+                                "integration": "google-meet",
+                                "query": "google_calendars",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_meeting": {
+                    "key": "update_meeting",
+                    "label": "Update Meeting",
+                    "schema": [
+                        {
+                            "key": "event_id",
+                            "type": "text",
+                            "label": "Event ID",
+                            "placeholder": "{{google_event_id}}",
+                            "required": true,
+                            "help": "The Google Calendar event ID. Use {{google_event_id}} from a Create Meeting node."
+                        },
+                        {
+                            "key": "summary",
+                            "type": "text",
+                            "label": "New Title",
+                            "placeholder": "Updated Meeting Title",
+                            "required": false
+                        },
+                        {
+                            "key": "description",
+                            "type": "textarea",
+                            "label": "New Description",
+                            "placeholder": "Updated agenda...",
+                            "required": false
+                        },
+                        {
+                            "key": "start_datetime",
+                            "type": "text",
+                            "label": "New Start Date & Time",
+                            "placeholder": "2026-05-01T10:00:00",
+                            "required": false,
+                            "help": "ISO 8601 format. Leave empty to keep existing."
+                        },
+                        {
+                            "key": "end_datetime",
+                            "type": "text",
+                            "label": "New End Date & Time",
+                            "placeholder": "2026-05-01T11:00:00",
+                            "required": false
+                        },
+                        {
+                            "key": "timezone",
+                            "type": "text",
+                            "label": "Timezone",
+                            "placeholder": "UTC",
+                            "required": false
+                        },
+                        {
+                            "key": "attendees",
+                            "type": "text",
+                            "label": "Attendees",
+                            "placeholder": "alice@example.com,bob@example.com",
+                            "required": false,
+                            "help": "Replaces the existing attendee list."
+                        },
+                        {
+                            "key": "calendar_id",
+                            "type": "text",
+                            "label": "Calendar",
+                            "required": false,
+                            "help": "Calendar ID to use (default: primary). Pick from the dynamic dropdown.",
+                            "dynamic": {
+                                "integration": "google-meet",
+                                "query": "google_calendars",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "cancel_meeting": {
+                    "key": "cancel_meeting",
+                    "label": "Cancel Meeting",
+                    "schema": [
+                        {
+                            "key": "event_id",
+                            "type": "text",
+                            "label": "Event ID",
+                            "placeholder": "{{google_event_id}}",
+                            "required": true,
+                            "help": "The Google Calendar event ID to cancel."
+                        },
+                        {
+                            "key": "send_notifications",
+                            "type": "select",
+                            "label": "Notify Attendees",
+                            "required": false,
+                            "options": [
+                                {
+                                    "value": "true",
+                                    "label": "Yes \u2014 send cancellation emails"
+                                },
+                                {
+                                    "value": "false",
+                                    "label": "No"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "calendar_id",
+                            "type": "text",
+                            "label": "Calendar",
+                            "required": false,
+                            "help": "Calendar ID to use (default: primary). Pick from the dynamic dropdown.",
+                            "dynamic": {
+                                "integration": "google-meet",
+                                "query": "google_calendars",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_space": {
+                    "key": "create_space",
+                    "label": "Create Instant Space",
+                    "schema": [
+                        {
+                            "key": "access_type",
+                            "type": "select",
+                            "label": "Access Type",
+                            "required": false,
+                            "options": [
+                                {
+                                    "value": "",
+                                    "label": "Default"
+                                },
+                                {
+                                    "value": "OPEN",
+                                    "label": "Open \u2014 anyone with the link"
+                                },
+                                {
+                                    "value": "TRUSTED",
+                                    "label": "Trusted \u2014 organisation members"
+                                },
+                                {
+                                    "value": "RESTRICTED",
+                                    "label": "Restricted \u2014 invited members only"
+                                }
+                            ],
+                            "help": "Who can join this Meet space."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "end_conference": {
+                    "key": "end_conference",
+                    "label": "End Active Conference",
+                    "schema": [
+                        {
+                            "key": "space_name",
+                            "type": "text",
+                            "label": "Space Name",
+                            "placeholder": "{{google_space_name}}",
+                            "required": true,
+                            "help": "The Meet space resource name (e.g. spaces/jQCFfuBOdKE). Use {{google_space_name}} from a Create Space node."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
+        },
+        "zoom": {
+            "slug": "zoom",
+            "name": "Zoom",
+            "icon": "zoom.svg",
+            "category": "app",
+            "requires_connection": true,
+            "auth_type": "oauth2",
+            "supports_webhook": false,
+            "triggers": {
+                "meeting_started": {
+                    "key": "meeting_started",
+                    "label": "Meeting Started",
+                    "hook": "zoom_webhook_meeting_started",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "meeting_ended": {
+                    "key": "meeting_ended",
+                    "label": "Meeting Ended",
+                    "hook": "zoom_webhook_meeting_ended",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "participant_joined": {
+                    "key": "participant_joined",
+                    "label": "Participant Joined",
+                    "hook": "zoom_webhook_participant_joined",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": {
+                "create_meeting": {
+                    "key": "create_meeting",
+                    "label": "Create Meeting",
+                    "schema": [
+                        {
+                            "key": "topic",
+                            "type": "text",
+                            "label": "Meeting Topic",
+                            "placeholder": "Team Standup",
+                            "required": true
+                        },
+                        {
+                            "key": "start_time",
+                            "type": "text",
+                            "label": "Start Time",
+                            "placeholder": "2026-05-01T10:00:00",
+                            "required": true,
+                            "help": "ISO 8601 format: YYYY-MM-DDTHH:MM:SS (local time in the chosen timezone)."
+                        },
+                        {
+                            "key": "duration",
+                            "type": "text",
+                            "label": "Duration (minutes)",
+                            "placeholder": "60",
+                            "required": false,
+                            "help": "Meeting length in minutes. Default: 60."
+                        },
+                        {
+                            "key": "timezone",
+                            "type": "text",
+                            "label": "Timezone",
+                            "placeholder": "UTC",
+                            "required": false,
+                            "help": "IANA timezone name (e.g. America/New_York). Default: UTC."
+                        },
+                        {
+                            "key": "agenda",
+                            "type": "textarea",
+                            "label": "Agenda",
+                            "placeholder": "Meeting agenda...",
+                            "required": false
+                        },
+                        {
+                            "key": "password",
+                            "type": "text",
+                            "label": "Passcode",
+                            "placeholder": "Optional meeting passcode",
+                            "required": false,
+                            "help": "Up to 10 characters. Alphanumeric and @, -, _, * only."
+                        },
+                        {
+                            "key": "waiting_room",
+                            "type": "select",
+                            "label": "Waiting Room",
+                            "required": false,
+                            "options": [
+                                {
+                                    "value": "true",
+                                    "label": "Enabled"
+                                },
+                                {
+                                    "value": "false",
+                                    "label": "Disabled"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "host_video",
+                            "type": "select",
+                            "label": "Start with Host Video On",
+                            "required": false,
+                            "options": [
+                                {
+                                    "value": "true",
+                                    "label": "Yes"
+                                },
+                                {
+                                    "value": "false",
+                                    "label": "No"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "user_id",
+                            "type": "text",
+                            "label": "Host User ID / Email",
+                            "placeholder": "me",
+                            "required": false,
+                            "help": "Zoom user ID or email to create the meeting under. Default: me (authenticated user)."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_meeting": {
+                    "key": "update_meeting",
+                    "label": "Update Meeting",
+                    "schema": [
+                        {
+                            "key": "meeting_id",
+                            "type": "text",
+                            "label": "Meeting ID",
+                            "placeholder": "{{zoom_meeting_id}}",
+                            "required": true,
+                            "help": "Numeric Zoom meeting ID. Use {{zoom_meeting_id}} from a Create Meeting node."
+                        },
+                        {
+                            "key": "topic",
+                            "type": "text",
+                            "label": "New Topic",
+                            "placeholder": "Updated title",
+                            "required": false
+                        },
+                        {
+                            "key": "start_time",
+                            "type": "text",
+                            "label": "New Start Time",
+                            "placeholder": "2026-05-01T10:00:00",
+                            "required": false,
+                            "help": "ISO 8601 format. Leave empty to keep existing."
+                        },
+                        {
+                            "key": "duration",
+                            "type": "text",
+                            "label": "New Duration (minutes)",
+                            "placeholder": "60",
+                            "required": false
+                        },
+                        {
+                            "key": "timezone",
+                            "type": "text",
+                            "label": "Timezone",
+                            "placeholder": "UTC",
+                            "required": false
+                        },
+                        {
+                            "key": "agenda",
+                            "type": "textarea",
+                            "label": "New Agenda",
+                            "placeholder": "Updated agenda...",
+                            "required": false
+                        },
+                        {
+                            "key": "password",
+                            "type": "text",
+                            "label": "New Passcode",
+                            "placeholder": "newpasscode",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_meeting": {
+                    "key": "delete_meeting",
+                    "label": "Delete Meeting",
+                    "schema": [
+                        {
+                            "key": "meeting_id",
+                            "type": "text",
+                            "label": "Meeting ID",
+                            "placeholder": "{{zoom_meeting_id}}",
+                            "required": true,
+                            "help": "Numeric Zoom meeting ID to delete."
+                        },
+                        {
+                            "key": "notify_registrants",
+                            "type": "select",
+                            "label": "Notify Registrants",
+                            "required": false,
+                            "options": [
+                                {
+                                    "value": "true",
+                                    "label": "Yes \u2014 send cancellation email"
+                                },
+                                {
+                                    "value": "false",
+                                    "label": "No"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add_registrant": {
+                    "key": "add_registrant",
+                    "label": "Add Meeting Registrant",
+                    "schema": [
+                        {
+                            "key": "meeting_id",
+                            "type": "text",
+                            "label": "Meeting ID",
+                            "placeholder": "{{zoom_meeting_id}}",
+                            "required": true
+                        },
+                        {
+                            "key": "email",
+                            "type": "text",
+                            "label": "Email",
+                            "placeholder": "attendee@example.com",
+                            "required": true
+                        },
+                        {
+                            "key": "first_name",
+                            "type": "text",
+                            "label": "First Name",
+                            "placeholder": "Alice",
+                            "required": true
+                        },
+                        {
+                            "key": "last_name",
+                            "type": "text",
+                            "label": "Last Name",
+                            "placeholder": "Smith",
+                            "required": false
+                        },
+                        {
+                            "key": "org",
+                            "type": "text",
+                            "label": "Organisation",
+                            "placeholder": "Acme Corp",
+                            "required": false
+                        },
+                        {
+                            "key": "job_title",
+                            "type": "text",
+                            "label": "Job Title",
+                            "placeholder": "Marketing Manager",
+                            "required": false
                         }
                     ],
                     "outputs": [
