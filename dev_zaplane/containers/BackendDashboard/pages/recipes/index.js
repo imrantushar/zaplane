@@ -1,6 +1,7 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   Box,
+  Button,
   Flex,
 
   Image,
@@ -17,10 +18,14 @@ import {
   getRecipeFolders,
 } from "@ZAPRedux/Slices/recipeSlice/actions/recipe";
 import FolderCard from "./FolderCard";
+import SubTopBar from "@ZAPComponents/SubTopBar";
+import { primaryBtn } from "../../../../../assets/scss/chakra/recipe";
+import CreateWorkflowModal from "@ZAPComponents/CreateWorkflowModal";
 
 
 const RecipesPage = () => {
   const dispatch = useDispatch();
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const { folders: recipeFolders = [] } = useSelector(
     (state) => state.recipes || {}
   );
@@ -28,7 +33,7 @@ const RecipesPage = () => {
   useEffect(() => {
     dispatch(getRecipeFolders());
   }, [dispatch]);
-  console.log(recipeFolders,'recipeFolders');
+
 
   return (
     <>
@@ -60,6 +65,15 @@ const RecipesPage = () => {
           </>
         )}
       />
+       <SubTopBar heading={__("Recipe Library", "zaplane")}>
+  
+        <Button
+          onClick={() => setIsModalOpen(true)}
+          {...primaryBtn}
+        >
+          {__("Create Workflow", "zaplane")}
+        </Button>
+      </SubTopBar>
 
       <div className="zaplane-page-content">
         <SimpleGrid columns={{ base: 1, sm: 2, lg: 3 }} spacing={4} gap='20px'>
@@ -68,6 +82,11 @@ const RecipesPage = () => {
           ))}
         </SimpleGrid>
       </div>
+      
+      <CreateWorkflowModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </>
   );
 };

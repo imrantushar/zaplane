@@ -3,7 +3,7 @@ import { __ } from '@wordpress/i18n';
 import ZAPLabel from '@ZAPComponents/Labels/ZAPLabel';
 import TopBar from '@ZAPComponents/TopBar';
 import { plugin_root_url, route_path } from '@ZAPUtils/helper';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { IoIosArrowForward } from 'react-icons/io';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -11,6 +11,9 @@ import { getRecipeFolders, getRecipes } from '@ZAPRedux/Slices/recipeSlice/actio
 import RecipeCard from './RecipeCard';
 import FolderCard from '../FolderCard';
 import { findFolder } from './helper';
+import SubTopBar from '@ZAPComponents/SubTopBar';
+import { primaryBtn } from '../../../../../../assets/scss/chakra/recipe';
+import CreateWorkflowModal from '@ZAPComponents/CreateWorkflowModal';
 
 
 const ShowRecipes = ({ id }) => {
@@ -18,6 +21,7 @@ const ShowRecipes = ({ id }) => {
     const dispatch = useDispatch();
     const { recipes, folders = [], loadingFolders } = useSelector((state) => state.recipes);
     const folderId = Number.isFinite(Number(id)) && Number(id) > 0 ? Number(id) : null;
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     useEffect(() => {
         dispatch(getRecipeFolders());
@@ -47,7 +51,9 @@ const ShowRecipes = ({ id }) => {
                             alignItems="center" justifyContent="center"
                         >
                             <Image src={`${plugin_root_url}assets/images/zaplane.svg`} boxSize="20px" />
+
                         </Flex>
+                        <IoIosArrowForward />
                         <Flex align="center" gap="6px" wrap="wrap">
                             <ZAPLabel
                                 as="span" type="subtitle" fontWeight="medium"
@@ -58,6 +64,14 @@ const ShowRecipes = ({ id }) => {
                     </>
                 )}
             />
+            <SubTopBar heading={__("Recipe Library", "zaplane")}>
+                <Button
+                    onClick={() => setIsModalOpen(true)}
+                    {...primaryBtn}
+                >
+                    {__("Create Workflow", "zaplane")}
+                </Button>
+            </SubTopBar>
 
             <div className="zaplane-page-content">
 
@@ -115,6 +129,11 @@ const ShowRecipes = ({ id }) => {
                     )}
                 </Flex>
             </div>
+
+            <CreateWorkflowModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+            />
         </div>
     );
 };
