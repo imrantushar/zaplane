@@ -182,6 +182,10 @@ return [
 			'file' => 'academy.php',
 			'class' => \Zaplane\Integrations\Academy::class
 		],
+		'lifter'            => [
+			'file' => 'lifter.php',
+			'class' => \Zaplane\Integrations\Lifter::class
+		],
 		'jetengine'            => [
 			'file' => 'jetengine.php',
 			'class' => \Zaplane\Integrations\Jetengine::class
