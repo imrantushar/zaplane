@@ -234,6 +234,9 @@ return [
 			'file' => 'weforms.php', 
 			'class' => \Zaplane\Integrations\Weforms::class
 			],
+		'suremembers'      => [
+			'file' => 'suremembers.php', 
+			'class' => \Zaplane\Integrations\Suremembers::class
 		'arform'      => [
 			'file' => 'arform.php',
 			'class' => \Zaplane\Integrations\ARForm::class
