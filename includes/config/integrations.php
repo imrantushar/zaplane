@@ -27,10 +27,10 @@ return [
 			'file' => 'variable.php',
 			'class' => \Zaplane\Integrations\Variable::class
 		],
-    'cartflows'            => [
-      'file' => 'cartflows.php',
-      'class' => \Zaplane\Integrations\Cartflows::class
-    ],
+		'cartflows'            => [
+		'file' => 'cartflows.php',
+		'class' => \Zaplane\Integrations\Cartflows::class
+		],
 		'wordpress'            => [
 			'file' => 'wordpress.php',
 			'class' => \Zaplane\Integrations\Wordpress::class
@@ -42,6 +42,7 @@ return [
 		'woomemberships'       => [
 			'file' => 'woo-memberships.php',
 			'class' => \Zaplane\Integrations\WooMemberships::class
+		],
 		'woosubscriptions'     => [
 			'file' => 'woo-subscriptions.php',
 			'class' => \Zaplane\Integrations\WooSubscriptions::class
@@ -174,13 +175,13 @@ return [
 			'file' => 'elementor.php',
 			'class' => \Zaplane\Integrations\Elementor::class
 		],
-		'masterstudy'          => [ 
-			'file' => 'masterstudy.php',          
-			'class' => \Zaplane\Integrations\Masterstudy::class 
+		'masterstudy'          => [
+			'file' => 'masterstudy.php',
+			'class' => \Zaplane\Integrations\Masterstudy::class
 		],
-		'academy'          => [ 
-			'file' => 'academy.php',          
-			'class' => \Zaplane\Integrations\Academy::class 
+		'academy'          => [
+			'file' => 'academy.php',
+			'class' => \Zaplane\Integrations\Academy::class
 		],
 		'jetengine'            => [
 			'file' => 'jetengine.php',
@@ -203,16 +204,20 @@ return [
 			'class' => \Zaplane\Integrations\Profilebuilder::class
 		],
 		'kadenceblocks'      => [
-			'file' => 'kadenceblocks.php', 
+			'file' => 'kadenceblocks.php',
 			'class' => \Zaplane\Integrations\Kadenceblocks::class
 			],
 		'bookingcalendar'      => [
-			'file' => 'bookingcalendar.php', 
+			'file' => 'bookingcalendar.php',
 			'class' => \Zaplane\Integrations\Bookingcalendar::class
 		],
 		'weforms'      => [
-			'file' => 'weforms.php', 
+			'file' => 'weforms.php',
 			'class' => \Zaplane\Integrations\Weforms::class
-			],
+		],
+		'mailster'      => [
+			'file' => 'mailster.php',
+			'class' => \Zaplane\Integrations\Mailster::class
+		],
 	],
 ];
