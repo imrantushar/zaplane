@@ -32,7 +32,7 @@ const ShowRecipes = ({ id }) => {
     }, [dispatch, folderId]);
 
     const handleNavigate = (selectedId) => {
-        const base = `${route_path}admin.php?page=zaplane-recipes&action=edit`;
+        const base = `${route_path}admin.php?page=zaplane-recipes`;
         navigate(selectedId ? `${base}&id=${selectedId}` : base);
     };
 
