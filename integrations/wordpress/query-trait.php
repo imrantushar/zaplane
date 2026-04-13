@@ -14,22 +14,67 @@ trait QueryTrait {
 		], $types);
 	}
 
-	public static function query_posts( $q ) {
+	public static function query_posts( $query ) {
 
-		$args = [
-			'post_type'   => $q['where']['post_type'] ?? 'post',
-			'post_status' => $q['where']['post_status'] ?? 'publish',
-			's'           => $q['search'] ?? '',
-			'numberposts' => $q['limit'] ?? 20,
-		];
+	$post_type = $query['post_type']
+		?? ( $query['where']['post_type'] ?? null )
+		?? 'post';
 
-		$posts = get_posts( $args );
-
-		return array_map(fn( $p)=>[
-			'ID'         => $p->ID,
-			'post_title' => $p->post_title,
-		], $posts);
+	if ( empty( $post_type ) || $post_type === '{{post_type}}' ) {
+		$post_type = 'post';
 	}
+error_log( print_r( $query, true));
+error_log( print_r( $post_type, true));
+	$args = [
+		'post_type'      => sanitize_text_field( $post_type ),
+		'posts_per_page' => -1,
+		'post_status'    => ( $post_type === 'attachment' ) ? 'inherit' : 'any',
+	];
+
+	$posts = get_posts( $args );
+
+	$result = [
+		[ 'name' => 'any', 'label' => 'Any' ]
+	];
+
+	foreach ( $posts as $post ) {
+		$result[] = [
+			'name'  => (string) $post->ID,
+			'label' => $post->post_title ?: '(no title)',
+		];
+	}
+
+	return $result;
+}
+
+	// public static function query_posts( $query ) {
+	// 	$options = [
+	// 		[
+	// 			'label' => 'Any Post',
+	// 			'name' => 'any'
+	// 		],
+	// 	];
+
+	// 	$where = $query['where'] ?? [];
+
+	// 	$post_status = $where['post_status'] ?? 'any';
+
+	// 	$args = [
+	// 		'post_type'      => $where['post_type'] ?? 'post',
+	// 		'post_status'    => $post_status,
+	// 		's'              => $query['search'] ?? '',
+	// 		'posts_per_page' => -1,
+	// 	];
+
+	// 	$posts = get_posts( $args );
+
+	// 	return array_map(function( $p ) {
+	// 		return [
+	// 			'name'  => (string) $p->ID,
+	// 			'label' => $p->post_title,
+	// 		];
+	// 	}, $posts);
+	// }
 
 	public static function query_terms( $query ) {
 		$taxonomy = $query['where']['taxonomy'] ?? '';
