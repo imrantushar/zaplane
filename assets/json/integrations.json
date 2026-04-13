@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-04-12 09:00:27",
+    "generated_at": "2026-04-13 06:00:46",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -13535,8 +13535,8 @@
                         "main"
                     ]
                 },
-                "create_group": {
-                    "key": "create_group",
+                "create_groups": {
+                    "key": "create_groups",
                     "label": "Create Group",
                     "hook": "groups_group_create_complete",
                     "schema": [],
@@ -13852,14 +13852,12 @@
                                 }
                             ]
                         },
-                        [
-                            {
-                                "key": "creator_email",
-                                "label": "Topic Creator Email",
-                                "type": "email",
-                                "required": true
-                            }
-                        ],
+                        {
+                            "key": "creator_email",
+                            "label": "Creator Email",
+                            "type": "email",
+                            "required": true
+                        },
                         {
                             "key": "group_type",
                             "label": "Group Type",
@@ -13871,7 +13869,8 @@
                                     "value",
                                     "label"
                                 ]
-                            }
+                            },
+                            "required": false
                         }
                     ],
                     "outputs": [
@@ -14023,9 +14022,9 @@
                         "main"
                     ]
                 },
-                "remove_user_form_group": {
-                    "key": "remove_user_form_group",
-                    "label": "Remove User Form Group",
+                "remove_user_from_group": {
+                    "key": "remove_user_from_group",
+                    "label": "Remove User From Group",
                     "schema": [
                         {
                             "key": "user_email",
@@ -14199,25 +14198,52 @@
                             "required": true
                         },
                         {
-                            "key": "profile_fields",
-                            "label": "Extended Profile Field Map",
-                            "type": "repeater",
-                            "required": true,
-                            "sub_fields": [
-                                {
-                                    "key": "field_name",
-                                    "label": "Field",
-                                    "type": "text",
-                                    "required": true
-                                },
-                                {
-                                    "key": "field_value",
-                                    "label": "Value",
-                                    "type": "text",
-                                    "required": false
-                                }
-                            ],
-                            "add_button_label": "+ Add Extended Profile Field"
+                            "key": "first_name",
+                            "label": "First Name",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "last_name",
+                            "label": "Last Name",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "nick_name",
+                            "label": "Nickname",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "paragraph",
+                            "label": "Paragraph Text",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "number",
+                            "label": "Number",
+                            "type": "number",
+                            "required": true
+                        },
+                        {
+                            "key": "checkbox",
+                            "label": "Checkbox",
+                            "type": "checkbox",
+                            "required": true
+                        },
+                        {
+                            "key": "drop_down",
+                            "label": "Drop Down",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "radio_buttons",
+                            "label": "Radio Buttons",
+                            "type": "text",
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -14278,7 +14304,7 @@
                 },
                 "subscribe_to_forum": {
                     "key": "subscribe_to_forum",
-                    "label": "Subscriber To Forum",
+                    "label": "Subscribe To Forum",
                     "schema": [
                         {
                             "key": "user_email",
