@@ -259,7 +259,7 @@ const WorkflowTable = () => {
         onClose={() => setSaveAsRecipeRow(null)}
         workflowId={saveAsRecipeRow?.id}
         defaultTitle={saveAsRecipeRow?.title}
-        initialFolderId={saveAsRecipeRow?.id != null ? recipeTargetFolderByWorkflow[saveAsRecipeRow.id]?.folderId ?? null : null}
+        initialFolderId={saveAsRecipeRow?.id}
       />
     </>
   );
