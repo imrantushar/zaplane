@@ -210,6 +210,10 @@ return [
 			'file' => 'kadenceblocks.php',
 			'class' => \Zaplane\Integrations\Kadenceblocks::class
 		],
+		'ultimatemember'      => [
+			'file' => 'ultimatemember.php', 
+			'class' => \Zaplane\Integrations\Ultimatemember::class
+		],
 		'bitform'      => [
 			'file' => 'bitform.php',
 			'class' => \Zaplane\Integrations\Bitform::class
