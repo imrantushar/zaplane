@@ -196,6 +196,12 @@ const Connections = () => {
                             options={appOptions}
                             placeholder={__("Select an app...", "zaplane")}
                             noOptionsMessage={() => __("No apps available", "zaplane")}
+                            styles={{
+                                menu: (base) => ({
+                                    ...base,
+                                    position: "static", 
+                                }),
+                            }}
                         />
 
                         {Object.keys(authTypes).length > 1 && Object.keys(authTypes).map((key) => (
