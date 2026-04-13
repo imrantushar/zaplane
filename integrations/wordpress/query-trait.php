@@ -17,18 +17,31 @@ trait QueryTrait {
 	public static function query_posts( $query ) {
 
 	$post_type = $query['post_type']
-		?? ( $query['where']['post_type'] ?? null )
-		?? 'post';
+		?? ( $query['where']['post_type'] ?? null );
 
 	if ( empty( $post_type ) || $post_type === '{{post_type}}' ) {
-		$post_type = 'post';
+		$post_type = ['post', 'page', 'attachment'];
 	}
-error_log( print_r( $query, true));
-error_log( print_r( $post_type, true));
+
+	if ( is_array( $post_type ) ) {
+		$post_type = array_map( 'sanitize_text_field', $post_type );
+	} else {
+		$post_type = sanitize_text_field( $post_type );
+	}
+
+	error_log(print_r($query, true));
+	error_log(print_r($post_type, true));
+
+	if ( is_array( $post_type ) ) {
+		$post_status = ['publish', 'inherit'];
+	} else {
+		$post_status = ( $post_type === 'attachment' ) ? 'inherit' : 'any';
+	}
+
 	$args = [
-		'post_type'      => sanitize_text_field( $post_type ),
+		'post_type'      => $post_type,
 		'posts_per_page' => -1,
-		'post_status'    => ( $post_type === 'attachment' ) ? 'inherit' : 'any',
+		'post_status'    => $post_status,
 	];
 
 	$posts = get_posts( $args );
@@ -38,9 +51,17 @@ error_log( print_r( $post_type, true));
 	];
 
 	foreach ( $posts as $post ) {
+
+		// 👉 media হলে filename দেখাও
+		if ( $post->post_type === 'attachment' ) {
+			$label = $post->post_title ?: basename( get_attached_file( $post->ID ) );
+		} else {
+			$label = $post->post_title ?: '(no title)';
+		}
+
 		$result[] = [
 			'name'  => (string) $post->ID,
-			'label' => $post->post_title ?: '(no title)',
+			'label' => $label,
 		];
 	}
 
