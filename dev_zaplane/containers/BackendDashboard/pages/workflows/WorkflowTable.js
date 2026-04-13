@@ -24,6 +24,8 @@ import { exportWorkflows } from "@ZAPRedux/Slices/workFlowSlice/actions/ExportIm
 import WorkflowsLogs from "./WorkflowsLogs";
 import OptionMenu from "@ZAPComponents/OptionMenu";
 import FolderCell from "./FolderCell";
+import SaveAsRecipeModal from "@ZAPComponents/SaveAsRecipeModal";
+import { FaSave } from "react-icons/fa";
 
 
 
@@ -42,6 +44,8 @@ const WorkflowTable = () => {
   const [selection, setSelection] = useState([]);
   const [loading, setLoading] = useState(allWorkFlows.length === 0);
   const [saveAsRecipeRow, setSaveAsRecipeRow] = useState(null);
+  const [recipeModalOpen, setRecipeModalOpen] = useState(false);
+  const [selectedWorkflow, setSelectedWorkflow] = useState(null);
 
 
   const handleRefresh = async (page = 1, per_page = 10) => {
@@ -112,9 +116,9 @@ const WorkflowTable = () => {
       name: <Text className="zaplane-label">{__("Folder", "zaplane")}</Text>,
       cell: (row) => {
         return (
-         <Box display="flex" justifyContent="center">
-          <FolderCell row={row} />
-        </Box>
+          <Box display="flex" justifyContent="center">
+            <FolderCell row={row} />
+          </Box>
         );
       },
       textAlign: "center",
@@ -191,6 +195,16 @@ const WorkflowTable = () => {
               hasBorder: false,
               onClick: () => handleExport(row),
             },
+            {
+              label: __("Save as Recipe", "zaplane"),
+              icon: <Icon as={FaSave} />,
+              type: "button",
+              hasBorder: false,
+              onClick: () => {
+                setSelectedWorkflow(row);
+                setRecipeModalOpen(true);
+              },
+            },
           ]}
         />
       ),
@@ -229,6 +243,15 @@ const WorkflowTable = () => {
       >
         {activeRunId && <WorkflowsLogs id={activeRunId} />}
       </ZAPDrawer>
+      <SaveAsRecipeModal
+        isOpen={recipeModalOpen}
+        onClose={() => {
+          setRecipeModalOpen(false);
+          setSelectedWorkflow(null);
+        }}
+        workflowId={selectedWorkflow?.id}
+        defaultTitle={selectedWorkflow?.title}
+      />
     </>
   );
 };
