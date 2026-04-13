@@ -206,6 +206,9 @@ return [
 			'file' => 'kadenceblocks.php',
 			'class' => \Zaplane\Integrations\Kadenceblocks::class
 			],
+		'sureform'      => [
+			'file' => 'sureform.php',
+			'class' => \Zaplane\Integrations\Sureform::class
 		'suremail'      => [
 			'file' => 'suremail.php',
 			'class' => \Zaplane\Integrations\Suremail::class
