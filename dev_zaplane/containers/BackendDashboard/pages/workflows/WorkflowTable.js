@@ -21,10 +21,9 @@ import { HistoryIcon } from "@ZAPUtils/icons";
 import ZAPActionBar from "@ZAPComponents/ZAPActionBar";
 import { TbFileExport } from "react-icons/tb";
 import { exportWorkflows } from "@ZAPRedux/Slices/workFlowSlice/actions/ExportImport";
-import SaveAsRecipeModal from "@ZAPComponents/SaveAsRecipeModal";
-import { getRecipeFolders } from "@ZAPRedux/Slices/recipeSlice/actions/recipe";
 import WorkflowsLogs from "./WorkflowsLogs";
 import OptionMenu from "@ZAPComponents/OptionMenu";
+import FolderCell from "./FolderCell";
 
 
 
@@ -55,9 +54,6 @@ const WorkflowTable = () => {
     handleRefresh();
   }, []);
 
-  useEffect(() => {
-    dispatch(getRecipeFolders());
-  }, [dispatch]);
 
   const handlePageChange = (newPage) => handleRefresh(newPage, perPage);
   const handlePerPageChange = (itemsPerPage) => handleRefresh(currentPage, itemsPerPage);
@@ -113,14 +109,12 @@ const WorkflowTable = () => {
       textAlign: "start",
     },
     {
-      name: <Text className="zaplane-label">{__("Recipes", "zaplane")}</Text>,
+      name: <Text className="zaplane-label">{__("Folder", "zaplane")}</Text>,
       cell: (row) => {
         return (
-          <Box display="flex" justifyContent="center">
-            <Button variant={'outline'} onClick={() => setSaveAsRecipeRow(row)}>
-              {__('Save as Recipes')}
-            </Button>
-          </Box>
+         <Box display="flex" justifyContent="center">
+          <FolderCell row={row} />
+        </Box>
         );
       },
       textAlign: "center",
@@ -235,13 +229,6 @@ const WorkflowTable = () => {
       >
         {activeRunId && <WorkflowsLogs id={activeRunId} />}
       </ZAPDrawer>
-      <SaveAsRecipeModal
-        isOpen={!!saveAsRecipeRow}
-        onClose={() => setSaveAsRecipeRow(null)}
-        workflowId={saveAsRecipeRow?.id}
-        defaultTitle={saveAsRecipeRow?.title}
-        initialFolderId={saveAsRecipeRow?.id}
-      />
     </>
   );
 };

@@ -7,7 +7,6 @@ import { __, sprintf } from "@wordpress/i18n";
 import { useDispatch } from "react-redux";
 import { route_path } from "@ZAPUtils/helper";
 import { FiEye, FiFolder } from "react-icons/fi";
-import { deleteRecipeFolder, updateRecipeFolder } from "@ZAPRedux/Slices/recipeSlice/actions/recipe";
 import { useNavigate } from "react-router-dom";
 import ZAPMenu from "@ZAPComponents/ZapMenu";
 import WPModal from "@ZAPComponents/Modal/WPModal";
@@ -25,7 +24,6 @@ const FolderCard = ({ folder }) => {
   const goToFolder = (id) =>
     navigate(`${route_path}admin.php?page=zaplane-recipes&action=edit&id=${id}`);
 
-  const deletedFolderHandle = () => dispatch(deleteRecipeFolder(folder.id));
 
   const updateFolderName = async () => {
     if (!title?.trim()) return;
@@ -66,7 +64,6 @@ const FolderCard = ({ folder }) => {
               isIcon
               items={[
                 { label: "Edit", onClick: () => setIsOpen(true) },
-                { label: "Delete", onClick: deletedFolderHandle },
               ]}
             />
           </Flex>

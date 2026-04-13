@@ -14,9 +14,6 @@ import TopBar from "@ZAPComponents/TopBar";
 import { plugin_root_url } from "@ZAPUtils/helper";
 import { IoIosArrowForward } from "react-icons/io";
 import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
-import {
-  getRecipeFolders,
-} from "@ZAPRedux/Slices/recipeSlice/actions/recipe";
 import FolderCard from "./FolderCard";
 import SubTopBar from "@ZAPComponents/SubTopBar";
 import { primaryBtn } from "../../../../../assets/scss/chakra/recipe";
@@ -30,9 +27,6 @@ const RecipesPage = () => {
     (state) => state.recipes || {}
   );
 
-  useEffect(() => {
-    dispatch(getRecipeFolders());
-  }, [dispatch]);
 
 
   return (
