@@ -77,7 +77,6 @@ trait BuddybossActionsTrait {
 			return self::action_error( 'Failed to set member type.' );
 		}
 
-		// FIX: was get_userinput() — does not exist. Correct function is get_userdata()
 		return self::action_success( self::object_to_array( get_userdata( $user_id ) ) );
 	}
 
@@ -100,7 +99,6 @@ trait BuddybossActionsTrait {
 			'status'     => $input['group_status'],
 		] );
 
-		// FIX: was is_wp_action_error() — does not exist. Correct function is is_wp_error()
 		if ( is_wp_error( $group_id ) || ! $group_id ) {
 			return self::action_error( 'There was an error creating the group.' );
 		}
@@ -128,7 +126,6 @@ trait BuddybossActionsTrait {
 		}
 
 		if ( friends_remove_friend( $user_id, $friend_id ) ) {
-			// FIX: was 'Friendship ended action_successfully.' — literal "action_" text in string
 			return self::action_success( [ 'message' => 'Friendship ended successfully.' ] );
 		}
 
@@ -172,13 +169,11 @@ trait BuddybossActionsTrait {
 		if ( $error = self::require_fields( $input, $config ) ) return $error;
 
 		if ( ! function_exists( 'bbp_get_forum_subscribers' ) ) {
-			// FIX: was 'config BuddyBoss functions do not exist.' — "config" word was leftover garbage
 			return self::action_error( 'BuddyBoss Forum functions do not exist.' );
 		}
 
 		$subscriber_ids = bbp_get_forum_subscribers( absint( $input['forum_id'] ) );
 
-		// FIX: was get_userinput() — does not exist. Correct function is get_userdata()
 		$subscribers = array_map( fn( $id ) => self::object_to_array( get_userdata( $id ) ), $subscriber_ids );
 
 		return self::action_success( $subscribers );
@@ -302,7 +297,6 @@ trait BuddybossActionsTrait {
 			}
 		}
 
-		// FIX: was 'User removed from group(s) action_successfully.' — literal "action_" text in string
 		return self::action_success( [ 'message' => 'User removed from group(s) successfully.' ] );
 	}
 
@@ -367,7 +361,6 @@ trait BuddybossActionsTrait {
 			return self::action_error( 'BuddyBoss message module is not active.' );
 		}
 
-		// FIX: removed invalid 'action_error_type' => 'wp_action_error' key — not a valid messages_new_message param
 		$sent = messages_new_message( [
 			'sender_id'  => $sender_id,
 			'recipients' => $recipient_ids,
@@ -416,7 +409,6 @@ trait BuddybossActionsTrait {
 			return self::action_error( 'BuddyBoss message module is not active.' );
 		}
 
-		// FIX: removed invalid 'action_error_type' => 'wp_action_error' — correct key is 'error_type' => 'wp_error'
 		$sent = messages_new_message( [
 			'sender_id'  => $sender_id,
 			'recipients' => $receiver_ids,
@@ -429,7 +421,6 @@ trait BuddybossActionsTrait {
 			return self::action_error( 'Failed to send message.' );
 		}
 
-		// FIX: was 'Message sent action_successfully.' — literal "action_" text in string
 		return self::action_success( [ 'message' => 'Message sent successfully.' ] );
 	}
 
@@ -482,14 +473,12 @@ trait BuddybossActionsTrait {
 			return self::action_error( 'User not found with provided email.' );
 		}
 
-		// FIX: was xprofile_set_field_input() — does not exist. Correct function is xprofile_set_field_data()
 		if ( ! function_exists( 'xprofile_set_field_data' ) ) {
 			return self::action_error( 'xprofile_set_field_data function not found.' );
 		}
 
 		$profile_fields = $input['profile_fields'];
 		if ( empty( $profile_fields ) ) {
-			// FIX: was 'At least one field mapping is config.' — "config" word was leftover garbage
 			return self::action_error( 'At least one field mapping is required.' );
 		}
 
@@ -503,7 +492,6 @@ trait BuddybossActionsTrait {
 				continue;
 			}
 
-			// FIX: was xprofile_set_field_input() / xprofile_get_field_input() — both do not exist
 			xprofile_set_field_data( $field_id, $user_id, $field_value );
 
 			if ( function_exists( 'xprofile_get_field_data' ) ) {
@@ -531,7 +519,6 @@ trait BuddybossActionsTrait {
 			return self::action_error( 'Please activate the Moderation component.' );
 		}
 
-		// FIX: BP_Suspend_Member is lazy-loaded by BuddyBoss — must manually include before use
 		if ( ! class_exists( 'BP_Suspend_Member' ) ) {
 			$class_file = buddypress()->plugin_dir
 				. 'src/bp-moderation/classes/suspend/class-bp-suspend-member.php';
@@ -584,7 +571,6 @@ trait BuddybossActionsTrait {
 		$result = $stop_fn( [ 'follower_id' => $follower->ID, 'leader_id' => $leader->ID ] );
 
 		return $result
-			// FIX: was 'Stopped following action_successfully.' — literal "action_" text in string
 			? self::action_success( [ 'message' => 'Stopped following successfully.' ] )
 			: self::action_error( 'Failed to stop following.' );
 	}
@@ -599,14 +585,12 @@ trait BuddybossActionsTrait {
 		}
 
 		if ( ! function_exists( 'bbp_add_user_forum_subscription' ) ) {
-			// FIX: was 'config BuddyBoss functions are not available.' — "config" word was leftover garbage
 			return self::action_error( 'Required BuddyBoss functions are not available.' );
 		}
 
 		$result = bbp_add_user_forum_subscription( $user_id, absint( $input['forum_id'] ) );
 
 		return $result
-			// FIX: was 'User subscribed to forum action_successfully.' — literal "action_" text in string
 			? self::action_success( [ 'message' => 'User subscribed to forum successfully.' ] )
 			: self::action_error( 'Failed to subscribe user to forum.' );
 	}

@@ -105,8 +105,6 @@ class Buddyboss extends IntegrationBase {
 				];
 
 			case 'follower_gained':
-				// FIX: bp_start_following hook passes a single object (not two separate IDs).
-				// $args[0] is a BP_Follow object with ->follower_id and ->leader_id properties.
 				$follow = $args[0] ?? null;
 
 				if (
@@ -378,7 +376,7 @@ class Buddyboss extends IntegrationBase {
 			'get_forum_subscribers'      => [ 'label' => 'Get Forum Subscribers' ],
 			'create_forum_topic_reply'   => [ 'label' => 'Create Forum Topic Reply' ],
 			'create_forum_topic'         => [ 'label' => 'Create Forum Topic' ],
-			'remove_user_from_group'     => [ 'label' => 'Remove User From Group' ], // FIX: was "remove_user_form_group" (typo)
+			'remove_user_from_group'     => [ 'label' => 'Remove User From Group' ],
 			'send_friend_request'        => [ 'label' => 'Send Friend Request' ],
 			'send_group_message'         => [ 'label' => 'Send Group Message' ],
 			'send_private_message'       => [ 'label' => 'Send Private Message' ],
@@ -386,26 +384,103 @@ class Buddyboss extends IntegrationBase {
 			'update_extended_profile'    => [ 'label' => 'Update Extended Profile' ],
 			'update_user_status'         => [ 'label' => 'Update User Status' ],
 			'stop_following_user'        => [ 'label' => 'Stop Following User' ],
-			'subscribe_to_forum'         => [ 'label' => 'Subscribe To Forum' ], // FIX: was "Subscriber To Forum" (typo)
+			'subscribe_to_forum'         => [ 'label' => 'Subscribe To Forum' ],
 		];
 	}
 
-	private static function email( string $label = 'Email', string $key = 'email' ): array {
+	private static function author_email(): array {
 		return [
 			[
-				'key'      => $key,
-				'label'    => $label,
+				'key'      => 'author_email',
+				'label'    => 'Author Email',
+				'type'     => 'email',
+				'required' => true,
+			],
+		];
+	}
+	
+	private static function user_email(): array {
+		return [
+			[
+				'key'      => 'user_email',
+				'label'    => 'User Email',
 				'type'     => 'email',
 				'required' => true,
 			],
 		];
 	}
 
-	private static function content( string $label = 'Content', string $key = 'content' ): array {
+	private static function creator_email(): array {
 		return [
 			[
-				'key'      => $key,
-				'label'    => $label,
+				'key'      => 'creator_email',
+				'label'    => 'Creator Email',
+				'type'     => 'email',
+				'required' => true,
+			],
+		];
+	}
+
+	private static function follower_email(): array {
+		return [
+			[
+				'key'      => 'follower_email',
+				'label'    => 'Follower Email',
+				'type'     => 'email',
+				'required' => true,
+			],
+		];
+	}
+
+	private static function leader_email(): array {
+		return [
+			[
+				'key'      => 'leader_email',
+				'label'    => 'Leader Email',
+				'type'     => 'email',
+				'required' => true,
+			],
+		];
+	}
+
+	private static function sender_email(): array {
+		return [
+			[
+				'key'      => 'sender_email',
+				'label'    => 'Sender Email',
+				'type'     => 'email',
+				'required' => true,
+			],
+		];
+	}
+
+	private static function receiver_email(): array {
+		return [
+			[
+				'key'      => 'receiver_email',
+				'label'    => 'Receiver Email',
+				'type'     => 'email',
+				'required' => true,
+			],
+		];
+	}
+	
+	private static function activity_content(): array {
+		return [
+			[
+				'key'      => 'content',
+				'label'    => 'Activity Content',
+				'type'     => 'textarea',
+				'required' => true,
+			],
+		];
+	}
+
+	private static function message_content(): array {
+		return [
+			[
+				'key'      => 'message_content',
+				'label'    => 'Message Content',
 				'type'     => 'textarea',
 				'required' => true,
 			],
@@ -492,16 +567,16 @@ class Buddyboss extends IntegrationBase {
 
 		$schemas = [
 			'create_activity_post' => [
-				...self::email( 'Author Email', 'author_email' ),
-				...self::content( 'Activity Content', 'content' ),
+				...self::author_email(),
+				...self::activity_content(),
 				...self::action(),
 				...self::action_link(),
 				...self::hide_sitewide(),
 			],
 			'create_group_post'    => [
 				...self::group_id(),
-				...self::email( 'Author Email', 'author_email' ),
-				...self::content( 'Activity Content', 'content' ),
+				...self::author_email(),
+				...self::activity_content(),
 				...self::action(),
 				...self::action_link(),
 				...self::hide_sitewide(),
@@ -513,18 +588,18 @@ class Buddyboss extends IntegrationBase {
 					'type'     => 'number',
 					'required' => true,
 				],
-				...self::email( 'Author Email', 'author_email' ),
-				...self::content( 'Activity Content', 'content' ),
+				...self::author_email(),
+				...self::activity_content(),
 				...self::action(),
 				...self::action_link(),
 				...self::hide_sitewide(),
 			],
 			'add_user_to_group'          => [
-				...self::email( 'User Email', 'user_email' ),
+				...self::user_email(),
 				...self::group_id(),
 			],
 			'update_member_profile_type' => [
-				...self::email( 'User Email', 'user_email' ),
+				...self::user_email(),
 				[
 					'key'      => 'profile_type',
 					'label'    => 'Profile Type',
@@ -555,7 +630,7 @@ class Buddyboss extends IntegrationBase {
 						[ 'value' => 'hidden',  'label' => 'Hidden' ],
 					],
 				],
-				...self::email( 'Creator Email', 'creator_email' ),
+				...self::creator_email(),
 				[
 					'key'     => 'group_type',
 					'label'   => 'Group Type',
@@ -569,12 +644,17 @@ class Buddyboss extends IntegrationBase {
 				],
 			],
 			'remove_friend_connection' => [
-				...self::email( 'User Email', 'user_email' ),
-				...self::email( 'Friend Email', 'friend_email' ),
+				...self::user_email(),
+				[
+					'key'      => 'friend_email',
+					'label'    => 'Friend Email',
+					'type'     => 'email',
+					'required' => true,
+				],
 			],
 			'follow_user'              => [
-				...self::email( 'Follower Email', 'follower_email' ),
-				...self::email( 'Leader Email', 'leader_email' ),
+				...self::follower_email(),
+				...self::leader_email(),
 			],
 			'get_forum_subscribers'    => [
 				[
@@ -598,8 +678,13 @@ class Buddyboss extends IntegrationBase {
 					'type'     => 'text',
 					'required' => true,
 				],
-				...self::content( 'Reply Content', 'reply_content' ),
-				...self::email( 'Author Email', 'author_email' ),
+				[
+					'key'      => 'reply_content',
+					'label'    => 'Reply Action',
+					'type'     => 'text',
+					'required' => false,
+				],
+				...self::author_email(),
 			],
 			'create_forum_topic'       => [
 				...self::forum_id(),
@@ -609,33 +694,43 @@ class Buddyboss extends IntegrationBase {
 					'type'     => 'text',
 					'required' => true,
 				],
-				...self::content( 'Topic Content', 'topic_content' ),
-				...self::email( 'Topic Creator Email', 'creator_email' ),
+				[
+					'key'      => 'topic_content',
+					'label'    => 'Topic Action',
+					'type'     => 'text',
+					'required' => false,
+				],
+				...self::creator_email(),
 			],
-			'remove_user_from_group'   => [ // FIX: was "remove_user_form_group" (typo)
-				...self::email( 'User Email', 'user_email' ),
+			'remove_user_from_group'   => [
+				...self::user_email(),
 				...self::group_id(),
 			],
 			'send_friend_request'      => [
-				...self::email( 'Sender Email', 'sender_email' ),
-				...self::email( 'Receiver Email', 'receiver_email' ),
+				...self::sender_email(),
+				...self::receiver_email(),
 			],
 			'send_group_message'       => [
 				...self::group_id(),
-				...self::email( 'Sender Email', 'sender_email' ),
+				...self::sender_email(),
 				...self::message_subject(),
-				...self::content( 'Message Content', 'message_content' ),
+				...self::message_content(),
 			],
 			'send_private_message'     => [
-				...self::email( 'Sender Email', 'sender_email' ),
-				...self::email( 'Receiver Email', 'receiver_email' ),
+				...self::sender_email(),
+				...self::receiver_email(),
 				...self::message_subject(),
-				...self::content( 'Message Content', 'message_content' ),
+				...self::message_content(),
 			],
 			'send_group_notification'  => [
 				...self::group_id(),
-				...self::email( 'Sender Email', 'sender_email' ),
-				...self::content( 'Notification Content', 'notification_content' ),
+				...self::sender_email(),
+				[
+					'key'      => 'notification_content',
+					'label'    => 'Notification Action',
+					'type'     => 'text',
+					'required' => false,
+				],
 				[
 					'key'      => 'notification_link',
 					'label'    => 'Notification Link',
@@ -644,7 +739,7 @@ class Buddyboss extends IntegrationBase {
 				],
 			],
 			'update_extended_profile'  => [
-				...self::email( 'User Email', 'user_email' ),
+				...self::user_email(),
 				[
 					'key'      => 'first_name',
 					'label'    => 'First Name',
@@ -695,7 +790,7 @@ class Buddyboss extends IntegrationBase {
 				],
 			],
 			'update_user_status'       => [
-				...self::email( 'User Email', 'user_email' ),
+				...self::user_email(),
 				[
 					'key'      => 'status',
 					'label'    => 'Status',
@@ -708,11 +803,11 @@ class Buddyboss extends IntegrationBase {
 				],
 			],
 			'stop_following_user'      => [
-				...self::email( 'Follower Email', 'follower_email' ),
-				...self::email( 'Leader Email', 'leader_email' ),
+				...self::follower_email(),
+				...self::leader_email(),
 			],
 			'subscribe_to_forum'       => [
-				...self::email( 'User Email', 'user_email' ),
+				...self::user_email(),
 				...self::forum_id(),
 			],
 		];
