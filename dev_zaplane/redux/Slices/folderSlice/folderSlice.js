@@ -25,7 +25,7 @@ export const getFolders = createAsyncThunk(
             });
 
             const { data, pagination } = res.data;
-            console.log(data, 'dta');
+      
 
             return {
                 data,
@@ -131,7 +131,7 @@ export const getFolderWorkflows = createAsyncThunk(
     async (args = {}, thunkAPI) => {
         try {
             const { folder_id, page = 1, per_page = 20 } = args;
-            console.log(args, 'args');
+          
 
             const res = await API.get(
                 namespace + `folders/${folder_id}/workflows`,
@@ -190,7 +190,7 @@ const folderSlice = createSlice({
 
             .addCase(getFolders.fulfilled, (state, action) => {
                 state.folders.isLoading = false;
-                console.log(action.payload, 'dataa');
+             
 
                 state.folders.data = action.payload.data;
             })

@@ -27,13 +27,12 @@ const Folders = () => {
     const [isFolderModalOpen, setIsFolderModalOpen] = useState(false);
     const { folders } = useSelector((state) => state.folder);
     const allFolders = folders?.data || [];
-    console.log(allFolders, 'alll');
     useEffect(() => {
         dispatch(getFolders());
 
     }, []);
 
-    console.log(folders, 'allfolder');
+
 
     return (
         <>

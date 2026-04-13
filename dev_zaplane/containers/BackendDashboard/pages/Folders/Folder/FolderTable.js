@@ -27,28 +27,34 @@ import { getFolderWorkflows } from "@ZAPRedux/Slices/folderSlice/folderSlice";
 import { downloadJSON, statusOptions } from "../../workflows/helper";
 import WorkflowsLogs from "../../workflows/WorkflowsLogs";
 import FolderCell from "../../workflows/FolderCell";
+import ImportWorkflow from "../../workflows/workFlowMotion/ImportWorkflow";
+import SubTopBar from "@ZAPComponents/SubTopBar";
+import { primaryBtn } from "../../../../../../assets/scss/chakra/recipe";
+import CreateWorkflowModal from "@ZAPComponents/CreateWorkflowModal";
 
 
 
 
-const FolderTable = ({folderId}) => {
+const FolderTable = ({ folderId }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [activeRunId, setActiveRunId] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const {data,totalItems,perPage,currentPage} = useSelector(
+  const { data, totalItems, perPage, currentPage } = useSelector(
     (state) => state.folder.folderWorkflows || {}
   );
   const [selection, setSelection] = useState([]);
   const [loading, setLoading] = useState(data?.length === 0);
-  const [saveAsRecipeRow, setSaveAsRecipeRow] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
 
   const handleRefresh = async (page = 1, itemsPerPage = perPage) => {
     setLoading(true);
-    await dispatch(getFolderWorkflows({  folder_id: folderId,
-        page,
-        perPage: itemsPerPage,}));
+    await dispatch(getFolderWorkflows({
+      folder_id: folderId,
+      page,
+      perPage: itemsPerPage,
+    }));
     setLoading(false);
   };
 
@@ -114,9 +120,9 @@ const FolderTable = ({folderId}) => {
       name: <Text className="zaplane-label">{__("Folder", "zaplane")}</Text>,
       cell: (row) => {
         return (
-         <Box display="flex" justifyContent="center">
-          <FolderCell row={row} />
-        </Box>
+          <Box display="flex" justifyContent="center">
+            <FolderCell row={row} />
+          </Box>
         );
       },
       textAlign: "center",
@@ -202,6 +208,15 @@ const FolderTable = ({folderId}) => {
 
   return (
     <>
+      <SubTopBar heading={__("Workflows", "zaplane")}>
+        <ImportWorkflow />
+        <Button
+          onClick={() => setIsModalOpen(true)}
+          {...primaryBtn}
+        >
+          {__("Create Workflow", "zaplane")}
+        </Button>
+      </SubTopBar>
       <ListTable
         columns={columns}
         data={data}
@@ -231,6 +246,11 @@ const FolderTable = ({folderId}) => {
       >
         {activeRunId && <WorkflowsLogs id={activeRunId} />}
       </ZAPDrawer>
+      <CreateWorkflowModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        id={folderId}
+      />
     </>
   );
 };
