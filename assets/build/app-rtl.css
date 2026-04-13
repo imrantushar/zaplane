@@ -430,7 +430,7 @@
   font-size: 20px;
 }
 
-.zaplane-button-actve {
+.zaplane-button-active {
   background: var(--zaplane-second-primary);
   color: var(--zaplane-primary) !important;
 }

@@ -5,8 +5,6 @@ import {
     Button,
     VStack,
     Text,
-    Input,
-    Heading,
     Flex,
     Image,
 } from "@chakra-ui/react";
@@ -23,14 +21,13 @@ import {
 
 import WPModal from "@ZAPComponents/Modal/WPModal";
 import TopBar from "@ZAPComponents/TopBar";
-import { outlineBtn, primaryBtn } from "../../../../../assets/scss/chakra/recipe";
+import { primaryBtn } from "../../../../../assets/scss/chakra/recipe";
 import ConnectionTable from "./ConnectionTable";
 import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
 import { formatLabel, integrations, plugin_root_url } from "@ZAPUtils/helper";
 import ZAPInput from "@ZAPComponents/ZAPInput";
 import { IoIosArrowForward } from "react-icons/io";
 import SubTopBar from "@ZAPComponents/SubTopBar";
-import { FiHelpCircle } from "react-icons/fi";
 
 
 const Connections = () => {
@@ -45,7 +42,6 @@ const Connections = () => {
     const [credentials, setCredentials] = useState({});
     const [loadingOAuth, setLoadingOAuth] = useState(false);
 
-
     const appOptions = useMemo(() => {
         return Object.values(integrations.apps)
             .filter((app) => app.requires_connection === true)
@@ -55,10 +51,9 @@ const Connections = () => {
             }));
     }, []);
 
-
+    // Fetch auth fields when app changes
     useEffect(() => {
         if (!selectedApp) return;
-
         dispatch(
             fetchAuthFields({
                 app: selectedApp.value,
@@ -67,7 +62,18 @@ const Connections = () => {
         );
     }, [selectedApp, selectedAuthType, dispatch]);
 
-
+    // Auto-select auth type when authFields loads
+    useEffect(() => {
+        if (!authFields) return;
+        const types = Object.keys(authFields?.available_auth_types || {});
+        if (types.length === 1) {
+            setSelectedAuthType(types[0]);
+        } else if (types.includes("oauth2")) {
+            setSelectedAuthType("oauth2");
+        } else if (authFields?.auth_type) {
+            setSelectedAuthType(authFields.auth_type);
+        }
+    }, [authFields]);
 
     const handleConnect = async () => {
         if (!selectedApp || !selectedAuthType) return;
@@ -124,6 +130,14 @@ const Connections = () => {
 
     const authTypes = authFields?.available_auth_types || {};
 
+    // Reset state when modal closes
+    const handleModalClose = () => {
+        setIsModalOpen(false);
+        setSelectedApp(null);
+        setSelectedAuthType(null);
+        setCredentials({});
+    };
+
     return (
         <>
             <TopBar
@@ -143,17 +157,7 @@ const Connections = () => {
                             fontWeight="medium"
                             label={__('Connections ', 'zaplane')}
                         />
-                        {/* <Box>
-                            <ZAPLabel
-                                label={__('Flows', 'zaplane')}
-                                variant="bold"
-                            />
-                            <Text className="zaplane-sub-title" color="var(--zaplane-text-muted)">
-                                {__("Connections between your apps", "zaplane")}
-                            </Text>
-                        </Box> */}
                     </>
-
                 )}
             />
             <SubTopBar heading={__("Dashboard", "zaplane")}>
@@ -165,6 +169,7 @@ const Connections = () => {
                     {__("Create credential", "zaplane")}
                 </Button>
             </SubTopBar>
+
             <div className="zaplane-page-content">
                 <ConnectionTable />
             </div>
@@ -172,13 +177,14 @@ const Connections = () => {
             <WPModal
                 title={__("Create credential", "zaplane")}
                 isOpen={isModalOpen}
-                onRequestClose={() => setIsModalOpen(false)}
+                onRequestClose={handleModalClose}
                 size="medium"
             >
                 <Box px={4}>
                     <VStack spacing={4} align="stretch">
-                        <Text className="zaplane-label">{__("Select an app or service to connect", "zaplane")}</Text>
-
+                        <Text className="zaplane-label">
+                            {__("Select an app or service to connect", "zaplane")}
+                        </Text>
                         <Select
                             value={selectedApp}
                             onChange={(val) => {
@@ -187,12 +193,14 @@ const Connections = () => {
                                 setCredentials({});
                             }}
                             options={appOptions}
-
+                            placeholder={__("Select an app...", "zaplane")}
+                            noOptionsMessage={() => __("No apps available", "zaplane")}
                         />
-                        {Object.keys(authTypes).map((key) => (
+
+                        {Object.keys(authTypes).length > 1 && Object.keys(authTypes).map((key) => (
                             <Button
                                 key={key}
-                                className={`${selectedAuthType === key && 'zaplane-button-actve'}`}
+                                className={`${selectedAuthType === key && 'zaplane-button-active'}`}
                                 variant={selectedAuthType === key ? "solid" : "outline"}
                                 onClick={() => {
                                     setSelectedAuthType(key);
@@ -202,6 +210,7 @@ const Connections = () => {
                                 {formatLabel(key)}
                             </Button>
                         ))}
+
                         {authFields?.auth_fields && selectedAuthType && (
                             <VStack spacing={3} align="stretch" pt={3}>
                                 {Object.entries(authFields.auth_fields).map(
@@ -234,7 +243,7 @@ const Connections = () => {
                             </VStack>
                         )}
 
-                        {selectedAuthType &&
+                        {selectedAuthType && (
                             <Button
                                 mt="16px"
                                 {...primaryBtn}
@@ -245,7 +254,7 @@ const Connections = () => {
                             >
                                 {__("Save Connection", "zaplane")}
                             </Button>
-                        }
+                        )}
 
                     </VStack>
                 </Box>
