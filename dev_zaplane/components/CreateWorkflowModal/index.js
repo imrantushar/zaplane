@@ -77,24 +77,29 @@ const CreateWorkflowModal = ({ isOpen, onClose, id }) => {
           value={workflowName}
           onChange={(e) => setWorkflowName(e.target.value)}
         />
+        {!!allFolders.length &&
+          (
+            <Flex direction="column" gap={2}>
+            <Text className="zaplane-label">
+              {__("Select Folder", "zaplane")}
+            </Text>
 
-        <Flex direction="column" gap={2}>
-          <Text className="zaplane-label">
-            {__("Select Folder", "zaplane")}
-          </Text>
+            <Select
+              options={options}
+              value={selectedOption}
+              onChange={(val) => setFolderId(val?.value || null)}
+              styles={{
+                menu: (base) => ({
+                  ...base,
+                  position: "static",
+                }),
+              }}
+            />
+          </Flex>
+          )
+        }
 
-          <Select
-            options={options}
-            value={selectedOption}
-            onChange={(val) => setFolderId(val?.value || null)}
-            styles={{
-              menu: (base) => ({
-                ...base,
-                position: "static",
-              }),
-            }}
-          />
-        </Flex>
+
 
         <ZAPDivider mt="24px" />
 
