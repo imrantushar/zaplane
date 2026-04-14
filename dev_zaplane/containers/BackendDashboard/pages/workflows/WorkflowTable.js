@@ -169,15 +169,6 @@ const WorkflowTable = () => {
         <OptionMenu
           options={[
             {
-              label: __("Details", "zaplane"),
-              icon: <Icon as={HistoryIcon} />,
-              type: "button",
-              onClick: () => {
-                setActiveRunId(row.id);
-                setDrawerOpen(true);
-              },
-            },
-            {
               label: __("Edit", "zaplane"),
               icon: <Icon as={LiaEditSolid} />,
               type: "button",
@@ -199,6 +190,15 @@ const WorkflowTable = () => {
                 ) {
                   dispatch(deleteWorkFlow(row.id));
                 }
+              },
+            },
+            {
+              label: __("Details", "zaplane"),
+              icon: <Icon as={HistoryIcon} />,
+              type: "button",
+              onClick: () => {
+                setActiveRunId(row.id);
+                setDrawerOpen(true);
               },
             },
             {

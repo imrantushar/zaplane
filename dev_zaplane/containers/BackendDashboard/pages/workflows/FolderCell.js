@@ -116,8 +116,9 @@ const FolderCell = ({ row, isFolder = false }) => {
                     trigger={
                         <HStack
                             spacing={1}
-                            px={2}
+                            px={'14px'}
                             py={1}
+                            h='36px'
                              borderRadius="999px"
                             border="0.5px solid"
                             borderColor="gray.200"
@@ -160,11 +161,13 @@ const FolderCell = ({ row, isFolder = false }) => {
                         <Button
                             size="14px"
                             variant="outline"
-                            fontSize="13px"
+                            fontSize="14px"
                             fontWeight="500"
-                            h="30px"
+                            py={1}
+                            spacing={1}
+                            h="36px"
                             borderRadius="999px"
-                            p='14px'
+                            px={'16px'}
                             onClick={(e) => e.stopPropagation()}
                             aria-label={__("Add to folder", "zaplane")}
                         >
@@ -191,6 +194,7 @@ const FolderCell = ({ row, isFolder = false }) => {
                     placeholder={__("Folder Name", "zaplane")}
                     value={folderName}
                     onChange={(e) => setFolderName(e.target.value)}
+                    className="zaplane-input"
                     onKeyDown={(e) => {
                         if (e.key === "Enter") handleCreateFolder();
                         if (e.key === "Escape") { setModalOpen(false); setFolderName(""); }

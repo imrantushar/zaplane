@@ -33,6 +33,7 @@ import { primaryBtn } from "../../../../../../assets/scss/chakra/recipe";
 import CreateWorkflowModal from "@ZAPComponents/CreateWorkflowModal";
 import { FaSave } from "react-icons/fa";
 import SaveAsRecipeModal from "@ZAPComponents/SaveAsRecipeModal";
+import ZAPIconGroup from "@ZAPComponents/ZAPIconGroup/ZAPIconGroup";
 
 
 
@@ -103,6 +104,16 @@ const FolderTable = ({ folderId }) => {
 
   const columns = [
     {
+      name: <Text className="zaplane-label">{__("Apps", "zaplane")}</Text>,
+      cell: (row) => {
+        return <ZAPIconGroup icons={row.integration_icons} />;
+        ;
+      },
+      textAlign: "start",
+      columnWidth: "120px",
+
+    },
+    {
       name: <Text className="zaplane-label">{__("Title", "zaplane")}</Text>,
       cell: (row) => (
         <Text
@@ -164,15 +175,6 @@ const FolderTable = ({ folderId }) => {
         <OptionMenu
           options={[
             {
-              label: __("Details", "zaplane"),
-              icon: <Icon as={HistoryIcon} />,
-              type: "button",
-              onClick: () => {
-                setActiveRunId(row.id);
-                setDrawerOpen(true);
-              },
-            },
-            {
               label: __("Edit", "zaplane"),
               icon: <Icon as={LiaEditSolid} />,
               type: "button",
@@ -195,6 +197,15 @@ const FolderTable = ({ folderId }) => {
                   await dispatch(deleteWorkFlow(row.id));
                   await handleRefresh();
                 }
+              },
+            },
+            {
+              label: __("Details", "zaplane"),
+              icon: <Icon as={HistoryIcon} />,
+              type: "button",
+              onClick: () => {
+                setActiveRunId(row.id);
+                setDrawerOpen(true);
               },
             },
             {
