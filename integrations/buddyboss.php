@@ -7,8 +7,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 use Zaplane\Framework\Classes\IntegrationBase;
 use Zaplane\Integrations\Buddyboss\ActionsResponseTrait;
-use Zaplane\Integrations\Buddyboss\QueryTrait;
 use Zaplane\Integrations\Buddyboss\BuddybossActionsTrait;
+use Zaplane\Integrations\Buddyboss\QueryTrait;
 
 class Buddyboss extends IntegrationBase {
 
@@ -30,68 +30,69 @@ class Buddyboss extends IntegrationBase {
 
 	public static function get_triggers(): array {
 		return [
-            'account_activated' => [
+			'account_activated' => [
 				'label' => 'Account Activated',
-				'hook'  => 'bp_core_activated_user'
+				'hook'  => 'bp_core_activated_user',
 			],
-            'follower_gained' => [
+			'follower_gained' => [
 				'label' => 'New Follower Gained',
-				'hook'  => 'bp_start_following'
+				'hook'  => 'bp_start_following',
 			],
-            'sent_friend_request' => [
+			'sent_friend_request' => [
 				'label' => 'Sent Friend Request',
-				'hook'  => 'friends_friendship_requested'
+				'hook'  => 'friends_friendship_requested',
 			],
-            'accepted_friend_request' => [
+			'accepted_friend_request' => [
 				'label' => 'Accepted Friend Request',
-				'hook'  => 'friends_friendship_accepted'
+				'hook'  => 'friends_friendship_accepted',
 			],
-            'create_groups' => [
+			'create_groups' => [
 				'label' => 'Create Group',
-				'hook'  => 'groups_group_create_complete'
+				'hook'  => 'groups_group_create_complete',
 			],
-            'access_requested_private_group' => [
+			'access_requested_private_group' => [
 				'label' => 'Access Requested Private Group',
-				'hook'  => 'groups_membership_requested'
+				'hook'  => 'groups_membership_requested',
 			],
 			'joined_public_group' => [
 				'label' => 'Joined Public Group',
-				'hook'  => 'groups_join_group'
+				'hook'  => 'groups_join_group',
 			],
 			'joined_private_group' => [
 				'label' => 'Joined Private Group',
-				'hook'  => 'groups_membership_accepted'
+				'hook'  => 'groups_membership_accepted',
 			],
 			'joined_specific_group' => [
 				'label' => 'Joined Specific Group',
-				'hook'  => 'groups_join_group'
+				'hook'  => 'groups_join_group',
 			],
 			'left_group' => [
 				'label' => 'Left Group',
-				'hook'  => 'groups_leave_group'
+				'hook'  => 'groups_leave_group',
 			],
 			'left_private_group' => [
 				'label' => 'Left Private Group',
-				'hook'  => 'groups_leave_group'
+				'hook'  => 'groups_leave_group',
 			],
 			'received_private_message' => [
 				'label' => 'Received Private Message',
-				'hook'  => 'messages_message_sent'
+				'hook'  => 'messages_message_sent',
 			],
 			'profile_type_change' => [
 				'label' => 'Profile Type Change',
-				'hook'  => 'bp_set_member_type'
+				'hook'  => 'bp_set_member_type',
 			],
 			'updated_profile' => [
 				'label' => 'Updated Profile',
-				'hook'  => 'xprofile_updated_profile'
+				'hook'  => 'xprofile_updated_profile',
 			],
 		];
 	}
 
-	public static function resolve_trigger( array $node, array $args ) {
+	public static function resolve_trigger( array $node, array $args ): array|false {
 
 		switch ( $node['event'] ) {
+
 			case 'account_activated':
 				$user_id = $args[0] ?? 0;
 
@@ -147,13 +148,17 @@ class Buddyboss extends IntegrationBase {
 				$friend_user_id    = $args[2] ?? 0;
 				$friendship        = $args[3] ?? null;
 
+				if ( ! $friendship_id ) {
+					return false;
+				}
+
 				$data = [
 					'friendship_id' => $friendship_id,
 					'initiator'     => self::resolve_user_payload( $initiator_user_id ),
 					'friend'        => self::resolve_user_payload( $friend_user_id ),
 				];
 
-				if ( $friendship !== null ) {
+				if ( null !== $friendship ) {
 					$data['friendship'] = self::object_to_array( $friendship );
 				}
 
@@ -228,7 +233,7 @@ class Buddyboss extends IntegrationBase {
 
 				$group = groups_get_group( $group_id );
 
-				if ( isset( $group->status ) && $group->status !== 'public' ) {
+				if ( isset( $group->status ) && 'public' !== $group->status ) {
 					return false;
 				}
 
@@ -257,7 +262,7 @@ class Buddyboss extends IntegrationBase {
 
 				$group = groups_get_group( $group_id );
 
-				if ( isset( $group->status ) && $group->status !== 'private' ) {
+				if ( isset( $group->status ) && 'private' !== $group->status ) {
 					return false;
 				}
 
@@ -276,14 +281,15 @@ class Buddyboss extends IntegrationBase {
 				];
 
 			case 'received_private_message':
-				$message = $args[0] ?? null;
+				$message_id = $args[0] ?? 0;
 
-				if (
-					! is_object( $message )
-					|| ! property_exists( $message, 'id' )
-					|| ! property_exists( $message, 'sender_id' )
-					|| ! property_exists( $message, 'recipients' )
-				) {
+				if ( ! $message_id || ! class_exists( 'BP_Messages_Message' ) ) {
+					return false;
+				}
+
+				$message = new \BP_Messages_Message( $message_id );
+
+				if ( empty( $message->id ) || empty( $message->sender_id ) ) {
 					return false;
 				}
 
@@ -294,7 +300,10 @@ class Buddyboss extends IntegrationBase {
 
 				if ( ! empty( $message->recipients ) ) {
 					foreach ( $message->recipients as $recipient ) {
-						if ( empty( $recipient->user_id ) || $recipient->user_id === $message->sender_id ) {
+						if (
+							empty( $recipient->user_id )
+							|| $recipient->user_id === $message->sender_id
+						) {
 							continue;
 						}
 
@@ -395,10 +404,10 @@ class Buddyboss extends IntegrationBase {
 				'label'    => 'Author Email',
 				'type'     => 'email',
 				'required' => true,
-			],
+			]
 		];
 	}
-	
+
 	private static function user_email(): array {
 		return [
 			[
@@ -406,7 +415,7 @@ class Buddyboss extends IntegrationBase {
 				'label'    => 'User Email',
 				'type'     => 'email',
 				'required' => true,
-			],
+			]
 		];
 	}
 
@@ -417,7 +426,7 @@ class Buddyboss extends IntegrationBase {
 				'label'    => 'Creator Email',
 				'type'     => 'email',
 				'required' => true,
-			],
+			]
 		];
 	}
 
@@ -428,7 +437,7 @@ class Buddyboss extends IntegrationBase {
 				'label'    => 'Follower Email',
 				'type'     => 'email',
 				'required' => true,
-			],
+			]
 		];
 	}
 
@@ -439,7 +448,7 @@ class Buddyboss extends IntegrationBase {
 				'label'    => 'Leader Email',
 				'type'     => 'email',
 				'required' => true,
-			],
+			]
 		];
 	}
 
@@ -450,7 +459,7 @@ class Buddyboss extends IntegrationBase {
 				'label'    => 'Sender Email',
 				'type'     => 'email',
 				'required' => true,
-			],
+			]
 		];
 	}
 
@@ -461,10 +470,10 @@ class Buddyboss extends IntegrationBase {
 				'label'    => 'Receiver Email',
 				'type'     => 'email',
 				'required' => true,
-			],
+			]
 		];
 	}
-	
+
 	private static function activity_content(): array {
 		return [
 			[
@@ -472,7 +481,7 @@ class Buddyboss extends IntegrationBase {
 				'label'    => 'Activity Content',
 				'type'     => 'textarea',
 				'required' => true,
-			],
+			]
 		];
 	}
 
@@ -483,18 +492,18 @@ class Buddyboss extends IntegrationBase {
 				'label'    => 'Message Content',
 				'type'     => 'textarea',
 				'required' => true,
-			],
+			]
 		];
 	}
 
-	private static function action(): array {
+	private static function action_field(): array {
 		return [
 			[
 				'key'      => 'action',
 				'label'    => 'Activity Action',
 				'type'     => 'text',
 				'required' => false,
-			],
+			]
 		];
 	}
 
@@ -505,7 +514,7 @@ class Buddyboss extends IntegrationBase {
 				'label'    => 'Activity Action Link',
 				'type'     => 'url',
 				'required' => false,
-			],
+			]
 		];
 	}
 
@@ -516,7 +525,7 @@ class Buddyboss extends IntegrationBase {
 				'label'    => 'Hide Sitewide',
 				'type'     => 'checkbox',
 				'required' => false,
-			],
+			]
 		];
 	}
 
@@ -527,39 +536,39 @@ class Buddyboss extends IntegrationBase {
 				'label'    => 'Message Subject',
 				'type'     => 'text',
 				'required' => true,
-			],
+			]
 		];
 	}
 
-	public static function forum_id(): array {
+	private static function forum_id(): array {
 		return [
 			[
-				'key'     => 'forum_id',
-				'label'   => 'Select Forum',
-				'type'    => 'select',
-				'dynamic' => [
+				'key'      => 'forum_id',
+				'label'    => 'Select Forum',
+				'type'     => 'select',
+				'required' => true,
+				'dynamic'  => [
 					'integration' => 'buddyboss',
 					'query'       => 'forums_query',
 					'select'      => [ 'value', 'label' ],
 				],
-				'required' => true,
-			],
+			]
 		];
 	}
 
-	public static function group_id(): array {
+	private static function group_id(): array {
 		return [
 			[
-				'key'     => 'group_id',
-				'label'   => 'Select Group',
-				'type'    => 'select',
-				'dynamic' => [
+				'key'      => 'group_id',
+				'label'    => 'Select Group',
+				'type'     => 'select',
+				'required' => true,
+				'dynamic'  => [
 					'integration' => 'buddyboss',
 					'query'       => 'group_query',
 					'select'      => [ 'value', 'label' ],
 				],
-				'required' => true,
-			],
+			]
 		];
 	}
 
@@ -569,15 +578,15 @@ class Buddyboss extends IntegrationBase {
 			'create_activity_post' => [
 				...self::author_email(),
 				...self::activity_content(),
-				...self::action(),
+				...self::action_field(),
 				...self::action_link(),
 				...self::hide_sitewide(),
 			],
-			'create_group_post'    => [
+			'create_group_post' => [
 				...self::group_id(),
 				...self::author_email(),
 				...self::activity_content(),
-				...self::action(),
+				...self::action_field(),
 				...self::action_link(),
 				...self::hide_sitewide(),
 			],
@@ -590,11 +599,11 @@ class Buddyboss extends IntegrationBase {
 				],
 				...self::author_email(),
 				...self::activity_content(),
-				...self::action(),
+				...self::action_field(),
 				...self::action_link(),
 				...self::hide_sitewide(),
 			],
-			'add_user_to_group'          => [
+			'add_user_to_group' => [
 				...self::user_email(),
 				...self::group_id(),
 			],
@@ -625,22 +634,31 @@ class Buddyboss extends IntegrationBase {
 					'type'     => 'select',
 					'required' => true,
 					'options'  => [
-						[ 'value' => 'public',  'label' => 'Public' ],
-						[ 'value' => 'private', 'label' => 'Private' ],
-						[ 'value' => 'hidden',  'label' => 'Hidden' ],
+						[
+							'value' => 'public',
+							'label' => 'Public'
+						],
+						[
+							'value' => 'private',
+							'label' => 'Private'
+						],
+						[
+							'value' => 'hidden',
+							'label' => 'Hidden'
+						],
 					],
 				],
 				...self::creator_email(),
 				[
-					'key'     => 'group_type',
-					'label'   => 'Group Type',
-					'type'    => 'select',
-					'dynamic' => [
+					'key'      => 'group_type',
+					'label'    => 'Group Type',
+					'type'     => 'select',
+					'required' => false,
+					'dynamic'  => [
 						'integration' => 'buddyboss',
 						'query'       => 'group_types_query',
 						'select'      => [ 'value', 'label' ],
 					],
-					'required' => false,
 				],
 			],
 			'remove_friend_connection' => [
@@ -652,11 +670,11 @@ class Buddyboss extends IntegrationBase {
 					'required' => true,
 				],
 			],
-			'follow_user'              => [
+			'follow_user' => [
 				...self::follower_email(),
 				...self::leader_email(),
 			],
-			'get_forum_subscribers'    => [
+			'get_forum_subscribers' => [
 				[
 					'key'      => 'forum_id',
 					'label'    => 'Forum ID',
@@ -680,13 +698,13 @@ class Buddyboss extends IntegrationBase {
 				],
 				[
 					'key'      => 'reply_content',
-					'label'    => 'Reply Action',
+					'label'    => 'Reply Content',
 					'type'     => 'text',
 					'required' => false,
 				],
 				...self::author_email(),
 			],
-			'create_forum_topic'       => [
+			'create_forum_topic' => [
 				...self::forum_id(),
 				[
 					'key'      => 'topic_title',
@@ -696,38 +714,38 @@ class Buddyboss extends IntegrationBase {
 				],
 				[
 					'key'      => 'topic_content',
-					'label'    => 'Topic Action',
+					'label'    => 'Topic Content',
 					'type'     => 'text',
 					'required' => false,
 				],
 				...self::creator_email(),
 			],
-			'remove_user_from_group'   => [
+			'remove_user_from_group' => [
 				...self::user_email(),
 				...self::group_id(),
 			],
-			'send_friend_request'      => [
+			'send_friend_request' => [
 				...self::sender_email(),
 				...self::receiver_email(),
 			],
-			'send_group_message'       => [
+			'send_group_message' => [
 				...self::group_id(),
 				...self::sender_email(),
 				...self::message_subject(),
 				...self::message_content(),
 			],
-			'send_private_message'     => [
+			'send_private_message' => [
 				...self::sender_email(),
 				...self::receiver_email(),
 				...self::message_subject(),
 				...self::message_content(),
 			],
-			'send_group_notification'  => [
+			'send_group_notification' => [
 				...self::group_id(),
 				...self::sender_email(),
 				[
 					'key'      => 'notification_content',
-					'label'    => 'Notification Action',
+					'label'    => 'Notification Content',
 					'type'     => 'text',
 					'required' => false,
 				],
@@ -738,58 +756,58 @@ class Buddyboss extends IntegrationBase {
 					'required' => false,
 				],
 			],
-			'update_extended_profile'  => [
+			'update_extended_profile' => [
 				...self::user_email(),
 				[
 					'key'      => 'first_name',
 					'label'    => 'First Name',
 					'type'     => 'text',
-					'required' => true,
+					'required' => false,
 				],
 				[
 					'key'      => 'last_name',
 					'label'    => 'Last Name',
 					'type'     => 'text',
-					'required' => true,
+					'required' => false,
 				],
 				[
 					'key'      => 'nick_name',
 					'label'    => 'Nickname',
 					'type'     => 'text',
-					'required' => true,
+					'required' => false,
 				],
 				[
 					'key'      => 'paragraph',
 					'label'    => 'Paragraph Text',
 					'type'     => 'text',
-					'required' => true,
+					'required' => false,
 				],
 				[
 					'key'      => 'number',
 					'label'    => 'Number',
 					'type'     => 'number',
-					'required' => true,
+					'required' => false,
 				],
 				[
 					'key'      => 'checkbox',
 					'label'    => 'Checkbox',
-					'type'     => 'checkbox',
-					'required' => true,
+					'type'     => 'text',
+					'required' => false,
 				],
 				[
 					'key'      => 'drop_down',
 					'label'    => 'Drop Down',
 					'type'     => 'text',
-					'required' => true,
+					'required' => false,
 				],
 				[
 					'key'      => 'radio_buttons',
 					'label'    => 'Radio Buttons',
 					'type'     => 'text',
-					'required' => true,
+					'required' => false,
 				],
 			],
-			'update_user_status'       => [
+			'update_user_status' => [
 				...self::user_email(),
 				[
 					'key'      => 'status',
@@ -797,16 +815,22 @@ class Buddyboss extends IntegrationBase {
 					'type'     => 'select',
 					'required' => true,
 					'options'  => [
-						[ 'value' => 'suspend',   'label' => 'Suspend' ],
-						[ 'value' => 'unsuspend', 'label' => 'Unsuspend' ],
+						[
+							'value' => 'suspend',
+							'label' => 'Suspend'
+						],
+						[
+							'value' => 'unsuspend',
+							'label' => 'Unsuspend'
+						],
 					],
 				],
 			],
-			'stop_following_user'      => [
+			'stop_following_user' => [
 				...self::follower_email(),
 				...self::leader_email(),
 			],
-			'subscribe_to_forum'       => [
+			'subscribe_to_forum' => [
 				...self::user_email(),
 				...self::forum_id(),
 			],
@@ -832,22 +856,22 @@ class Buddyboss extends IntegrationBase {
 
 	public static function get_dynamic_queries(): array {
 		return [
-			'forums_query'      => [ self::class, 'query_forums' ],
-			'group_query'       => [ self::class, 'query_group' ],
-			'group_types_query' => [ self::class, 'query_group_types' ],
+			'forums_query'       => [ self::class, 'query_forums' ],
+			'group_query'        => [ self::class, 'query_group' ],
+			'group_types_query'  => [ self::class, 'query_group_types' ],
 			'member_types_query' => [ self::class, 'query_member_types' ],
 		];
 	}
 
 	private static function object_to_array( $object ): array {
-		return json_decode( json_encode( $object ), true ) ?? [];
+		return (array) $object;
 	}
 
-	private static function resolve_user_payload( int $user_id ) {
+	private static function resolve_user_payload( int $user_id ): array {
 		$user = get_userdata( $user_id );
 
 		if ( ! $user ) {
-			return false;
+			return [];
 		}
 
 		return [
@@ -865,8 +889,10 @@ class Buddyboss extends IntegrationBase {
 
 	private static function require_fields( array $data, array $fields ): ?array {
 		foreach ( $fields as $field ) {
-			if ( empty( $data[ $field ] ) ) {
-				return self::action_error( "Field '{$field}' is required." );
+			$key = is_array( $field ) ? ( $field['key'] ?? null ) : $field;
+
+			if ( ! $key || empty( $data[ $key ] ) ) {
+				return self::action_error( "Field '{$key}' is required." );
 			}
 		}
 
@@ -874,19 +900,21 @@ class Buddyboss extends IntegrationBase {
 	}
 
 	private static function resolve_follow_function( string $action ): ?callable {
-		if ( $action === 'start' ) {
+		if ( 'start' === $action ) {
 			if ( function_exists( 'bp_follow_start_following' ) && function_exists( 'bp_is_active' ) && bp_is_active( 'follow' ) ) {
 				return 'bp_follow_start_following';
 			}
+
 			if ( function_exists( 'bp_start_following' ) ) {
 				return 'bp_start_following';
 			}
 		}
 
-		if ( $action === 'stop' ) {
+		if ( 'stop' === $action ) {
 			if ( function_exists( 'bp_follow_stop_following' ) && function_exists( 'bp_is_active' ) && bp_is_active( 'follow' ) ) {
 				return 'bp_follow_stop_following';
 			}
+
 			if ( function_exists( 'bp_stop_following' ) ) {
 				return 'bp_stop_following';
 			}
@@ -895,9 +923,18 @@ class Buddyboss extends IntegrationBase {
 		return null;
 	}
 
-	private static function handle_activity_post( array $data, string $component = 'activity', ?int $group_id = null, ?int $user_activity_id = null ): array {
-		$author_id = email_exists( $data['author_email'] );
+	private static function handle_activity_post(
+		array $data,
+		string $component = 'activity',
+		?int $group_id = null,
+		?int $user_activity_id = null
+	): array {
+		$error = self::require_fields( $data, [ 'author_email', 'content' ] );
+		if ( $error ) {
+			return $error;
+		}
 
+		$author_id = email_exists( $data['author_email'] );
 		if ( ! $author_id ) {
 			return self::action_error( 'User not found with provided email.' );
 		}
@@ -915,12 +952,12 @@ class Buddyboss extends IntegrationBase {
 			'type'          => 'activity_update',
 		];
 
-		if ( $group_id !== null ) {
+		if ( null !== $group_id ) {
 			$payload['user_id'] = $author_id;
 			$payload['item_id'] = $group_id;
 		}
 
-		if ( $user_activity_id !== null ) {
+		if ( null !== $user_activity_id ) {
 			$payload['user_id']           = $author_id;
 			$payload['secondary_item_id'] = $user_activity_id;
 		}
@@ -936,7 +973,7 @@ class Buddyboss extends IntegrationBase {
 			'user_id'     => $author_id,
 		];
 
-		if ( $group_id !== null ) {
+		if ( null !== $group_id ) {
 			$response['group_id'] = $group_id;
 		}
 

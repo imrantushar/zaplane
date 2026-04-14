@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-04-13 06:59:42",
+    "generated_at": "2026-04-14 04:51:22",
     "apps": {
         "wordpress": {
             "slug": "wordpress",
@@ -13674,6 +13674,7 @@
                             "key": "group_id",
                             "label": "Select Group",
                             "type": "select",
+                            "required": true,
                             "dynamic": {
                                 "integration": "buddyboss",
                                 "query": "group_query",
@@ -13681,8 +13682,7 @@
                                     "value",
                                     "label"
                                 ]
-                            },
-                            "required": true
+                            }
                         },
                         {
                             "key": "author_email",
@@ -13778,6 +13778,7 @@
                             "key": "group_id",
                             "label": "Select Group",
                             "type": "select",
+                            "required": true,
                             "dynamic": {
                                 "integration": "buddyboss",
                                 "query": "group_query",
@@ -13785,8 +13786,7 @@
                                     "value",
                                     "label"
                                 ]
-                            },
-                            "required": true
+                            }
                         }
                     ],
                     "outputs": [
@@ -13862,6 +13862,7 @@
                             "key": "group_type",
                             "label": "Group Type",
                             "type": "select",
+                            "required": false,
                             "dynamic": {
                                 "integration": "buddyboss",
                                 "query": "group_types_query",
@@ -13869,8 +13870,7 @@
                                     "value",
                                     "label"
                                 ]
-                            },
-                            "required": false
+                            }
                         }
                     ],
                     "outputs": [
@@ -13942,6 +13942,7 @@
                             "key": "forum_id",
                             "label": "Select Forum",
                             "type": "select",
+                            "required": true,
                             "dynamic": {
                                 "integration": "buddyboss",
                                 "query": "forums_query",
@@ -13949,8 +13950,7 @@
                                     "value",
                                     "label"
                                 ]
-                            },
-                            "required": true
+                            }
                         },
                         {
                             "key": "topic_id",
@@ -13967,8 +13967,8 @@
                         {
                             "key": "reply_content",
                             "label": "Reply Content",
-                            "type": "textarea",
-                            "required": true
+                            "type": "text",
+                            "required": false
                         },
                         {
                             "key": "author_email",
@@ -13989,6 +13989,7 @@
                             "key": "forum_id",
                             "label": "Select Forum",
                             "type": "select",
+                            "required": true,
                             "dynamic": {
                                 "integration": "buddyboss",
                                 "query": "forums_query",
@@ -13996,8 +13997,7 @@
                                     "value",
                                     "label"
                                 ]
-                            },
-                            "required": true
+                            }
                         },
                         {
                             "key": "topic_title",
@@ -14008,12 +14008,12 @@
                         {
                             "key": "topic_content",
                             "label": "Topic Content",
-                            "type": "textarea",
-                            "required": true
+                            "type": "text",
+                            "required": false
                         },
                         {
                             "key": "creator_email",
-                            "label": "Topic Creator Email",
+                            "label": "Creator Email",
                             "type": "email",
                             "required": true
                         }
@@ -14036,6 +14036,7 @@
                             "key": "group_id",
                             "label": "Select Group",
                             "type": "select",
+                            "required": true,
                             "dynamic": {
                                 "integration": "buddyboss",
                                 "query": "group_query",
@@ -14043,8 +14044,7 @@
                                     "value",
                                     "label"
                                 ]
-                            },
-                            "required": true
+                            }
                         }
                     ],
                     "outputs": [
@@ -14080,6 +14080,7 @@
                             "key": "group_id",
                             "label": "Select Group",
                             "type": "select",
+                            "required": true,
                             "dynamic": {
                                 "integration": "buddyboss",
                                 "query": "group_query",
@@ -14087,8 +14088,7 @@
                                     "value",
                                     "label"
                                 ]
-                            },
-                            "required": true
+                            }
                         },
                         {
                             "key": "sender_email",
@@ -14154,6 +14154,7 @@
                             "key": "group_id",
                             "label": "Select Group",
                             "type": "select",
+                            "required": true,
                             "dynamic": {
                                 "integration": "buddyboss",
                                 "query": "group_query",
@@ -14161,8 +14162,7 @@
                                     "value",
                                     "label"
                                 ]
-                            },
-                            "required": true
+                            }
                         },
                         {
                             "key": "sender_email",
@@ -14173,8 +14173,8 @@
                         {
                             "key": "notification_content",
                             "label": "Notification Content",
-                            "type": "textarea",
-                            "required": true
+                            "type": "text",
+                            "required": false
                         },
                         {
                             "key": "notification_link",
@@ -14201,49 +14201,49 @@
                             "key": "first_name",
                             "label": "First Name",
                             "type": "text",
-                            "required": true
+                            "required": false
                         },
                         {
                             "key": "last_name",
                             "label": "Last Name",
                             "type": "text",
-                            "required": true
+                            "required": false
                         },
                         {
                             "key": "nick_name",
                             "label": "Nickname",
                             "type": "text",
-                            "required": true
+                            "required": false
                         },
                         {
                             "key": "paragraph",
                             "label": "Paragraph Text",
                             "type": "text",
-                            "required": true
+                            "required": false
                         },
                         {
                             "key": "number",
                             "label": "Number",
                             "type": "number",
-                            "required": true
+                            "required": false
                         },
                         {
                             "key": "checkbox",
                             "label": "Checkbox",
-                            "type": "checkbox",
-                            "required": true
+                            "type": "text",
+                            "required": false
                         },
                         {
                             "key": "drop_down",
                             "label": "Drop Down",
                             "type": "text",
-                            "required": true
+                            "required": false
                         },
                         {
                             "key": "radio_buttons",
                             "label": "Radio Buttons",
                             "type": "text",
-                            "required": true
+                            "required": false
                         }
                     ],
                     "outputs": [
@@ -14316,6 +14316,7 @@
                             "key": "forum_id",
                             "label": "Select Forum",
                             "type": "select",
+                            "required": true,
                             "dynamic": {
                                 "integration": "buddyboss",
                                 "query": "forums_query",
@@ -14323,8 +14324,7 @@
                                     "value",
                                     "label"
                                 ]
-                            },
-                            "required": true
+                            }
                         }
                     ],
                     "outputs": [
