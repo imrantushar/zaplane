@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class CreateRecipeFoldersTable extends Migration {
+class CreateFoldersTable extends Migration {
 
 	public function up(): void {
 		Schema::create( 'recipe_folders', function ( Blueprint $table ) {
