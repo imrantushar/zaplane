@@ -11,7 +11,7 @@ import { useNavigate } from "react-router-dom";
 import ZAPMenu from "@ZAPComponents/ZapMenu";
 import WPModal from "@ZAPComponents/Modal/WPModal";
 import { primaryBtn } from '../../../../../assets/scss/chakra/recipe';
-import { updateFolder ,deleteFolder} from '@ZAPRedux/Slices/folderSlice/folderSlice';
+import { updateFolder, deleteFolder } from '@ZAPRedux/Slices/folderSlice/folderSlice';
 
 
 const FolderCard = ({ folder }) => {
@@ -58,9 +58,12 @@ const FolderCard = ({ folder }) => {
         position="relative"
         minH="104px"
         transition="border-color 0.18s, box-shadow 0.18s"
-         onClick={() => goToFolder(folder?.id)}
+        onClick={() => goToFolder(folder?.id)}
+        _hover={{
+          boxShadow: "var(--zaplane-shadow)",
+        }}
       >
-    
+
         <Flex justify="space-between" align="flex-start" gap={3} mb={3}>
           <HStack spacing={2} minW={0} align="flex-start">
             <Icon as={FiFolder} boxSize={5} flexShrink={0} mt={0.5} />
@@ -69,7 +72,7 @@ const FolderCard = ({ folder }) => {
             </Text>
           </HStack>
 
-  
+
           <ZAPMenu
             isIcon
             items={[
@@ -103,6 +106,7 @@ const FolderCard = ({ folder }) => {
         size="large"
       >
         <Input
+         className='zaplane-input'
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder={__("Enter folder name", "zaplane")}
