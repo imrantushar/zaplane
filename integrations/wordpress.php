@@ -565,47 +565,45 @@ class Wordpress extends IntegrationBase {
 
 			case 'post_updated':
 
-    $post_id = isset($args[0]) ? (int) $args[0] : 0;
+				$post_id = isset($args[0]) ? (int) $args[0] : 0;
+				if ( ! $post_id ) {
+					return;
+				}
 
-    if ( ! $post_id ) {
-        return;
-    }
+				$post = get_post( $post_id );
+				if ( ! $post ) {
+					return;
+				}
 
-    $post = get_post( $post_id );
+				if (
+					( defined('DOING_AUTOSAVE') && DOING_AUTOSAVE ) ||
+					wp_is_post_revision( $post_id ) ||
+					$post->post_status === 'auto-draft'
+				) {
+					return;
+				}
 
-    if ( ! $post ) {
-        return;
-    }
+				$selected_type = $config['post_type'] ?? 'post';
+				$selected_id   = $config['post'] ?? null;
 
-    if ( defined('DOING_AUTOSAVE') && DOING_AUTOSAVE ) {
-        return;
-    }
+				$current_type = $post->post_type;
 
-    if ( wp_is_post_revision( $post_id ) ) {
-        return;
-    }
+				if ( $current_type === 'attachment' ) {
+					$current_type = 'media';
+				}
 
-    if ( $post->post_status === 'auto-draft' ) {
-        return;
-    }
+				if ( $selected_type !== $current_type ) {
+					return;
+				}
 
-    // 🔥 IMPORTANT
-    $selected_post_id = $config['post'] ?? 'any';
-	
-    // DEBUG (temporary)
-    error_log('Selected: ' . $selected_post_id . ' | Current: ' . $post_id);
+				if ( $selected_id !== null && $selected_id !== '' ) {
 
-    if ( $selected_post_id === 'any' ) {
-        return self::resolve_post_payload( $post_id );
-    }
+					if ( (int) $selected_id !== (int) $post_id ) {
+						return;
+					}
+				}
 
-    // ✅ Specific Post → match করলে trigger
-    if ( (int) $selected_post_id === $post_id ) {
-        return self::resolve_post_payload( $post_id );
-    }
-
-    // ❌ otherwise না
-    return;
+				return self::resolve_post_payload( $post_id );
 
 			case 'transition_post_status':
 				$wpPost = $args[2] ?? null;
