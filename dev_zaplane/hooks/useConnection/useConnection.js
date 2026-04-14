@@ -19,7 +19,7 @@ const INITIAL_STATE = {
 
 const useConnection = () => {
     const dispatch = useDispatch();
-    const { authFields ,loading } = useSelector((state) => state.connections || []);
+    const { authFields, loading } = useSelector((state) => state.connections || []);
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const [loadingOAuth, setLoadingOAuth] = useState(false);
     const [{ drawerStep, selectedApp, selectedAuthType, credentials }, setDrawerState] =
@@ -69,7 +69,7 @@ const useConnection = () => {
         const types = Object.keys(authFields?.available_auth_types || {});
         let resolved = null;
 
-        if (types.length === 1)         resolved = types[0];
+        if (types.length === 1) resolved = types[0];
         else if (types.includes("oauth2")) resolved = "oauth2";
         else if (authFields?.auth_type) resolved = authFields.auth_type;
 
@@ -108,7 +108,16 @@ const useConnection = () => {
 
     const openOAuthPopup = useCallback((authUrl) => {
         return new Promise((resolve, reject) => {
-            const popup = window.open(authUrl, "oauth_popup", "width=600,height=700");
+            const width = 600;
+            const height = 700;
+            const left = window.screenX + (window.outerWidth - width) / 2;
+            const top = window.screenY + (window.outerHeight - height) / 2;
+
+            const popup = window.open(
+                authUrl,
+                "oauth_popup",
+                `width=${width},height=${height},left=${left},top=${top}`
+            );
 
             if (!popup) {
                 reject(new Error("Popup was blocked by the browser."));
@@ -117,6 +126,7 @@ const useConnection = () => {
 
             const handler = (event) => {
                 if (event.data?.type !== "zaplane_oauth_callback") return;
+
                 window.removeEventListener("message", handler);
                 popup.close();
 
