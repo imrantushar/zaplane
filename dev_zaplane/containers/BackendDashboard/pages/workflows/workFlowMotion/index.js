@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { ReactFlowProvider, useEdgesState, useNodesState } from "@xyflow/react";
 import FlowCanvas from "./FlowCanvas/FlowCanvas";
 import { Formik } from "formik";
-import { generateFlowHash, mapEdgesForBackend, mapNodesForBackend } from "./helper";
+import { extractIntegrationIcons, generateFlowHash, mapEdgesForBackend, mapNodesForBackend } from "./helper";
 import { useDispatch, useSelector } from "react-redux";
 import { Box, Flex } from "@chakra-ui/react";
 import { updateWorkFlow } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow";
@@ -65,7 +65,8 @@ export default function Workflows({ id }) {
     const payload = {
       nodes: mapNodesForBackend(nodes),
       edges: mapEdgesForBackend(edges),
-      layout: canvasLayout
+      layout: canvasLayout,
+      integration_icons: extractIntegrationIcons(nodes),
     }
     await dispatch(
       updateWorkFlow({ id, payload })
