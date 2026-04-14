@@ -14994,7 +14994,7 @@
         "gemcrm": {
             "slug": "gemcrm",
             "name": "GemCRM",
-            "icon": "gemcrm-logo-icon.svg",
+            "icon": "crm.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -16157,7 +16157,7 @@
         "bitform": {
             "slug": "bitform",
             "name": "Bit Form",
-            "icon": "bitform.svg",
+            "icon": "bit-form-new-icon.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -16259,7 +16259,7 @@
         "bookingcalendar": {
             "slug": "bookingcalendar",
             "name": "Booking Calendar",
-            "icon": "booking-calendar.svg",
+            "icon": "wpbookingcalender.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -16280,7 +16280,7 @@
         "weforms": {
             "slug": "weforms",
             "name": "We Forms",
-            "icon": "we-forms.svg",
+            "icon": "weforms.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
