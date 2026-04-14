@@ -10,7 +10,7 @@ import { createWorkflows } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow
 import { route_path } from "@ZAPUtils/helper";
 import { primaryBtn } from "../../../assets/scss/chakra/recipe";
 import ZAPDivider from "@ZAPComponents/ZAPDivider";
-import { getFolders } from "@ZAPRedux/Slices/folderSlice/folderSlice";
+import { addWorkflowToFolder, getFolders } from "@ZAPRedux/Slices/folderSlice/folderSlice";
 import Select from "react-select";
 
 const CreateWorkflowModal = ({ isOpen, onClose, id }) => {
@@ -44,17 +44,21 @@ const CreateWorkflowModal = ({ isOpen, onClose, id }) => {
     if (!workflowName.trim()) return;
 
     const payload = {
-      title: workflowName,
+
       ...(effectiveFolderId && { folderId: effectiveFolderId }),
     };
 
-    const res = await dispatch(createWorkflows(payload));
+    const res = await dispatch(createWorkflows({ title: workflowName }));
 
     if (res?.payload?.id) {
       navigate(
         `${route_path}admin.php?page=zaplane-workflows&action=edit&id=${res.payload.id}`
       );
     }
+    if (effectiveFolderId) {
+      await dispatch(addWorkflowToFolder({ folder_id: effectiveFolderId, workflow_id: res?.payload?.id }));
+    }
+
 
     setWorkflowName("");
     setFolderId(null);
@@ -80,23 +84,23 @@ const CreateWorkflowModal = ({ isOpen, onClose, id }) => {
         {!!allFolders.length &&
           (
             <Flex direction="column" gap={2}>
-            <Text className="zaplane-label">
-              {__("Select Folder", "zaplane")}
-            </Text>
+              <Text className="zaplane-label">
+                {__("Select Folder", "zaplane")}
+              </Text>
 
-            <Select
-            className="zaplane-select"
-              options={options}
-              value={selectedOption}
-              onChange={(val) => setFolderId(val?.value || null)}
-              styles={{
-                menu: (base) => ({
-                  ...base,
-                  position: "static",
-                }),
-              }}
-            />
-          </Flex>
+              <Select
+                className="zaplane-select"
+                options={options}
+                value={selectedOption}
+                onChange={(val) => setFolderId(val?.value || null)}
+                styles={{
+                  menu: (base) => ({
+                    ...base,
+                    position: "static",
+                  }),
+                }}
+              />
+            </Flex>
           )
         }
 
