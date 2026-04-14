@@ -26,7 +26,6 @@ import OptionMenu from "@ZAPComponents/OptionMenu";
 import { getFolderWorkflows } from "@ZAPRedux/Slices/folderSlice/folderSlice";
 import { downloadJSON, statusOptions } from "../../workflows/helper";
 import WorkflowsLogs from "../../workflows/WorkflowsLogs";
-import FolderCell from "../../workflows/FolderCell";
 import ImportWorkflow from "../../workflows/workFlowMotion/ImportWorkflow";
 import SubTopBar from "@ZAPComponents/SubTopBar";
 import { primaryBtn } from "../../../../../../assets/scss/chakra/recipe";
@@ -34,6 +33,7 @@ import CreateWorkflowModal from "@ZAPComponents/CreateWorkflowModal";
 import { FaSave } from "react-icons/fa";
 import SaveAsRecipeModal from "@ZAPComponents/SaveAsRecipeModal";
 import ZAPIconGroup from "@ZAPComponents/ZAPIconGroup/ZAPIconGroup";
+import FolderCell from "@ZAPComponents/FolderCell";
 
 
 

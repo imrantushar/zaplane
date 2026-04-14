@@ -11,9 +11,9 @@ import {
     getFolderWorkflows,
 } from "@ZAPRedux/Slices/folderSlice/folderSlice";
 import WPModal from "@ZAPComponents/Modal/WPModal";
-import { primaryBtn } from "../../../../../assets/scss/chakra/recipe";
 import { getWorkFlow } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow";
 import ZAPMenu from "@ZAPComponents/ZapMenu";
+import { primaryBtn } from "../../../assets/scss/chakra/recipe";
 
 
 const FolderCell = ({ row, isFolder = false }) => {
