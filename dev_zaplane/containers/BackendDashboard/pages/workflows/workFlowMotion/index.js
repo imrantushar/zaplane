@@ -14,13 +14,13 @@ export default function Workflows({ id }) {
   const getNewNodeId = nodeIdRef.current;
   const [initialHash, setInitialHash] = useState("");
   const { workFlow } = useSelector((state) => state.workflows);
- const [canvasLayout, setCanvasLayOut] = useState(workFlow?.workflow?.layout)
+  const [canvasLayout, setCanvasLayOut] = useState(workFlow?.workflow?.layout)
   const [nodes, setNodes, onNodesChange] = useNodesState([
     {
       id: getNewNodeId(),
       type: 'custom',
       data: {
-        icon:'plus',
+        icon: 'plus',
         app: "Select an app",
         action: 'trigger',
         config: {}
@@ -37,7 +37,7 @@ export default function Workflows({ id }) {
         id: getNewNodeId(),
         type: "custom",
         data: {
-           icon:'plus',
+          icon: 'plus',
           app: "Select an app",
           action: "trigger",
           config: {},
@@ -53,10 +53,10 @@ export default function Workflows({ id }) {
     setInitialHash(hash);
   }, [id]);
   useEffect(() => {
-  if (workFlow?.workflow?.layout) {
-    setCanvasLayOut(workFlow.workflow.layout);
-  }
-}, [workFlow]);
+    if (workFlow?.workflow?.layout) {
+      setCanvasLayOut(workFlow.workflow.layout);
+    }
+  }, [workFlow]);
   const currentHash = useMemo(() => {
     return generateFlowHash(nodes, edges);
   }, [nodes, edges]);
@@ -82,7 +82,9 @@ export default function Workflows({ id }) {
         <Formik
           enableReinitialize
           initialValues={
-            {}}
+            {
+              nodeClick: false,
+            }}
           onSubmit={onSubmitHandler}
         >
           {({ }) => (
