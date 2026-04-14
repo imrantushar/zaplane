@@ -25,6 +25,8 @@ import {
 import { DeleteIcon } from 'lucide-react';
 import { primaryBtn } from '../../../../../assets/scss/chakra/recipe';
 import ZAPDivider from '@ZAPComponents/ZAPDivider';
+import { IoIosPlay } from 'react-icons/io';
+import ZAPTooltip from '@ZAPComponents/ZAPTooltip';
 
 const RecipeCard = ({ recipe }) => {
   const dispatch = useDispatch();
@@ -69,16 +71,21 @@ const RecipeCard = ({ recipe }) => {
 
   return (
     <>
-      <Box
+      <Flex
         border="1px solid"
         borderColor="var(--zaplane-border-color)"
         borderRadius="8px"
         p="16px"
         bg="white"
         transition="0.2s"
+        flexDirection='column'
+        gap='8px'
+        _hover={{
+          boxShadow: "var(--zaplane-shadow)",
+        }}
 
       >
-        <Flex justify="space-between" align="center" mb="12px">
+        <Flex justify="space-between" align="center"  >
 
           <HStack spacing="8px">
             <Box
@@ -102,29 +109,34 @@ const RecipeCard = ({ recipe }) => {
           </HStack>
 
           <HStack spacing="6px">
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => setIsConvertOpen(true)}
-            >
-              ▶ {__('Try now', 'zaplane')}
-            </Button>
+            <ZAPTooltip content='Use Recipe'>
+              <Button
+                size="sm"
+                variant="outline"
+                color='var(--zaplane-font-secondary-color)'
+                fontWeight='500'
+                onClick={() => setIsConvertOpen(true)}
+              >
+                <IoIosPlay />
+                {__('Try now', 'zaplane')}
+              </Button>
+            </ZAPTooltip>
             <Button onClick={deletedRecipe} variant={'outline'} size="sm">
               <DeleteIcon />
             </Button>
 
           </HStack>
         </Flex>
-        <ZAPDivider />
+        <ZAPDivider m='12px 0 8px -16px' w='109%' />
         <Text className='zaplane-label'>
           {recipe?.title}
         </Text>
 
-        <Text className='zaplane-label'>
+        <Text className='zaplane-sub-title' color='#454F59'>
           {recipe?.description ||
             __('No description', 'zaplane')}
         </Text>
-      </Box>
+      </Flex>
 
 
       <WPModal
@@ -139,6 +151,7 @@ const RecipeCard = ({ recipe }) => {
           </Text>
 
           <Input
+            className='zaplane-input'
             value={titleOverride}
             onChange={(e) =>
               setTitleOverride(e.target.value)

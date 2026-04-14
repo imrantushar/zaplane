@@ -33,16 +33,17 @@ const FolderCell = ({ row, isFolder = false }) => {
             dispatch(getFolders());
         }
     }, []);
-
     const handleSelectFolder = async (folder) => {
         setAssigning(true);
         try {
             await dispatch(addWorkflowToFolder({ folder_id: folder.id, workflow_id: row.id }));
-            dispatch(getWorkFlow());
+
             if (isFolder) {
                 await dispatch(getFolderWorkflows({
                     folder_id: row?.folder_id,
                 }));
+            } else {
+                await dispatch(getWorkFlow());
             }
         } finally {
             setAssigning(false);
@@ -54,7 +55,14 @@ const FolderCell = ({ row, isFolder = false }) => {
         setAssigning(true);
         try {
             await dispatch(removeWorkflowFromFolder({ folder_id: selectedFolder.id, workflow_id: row.id }));
-            dispatch(getWorkFlow());
+            if (isFolder) {
+                await dispatch(getFolderWorkflows({
+                    folder_id: row?.folder_id,
+                }));
+            } else {
+                await dispatch(getWorkFlow());
+            }
+
         } finally {
             setAssigning(false);
         }
