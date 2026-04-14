@@ -24,7 +24,7 @@ class Bitform extends IntegrationBase
 
     public static function get_icon(): string
     {
-        return 'bitform.svg';
+        return 'bit-form-new-icon.svg';
     }
 
     public static function get_triggers(): array
