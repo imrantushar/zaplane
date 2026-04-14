@@ -17,9 +17,10 @@ import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
 import FolderCard from "./FolderCard";
 import SubTopBar from "@ZAPComponents/SubTopBar";
 import { primaryBtn } from "../../../../../assets/scss/chakra/recipe";
-import CreateWorkflowModal from "@ZAPComponents/CreateWorkflowModal";
 import { getFolders } from "@ZAPRedux/Slices/folderSlice/folderSlice";
 import CreateFolderModal from "@ZAPComponents/CreateFolderModal";
+import WorkflowFolderEmptyState from "./WorkflowFolderEmptyState";
+import ZAPLoading from "@ZAPComponents/Loading";
 
 
 const Folders = () => {
@@ -27,13 +28,14 @@ const Folders = () => {
     const [isFolderModalOpen, setIsFolderModalOpen] = useState(false);
     const { folders } = useSelector((state) => state.folder);
     const allFolders = folders?.data || [];
+    const isLoading = folders.isLoading
     useEffect(() => {
         dispatch(getFolders());
 
     }, []);
 
 
-
+   if(isLoading)return <ZAPLoading/>
     return (
         <>
             <TopBar
@@ -75,11 +77,14 @@ const Folders = () => {
             </SubTopBar>
 
             <div className="zaplane-page-content">
-                <SimpleGrid columns={{ base: 1, sm: 2, lg: 3 }} spacing={4} gap='20px'>
+                {allFolders.length ? (<SimpleGrid columns={{ base: 1, sm: 2, lg: 3 }} spacing={4} gap='20px'>
                     {allFolders?.map((folder) => (
                         <FolderCard key={folder.id} folder={folder} />
                     ))}
-                </SimpleGrid>
+                </SimpleGrid>) :
+                    <WorkflowFolderEmptyState />}
+
+
             </div>
 
             <CreateFolderModal

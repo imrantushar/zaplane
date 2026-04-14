@@ -160,13 +160,12 @@ export const getFolderWorkflows = createAsyncThunk(
 const initialState = {
     folders: {
         data: [],
-        isLoading: false,
+        isLoading: true,
     },
 
     folderWorkflows: {},
     folderWorkflowsLoading: {},
     folderWorkflowsError: {},
-
     isCreatingFolder: false,
     isUpdatingFolder: false,
     isDeletingFolder: false,

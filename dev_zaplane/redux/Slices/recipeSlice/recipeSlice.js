@@ -96,23 +96,19 @@ const recipeSlice = createSlice({
   initialState: {
     recipes: [],
     pagination: null,
-    loadingRecipes: false,
+    loadingRecipes: true,
   },
   reducers: {},
   extraReducers: (builder) => {
     builder
  
-      .addCase(getRecipes.pending, (state) => {
-        state.loadingRecipes = true;
-      })
+    
       .addCase(getRecipes.fulfilled, (state, action) => {
         state.loadingRecipes = false;
         state.recipes = Array.isArray(action.payload.recipes) ? action.payload.recipes : [];
         state.pagination = action.payload.pagination;
       })
-      .addCase(getRecipes.rejected, (state) => {
-        state.loadingRecipes = false;
-      })
+    
  
       .addCase(updateRecipe.fulfilled, (state, action) => {
         const item = action.payload;

@@ -19,18 +19,20 @@ import { primaryBtn } from "../../../../../assets/scss/chakra/recipe";
 import CreateWorkflowModal from "@ZAPComponents/CreateWorkflowModal";
 import { getRecipes } from "@ZAPRedux/Slices/recipeSlice/recipeSlice";
 import RecipeCard from "./RecipeCard";
+import ZAPLoading from "@ZAPComponents/Loading";
 
 
 const RecipesPage = () => {
   const dispatch = useDispatch();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { recipes } = useSelector(
+  const { recipes,loadingRecipes } = useSelector(
     (state) => state.recipes || {}
   );
 
   useEffect(() => {
     dispatch(getRecipes())
   }, [dispatch])
+  if(loadingRecipes)return <ZAPLoading/>
   return (
     <>
       <TopBar

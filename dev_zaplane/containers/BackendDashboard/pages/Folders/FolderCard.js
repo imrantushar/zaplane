@@ -40,12 +40,6 @@ const FolderCard = ({ folder }) => {
     setIsRenameOpen(false);
   };
 
-  const handleDelete = async () => {
-    setIsDeleting(true);
-    await dispatch(deleteFolder(folder?.id));
-    setIsDeleting(false);
-    setIsDeleteOpen(false);
-  };
 
   return (
     <>
@@ -77,7 +71,14 @@ const FolderCard = ({ folder }) => {
             isIcon
             items={[
               { label: __("Rename", "zaplane"), onClick: () => setIsRenameOpen(true) },
-              { label: __("Delete", "zaplane"), onClick: () => setIsDeleteOpen(true) },
+              {
+                label: __("Delete", "zaplane"),
+                onClick: () => {
+                  if (window.confirm("Are you sure you want to delete this folder?")) {
+                    dispatch(deleteFolder(folder?.id));
+                  }
+                },
+              }
             ]}
           />
         </Flex>
@@ -106,7 +107,7 @@ const FolderCard = ({ folder }) => {
         size="large"
       >
         <Input
-         className='zaplane-input'
+          className='zaplane-input'
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder={__("Enter folder name", "zaplane")}
@@ -127,32 +128,6 @@ const FolderCard = ({ folder }) => {
         </Flex>
       </WPModal>
 
-
-      <WPModal
-        title={__("Delete Folder", "zaplane")}
-        isOpen={isDeleteOpen}
-        onRequestClose={() => setIsDeleteOpen(false)}
-        size="large"
-      >
-        <Text mb={4}>
-          {sprintf(
-            __('Are you sure you want to delete "%s"? This action cannot be undone.', "zaplane"),
-            folder?.title
-          )}
-        </Text>
-        <Flex justify="flex-end" gap={3}>
-          <Button variant="outline" onClick={() => setIsDeleteOpen(false)}>
-            {__("Cancel", "zaplane")}
-          </Button>
-          <Button
-            colorScheme="red"
-            onClick={handleDelete}
-            isLoading={isDeleting}
-          >
-            {__("Delete", "zaplane")}
-          </Button>
-        </Flex>
-      </WPModal>
     </>
   );
 };
