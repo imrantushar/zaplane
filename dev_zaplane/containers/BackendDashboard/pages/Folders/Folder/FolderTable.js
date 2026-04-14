@@ -31,6 +31,8 @@ import ImportWorkflow from "../../workflows/workFlowMotion/ImportWorkflow";
 import SubTopBar from "@ZAPComponents/SubTopBar";
 import { primaryBtn } from "../../../../../../assets/scss/chakra/recipe";
 import CreateWorkflowModal from "@ZAPComponents/CreateWorkflowModal";
+import { FaSave } from "react-icons/fa";
+import SaveAsRecipeModal from "@ZAPComponents/SaveAsRecipeModal";
 
 
 
@@ -46,6 +48,8 @@ const FolderTable = ({ folderId }) => {
   const [selection, setSelection] = useState([]);
   const [loading, setLoading] = useState(data?.length === 0);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [recipeModalOpen, setRecipeModalOpen] = useState(false);
+  const [selectedWorkflow, setSelectedWorkflow] = useState(null);
 
 
   const handleRefresh = async (page = 1, itemsPerPage = perPage) => {
@@ -91,7 +95,7 @@ const FolderTable = ({ folderId }) => {
           .map((id) => dispatch(deleteWorkFlow(id)))
       );
       setSelection([]);
-      dispatch(getWorkFlow({ page: currentPage, per_page: perPage }));
+      await handleRefresh();
     } catch (e) {
       console.error("Failed to delete selected workflows", e);
     }
@@ -121,7 +125,7 @@ const FolderTable = ({ folderId }) => {
       cell: (row) => {
         return (
           <Box display="flex" justifyContent="center">
-            <FolderCell row={row} />
+            <FolderCell row={row} isFolder={true} />
           </Box>
         );
       },
@@ -182,13 +186,14 @@ const FolderTable = ({ folderId }) => {
               icon: <Icon as={RiDeleteBin6Line} />,
               type: "button",
               suffix: "trash",
-              onClick: () => {
+              onClick: async () => {
                 if (
                   window.confirm(
                     __("Are you sure you want to delete?", "zaplane")
                   )
                 ) {
-                  dispatch(deleteWorkFlow(row.id));
+                  await dispatch(deleteWorkFlow(row.id));
+                  await handleRefresh();
                 }
               },
             },
@@ -198,6 +203,16 @@ const FolderTable = ({ folderId }) => {
               type: "button",
               hasBorder: false,
               onClick: () => handleExport(row),
+            },
+            {
+              label: __("Save as Recipe", "zaplane"),
+              icon: <Icon as={FaSave} />,
+              type: "button",
+              hasBorder: false,
+              onClick: () => {
+                setSelectedWorkflow(row);
+                setRecipeModalOpen(true);
+              },
             },
           ]}
         />
@@ -250,6 +265,15 @@ const FolderTable = ({ folderId }) => {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         id={folderId}
+      />
+      <SaveAsRecipeModal
+        isOpen={recipeModalOpen}
+        onClose={() => {
+          setRecipeModalOpen(false);
+          setSelectedWorkflow(null);
+        }}
+        workflowId={selectedWorkflow?.id}
+        defaultTitle={selectedWorkflow?.title}
       />
     </>
   );

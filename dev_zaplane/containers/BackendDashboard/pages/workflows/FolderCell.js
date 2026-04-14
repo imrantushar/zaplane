@@ -8,6 +8,7 @@ import {
     createFolder,
     addWorkflowToFolder,
     removeWorkflowFromFolder,
+    getFolderWorkflows,
 } from "@ZAPRedux/Slices/folderSlice/folderSlice";
 import WPModal from "@ZAPComponents/Modal/WPModal";
 import { primaryBtn } from "../../../../../assets/scss/chakra/recipe";
@@ -15,7 +16,7 @@ import { getWorkFlow } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow";
 import ZAPMenu from "@ZAPComponents/ZapMenu";
 
 
-const FolderCell = ({ row }) => {
+const FolderCell = ({ row, isFolder = false }) => {
     const dispatch = useDispatch();
     const { folders } = useSelector((state) => state.folder);
     const allFolders = folders?.data || [];
@@ -38,6 +39,11 @@ const FolderCell = ({ row }) => {
         try {
             await dispatch(addWorkflowToFolder({ folder_id: folder.id, workflow_id: row.id }));
             dispatch(getWorkFlow());
+            if (isFolder) {
+                await dispatch(getFolderWorkflows({
+                    folder_id: row?.folder_id,
+                }));
+            }
         } finally {
             setAssigning(false);
         }
