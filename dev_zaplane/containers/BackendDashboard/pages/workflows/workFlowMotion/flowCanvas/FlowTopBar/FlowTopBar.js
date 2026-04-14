@@ -29,6 +29,7 @@ import ZAPMenu from "@ZAPComponents/ZapMenu";
 import { exportWorkflows } from "@ZAPRedux/Slices/workFlowSlice/actions/ExportImport";
 import { IoIosArrowForward } from "react-icons/io";
 import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
+import ZAPTooltip from "@ZAPComponents/ZAPTooltip";
 
 export default function FlowTopBar({
   workFlow,
@@ -111,9 +112,8 @@ export default function FlowTopBar({
       <TopBar
         leftContent={() => (
           <>
-            <Image
+            <img
               src={`${plugin_root_url}assets/images/zaplane.svg`}
-              boxSize="20px"
             />
             <IoIosArrowForward />
             <ZAPLabel
@@ -158,6 +158,7 @@ export default function FlowTopBar({
                 onClick={() => setIsEditingTitle(true)}
                 noOfLines={1}
                 maxW="200px"
+                textOverflow="ellipsis"
               >
                 {currentTitle}
               </Text>
@@ -189,10 +190,19 @@ export default function FlowTopBar({
                 </Text>
               </Flex>
             )}
-            <Button size="sm" variant="outline"
-              className={`${isFullscreen && "zaplane-button-actve"}`} onClick={toggleFullscreen}>
-              {isFullscreen ? <LuMinimize /> : <LuFullscreen />}
-            </Button>
+            <ZAPTooltip content={'Full Screen'} positioning={{
+              placement: "buttom",
+              offset: {
+                mainAxis: 45,
+                crossAxis: -5,
+              }
+            }}>
+              <Button size="sm" variant="outline"
+                className={`${isFullscreen && "zaplane-button-actve"}`} onClick={toggleFullscreen}>
+                {isFullscreen ? <LuMinimize /> : <LuFullscreen />}
+              </Button>
+            </ZAPTooltip>
+
 
             {/* Logs Drawer */}
             <ZAPDrawer
@@ -261,16 +271,24 @@ export default function FlowTopBar({
                 // >
                 //   <LucideHistory />
                 // </Text>
-                <Button
-                  className={`${activeDrawer === 'history' && 'zaplane-button-actve'}`}
-                  size="sm"
-                  variant="outline"
-                  onClick={() => {
-                    setActiveDrawer("history");
-                  }}
-                >
-                  <LucideHistory />
-                </Button>
+                <ZAPTooltip content={'History'} positioning={{
+                  placement: "buttom",
+                  offset: {
+                    mainAxis: 45,
+                    crossAxis: -5,
+                  }
+                }}>
+                  <Button
+                    className={`${activeDrawer === 'history' && 'zaplane-button-actve'}`}
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      setActiveDrawer("history");
+                    }}
+                  >
+                    <LucideHistory />
+                  </Button>
+                </ZAPTooltip>
               }
             >
               <VersionHistoryTable id={id} />
@@ -296,7 +314,7 @@ export default function FlowTopBar({
                 control: (provided) => ({
                   ...provided,
                   minHeight: "36px",
-                  height:'36px'
+                  height: '36px'
                 }),
               }}
             />

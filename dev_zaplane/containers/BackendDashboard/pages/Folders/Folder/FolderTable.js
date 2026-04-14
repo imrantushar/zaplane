@@ -131,6 +131,7 @@ const FolderTable = ({ folderId }) => {
         </Text>
       ),
       textAlign: "start",
+      columnWidth: "200px",
     },
     {
       name: <Text className="zaplane-label">{__("Folder", "zaplane")}</Text>,
