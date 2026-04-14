@@ -163,7 +163,7 @@ const connectionsSlice = createSlice({
     allConnection: [],
     authFields: {},
     oauthData: null,
-    loading: false,
+    loading: true,
     error: null,
     connection: {},
     itemPerPage: 10,
@@ -192,6 +192,7 @@ const connectionsSlice = createSlice({
       })
       .addCase(fetchAuthFields.fulfilled, (state, action) => {
         state.authFields = action.payload || {};
+        state.loading =false
       })
 
       .addCase(initOAuth.fulfilled, (state, action) => {
