@@ -595,7 +595,6 @@ class Wordpress extends IntegrationBase {
     // DEBUG (temporary)
     error_log('Selected: ' . $selected_post_id . ' | Current: ' . $post_id);
 
-    // ✅ Any Post → সব trigger
     if ( $selected_post_id === 'any' ) {
         return self::resolve_post_payload( $post_id );
     }
