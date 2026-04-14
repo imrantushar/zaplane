@@ -17,13 +17,15 @@ class Recipe extends Model {
 		'description',
 		'thumbnail_id',
 		'blueprint',
+		'integration_icons',
 		'created_by',
 	];
 
 	protected static array $casts = [
-		'id'           => 'integer',
-		'thumbnail_id' => 'integer',
-		'created_by'   => 'integer',
+		'id'                => 'integer',
+		'thumbnail_id'      => 'integer',
+		'created_by'        => 'integer',
+		'integration_icons' => 'json',
 	];
 
 	// -------------------------------------------------------------------------
@@ -56,14 +58,15 @@ class Recipe extends Model {
 
 	public function toResponse(): array {
 		return [
-			'id'            => $this->id,
-			'title'         => $this->title,
-			'description'   => $this->description,
-			'thumbnail_id'  => $this->thumbnail_id,
-			'thumbnail_url' => $this->thumbnailUrl(),
-			'created_by'    => $this->created_by,
-			'created_at'    => $this->created_at,
-			'updated_at'    => $this->updated_at,
+			'id'                => $this->id,
+			'title'             => $this->title,
+			'description'       => $this->description,
+			'thumbnail_id'      => $this->thumbnail_id,
+			'thumbnail_url'     => $this->thumbnailUrl(),
+			'integration_icons' => $this->integration_icons ?? [],
+			'created_by'        => $this->created_by,
+			'created_at'        => $this->created_at,
+			'updated_at'        => $this->updated_at,
 		];
 	}
 }

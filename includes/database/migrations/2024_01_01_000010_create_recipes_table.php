@@ -19,6 +19,7 @@ class CreateRecipesTable extends Migration {
 			$table->text( 'description' )->nullable();
 			$table->unsignedBigInteger( 'thumbnail_id' )->nullable();
 			$table->longText( 'blueprint' );
+			$table->text( 'integration_icons' )->nullable();
 			$table->unsignedBigInteger( 'created_by' );
 			$table->timestamps();
 

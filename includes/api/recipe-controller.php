@@ -196,11 +196,12 @@ class RecipeController extends WP_REST_Controller {
 		$blueprint = ( new BlueprintService() )->serialize( $workflow, 'active' );
 
 		$recipe = Recipe::create( [
-			'title'        => $title,
-			'description'  => $description,
-			'thumbnail_id' => $thumbnailId ? (int) $thumbnailId : null,
-			'blueprint'    => wp_json_encode( $blueprint ),
-			'created_by'   => get_current_user_id(),
+			'title'             => $title,
+			'description'       => $description,
+			'thumbnail_id'      => $thumbnailId ? (int) $thumbnailId : null,
+			'blueprint'         => wp_json_encode( $blueprint ),
+			'integration_icons' => wp_json_encode( $workflow->integration_icons ?? [] ),
+			'created_by'        => get_current_user_id(),
 		] );
 
 		return rest_ensure_response( $recipe->toResponse() );

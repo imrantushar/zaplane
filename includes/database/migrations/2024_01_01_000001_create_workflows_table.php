@@ -18,6 +18,7 @@ class CreateWorkflowsTable extends Migration {
 			$table->unsignedBigInteger( 'user_id' );
 			$table->unsignedBigInteger( 'folder_id' )->nullable();
 			$table->string( 'title' );
+			$table->text( 'integration_icons' )->nullable();
 			$table->enum( 'status', [ 'active', 'paused', 'draft' ] )->default( 'draft' );
 			$table->string( 'layout', 20 )->default( 'LR' );
 			$table->timestamps();
