@@ -20,14 +20,10 @@ export const mapNodesForBackend = (nodes) => {
 export const mapEdgesForBackend = (edges) => {
   return edges.map(({ type, ...edge }) => edge);
 };
-export const extractIntegrationIcons = (nodes) => {
-  const icons = nodes
-    .map((node) => node?.data?.icon) 
+export const extractIntegrationIcons = (nodes = []) => {
+  return nodes
+    .map(node => node?.data?.icon)
     .filter(Boolean);
-
-  const uniqueIcons = [...new Set(icons)];
-
-  return uniqueIcons.slice(0, 3); 
 };
 /**
  * Generate comparable flow hash

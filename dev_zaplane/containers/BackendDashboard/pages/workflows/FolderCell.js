@@ -118,7 +118,7 @@ const FolderCell = ({ row, isFolder = false }) => {
                             spacing={1}
                             px={2}
                             py={1}
-                            borderRadius="md"
+                             borderRadius="999px"
                             border="0.5px solid"
                             borderColor="gray.200"
                             bg="gray.50"
@@ -158,12 +158,13 @@ const FolderCell = ({ row, isFolder = false }) => {
                     items={menuItems}
                     trigger={
                         <Button
-                            size="sm"
+                            size="14px"
                             variant="outline"
                             fontSize="13px"
-                            fontWeight="400"
+                            fontWeight="500"
                             h="30px"
-                            px={3}
+                            borderRadius="999px"
+                            p='14px'
                             onClick={(e) => e.stopPropagation()}
                             aria-label={__("Add to folder", "zaplane")}
                         >

@@ -220,9 +220,12 @@ class WorkflowsController extends WP_REST_Controller {
 		$workflow->layout = $layout;
 
 		$icons = $graph['integration_icons'] ?? null;
+		// if ( is_array( $icons ) ) {
+		// 	$workflow->integration_icons = array_slice( array_values( array_unique( $icons ) ), 0, 3 );
+		// }
 		if ( is_array( $icons ) ) {
-			$workflow->integration_icons = array_slice( array_values( array_unique( $icons ) ), 0, 3 );
-		}
+        $workflow->integration_icons = array_values(array_unique($icons));
+         }
 
 		$workflow->save();
 

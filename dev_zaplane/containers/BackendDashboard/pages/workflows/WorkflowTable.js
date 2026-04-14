@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { __ } from "@wordpress/i18n";
-import { Text, Box, Icon, HStack, Button, Menu, Portal } from "@chakra-ui/react";
+import { Text, Box, Icon, HStack, Button, Menu, Portal, Flex } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import ListTable from "@ZAPComponents/ListTable";
@@ -26,6 +26,9 @@ import OptionMenu from "@ZAPComponents/OptionMenu";
 import FolderCell from "./FolderCell";
 import SaveAsRecipeModal from "@ZAPComponents/SaveAsRecipeModal";
 import { FaSave } from "react-icons/fa";
+import ZAPIcon from "@ZAPComponents/ZAPIcon";
+import ZAPIconGroup from "@ZAPComponents/ZAPIconGroup/ZAPIconGroup";
+
 
 
 
@@ -95,6 +98,16 @@ const WorkflowTable = () => {
 
   const columns = [
     {
+      name: <Text className="zaplane-label">{__("Apps", "zaplane")}</Text>,
+      cell: (row) => {
+        return <ZAPIconGroup icons={row.integration_icons} />;
+        ;
+      },
+      textAlign: "start",
+      columnWidth: "120px",
+
+    },
+    {
       name: <Text className="zaplane-label">{__("Title", "zaplane")}</Text>,
       cell: (row) => (
         <Text
@@ -116,7 +129,7 @@ const WorkflowTable = () => {
       name: <Text className="zaplane-label">{__("Folder", "zaplane")}</Text>,
       cell: (row) => {
         return (
-          <Box display="flex" justifyContent="center">
+          <Box display="flex" justifyContent="center" >
             <FolderCell row={row} />
           </Box>
         );
@@ -211,7 +224,6 @@ const WorkflowTable = () => {
       textAlign: "center",
     }
   ];
-
   return (
     <>
       <ListTable

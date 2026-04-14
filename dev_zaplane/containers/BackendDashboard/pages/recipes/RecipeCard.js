@@ -27,6 +27,8 @@ import { primaryBtn } from '../../../../../assets/scss/chakra/recipe';
 import ZAPDivider from '@ZAPComponents/ZAPDivider';
 import { IoIosPlay } from 'react-icons/io';
 import ZAPTooltip from '@ZAPComponents/ZAPTooltip';
+import ZAPIconGroup from '@ZAPComponents/ZAPIconGroup/ZAPIconGroup';
+import { AiTwotoneDelete } from "react-icons/ai";
 
 const RecipeCard = ({ recipe }) => {
   const dispatch = useDispatch();
@@ -87,26 +89,7 @@ const RecipeCard = ({ recipe }) => {
       >
         <Flex justify="space-between" align="center"  >
 
-          <HStack spacing="8px">
-            <Box
-              p="6px"
-              borderRadius="8px"
-            >
-              <Image src="/icons/google-form.png" boxSize="20px" />
-            </Box>
-            <Box
-              p="6px"
-              borderRadius="8px"
-            >
-              <Image src="/icons/ai.png" boxSize="20px" />
-            </Box>
-            <Box
-              p="6px"
-              borderRadius="8px"
-            >
-              <Image src="/icons/airtable.png" boxSize="20px" />
-            </Box>
-          </HStack>
+          <ZAPIconGroup icons={recipe?.integration_icons} />
 
           <HStack spacing="6px">
             <ZAPTooltip content='Use Recipe'>
@@ -122,7 +105,7 @@ const RecipeCard = ({ recipe }) => {
               </Button>
             </ZAPTooltip>
             <Button onClick={deletedRecipe} variant={'outline'} size="sm">
-              <DeleteIcon />
+              <AiTwotoneDelete />
             </Button>
 
           </HStack>
