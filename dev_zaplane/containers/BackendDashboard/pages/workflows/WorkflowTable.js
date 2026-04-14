@@ -24,7 +24,6 @@ import { exportWorkflows } from "@ZAPRedux/Slices/workFlowSlice/actions/ExportIm
 import WorkflowsLogs from "./WorkflowsLogs";
 import OptionMenu from "@ZAPComponents/OptionMenu";
 import SaveAsRecipeModal from "@ZAPComponents/SaveAsRecipeModal";
-import { FaSave } from "react-icons/fa";
 import ZAPIconGroup from "@ZAPComponents/ZAPIconGroup/ZAPIconGroup";
 import FolderCell from "@ZAPComponents/FolderCell";
 import { FiLayers } from "react-icons/fi";
@@ -203,14 +202,14 @@ const WorkflowTable = () => {
             },
             {
               label: __("Export", "zaplane"),
-              icon: <Icon as={FiLayers} />,
+              icon: <Icon as={TbFileExport} />,
               type: "button",
               hasBorder: false,
               onClick: () => handleExport(row),
             },
             {
               label: __("Save as Recipe", "zaplane"),
-              icon: <Icon as={FaSave} />,
+              icon: <Icon as={FiLayers} />,
               type: "button",
               hasBorder: false,
               onClick: () => {
