@@ -91,6 +91,7 @@ const CreateWorkflowModal = ({ isOpen, onClose, id }) => {
               <Select
                 className="zaplane-select"
                 options={options}
+                isClearable
                 value={selectedOption}
                 onChange={(val) => setFolderId(val?.value || null)}
                 styles={{
