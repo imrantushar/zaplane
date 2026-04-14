@@ -1,10 +1,7 @@
 import { useEffect, useState } from "react";
 import {
   Box,
-  Button,
   Flex,
-
-  Image,
   SimpleGrid,
 
 } from "@chakra-ui/react";
@@ -20,19 +17,21 @@ import CreateWorkflowModal from "@ZAPComponents/CreateWorkflowModal";
 import { getRecipes } from "@ZAPRedux/Slices/recipeSlice/recipeSlice";
 import RecipeCard from "./RecipeCard";
 import ZAPLoading from "@ZAPComponents/Loading";
+import CustomTableMessage from "@ZAPComponents/Oops/CustomTableMessage";
+import './styles.scss'
 
 
 const RecipesPage = () => {
   const dispatch = useDispatch();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { recipes,loadingRecipes } = useSelector(
+  const { recipes, loadingRecipes } = useSelector(
     (state) => state.recipes || {}
   );
 
   useEffect(() => {
     dispatch(getRecipes())
   }, [dispatch])
-  if(loadingRecipes)return <ZAPLoading/>
+  if (loadingRecipes) return <ZAPLoading />
   return (
     <>
       <TopBar
@@ -46,9 +45,8 @@ const RecipesPage = () => {
               alignItems="center"
               justifyContent="center"
             >
-              <Image
+              <img
                 src={`${plugin_root_url}assets/images/zaplane.svg`}
-                boxSize="20px"
               />
             </Flex>
 
@@ -58,7 +56,7 @@ const RecipesPage = () => {
               as="h2"
               type="subtitle"
               fontWeight="medium"
-              label={__("Recipe Library", "zaplane")}
+              label={__("Recipe", "zaplane")}
             />
           </>
         )}
@@ -72,13 +70,29 @@ const RecipesPage = () => {
           {__("Create Workflow", "zaplane")}
         </Button>
       </SubTopBar> */}
+      <SubTopBar heading={__("Recipes", "zaplane")}>
+
+      </SubTopBar>
 
       <div className="zaplane-page-content">
-        <SimpleGrid columns={{ base: 1, md: 2, xl: 3 }} spacing={4} gap='20px'>
-          {recipes.map((recipe) => (
-            <RecipeCard key={recipe.id} recipe={recipe} />
-          ))}
-        </SimpleGrid>
+        {
+          recipes?.length ? <SimpleGrid columns={{ base: 1, md: 2, xl: 3 }} spacing={4} gap='20px'>
+            {recipes.map((recipe) => (
+              <RecipeCard key={recipe.id} recipe={recipe} />
+            ))}
+          </SimpleGrid> : (
+           <Box className="zaplane-recipes-custom-msg">
+             <CustomTableMessage
+                  title={__(
+                    'No Data Available!!!',
+                    'zaplane'
+                  )}
+                  subText={'Please, create data to see the available list here.'}
+                />
+           </Box>
+          )
+        }
+
       </div>
 
       <CreateWorkflowModal

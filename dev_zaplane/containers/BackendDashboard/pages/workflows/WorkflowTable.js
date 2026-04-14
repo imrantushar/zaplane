@@ -27,6 +27,7 @@ import SaveAsRecipeModal from "@ZAPComponents/SaveAsRecipeModal";
 import { FaSave } from "react-icons/fa";
 import ZAPIconGroup from "@ZAPComponents/ZAPIconGroup/ZAPIconGroup";
 import FolderCell from "@ZAPComponents/FolderCell";
+import { FiLayers } from "react-icons/fi";
 
 
 
@@ -99,7 +100,7 @@ const WorkflowTable = () => {
     {
       name: <Text className="zaplane-label">{__("Apps", "zaplane")}</Text>,
       cell: (row) => {
-        return <ZAPIconGroup icons={row.integration_icons} />;
+        return <ZAPIconGroup icons={row.integration_icons} maxVisible={2}/>;
         ;
       },
       textAlign: "start",
@@ -202,7 +203,7 @@ const WorkflowTable = () => {
             },
             {
               label: __("Export", "zaplane"),
-              icon: <Icon as={TbFileExport} />,
+              icon: <Icon as={FiLayers} />,
               type: "button",
               hasBorder: false,
               onClick: () => handleExport(row),

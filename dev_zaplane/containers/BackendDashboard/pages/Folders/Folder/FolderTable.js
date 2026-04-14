@@ -34,6 +34,7 @@ import { FaSave } from "react-icons/fa";
 import SaveAsRecipeModal from "@ZAPComponents/SaveAsRecipeModal";
 import ZAPIconGroup from "@ZAPComponents/ZAPIconGroup/ZAPIconGroup";
 import FolderCell from "@ZAPComponents/FolderCell";
+import { FiLayers } from "react-icons/fi";
 
 
 
@@ -106,7 +107,7 @@ const FolderTable = ({ folderId }) => {
     {
       name: <Text className="zaplane-label">{__("Apps", "zaplane")}</Text>,
       cell: (row) => {
-        return <ZAPIconGroup icons={row.integration_icons} />;
+        return <ZAPIconGroup icons={row.integration_icons} maxVisible={2} />;
         ;
       },
       textAlign: "start",
@@ -217,7 +218,7 @@ const FolderTable = ({ folderId }) => {
             },
             {
               label: __("Save as Recipe", "zaplane"),
-              icon: <Icon as={FaSave} />,
+              icon: <Icon as={FiLayers} />,
               type: "button",
               hasBorder: false,
               onClick: () => {

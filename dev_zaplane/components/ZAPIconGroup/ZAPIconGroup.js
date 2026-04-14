@@ -2,8 +2,10 @@ import { Flex, Text, Image } from "@chakra-ui/react";
 import { plugin_root_url } from "@ZAPUtils/helper";
 
 const ZAPIconGroup = ({ icons = [], maxVisible = 3 }) => {
-    const visibleIcons = icons.slice(0, maxVisible);
-    const remaining = icons.length - maxVisible;
+    const safeIcons = Array.isArray(icons) ? icons : [];
+    const visibleIcons = safeIcons.slice(0, maxVisible);
+    const remaining = Math.max(0, safeIcons.length - maxVisible);
+    const totalItems = visibleIcons.length + (remaining > 0 ? 1 : 0);
     return (
         <Flex
             border="1px solid var(--zaplane-border-color)"
@@ -13,16 +15,19 @@ const ZAPIconGroup = ({ icons = [], maxVisible = 3 }) => {
         >
             {visibleIcons.map((icon, index) => {
                 const isSvg = icon?.endsWith(".svg");
+                const isLast = index === totalItems - 1;
                 return (
                     <Flex
                         key={index}
-                        w="40px"
-                        h="40px"
+                        h="32px"
+                        w='36px'
                         justifyContent="center"
                         alignItems="center"
                         bg="var(--zaplane-background)"
-                        p="7px"
-                        borderRight="1px solid var(--zaplane-border-color)"
+                        p="4px 8px"
+                        borderRight={
+                            isLast ? "none" : "1px solid var(--zaplane-border-color)"
+                        }
                     >
                         {isSvg ? (
                             <Image
@@ -43,11 +48,11 @@ const ZAPIconGroup = ({ icons = [], maxVisible = 3 }) => {
 
             {remaining > 0 && (
                 <Flex
-                    w="40px"
-                    h="40px"
+                   w='36px'
+                    h="32px"
                     justifyContent="center"
                     alignItems="center"
-                     bg="var(--zaplane-background)"
+                    bg="var(--zaplane-background)"
                 >
                     <Text
                         className="zapane-title"

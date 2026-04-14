@@ -2945,3 +2945,15 @@ h2.react-datepicker__current-month {
     transform: rotate(-360deg);
   }
 }
+/*!**************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/@wordpress/scripts/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./dev_zaplane/containers/BackendDashboard/pages/recipes/styles.scss ***!
+  \**************************************************************************************************************************************************************************************************************************************************************************************************************************/
+.zaplane-recipes-custom-msg {
+  position: relative;
+}
+.zaplane-recipes-custom-msg .zaplane-oops__content {
+  position: absolute;
+  top: 75%;
+  right: 50%;
+  transform: translate(50%, -50%);
+}

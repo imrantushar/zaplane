@@ -20,7 +20,7 @@ const ZAPTable = ({
   isLoading = false,
   noDataText = __(
     'Please, create data to see the available list here.',
-    'easy-content-manager'
+    'zaplane'
   )
 }) => {
   const colSpan = columns.length + (actionsRenderer ? 1 : 0);
@@ -93,7 +93,7 @@ const ZAPTable = ({
                   <CustomTableMessage
                     title={__(
                       'No Data Available!!!',
-                      'easy-content-manager'
+                      'zaplane'
                     )}
                     subText={noDataText}
                   />

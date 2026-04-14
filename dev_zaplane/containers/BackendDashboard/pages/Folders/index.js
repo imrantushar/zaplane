@@ -49,9 +49,8 @@ const Folders = () => {
                             alignItems="center"
                             justifyContent="center"
                         >
-                            <Image
+                            <img
                                 src={`${plugin_root_url}assets/images/zaplane.svg`}
-                                boxSize="20px"
                             />
                         </Flex>
 
