@@ -554,6 +554,8 @@ class Wordpress extends IntegrationBase {
 
 	public static function resolve_trigger( array $node, array $args ) {
 
+		$config = $node['config'] ?? [];
+
 		switch ( $node['event'] ) {
 			case 'publish_post':
 			case 'delete_post':
