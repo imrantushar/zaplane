@@ -3,14 +3,7 @@
 
 if ( ! function_exists( 'get_userdata' ) ) {
     function get_userdata( $user_id ) {
-        return (object) [
-            'ID'           => $user_id,
-            'user_login'   => 'testuser',
-            'user_email'   => 'test@example.com',
-            'nickname'     => 'Tester',
-            'display_name' => 'Test User',
-            'roles'        => ['subscriber'], // default WP role
-        ];
+        return new WP_User( (int) $user_id );
     }
 }
 
@@ -30,10 +23,60 @@ if ( ! function_exists( 'get_avatar_url' ) ) {
 
 if ( ! class_exists( 'WP_User' ) ) {
     class WP_User {
-        public $ID;
-        public $role;
-        public function __construct( $id ) { $this->ID = $id; }
-        public function set_role( $role ) { $this->role = $role; }
+        public $ID = 0;
+        public $role = '';
+        public $roles = [];
+        public $caps = [];
+        public $allcaps = [];
+        public $user_login = 'testuser';
+        public $user_email = 'test@example.com';
+        public $nickname = 'Tester';
+        public $display_name = 'Test User';
+
+        public function __construct( $id = 0 ) {
+            $this->ID = (int) $id;
+            if ( empty( $this->roles ) ) {
+                $this->roles = [ 'subscriber' ];
+            }
+        }
+
+        public function set_role( $role ) {
+            $this->role = (string) $role;
+            $this->roles = '' === $this->role ? [] : [ $this->role ];
+        }
+
+        public function add_role( $role ) {
+            $role = (string) $role;
+            if ( '' !== $role && ! in_array( $role, $this->roles, true ) ) {
+                $this->roles[] = $role;
+            }
+        }
+
+        public function remove_role( $role ) {
+            $this->roles = array_values(
+                array_filter(
+                    $this->roles,
+                    function ( $item ) use ( $role ) {
+                        return (string) $item !== (string) $role;
+                    }
+                )
+            );
+        }
+
+        public function add_cap( $cap, $grant = true ) {
+            $cap = (string) $cap;
+            if ( '' === $cap ) {
+                return;
+            }
+
+            $this->caps[ $cap ] = (bool) $grant;
+            $this->allcaps[ $cap ] = (bool) $grant;
+        }
+
+        public function remove_cap( $cap ) {
+            $cap = (string) $cap;
+            unset( $this->caps[ $cap ], $this->allcaps[ $cap ] );
+        }
     }
 }
 
@@ -46,7 +89,15 @@ if ( ! function_exists( 'wp_roles' ) ) {
                 'author'        => ['name'=>'Author'],
                 'contributor'   => ['name'=>'Contributor'],
                 'subscriber'    => ['name'=>'Subscriber'],
-            ]
+            ],
+            'role_names' => [
+                'administrator' => 'Administrator',
+                'editor'        => 'Editor',
+                'author'        => 'Author',
+                'contributor'   => 'Contributor',
+                'subscriber'    => 'Subscriber',
+            ],
+            'role_key' => 'wp_user_roles',
         ];
     }
 }

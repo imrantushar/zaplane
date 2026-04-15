@@ -78,12 +78,18 @@ if ( ! function_exists( 'get_userdata' ) ) {
 }
 
 if ( ! function_exists( 'get_user_meta' ) ) {
-    function get_user_meta( $user_id, $key ) {
+    function get_user_meta( $user_id, $key = '', $single = false ) {
         $data = [
             'first_name' => 'John',
             'last_name' => 'Doe',
         ];
-        return $data[ $key ] ?? '';
+
+        if ( '' === (string) $key ) {
+            return $data;
+        }
+
+        $value = $data[ $key ] ?? '';
+        return $single ? $value : [ $value ];
     }
 }
 
