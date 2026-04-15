@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-04-15 05:33:59",
+    "generated_at": "2026-04-14 10:08:15",
     "apps": {
         "cartflows": {
             "slug": "cartflows",
@@ -798,6 +798,23 @@
                                 ]
                             },
                             "required": true
+                        },
+                        {
+                            "key": "post",
+                            "label": "Posts",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "posts",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ],
+                                "depends_on": [
+                                    "post_type"
+                                ]
+                            },
+                            "required": false
                         },
                         {
                             "key": "post_status",

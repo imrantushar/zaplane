@@ -14,21 +14,41 @@ trait QueryTrait {
 		], $types);
 	}
 
-	public static function query_posts( $q ) {
+	public static function query_posts( $query ) {
+		$post_type = $query['post_type'] ?? ( $query['where']['post_type'] ?? null );
 
-		$args = [
-			'post_type'   => $q['where']['post_type'] ?? 'post',
-			'post_status' => $q['where']['post_status'] ?? 'publish',
-			's'           => $q['search'] ?? '',
-			'numberposts' => $q['limit'] ?? 20,
-		];
+		if ( empty( $post_type ) ) {
+			$post_type = [ 'post', 'page' ];
+		}
 
-		$posts = get_posts( $args );
+		if ( is_array( $post_type ) ) {
+			$post_type   = array_map( 'sanitize_text_field', $post_type );
+			$post_status = [ 'publish', 'inherit' ];
+		} else {
+			$post_type   = sanitize_text_field( $post_type );
+			$post_status = ( $post_type === 'attachment' ) ? 'inherit' : 'any';
+		}
 
-		return array_map(fn( $p)=>[
-			'ID'         => $p->ID,
-			'post_title' => $p->post_title,
-		], $posts);
+		$posts = get_posts( [
+			'post_type'      => $post_type,
+			'post_status'    => $post_status,
+			'posts_per_page' => -1,
+		] );
+
+		$result = [ [ 'name' => 'any', 'label' => 'Any' ] ];
+
+		foreach ( $posts as $post ) {
+			$label = ( $post->post_type === 'attachment' )
+				? ( $post->post_title ?: basename( get_attached_file( $post->ID ) ) )
+				: ( $post->post_title ?: '(no title)' );
+
+			$result[] = [
+				'name'  => (string) $post->ID,
+				'label' => $label,
+			];
+		}
+
+		return $result;
 	}
 
 	public static function query_terms( $query ) {

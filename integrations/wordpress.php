@@ -1,12 +1,11 @@
-<?php
+﻿<?php
 namespace Zaplane\Integrations;
-
-use Zaplane\Traits\ActionResponseTrait;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+use Zaplane\Traits\ActionResponseTrait;
 use Zaplane\Framework\Classes\IntegrationBase;
 use Zaplane\Framework\Models\Post;
 use Zaplane\Framework\Models\User;
@@ -328,11 +327,8 @@ class Wordpress extends IntegrationBase {
 		];
 	}
 
-
-
 	public static function get_trigger_config_schema( string $trigger ): array {
-
-		if ( in_array( $trigger, [ 'publish_post', 'post_updated' ], true ) ) {
+		if ( 'publish_post' === $trigger ) {
 			return [
 				[
 					'key'   => 'post_type',
@@ -350,19 +346,50 @@ class Wordpress extends IntegrationBase {
 					'label' => 'Post Status',
 					'type'  => 'select',
 					'options' => [
-						[
-							'label' => 'Publish',
-							'value' => 'publish'
-						],
-						[
-							'label' => 'Draft',
-							'value' => 'draft'
-						],
+						['label' => 'Publish', 'value' => 'publish'],
+						['label' => 'Draft', 'value' => 'draft'],
 					]
 				]
-
 			];
 		}//end if
+
+		if ( 'post_updated' === $trigger ) {
+			return [
+				[
+					'key'   => 'post_type',
+					'label' => 'Post Type',
+					'type'  => 'select',
+					'dynamic' => [
+						'integration' => 'wordpress',
+						'query'       => 'post_types',
+						'select'      => [ 'name', 'label' ],
+					],
+					'required' => true,
+				],
+				[
+					'key'   => 'post',
+					'label' => 'Posts',
+					'type'  => 'select',
+					'dynamic' => [
+						'integration' => 'wordpress',
+						'query'       => 'posts',
+						'select'      => [ 'name', 'label' ],
+						'depends_on'  => ['post_type'],
+					],
+					'required' => false,
+				],
+				[
+					'key'   => 'post_status',
+					'label' => 'Post Status',
+					'type'  => 'select',
+					'options' => [
+						['label' => 'Publish', 'value' => 'publish'],
+						['label' => 'Draft', 'value' => 'draft'],
+					]
+				]
+			];
+		}//end if
+
 		if ( in_array( $trigger, [ 'trashed_comment', 'untrashed_comment' ], true ) ) {
 			return [
 				[
@@ -684,15 +711,58 @@ class Wordpress extends IntegrationBase {
 
 	public static function resolve_trigger( array $node, array $args ) {
 
+		$config = $node['config'] ?? [];
+
 		switch ( $node['event'] ) {
 			case 'publish_post':
-			case 'post_updated':
 			case 'delete_post':
 			case 'untrashed_post':
 			case 'wp_trash_post':
 			case 'deleted_post':
 			case 'save_post':
 				return self::resolve_post_payload( $args[0] ?? 0 );
+
+			case 'post_updated':
+
+				$post_id = isset($args[0]) ? (int) $args[0] : 0;
+				if ( ! $post_id ) {
+					return;
+				}
+
+				$post = get_post( $post_id );
+				if ( ! $post ) {
+					return;
+				}
+
+				if (
+					( defined('DOING_AUTOSAVE') && DOING_AUTOSAVE ) ||
+					wp_is_post_revision( $post_id ) ||
+					$post->post_status === 'auto-draft'
+				) {
+					return;
+				}
+
+				$selected_type = $config['post_type'] ?? 'post';
+				$selected_id   = $config['post'] ?? null;
+
+				$current_type = $post->post_type;
+
+				if ( $current_type === 'attachment' ) {
+					$current_type = 'media';
+				}
+
+				if ( $selected_type !== $current_type ) {
+					return;
+				}
+
+				if ( $selected_id !== null && $selected_id !== '' ) {
+
+					if ( (int) $selected_id !== (int) $post_id ) {
+						return;
+					}
+				}
+
+				return self::resolve_post_payload( $post_id );
 
 			case 'transition_post_status':
 				$wpPost = $args[2] ?? null;
@@ -1507,82 +1577,299 @@ class Wordpress extends IntegrationBase {
 
 			'create_post' => [
 				[
-					'key' => 'post_title',
-					'label' => 'Title',
-					'type' => 'expression',
-					'required' => true
-				],
-				[
-					'key' => 'post_content',
-					'label' => 'Content',
-					'type' => 'textarea'
-				],
-				[
-					'key' => 'post_type',
-					'label' => 'Post Type',
-					'type' => 'select',
+					'key'      => 'post_title',
+					'label'    => 'Post Title',
+					'type'     => 'expression',
 					'required' => true,
-					'dynamic' => [
-						'integration' => 'wordpress',
-						'query' => 'post_types',
-						'select' => [ 'name', 'label' ],
-					]
 				],
 				[
-					'key' => 'post_status',
-					'label' => 'Status',
-					'type' => 'select',
-					'options' => [
-						[
-							'label' => 'Draft',
-							'value' => 'draft'
-						],
-						[
-							'label' => 'Publish',
-							'value' => 'publish'
-						],
-					]
+					'key'         => 'post_type',
+					'label'       => 'Post Type',
+					'type'        => 'select',
+					'required'    => true,
+					'placeholder' => 'any post type',
+					'dynamic'     => [
+						'integration' => 'wordpress',
+						'query'       => 'post_types',
+						'select'      => [ 'name', 'label' ],
+					],
+				],
+				[
+					'key'         => 'post_status',
+					'label'       => 'Post Status',
+					'type'        => 'select',
+					'required'    => true,
+					'placeholder' => 'any post status',
+					'options'     => [
+						[ 'label' => 'Draft',   'value' => 'draft' ],
+						[ 'label' => 'Publish', 'value' => 'publish' ],
+						[ 'label' => 'Pending', 'value' => 'pending' ],
+						[ 'label' => 'Private', 'value' => 'private' ],
+						[ 'label' => 'Future',  'value' => 'future' ],
+					],
+				],
+				[
+					'key'         => 'post_author',
+					'label'       => 'Post Author',
+					'type'        => 'select',
+					'placeholder' => 'any post author',
+					'dynamic'     => [
+						'integration' => 'wordpress',
+						'query'       => 'users',
+						'select'      => [ 'name', 'label' ],
+					],
+				],
+				[
+					'key'         => 'post_category',
+					'label'       => 'Post Category',
+					'type'        => 'select',
+					'placeholder' => 'any post category',
+					'dynamic'     => [
+						'integration' => 'wordpress',
+						'query'       => 'categories',
+						'select'      => [ 'name', 'label' ],
+					],
+				],
+				[
+					'key'      => 'post_tags',
+					'label'    => 'Select Post Tags',
+					'type'     => 'select',
+					'required' => true,
+					'multiple' => true,
+					'dynamic'  => [
+						'integration' => 'wordpress',
+						'query'       => 'tags',
+						'select'      => [ 'name', 'label' ],
+					],
+				],
+				[
+					'key'   => 'post_content',
+					'label' => 'Post Content',
+					'type'  => 'textarea',
+				],
+				[
+					'key'   => 'post_excerpt',
+					'label' => 'Post Excerpt',
+					'type'  => 'textarea',
+				],
+				[
+					'key'   => 'post_date',
+					'label' => 'Post Date',
+					'type'  => 'expression',
+				],
+				[
+					'key'   => 'post_date_gmt',
+					'label' => 'Post Date GMT',
+					'type'  => 'expression',
+				],
+				[
+					'key'   => 'post_name',
+					'label' => 'Post Slug',
+					'type'  => 'expression',
+				],
+				[
+					'key'         => 'post_parent',
+					'label'       => 'Post Parent Id',
+					'type'        => 'expression',
+					'description' => 'Provide the Id of the parent post if this is a child post.',
+				],
+				[
+					'key'         => 'post_password',
+					'label'       => 'Post Password',
+					'type'        => 'expression',
+					'description' => 'Only visible to those who know the password.',
+				],
+				[
+					'key'    => 'featured_image_url',
+					'label'  => 'Post Featured Image URL',
+					'type'   => 'expression',
+					'toggle' => 'use_featured_image_id',
+				],
+				[
+					'key'         => 'use_featured_image_id',
+					'label'       => 'Use Featured Image ID instead of URL',
+					'type'        => 'toggle',
+					'description' => 'Enable to use Featured Image ID field instead of URL.',
+				],
+				[
+					'key'         => 'taxonomy',
+					'label'       => 'Select Taxonomy',
+					'type'        => 'select',
+					'placeholder' => 'any post Taxonomy',
+					'dynamic'     => [
+						'integration' => 'wordpress',
+						'query'       => 'taxonomies',
+						'select'      => [ 'name', 'label' ],
+					],
+				],
+				[
+					'key'         => 'taxonomy_term',
+					'label'       => 'Select Taxonomy Term',
+					'type'        => 'select',
+					'placeholder' => 'any post Taxonomy Term',
+					'dynamic'     => [
+						'integration' => 'wordpress',
+						'query'       => 'taxonomy_terms',
+						'select'      => [ 'name', 'label' ],
+					],
+				],
+				[
+					'key'    => 'custom_fields',
+					'label'  => 'Post Custom Field Map',
+					'type'   => 'map',
+					'fields' => [
+						[ 'key' => 'key',   'label' => 'Key',   'type' => 'expression', 'required' => true ],
+						[ 'key' => 'value', 'label' => 'Value', 'type' => 'expression', 'required' => true ],
+					],
 				],
 			],
 
 			'update_post' => [
 				...self::field_post_id(),
 				[
-					'key' => 'post_title',
-					'label' => 'New Post Title',
-					'type' => 'expression',
-					'required' => true
+					'key'      => 'post_title',
+					'label'    => 'Post Title',
+					'type'     => 'expression',
+					'required' => true,
 				],
 				[
-					'key' => 'post_content',
-					'label' => 'New Post Content',
-					'type' => 'expression',
-					'required' => true
-				],
-				[
-					'key' => 'post_type',
-					'label' => 'Post Type',
-					'type' => 'select',
-					'dynamic' => [
+					'key'         => 'post_type',
+					'label'       => 'Post Type',
+					'type'        => 'select',
+					'required'    => true,
+					'placeholder' => 'any post type',
+					'dynamic'     => [
 						'integration' => 'wordpress',
 						'query'       => 'post_types',
 						'select'      => [ 'name', 'label' ],
 					],
-					'required' => true,
 				],
 				[
-					'key' => 'post_status',
-					'label' => 'Status',
-					'type' => 'select',
-					'options' => [
-						[
-							'label' => 'Draft',
-							'value' => 'draft'
-						],
-						[
-							'label' => 'Publish',
-							'value' => 'publish'
-						],
+					'key'         => 'post_status',
+					'label'       => 'Post Status',
+					'type'        => 'select',
+					'required'    => true,
+					'placeholder' => 'any post status',
+					'options'     => [
+						[ 'label' => 'Draft',   'value' => 'draft' ],
+						[ 'label' => 'Publish', 'value' => 'publish' ],
+						[ 'label' => 'Pending', 'value' => 'pending' ],
+						[ 'label' => 'Private', 'value' => 'private' ],
+						[ 'label' => 'Future',  'value' => 'future' ],
+					],
+				],
+				[
+					'key'         => 'post_author',
+					'label'       => 'Post Author',
+					'type'        => 'select',
+					'placeholder' => 'any post author',
+					'dynamic'     => [
+						'integration' => 'wordpress',
+						'query'       => 'users',
+						'select'      => [ 'name', 'label' ],
+					],
+				],
+				[
+					'key'         => 'post_category',
+					'label'       => 'Post Category',
+					'type'        => 'select',
+					'placeholder' => 'any post category',
+					'dynamic'     => [
+						'integration' => 'wordpress',
+						'query'       => 'categories',
+						'select'      => [ 'name', 'label' ],
+					],
+				],
+				[
+					'key'      => 'post_tags',
+					'label'    => 'Select Post Tags',
+					'type'     => 'select',
+					'required' => true,
+					'multiple' => true,
+					'dynamic'  => [
+						'integration' => 'wordpress',
+						'query'       => 'tags',
+						'select'      => [ 'name', 'label' ],
+					],
+				],
+				[
+					'key'   => 'post_content',
+					'label' => 'Post Content',
+					'type'  => 'textarea',
+				],
+				[
+					'key'   => 'post_excerpt',
+					'label' => 'Post Excerpt',
+					'type'  => 'textarea',
+				],
+				[
+					'key'   => 'post_date',
+					'label' => 'Post Date',
+					'type'  => 'expression',
+				],
+				[
+					'key'   => 'post_date_gmt',
+					'label' => 'Post Date GMT',
+					'type'  => 'expression',
+				],
+				[
+					'key'   => 'post_name',
+					'label' => 'Post Slug',
+					'type'  => 'expression',
+				],
+				[
+					'key'         => 'post_parent',
+					'label'       => 'Post Parent Id',
+					'type'        => 'expression',
+					'description' => 'Provide the Id of the parent post if this is a child post.',
+				],
+				[
+					'key'         => 'post_password',
+					'label'       => 'Post Password',
+					'type'        => 'expression',
+					'description' => 'Only visible to those who know the password.',
+				],
+				[
+					'key'    => 'featured_image_url',
+					'label'  => 'Post Featured Image URL',
+					'type'   => 'expression',
+					'toggle' => 'use_featured_image_id',
+				],
+				[
+					'key'         => 'use_featured_image_id',
+					'label'       => 'Use Featured Image ID instead of URL',
+					'type'        => 'toggle',
+					'description' => 'Enable to use Featured Image ID field instead of URL.',
+				],
+				[
+					'key'         => 'taxonomy',
+					'label'       => 'Select Taxonomy',
+					'type'        => 'select',
+					'placeholder' => 'any post Taxonomy',
+					'dynamic'     => [
+						'integration' => 'wordpress',
+						'query'       => 'taxonomies',
+						'select'      => [ 'name', 'label' ],
+					],
+				],
+				[
+					'key'         => 'taxonomy_term',
+					'label'       => 'Select Taxonomy Term',
+					'type'        => 'select',
+					'placeholder' => 'any post Taxonomy Term',
+					'dynamic'     => [
+						'integration' => 'wordpress',
+						'query'       => 'taxonomy_terms',
+						'select'      => [ 'name', 'label' ],
+					],
+				],
+				[
+					'key'    => 'custom_fields',
+					'label'  => 'Post Custom Field Map',
+					'type'   => 'map',
+					'fields' => [
+						[ 'key' => 'key',   'label' => 'Key',   'type' => 'expression', 'required' => true ],
+						[ 'key' => 'value', 'label' => 'Value', 'type' => 'expression', 'required' => true ],
 					],
 				],
 			],

@@ -62,11 +62,12 @@ export const initOAuth = createAsyncThunk(
 // Create token-based connection
 export const createTokenConnection = createAsyncThunk(
   'connections/createTokenConnection',
-  async ({ app, name, authType, credentials }, thunkAPI) => {
+  async ({ app, name,icon, authType, credentials }, thunkAPI) => {
     try {
       const res = await API.post(namespace + 'connections', {
         app,
         name,
+        icon,
         auth_type: authType,
         credentials,
       });

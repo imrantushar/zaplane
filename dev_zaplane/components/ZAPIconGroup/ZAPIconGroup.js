@@ -6,6 +6,14 @@ const ZAPIconGroup = ({ icons = [], maxVisible = 3 }) => {
     const visibleIcons = safeIcons.slice(0, maxVisible);
     const remaining = Math.max(0, safeIcons.length - maxVisible);
     const totalItems = visibleIcons.length + (remaining > 0 ? 1 : 0);
+        if (safeIcons.length === 0) {
+        return (
+                <Image
+                    src={`${plugin_root_url}assets/images/button.svg`}
+                    boxSize="40px"
+                />
+        );
+    }
     return (
         <Flex
             border="1px solid var(--zaplane-border-color)"
