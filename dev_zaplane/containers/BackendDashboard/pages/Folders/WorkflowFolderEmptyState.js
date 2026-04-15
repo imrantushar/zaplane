@@ -11,14 +11,7 @@ import { useState } from "react";
 import { __ } from "@wordpress/i18n";
 import CreateFolderModal from "@ZAPComponents/CreateFolderModal";
 
-/**
- * WorkflowFolderEmptyState
- *
- * Displays an empty-state prompt when no workflow folders exist yet.
- *
- * Props:
- *   onCreateFolder — callback fired when the "Create Folder +" button is clicked
- */
+
 const WorkflowFolderEmptyState = ({ onCreateFolder }) => {
     const [isFolderModalOpen, setIsFolderModalOpen] = useState(false);
     return (
@@ -33,11 +26,11 @@ const WorkflowFolderEmptyState = ({ onCreateFolder }) => {
                 w="full"
                 textAlign="center"
             >
-                <VStack spacing={3}>
+                <VStack gap='18px'>
                     <Icon
                         as={FolderPlus}
                         boxSize={8}
-                        color="var(--zaplane-font-color, #141A24)"
+                        color="var(--zaplane-font-color)"
                         strokeWidth={1.5}
                     />
 
@@ -45,13 +38,13 @@ const WorkflowFolderEmptyState = ({ onCreateFolder }) => {
                         fontWeight="700"
                         fontSize="lg"
                         className="zaplane-label"
-                        color="var(--zaplane-font-color, #141A24)"
+                        color="var(--zaplane-font-color)"
                     >
                         {__('Create Folders for your Workflows', 'zaplane')}
                     </Text>
                     <Text
                         fontSize="sm"
-                        color="var(--zaplane-font-secondary-color, #737373)"
+                        color="var(--zaplane-font-secondary-color)"
                         maxW="sm"
                         lineHeight="tall"
                         className="zaplane-label"
