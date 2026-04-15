@@ -14,7 +14,8 @@ export const useFlowActions = ({
     getNewNodeId,
     setFieldValue,
     canvasLayout,
-    setCanvasLayOut
+    setCanvasLayOut,
+    values
 
 }) => {
 
@@ -56,20 +57,20 @@ export const useFlowActions = ({
         );
     };
 
-  const handleAddAction = (actionData) => {
-    createActionNode({
-        nodes,
-        edges,
-        drawerContext,
-        canvasLayout,
-        getNewNodeId,
-        setNodes,
-        setEdges,
-        setDrawerContext,
-        setDrawerOpen,
-        actionData,
-    });
-};
+    const handleAddAction = (actionData) => {
+        createActionNode({
+            nodes,
+            edges,
+            drawerContext,
+            canvasLayout,
+            getNewNodeId,
+            setNodes,
+            setEdges,
+            setDrawerContext,
+            setDrawerOpen,
+            actionData,
+        });
+    };
     const onAddNode = (edgeId) => {
         const edge = edges.find((e) => e.id === edgeId);
         return edge;
@@ -77,6 +78,7 @@ export const useFlowActions = ({
 
     const openDrawerForNode = (node) => {
         setDrawerContext({ source: "node", node, edge: null });
+      setFieldValue("nodeClick", !values.nodeClick);
         setDrawerOpen(true);
     };
 

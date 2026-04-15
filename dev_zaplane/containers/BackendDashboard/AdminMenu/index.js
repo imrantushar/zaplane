@@ -39,7 +39,7 @@ const AdminMenu = () => {
 					<br />
 				</div>
 				<div className="wp-menu-name">
-					{ __( 'zaplane', 'zaplane' ) }
+					{ __( 'Zaplane', 'zaplane' ) }
 				</div>
 			</Link>
 			<ul className="wp-submenu wp-submenu-wrap">

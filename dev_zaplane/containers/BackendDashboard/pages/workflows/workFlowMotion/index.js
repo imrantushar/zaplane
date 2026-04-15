@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { ReactFlowProvider, useEdgesState, useNodesState } from "@xyflow/react";
 import FlowCanvas from "./FlowCanvas/FlowCanvas";
 import { Formik } from "formik";
-import { generateFlowHash, mapEdgesForBackend, mapNodesForBackend } from "./helper";
+import { extractIntegrationIcons, generateFlowHash, mapEdgesForBackend, mapNodesForBackend } from "./helper";
 import { useDispatch, useSelector } from "react-redux";
 import { Box, Flex } from "@chakra-ui/react";
 import { updateWorkFlow } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow";
@@ -14,18 +14,18 @@ export default function Workflows({ id }) {
   const getNewNodeId = nodeIdRef.current;
   const [initialHash, setInitialHash] = useState("");
   const { workFlow } = useSelector((state) => state.workflows);
- const [canvasLayout, setCanvasLayOut] = useState(workFlow?.workflow?.layout)
+  const [canvasLayout, setCanvasLayOut] = useState(workFlow?.workflow?.layout)
   const [nodes, setNodes, onNodesChange] = useNodesState([
     {
       id: getNewNodeId(),
       type: 'custom',
       data: {
-        icon:'plus',
+        icon: 'plus',
         app: "Select an app",
         action: 'trigger',
         config: {}
       },
-      position: { x: 125, y: 300 },
+      position: { x: 400, y: 300 },
     }
   ]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
@@ -37,12 +37,12 @@ export default function Workflows({ id }) {
         id: getNewNodeId(),
         type: "custom",
         data: {
-           icon:'plus',
+          icon: 'plus',
           app: "Select an app",
           action: "trigger",
           config: {},
         },
-        position: { x: 125, y: 300 },
+        position: { x: 400, y: 300 },
       },
     ];
 
@@ -53,10 +53,10 @@ export default function Workflows({ id }) {
     setInitialHash(hash);
   }, [id]);
   useEffect(() => {
-  if (workFlow?.workflow?.layout) {
-    setCanvasLayOut(workFlow.workflow.layout);
-  }
-}, [workFlow]);
+    if (workFlow?.workflow?.layout) {
+      setCanvasLayOut(workFlow.workflow.layout);
+    }
+  }, [workFlow]);
   const currentHash = useMemo(() => {
     return generateFlowHash(nodes, edges);
   }, [nodes, edges]);
@@ -65,7 +65,8 @@ export default function Workflows({ id }) {
     const payload = {
       nodes: mapNodesForBackend(nodes),
       edges: mapEdgesForBackend(edges),
-      layout: canvasLayout
+      layout: canvasLayout,
+      integration_icons: extractIntegrationIcons(nodes),
     }
     await dispatch(
       updateWorkFlow({ id, payload })
@@ -81,7 +82,9 @@ export default function Workflows({ id }) {
         <Formik
           enableReinitialize
           initialValues={
-            {}}
+            {
+              nodeClick: false,
+            }}
           onSubmit={onSubmitHandler}
         >
           {({ }) => (

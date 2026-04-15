@@ -16,7 +16,7 @@ class ConnectionManager {
 
 
 
-	public function create( int $user_id, string $app, string $name, string $auth_type, array $credentials ): array {
+	public function create( int $user_id, string $app, string $name, string $auth_type, array $credentials, ?string $icon = null ): array {
 		$integration = IntegrationLoader::get( $app );
 		if ( ! $integration ) {
 			throw IntegrationException::notFound( esc_html( $app ) );
@@ -43,6 +43,7 @@ class ConnectionManager {
 		$connection = Connection::create([
 			'user_id' => $user_id,
 			'app' => $app,
+			'icon' => $icon,
 			'name' => $name,
 			'auth_type' => $auth_type,
 			'encrypted_credentials' => $encrypted,

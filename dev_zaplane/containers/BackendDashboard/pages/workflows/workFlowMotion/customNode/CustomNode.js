@@ -87,9 +87,10 @@ export default function CustomNode({ id, data, canvasLayout, nodes }) {
       <Box
         bg="var(--zaplane-body-background)"
         borderRadius="md"
-        px={4}
-        py={2}
+        padding="16px 28px 16px 14px"
         width="180px"
+        display="flex"
+        height="60px"
         textAlign="center"
         boxShadow="sm"
         onClick={data.onOpenDrawer}
@@ -112,7 +113,7 @@ export default function CustomNode({ id, data, canvasLayout, nodes }) {
         {/* NODE CONTENT */}
         <HStack spacing={3} align="center">
           <ZAPIcon icon={data?.icon} name={data.app} />
-          <Box textAlign="left" flex="1" minW="0">
+          <Box textAlign="left" flex="1" minW="0" w='105px'>
             <Text
               className="zaplane-label"
               overflow="hidden"

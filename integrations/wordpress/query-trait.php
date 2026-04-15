@@ -14,21 +14,41 @@ trait QueryTrait {
 		], $types);
 	}
 
-	public static function query_posts( $q ) {
+	public static function query_posts( $query ) {
+		$post_type = $query['post_type'] ?? ( $query['where']['post_type'] ?? null );
 
-		$args = [
-			'post_type'   => $q['where']['post_type'] ?? 'post',
-			'post_status' => $q['where']['post_status'] ?? 'publish',
-			's'           => $q['search'] ?? '',
-			'numberposts' => $q['limit'] ?? 20,
-		];
+		if ( empty( $post_type ) ) {
+			$post_type = [ 'post', 'page' ];
+		}
 
-		$posts = get_posts( $args );
+		if ( is_array( $post_type ) ) {
+			$post_type   = array_map( 'sanitize_text_field', $post_type );
+			$post_status = [ 'publish', 'inherit' ];
+		} else {
+			$post_type   = sanitize_text_field( $post_type );
+			$post_status = ( $post_type === 'attachment' ) ? 'inherit' : 'any';
+		}
 
-		return array_map(fn( $p)=>[
-			'ID'         => $p->ID,
-			'post_title' => $p->post_title,
-		], $posts);
+		$posts = get_posts( [
+			'post_type'      => $post_type,
+			'post_status'    => $post_status,
+			'posts_per_page' => -1,
+		] );
+
+		$result = [ [ 'name' => 'any', 'label' => 'Any' ] ];
+
+		foreach ( $posts as $post ) {
+			$label = ( $post->post_type === 'attachment' )
+				? ( $post->post_title ?: basename( get_attached_file( $post->ID ) ) )
+				: ( $post->post_title ?: '(no title)' );
+
+			$result[] = [
+				'name'  => (string) $post->ID,
+				'label' => $label,
+			];
+		}
+
+		return $result;
 	}
 
 	public static function query_terms( $query ) {
@@ -66,27 +86,46 @@ trait QueryTrait {
 		$q = is_array( $q ) ? $q : [];
 		$users = $q['users'] ?? get_users( [ 'search' => $q['search'] ?? '' ] );
 		return array_map(function ( $user ) {
-			$data = (array) $user->data;
+			if ( is_array( $user ) ) {
+				$user = (object) $user;
+			}
+
+			if ( ! is_object( $user ) ) {
+				return [];
+			}
+
+			if ( isset( $user->data ) && is_object( $user->data ) ) {
+				$data = (array) $user->data;
+			} elseif ( isset( $user->data ) && is_array( $user->data ) ) {
+				$data = $user->data;
+			} else {
+				$data = (array) $user;
+			}
+
 			unset( $data['user_pass'], $data['user_activation_key'] );
 
+			$user_id = (int) ( $user->ID ?? $data['ID'] ?? 0 );
+			$roles = isset( $user->roles ) && is_array( $user->roles ) ? $user->roles : ( $data['roles'] ?? [] );
+			$caps = isset( $user->caps ) && is_array( $user->caps ) ? $user->caps : [];
+
 			return [
-				'ID'          => $user->ID,
-				'name'        => $user->display_name,
-				'email'       => $user->user_email,
-				'login'       => $user->user_login,
-				'nicename'    => $user->user_nicename,
-				'url'         => $user->user_url,
-				'registered'  => $user->user_registered,
-				'roles'       => $user->roles ?? [],
-				'first_name'  => $user->first_name ?? '',
-				'last_name'   => $user->last_name ?? '',
-				'nickname'    => $user->nickname ?? '',
-				'description' => $user->description ?? '',
-				'locale'      => function_exists( 'get_user_locale' ) ? get_user_locale( $user->ID ) : '',
-				'avatar'      => get_avatar_url( $user->ID ),
-				'caps'        => array_keys( $user->caps ?? [] ),
+				'ID'          => $user_id,
+				'name'        => $user->display_name ?? $data['display_name'] ?? '',
+				'email'       => $user->user_email ?? $data['user_email'] ?? '',
+				'login'       => $user->user_login ?? $data['user_login'] ?? '',
+				'nicename'    => $user->user_nicename ?? $data['user_nicename'] ?? '',
+				'url'         => $user->user_url ?? $data['user_url'] ?? '',
+				'registered'  => $user->user_registered ?? $data['user_registered'] ?? '',
+				'roles'       => $roles,
+				'first_name'  => $user->first_name ?? $data['first_name'] ?? '',
+				'last_name'   => $user->last_name ?? $data['last_name'] ?? '',
+				'nickname'    => $user->nickname ?? $data['nickname'] ?? '',
+				'description' => $user->description ?? $data['description'] ?? '',
+				'locale'      => ( $user_id > 0 && function_exists( 'get_user_locale' ) ) ? get_user_locale( $user_id ) : '',
+				'avatar'      => $user_id > 0 ? get_avatar_url( $user_id ) : '',
+				'caps'        => array_keys( $caps ),
 				'data'        => $data,
-				'meta'        => get_user_meta( $user->ID ),
+				'meta'        => $user_id > 0 ? get_user_meta( $user_id, '' ) : [],
 			];
 		}, $users);
 	}

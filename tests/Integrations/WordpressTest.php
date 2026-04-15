@@ -262,7 +262,7 @@ class WordpressTest extends IntegrationTestCase {
 			'update_user_role'         => [ 'user_id' => 1, 'role' => 'editor' ],
 			'get_users'                => [ 'search' => '' ],
 			'get_users_by_role'        => [ 'role' => 'subscriber' ],
-			'get_user_by_email'        => [ 'email' => 'user1@example.com' ],
+			'get_user_by_email'        => [ 'email' => 'admin@example.com' ],
 			'get_user_by_field'        => [ 'field' => 'id', 'value' => '1' ],
 			'get_user_meta_all'        => [ 'user_id' => 1 ],
 			'get_user_meta_single'     => [ 'user_id' => 1, 'meta_key' => 'some_key' ],
@@ -473,6 +473,29 @@ class WordpressTest extends IntegrationTestCase {
 
 	public function test_trigger_delete_user_returns_array(): void {
 		$result = Wordpress::resolve_trigger( $this->makeTriggerNode( 'delete_user' ), [ 1 ] );
+		$this->assertIsArray( $result );
+	}
+
+	public function test_trigger_user_filter_allows_selected_user_only(): void {
+		$matched = Wordpress::resolve_trigger(
+			$this->makeTriggerNode( 'user_register', [ 'user_id' => 1 ] ),
+			[ 1 ]
+		);
+		$filtered = Wordpress::resolve_trigger(
+			$this->makeTriggerNode( 'user_register', [ 'user_id' => 2 ] ),
+			[ 1 ]
+		);
+
+		$this->assertIsArray( $matched );
+		$this->assertFalse( $filtered );
+	}
+
+	public function test_trigger_user_filter_accepts_any_user(): void {
+		$result = Wordpress::resolve_trigger(
+			$this->makeTriggerNode( 'user_register', [ 'user_id' => 'any' ] ),
+			[ 1 ]
+		);
+
 		$this->assertIsArray( $result );
 	}
 
@@ -1204,6 +1227,33 @@ class WordpressTest extends IntegrationTestCase {
 		);
 	}
 
+	public function test_trigger_term_filter_allows_selected_term_only(): void {
+		WPMocks::setTerm( 5, [ 'name' => 'PHP', 'taxonomy' => 'category' ] );
+		WPMocks::setTerm( 6, [ 'name' => 'JS', 'taxonomy' => 'category' ] );
+
+		$matched = Wordpress::resolve_trigger(
+			$this->makeTriggerNode( 'create_term', [ 'term_id' => 5 ] ),
+			[ 5, 1, 'category' ]
+		);
+		$filtered = Wordpress::resolve_trigger(
+			$this->makeTriggerNode( 'create_term', [ 'term_id' => 6 ] ),
+			[ 5, 1, 'category' ]
+		);
+
+		$this->assertIsArray( $matched );
+		$this->assertFalse( $filtered );
+	}
+
+	public function test_trigger_term_filter_accepts_any_term(): void {
+		WPMocks::setTerm( 5, [ 'name' => 'PHP', 'taxonomy' => 'category' ] );
+		$result = Wordpress::resolve_trigger(
+			$this->makeTriggerNode( 'create_term', [ 'term_id' => 'any' ] ),
+			[ 5, 1, 'category' ]
+		);
+
+		$this->assertIsArray( $result );
+	}
+
 	// --- switch_blog ---------------------------------------------------------
 
 	public function test_trigger_switch_blog_with_valid_id_returns_array_or_false(): void {
@@ -1271,6 +1321,44 @@ class WordpressTest extends IntegrationTestCase {
 				$this->assertArrayHasKey( 'type', $field, "Field in '$trigger' schema missing 'type'" );
 			}
 		}
+	}
+
+	public function test_user_trigger_schema_has_dynamic_all_users_selector(): void {
+		$schema = Wordpress::get_trigger_config_schema( 'user_register' );
+		$field = $schema[0] ?? [];
+
+		$this->assertSame( 'user_id', $field['key'] ?? '' );
+		$this->assertSame( 'users_with_any', $field['dynamic']['query'] ?? '' );
+		$this->assertSame( 'any', $field['default'] ?? '' );
+	}
+
+	public function test_query_users_with_any_starts_with_all_users_option(): void {
+		$users = Wordpress::query_users_with_any( [] );
+
+		$this->assertNotEmpty( $users );
+		$this->assertSame( 'any', (string) ( $users[0]['ID'] ?? '' ) );
+		$this->assertSame( 'All Users', $users[0]['name'] ?? '' );
+	}
+
+	public function test_term_trigger_schema_has_dynamic_all_terms_selector(): void {
+		$schema = Wordpress::get_trigger_config_schema( 'create_term' );
+		$field = $schema[0] ?? [];
+
+		$this->assertSame( 'term_id', $field['key'] ?? '' );
+		$this->assertSame( 'terms_with_any', $field['dynamic']['query'] ?? '' );
+		$this->assertSame( 'any', $field['default'] ?? '' );
+	}
+
+	public function test_query_terms_with_any_starts_with_all_terms_option(): void {
+		$terms = Wordpress::query_terms_with_any( [
+			'where' => [
+				'taxonomy' => 'category',
+			],
+		] );
+
+		$this->assertNotEmpty( $terms );
+		$this->assertSame( 'any', (string) ( $terms[0]['term_id'] ?? '' ) );
+		$this->assertSame( 'All Terms', $terms[0]['name'] ?? '' );
 	}
 
 	public function test_action_config_schemas_contain_valid_fields(): void {

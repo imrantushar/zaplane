@@ -65,7 +65,7 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
         openDrawerForNode,
         openDrawerFromAdd,
         onLayout
-    } = useFlowActions({ nodes, setNodes, edges, setEdges, drawerContext, getNewNodeId, setDrawerContext, setDrawerOpen, setFieldValue, canvasLayout,setCanvasLayOut });
+    } = useFlowActions({ values,nodes, setNodes, edges, setEdges, drawerContext, getNewNodeId, setDrawerContext, setDrawerOpen, setFieldValue, canvasLayout,setCanvasLayOut });
 
     const onAddNode = (edgeId) => {
         const edge = edges.find((e) => e.id === edgeId);
@@ -156,10 +156,10 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
                     onNodesChange={onNodesChange}
                     onEdgesChange={onEdgesChange}
                     onConnect={onConnect}
-                    fitView
-                    fitViewOnInit
+                    // fitView
+                    // fitViewOnInit
                     //  defaultViewport={{ x: 0, y: 0, zoom: 1 }}
-                    fitViewOptions={{ minZoom: 0.5, maxZoom: 1.5 }}
+                    fitViewOptions={{ minZoom: 0.5, maxZoom: 1 }}
                     panOnDrag
                     zoomOnScroll
                     zoomOnDoubleClick
