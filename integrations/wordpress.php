@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 namespace Zaplane\Integrations;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -1383,82 +1383,299 @@ class Wordpress extends IntegrationBase {
 
 			'create_post' => [
 				[
-					'key' => 'post_title',
-					'label' => 'Title',
-					'type' => 'expression',
-					'required' => true
-				],
-				[
-					'key' => 'post_content',
-					'label' => 'Content',
-					'type' => 'textarea'
-				],
-				[
-					'key' => 'post_type',
-					'label' => 'Post Type',
-					'type' => 'select',
+					'key'      => 'post_title',
+					'label'    => 'Post Title',
+					'type'     => 'expression',
 					'required' => true,
-					'dynamic' => [
-						'integration' => 'wordpress',
-						'query' => 'post_types',
-						'select' => [ 'name', 'label' ],
-					]
 				],
 				[
-					'key' => 'post_status',
-					'label' => 'Status',
-					'type' => 'select',
-					'options' => [
-						[
-							'label' => 'Draft',
-							'value' => 'draft'
-						],
-						[
-							'label' => 'Publish',
-							'value' => 'publish'
-						],
-					]
+					'key'         => 'post_type',
+					'label'       => 'Post Type',
+					'type'        => 'select',
+					'required'    => true,
+					'placeholder' => 'any post type',
+					'dynamic'     => [
+						'integration' => 'wordpress',
+						'query'       => 'post_types',
+						'select'      => [ 'name', 'label' ],
+					],
+				],
+				[
+					'key'         => 'post_status',
+					'label'       => 'Post Status',
+					'type'        => 'select',
+					'required'    => true,
+					'placeholder' => 'any post status',
+					'options'     => [
+						[ 'label' => 'Draft',   'value' => 'draft' ],
+						[ 'label' => 'Publish', 'value' => 'publish' ],
+						[ 'label' => 'Pending', 'value' => 'pending' ],
+						[ 'label' => 'Private', 'value' => 'private' ],
+						[ 'label' => 'Future',  'value' => 'future' ],
+					],
+				],
+				[
+					'key'         => 'post_author',
+					'label'       => 'Post Author',
+					'type'        => 'select',
+					'placeholder' => 'any post author',
+					'dynamic'     => [
+						'integration' => 'wordpress',
+						'query'       => 'users',
+						'select'      => [ 'name', 'label' ],
+					],
+				],
+				[
+					'key'         => 'post_category',
+					'label'       => 'Post Category',
+					'type'        => 'select',
+					'placeholder' => 'any post category',
+					'dynamic'     => [
+						'integration' => 'wordpress',
+						'query'       => 'categories',
+						'select'      => [ 'name', 'label' ],
+					],
+				],
+				[
+					'key'      => 'post_tags',
+					'label'    => 'Select Post Tags',
+					'type'     => 'select',
+					'required' => true,
+					'multiple' => true,
+					'dynamic'  => [
+						'integration' => 'wordpress',
+						'query'       => 'tags',
+						'select'      => [ 'name', 'label' ],
+					],
+				],
+				[
+					'key'   => 'post_content',
+					'label' => 'Post Content',
+					'type'  => 'textarea',
+				],
+				[
+					'key'   => 'post_excerpt',
+					'label' => 'Post Excerpt',
+					'type'  => 'textarea',
+				],
+				[
+					'key'   => 'post_date',
+					'label' => 'Post Date',
+					'type'  => 'expression',
+				],
+				[
+					'key'   => 'post_date_gmt',
+					'label' => 'Post Date GMT',
+					'type'  => 'expression',
+				],
+				[
+					'key'   => 'post_name',
+					'label' => 'Post Slug',
+					'type'  => 'expression',
+				],
+				[
+					'key'         => 'post_parent',
+					'label'       => 'Post Parent Id',
+					'type'        => 'expression',
+					'description' => 'Provide the Id of the parent post if this is a child post.',
+				],
+				[
+					'key'         => 'post_password',
+					'label'       => 'Post Password',
+					'type'        => 'expression',
+					'description' => 'Only visible to those who know the password.',
+				],
+				[
+					'key'    => 'featured_image_url',
+					'label'  => 'Post Featured Image URL',
+					'type'   => 'expression',
+					'toggle' => 'use_featured_image_id',
+				],
+				[
+					'key'         => 'use_featured_image_id',
+					'label'       => 'Use Featured Image ID instead of URL',
+					'type'        => 'toggle',
+					'description' => 'Enable to use Featured Image ID field instead of URL.',
+				],
+				[
+					'key'         => 'taxonomy',
+					'label'       => 'Select Taxonomy',
+					'type'        => 'select',
+					'placeholder' => 'any post Taxonomy',
+					'dynamic'     => [
+						'integration' => 'wordpress',
+						'query'       => 'taxonomies',
+						'select'      => [ 'name', 'label' ],
+					],
+				],
+				[
+					'key'         => 'taxonomy_term',
+					'label'       => 'Select Taxonomy Term',
+					'type'        => 'select',
+					'placeholder' => 'any post Taxonomy Term',
+					'dynamic'     => [
+						'integration' => 'wordpress',
+						'query'       => 'taxonomy_terms',
+						'select'      => [ 'name', 'label' ],
+					],
+				],
+				[
+					'key'    => 'custom_fields',
+					'label'  => 'Post Custom Field Map',
+					'type'   => 'map',
+					'fields' => [
+						[ 'key' => 'key',   'label' => 'Key',   'type' => 'expression', 'required' => true ],
+						[ 'key' => 'value', 'label' => 'Value', 'type' => 'expression', 'required' => true ],
+					],
 				],
 			],
 
 			'update_post' => [
 				...self::field_post_id(),
 				[
-					'key' => 'post_title',
-					'label' => 'New Post Title',
-					'type' => 'expression',
-					'required' => true
+					'key'      => 'post_title',
+					'label'    => 'Post Title',
+					'type'     => 'expression',
+					'required' => true,
 				],
 				[
-					'key' => 'post_content',
-					'label' => 'New Post Content',
-					'type' => 'expression',
-					'required' => true
-				],
-				[
-					'key' => 'post_type',
-					'label' => 'Post Type',
-					'type' => 'select',
-					'dynamic' => [
+					'key'         => 'post_type',
+					'label'       => 'Post Type',
+					'type'        => 'select',
+					'required'    => true,
+					'placeholder' => 'any post type',
+					'dynamic'     => [
 						'integration' => 'wordpress',
 						'query'       => 'post_types',
 						'select'      => [ 'name', 'label' ],
 					],
-					'required' => true,
 				],
 				[
-					'key' => 'post_status',
-					'label' => 'Status',
-					'type' => 'select',
-					'options' => [
-						[
-							'label' => 'Draft',
-							'value' => 'draft'
-						],
-						[
-							'label' => 'Publish',
-							'value' => 'publish'
-						],
+					'key'         => 'post_status',
+					'label'       => 'Post Status',
+					'type'        => 'select',
+					'required'    => true,
+					'placeholder' => 'any post status',
+					'options'     => [
+						[ 'label' => 'Draft',   'value' => 'draft' ],
+						[ 'label' => 'Publish', 'value' => 'publish' ],
+						[ 'label' => 'Pending', 'value' => 'pending' ],
+						[ 'label' => 'Private', 'value' => 'private' ],
+						[ 'label' => 'Future',  'value' => 'future' ],
+					],
+				],
+				[
+					'key'         => 'post_author',
+					'label'       => 'Post Author',
+					'type'        => 'select',
+					'placeholder' => 'any post author',
+					'dynamic'     => [
+						'integration' => 'wordpress',
+						'query'       => 'users',
+						'select'      => [ 'name', 'label' ],
+					],
+				],
+				[
+					'key'         => 'post_category',
+					'label'       => 'Post Category',
+					'type'        => 'select',
+					'placeholder' => 'any post category',
+					'dynamic'     => [
+						'integration' => 'wordpress',
+						'query'       => 'categories',
+						'select'      => [ 'name', 'label' ],
+					],
+				],
+				[
+					'key'      => 'post_tags',
+					'label'    => 'Select Post Tags',
+					'type'     => 'select',
+					'required' => true,
+					'multiple' => true,
+					'dynamic'  => [
+						'integration' => 'wordpress',
+						'query'       => 'tags',
+						'select'      => [ 'name', 'label' ],
+					],
+				],
+				[
+					'key'   => 'post_content',
+					'label' => 'Post Content',
+					'type'  => 'textarea',
+				],
+				[
+					'key'   => 'post_excerpt',
+					'label' => 'Post Excerpt',
+					'type'  => 'textarea',
+				],
+				[
+					'key'   => 'post_date',
+					'label' => 'Post Date',
+					'type'  => 'expression',
+				],
+				[
+					'key'   => 'post_date_gmt',
+					'label' => 'Post Date GMT',
+					'type'  => 'expression',
+				],
+				[
+					'key'   => 'post_name',
+					'label' => 'Post Slug',
+					'type'  => 'expression',
+				],
+				[
+					'key'         => 'post_parent',
+					'label'       => 'Post Parent Id',
+					'type'        => 'expression',
+					'description' => 'Provide the Id of the parent post if this is a child post.',
+				],
+				[
+					'key'         => 'post_password',
+					'label'       => 'Post Password',
+					'type'        => 'expression',
+					'description' => 'Only visible to those who know the password.',
+				],
+				[
+					'key'    => 'featured_image_url',
+					'label'  => 'Post Featured Image URL',
+					'type'   => 'expression',
+					'toggle' => 'use_featured_image_id',
+				],
+				[
+					'key'         => 'use_featured_image_id',
+					'label'       => 'Use Featured Image ID instead of URL',
+					'type'        => 'toggle',
+					'description' => 'Enable to use Featured Image ID field instead of URL.',
+				],
+				[
+					'key'         => 'taxonomy',
+					'label'       => 'Select Taxonomy',
+					'type'        => 'select',
+					'placeholder' => 'any post Taxonomy',
+					'dynamic'     => [
+						'integration' => 'wordpress',
+						'query'       => 'taxonomies',
+						'select'      => [ 'name', 'label' ],
+					],
+				],
+				[
+					'key'         => 'taxonomy_term',
+					'label'       => 'Select Taxonomy Term',
+					'type'        => 'select',
+					'placeholder' => 'any post Taxonomy Term',
+					'dynamic'     => [
+						'integration' => 'wordpress',
+						'query'       => 'taxonomy_terms',
+						'select'      => [ 'name', 'label' ],
+					],
+				],
+				[
+					'key'    => 'custom_fields',
+					'label'  => 'Post Custom Field Map',
+					'type'   => 'map',
+					'fields' => [
+						[ 'key' => 'key',   'label' => 'Key',   'type' => 'expression', 'required' => true ],
+						[ 'key' => 'value', 'label' => 'Value', 'type' => 'expression', 'required' => true ],
 					],
 				],
 			],
