@@ -19,6 +19,7 @@ import RecipeCard from "./RecipeCard";
 import ZAPLoading from "@ZAPComponents/Loading";
 import CustomTableMessage from "@ZAPComponents/Oops/CustomTableMessage";
 import './styles.scss'
+import RecipesSkeleton from "@ZAPComponents/ZaplaneLoader/RecipesSkeletion";
 
 
 const RecipesPage = () => {
@@ -31,7 +32,7 @@ const RecipesPage = () => {
   useEffect(() => {
     dispatch(getRecipes())
   }, [dispatch])
-  if (loadingRecipes) return <ZAPLoading />
+  if (loadingRecipes) return <RecipesSkeleton />
   return (
     <>
       <TopBar
@@ -76,21 +77,21 @@ const RecipesPage = () => {
 
       <div className="zaplane-page-content">
         {
-          recipes?.length ? <SimpleGrid columns={{ base: 1, md: 2, xl: 3 }} spacing={4} gap='20px'   flexWrap="wrap"
-  alignItems="flex-start">
+          recipes?.length ? <SimpleGrid columns={{ base: 1, md: 2, xl: 3 }} spacing={4} gap='20px' flexWrap="wrap"
+            alignItems="flex-start">
             {recipes.map((recipe) => (
               <RecipeCard key={recipe.id} recipe={recipe} />
             ))}
           </SimpleGrid> : (
-           <Box className="zaplane-recipes-custom-msg">
-             <CustomTableMessage
-                  title={__(
-                    'No Data Available!!!',
-                    'zaplane'
-                  )}
-                  subText={'Please, create data to see the available list here.'}
-                />
-           </Box>
+            <Box className="zaplane-recipes-custom-msg">
+              <CustomTableMessage
+                title={__(
+                  'No Data Available!!!',
+                  'zaplane'
+                )}
+                subText={'Please, create data to see the available list here.'}
+              />
+            </Box>
           )
         }
 

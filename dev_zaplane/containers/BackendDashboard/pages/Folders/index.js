@@ -21,6 +21,7 @@ import { getFolders } from "@ZAPRedux/Slices/folderSlice/folderSlice";
 import CreateFolderModal from "@ZAPComponents/CreateFolderModal";
 import WorkflowFolderEmptyState from "./WorkflowFolderEmptyState";
 import ZAPLoading from "@ZAPComponents/Loading";
+import FolderSkeleton from "@ZAPComponents/ZaplaneLoader/FolderSkeleton";
 
 
 const Folders = () => {
@@ -35,7 +36,7 @@ const Folders = () => {
     }, []);
 
 
-   if(isLoading)return <ZAPLoading/>
+   if(isLoading)return <FolderSkeleton/>
     return (
         <>
             <TopBar
