@@ -509,7 +509,165 @@ class Wordpress extends IntegrationBase {
 				],
 			];
 		}
+
+		if ( in_array( $trigger, self::get_user_filterable_triggers(), true ) ) {
+			return self::field_trigger_user_filter();
+		}
+
+		if ( in_array( $trigger, self::get_term_filterable_triggers(), true ) ) {
+			return self::field_trigger_term_filter();
+		}
+
 		return [];
+	}
+
+	private static function get_user_filterable_triggers(): array {
+		return [
+			'user_register',
+			'set_user_role',
+			'profile_update',
+			'wp_update_user',
+			'remove_user_from_blog',
+			'delete_user',
+			'wpmu_delete_user',
+			'wpmu_new_user',
+			'wpmu_activate_user',
+			'create_application_password',
+			'update_application_password',
+			'delete_application_password',
+			'add_user_role',
+			'wp_login',
+			'validate_reset',
+			'wp_logout',
+		];
+	}
+
+	private static function field_trigger_user_filter(): array {
+		return [
+			[
+				'key' => 'user_id',
+				'label' => 'User',
+				'type' => 'select',
+				'dynamic' => [
+					'integration' => 'wordpress',
+					'query'       => 'users_with_any',
+					'select'      => [ 'ID', 'name' ],
+				],
+				'default' => 'any',
+				'required' => false,
+			],
+		];
+	}
+
+	private static function get_term_filterable_triggers(): array {
+		return [
+			'create_term',
+			'created_term',
+			'edit_term',
+			'edited_term',
+			'saved_term',
+			'delete_term',
+		];
+	}
+
+	private static function field_trigger_term_filter(): array {
+		return [
+			[
+				'key' => 'term_id',
+				'label' => 'Term',
+				'type' => 'select',
+				'dynamic' => [
+					'integration' => 'wordpress',
+					'query'       => 'terms_with_any',
+					'select'      => [ 'term_id', 'name' ],
+				],
+				'default' => 'any',
+				'required' => false,
+			],
+		];
+	}
+
+	private static function get_trigger_node_config( array $node ): array {
+		if ( isset( $node['config'] ) && is_array( $node['config'] ) ) {
+			return $node['config'];
+		}
+
+		$data = $node['data'] ?? [];
+		if ( isset( $data['config'] ) && is_array( $data['config'] ) ) {
+			return $data['config'];
+		}
+
+		return [];
+	}
+
+	private static function get_payload_user_id( array $payload ): int {
+		$keys = [ 'ID', 'id', 'user_id', 'userId' ];
+		foreach ( $keys as $key ) {
+			if ( isset( $payload[ $key ] ) ) {
+				return (int) $payload[ $key ];
+			}
+		}
+
+		return 0;
+	}
+
+	private static function get_payload_term_id( array $payload ): int {
+		$keys = [ 'term_id', 'id', 'termId' ];
+		foreach ( $keys as $key ) {
+			if ( isset( $payload[ $key ] ) ) {
+				return (int) $payload[ $key ];
+			}
+		}
+
+		return 0;
+	}
+
+	private static function filter_user_trigger_payload( array $node, $payload ) {
+		if ( ! is_array( $payload ) ) {
+			return false;
+		}
+
+		$event = $node['event'] ?? ( $node['data']['event'] ?? '' );
+		if ( ! in_array( $event, self::get_user_filterable_triggers(), true ) ) {
+			return $payload;
+		}
+
+		$config = self::get_trigger_node_config( $node );
+		$selected_user_id = strtolower( trim( (string) ( $config['user_id'] ?? 'any' ) ) );
+		if ( '' === $selected_user_id || 'any' === $selected_user_id || 'all' === $selected_user_id ) {
+			return $payload;
+		}
+
+		$payload_user_id = self::get_payload_user_id( $payload );
+		if ( $payload_user_id <= 0 ) {
+			return false;
+		}
+
+		return ( (int) $selected_user_id === $payload_user_id ) ? $payload : false;
+	}
+
+	private static function filter_term_trigger_payload( array $node, $payload ) {
+		if ( ! is_array( $payload ) ) {
+			return false;
+		}
+
+		$event = $node['event'] ?? ( $node['data']['event'] ?? '' );
+		if ( ! in_array( $event, self::get_term_filterable_triggers(), true ) ) {
+			return $payload;
+		}
+
+		$config = self::get_trigger_node_config( $node );
+		$selected_term_id = strtolower( trim( (string) ( $config['term_id'] ?? 'any' ) ) );
+		if ( '' === $selected_term_id || 'any' === $selected_term_id || 'all' === $selected_term_id ) {
+			return $payload;
+		}
+
+		$payload_term_id = self::get_payload_term_id( $payload );
+		if ( $payload_term_id <= 0 ) {
+			return false;
+		}
+
+		return ( (int) $selected_term_id === $payload_term_id ) ? $payload : false;
 	}
 
 	private static function resolve_post_payload( int $post_id ) {
@@ -566,7 +724,7 @@ class Wordpress extends IntegrationBase {
 
 			case 'post_updated':
 
-				$post_id = isset($args[0]) ? (int) $args[0] : 0;
+				$post_id = isset( $args[0] ) ? (int) $args[0] : 0;
 				if ( ! $post_id ) {
 					return;
 				}
@@ -577,7 +735,7 @@ class Wordpress extends IntegrationBase {
 				}
 
 				if (
-					( defined('DOING_AUTOSAVE') && DOING_AUTOSAVE ) ||
+					( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) ||
 					wp_is_post_revision( $post_id ) ||
 					$post->post_status === 'auto-draft'
 				) {
@@ -587,21 +745,14 @@ class Wordpress extends IntegrationBase {
 				$selected_type = $config['post_type'] ?? 'post';
 				$selected_id   = $config['post'] ?? null;
 
-				$current_type = $post->post_type;
-
-				if ( $current_type === 'attachment' ) {
-					$current_type = 'media';
-				}
+				$current_type = ( $post->post_type === 'attachment' ) ? 'media' : $post->post_type;
 
 				if ( $selected_type !== $current_type ) {
 					return;
 				}
 
-				if ( $selected_id !== null && $selected_id !== '' ) {
-
-					if ( (int) $selected_id !== (int) $post_id ) {
-						return;
-					}
+				if ( ! empty( $selected_id ) && (int) $selected_id !== $post_id ) {
+					return;
 				}
 
 				return self::resolve_post_payload( $post_id );
@@ -795,11 +946,14 @@ class Wordpress extends IntegrationBase {
 			case 'profile_update':
 			case 'set_user_role':
 			case 'add_user_role':
+			case 'remove_user_from_blog':
 			case 'delete_user':
 			case 'wpmu_delete_user':
 			case 'wp_update_user':
 			case 'wpmu_new_user':
-				return self::get_user_payload( $args[0] ?? 0 );
+			case 'wpmu_activate_user':
+				$payload = self::get_user_payload( $args[0] ?? 0 );
+				return self::filter_user_trigger_payload( $node, $payload );
 
 			case 'wp_login':
 			case 'validate_reset':
@@ -813,9 +967,11 @@ class Wordpress extends IntegrationBase {
 					return false;
 				}
 
-				return array_merge($user->toArray(), [
+				$payload = array_merge($user->toArray(), [
 					'roles' => $wpUser->roles,
 				]);
+
+				return self::filter_user_trigger_payload( $node, $payload );
 
 			case 'wp_login_failed':
 				return [
@@ -829,7 +985,7 @@ class Wordpress extends IntegrationBase {
 					return false;
 				}
 
-				return $currentUser->toArray();
+				return self::filter_user_trigger_payload( $node, $currentUser->toArray() );
 
 			case 'create_application_password':
 				$user_id      = $args[0] ?? 0;
@@ -842,10 +998,12 @@ class Wordpress extends IntegrationBase {
 					return false;
 				}
 
-				return array_merge($user->toArray(), [
+				$payload = array_merge($user->toArray(), [
 					'new_password' => $new_password,
 					'time'         => current_time( 'mysql' ),
 				]);
+
+				return self::filter_user_trigger_payload( $node, $payload );
 
 			case 'update_application_password':
 				$user_id = $args[0] ?? 0;
@@ -859,11 +1017,13 @@ class Wordpress extends IntegrationBase {
 					return false;
 				}
 
-				return array_merge($user->toArray(), [
+				$payload = array_merge($user->toArray(), [
 					'item_name' => $item['name'] ?? '',
 					'item_id'   => $item['uuid'] ?? '',
 					'time'      => current_time( 'mysql' ),
 				]);
+
+				return self::filter_user_trigger_payload( $node, $payload );
 
 			case 'delete_application_password':
 				$user_id = $args[0] ?? 0;
@@ -877,9 +1037,11 @@ class Wordpress extends IntegrationBase {
 					return false;
 				}
 
-				return array_merge($user->toArray(), [
+				$payload = array_merge($user->toArray(), [
 					'uuid' => $uuid,
 				]);
+
+				return self::filter_user_trigger_payload( $node, $payload );
 
 			case 'create_term':
 			case 'created_term':
@@ -887,11 +1049,12 @@ class Wordpress extends IntegrationBase {
 			case 'edited_term':
 			case 'saved_term':
 			case 'delete_term':
-				return self::get_term_payload(
+				$payload = self::get_term_payload(
 					$args[0] ?? 0,
 					$args[2] ?? '',
 					$args[1] ?? 0
 				);
+				return self::filter_term_trigger_payload( $node, $payload );
 
 			case 'add_option':
 			case 'update_option':
@@ -986,6 +1149,30 @@ class Wordpress extends IntegrationBase {
 		}//end switch
 
 		return false;
+	}
+
+	public static function query_users_with_any( $q ): array {
+		return array_merge(
+			[
+				[
+					'ID' => 'any',
+					'name' => 'All Users',
+				],
+			],
+			self::query_users( $q )
+		);
+	}
+
+	public static function query_terms_with_any( $q ): array {
+		return array_merge(
+			[
+				[
+					'term_id' => 'any',
+					'name'    => 'All Terms',
+				],
+			],
+			self::query_terms( $q )
+		);
 	}
 
 
@@ -2786,7 +2973,9 @@ class Wordpress extends IntegrationBase {
 			'post_types' => [ self::class, 'query_post_types' ],
 			'posts'      => [ self::class, 'query_posts' ],
 			'terms'      => [ self::class, 'query_terms' ],
+			'terms_with_any' => [ self::class, 'query_terms_with_any' ],
 			'users'      => [ self::class, 'query_users' ],
+			'users_with_any' => [ self::class, 'query_users_with_any' ],
 			'taxonomies' => [ self::class, 'query_taxonomies' ],
 			'categories' => [ self::class, 'query_categories' ],
 			'roles'      => [ self::class, 'query_roles' ],
