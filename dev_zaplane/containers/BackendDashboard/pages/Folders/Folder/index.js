@@ -41,6 +41,7 @@ const Folder = ({ id }) => {
                     <ZAPLabel
                         as="h2"
                         type="subtitle"
+                        fontSize='14px'
                         fontWeight="medium"
                         href={`${route_path}admin.php?page=zaplane-folders`}
                         label={__("Folders", "zaplane")}

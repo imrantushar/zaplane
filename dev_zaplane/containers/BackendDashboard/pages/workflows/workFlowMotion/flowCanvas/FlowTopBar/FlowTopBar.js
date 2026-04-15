@@ -124,6 +124,7 @@ export default function FlowTopBar({
               color="var(--zapplane-font-color)"
               type="subtitle"
               fontWeight="medium"
+              fontSize="14px"
               href={`${route_path}admin.php?page=zaplane-workflows`}
               label={__('Flows', 'zaplane')}
             />

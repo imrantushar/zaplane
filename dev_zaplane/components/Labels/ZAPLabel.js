@@ -121,7 +121,7 @@ const ZAPLabel = ({
 		<>
 			{ href ? (
 				<Button { ...clearBtn }>
-					<Link to={ href } color="var(--zaplane-font-color)">
+					<Link to={ href } style={{ color: "var(--zaplane-font-color)" }}>
 						<Text { ...textProps } _hover={ { color: '#4F46E5' } }>
 							{ `${ label }` }
 						</Text>
