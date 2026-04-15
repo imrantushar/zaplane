@@ -158,7 +158,7 @@ const RecipeCard = ({ recipe }) => {
           color='#454F59'
           style={{
             display: '-webkit-box',
-            WebkitLineClamp: 3,
+            WebkitLineClamp: 2,
             WebkitBoxOrient: 'vertical',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
