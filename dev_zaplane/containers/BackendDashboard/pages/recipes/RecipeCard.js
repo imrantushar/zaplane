@@ -141,11 +141,30 @@ const RecipeCard = ({ recipe }) => {
 
         <ZAPDivider m='12px 0 8px -16px' w='109%' />
 
-        <Text className='zaplane-label'>
+        <Text
+          className='zaplane-label'
+          style={{
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+          }}
+          title={recipe?.title}
+        >
           {recipe?.title}
         </Text>
 
-        <Text className='zaplane-sub-title' color='#454F59'>
+        <Text
+          className='zaplane-sub-title'
+          color='#454F59'
+          style={{
+            display: '-webkit-box',
+            WebkitLineClamp: 3,
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+          }}
+          title={recipe?.description}
+        >
           {recipe?.description || __('No description', 'zaplane')}
         </Text>
       </Flex>
