@@ -30,6 +30,7 @@ const ZAPLabel = ({
 	sliceLength = 100,
 	sliceMore = '...',
 	textOverflow='',
+	onClick,
 }) => {
 	const [isExpanded, setIsExpanded] = useState(false);
 
@@ -120,7 +121,7 @@ const ZAPLabel = ({
 	return (
 		<>
 			{ href ? (
-				<Button { ...clearBtn }>
+				<Button { ...clearBtn } onClick={ onClick }>
 					<Link to={ href } style={{ color: "var(--zaplane-font-color)" }}>
 						<Text { ...textProps } _hover={ { color: '#4F46E5' } }>
 							{ `${ label }` }
@@ -128,7 +129,7 @@ const ZAPLabel = ({
 					</Link>
 				</Button>
 			) : (
-				<Text { ...textProps }>{ `${ label }` }</Text>
+				<Text { ...textProps } onClick={ onClick } cursor={onClick ? 'pointer' : textProps.cursor}>{ `${ label }` }</Text>
 			) }
 		</>
 	);

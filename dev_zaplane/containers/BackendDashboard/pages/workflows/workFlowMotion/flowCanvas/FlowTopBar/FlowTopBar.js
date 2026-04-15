@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Button, Text, Flex, Input, Box, FileUpload, Image } from "@chakra-ui/react";
+import { Button, Text, Flex, Input } from "@chakra-ui/react";
 import TopBar from "@ZAPComponents/TopBar";
-import { FiArrowLeft, FiDownload, FiUpload } from "react-icons/fi";
+import {  FiDownload } from "react-icons/fi";
 import { TfiReload } from "react-icons/tfi";
 import { LuFullscreen, LuMinimize, LuSquarePlay } from "react-icons/lu";
 import { LucideHistory } from "lucide-react";
@@ -112,23 +112,32 @@ export default function FlowTopBar({
       <TopBar
         leftContent={() => (
           <>
-            <Flex height='40px' width='40px' borderRadius='20px' gap='10px' background='var(--zaplane-second-primary)' alignItems='center' justifyContent='center'>
+            <Flex
+              height="40px"
+              width="40px"
+              borderRadius="20px"
+              background="var(--zaplane-second-primary)"
+              alignItems="center"
+              justifyContent="center"
+            >
               <img
                 src={`${plugin_root_url}assets/images/zaplane.svg`}
-
+                alt="Zaplane"
               />
             </Flex>
+
             <IoIosArrowForward />
+            
             <ZAPLabel
               as="h2"
-              color="var(--zapplane-font-color)"
               type="subtitle"
               fontWeight="medium"
-              fontSize="14px"
               href={`${route_path}admin.php?page=zaplane-workflows`}
               label={__('Flows', 'zaplane')}
             />
+
             <IoIosArrowForward />
+
             {isEditingTitle ? (
               <Input
                 ref={titleInputRef}
@@ -152,20 +161,14 @@ export default function FlowTopBar({
                 maxW="200px"
               />
             ) : (
-              <Text
+              <ZAPLabel
                 as="h2"
-                m='0'
-                fontSize="14px"
-                fontWeight="500"
-                color="var(--zapplane-font-color)"
-                cursor="pointer"
+                type="subtitle"
+                fontWeight="medium"
                 onClick={() => setIsEditingTitle(true)}
-                noOfLines={1}
-                maxW="200px"
-                textOverflow="ellipsis"
-              >
-                {currentTitle}
-              </Text>
+                label={currentTitle}
+                cursor="pointer"
+              />
             )}
           </>
         )}
