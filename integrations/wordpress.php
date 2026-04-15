@@ -487,6 +487,10 @@ class Wordpress extends IntegrationBase {
 			return self::field_trigger_user_filter();
 		}
 
+		if ( in_array( $trigger, self::get_term_filterable_triggers(), true ) ) {
+			return self::field_trigger_term_filter();
+		}
+
 		return [];
 	}
 
@@ -528,6 +532,34 @@ class Wordpress extends IntegrationBase {
 		];
 	}
 
+	private static function get_term_filterable_triggers(): array {
+		return [
+			'create_term',
+			'created_term',
+			'edit_term',
+			'edited_term',
+			'saved_term',
+			'delete_term',
+		];
+	}
+
+	private static function field_trigger_term_filter(): array {
+		return [
+			[
+				'key' => 'term_id',
+				'label' => 'Term',
+				'type' => 'select',
+				'dynamic' => [
+					'integration' => 'wordpress',
+					'query'       => 'terms_with_any',
+					'select'      => [ 'term_id', 'name' ],
+				],
+				'default' => 'any',
+				'required' => false,
+			],
+		];
+	}
+
 	private static function get_trigger_node_config( array $node ): array {
 		if ( isset( $node['config'] ) && is_array( $node['config'] ) ) {
 			return $node['config'];
@@ -543,6 +575,17 @@ class Wordpress extends IntegrationBase {
 
 	private static function get_payload_user_id( array $payload ): int {
 		$keys = [ 'ID', 'id', 'user_id', 'userId' ];
+		foreach ( $keys as $key ) {
+			if ( isset( $payload[ $key ] ) ) {
+				return (int) $payload[ $key ];
+			}
+		}
+
+		return 0;
+	}
+
+	private static function get_payload_term_id( array $payload ): int {
+		$keys = [ 'term_id', 'id', 'termId' ];
 		foreach ( $keys as $key ) {
 			if ( isset( $payload[ $key ] ) ) {
 				return (int) $payload[ $key ];
@@ -574,6 +617,30 @@ class Wordpress extends IntegrationBase {
 		}
 
 		return ( (int) $selected_user_id === $payload_user_id ) ? $payload : false;
+	}
+
+	private static function filter_term_trigger_payload( array $node, $payload ) {
+		if ( ! is_array( $payload ) ) {
+			return false;
+		}
+
+		$event = $node['event'] ?? ( $node['data']['event'] ?? '' );
+		if ( ! in_array( $event, self::get_term_filterable_triggers(), true ) ) {
+			return $payload;
+		}
+
+		$config = self::get_trigger_node_config( $node );
+		$selected_term_id = strtolower( trim( (string) ( $config['term_id'] ?? 'any' ) ) );
+		if ( '' === $selected_term_id || 'any' === $selected_term_id || 'all' === $selected_term_id ) {
+			return $payload;
+		}
+
+		$payload_term_id = self::get_payload_term_id( $payload );
+		if ( $payload_term_id <= 0 ) {
+			return false;
+		}
+
+		return ( (int) $selected_term_id === $payload_term_id ) ? $payload : false;
 	}
 
 	private static function resolve_post_payload( int $post_id ) {
@@ -919,11 +986,12 @@ class Wordpress extends IntegrationBase {
 			case 'edited_term':
 			case 'saved_term':
 			case 'delete_term':
-				return self::get_term_payload(
+				$payload = self::get_term_payload(
 					$args[0] ?? 0,
 					$args[2] ?? '',
 					$args[1] ?? 0
 				);
+				return self::filter_term_trigger_payload( $node, $payload );
 
 			case 'add_option':
 			case 'update_option':
@@ -1029,6 +1097,18 @@ class Wordpress extends IntegrationBase {
 				],
 			],
 			self::query_users( $q )
+		);
+	}
+
+	public static function query_terms_with_any( $q ): array {
+		return array_merge(
+			[
+				[
+					'term_id' => 'any',
+					'name'    => 'All Terms',
+				],
+			],
+			self::query_terms( $q )
 		);
 	}
 
@@ -2613,6 +2693,7 @@ class Wordpress extends IntegrationBase {
 			'post_types' => [ self::class, 'query_post_types' ],
 			'posts'      => [ self::class, 'query_posts' ],
 			'terms'      => [ self::class, 'query_terms' ],
+			'terms_with_any' => [ self::class, 'query_terms_with_any' ],
 			'users'      => [ self::class, 'query_users' ],
 			'users_with_any' => [ self::class, 'query_users_with_any' ],
 			'taxonomies' => [ self::class, 'query_taxonomies' ],

@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-04-15 05:14:53",
+    "generated_at": "2026-04-15 05:33:59",
     "apps": {
         "cartflows": {
             "slug": "cartflows",
@@ -1561,7 +1561,23 @@
                     "key": "create_term",
                     "label": "Create Term",
                     "hook": "create_term",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "term_id",
+                            "label": "Term",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "terms_with_any",
+                                "select": [
+                                    "term_id",
+                                    "name"
+                                ]
+                            },
+                            "default": "any",
+                            "required": false
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -1570,7 +1586,23 @@
                     "key": "created_term",
                     "label": "Term Created",
                     "hook": "created_term",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "term_id",
+                            "label": "Term",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "terms_with_any",
+                                "select": [
+                                    "term_id",
+                                    "name"
+                                ]
+                            },
+                            "default": "any",
+                            "required": false
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -1579,7 +1611,23 @@
                     "key": "edit_term",
                     "label": "Edit Term",
                     "hook": "edit_term",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "term_id",
+                            "label": "Term",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "terms_with_any",
+                                "select": [
+                                    "term_id",
+                                    "name"
+                                ]
+                            },
+                            "default": "any",
+                            "required": false
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -1588,7 +1636,23 @@
                     "key": "edited_term",
                     "label": "Term Edited",
                     "hook": "edited_term",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "term_id",
+                            "label": "Term",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "terms_with_any",
+                                "select": [
+                                    "term_id",
+                                    "name"
+                                ]
+                            },
+                            "default": "any",
+                            "required": false
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -1597,7 +1661,23 @@
                     "key": "saved_term",
                     "label": "Term Updated",
                     "hook": "saved_term",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "term_id",
+                            "label": "Term",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "terms_with_any",
+                                "select": [
+                                    "term_id",
+                                    "name"
+                                ]
+                            },
+                            "default": "any",
+                            "required": false
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -1606,7 +1686,23 @@
                     "key": "delete_term",
                     "label": "Delete Term",
                     "hook": "delete_term",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "term_id",
+                            "label": "Term",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "terms_with_any",
+                                "select": [
+                                    "term_id",
+                                    "name"
+                                ]
+                            },
+                            "default": "any",
+                            "required": false
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]

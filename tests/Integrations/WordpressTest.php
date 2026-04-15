@@ -262,7 +262,7 @@ class WordpressTest extends IntegrationTestCase {
 			'update_user_role'         => [ 'user_id' => 1, 'role' => 'editor' ],
 			'get_users'                => [ 'search' => '' ],
 			'get_users_by_role'        => [ 'role' => 'subscriber' ],
-			'get_user_by_email'        => [ 'email' => 'user1@example.com' ],
+			'get_user_by_email'        => [ 'email' => 'admin@example.com' ],
 			'get_user_by_field'        => [ 'field' => 'id', 'value' => '1' ],
 			'get_user_meta_all'        => [ 'user_id' => 1 ],
 			'get_user_meta_single'     => [ 'user_id' => 1, 'meta_key' => 'some_key' ],
@@ -1227,6 +1227,33 @@ class WordpressTest extends IntegrationTestCase {
 		);
 	}
 
+	public function test_trigger_term_filter_allows_selected_term_only(): void {
+		WPMocks::setTerm( 5, [ 'name' => 'PHP', 'taxonomy' => 'category' ] );
+		WPMocks::setTerm( 6, [ 'name' => 'JS', 'taxonomy' => 'category' ] );
+
+		$matched = Wordpress::resolve_trigger(
+			$this->makeTriggerNode( 'create_term', [ 'term_id' => 5 ] ),
+			[ 5, 1, 'category' ]
+		);
+		$filtered = Wordpress::resolve_trigger(
+			$this->makeTriggerNode( 'create_term', [ 'term_id' => 6 ] ),
+			[ 5, 1, 'category' ]
+		);
+
+		$this->assertIsArray( $matched );
+		$this->assertFalse( $filtered );
+	}
+
+	public function test_trigger_term_filter_accepts_any_term(): void {
+		WPMocks::setTerm( 5, [ 'name' => 'PHP', 'taxonomy' => 'category' ] );
+		$result = Wordpress::resolve_trigger(
+			$this->makeTriggerNode( 'create_term', [ 'term_id' => 'any' ] ),
+			[ 5, 1, 'category' ]
+		);
+
+		$this->assertIsArray( $result );
+	}
+
 	// --- switch_blog ---------------------------------------------------------
 
 	public function test_trigger_switch_blog_with_valid_id_returns_array_or_false(): void {
@@ -1311,6 +1338,27 @@ class WordpressTest extends IntegrationTestCase {
 		$this->assertNotEmpty( $users );
 		$this->assertSame( 'any', (string) ( $users[0]['ID'] ?? '' ) );
 		$this->assertSame( 'All Users', $users[0]['name'] ?? '' );
+	}
+
+	public function test_term_trigger_schema_has_dynamic_all_terms_selector(): void {
+		$schema = Wordpress::get_trigger_config_schema( 'create_term' );
+		$field = $schema[0] ?? [];
+
+		$this->assertSame( 'term_id', $field['key'] ?? '' );
+		$this->assertSame( 'terms_with_any', $field['dynamic']['query'] ?? '' );
+		$this->assertSame( 'any', $field['default'] ?? '' );
+	}
+
+	public function test_query_terms_with_any_starts_with_all_terms_option(): void {
+		$terms = Wordpress::query_terms_with_any( [
+			'where' => [
+				'taxonomy' => 'category',
+			],
+		] );
+
+		$this->assertNotEmpty( $terms );
+		$this->assertSame( 'any', (string) ( $terms[0]['term_id'] ?? '' ) );
+		$this->assertSame( 'All Terms', $terms[0]['name'] ?? '' );
 	}
 
 	public function test_action_config_schemas_contain_valid_fields(): void {
