@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 namespace Zaplane\Integrations;
 
 if ( ! defined( 'ABSPATH' ) ) {

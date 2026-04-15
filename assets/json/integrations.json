@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-04-14 10:08:15",
+    "generated_at": "2026-04-15 11:42:47",
     "apps": {
         "cartflows": {
             "slug": "cartflows",
@@ -1888,20 +1888,16 @@
                     "schema": [
                         {
                             "key": "post_title",
-                            "label": "Title",
+                            "label": "Post Title",
                             "type": "expression",
                             "required": true
-                        },
-                        {
-                            "key": "post_content",
-                            "label": "Content",
-                            "type": "textarea"
                         },
                         {
                             "key": "post_type",
                             "label": "Post Type",
                             "type": "select",
                             "required": true,
+                            "placeholder": "any post type",
                             "dynamic": {
                                 "integration": "wordpress",
                                 "query": "post_types",
@@ -1913,8 +1909,10 @@
                         },
                         {
                             "key": "post_status",
-                            "label": "Status",
+                            "label": "Post Status",
                             "type": "select",
+                            "required": true,
+                            "placeholder": "any post status",
                             "options": [
                                 {
                                     "label": "Draft",
@@ -1923,6 +1921,157 @@
                                 {
                                     "label": "Publish",
                                     "value": "publish"
+                                },
+                                {
+                                    "label": "Pending",
+                                    "value": "pending"
+                                },
+                                {
+                                    "label": "Private",
+                                    "value": "private"
+                                },
+                                {
+                                    "label": "Future",
+                                    "value": "future"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "post_author",
+                            "label": "Post Author",
+                            "type": "select",
+                            "placeholder": "any post author",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "users",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "post_category",
+                            "label": "Post Category",
+                            "type": "select",
+                            "placeholder": "any post category",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "categories",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "post_tags",
+                            "label": "Select Post Tags",
+                            "type": "select",
+                            "required": true,
+                            "multiple": true,
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "tags",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "post_content",
+                            "label": "Post Content",
+                            "type": "textarea"
+                        },
+                        {
+                            "key": "post_excerpt",
+                            "label": "Post Excerpt",
+                            "type": "textarea"
+                        },
+                        {
+                            "key": "post_date",
+                            "label": "Post Date",
+                            "type": "expression"
+                        },
+                        {
+                            "key": "post_date_gmt",
+                            "label": "Post Date GMT",
+                            "type": "expression"
+                        },
+                        {
+                            "key": "post_name",
+                            "label": "Post Slug",
+                            "type": "expression"
+                        },
+                        {
+                            "key": "post_parent",
+                            "label": "Post Parent Id",
+                            "type": "expression",
+                            "description": "Provide the Id of the parent post if this is a child post."
+                        },
+                        {
+                            "key": "post_password",
+                            "label": "Post Password",
+                            "type": "expression",
+                            "description": "Only visible to those who know the password."
+                        },
+                        {
+                            "key": "featured_image_url",
+                            "label": "Post Featured Image URL",
+                            "type": "expression",
+                            "toggle": "use_featured_image_id"
+                        },
+                        {
+                            "key": "use_featured_image_id",
+                            "label": "Use Featured Image ID instead of URL",
+                            "type": "toggle",
+                            "description": "Enable to use Featured Image ID field instead of URL."
+                        },
+                        {
+                            "key": "taxonomy",
+                            "label": "Select Taxonomy",
+                            "type": "select",
+                            "placeholder": "any post Taxonomy",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "taxonomies",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "taxonomy_term",
+                            "label": "Select Taxonomy Term",
+                            "type": "select",
+                            "placeholder": "any post Taxonomy Term",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "taxonomy_terms",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "custom_fields",
+                            "label": "Post Custom Field Map",
+                            "type": "map",
+                            "fields": [
+                                {
+                                    "key": "key",
+                                    "label": "Key",
+                                    "type": "expression",
+                                    "required": true
+                                },
+                                {
+                                    "key": "value",
+                                    "label": "Value",
+                                    "type": "expression",
+                                    "required": true
                                 }
                             ]
                         }
@@ -3957,13 +4106,7 @@
                         },
                         {
                             "key": "post_title",
-                            "label": "New Post Title",
-                            "type": "expression",
-                            "required": true
-                        },
-                        {
-                            "key": "post_content",
-                            "label": "New Post Content",
+                            "label": "Post Title",
                             "type": "expression",
                             "required": true
                         },
@@ -3971,6 +4114,8 @@
                             "key": "post_type",
                             "label": "Post Type",
                             "type": "select",
+                            "required": true,
+                            "placeholder": "any post type",
                             "dynamic": {
                                 "integration": "wordpress",
                                 "query": "post_types",
@@ -3978,13 +4123,14 @@
                                     "name",
                                     "label"
                                 ]
-                            },
-                            "required": true
+                            }
                         },
                         {
                             "key": "post_status",
-                            "label": "Status",
+                            "label": "Post Status",
                             "type": "select",
+                            "required": true,
+                            "placeholder": "any post status",
                             "options": [
                                 {
                                     "label": "Draft",
@@ -3993,6 +4139,157 @@
                                 {
                                     "label": "Publish",
                                     "value": "publish"
+                                },
+                                {
+                                    "label": "Pending",
+                                    "value": "pending"
+                                },
+                                {
+                                    "label": "Private",
+                                    "value": "private"
+                                },
+                                {
+                                    "label": "Future",
+                                    "value": "future"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "post_author",
+                            "label": "Post Author",
+                            "type": "select",
+                            "placeholder": "any post author",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "users",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "post_category",
+                            "label": "Post Category",
+                            "type": "select",
+                            "placeholder": "any post category",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "categories",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "post_tags",
+                            "label": "Select Post Tags",
+                            "type": "select",
+                            "required": true,
+                            "multiple": true,
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "tags",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "post_content",
+                            "label": "Post Content",
+                            "type": "textarea"
+                        },
+                        {
+                            "key": "post_excerpt",
+                            "label": "Post Excerpt",
+                            "type": "textarea"
+                        },
+                        {
+                            "key": "post_date",
+                            "label": "Post Date",
+                            "type": "expression"
+                        },
+                        {
+                            "key": "post_date_gmt",
+                            "label": "Post Date GMT",
+                            "type": "expression"
+                        },
+                        {
+                            "key": "post_name",
+                            "label": "Post Slug",
+                            "type": "expression"
+                        },
+                        {
+                            "key": "post_parent",
+                            "label": "Post Parent Id",
+                            "type": "expression",
+                            "description": "Provide the Id of the parent post if this is a child post."
+                        },
+                        {
+                            "key": "post_password",
+                            "label": "Post Password",
+                            "type": "expression",
+                            "description": "Only visible to those who know the password."
+                        },
+                        {
+                            "key": "featured_image_url",
+                            "label": "Post Featured Image URL",
+                            "type": "expression",
+                            "toggle": "use_featured_image_id"
+                        },
+                        {
+                            "key": "use_featured_image_id",
+                            "label": "Use Featured Image ID instead of URL",
+                            "type": "toggle",
+                            "description": "Enable to use Featured Image ID field instead of URL."
+                        },
+                        {
+                            "key": "taxonomy",
+                            "label": "Select Taxonomy",
+                            "type": "select",
+                            "placeholder": "any post Taxonomy",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "taxonomies",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "taxonomy_term",
+                            "label": "Select Taxonomy Term",
+                            "type": "select",
+                            "placeholder": "any post Taxonomy Term",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "taxonomy_terms",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "custom_fields",
+                            "label": "Post Custom Field Map",
+                            "type": "map",
+                            "fields": [
+                                {
+                                    "key": "key",
+                                    "label": "Key",
+                                    "type": "expression",
+                                    "required": true
+                                },
+                                {
+                                    "key": "value",
+                                    "label": "Value",
+                                    "type": "expression",
+                                    "required": true
                                 }
                             ]
                         }
@@ -18526,6 +18823,157 @@
                     ]
                 }
             }
+        },
+        "gamipress": {
+            "slug": "gamipress",
+            "name": "GamiPress",
+            "icon": "gamipress.svg",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": {
+                "user_earns_rank": {
+                    "key": "user_earns_rank",
+                    "label": "User Earns Rank",
+                    "hook": "gamipress_update_user_rank",
+                    "schema": [
+                        {
+                            "key": "rank_type",
+                            "label": "Rank Type",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "gamipress",
+                                "query": "rank_type_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "rank_id",
+                            "label": "Rank",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "gamipress",
+                                "query": "rank_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ],
+                                "depends_on": [
+                                    "rank_type"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "user_earns_points": {
+                    "key": "user_earns_points",
+                    "label": "User Earns Points",
+                    "hook": "gamipress_update_user_points",
+                    "schema": [
+                        {
+                            "key": "achievement_type",
+                            "label": "Achievement Type",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "gamipress",
+                                "query": "achievement_type_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "user_earns_specific_achievement_type": {
+                    "key": "user_earns_specific_achievement_type",
+                    "label": "User Earns Specific Achievement Type",
+                    "hook": "gamipress_award_achievement",
+                    "schema": [
+                        {
+                            "key": "achievement_type",
+                            "label": "Achievement Type",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "gamipress",
+                                "query": "achievement_type_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "user_gains_achievement": {
+                    "key": "user_gains_achievement",
+                    "label": "User Gains Achievement",
+                    "hook": "gamipress_award_achievement",
+                    "schema": [
+                        {
+                            "key": "achievement_type",
+                            "label": "Achievement Type",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "gamipress",
+                                "query": "achievement_type_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "achievement_id",
+                            "label": "Achievement",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "gamipress",
+                                "query": "achievement_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ],
+                                "depends_on": [
+                                    "achievement_type"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "user_achievement_revoked": {
+                    "key": "user_achievement_revoked",
+                    "label": "User Achievement Was Revoked",
+                    "hook": "gamipress_revoke_achievement_to_user",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": []
         }
     },
     "tools": {
