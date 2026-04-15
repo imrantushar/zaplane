@@ -15,48 +15,41 @@ import WorkflowTable from "@ZAPComponents/WorkflowTable";
 
 
 
-const CreateWorkflows = ({ onNavigateToEdit, title = __('Flows', 'zaplane')}) => {
+const CreateWorkflows = ({ onNavigateToEdit, title = __('Flows', 'zaplane'), renderTopBar=null}) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // if (res?.payload.id) {
-  //     if (onNavigateToEdit) {
-  //       onNavigateToEdit(res.payload.id);
-  //     } else {
-  //       navigate(
-  //         `${route_path}admin.php?page=zaplane-workflows&action=edit&id=${res.payload.id}`
-  //       );
-  //     }
-  //   }
   return (
     <>
-      <TopBar
-        leftContent={() => (
-          <>
-            <Flex
-              height="40px"
-              width="40px"
-              borderRadius="20px"
-              background="var(--zaplane-second-primary)"
-              alignItems="center"
-              justifyContent="center"
-            >
-              <img
-                src={`${plugin_root_url}assets/images/zaplane.svg`}
+      {renderTopBar ? renderTopBar({}) : (
+        <TopBar
+          leftContent={() => (
+            <>
+              <Flex
+                height="40px"
+                width="40px"
+                borderRadius="20px"
+                background="var(--zaplane-second-primary)"
+                alignItems="center"
+                justifyContent="center"
+              >
+                <img
+                  src={`${plugin_root_url}assets/images/zaplane.svg`}
+                />
+              </Flex>
+  
+              <IoIosArrowForward />
+  
+              <ZAPLabel
+                as="h2"
+                color="var(--zapplane-font-color)"
+                type="subtitle"
+                fontWeight="medium"
+                label={title}
               />
-            </Flex>
-
-            <IoIosArrowForward />
-
-            <ZAPLabel
-              as="h2"
-              color="var(--zapplane-font-color)"
-              type="subtitle"
-              fontWeight="medium"
-              label={title}
-            />
-          </>
-        )}
-      />
+            </>
+          )}
+        />
+      )}
 
       <SubTopBar heading={__("Workflows", "zaplane")}>
         <ImportWorkflow />
@@ -75,6 +68,7 @@ const CreateWorkflows = ({ onNavigateToEdit, title = __('Flows', 'zaplane')}) =>
       <CreateWorkflowModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        onNavigateToEdit={onNavigateToEdit}
       />
     </>
   );

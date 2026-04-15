@@ -9,7 +9,7 @@ import { updateWorkFlow } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow"
 import NavigationBlocker from "@ZAPComponents/NavigationBlocker";
 import { createNodeIdGenerator } from "./FlowCanvas/helper";
 
-export default function Workflows({ id, onNavigateBack }) {
+export default function Workflows({ id, onNavigateBack, renderTopBar }) {
   const nodeIdRef = useRef(createNodeIdGenerator());
   const getNewNodeId = nodeIdRef.current;
   const [initialHash, setInitialHash] = useState("");
@@ -92,7 +92,7 @@ export default function Workflows({ id, onNavigateBack }) {
               <NavigationBlocker when={isFlowDirty} />
               <FlowCanvas setNodes={setNodes} setEdges={setEdges} onEdgesChange={onEdgesChange}
                 onNodesChange={onNodesChange} nodes={nodes} edges={edges} getNewNodeId={getNewNodeId}
-                workFlow={workFlow} id={id} isFlowDirty={isFlowDirty} canvasLayout={canvasLayout} setCanvasLayOut={setCanvasLayOut} onNavigateBack={onNavigateBack} />
+                workFlow={workFlow} id={id} isFlowDirty={isFlowDirty} canvasLayout={canvasLayout} setCanvasLayOut={setCanvasLayOut} onNavigateBack={onNavigateBack} renderTopBar={renderTopBar} />
             </Box>
           )}
 

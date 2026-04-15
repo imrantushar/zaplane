@@ -32,7 +32,7 @@ export const WorkFlowHook = () => {
 		'zaplane.workflow-editor',
 		(nullValue, props) => (
 			<ZaplaneWrapper>
-				<Workflows id={props.id} onNavigateBack={props.onNavigateBack} />
+				<Workflows id={props.id} onNavigateBack={props.onNavigateBack} renderTopBar={props.renderTopBar} />
 			</ZaplaneWrapper>
 		)
 	);
