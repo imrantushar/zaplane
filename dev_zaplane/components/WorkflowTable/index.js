@@ -246,7 +246,7 @@ const WorkflowTable = ({ folderId = null, showHeader = false }) => {
     <>
       {showHeader && (
         <SubTopBar heading={__("Workflows", "zaplane")}>
-          <ImportWorkflow />
+          {/* <ImportWorkflow /> */}
           <Button onClick={() => setIsCreateOpen(true)} {...primaryBtn}>
             {__("Create Workflow", "zaplane")}
           </Button>
