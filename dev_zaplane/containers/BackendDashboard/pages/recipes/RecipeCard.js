@@ -37,6 +37,7 @@ const RecipeCard = ({ recipe }) => {
 
   const [loading, setLoading] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [showFullDesc, setShowFullDesc] = useState(false);
 
   useEffect(() => {
     setTitleOverride(recipe?.title || '');
@@ -142,7 +143,7 @@ const RecipeCard = ({ recipe }) => {
         <ZAPDivider m='12px 0 8px -16px' w='109%' />
 
         <Text
-          w={ "80%"}
+          w={"80%"}
           className='zaplane-label'
           style={{
             whiteSpace: 'nowrap',
@@ -154,20 +155,40 @@ const RecipeCard = ({ recipe }) => {
           {recipe?.title}
         </Text>
 
-        <Text
-          className='zaplane-sub-title'
-          color='#454F59'
-          style={{
-            display: '-webkit-box',
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: 'vertical',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-          }}
-          title={recipe?.description}
-        >
-          {recipe?.description || __('No description', 'zaplane')}
-        </Text>
+        <>
+          <Text
+            className='zaplane-sub-title'
+            color='#454F59'
+            style={
+              !showFullDesc
+                ? {
+                  display: '-webkit-box',
+                  WebkitLineClamp: 2,
+                  WebkitBoxOrient: 'vertical',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }
+                : {}
+            }
+            title={recipe?.description}
+          >
+            {recipe?.description || __('No description', 'zaplane')}
+          </Text>
+
+          {recipe?.description && recipe.description.length > 100 && (
+            <Text
+              as="span"
+              fontSize="12px"
+              color="var(--zaplane-primary-color)"
+              cursor="pointer"
+              fontWeight="500"
+              onClick={() => setShowFullDesc((prev) => !prev)}
+              _hover={{ textDecoration: 'underline' }}
+            >
+              {showFullDesc ? __('See less', 'zaplane') : __('See more', 'zaplane')}
+            </Text>
+          )}
+        </>
       </Flex>
 
       {/* Convert Modal */}

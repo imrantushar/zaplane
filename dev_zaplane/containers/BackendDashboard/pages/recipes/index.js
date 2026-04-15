@@ -76,7 +76,8 @@ const RecipesPage = () => {
 
       <div className="zaplane-page-content">
         {
-          recipes?.length ? <SimpleGrid columns={{ base: 1, md: 2, xl: 3 }} spacing={4} gap='20px'>
+          recipes?.length ? <SimpleGrid columns={{ base: 1, md: 2, xl: 3 }} spacing={4} gap='20px'   flexWrap="wrap"
+  alignItems="flex-start">
             {recipes.map((recipe) => (
               <RecipeCard key={recipe.id} recipe={recipe} />
             ))}
