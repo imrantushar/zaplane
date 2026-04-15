@@ -91,10 +91,9 @@ const ConnectionTable = () => {
 
             ),
             cell: (row) =>{
-                const icons =row.app + '.svg'
                 return (
                     <Flex gap='12px' alignItems='center'>
-                    <ZAPIconGroup icons={[icons]}/>
+                    <ZAPIconGroup icons={[row?.icon]}/>
                     <Text className="zaplane-label" fontWeight="400" textOverflow="ellipsis">
                         {row.name}
                     </Text>

@@ -142,6 +142,7 @@ const useConnection = () => {
 
     const saveConnection = useCallback(async () => {
         if (!selectedApp || !selectedAuthType) return;
+        
 
         if (selectedAuthType === "oauth2") {
             try {
@@ -151,6 +152,7 @@ const useConnection = () => {
                     initOAuth({
                         app: selectedApp.id,
                         name: selectedApp.name,
+                        icon:selectedApp.icon,
                         credentials,
                     })
                 ).unwrap();
@@ -168,6 +170,7 @@ const useConnection = () => {
                 createTokenConnection({
                     app: selectedApp.id,
                     name: selectedApp.name,
+                    icon:selectedApp.icon,
                     authType: selectedAuthType,
                     credentials,
                 })
