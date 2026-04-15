@@ -58,15 +58,6 @@ const CreateWorkflows = () => {
           </Box>
         )}
         rightContent={() => (
-          // <ZAPMenu
-          //   triggerLabel="Create Workflow"
-          //   items={[
-          //     {
-          //       label: "Create from Scratch",
-          //       onClick: () => setIsModalOpen(true),
-          //     },
-          //   ]}
-          // />
           <Button {...primaryBtn} onClick={() => setIsModalOpen(true)}>
             {__('Create Workflow', 'zaplane')}
           </Button>
