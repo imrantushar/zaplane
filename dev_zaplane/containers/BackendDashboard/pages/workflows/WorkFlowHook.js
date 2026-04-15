@@ -1,9 +1,39 @@
 import CreateWorkflows from ".";
+import Workflows from "./workFlowMotion";
+import { ChakraProvider } from '@chakra-ui/react';
+import { Provider } from 'react-redux';
+import { BrowserRouter as Router } from 'react-router-dom';
+import { theme } from '../../../../../assets/scss/chakra/theme';
+import { store } from '@ZAPRedux/store';
+
+const ZaplaneWrapper = ({ children }) => (
+	<Provider store={store}>
+		<ChakraProvider value={theme}>
+			<Router>
+				{children}
+			</Router>
+		</ChakraProvider>
+	</Provider>
+);
 
 export const WorkFlowHook = () => {
-wp.hooks.addFilter(
+	wp.hooks.addFilter(
 		'zaplane-integration.workflow-content.content',
 		'zaplane.workflow-content',
-		(nullValue, props) => <CreateWorkflows {...props} />
+		(nullValue, props) => (
+			<ZaplaneWrapper>
+				<CreateWorkflows {...props} />
+			</ZaplaneWrapper>
+		)
+	);
+
+	wp.hooks.addFilter(
+		'zaplane-integration.workflow-editor.content',
+		'zaplane.workflow-editor',
+		(nullValue, props) => (
+			<ZaplaneWrapper>
+				<Workflows id={props.id} onNavigateBack={props.onNavigateBack} />
+			</ZaplaneWrapper>
+		)
 	);
 }

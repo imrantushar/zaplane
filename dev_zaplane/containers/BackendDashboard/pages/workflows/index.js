@@ -18,13 +18,11 @@ import { route_path } from "@ZAPUtils/helper";
 import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
 
 
-const CreateWorkflows = () => {
+const CreateWorkflows = ({ onNavigateToEdit, title = __('Flows', 'zaplane')}) => {
   const dispatch = useDispatch();
   const navigate =useNavigate()
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [workflowName, setWorkflowName] = useState("");
-
-;
 
    const handleCreate = async () => {
     if (!workflowName.trim()) return;
@@ -34,9 +32,13 @@ const CreateWorkflows = () => {
       })
     )
     if (res?.payload.id) {
-      navigate(
-        `${route_path}admin.php?page=zaplane-workflows&action=edit&id=${res.payload.id}`
-      );
+      if (onNavigateToEdit) {
+        onNavigateToEdit(res.payload.id);
+      } else {
+        navigate(
+          `${route_path}admin.php?page=zaplane-workflows&action=edit&id=${res.payload.id}`
+        );
+      }
     }
 
     setWorkflowName("");
@@ -51,7 +53,7 @@ const CreateWorkflows = () => {
         render={() => (
           <Box>
             <ZAPLabel
-              label={__('Flows', 'zaplane')}
+              label={title}
               variant="bold"
             />
 
@@ -65,7 +67,7 @@ const CreateWorkflows = () => {
       />
 
       <div className="zaplane-page-content">
-        <WorkflowTable
+        <WorkflowTable onNavigateToEdit={onNavigateToEdit}
         />
       </div>
 

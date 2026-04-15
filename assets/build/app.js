@@ -12311,13 +12311,44 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   WorkFlowHook: () => (/* binding */ WorkFlowHook)
 /* harmony export */ });
 /* harmony import */ var ___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! . */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/index.js");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _workFlowMotion__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./workFlowMotion */ "./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/index.js");
+/* harmony import */ var _chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @chakra-ui/react */ "./node_modules/@chakra-ui/react/dist/esm/styled-system/provider.js");
+/* harmony import */ var react_redux__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/dist/react-redux.mjs");
+/* harmony import */ var react_router_dom__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! react-router-dom */ "./node_modules/react-router-dom/dist/index.js");
+/* harmony import */ var _assets_scss_chakra_theme__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../../../../assets/scss/chakra/theme */ "./assets/scss/chakra/theme.js");
+/* harmony import */ var _ZAPRedux_store__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @ZAPRedux/store */ "./dev_zaplane/redux/store.js");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__);
 
 
+
+
+
+
+
+
+const ZaplaneWrapper = ({
+  children
+}) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(react_redux__WEBPACK_IMPORTED_MODULE_3__.Provider, {
+  store: _ZAPRedux_store__WEBPACK_IMPORTED_MODULE_6__.store,
+  children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.ChakraProvider, {
+    value: _assets_scss_chakra_theme__WEBPACK_IMPORTED_MODULE_5__.theme,
+    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(react_router_dom__WEBPACK_IMPORTED_MODULE_4__.BrowserRouter, {
+      children: children
+    })
+  })
+});
 const WorkFlowHook = () => {
-  wp.hooks.addFilter('zaplane-integration.workflow-content.content', 'zaplane.workflow-content', (nullValue, props) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)(___WEBPACK_IMPORTED_MODULE_0__["default"], {
-    ...props
+  wp.hooks.addFilter('zaplane-integration.workflow-content.content', 'zaplane.workflow-content', (nullValue, props) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(ZaplaneWrapper, {
+    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(___WEBPACK_IMPORTED_MODULE_0__["default"], {
+      ...props
+    })
+  }));
+  wp.hooks.addFilter('zaplane-integration.workflow-editor.content', 'zaplane.workflow-editor', (nullValue, props) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(ZaplaneWrapper, {
+    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_workFlowMotion__WEBPACK_IMPORTED_MODULE_1__["default"], {
+      id: props.id,
+      onNavigateBack: props.onNavigateBack
+    })
   }));
 };
 
@@ -12383,8 +12414,17 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-const WorkflowTable = () => {
+const WorkflowTable = ({
+  onNavigateToEdit
+}) => {
   const navigate = (0,react_router_dom__WEBPACK_IMPORTED_MODULE_6__.useNavigate)();
+  const goToEdit = id => {
+    if (onNavigateToEdit) {
+      onNavigateToEdit(id);
+    } else {
+      navigate(`${_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_10__.route_path}admin.php?page=zaplane-workflows&action=edit&id=${id}`);
+    }
+  };
   const dispatch = (0,react_redux__WEBPACK_IMPORTED_MODULE_7__.useDispatch)();
   const [activeRunId, setActiveRunId] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(null);
   const [drawerOpen, setDrawerOpen] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
@@ -12423,7 +12463,7 @@ const WorkflowTable = () => {
       fontSize: "14px",
       textOverflow: "ellipsis",
       cursor: "pointer",
-      onClick: () => navigate(`${_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_10__.route_path}admin.php?page=zaplane-workflows&action=edit&id=${row.id}`),
+      onClick: () => goToEdit(row.id),
       children: row.title
     }),
     // columnWidth: "100px",
@@ -12534,9 +12574,7 @@ const WorkflowTable = () => {
           alignItems: "center",
           borderRadius: "2.917px",
           border: "1px solid var(--zaplane-border-color)",
-          onClick: () => {
-            navigate(`${_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_10__.route_path}admin.php?page=zaplane-workflows&action=edit&id=${row.id}`);
-          },
+          onClick: () => goToEdit(row.id),
           children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_5__.Icon, {
             height: "15px",
             width: "15px",
@@ -12704,19 +12742,25 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-const CreateWorkflows = () => {
+const CreateWorkflows = ({
+  onNavigateToEdit,
+  title = (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Flows', 'zaplane')
+}) => {
   const dispatch = (0,react_redux__WEBPACK_IMPORTED_MODULE_5__.useDispatch)();
   const navigate = (0,react_router_dom__WEBPACK_IMPORTED_MODULE_13__.useNavigate)();
   const [isModalOpen, setIsModalOpen] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
   const [workflowName, setWorkflowName] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)("");
-  ;
   const handleCreate = async () => {
     if (!workflowName.trim()) return;
     const res = await dispatch((0,_ZAPRedux_Slices_workFlowSlice_actions_workFlow__WEBPACK_IMPORTED_MODULE_11__.createWorkflows)({
       title: workflowName
     }));
     if (res?.payload.id) {
-      navigate(`${_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_14__.route_path}admin.php?page=zaplane-workflows&action=edit&id=${res.payload.id}`);
+      if (onNavigateToEdit) {
+        onNavigateToEdit(res.payload.id);
+      } else {
+        navigate(`${_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_14__.route_path}admin.php?page=zaplane-workflows&action=edit&id=${res.payload.id}`);
+      }
     }
     setWorkflowName("");
     setIsModalOpen(false);
@@ -12725,7 +12769,7 @@ const CreateWorkflows = () => {
     children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_ZAPComponents_TopBar__WEBPACK_IMPORTED_MODULE_7__["default"], {
       render: () => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_2__.Box, {
         children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_ZAPComponents_Labels_ZAPLabel__WEBPACK_IMPORTED_MODULE_15__["default"], {
-          label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Flows', 'zaplane'),
+          label: title,
           variant: "bold"
         })
       }),
@@ -12736,7 +12780,9 @@ const CreateWorkflows = () => {
       })
     }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)("div", {
       className: "zaplane-page-content",
-      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_WorkflowTable__WEBPACK_IMPORTED_MODULE_12__["default"], {})
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_WorkflowTable__WEBPACK_IMPORTED_MODULE_12__["default"], {
+        onNavigateToEdit: onNavigateToEdit
+      })
     }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_ZAPComponents_Modal_WPModal__WEBPACK_IMPORTED_MODULE_9__["default"], {
       title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)("Create Workflow", "zaplane"),
       isOpen: isModalOpen,
@@ -14904,7 +14950,8 @@ function FlowCanvas({
   workFlow,
   isFlowDirty,
   canvasLayout,
-  setCanvasLayOut
+  setCanvasLayOut,
+  onNavigateBack
 }) {
   const dispatch = (0,react_redux__WEBPACK_IMPORTED_MODULE_11__.useDispatch)();
   const navigate = (0,react_router_dom__WEBPACK_IMPORTED_MODULE_10__.useNavigate)();
@@ -15042,7 +15089,8 @@ function FlowCanvas({
       handleSubmit: handleSubmit,
       activeDrawer: activeDrawer,
       setActiveDrawer: setActiveDrawer,
-      isFlowDirty: isFlowDirty
+      isFlowDirty: isFlowDirty,
+      onNavigateBack: onNavigateBack
     }), loading ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)(_ZAPComponents_Loading__WEBPACK_IMPORTED_MODULE_13__["default"], {}) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsxs)(_xyflow_react__WEBPACK_IMPORTED_MODULE_1__.ReactFlow, {
       nodes: nodes,
       edges: edges,
@@ -15212,7 +15260,8 @@ function FlowTopBar({
   handleSubmit,
   activeDrawer,
   setActiveDrawer,
-  isFlowDirty
+  isFlowDirty,
+  onNavigateBack
 }) {
   const {
     apiCountdown,
@@ -15272,7 +15321,11 @@ function FlowTopBar({
             const confirmLeave = window.confirm("You have unsaved changes. Are you sure you want to leave?");
             if (!confirmLeave) return;
           }
-          navigate(`${_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_32__.route_path}admin.php?page=zaplane-workflows`);
+          if (onNavigateBack) {
+            onNavigateBack();
+          } else {
+            navigate(`${_ZAPUtils_helper__WEBPACK_IMPORTED_MODULE_32__.route_path}admin.php?page=zaplane-workflows`);
+          }
         },
         children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsx)(react_icons_fi__WEBPACK_IMPORTED_MODULE_7__.FiArrowLeft, {})
       }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_33__.jsx)(_chakra_ui_react__WEBPACK_IMPORTED_MODULE_1__.Box, {
@@ -15991,7 +16044,8 @@ __webpack_require__.r(__webpack_exports__);
 
 
 function Workflows({
-  id
+  id,
+  onNavigateBack
 }) {
   const nodeIdRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)((0,_flowCanvas_helper__WEBPACK_IMPORTED_MODULE_6__.createNodeIdGenerator)());
   const getNewNodeId = nodeIdRef.current;
@@ -16080,7 +16134,8 @@ function Workflows({
             id: id,
             isFlowDirty: isFlowDirty,
             canvasLayout: canvasLayout,
-            setCanvasLayOut: setCanvasLayOut
+            setCanvasLayOut: setCanvasLayOut,
+            onNavigateBack: onNavigateBack
           })]
         })
       })
@@ -220192,9 +220247,9 @@ __webpack_require__.r(__webpack_exports__);
 
 
 document.addEventListener('DOMContentLoaded', () => {
+  (0,_ZAPContainers_BackendDashboard_pages_workflows_WorkFlowHook__WEBPACK_IMPORTED_MODULE_10__.WorkFlowHook)();
   const container = document.getElementById('zaplane-app');
   if (container) {
-    (0,_ZAPContainers_BackendDashboard_pages_workflows_WorkFlowHook__WEBPACK_IMPORTED_MODULE_10__.WorkFlowHook)();
     const root = (0,react_dom_client__WEBPACK_IMPORTED_MODULE_1__.createRoot)(container);
     const menuPage = document.getElementById('toplevel_page_zaplane');
     function MenuPortal({

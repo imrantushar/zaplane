@@ -39,7 +39,8 @@ export default function FlowTopBar({
   handleSubmit,
   activeDrawer,
   setActiveDrawer,
-  isFlowDirty
+  isFlowDirty,
+  onNavigateBack
 }) {
   const { apiCountdown, apiRequestRunning } = useSelector((state) => state.workflows);
   const [refreshing, setRefreshing] = useState(false);
@@ -95,7 +96,11 @@ export default function FlowTopBar({
                 if (!confirmLeave) return;
               }
 
-              navigate(`${route_path}admin.php?page=zaplane-workflows`);
+              if (onNavigateBack) {
+                onNavigateBack();
+              } else {
+                navigate(`${route_path}admin.php?page=zaplane-workflows`);
+              }
             }}>
             <FiArrowLeft />
           </Button>

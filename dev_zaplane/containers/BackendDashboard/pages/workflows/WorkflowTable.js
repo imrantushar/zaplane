@@ -28,8 +28,16 @@ import LogDetails from "@ZAPComponents/LogDetails";
 import { nodeLogsRunDetails } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlowLogs";
 import { HistoryIcon, TableArrow } from "@ZAPUtils/icons";
 
-const WorkflowTable = () => {
+const WorkflowTable = ({ onNavigateToEdit }) => {
   const navigate = useNavigate();
+
+  const goToEdit = (id) => {
+    if (onNavigateToEdit) {
+      onNavigateToEdit(id);
+    } else {
+      navigate(`${route_path}admin.php?page=zaplane-workflows&action=edit&id=${id}`);
+    }
+  };
   const dispatch = useDispatch();
   const [activeRunId, setActiveRunId] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -73,11 +81,7 @@ const WorkflowTable = () => {
           fontSize="14px"
           textOverflow="ellipsis"
           cursor="pointer"
-          onClick={() =>
-            navigate(
-              `${route_path}admin.php?page=zaplane-workflows&action=edit&id=${row.id}`
-            )
-          }
+          onClick={() => goToEdit(row.id)}
         >
           {row.title}
         </Text>
@@ -194,11 +198,7 @@ const WorkflowTable = () => {
               alignItems="center"
               borderRadius="2.917px"
               border="1px solid var(--zaplane-border-color)"
-              onClick={() => {
-                navigate(
-                  `${route_path}admin.php?page=zaplane-workflows&action=edit&id=${row.id}`
-                )
-              }}
+              onClick={() => goToEdit(row.id)}
             >
               <Icon
                 height="15px"

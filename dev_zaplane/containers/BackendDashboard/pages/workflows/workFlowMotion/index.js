@@ -9,7 +9,7 @@ import { Box, Flex } from "@chakra-ui/react";
 import { updateWorkFlow } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow";
 import NavigationBlocker from "@ZAPComponents/NavigationBlocker";
 
-export default function Workflows({ id }) {
+export default function Workflows({ id, onNavigateBack }) {
   const nodeIdRef = useRef(createNodeIdGenerator());
   const getNewNodeId = nodeIdRef.current;
   const [initialHash, setInitialHash] = useState("");
@@ -87,7 +87,7 @@ export default function Workflows({ id }) {
               <NavigationBlocker when={isFlowDirty} />
               <FlowCanvas setNodes={setNodes} setEdges={setEdges} onEdgesChange={onEdgesChange}
                 onNodesChange={onNodesChange} nodes={nodes} edges={edges} getNewNodeId={getNewNodeId}
-                workFlow={workFlow} id={id} isFlowDirty={isFlowDirty} canvasLayout={canvasLayout} setCanvasLayOut={setCanvasLayOut} />
+                workFlow={workFlow} id={id} isFlowDirty={isFlowDirty} canvasLayout={canvasLayout} setCanvasLayOut={setCanvasLayOut} onNavigateBack={onNavigateBack} />
             </Box>
           )}
 

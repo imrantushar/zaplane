@@ -11,9 +11,9 @@ import { store } from '@ZAPRedux/store';
 import { WorkFlowHook } from '@ZAPContainers/BackendDashboard/pages/workflows/WorkFlowHook';
 
 document.addEventListener('DOMContentLoaded', () => {
+	WorkFlowHook();
 	const container = document.getElementById('zaplane-app');
 	if (container) {
-		WorkFlowHook();
 		const root = createRoot(container);
 		const menuPage = document.getElementById('toplevel_page_zaplane');
 		function MenuPortal({ children }) {
