@@ -17,6 +17,7 @@ class CreateConnectionsTable extends Migration {
 			$table->id();
 			$table->unsignedBigInteger( 'user_id' );
 			$table->string( 'app', 100 );
+			$table->string( 'icon' )->nullable();
 			$table->string( 'name' );
 			$table->string( 'auth_type', 20 );
 			$table->longText( 'encrypted_credentials' );
