@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-04-13 05:14:29",
+    "generated_at": "2026-04-15 05:14:53",
     "apps": {
         "cartflows": {
             "slug": "cartflows",
@@ -994,7 +994,23 @@
                     "key": "user_register",
                     "label": "User Registered",
                     "hook": "user_register",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "users_with_any",
+                                "select": [
+                                    "ID",
+                                    "name"
+                                ]
+                            },
+                            "default": "any",
+                            "required": false
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -1003,7 +1019,23 @@
                     "key": "set_user_role",
                     "label": "User Role Updated",
                     "hook": "set_user_role",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "users_with_any",
+                                "select": [
+                                    "ID",
+                                    "name"
+                                ]
+                            },
+                            "default": "any",
+                            "required": false
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -1012,7 +1044,23 @@
                     "key": "profile_update",
                     "label": "Profile Updated",
                     "hook": "profile_update",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "users_with_any",
+                                "select": [
+                                    "ID",
+                                    "name"
+                                ]
+                            },
+                            "default": "any",
+                            "required": false
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -1021,7 +1069,23 @@
                     "key": "wp_update_user",
                     "label": "Update User",
                     "hook": "wp_update_user",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "users_with_any",
+                                "select": [
+                                    "ID",
+                                    "name"
+                                ]
+                            },
+                            "default": "any",
+                            "required": false
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -1030,7 +1094,23 @@
                     "key": "remove_user_from_blog",
                     "label": "Remove Blog User",
                     "hook": "remove_user_from_blog",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "users_with_any",
+                                "select": [
+                                    "ID",
+                                    "name"
+                                ]
+                            },
+                            "default": "any",
+                            "required": false
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -1039,7 +1119,23 @@
                     "key": "delete_user",
                     "label": "Delete User",
                     "hook": "delete_user",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "users_with_any",
+                                "select": [
+                                    "ID",
+                                    "name"
+                                ]
+                            },
+                            "default": "any",
+                            "required": false
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -1048,7 +1144,23 @@
                     "key": "wpmu_delete_user",
                     "label": "Delete User (MU)",
                     "hook": "wpmu_delete_user",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "users_with_any",
+                                "select": [
+                                    "ID",
+                                    "name"
+                                ]
+                            },
+                            "default": "any",
+                            "required": false
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -1057,7 +1169,23 @@
                     "key": "wpmu_new_user",
                     "label": "New User Created",
                     "hook": "wpmu_new_user",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "users_with_any",
+                                "select": [
+                                    "ID",
+                                    "name"
+                                ]
+                            },
+                            "default": "any",
+                            "required": false
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -1066,7 +1194,23 @@
                     "key": "wpmu_activate_user",
                     "label": "Activate User",
                     "hook": "wpmu_activate_user",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "users_with_any",
+                                "select": [
+                                    "ID",
+                                    "name"
+                                ]
+                            },
+                            "default": "any",
+                            "required": false
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -1075,7 +1219,23 @@
                     "key": "create_application_password",
                     "label": "Create Application Password",
                     "hook": "wp_create_application_password",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "users_with_any",
+                                "select": [
+                                    "ID",
+                                    "name"
+                                ]
+                            },
+                            "default": "any",
+                            "required": false
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -1084,7 +1244,23 @@
                     "key": "update_application_password",
                     "label": "Update Application Password",
                     "hook": "wp_update_application_password",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "users_with_any",
+                                "select": [
+                                    "ID",
+                                    "name"
+                                ]
+                            },
+                            "default": "any",
+                            "required": false
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -1093,7 +1269,23 @@
                     "key": "delete_application_password",
                     "label": "Delete Application Password",
                     "hook": "wp_delete_application_password",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "users_with_any",
+                                "select": [
+                                    "ID",
+                                    "name"
+                                ]
+                            },
+                            "default": "any",
+                            "required": false
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -1102,7 +1294,23 @@
                     "key": "add_user_role",
                     "label": "User Added to a Role",
                     "hook": "add_user_role",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "users_with_any",
+                                "select": [
+                                    "ID",
+                                    "name"
+                                ]
+                            },
+                            "default": "any",
+                            "required": false
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -1111,7 +1319,23 @@
                     "key": "wp_login",
                     "label": "User Logged In",
                     "hook": "wp_login",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "users_with_any",
+                                "select": [
+                                    "ID",
+                                    "name"
+                                ]
+                            },
+                            "default": "any",
+                            "required": false
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -1129,7 +1353,23 @@
                     "key": "wp_logout",
                     "label": "User Logged Out",
                     "hook": "wp_logout",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "users_with_any",
+                                "select": [
+                                    "ID",
+                                    "name"
+                                ]
+                            },
+                            "default": "any",
+                            "required": false
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -1147,7 +1387,23 @@
                     "key": "validate_reset",
                     "label": "Validate Reset",
                     "hook": "validate_password_reset",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "users_with_any",
+                                "select": [
+                                    "ID",
+                                    "name"
+                                ]
+                            },
+                            "default": "any",
+                            "required": false
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]

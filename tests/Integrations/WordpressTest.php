@@ -476,6 +476,29 @@ class WordpressTest extends IntegrationTestCase {
 		$this->assertIsArray( $result );
 	}
 
+	public function test_trigger_user_filter_allows_selected_user_only(): void {
+		$matched = Wordpress::resolve_trigger(
+			$this->makeTriggerNode( 'user_register', [ 'user_id' => 1 ] ),
+			[ 1 ]
+		);
+		$filtered = Wordpress::resolve_trigger(
+			$this->makeTriggerNode( 'user_register', [ 'user_id' => 2 ] ),
+			[ 1 ]
+		);
+
+		$this->assertIsArray( $matched );
+		$this->assertFalse( $filtered );
+	}
+
+	public function test_trigger_user_filter_accepts_any_user(): void {
+		$result = Wordpress::resolve_trigger(
+			$this->makeTriggerNode( 'user_register', [ 'user_id' => 'any' ] ),
+			[ 1 ]
+		);
+
+		$this->assertIsArray( $result );
+	}
+
 	public function test_trigger_create_application_password_returns_payload(): void {
 		$result = Wordpress::resolve_trigger(
 			$this->makeTriggerNode( 'create_application_password' ),
@@ -1271,6 +1294,23 @@ class WordpressTest extends IntegrationTestCase {
 				$this->assertArrayHasKey( 'type', $field, "Field in '$trigger' schema missing 'type'" );
 			}
 		}
+	}
+
+	public function test_user_trigger_schema_has_dynamic_all_users_selector(): void {
+		$schema = Wordpress::get_trigger_config_schema( 'user_register' );
+		$field = $schema[0] ?? [];
+
+		$this->assertSame( 'user_id', $field['key'] ?? '' );
+		$this->assertSame( 'users_with_any', $field['dynamic']['query'] ?? '' );
+		$this->assertSame( 'any', $field['default'] ?? '' );
+	}
+
+	public function test_query_users_with_any_starts_with_all_users_option(): void {
+		$users = Wordpress::query_users_with_any( [] );
+
+		$this->assertNotEmpty( $users );
+		$this->assertSame( 'any', (string) ( $users[0]['ID'] ?? '' ) );
+		$this->assertSame( 'All Users', $users[0]['name'] ?? '' );
 	}
 
 	public function test_action_config_schemas_contain_valid_fields(): void {
