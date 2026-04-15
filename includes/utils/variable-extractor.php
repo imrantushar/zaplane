@@ -2,219 +2,189 @@
 
 namespace Zaplane\Utils;
 
-if (!defined('ABSPATH')) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
-class VariableExtractor
-{
-    /**
-     * Extract variables from an output array with auto-detected types
-     *
-     * @param mixed $data The output data to extract variables from
-     * @param string $prefix Optional prefix for nested keys
-     * @return array Array of variable definitions with key, type, and sample
-     */
-    public static function extract($data, string $prefix = ''): array
-    {
-        // Handle non-array data
-        if (!is_array($data)) {
-            if ($data === null) {
-                return [];
-            }
-            return [
-                [
-                    'key' => $prefix ?: 'value',
-                    'type' => self::detectType($data),
-                    'sample' => self::getSample($data),
-                ]
-            ];
-        }
+class VariableExtractor {
 
-        if (empty($data)) {
-            return [];
-        }
 
-        $variables = [];
 
-        foreach ($data as $key => $value) {
-            $fullKey = $prefix ? "{$prefix}.{$key}" : $key;
+	public static function extract( $data, string $prefix = '' ): array {
 
-            if (is_array($value)) {
-                // Check if it's an indexed array (list) or associative array (object)
-                if (self::isIndexedArray($value)) {
-                    $variables[] = [
-                        'key' => $fullKey,
-                        'type' => 'array',
-                        'sample' => self::getSample($value),
-                    ];
+		if ( ! is_array( $data ) ) {
+			if ( null === $data ) {
+				return [];
+			}
+			return [
+				[
+					'key' => $prefix ? $prefix : 'value',
+					'type' => self::detectType( $data ),
+					'sample' => self::getSample( $data ),
+				]
+			];
+		}
 
-                    // If array has items, extract the first item's structure
-                    if (!empty($value) && is_array($value[0])) {
-                        $nestedVars = self::extract($value[0], "{$fullKey}[]");
-                        $variables = array_merge($variables, $nestedVars);
-                    }
-                } else {
-                    // Associative array - recurse into it
-                    $nestedVars = self::extract($value, $fullKey);
-                    $variables = array_merge($variables, $nestedVars);
-                }
-            } else {
-                $variables[] = [
-                    'key' => $fullKey,
-                    'type' => self::detectType($value),
-                    'sample' => self::getSample($value),
-                ];
-            }
-        }
+		if ( empty( $data ) ) {
+			return [];
+		}
 
-        return $variables;
-    }
+		$variables = [];
 
-    /**
-     * Detect the type of a value
-     */
-    private static function detectType($value): string
-    {
-        if (is_null($value)) {
-            return 'null';
-        }
+		foreach ( $data as $key => $value ) {
+			$fullKey = $prefix ? "{$prefix}.{$key}" : $key;
 
-        if (is_bool($value)) {
-            return 'boolean';
-        }
+			if ( is_array( $value ) ) {
+				if ( self::isIndexedArray( $value ) ) {
+					$variables[] = [
+						'key' => $fullKey,
+						'type' => 'array',
+						'sample' => self::getSample( $value ),
+					];
 
-        if (is_int($value)) {
-            return 'integer';
-        }
+					if ( ! empty( $value ) && is_array( $value[0] ) ) {
+						$nestedVars = self::extract( $value[0], "{$fullKey}[]" );
+						$variables = array_merge( $variables, $nestedVars );
+					}
+				} else {
+					$nestedVars = self::extract( $value, $fullKey );
+					$variables = array_merge( $variables, $nestedVars );
+				}
+			} else {
+				$variables[] = [
+					'key' => $fullKey,
+					'type' => self::detectType( $value ),
+					'sample' => self::getSample( $value ),
+				];
+			}//end if
+		}//end foreach
 
-        if (is_float($value)) {
-            return 'float';
-        }
+		return $variables;
+	}
 
-        if (is_string($value)) {
-            // Check for special string types
-            if (self::isDateString($value)) {
-                return 'datetime';
-            }
 
-            if (self::isEmailString($value)) {
-                return 'email';
-            }
 
-            if (self::isUrlString($value)) {
-                return 'url';
-            }
+	private static function detectType( $value ): string {
+		if ( is_null( $value ) ) {
+			return 'null';
+		}
 
-            if (self::isHtmlString($value)) {
-                return 'html';
-            }
+		if ( is_bool( $value ) ) {
+			return 'boolean';
+		}
 
-            return 'string';
-        }
+		if ( is_int( $value ) ) {
+			return 'integer';
+		}
 
-        return 'mixed';
-    }
+		if ( is_float( $value ) ) {
+			return 'float';
+		}
 
-    /**
-     * Check if an array is indexed (list) or associative
-     */
-    private static function isIndexedArray(array $array): bool
-    {
-        if (empty($array)) {
-            return true;
-        }
+		if ( is_string( $value ) ) {
+			if ( self::isDateString( $value ) ) {
+				return 'datetime';
+			}
 
-        return array_keys($array) === range(0, count($array) - 1);
-    }
+			if ( self::isEmailString( $value ) ) {
+				return 'email';
+			}
 
-    /**
-     * Get a sample value for display
-     */
-    private static function getSample($value): mixed
-    {
-        if (is_array($value)) {
-            if (empty($value)) {
-                return [];
-            }
+			if ( self::isUrlString( $value ) ) {
+				return 'url';
+			}
 
-            // For arrays, return count indicator
-            return count($value) . ' items';
-        }
+			if ( self::isHtmlString( $value ) ) {
+				return 'html';
+			}
 
-        if (is_string($value) && strlen($value) > 100) {
-            return substr($value, 0, 100) . '...';
-        }
+			return 'string';
+		}
 
-        return $value;
-    }
+		return 'mixed';
+	}
 
-    /**
-     * Check if string looks like a date
-     */
-    private static function isDateString(string $value): bool
-    {
-        // Common date patterns
-        $patterns = [
-            '/^\d{4}-\d{2}-\d{2}/',  // 2024-01-01
-            '/^\d{2}\/\d{2}\/\d{4}/', // 01/01/2024
-            '/^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}/', // ISO datetime
-        ];
 
-        foreach ($patterns as $pattern) {
-            if (preg_match($pattern, $value)) {
-                return true;
-            }
-        }
 
-        return false;
-    }
+	private static function isIndexedArray( array $array ): bool {
+		if ( empty( $array ) ) {
+			return true;
+		}
 
-    /**
-     * Check if string looks like an email
-     */
-    private static function isEmailString(string $value): bool
-    {
-        return filter_var($value, FILTER_VALIDATE_EMAIL) !== false;
-    }
+		return array_keys( $array ) === range( 0, count( $array ) - 1 );
+	}
 
-    /**
-     * Check if string looks like a URL
-     */
-    private static function isUrlString(string $value): bool
-    {
-        return filter_var($value, FILTER_VALIDATE_URL) !== false;
-    }
 
-    /**
-     * Check if string contains HTML
-     */
-    private static function isHtmlString(string $value): bool
-    {
-        return $value !== strip_tags($value);
-    }
 
-    /**
-     * Convert output to a flat key-value map for condition building
-     *
-     * @param array $data The output data
-     * @param string $prefix Optional prefix for nested keys
-     * @return array Flat associative array with dot-notation keys
-     */
-    public static function flatten(array $data, string $prefix = ''): array
-    {
-        $result = [];
+	private static function getSample( $value ) {
+		if ( is_array( $value ) ) {
+			if ( empty( $value ) ) {
+				return [];
+			}
 
-        foreach ($data as $key => $value) {
-            $fullKey = $prefix ? "{$prefix}.{$key}" : $key;
+			return count( $value ) . ' items';
+		}
 
-            if (is_array($value) && !self::isIndexedArray($value)) {
-                // Recursively flatten associative arrays
-                $nested = self::flatten($value, $fullKey);
-                $result = array_merge($result, $nested);
-            } else {
-                $result[$fullKey] = $value;
-            }
-        }
+		if ( is_string( $value ) && strlen( $value ) > 100 ) {
+			return substr( $value, 0, 100 ) . '...';
+		}
 
-        return $result;
-    }
+		return $value;
+	}
+
+
+
+	private static function isDateString( string $value ): bool {
+
+		$patterns = [
+			'/^\d{4}-\d{2}-\d{2}/',
+			'/^\d{2}\/\d{2}\/\d{4}/',
+			'/^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}/',
+		];
+
+		foreach ( $patterns as $pattern ) {
+			if ( preg_match( $pattern, $value ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+
+
+	private static function isEmailString( string $value ): bool {
+		return filter_var( $value, FILTER_VALIDATE_EMAIL ) !== false;
+	}
+
+
+
+	private static function isUrlString( string $value ): bool {
+		return filter_var( $value, FILTER_VALIDATE_URL ) !== false;
+	}
+
+
+
+	private static function isHtmlString( string $value ): bool {
+		return wp_strip_all_tags( $value ) !== $value;
+	}
+
+
+
+	public static function flatten( array $data, string $prefix = '' ): array {
+		$result = [];
+
+		foreach ( $data as $key => $value ) {
+			$fullKey = $prefix ? "{$prefix}.{$key}" : $key;
+
+			if ( is_array( $value ) && ! self::isIndexedArray( $value ) ) {
+				$nested = self::flatten( $value, $fullKey );
+				$result = array_merge( $result, $nested );
+			} else {
+				$result[ $fullKey ] = $value;
+			}
+		}
+
+		return $result;
+	}
 }

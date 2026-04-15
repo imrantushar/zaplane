@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { __ } from '@wordpress/i18n';
-import { Text, Button, Flex } from '@chakra-ui/react';
+import { Text, Button } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
 
-import { clearBtn, clearPrimaryBtn } from '../../../assets/scss/chakra/recipe';
+import { clearBtn } from '../../../assets/scss/chakra/recipe';
 import { sliceString } from '@ZAPUtils/helper';
 
 const ZAPLabel = ({
@@ -30,9 +30,6 @@ const ZAPLabel = ({
 	sliceLength = 100,
 	sliceMore = '...',
 	textOverflow='',
-	showToggle = true,
-	seeMoreText = __('See more', 'zaplane'),
-	seeLessText = __('See less', 'zaplane'),
 }) => {
 	const [isExpanded, setIsExpanded] = useState(false);
 
@@ -117,68 +114,22 @@ const ZAPLabel = ({
 		textOverflow:textOverflow
 	};
 
-	const needsSlicing = enableSlice && label && label.length > sliceLength;
 
-	const getDisplayText = () => {
-		if (!enableSlice || !needsSlicing) {
-			return label;
-		}
-
-		if (isExpanded) {
-			return label;
-		}
-
-		return sliceString(label, sliceLength, sliceMore);
-	};
-
-	const displayText = getDisplayText();
-
-	const toggleExpansion = () => {
-		setIsExpanded(!isExpanded);
-	};
-
-	const renderContent = () => {
-		if (href) {
-			return (
-				<Button {...clearBtn}>
-					<Link to={href} color="var(--zaplane-primary-color)">
-						{displayText}
-					</Link>
-				</Button>
-			);
-		}
-
-		if (icon) {
-			return (
-				<Flex alignItems="center" gap="2">
-					{icon} {displayText}
-				</Flex>
-			);
-		}
-
-		return displayText;
-	};
+	
 
 	return (
 		<>
-			<Text  {...textProps}>
-				{renderContent()}
-
-				{enableSlice && needsSlicing && showToggle && !href && (
-					<Button
-						{...clearPrimaryBtn}
-						fontSize="14px"
-						fontWeight="400"
-						lineHeight="24px"
-						variant="plain"
-						size="md"
-						marginLeft={1}
-						onClick={toggleExpansion}
-					>
-						{isExpanded ? seeLessText : seeMoreText}
-					</Button>
-				)}
-			</Text>
+			{ href ? (
+				<Button { ...clearBtn }>
+					<Link to={ href } style={{ color: "var(--zaplane-font-color)" }}>
+						<Text { ...textProps } _hover={ { color: '#4F46E5' } }>
+							{ `${ label }` }
+						</Text>
+					</Link>
+				</Button>
+			) : (
+				<Text { ...textProps }>{ `${ label }` }</Text>
+			) }
 		</>
 	);
 };

@@ -24,19 +24,21 @@
  */
 import { useState, useMemo, useEffect } from "react";
 import { APPS, TOOLS } from "./helper";
+import { integrations } from "@ZAPUtils/helper";
 
-export const useActionDrawer = (open, node, source, setFieldValue, isTrigger) => {
+export const useActionDrawer = (open, node, source, setFieldValue, isTrigger,values) => {
   const [mode, setMode] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
   const [search, setSearch] = useState("");
+   console.log(values,'vv');
 
   useEffect(() => {
+    console.log('iam calling');
     if (!open || !node?.data || source === "add") return;
 
     const detectedItem = APPS.concat(TOOLS).find(
       i => i.name === node.data.app || i.id === node.data.app
     );
-
     if (detectedItem) {
       setMode(TOOLS.includes(detectedItem) ? "tools" : "app");
       setSelectedItem(detectedItem);
@@ -47,9 +49,21 @@ export const useActionDrawer = (open, node, source, setFieldValue, isTrigger) =>
     if (node.data.config) {
       Object.entries(node.data.config).forEach(([k, v]) => setFieldValue(k, v));
     }
-  }, [open, node?.data]);
+  }, [open, node?.data,values.nodeClick]);
 
-  const list = useMemo(() => (mode === "app" ? APPS : mode === "tools" ? TOOLS : []), [mode]);
+   const list = useMemo(() => {
+    const base = mode === "app" ? APPS : mode === "tools" ? TOOLS : [];
+
+    if (isTrigger) return base;
+
+    return base.filter((item) => {
+      const integration =
+        integrations.apps?.[item.id] ||
+        integrations.tools?.[item.id];
+
+      return integration?.actions && Object.keys(integration.actions).length > 0;
+    });
+  }, [mode, isTrigger]);
 
   const searchList = useMemo(() => {
     if (!search) return [];

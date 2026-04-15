@@ -1,6 +1,7 @@
 /vendor/
 .claude/
 .DS_Store
+CLAUDE.md
 node_modules/
 vendor/
 package-lock.json

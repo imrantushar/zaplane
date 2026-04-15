@@ -1,15 +1,12 @@
-import { useState, useRef, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import {  useRef,  } from "react";
+import {  useSelector } from "react-redux";
 import ZAPInput from "@ZAPComponents/ZAPInput";
 import ZAPSelect from "@ZAPComponents/ZAPSelect";
 import ZAPDatePicker from "@ZAPComponents/ZAPDatePicker";
 import ConditionGroupField from "../ConditionGroupField/ConditionGroupField";
-import { mapEdgesForBackend, mapNodesForBackend } from "../../helper";
-import { conditionVariables } from "@ZAPRedux/Slices/workFlowSlice/actions/conditonVariales";
-import {  insertVariableAtCursor } from "./helper";
-import VariablePopover from "../VariablePopaver/VariablePopover";
 import './styles.scss'
 import { __ } from "@wordpress/i18n";
+import VariableEditor from "@ZAPComponents/VariableEditor/index.js";
 
 const ActionFieldRenderer = ({
   field,
@@ -19,53 +16,40 @@ const ActionFieldRenderer = ({
   dynamicOptions,
   loadingFields,
   fetchDynamicOptions,
-  nodeId,
-  workFlow,
-  nodes,
-  edges
 }) => {
-  const [isPopoverOpen, setPopoverOpen] = useState(false);
+
   const inputRef = useRef(null);
   const { workflowVariables } = useSelector(
     (state) => state.workflows
   );
   switch (field.type) {
 
-    case "text":
-    case "expression":
     case "number":
     case "email":
     case "url":
+
+      return <>
+        <ZAPInput
+          type={field.type}
+          label={field.label}
+          value={value || ""}
+          inputRef={inputRef}
+          onChange={(e) => setFieldValue(field.key, e.target.value)}
+        /></>
+    case "text":
+    case "expression":
+
     case "textarea":
       return (
         <>
-          <ZAPInput
+          <VariableEditor
             label={field.label}
-            placeholder={__('Type "@" here to add dynamic', 'zaplane')}
             value={value || ""}
-            inputRef={inputRef}
-            onChange={(e) => setFieldValue(field.key, e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "@") {
-                setPopoverOpen(true);
-              }
-            }}
-          />
-
-          <VariablePopover
-            isOpen={isPopoverOpen}
-            prefix="variables-popaver"
-            onClose={() => setPopoverOpen(false)}
-            data={workflowVariables?.data}
-            onSelectVariable={(variable) => {
-              insertVariableAtCursor({
-                variable,
-                inputRef,
-                fieldKey: field.key,
-                setFieldValue,
-                setPopoverOpen,
-              });
-            }}
+            setValue={(val) => setFieldValue(field.key, val)}
+            variables={workflowVariables?.data || []}
+            field={field}
+            setFieldValue={setFieldValue}
+            placeholder={__('Type "@" here to add dynamic', "zaplane")}
           />
         </>
       );

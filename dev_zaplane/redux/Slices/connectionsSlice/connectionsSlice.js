@@ -62,11 +62,12 @@ export const initOAuth = createAsyncThunk(
 // Create token-based connection
 export const createTokenConnection = createAsyncThunk(
   'connections/createTokenConnection',
-  async ({ app, name, authType, credentials }, thunkAPI) => {
+  async ({ app, name,icon, authType, credentials }, thunkAPI) => {
     try {
       const res = await API.post(namespace + 'connections', {
         app,
         name,
+        icon,
         auth_type: authType,
         credentials,
       });
@@ -163,7 +164,7 @@ const connectionsSlice = createSlice({
     allConnection: [],
     authFields: {},
     oauthData: null,
-    loading: false,
+    loading: true,
     error: null,
     connection: {},
     itemPerPage: 10,
@@ -192,6 +193,7 @@ const connectionsSlice = createSlice({
       })
       .addCase(fetchAuthFields.fulfilled, (state, action) => {
         state.authFields = action.payload || {};
+        state.loading =false
       })
 
       .addCase(initOAuth.fulfilled, (state, action) => {

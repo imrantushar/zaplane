@@ -1,7 +1,6 @@
 import { VStack } from "@chakra-ui/react";
 import DrawerItemButton from "./DrawerItemButton";
 import { IoIosArrowForward } from "react-icons/io";
-import { ReactComponent as SlackIcon } from "./slack.svg";
 
 const DrawerModeList = ({ setMode, setSelectedItem, isTrigger, source, TOOLS }) => {
   return (
@@ -11,7 +10,7 @@ const DrawerModeList = ({ setMode, setSelectedItem, isTrigger, source, TOOLS }) 
         onClick={() => setMode("app")}
         arrowIcon={<IoIosArrowForward />}
         showType={false}
-        icon={SlackIcon}
+        icon={'apps'}
       />
 
       {(!isTrigger || source === "add") &&
@@ -21,9 +20,11 @@ const DrawerModeList = ({ setMode, setSelectedItem, isTrigger, source, TOOLS }) 
             item={{ ...tool, type: "tools" }}
             onClick={() => {
               setMode("tools");
-              setSelectedItem(tool);
+              setSelectedItem({
+                ...tool,
+               mode: "tools"});
             }}
-            icon={SlackIcon}
+            icon={tool?.icon}
           />
         ))}
     </VStack>

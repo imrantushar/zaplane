@@ -20,7 +20,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { toggleFullscreenMode, mapGraphFromBackend } from "./helper";
 import ZAPLoading from "@ZAPComponents/Loading";
 import { useFlowActions } from "@ZAPHooks/useFlowActions/useFlowActions";
-import CustomNode from "../customNode/CustomNode";
+import CustomNode from "../CustomNode/CustomNode";
 import './styles.scss'
 import { IoSwapHorizontal, IoSwapVerticalOutline } from "react-icons/io5";
 import ZAPTooltip from "@ZAPComponents/ZAPTooltip";
@@ -50,20 +50,6 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
         node: null,
         edge: null,
     });
-    // layout update
-    // useEffect(() => {
-    //     if (canvasLayout !== workFlow.workflow?.layout) {
-    //         const updateLayout = async () => {
-    //             try {
-    //                 await dispatch(updateWorkFlowLayout({ id, layout: canvasLayout }));
-    //             } catch (error) {
-    //                 console.error("Failed to update layout:", error);
-    //             }
-    //         };
-
-    //         updateLayout();
-    //     }
-    // }, [canvasLayout]);
 
     const activeVersionId = versions?.find(v => v.is_active)?.id;
 
@@ -75,11 +61,11 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
     const {
         updateNodeData,
         deleteNode,
-        createActionNode,
+        handleAddAction,
         openDrawerForNode,
         openDrawerFromAdd,
         onLayout
-    } = useFlowActions({ nodes, setNodes, edges, setEdges, drawerContext, getNewNodeId, setDrawerContext, setDrawerOpen, setFieldValue, canvasLayout,setCanvasLayOut });
+    } = useFlowActions({ values,nodes, setNodes, edges, setEdges, drawerContext, getNewNodeId, setDrawerContext, setDrawerOpen, setFieldValue, canvasLayout,setCanvasLayOut });
 
     const onAddNode = (edgeId) => {
         const edge = edges.find((e) => e.id === edgeId);
@@ -105,10 +91,10 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
         setEdges((eds) => eds.filter((e) => e.id !== edgeId));
     };
 
-    console.log(nodes, 'all nodes',);
-    console.log(edges, 'all edges');
+    
     const nodeTypes = {
         custom: (props) => (
+        
             <CustomNode
                 {...props}
                 data={{
@@ -119,6 +105,7 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
 
                 }}
                 canvasLayout={canvasLayout}
+                nodes={nodes}
             />
         ),
     };
@@ -131,22 +118,16 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
             />
         ),
     };
-    //listiner
 
-    // useEffect(() => {
-    //     const interval = setInterval(() => {
-    //         dispatch(getRunWorkFlow());
-    //     }, 5000);
-
-    //     return () => clearInterval(interval);
-    // }, []);  
+    // console.log(nodes, 'all nodes',);
+    // console.log(edges, 'all edges');
     return (
         <Box
             ref={containerRef}
             className="zaplane_flowcanvas"
             flex="1"
             height="100vh"
-            marginRight={activeDrawer ? "497px" : "0px"}
+            // marginRight={activeDrawer ? "600px" : "0px"}
             transition="margin-right 0.4s ease"
         >
 
@@ -176,15 +157,16 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
                     onNodesChange={onNodesChange}
                     onEdgesChange={onEdgesChange}
                     onConnect={onConnect}
-                    fitView
-                    fitViewOnInit
+                    // fitView
+                    // fitViewOnInit
+                    //  defaultViewport={{ x: 0, y: 0, zoom: 1 }}
+                    fitViewOptions={{ minZoom: 0.5, maxZoom: 1 }}
                     panOnDrag
                     zoomOnScroll
                     zoomOnDoubleClick
                     nodesDraggable
                     nodesConnectable
                     elementsSelectable
-                    minZoom={0.5}
                 >
 
                     <Background />
@@ -241,7 +223,7 @@ export default function FlowCanvas({ id, nodes, setNodes, edges, setEdges, onEdg
                     setDrawerContext({ source: null, node: null, edge: null });
                 }}
                 context={drawerContext}
-                createActionNode={createActionNode}
+                handleAddAction={handleAddAction}
                 updateNodeData={updateNodeData}
                 workFlow={workFlow}
                 nodes={nodes}

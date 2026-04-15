@@ -2,25 +2,23 @@
 
 namespace Zaplane\Framework\Classes;
 
-if (!defined('ABSPATH')) {
-    exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
-abstract class AbstractAjaxHandler extends AbstractRequestHandler
-{
-    protected bool $is_ajax = true;
+abstract class AbstractAjaxHandler extends AbstractRequestHandler {
 
-    /**
-     * Dispatch AJAX actions.
-     */
-    final public function dispatch_actions()
-    {
-        foreach ($this->actions as $action => $details) {
-            add_action('wp_ajax_' . $this->namespace . '/' . $action, [$this, 'handle_request']);
+	protected bool $is_ajax = true;
 
-            if (isset($details['allow_visitor_action']) && $details['allow_visitor_action'] === true) {
-                add_action('wp_ajax_nopriv_' . $this->namespace . '/' . $action, [$this, 'handle_request']);
-            }
-        }
-    }
+
+
+	final public function dispatch_actions() {
+		foreach ( $this->actions as $action => $details ) {
+			add_action( 'wp_ajax_' . $this->namespace . '/' . $action, [ $this, 'handle_request' ] );
+
+			if ( isset( $details['allow_visitor_action'] ) && true === $details['allow_visitor_action'] ) {
+				add_action( 'wp_ajax_nopriv_' . $this->namespace . '/' . $action, [ $this, 'handle_request' ] );
+			}
+		}
+	}
 }

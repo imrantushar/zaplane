@@ -1,19 +1,20 @@
 :root {
     --zaplane-font: "Roboto", sans-serif;
     --zaplane-primary: #6C4DFF;
-    --zaplane-second-primary: #E3E7FF;
+    --zaplane-second-primary: #DAEAFF;
     --zaplane-secondary: #f5f5f5;
     --zaplane-secondary-color: #F6F7F8;
     --zaplane-border-color: #CBD1D7;
     --zaplane-body-background: #F6F7F8;
     --zaplane-background: #FFFFFF;
     --zaplane-font-color: #141A24;
+    --zaplane-font-secondary-color: #737373;
     --zaplane-text-muted: #738496;
     --zaplane-danger: #e44a3f;
     --zaplane-warning: #FDB022;
     --zaplane-placeholder: #A2ADB9;
-    --zaplane-shadow: 0px 0px 1px 0px rgba(20, 26, 36, 0.2), 0px 1px 2px 0px rgba(20, 26, 36, 0.1);
-    --zaplane-shadow-2: 0px 0px 1px 0px rgba(16, 24, 40, 0.15), 0px 8px 16px 0px rgba(20, 26, 36, 0.1);
+    --zaplane-shadow: 0 0 1px 0 rgba(212, 212, 216, 0.30) inset, 0 8px 16px 0 rgba(24, 24, 27, 0.10);
+    --zaplane-shadow-2: 0 0 1px 0 rgba(20, 26, 36, 0.20), 0 1px 2px 0 rgba(20, 26, 36, 0.10);
     --zaplane-gray: #F6F7F8;
 }
 

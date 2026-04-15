@@ -1,108 +1,81 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { __ } from "@wordpress/i18n";
-import { Box, Flex, Heading, Button } from "@chakra-ui/react";
-import { useDispatch, useSelector } from "react-redux";
-import ZAPMenu from "@ZAPComponents/ZapMenu";
-import TopBar from "@ZAPComponents/TopBar";
-import ZAPInput from "@ZAPComponents/ZAPInput";
-import WPModal from "@ZAPComponents/Modal/WPModal";
-import { primaryBtn } from "../../../../../assets/scss/chakra/recipe";
+import { Button, Flex, Image } from "@chakra-ui/react";
 
-import {
-  createWorkflows,
-  getWorkFlow,
-} from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow";
-import WorkflowTable from "./WorkflowTable";
-import { useNavigate } from "react-router-dom";
-import { route_path } from "@ZAPUtils/helper";
+import TopBar from "@ZAPComponents/TopBar";
 import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
+import CreateWorkflowModal from "@ZAPComponents/CreateWorkflowModal";
+import SubTopBar from "@ZAPComponents/SubTopBar";
+
+import { primaryBtn } from "../../../../../assets/scss/chakra/recipe";
+import { IoIosArrowForward } from "react-icons/io";
+import { plugin_root_url } from "@ZAPUtils/helper";
+import ImportWorkflow from "./workFlowMotion/ImportWorkflow";
+import WorkflowTable from "@ZAPComponents/WorkflowTable";
+
 
 
 const CreateWorkflows = ({ onNavigateToEdit, title = __('Flows', 'zaplane')}) => {
-  const dispatch = useDispatch();
-  const navigate =useNavigate()
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [workflowName, setWorkflowName] = useState("");
 
-   const handleCreate = async () => {
-    if (!workflowName.trim()) return;
-    const res = await dispatch(
-      createWorkflows({
-        title: workflowName
-      })
-    )
-    if (res?.payload.id) {
-      if (onNavigateToEdit) {
-        onNavigateToEdit(res.payload.id);
-      } else {
-        navigate(
-          `${route_path}admin.php?page=zaplane-workflows&action=edit&id=${res.payload.id}`
-        );
-      }
-    }
-
-    setWorkflowName("");
-    setIsModalOpen(false);
-  };
-
-
-
+  // if (res?.payload.id) {
+  //     if (onNavigateToEdit) {
+  //       onNavigateToEdit(res.payload.id);
+  //     } else {
+  //       navigate(
+  //         `${route_path}admin.php?page=zaplane-workflows&action=edit&id=${res.payload.id}`
+  //       );
+  //     }
+  //   }
   return (
     <>
       <TopBar
-        render={() => (
-          <Box>
-            <ZAPLabel
-              label={title}
-              variant="bold"
-            />
+        leftContent={() => (
+          <>
+            <Flex
+              height="40px"
+              width="40px"
+              borderRadius="20px"
+              background="var(--zaplane-second-primary)"
+              alignItems="center"
+              justifyContent="center"
+            >
+              <img
+                src={`${plugin_root_url}assets/images/zaplane.svg`}
+              />
+            </Flex>
 
-          </Box>
-        )}
-        rightContent={() => (
-          <Button {...primaryBtn} onClick={() => setIsModalOpen(true)}>
-            {__('Create Workflow', 'zaplane')}
-          </Button>
+            <IoIosArrowForward />
+
+            <ZAPLabel
+              as="h2"
+              color="var(--zapplane-font-color)"
+              type="subtitle"
+              fontWeight="medium"
+              label={title}
+            />
+          </>
         )}
       />
 
+      <SubTopBar heading={__("Workflows", "zaplane")}>
+        <ImportWorkflow />
+        <Button
+          onClick={() => setIsModalOpen(true)}
+          {...primaryBtn}
+        >
+          {__("Create Workflow", "zaplane")}
+        </Button>
+      </SubTopBar>
+
       <div className="zaplane-page-content">
-        <WorkflowTable onNavigateToEdit={onNavigateToEdit}
-        />
+        <WorkflowTable onNavigateToEdit={onNavigateToEdit} />
       </div>
 
-      <WPModal
-        title={__("Create Workflow", "zaplane")}
+      <CreateWorkflowModal
         isOpen={isModalOpen}
-        onRequestClose={() => setIsModalOpen(false)}
-        size="medium"
-      >
-        <Box px={4}>
-          <ZAPInput
-            label={__("Workflow Name", "zaplane")}
-            placeholder={__("Enter workflow name", "zaplane")}
-            value={workflowName}
-            onChange={(e) => setWorkflowName(e.target.value)}
-          />
-
-          <Flex justify="flex-end" mt={5}>
-            <Button
-              variant="outline"
-              mr={3}
-              onClick={() => setIsModalOpen(false)}
-            >
-              {__("Cancel", "zaplane")}
-            </Button>
-            <Button
-              {...primaryBtn}
-              onClick={handleCreate}
-              isDisabled={!workflowName.trim()}
-            >
-              {__("Create", "zaplane")}
-            </Button>
-          </Flex>
-        </Box>
-      </WPModal>
+        onClose={() => setIsModalOpen(false)}
+      />
     </>
   );
 };

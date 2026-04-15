@@ -20,7 +20,9 @@ const workflowsSlice = createSlice({
 		versions: [],
 		nodeDetails: [],
 		isLoading: true,
-		singleNodeExecution: null,
+		singleNodeExecution: {
+			
+		},
 		apiCountdown: 0,
 		apiRequestRunning: false,
 		workflowVariables: [],
@@ -32,7 +34,7 @@ const workflowsSlice = createSlice({
 	},
 	reducers: {
 		resetSingleNodeExecution(state) {
-			state.singleNodeExecution = null;
+			// state.singleNodeExecution = null;
 			state.isLoading = false;
 		},
 		startApiCountdown(state, action) {
@@ -134,7 +136,11 @@ const workflowsSlice = createSlice({
 			})
 			.addCase(workFLowSingeNodeExction.fulfilled, (state, action) => {
 				state.isLoading = false;
-				state.singleNodeExecution = action.payload?.data || null;
+				const node_id=action?.payload?.data?.node?.id
+				if (!state.singleNodeExecution[node_id]) {
+					state.singleNodeExecution[node_id] = {}
+				}
+				state.singleNodeExecution[node_id] = action.payload.data
 			})
 
 

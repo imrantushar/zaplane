@@ -21,6 +21,9 @@ import ConnectionDetails from "./ConnectionDetails/ConnectionDetails";
 import { formatDateTime } from "@ZAPUtils/helper";
 import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
 import { TableArrow } from "@ZAPUtils/icons";
+import ZAPActionBar from "@ZAPComponents/ZAPActionBar";
+import ZAPIcon from "@ZAPComponents/ZAPIcon";
+import ZAPIconGroup from "@ZAPComponents/ZAPIconGroup/ZAPIconGroup";
 
 const ConnectionTable = () => {
     const dispatch = useDispatch();
@@ -29,6 +32,7 @@ const ConnectionTable = () => {
     const { allConnection = [], isLoading, connection, currentPage, perPage, totalItems } = useSelector(
         (state) => state.connections
     );
+    const [selection, setSelection] = useState([]);
     const [loading, setLoading] = useState(allConnection.length === 0);
     const handleRefresh = async (page = 1, per_page = 10) => {
         setLoading(true)
@@ -62,6 +66,21 @@ const ConnectionTable = () => {
         dispatch(fetchSingleConnection(row.id));
         setDetailsOpen(true);
     };
+    const handleDeleteSelected = async () => {
+        if (!selection.length) return;
+        try {
+            await Promise.all(
+                selection
+                    .map((row) => row?.id)
+                    .filter(Boolean)
+                    .map((id) => dispatch(deleteConnection(id)))
+            );
+            setSelection([]);
+            dispatch(fetchConnections({ page: currentPage, per_page: perPage }));
+        } catch (e) {
+            console.error("Failed to delete selected team members", e);
+        }
+    };
 
     const columns = [
         {
@@ -71,11 +90,17 @@ const ConnectionTable = () => {
                 </Text>
 
             ),
-            cell: (row) => (
-                <Text className="zaplane-label" fontWeight="400" textOverflow="ellipsis">
-                    {row.name}
-                </Text>
-            ),
+            cell: (row) =>{
+                return (
+                    <Flex gap='12px' alignItems='center'>
+                    <ZAPIconGroup icons={[row?.icon]}/>
+                    <Text className="zaplane-label" fontWeight="400" textOverflow="ellipsis">
+                        {row.name}
+                    </Text>
+                </Flex>
+                )
+
+            },
             // columnWidth: "150px",
             textAlign: "start",
         },
@@ -105,7 +130,7 @@ const ConnectionTable = () => {
                 return (
                     <Box textAlign="center">
                         <ZAPLabel label={date} type={"simple"} />
-                        <Text className="zaplane-sub-title" ml='-45px' color="var(--zaplane-text-muted)">
+                        <Text className="zaplane-sub-title" ml='-38px' color="var(--zaplane-text-muted)">
                             {__(time, 'zaplane')}
                         </Text>
                     </Box>
@@ -116,10 +141,10 @@ const ConnectionTable = () => {
         },
         {
             name: (
-                    <Text className="zaplane-label" ml='-32px'>
-                        {__("Updated At", "zaplane")}
-                    </Text>
-               
+                <Text className="zaplane-label" ml='-32px'>
+                    {__("Updated At", "zaplane")}
+                </Text>
+
             ),
             cell: (row) => {
                 const { date, time } = formatDateTime(row.updated_at);
@@ -127,7 +152,7 @@ const ConnectionTable = () => {
                 return (
                     <Box textAlign="center">
                         <ZAPLabel label={date} type={"simple"} />
-                        <Text className="zaplane-sub-title" ml='-45px' color="var(--zaplane-text-muted)">
+                        <Text className="zaplane-sub-title" ml='-38px' color="var(--zaplane-text-muted)">
                             {__(time, 'zaplane')}
                         </Text>
                     </Box>
@@ -138,10 +163,10 @@ const ConnectionTable = () => {
         },
         {
             name: (
-                    <Text className="zaplane-label">
-                        {__("Status", "zaplane")}
-                    </Text>
-                   
+                <Text className="zaplane-label">
+                    {__("Status", "zaplane")}
+                </Text>
+
             ),
             cell: (row) => (
                 <StatusOptions
@@ -212,7 +237,7 @@ const ConnectionTable = () => {
                 isRowSelectable={true}
                 showSubHeader={false}
                 showColumnFilter={false}
-                showPagination={allConnection.length >= 10}
+                showPagination={totalItems >= 10}
                 noDataText={__("No connections found", "zaplane")}
                 totalItems={totalItems}
                 dataFetchingStatus={loading}
@@ -221,6 +246,14 @@ const ConnectionTable = () => {
                 perPage={perPage}
                 onChangePage={handlePageChange}
                 onChangeItemsPerPage={handlePerPageChange}
+                getSelectRowValue={(rows) => {
+                    setSelection(rows || []);
+                }}
+            />
+            <ZAPActionBar
+                selection={selection}
+                onDelete={handleDeleteSelected}
+                onClose={() => setSelection([])}
             />
 
             <ConnectionDetails

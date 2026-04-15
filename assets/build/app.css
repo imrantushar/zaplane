@@ -4,19 +4,20 @@
 :root {
   --zaplane-font: "Roboto", sans-serif;
   --zaplane-primary: #6C4DFF;
-  --zaplane-second-primary: #E3E7FF;
+  --zaplane-second-primary: #DAEAFF;
   --zaplane-secondary: #f5f5f5;
   --zaplane-secondary-color: #F6F7F8;
   --zaplane-border-color: #CBD1D7;
   --zaplane-body-background: #F6F7F8;
   --zaplane-background: #FFFFFF;
   --zaplane-font-color: #141A24;
+  --zaplane-font-secondary-color: #737373;
   --zaplane-text-muted: #738496;
   --zaplane-danger: #e44a3f;
   --zaplane-warning: #FDB022;
   --zaplane-placeholder: #A2ADB9;
-  --zaplane-shadow: 0px 0px 1px 0px rgba(20, 26, 36, 0.2), 0px 1px 2px 0px rgba(20, 26, 36, 0.1);
-  --zaplane-shadow-2: 0px 0px 1px 0px rgba(16, 24, 40, 0.15), 0px 8px 16px 0px rgba(20, 26, 36, 0.1);
+  --zaplane-shadow: 0 0 1px 0 rgba(212, 212, 216, 0.30) inset, 0 8px 16px 0 rgba(24, 24, 27, 0.10);
+  --zaplane-shadow-2: 0 0 1px 0 rgba(20, 26, 36, 0.20), 0 1px 2px 0 rgba(20, 26, 36, 0.10);
   --zaplane-gray: #F6F7F8;
 }
 
@@ -426,7 +427,11 @@
   box-sizing: border-box;
 }
 
-.zaplane-button-actve {
+.zaplane-icon {
+  font-size: 20px;
+}
+
+.zaplane-button-active {
   background: var(--zaplane-second-primary);
   color: var(--zaplane-primary) !important;
 }
@@ -673,7 +678,7 @@
 
 .zaplane-textarea {
   border: 1px solid var(--zaplane-border-color);
-  height: 37px;
+  height: 100%;
   width: 100%;
   padding: 7px;
   border-radius: 4px;
@@ -1107,6 +1112,7 @@
   justify-content: space-between;
   gap: 16px;
   margin-top: 12px;
+  flex-wrap: wrap;
 }
 
 .zaplane-table__footer-right {
@@ -1154,6 +1160,12 @@
 .zaplane-wp-modal {
   width: 600px;
   min-height: 220px;
+}
+.zaplane-wp-modal .components-button {
+  background: var(--zaplane-body-background);
+}
+.zaplane-wp-modal .components-button:hover:not(:disabled, [aria-disabled=true]) {
+  color: var(--zaplane-primary);
 }
 /*!******************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/@wordpress/scripts/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./dev_zaplane/components/Pagination/styles.scss ***!
@@ -1256,6 +1268,88 @@
   max-width: fit-content;
   margin-top: 24px;
 }
+/*!*********************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/@wordpress/scripts/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./dev_zaplane/components/StatusOptions/styles.scss ***!
+  \*********************************************************************************************************************************************************************************************************************************************************************************************************/
+.zaplane-dropdown-option {
+  position: relative;
+  cursor: pointer;
+  padding: 8px 12px !important;
+  border-radius: 999px;
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 125px;
+  width: -moz-fit-content;
+  width: fit-content;
+  margin: 0 auto;
+}
+.zaplane-dropdown-option span.label {
+  text-transform: capitalize;
+  font-size: 14px;
+  line-height: 18px;
+}
+.zaplane-dropdown-option--completed, .zaplane-dropdown-option--active, .zaplane-dropdown-option--approved, .zaplane-dropdown-option--pass, .zaplane-dropdown-option--future {
+  color: #00AD6B;
+  border: none;
+  background: rgba(36, 161, 72, 0.1);
+}
+.zaplane-dropdown-option--processing, .zaplane-dropdown-option--paused, .zaplane-dropdown-option--submitted {
+  color: #FDB022;
+  border: none;
+  background: rgba(236, 152, 20, 0.12);
+}
+.zaplane-dropdown-option--draft, .zaplane-dropdown-option--private, .zaplane-dropdown-option--inactive {
+  color: #0F0E16;
+  border: none;
+  background: rgba(114, 114, 114, 0.12);
+}
+.zaplane-dropdown-option--cancel, .zaplane-dropdown-option--trash, .zaplane-dropdown-option--failed {
+  color: #FF4D4D;
+  border: none;
+  background: rgba(244, 72, 63, 0.12);
+}
+.zaplane-dropdown-option .zaplane-icon--angle-down {
+  pointer-events: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.zaplane-dropdown-option .zaplane-icon--angle-down::before {
+  font-size: 8px;
+}
+.zaplane-dropdown-option__lists .zaplane-more-status-options {
+  position: relative;
+  min-width: 175px;
+  z-index: 99999;
+  border-radius: 4px;
+  background: #fff;
+  margin: 0;
+  padding: 5px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: var(--zaplane-border-color);
+  box-shadow: rgba(0, 0, 0, 0.04) 0px 1px 1px;
+}
+.zaplane-dropdown-option__lists .zaplane-more-status-options__item {
+  display: flex;
+  color: var(--zaplane-font-color);
+  background: #fff;
+  font-size: 12px;
+  font-weight: 500;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 15px;
+  margin-bottom: 5px;
+  cursor: pointer;
+}
+.zaplane-dropdown-option__lists .zaplane-more-status-options__item:last-child {
+  margin-bottom: 0;
+}
+.zaplane-dropdown-option__lists .zaplane-more-status-options__item:hover, .zaplane-dropdown-option__lists .zaplane-more-status-options__item.active {
+  color: #0F0E16;
+  background: #F5F5F5;
+}
 /*!******************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/@wordpress/scripts/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./dev_zaplane/components/OptionMenu/styles.scss ***!
   \******************************************************************************************************************************************************************************************************************************************************************************************************/
@@ -1357,88 +1451,6 @@
 .zaplane-dropdown-menu__inline-form .zaplane-btn--trash {
   padding: 0;
   color: var(--zaplane-placing);
-}
-/*!*********************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/@wordpress/scripts/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./dev_zaplane/components/StatusOptions/styles.scss ***!
-  \*********************************************************************************************************************************************************************************************************************************************************************************************************/
-.zaplane-dropdown-option {
-  position: relative;
-  cursor: pointer;
-  padding: 8px 12px !important;
-  border-radius: 999px;
-  display: flex !important;
-  align-items: center;
-  justify-content: space-between;
-  min-width: 125px;
-  width: -moz-fit-content;
-  width: fit-content;
-  margin: 0 auto;
-}
-.zaplane-dropdown-option span.label {
-  text-transform: capitalize;
-  font-size: 14px;
-  line-height: 18px;
-}
-.zaplane-dropdown-option--completed, .zaplane-dropdown-option--active, .zaplane-dropdown-option--approved, .zaplane-dropdown-option--pass, .zaplane-dropdown-option--future {
-  color: #00AD6B;
-  border: none;
-  background: rgba(36, 161, 72, 0.1);
-}
-.zaplane-dropdown-option--processing, .zaplane-dropdown-option--paused, .zaplane-dropdown-option--submitted {
-  color: #FDB022;
-  border: none;
-  background: rgba(236, 152, 20, 0.12);
-}
-.zaplane-dropdown-option--draft, .zaplane-dropdown-option--private, .zaplane-dropdown-option--inactive {
-  color: #0F0E16;
-  border: none;
-  background: rgba(114, 114, 114, 0.12);
-}
-.zaplane-dropdown-option--cancel, .zaplane-dropdown-option--trash, .zaplane-dropdown-option--failed {
-  color: #FF4D4D;
-  border: none;
-  background: rgba(244, 72, 63, 0.12);
-}
-.zaplane-dropdown-option .zaplane-icon--angle-down {
-  pointer-events: none;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-.zaplane-dropdown-option .zaplane-icon--angle-down::before {
-  font-size: 8px;
-}
-.zaplane-dropdown-option__lists .zaplane-more-status-options {
-  position: relative;
-  min-width: 175px;
-  z-index: 99999;
-  border-radius: 4px;
-  background: #fff;
-  margin: 0;
-  padding: 5px;
-  border-width: 1px;
-  border-style: solid;
-  border-color: var(--zaplane-border-color);
-  box-shadow: rgba(0, 0, 0, 0.04) 0px 1px 1px;
-}
-.zaplane-dropdown-option__lists .zaplane-more-status-options__item {
-  display: flex;
-  color: var(--zaplane-font-color);
-  background: #fff;
-  font-size: 12px;
-  font-weight: 500;
-  border: none;
-  border-radius: 6px;
-  padding: 8px 15px;
-  margin-bottom: 5px;
-  cursor: pointer;
-}
-.zaplane-dropdown-option__lists .zaplane-more-status-options__item:last-child {
-  margin-bottom: 0;
-}
-.zaplane-dropdown-option__lists .zaplane-more-status-options__item:hover, .zaplane-dropdown-option__lists .zaplane-more-status-options__item.active {
-  color: #0F0E16;
-  background: #F5F5F5;
 }
 /*!**********************************************************************************************************************************************************************************************!*\
   !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[2].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[2].use[2]!./node_modules/@xyflow/react/dist/base.css ***!
@@ -1974,12 +1986,12 @@ svg.react-flow__connectionline {
   background: var(--zaplane-background);
   border: 1px solid var(--zaplane-border-color);
   border-radius: 4px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   z-index: 9999;
-  left: -506px !important;
+  right: 720px !important;
+  left: unset !important;
   position: fixed !important;
-  top: 100px;
-  transform: translateX(1021px) translateY(145px) !important;
+  top: 110px !important;
+  transform: unset !important;
   z-index: 9999;
 }
 .zaplane-popover .components-popover__content {
@@ -1987,6 +1999,7 @@ svg.react-flow__connectionline {
   width: 100%;
   max-height: -moz-fit-content !important;
   max-height: fit-content !important;
+  box-shadow: none;
 }
 .zaplane-popover .zaplane-popover-inner {
   width: 100%;
@@ -2007,7 +2020,7 @@ svg.react-flow__connectionline {
   !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/@wordpress/scripts/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/ConnectionSelector/styles.scss ***!
   \*************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
 .connection-popaver {
-  transform: translateX(1387px) translateY(175px) !important;
+  right: 510px !important;
 }
 /*!*************************************************************************************************************************************************************************************************************!*\
   !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[2].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[2].use[2]!./node_modules/react-datepicker/dist/react-datepicker.css ***!
@@ -2783,12 +2796,107 @@ h2.react-datepicker__current-month {
   margin-top: -0.7em;
 }
 
+/*!**********************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/@wordpress/scripts/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./dev_zaplane/components/VariableEditor/styles.scss ***!
+  \**********************************************************************************************************************************************************************************************************************************************************************************************************/
+.zaplane-variable-editor {
+  border: 1px solid var(--zaplane-border-color);
+  border-radius: 6px;
+  min-height: 40px;
+  padding: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  position: relative;
+}
+
+.zaplane-variable-item {
+  display: inline-flex;
+  align-items: center;
+  background: #E0F2FF;
+  border-radius: 4px;
+  padding: 0 4px;
+  margin: 0 2px;
+}
+
+.zaplane-variable-remove {
+  cursor: pointer;
+  margin-left: 4px;
+  font-weight: bold;
+}
+
+.zaplane-variable-label {
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+}
+
+.zaplane-variable-editor.zaplane-empty::before {
+  content: attr(data-placeholder);
+  color: #A0AEC0;
+  pointer-events: none;
+  display: block;
+}
 /*!****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/@wordpress/scripts/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/ActionFieldRenderer/styles.scss ***!
   \****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
 
+/*!********************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/@wordpress/scripts/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/styles.scss ***!
+  \********************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+.action-drowar-lists span:empty {
+  display: none;
+}
+/*!**************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/@wordpress/scripts/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./dev_zaplane/components/Search/styles.scss ***!
+  \**************************************************************************************************************************************************************************************************************************************************************************************************/
+.zaplane-search-component {
+  position: relative;
+}
+.zaplane-search-component input.zaplane-search-component__input {
+  height: 38px;
+  padding-left: 40px;
+  padding-right: 20px;
+  width: 100%;
+  border: 1px solid var(--zaplane-border-color);
+}
+.zaplane-search-component input.zaplane-search-component__input:hover, .zaplane-search-component input.zaplane-search-component__input:focus {
+  border-color: var(--zaplane-primary);
+}
+.zaplane-search-component__search {
+  position: absolute;
+  top: 6px;
+  left: 14px;
+  bottom: 0;
+  cursor: pointer;
+  font-size: 20px;
+  color: #0A2540;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  margin: 0 !important;
+}
+.zaplane-search-component__control {
+  width: 40px;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  cursor: pointer;
+  font-size: 15px;
+  color: #999;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  margin-bottom: 8px;
+  font-size: 20px;
+}
+.zaplane-search-component__control:hover, .zaplane-search-component__control:focus {
+  background: none;
+  color: #f94d4d;
+  border: 0;
+}
 /*!******************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/@wordpress/scripts/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/styles.scss ***!
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/@wordpress/scripts/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/FlowCanvas/styles.scss ***!
   \******************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
 .zaplane-canvas-controls {
   gap: 5px;
@@ -2840,9 +2948,17 @@ h2.react-datepicker__current-month {
     transform: rotate(360deg);
   }
 }
-/*!****************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/@wordpress/scripts/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./dev_zaplane/containers/BackendDashboard/pages/dashboard/styles.scss ***!
-  \****************************************************************************************************************************************************************************************************************************************************************************************************************************/
-
+/*!**************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/@wordpress/scripts/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./dev_zaplane/containers/BackendDashboard/pages/recipes/styles.scss ***!
+  \**************************************************************************************************************************************************************************************************************************************************************************************************************************/
+.zaplane-recipes-custom-msg {
+  position: relative;
+}
+.zaplane-recipes-custom-msg .zaplane-oops__content {
+  position: absolute;
+  top: 75%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
 
 /*# sourceMappingURL=app.css.map*/
