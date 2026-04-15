@@ -17,7 +17,7 @@ const ZAPMenu = ({
         {trigger ? (
           trigger
         ) : isIcon ? (
-          <IconButton onClick={e=>{
+          <IconButton  h='36px'  onClick={e=>{
              e.stopPropagation();
           }} size="sm" variant={variant} aria-label="More options">
             <BsThreeDotsVertical />

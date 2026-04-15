@@ -26,12 +26,14 @@ import { useState, useMemo, useEffect } from "react";
 import { APPS, TOOLS } from "./helper";
 import { integrations } from "@ZAPUtils/helper";
 
-export const useActionDrawer = (open, node, source, setFieldValue, isTrigger) => {
+export const useActionDrawer = (open, node, source, setFieldValue, isTrigger,values) => {
   const [mode, setMode] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
   const [search, setSearch] = useState("");
+   console.log(values,'vv');
 
   useEffect(() => {
+    console.log('iam calling');
     if (!open || !node?.data || source === "add") return;
 
     const detectedItem = APPS.concat(TOOLS).find(
@@ -47,7 +49,7 @@ export const useActionDrawer = (open, node, source, setFieldValue, isTrigger) =>
     if (node.data.config) {
       Object.entries(node.data.config).forEach(([k, v]) => setFieldValue(k, v));
     }
-  }, [open, node?.data]);
+  }, [open, node?.data,values.nodeClick]);
 
    const list = useMemo(() => {
     const base = mode === "app" ? APPS : mode === "tools" ? TOOLS : [];

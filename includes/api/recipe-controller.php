@@ -7,7 +7,6 @@ use WP_REST_Server;
 use WP_Error;
 use Zaplane\Framework\Classes\Container;
 use Zaplane\Models\Recipe;
-use Zaplane\Models\RecipeFolder;
 use Zaplane\Models\Workflow;
 use Zaplane\Services\BlueprintService;
 
@@ -25,22 +24,29 @@ class RecipeController extends WP_REST_Controller {
 	}
 
 	public function register_routes(): void {
-		// Recipe collection
 		register_rest_route( $this->namespace, '/recipes', [
 			[
 				'methods'             => WP_REST_Server::READABLE,
 				'callback'            => [ $this, 'get_items' ],
 				'permission_callback' => [ $this, 'permissions_check' ],
 				'args'                => [
-					'folder_id' => [
-						'type'     => 'integer',
-						'required' => false,
+					'page'     => [
+						'type'              => 'integer',
+						'default'           => 1,
+						'minimum'           => 1,
+						'sanitize_callback' => 'absint',
+					],
+					'per_page' => [
+						'type'              => 'integer',
+						'default'           => 20,
+						'minimum'           => 1,
+						'maximum'           => 100,
+						'sanitize_callback' => 'absint',
 					],
 				],
 			],
 		] );
 
-		// Single recipe
 		register_rest_route( $this->namespace, '/recipes/(?P<id>\d+)', [
 			[
 				'methods'             => WP_REST_Server::READABLE,
@@ -59,30 +65,24 @@ class RecipeController extends WP_REST_Controller {
 			],
 		] );
 
-		// Workflow → Recipe
 		register_rest_route( $this->namespace, '/workflows/(?P<id>\d+)/to-recipe', [
 			[
 				'methods'             => WP_REST_Server::CREATABLE,
 				'callback'            => [ $this, 'workflow_to_recipe' ],
 				'permission_callback' => [ $this, 'permissions_check' ],
 				'args'                => [
-					'title' => [
-						'type'     => 'string',
-						'required' => true,
+					'title'        => [
+						'type'              => 'string',
+						'required'          => true,
 						'sanitize_callback' => 'sanitize_text_field',
 					],
-					'description' => [
-						'type'     => 'string',
-						'required' => false,
-						'default'  => '',
+					'description'  => [
+						'type'              => 'string',
+						'required'          => false,
+						'default'           => '',
 						'sanitize_callback' => 'sanitize_textarea_field',
 					],
 					'thumbnail_id' => [
-						'type'     => 'integer',
-						'required' => false,
-						'default'  => null,
-					],
-					'folder_id' => [
 						'type'     => 'integer',
 						'required' => false,
 						'default'  => null,
@@ -91,7 +91,6 @@ class RecipeController extends WP_REST_Controller {
 			],
 		] );
 
-		// Recipe → Workflow
 		register_rest_route( $this->namespace, '/recipes/(?P<id>\d+)/to-workflow', [
 			[
 				'methods'             => WP_REST_Server::CREATABLE,
@@ -99,9 +98,9 @@ class RecipeController extends WP_REST_Controller {
 				'permission_callback' => [ $this, 'permissions_check' ],
 				'args'                => [
 					'title' => [
-						'type'     => 'string',
-						'required' => false,
-						'default'  => '',
+						'type'              => 'string',
+						'required'          => false,
+						'default'           => '',
 						'sanitize_callback' => 'sanitize_text_field',
 					],
 				],
@@ -113,28 +112,27 @@ class RecipeController extends WP_REST_Controller {
 		return current_user_can( 'manage_options' );
 	}
 
-	// -------------------------------------------------------------------------
-	// GET /recipes
-	// -------------------------------------------------------------------------
-
 	public function get_items( $request ) {
-		$folderId = $request->get_param( 'folder_id' );
+		$page    = max( 1, (int) ( $request->get_param( 'page' ) ?? 1 ) );
+		$perPage = max( 1, min( 100, (int) ( $request->get_param( 'per_page' ) ?? 20 ) ) );
 
-		$query = Recipe::orderBy( 'title', 'asc' );
+		$total   = Recipe::count();
+		$recipes = Recipe::orderBy( 'title', 'asc' )
+			->forPage( $page, $perPage )
+			->get()
+			->map( fn( $r ) => $r->toResponse() )
+			->toArray();
 
-		if ( null !== $folderId ) {
-			// null folder_id param means "all"; explicit 0 means root (unfoldered).
-			$query = $query->where( 'folder_id', (int) $folderId ?: null );
-		}
-
-		$recipes = $query->get()->map( fn( $r ) => $r->toResponse() )->toArray();
-
-		return rest_ensure_response( [ 'recipes' => $recipes ] );
+		return rest_ensure_response( [
+			'data'       => $recipes,
+			'pagination' => [
+				'page'        => $page,
+				'per_page'    => $perPage,
+				'total'       => $total,
+				'total_pages' => (int) ceil( $total / $perPage ),
+			],
+		] );
 	}
-
-	// -------------------------------------------------------------------------
-	// GET /recipes/{id}
-	// -------------------------------------------------------------------------
 
 	public function get_item( $request ) {
 		$recipe = Recipe::find( (int) $request['id'] );
@@ -144,10 +142,6 @@ class RecipeController extends WP_REST_Controller {
 
 		return rest_ensure_response( $recipe->toResponse() );
 	}
-
-	// -------------------------------------------------------------------------
-	// PUT /recipes/{id} — update metadata only (no blueprint change)
-	// -------------------------------------------------------------------------
 
 	public function update_item( $request ) {
 		$recipe = Recipe::find( (int) $request['id'] );
@@ -169,27 +163,10 @@ class RecipeController extends WP_REST_Controller {
 			$recipe->thumbnail_id = $params['thumbnail_id'] ? (int) $params['thumbnail_id'] : null;
 		}
 
-		if ( array_key_exists( 'folder_id', $params ) ) {
-			$newFolderId = $params['folder_id'] ? (int) $params['folder_id'] : null;
-
-			if ( $newFolderId ) {
-				$folder = RecipeFolder::find( $newFolderId );
-				if ( ! $folder ) {
-					return new WP_Error( 'folder_not_found', 'Target folder not found.', [ 'status' => 404 ] );
-				}
-			}
-
-			$recipe->folder_id = $newFolderId;
-		}
-
 		$recipe->save();
 
 		return rest_ensure_response( $recipe->toResponse() );
 	}
-
-	// -------------------------------------------------------------------------
-	// DELETE /recipes/{id}
-	// -------------------------------------------------------------------------
 
 	public function delete_item( $request ) {
 		$recipe = Recipe::find( (int) $request['id'] );
@@ -202,10 +179,6 @@ class RecipeController extends WP_REST_Controller {
 		return rest_ensure_response( [ 'deleted' => true, 'id' => (int) $request['id'] ] );
 	}
 
-	// -------------------------------------------------------------------------
-	// POST /workflows/{id}/to-recipe
-	// -------------------------------------------------------------------------
-
 	public function workflow_to_recipe( $request ) {
 		$workflow = Workflow::find( (int) $request['id'] );
 		if ( ! $workflow ) {
@@ -215,38 +188,24 @@ class RecipeController extends WP_REST_Controller {
 		$title       = $request->get_param( 'title' );
 		$description = $request->get_param( 'description' ) ?? '';
 		$thumbnailId = $request->get_param( 'thumbnail_id' );
-		$folderId    = $request->get_param( 'folder_id' );
 
 		if ( ! $title ) {
 			return new WP_Error( 'missing_title', 'Recipe title is required.', [ 'status' => 400 ] );
 		}
 
-		// Validate folder if provided.
-		if ( $folderId ) {
-			$folder = RecipeFolder::find( (int) $folderId );
-			if ( ! $folder ) {
-				return new WP_Error( 'folder_not_found', 'Target folder not found.', [ 'status' => 404 ] );
-			}
-		}
-
-		// Serialize the active version of the workflow.
 		$blueprint = ( new BlueprintService() )->serialize( $workflow, 'active' );
 
 		$recipe = Recipe::create( [
-			'folder_id'    => $folderId ? (int) $folderId : null,
-			'title'        => $title,
-			'description'  => $description,
-			'thumbnail_id' => $thumbnailId ? (int) $thumbnailId : null,
-			'blueprint'    => wp_json_encode( $blueprint ),
-			'created_by'   => get_current_user_id(),
+			'title'             => $title,
+			'description'       => $description,
+			'thumbnail_id'      => $thumbnailId ? (int) $thumbnailId : null,
+			'blueprint'         => wp_json_encode( $blueprint ),
+			'integration_icons' => wp_json_encode( $workflow->integration_icons ?? [] ),
+			'created_by'        => get_current_user_id(),
 		] );
 
 		return rest_ensure_response( $recipe->toResponse() );
 	}
-
-	// -------------------------------------------------------------------------
-	// POST /recipes/{id}/to-workflow
-	// -------------------------------------------------------------------------
 
 	public function recipe_to_workflow( $request ) {
 		$recipe = Recipe::find( (int) $request['id'] );

@@ -8,7 +8,7 @@ const whatsNewContent = [
     {
         version: 'v2.1.0',
         age: '1 week ago',
-        title: "Fresh Out of OttoKit",
+        title: "Fresh Out of zaplane",
         sections: [
             {
                 label: 'New Triggers',

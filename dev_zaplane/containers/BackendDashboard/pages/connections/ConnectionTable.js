@@ -1,4 +1,4 @@
-import { Text, Icon, Box } from "@chakra-ui/react";
+import { Text, Icon, Box, Flex } from "@chakra-ui/react";
 import { __ } from "@wordpress/i18n";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
@@ -22,6 +22,8 @@ import { formatDateTime } from "@ZAPUtils/helper";
 import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
 import { TableArrow } from "@ZAPUtils/icons";
 import ZAPActionBar from "@ZAPComponents/ZAPActionBar";
+import ZAPIcon from "@ZAPComponents/ZAPIcon";
+import ZAPIconGroup from "@ZAPComponents/ZAPIconGroup/ZAPIconGroup";
 
 const ConnectionTable = () => {
     const dispatch = useDispatch();
@@ -88,11 +90,18 @@ const ConnectionTable = () => {
                 </Text>
 
             ),
-            cell: (row) => (
-                <Text className="zaplane-label" fontWeight="400" textOverflow="ellipsis">
-                    {row.name}
-                </Text>
-            ),
+            cell: (row) =>{
+                const icons =row.app + '.svg'
+                return (
+                    <Flex gap='12px' alignItems='center'>
+                    <ZAPIconGroup icons={[icons]}/>
+                    <Text className="zaplane-label" fontWeight="400" textOverflow="ellipsis">
+                        {row.name}
+                    </Text>
+                </Flex>
+                )
+
+            },
             // columnWidth: "150px",
             textAlign: "start",
         },
@@ -229,7 +238,7 @@ const ConnectionTable = () => {
                 isRowSelectable={true}
                 showSubHeader={false}
                 showColumnFilter={false}
-                showPagination={totalItems>= 10}
+                showPagination={totalItems >= 10}
                 noDataText={__("No connections found", "zaplane")}
                 totalItems={totalItems}
                 dataFetchingStatus={loading}
