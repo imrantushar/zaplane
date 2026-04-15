@@ -567,7 +567,7 @@ class Wordpress extends IntegrationBase {
 
 			case 'post_updated':
 
-				$post_id = isset($args[0]) ? (int) $args[0] : 0;
+				$post_id = isset( $args[0] ) ? (int) $args[0] : 0;
 				if ( ! $post_id ) {
 					return;
 				}
@@ -578,7 +578,7 @@ class Wordpress extends IntegrationBase {
 				}
 
 				if (
-					( defined('DOING_AUTOSAVE') && DOING_AUTOSAVE ) ||
+					( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) ||
 					wp_is_post_revision( $post_id ) ||
 					$post->post_status === 'auto-draft'
 				) {
@@ -588,21 +588,14 @@ class Wordpress extends IntegrationBase {
 				$selected_type = $config['post_type'] ?? 'post';
 				$selected_id   = $config['post'] ?? null;
 
-				$current_type = $post->post_type;
-
-				if ( $current_type === 'attachment' ) {
-					$current_type = 'media';
-				}
+				$current_type = ( $post->post_type === 'attachment' ) ? 'media' : $post->post_type;
 
 				if ( $selected_type !== $current_type ) {
 					return;
 				}
 
-				if ( $selected_id !== null && $selected_id !== '' ) {
-
-					if ( (int) $selected_id !== (int) $post_id ) {
-						return;
-					}
+				if ( ! empty( $selected_id ) && (int) $selected_id !== $post_id ) {
+					return;
 				}
 
 				return self::resolve_post_payload( $post_id );
