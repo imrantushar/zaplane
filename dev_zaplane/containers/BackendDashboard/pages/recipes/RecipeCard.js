@@ -106,6 +106,7 @@ const RecipeCard = ({ recipe }) => {
         flexDirection='column'
         gap='8px'
         _hover={{ boxShadow: "var(--zaplane-shadow)" }}
+        minH='190px'
       >
         <Flex justify="space-between" align="center">
           <ZAPIconGroup icons={recipe?.integration_icons} />
