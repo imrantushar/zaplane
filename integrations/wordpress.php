@@ -1,12 +1,11 @@
 <?php
 namespace Zaplane\Integrations;
 
-use Zaplane\Traits\ActionResponseTrait;
-
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+use Zaplane\Traits\ActionResponseTrait;
 use Zaplane\Framework\Classes\IntegrationBase;
 use Zaplane\Framework\Models\Post;
 use Zaplane\Framework\Models\User;
