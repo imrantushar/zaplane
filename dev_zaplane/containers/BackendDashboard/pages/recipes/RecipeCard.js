@@ -183,6 +183,7 @@ const RecipeCard = ({ recipe }) => {
               color="var(--zaplane-primary-color)"
               cursor="pointer"
               fontWeight="500"
+              textAlign={'right'}
               onClick={() => setShowFullDesc((prev) => !prev)}
               _hover={{ textDecoration: 'underline' }}
             >
