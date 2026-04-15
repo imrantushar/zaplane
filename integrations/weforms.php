@@ -15,7 +15,7 @@ class Weforms extends IntegrationBase {
 	}
 
 	public static function get_icon(): string {
-		return 'we-forms.svg';
+		return 'weforms.svg';
 	}
 
     public static function get_triggers(): array {

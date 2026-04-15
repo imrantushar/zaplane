@@ -3,7 +3,6 @@ import { __ } from "@wordpress/i18n";
 import { Button, Flex, Image } from "@chakra-ui/react";
 
 import TopBar from "@ZAPComponents/TopBar";
-import WorkflowTable from "./WorkflowTable";
 import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
 import CreateWorkflowModal from "@ZAPComponents/CreateWorkflowModal";
 import SubTopBar from "@ZAPComponents/SubTopBar";
@@ -12,6 +11,7 @@ import { primaryBtn } from "../../../../../assets/scss/chakra/recipe";
 import { IoIosArrowForward } from "react-icons/io";
 import { plugin_root_url } from "@ZAPUtils/helper";
 import ImportWorkflow from "./workFlowMotion/ImportWorkflow";
+import WorkflowTable from "@ZAPComponents/WorkflowTable";
 
 
 
@@ -31,9 +31,8 @@ const CreateWorkflows = () => {
               alignItems="center"
               justifyContent="center"
             >
-              <Image
+              <img
                 src={`${plugin_root_url}assets/images/zaplane.svg`}
-                boxSize="20px"
               />
             </Flex>
 

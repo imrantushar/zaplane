@@ -18,7 +18,7 @@ class Bookingcalendar extends IntegrationBase {
 	}
 
 	public static function get_icon(): string {
-		return 'booking-calendar.svg';
+		return 'wpbookingcalender.svg';
 	}
 
 	public static function get_triggers(): array {

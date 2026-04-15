@@ -7,31 +7,39 @@ import { __, sprintf } from "@wordpress/i18n";
 import { useDispatch } from "react-redux";
 import { route_path } from "@ZAPUtils/helper";
 import { FiEye, FiFolder } from "react-icons/fi";
-import { deleteRecipeFolder, updateRecipeFolder } from "@ZAPRedux/Slices/recipeSlice/actions/recipe";
 import { useNavigate } from "react-router-dom";
 import ZAPMenu from "@ZAPComponents/ZapMenu";
 import WPModal from "@ZAPComponents/Modal/WPModal";
 import { primaryBtn } from '../../../../../assets/scss/chakra/recipe';
+import { updateFolder, deleteFolder } from '@ZAPRedux/Slices/folderSlice/folderSlice';
+
 
 const FolderCard = ({ folder }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [title, setTitle] = useState(folder?.title || "");
-  const [isOpen, setIsOpen] = useState(false);
+  const [isRenameOpen, setIsRenameOpen] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
-  const children = folder?.children || [];
-  const hasChildren = children.length > 0;
+  const workflowCount = folder?.workflow_count ?? 0;
+  const workflowLabel = workflowCount === 1
+    ? __("1 Workflow", "zaplane")
+    : sprintf(__("%d Workflows", "zaplane"), workflowCount);
 
   const goToFolder = (id) =>
-    navigate(`${route_path}admin.php?page=zaplane-recipes&action=edit&id=${id}`);
+    navigate(`${route_path}admin.php?page=zaplane-folders&action=edit&id=${id}`);
 
-  const deletedFolderHandle = () => dispatch(deleteRecipeFolder(folder.id));
 
-  const updateFolderName = async () => {
+  const handleRename = async () => {
     if (!title?.trim()) return;
-    await dispatch(updateRecipeFolder({ id: folder?.id, payload: { title } }));
-    setIsOpen(false);
+    setIsUpdating(true);
+    await dispatch(updateFolder({ id: folder?.id, title: title.trim() }));
+    setIsUpdating(false);
+    setIsRenameOpen(false);
   };
+
 
   return (
     <>
@@ -45,44 +53,41 @@ const FolderCard = ({ folder }) => {
         minH="104px"
         transition="border-color 0.18s, box-shadow 0.18s"
         onClick={() => goToFolder(folder?.id)}
+        _hover={{
+          boxShadow: "var(--zaplane-shadow)",
+        }}
       >
+
         <Flex justify="space-between" align="flex-start" gap={3} mb={3}>
           <HStack spacing={2} minW={0} align="flex-start">
-            <Icon as={FiFolder} boxSize={5} flexShrink={0} mt={0.5}  />
-            <Text
-              fontWeight="600"
-              fontSize="15px"
-              m={0}
-              noOfLines={2}
-              cursor="pointer"
-            >
+            <Icon as={FiFolder} boxSize={5} flexShrink={0} mt={0.5} />
+            <Text fontWeight="600" fontSize="15px" m={0} noOfLines={2} cursor="pointer">
               {folder?.title}
             </Text>
           </HStack>
 
-          <Flex align="center" gap={2}>
 
-            <ZAPMenu
-              isIcon
-              items={[
-                { label: "Edit", onClick: () => setIsOpen(true) },
-                { label: "Delete", onClick: deletedFolderHandle },
-              ]}
-            />
-          </Flex>
+          <ZAPMenu
+            isIcon
+            items={[
+              { label: __("Rename", "zaplane"), onClick: () => setIsRenameOpen(true) },
+              {
+                label: __("Delete", "zaplane"),
+                onClick: () => {
+                  if (window.confirm("Are you sure you want to delete this folder?")) {
+                    dispatch(deleteFolder(folder?.id));
+                  }
+                },
+              }
+            ]}
+          />
         </Flex>
 
-        <Flex justify="space-between" align="flex-end">
 
-            <Box
-              fontSize="11px"
-              borderRadius="6px"
-              px={2}
-              py="2px"
-              fontWeight="700"
-            >
-              📂 {children.length ? children.length :0}
-            </Box>
+        <Flex justify="space-between" align="center">
+          <Text fontSize="13px" color="gray.500" m={0}>
+            {workflowLabel}
+          </Text>
           <IconButton
             aria-label={sprintf(__("View %s", "zaplane"), folder?.title)}
             size="sm"
@@ -94,27 +99,35 @@ const FolderCard = ({ folder }) => {
         </Flex>
       </Box>
 
+
       <WPModal
         title={__("Rename Folder", "zaplane")}
-        isOpen={isOpen}
-        onRequestClose={() => setIsOpen(false)}
+        isOpen={isRenameOpen}
+        onRequestClose={() => setIsRenameOpen(false)}
         size="large"
       >
         <Input
+          className='zaplane-input'
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          placeholder="Enter folder name"
+          placeholder={__("Enter folder name", "zaplane")}
           mb={4}
         />
         <Flex justify="flex-end" gap={3}>
-          <Button variant="outline" onClick={() => setIsOpen(false)}>
+          <Button variant="outline" onClick={() => setIsRenameOpen(false)}>
             {__("Cancel", "zaplane")}
           </Button>
-          <Button {...primaryBtn} onClick={updateFolderName} isDisabled={!title.trim()}>
+          <Button
+            {...primaryBtn}
+            onClick={handleRename}
+            isLoading={isUpdating}
+            isDisabled={!title.trim()}
+          >
             {__("Update", "zaplane")}
           </Button>
         </Flex>
       </WPModal>
+
     </>
   );
 };

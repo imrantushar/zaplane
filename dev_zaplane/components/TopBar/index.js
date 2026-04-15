@@ -74,7 +74,7 @@ const TopBar = ({
 
 				<Flex align="center" gap={2}>
 					{rightContent()}
-					<Button
+					{/* <Button
 						bg="transparent"
 						borderWidth="1px"
 						borderColor="var(--zaplane-border-color)"
@@ -91,7 +91,7 @@ const TopBar = ({
 								<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke="var(--zaplane-font-color)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
 							</svg>
 						)}
-					</Button>
+					</Button> */}
 				</Flex>
 			</Flex>
 		</React.Fragment>

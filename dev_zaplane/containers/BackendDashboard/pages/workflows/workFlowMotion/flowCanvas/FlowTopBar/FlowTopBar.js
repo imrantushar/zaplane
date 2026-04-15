@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Button, Text, Flex, Input, Box, FileUpload,Image} from "@chakra-ui/react";
+import { Button, Text, Flex, Input, Box, FileUpload, Image } from "@chakra-ui/react";
 import TopBar from "@ZAPComponents/TopBar";
 import { FiArrowLeft, FiDownload, FiUpload } from "react-icons/fi";
 import { TfiReload } from "react-icons/tfi";
@@ -29,6 +29,7 @@ import ZAPMenu from "@ZAPComponents/ZapMenu";
 import { exportWorkflows } from "@ZAPRedux/Slices/workFlowSlice/actions/ExportImport";
 import { IoIosArrowForward } from "react-icons/io";
 import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
+import ZAPTooltip from "@ZAPComponents/ZAPTooltip";
 
 export default function FlowTopBar({
   workFlow,
@@ -105,15 +106,14 @@ export default function FlowTopBar({
     }
   };
 
-const currentTitle = values?.title ?? workFlow?.workflow?.title ?? "Untitled Flow";
+  const currentTitle = values?.title ?? workFlow?.workflow?.title ?? "Untitled Flow";
   return (
     <>
       <TopBar
         leftContent={() => (
           <>
-            <Image
+            <img
               src={`${plugin_root_url}assets/images/zaplane.svg`}
-              boxSize="20px"
             />
             <IoIosArrowForward />
             <ZAPLabel
@@ -158,6 +158,7 @@ const currentTitle = values?.title ?? workFlow?.workflow?.title ?? "Untitled Flo
                 onClick={() => setIsEditingTitle(true)}
                 noOfLines={1}
                 maxW="200px"
+                textOverflow="ellipsis"
               >
                 {currentTitle}
               </Text>
@@ -165,7 +166,7 @@ const currentTitle = values?.title ?? workFlow?.workflow?.title ?? "Untitled Flo
           </>
         )}
         rightContent={() => (
-          <Flex gap='12px'>
+          <Flex gap='12px' >
             {!apiRequestRunning ? (
               <Button {...secondPrimaryBtn} h="36px" onClick={() => {
                 dispatch(startApiCountdown(120));
@@ -189,10 +190,19 @@ const currentTitle = values?.title ?? workFlow?.workflow?.title ?? "Untitled Flo
                 </Text>
               </Flex>
             )}
-            <Button size="sm" variant="outline"
-              className={`${isFullscreen && "zaplane-button-actve"}`} onClick={toggleFullscreen}>
-              {isFullscreen ? <LuMinimize /> : <LuFullscreen />}
-            </Button>
+            <ZAPTooltip content={'Full Screen'} positioning={{
+              placement: "buttom",
+              offset: {
+                mainAxis: 45,
+                crossAxis: -5,
+              }
+            }}>
+              <Button size="sm" variant="outline"
+                className={`${isFullscreen && "zaplane-button-actve"}`} onClick={toggleFullscreen}>
+                {isFullscreen ? <LuMinimize /> : <LuFullscreen />}
+              </Button>
+            </ZAPTooltip>
+
 
             {/* Logs Drawer */}
             <ZAPDrawer
@@ -242,7 +252,7 @@ const currentTitle = values?.title ?? workFlow?.workflow?.title ?? "Untitled Flo
                 </Button>
               </Flex>
 
-              <RunsTable id={id} activeDrawer={activeDrawer} setRefreshing={setRefreshing}/>
+              <RunsTable id={id} activeDrawer={activeDrawer} setRefreshing={setRefreshing} />
             </ZAPDrawer>
 
             {/* Version Drawer */}
@@ -261,16 +271,24 @@ const currentTitle = values?.title ?? workFlow?.workflow?.title ?? "Untitled Flo
                 // >
                 //   <LucideHistory />
                 // </Text>
-                <Button
-                  className={`${activeDrawer === 'history' && 'zaplane-button-actve'}`}
-                  size="sm"
-                  variant="outline"
-                  onClick={() => {
-                    setActiveDrawer("history");
-                  }}
-                >
-                  <LucideHistory />
-                </Button>
+                <ZAPTooltip content={'History'} positioning={{
+                  placement: "buttom",
+                  offset: {
+                    mainAxis: 45,
+                    crossAxis: -5,
+                  }
+                }}>
+                  <Button
+                    className={`${activeDrawer === 'history' && 'zaplane-button-actve'}`}
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      setActiveDrawer("history");
+                    }}
+                  >
+                    <LucideHistory />
+                  </Button>
+                </ZAPTooltip>
               }
             >
               <VersionHistoryTable id={id} />
@@ -292,9 +310,17 @@ const currentTitle = values?.title ?? workFlow?.workflow?.title ?? "Untitled Flo
               isClearable={false}
               isSearchable={false}
               placeholder="Select status"
+              styles={{
+                control: (provided) => ({
+                  ...provided,
+                  minHeight: "36px",
+                  height: '36px'
+                }),
+              }}
             />
 
-            <Button {...primaryBtn} disabled={!isFlowDirty} size="sm" onClick={handleSubmit}>
+
+            <Button h='36px' {...primaryBtn} disabled={!isFlowDirty} size="sm" onClick={handleSubmit}>
               {__("Update", "zaplane")}
             </Button>
             <ZAPMenu
@@ -307,6 +333,7 @@ const currentTitle = values?.title ?? workFlow?.workflow?.title ?? "Untitled Flo
                 },
               ]}
             />
+
           </Flex>
         )}
       />

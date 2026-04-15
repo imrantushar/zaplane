@@ -211,9 +211,8 @@ const Logs = () => {
                 leftContent={() => (
                     <>
                         <Flex height='40px' width='40px' borderRadius='20px' gap='10px' background='var(--zaplane-second-primary)' alignItems='center' justifyContent='center'>
-                            <Image
+                            <img
                                 src={`${plugin_root_url}assets/images/zaplane.svg`}
-                                boxSize="20px"
                             />
                         </Flex>
                         <IoIosArrowForward />

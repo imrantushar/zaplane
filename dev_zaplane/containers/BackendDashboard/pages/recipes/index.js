@@ -1,10 +1,7 @@
 import { useEffect, useState } from "react";
 import {
   Box,
-  Button,
   Flex,
-
-  Image,
   SimpleGrid,
 
 } from "@chakra-ui/react";
@@ -14,27 +11,27 @@ import TopBar from "@ZAPComponents/TopBar";
 import { plugin_root_url } from "@ZAPUtils/helper";
 import { IoIosArrowForward } from "react-icons/io";
 import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
-import {
-  getRecipeFolders,
-} from "@ZAPRedux/Slices/recipeSlice/actions/recipe";
-import FolderCard from "./FolderCard";
 import SubTopBar from "@ZAPComponents/SubTopBar";
 import { primaryBtn } from "../../../../../assets/scss/chakra/recipe";
 import CreateWorkflowModal from "@ZAPComponents/CreateWorkflowModal";
+import { getRecipes } from "@ZAPRedux/Slices/recipeSlice/recipeSlice";
+import RecipeCard from "./RecipeCard";
+import ZAPLoading from "@ZAPComponents/Loading";
+import CustomTableMessage from "@ZAPComponents/Oops/CustomTableMessage";
+import './styles.scss'
 
 
 const RecipesPage = () => {
   const dispatch = useDispatch();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { folders: recipeFolders = [] } = useSelector(
+  const { recipes, loadingRecipes } = useSelector(
     (state) => state.recipes || {}
   );
 
   useEffect(() => {
-    dispatch(getRecipeFolders());
-  }, [dispatch]);
-
-
+    dispatch(getRecipes())
+  }, [dispatch])
+  if (loadingRecipes) return <ZAPLoading />
   return (
     <>
       <TopBar
@@ -48,9 +45,8 @@ const RecipesPage = () => {
               alignItems="center"
               justifyContent="center"
             >
-              <Image
+              <img
                 src={`${plugin_root_url}assets/images/zaplane.svg`}
-                boxSize="20px"
               />
             </Flex>
 
@@ -60,12 +56,12 @@ const RecipesPage = () => {
               as="h2"
               type="subtitle"
               fontWeight="medium"
-              label={__("Recipe Library", "zaplane")}
+              label={__("Recipe", "zaplane")}
             />
           </>
         )}
       />
-       <SubTopBar heading={__("Recipe Library", "zaplane")}>
+      {/* <SubTopBar heading={__("Recipe Library", "zaplane")}>
   
         <Button
           onClick={() => setIsModalOpen(true)}
@@ -73,16 +69,32 @@ const RecipesPage = () => {
         >
           {__("Create Workflow", "zaplane")}
         </Button>
+      </SubTopBar> */}
+      <SubTopBar heading={__("Recipes", "zaplane")}>
+
       </SubTopBar>
 
       <div className="zaplane-page-content">
-        <SimpleGrid columns={{ base: 1, sm: 2, lg: 3 }} spacing={4} gap='20px'>
-          {recipeFolders?.map((folder) => (
-            <FolderCard key={folder.id} folder={folder} />
-          ))}
-        </SimpleGrid>
+        {
+          recipes?.length ? <SimpleGrid columns={{ base: 1, md: 2, xl: 3 }} spacing={4} gap='20px'>
+            {recipes.map((recipe) => (
+              <RecipeCard key={recipe.id} recipe={recipe} />
+            ))}
+          </SimpleGrid> : (
+           <Box className="zaplane-recipes-custom-msg">
+             <CustomTableMessage
+                  title={__(
+                    'No Data Available!!!',
+                    'zaplane'
+                  )}
+                  subText={'Please, create data to see the available list here.'}
+                />
+           </Box>
+          )
+        }
+
       </div>
-      
+
       <CreateWorkflowModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

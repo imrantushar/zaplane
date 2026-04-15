@@ -13,19 +13,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 class CreateFoldersTable extends Migration {
 
 	public function up(): void {
-		Schema::create( 'recipe_folders', function ( Blueprint $table ) {
+		Schema::create( 'folders', function ( Blueprint $table ) {
 			$table->id();
 			$table->string( 'title', 255 );
-			$table->unsignedBigInteger( 'parent_id' )->nullable();
 			$table->unsignedBigInteger( 'created_by' );
 			$table->timestamps();
 
-			$table->index( 'parent_id' );
 			$table->index( 'created_by' );
 		} );
 	}
 
 	public function down(): void {
-		Schema::drop( 'recipe_folders' );
+		Schema::drop( 'folders' );
 	}
 }

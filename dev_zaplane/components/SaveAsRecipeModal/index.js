@@ -3,22 +3,17 @@ import { Box, Button, Flex, Input, Textarea, VStack, Text } from "@chakra-ui/rea
 import { __ } from "@wordpress/i18n";
 import { useDispatch, useSelector } from "react-redux";
 import WPModal from "@ZAPComponents/Modal/WPModal";
-import RecipeFolderTree from "@ZAPComponents/RecipeFolderTree";
 
-import {
-  createRecipeFolder,
-  getRecipeFolders,
-  workflowToRecipe,
-} from "@ZAPRedux/Slices/recipeSlice/actions/recipe";
 import { primaryBtn } from "../../../assets/scss/chakra/recipe";
 import ZAPInput from "@ZAPComponents/ZAPInput";
+import { workflowToRecipe } from "@ZAPRedux/Slices/recipeSlice/recipeSlice";
 
 const SaveAsRecipeModal = ({
   isOpen,
   onClose,
   workflowId,
   defaultTitle = "",
-  initialFolderId = null,
+  
 }) => {
   const dispatch = useDispatch();
   const { folders, loadingFolders } = useSelector((state) => state.recipes);
@@ -27,9 +22,7 @@ const SaveAsRecipeModal = ({
   const [description, setDescription] = useState("");
   const [thumbnailId, setThumbnailId] = useState(null);
   const [thumbnailUrl, setThumbnailUrl] = useState(null); // for preview
-  const [folderId, setFolderId] = useState(initialFolderId);
   const [creating, setCreating] = useState(false);
-  const [creatingFolder, setCreatingFolder] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -37,10 +30,8 @@ const SaveAsRecipeModal = ({
       setDescription("");
       setThumbnailId(null);
       setThumbnailUrl(null);
-      setFolderId(initialFolderId);
-      dispatch(getRecipeFolders());
     }
-  }, [isOpen, defaultTitle, initialFolderId, dispatch]);
+  }, [isOpen, defaultTitle, dispatch]);
 
   const handleSave = async () => {
     if (!title.trim()) return;
@@ -50,14 +41,11 @@ const SaveAsRecipeModal = ({
       await dispatch(
         workflowToRecipe({
           workflowId,
-          folder_id: folderId,
           title,
           description: description.trim() || undefined,
           thumbnail_id: thumbnailId || undefined,
         })
       ).unwrap();
-
-      await dispatch(getRecipeFolders());
       onClose();
     } catch (err) {
       console.error("Failed to create recipe:", err);
@@ -65,21 +53,6 @@ const SaveAsRecipeModal = ({
     setCreating(false);
   };
 
-  const handleCreateFolder = async (payload) => {
-    setCreatingFolder(true);
-
-    try {
-      const result = await dispatch(createRecipeFolder(payload)).unwrap();
-      if (result?.id) {
-        setFolderId(result.id);
-      }
-      await dispatch(getRecipeFolders());
-    } catch (err) {
-      console.error("Failed to create recipe folder:", err);
-    }
-
-    setCreatingFolder(false);
-  };
 
   // Handler for WP media uploader selection
   const handleMediaSelect = (attachment) => {
@@ -148,13 +121,6 @@ const SaveAsRecipeModal = ({
         </Box> */}
 
         {/* Folder Tree */}
-        <RecipeFolderTree
-          folders={folders}
-          selectedFolderId={folderId}
-          onSelectFolder={(id) => setFolderId(id)}
-          onCreateFolder={handleCreateFolder}
-          loading={loadingFolders}
-        />
 
         {/* Actions */}
         <Flex justify="flex-end" gap={3}>
