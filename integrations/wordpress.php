@@ -328,11 +328,8 @@ class Wordpress extends IntegrationBase {
 		];
 	}
 
-
-
 	public static function get_trigger_config_schema( string $trigger ): array {
-
-		if ( in_array( $trigger, [ 'publish_post', 'post_updated' ], true ) ) {
+		if ( 'publish_post' === $trigger ) {
 			return [
 				[
 					'key'   => 'post_type',
@@ -350,19 +347,50 @@ class Wordpress extends IntegrationBase {
 					'label' => 'Post Status',
 					'type'  => 'select',
 					'options' => [
-						[
-							'label' => 'Publish',
-							'value' => 'publish'
-						],
-						[
-							'label' => 'Draft',
-							'value' => 'draft'
-						],
+						['label' => 'Publish', 'value' => 'publish'],
+						['label' => 'Draft', 'value' => 'draft'],
 					]
 				]
-
 			];
 		}//end if
+
+		if ( 'post_updated' === $trigger ) {
+			return [
+				[
+					'key'   => 'post_type',
+					'label' => 'Post Type',
+					'type'  => 'select',
+					'dynamic' => [
+						'integration' => 'wordpress',
+						'query'       => 'post_types',
+						'select'      => [ 'name', 'label' ],
+					],
+					'required' => true,
+				],
+				[
+					'key'   => 'post',
+					'label' => 'Posts',
+					'type'  => 'select',
+					'dynamic' => [
+						'integration' => 'wordpress',
+						'query'       => 'posts',
+						'select'      => [ 'name', 'label' ],
+						'depends_on'  => ['post_type'],
+					],
+					'required' => false,
+				],
+				[
+					'key'   => 'post_status',
+					'label' => 'Post Status',
+					'type'  => 'select',
+					'options' => [
+						['label' => 'Publish', 'value' => 'publish'],
+						['label' => 'Draft', 'value' => 'draft'],
+					]
+				]
+			];
+		}//end if
+
 		if ( in_array( $trigger, [ 'trashed_comment', 'untrashed_comment' ], true ) ) {
 			return [
 				[
@@ -526,15 +554,58 @@ class Wordpress extends IntegrationBase {
 
 	public static function resolve_trigger( array $node, array $args ) {
 
+		$config = $node['config'] ?? [];
+
 		switch ( $node['event'] ) {
 			case 'publish_post':
-			case 'post_updated':
 			case 'delete_post':
 			case 'untrashed_post':
 			case 'wp_trash_post':
 			case 'deleted_post':
 			case 'save_post':
 				return self::resolve_post_payload( $args[0] ?? 0 );
+
+			case 'post_updated':
+
+				$post_id = isset($args[0]) ? (int) $args[0] : 0;
+				if ( ! $post_id ) {
+					return;
+				}
+
+				$post = get_post( $post_id );
+				if ( ! $post ) {
+					return;
+				}
+
+				if (
+					( defined('DOING_AUTOSAVE') && DOING_AUTOSAVE ) ||
+					wp_is_post_revision( $post_id ) ||
+					$post->post_status === 'auto-draft'
+				) {
+					return;
+				}
+
+				$selected_type = $config['post_type'] ?? 'post';
+				$selected_id   = $config['post'] ?? null;
+
+				$current_type = $post->post_type;
+
+				if ( $current_type === 'attachment' ) {
+					$current_type = 'media';
+				}
+
+				if ( $selected_type !== $current_type ) {
+					return;
+				}
+
+				if ( $selected_id !== null && $selected_id !== '' ) {
+
+					if ( (int) $selected_id !== (int) $post_id ) {
+						return;
+					}
+				}
+
+				return self::resolve_post_payload( $post_id );
 
 			case 'transition_post_status':
 				$wpPost = $args[2] ?? null;
