@@ -258,7 +258,7 @@ const WorkflowTable = ({ folderId = null, showHeader = false }) => {
         data={workflows}
         isRowSelectable
         getSelectRowValue={(rows) => setSelection(rows || [])}
-        showPagination={totalCount}
+        showPagination={totalCount >= 10}
         noDataText={__("No workflows found", "zaplane")}
         dataFetchingStatus={loading}
         totalItems={totalCount}
