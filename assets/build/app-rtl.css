@@ -17,7 +17,7 @@
   --zaplane-warning: #FDB022;
   --zaplane-placeholder: #A2ADB9;
   --zaplane-shadow: 0 0 1px 0 rgba(212, 212, 216, 0.30) inset, 0 8px 16px 0 rgba(24, 24, 27, 0.10);
-  --zaplane-shadow-2: 0px 0px 1px 0px rgba(16, 24, 40, 0.15), 0px 8px 16px 0px rgba(20, 26, 36, 0.1);
+  --zaplane-shadow-2: 0 0 1px 0 rgba(20, 26, 36, 0.20), 0 1px 2px 0 rgba(20, 26, 36, 0.10);
   --zaplane-gray: #F6F7F8;
 }
 
@@ -1163,6 +1163,9 @@
 }
 .zaplane-wp-modal .components-button {
   background: var(--zaplane-body-background);
+}
+.zaplane-wp-modal .components-button:hover:not(:disabled, [aria-disabled=true]) {
+  color: var(--zaplane-primary);
 }
 /*!******************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/@wordpress/scripts/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./dev_zaplane/components/Pagination/styles.scss ***!

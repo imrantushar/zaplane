@@ -97,11 +97,10 @@ const RecipeCard = ({ recipe }) => {
   return (
     <>
       <Flex
-        border="1px solid"
-        borderColor="var(--zaplane-border-color)"
         borderRadius="8px"
         p="16px"
         bg="white"
+        boxShadow={'var(--zaplane-shadow-2)'}
         transition="0.2s"
         flexDirection='column'
         gap='8px'

@@ -45,11 +45,10 @@ const FolderCard = ({ folder }) => {
     <>
       <Box
         bg="var(--zaplane-background)"
-        borderWidth="1px"
-        borderColor="var(--zaplane-border-color)"
-        borderRadius="12px"
+        borderRadius="8px"
         p={4}
         position="relative"
+        boxShadow={'var(--zaplane-shadow-2)'}
         minH="104px"
         transition="border-color 0.18s, box-shadow 0.18s"
         onClick={() => goToFolder(folder?.id)}
