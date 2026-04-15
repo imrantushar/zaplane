@@ -92,7 +92,6 @@ const ConnectionTable = () => {
             ),
             cell: (row) =>{
                 const icons =row.app + '.svg'
-                console.log(icons,'icons');
                 return (
                     <Flex gap='12px' alignItems='center'>
                     <ZAPIconGroup icons={[icons]}/>
