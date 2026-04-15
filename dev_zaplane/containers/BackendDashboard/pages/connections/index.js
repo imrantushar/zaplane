@@ -71,6 +71,7 @@ const Connections = () => {
                 title={__(drawerTitle, "zaplane")}
                 size="md"
                 placement="end"
+                closeOnOverlayClick
                 arrowClose={drawerStep === "configure"}
                 arrowOnClick={goBack}
                 footer={
