@@ -112,9 +112,12 @@ export default function FlowTopBar({
       <TopBar
         leftContent={() => (
           <>
-            <img
-              src={`${plugin_root_url}assets/images/zaplane.svg`}
-            />
+            <Flex height='40px' width='40px' borderRadius='20px' gap='10px' background='var(--zaplane-second-primary)' alignItems='center' justifyContent='center'>
+              <img
+                src={`${plugin_root_url}assets/images/zaplane.svg`}
+
+              />
+            </Flex>
             <IoIosArrowForward />
             <ZAPLabel
               as="h2"
