@@ -142,6 +142,7 @@ const RecipeCard = ({ recipe }) => {
         <ZAPDivider m='12px 0 8px -16px' w='109%' />
 
         <Text
+          w={ "80%"}
           className='zaplane-label'
           style={{
             whiteSpace: 'nowrap',
