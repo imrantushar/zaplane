@@ -6,9 +6,9 @@ import { plugin_root_url, route_path } from '@ZAPUtils/helper';
 import React, { useEffect } from 'react';
 import { IoIosArrowForward } from 'react-icons/io';
 
-import FolderTable from './FolderTable';
 import { getFolders } from '@ZAPRedux/Slices/folderSlice/folderSlice';
 import { useDispatch, useSelector } from 'react-redux';
+import WorkflowTable from '@ZAPComponents/WorkflowTable';
 
 const Folder = ({ id }) => {
     const dispatch =useDispatch()
@@ -58,7 +58,7 @@ const Folder = ({ id }) => {
             )}
         />
             <div className="zaplane-page-content">
-                <FolderTable folderId={id} />
+              <WorkflowTable folderId={id} showHeader />
             </div>
 
         </>
