@@ -12,16 +12,15 @@ import { TOOLS } from "@ZAPHooks/useActionDrawer/helper";
 import { getIntegration } from "./helper";
 import SelectTab from "./SelectTab/SelectTab";
 import TestRun from "./TestRun/TestRun";
-import DrawerSearchList from "./DrawerSearchList/DrawerSearchList";
-import DrawerModeList from "./DrawerItemList/DrawerModeList";
-import DrawerItemList from "./DrawerItemList";
 import ActionFieldRenderer from "./ActionFieldRenderer/ActionFieldRenderer";
 import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
 import { useDynamicFields } from "@ZAPHooks/useActionDrawer/useDynamicFields";
 import { mapEdgesForBackend, mapNodesForBackend } from "../helper";
 import { conditionVariables } from "@ZAPRedux/Slices/workFlowSlice/actions/conditonVariales";
+import SearchableDrawerList from "@ZAPComponents/SearchableDrawerList";
 import './styles.scss'
-import Search from "@ZAPComponents/Search";
+import DrawerModeList from "@ZAPComponents/SearchableDrawerList/DrawerItemList/DrawerModeList";
+import DrawerItemList from "@ZAPComponents/SearchableDrawerList/DrawerItemList";
 
 const ActionDrawer = ({ open, context, onClose, updateNodeData, handleAddAction, workFlow, isFullscreen, nodes, edges }) => {
   const { source, node } = context;
@@ -171,35 +170,30 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, handleAddAction,
       }
     >
     
-        <Search
-          placeholder={__("Search apps or tools...", "zaplane")}
-          defaultValue={search}
-          onSearchHandler={(value) => setSearch(value)}
-        />
-      {search &&
-        <DrawerSearchList
-          searchList={searchList}
-          setMode={setMode}
-          setSelectedItem={setSelectedItem}
+      {!selectedItem && (
+        <SearchableDrawerList
+          search={search}
           setSearch={setSearch}
-        />}
-
-      {!mode && !search && !selectedItem && (
-        <DrawerModeList
+          searchList={searchList}
+          onSelect={setSelectedItem}
           setMode={setMode}
-          setSelectedItem={setSelectedItem}
-          isTrigger={isTrigger}
-          source={source}
-          TOOLS={TOOLS}
-        />
-      )}
-
-      {mode && !selectedItem && !search && (
-        <DrawerItemList
-          list={list}
-          setSelectedItem={setSelectedItem}
-          setMode={setMode}
-        />
+        >
+          {!mode ? (
+            <DrawerModeList
+              setMode={setMode}
+              setSelectedItem={setSelectedItem}
+              isTrigger={isTrigger}
+              source={source}
+              TOOLS={TOOLS}
+            />
+          ) : (
+            <DrawerItemList
+              list={list}
+              setSelectedItem={setSelectedItem}
+              setMode={setMode}
+            />
+          )}
+        </SearchableDrawerList>
       )}
 
       {selectedItem && (

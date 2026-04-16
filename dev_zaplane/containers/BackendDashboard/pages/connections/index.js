@@ -7,10 +7,10 @@ import ConnectionTable from "./ConnectionTable";
 import { primaryBtn } from "../../../../../assets/scss/chakra/recipe";
 import { formatLabel } from "@ZAPUtils/helper";
 import ZAPDrawer from "@ZAPComponents/Drawer";
-import DrawerItemList from "../workflows/workFlowMotion/ActionDrawer/DrawerItemList";
 import useConnection from "@ZAPHooks/useConnection/useConnection";
 import ZAPLoading from "@ZAPComponents/Loading";
 import PageLayout from "@ZAPComponents/PageLayout";
+import SearchableDrawerList from "@ZAPComponents/SearchableDrawerList";
 
 
 const Connections = () => {
@@ -31,7 +31,10 @@ const Connections = () => {
         selectAuthType,
         updateCredential,
         saveConnection,
-        loading
+        loading,
+        search,
+        setDrawerSearch,
+        searchList
     } = useConnection();
 
     return (
@@ -69,7 +72,13 @@ const Connections = () => {
                 }
             >
                 {drawerStep === "select" && (
-                    <DrawerItemList list={appList} setSelectedItem={selectApp} />
+                    <SearchableDrawerList
+                        search={search}
+                        setSearch={setDrawerSearch}
+                        searchList={searchList}
+                        list={appList}
+                        onSelect={selectApp}
+                    />
                 )}
 
                 {drawerStep === "configure" && (
