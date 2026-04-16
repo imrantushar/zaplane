@@ -271,5 +271,9 @@ return [
 			'file'  => 'zoom.php',
 			'class' => \Zaplane\Integrations\Zoom::class
 		],
+		'gamipress'        => [
+			'file'  => 'gamipress.php',
+			'class' => \Zaplane\Integrations\Gamipress::class
+		],
 	],
 ];
