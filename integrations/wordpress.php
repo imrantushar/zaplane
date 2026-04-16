@@ -723,10 +723,14 @@ class Wordpress extends IntegrationBase {
 				return self::resolve_post_payload( $args[0] ?? 0 );
 
 			case 'post_updated':
-
 				$post_id = isset( $args[0] ) ? (int) $args[0] : 0;
+
 				if ( ! $post_id ) {
 					return;
+				}
+
+				if ( $parent_id = wp_is_post_revision( $post_id ) ) {
+					$post_id = $parent_id;
 				}
 
 				$post = get_post( $post_id );
@@ -744,14 +748,13 @@ class Wordpress extends IntegrationBase {
 
 				$selected_type = $config['post_type'] ?? 'post';
 				$selected_id   = $config['post'] ?? null;
-
-				$current_type = ( $post->post_type === 'attachment' ) ? 'media' : $post->post_type;
+				$current_type  = ( $post->post_type === 'attachment' ) ? 'media' : $post->post_type;
 
 				if ( $selected_type !== $current_type ) {
 					return;
 				}
 
-				if ( ! empty( $selected_id ) && (int) $selected_id !== $post_id ) {
+				if ( ! empty( $selected_id ) && $selected_id !== 'any' && (int) $selected_id !== $post_id ) {
 					return;
 				}
 
