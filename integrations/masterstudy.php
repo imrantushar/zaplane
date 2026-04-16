@@ -280,7 +280,7 @@ class Masterstudy extends IntegrationBase {
 		];
 	}
 
-	public static function course_query_types( $q ) {
+	public static function course_query_types( $query ) {
 		$all_course = [
 			[
 				'label' => 'Any course',
@@ -308,7 +308,7 @@ class Masterstudy extends IntegrationBase {
 		return $all_course;
 	}
 
-	public static function lesson_query_types( $q ) {
+	public static function lesson_query_types( $query ) {
 		$all_lesson = [
 			[
 				'label' => 'Any lesson',
@@ -336,7 +336,7 @@ class Masterstudy extends IntegrationBase {
 		return $all_lesson;
 	}
 
-	public static function quiz_query_types( $q ) {
+	public static function quiz_query_types( $query ) {
 		global $wpdb;
 		$course_id = $q['course_id'] ?? 'any';
 		$all_quiz = [

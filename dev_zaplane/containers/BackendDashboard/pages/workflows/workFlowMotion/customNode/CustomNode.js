@@ -113,7 +113,7 @@ export default function CustomNode({ id, data, canvasLayout, nodes }) {
         {/* NODE CONTENT */}
         <HStack spacing={3} align="center">
           <ZAPIcon icon={data?.icon} name={data.app} />
-          <Box textAlign="left" flex="1" minW="0">
+          <Box textAlign="left" flex="1" minW="0" w='105px'>
             <Text
               className="zaplane-label"
               overflow="hidden"

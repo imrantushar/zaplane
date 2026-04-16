@@ -26,7 +26,7 @@ class Menu {
             $icon_url = 'data:image/svg+xml;base64, ' . base64_encode(file_get_contents(ZAPLANE_ASSETS_DIR_PATH . 'images/menu-icon.svg'));
             return apply_filters('zaplane/admin/toplevel_active_menu_icon', $icon_url);
         }
-        $icon_url = 'data:image/svg+xml;base64, ' . base64_encode(file_get_contents(ZAPLANE_ASSETS_DIR_PATH . 'images/menu-icon.svg'));
+        $icon_url = 'data:image/svg+xml;base64, ' . base64_encode(file_get_contents(ZAPLANE_ASSETS_DIR_PATH . 'images/menu-icon-gray.svg'));
         return apply_filters('zaplane/admin/toplevel_inactive_menu_icon', $icon_url);
     }
 	public function get_toplevel_menu_title()

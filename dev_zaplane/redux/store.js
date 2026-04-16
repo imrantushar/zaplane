@@ -9,6 +9,8 @@ import dashboardReducer from './Slices/dashboardSlice/dashboardSlice';
 import connectionsReducer from './Slices/connectionsSlice/connectionsSlice';
 import settingReducer from './Slices/settingSlice/settingSlice';
 import notificationReducer from './Slices/notificationSlice/notificationSlice';
+import recipeReducer from './Slices/recipeSlice/recipeSlice';
+import folderReducer from './Slices/folderSlice/folderSlice';
 
 import logger from 'redux-logger'
 /**
@@ -28,7 +30,9 @@ export const store = configureStore({
         logs:logsReducer,
         connections:connectionsReducer,
         setting:settingReducer,
-        dashboard:dashboardReducer
+        dashboard:dashboardReducer,
+        recipes: recipeReducer,
+        folder: folderReducer
         // Future reducers will be added here (e.g., points, settings)
     },
     middleware: (getDefaultMiddleware) =>

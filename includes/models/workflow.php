@@ -15,15 +15,19 @@ class Workflow extends Model {
 
 	protected static array $fillable = [
 		'user_id',
+		'folder_id',
 		'title',
 		'name',
 		'status',
 		'layout',
+		'integration_icons',
 	];
 
 	protected static array $casts = [
-		'id' => 'integer',
-		'user_id' => 'integer',
+		'id'                => 'integer',
+		'user_id'           => 'integer',
+		'folder_id'         => 'integer',
+		'integration_icons' => 'json',
 	];
 
 	public function versions(): Collection {

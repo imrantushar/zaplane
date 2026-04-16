@@ -487,7 +487,7 @@ class Learndash extends IntegrationBase {
 		];
 	}
 
-	public static function course_query_types( $q ) {
+	public static function course_query_types( $query ) {
 		$all_course = [
 			[
 				'label' => 'Any course',
@@ -515,7 +515,7 @@ class Learndash extends IntegrationBase {
 		return $all_course;
 	}
 
-	public static function lesson_query_types( $q ) {
+	public static function lesson_query_types( $query ) {
 		$all_lesson = [
 			[
 				'label' => 'Any lesson',
@@ -543,7 +543,7 @@ class Learndash extends IntegrationBase {
 		return $all_lesson;
 	}
 
-	public static function topic_query_types( $q ) {
+	public static function topic_query_types( $query ) {
 		$all_topic = [
 			[
 				'label' => 'Any Topic',
@@ -571,7 +571,7 @@ class Learndash extends IntegrationBase {
 		return $all_topic;
 	}
 
-	public static function quiz_query_types( $q ) {
+	public static function quiz_query_types( $query ) {
 		$all_quiz = [
 			[
 				'label' => 'Any Quiz',
@@ -599,7 +599,7 @@ class Learndash extends IntegrationBase {
 		return $all_quiz;
 	}
 
-	public static function group_query_types( $q ) {
+	public static function group_query_types( $query ) {
 		$all_group = [
 			[
 				'label' => 'Any Group',

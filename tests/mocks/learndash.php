@@ -64,7 +64,24 @@ if ( ! class_exists( 'LD_Topic' ) ) {
 if ( ! function_exists( 'get_user_by' ) ) {
     function get_user_by( $type, $id )
     {
-        return new \LD_User( $id );
+        $type = strtolower( (string) $type );
+
+        if ( class_exists( 'WP_User' ) ) {
+            $user_id = is_numeric( $id ) ? (int) $id : 1;
+            $user = new \WP_User( $user_id );
+
+            if ( 'email' === $type ) {
+                $user->user_email = (string) $id;
+            } elseif ( 'login' === $type ) {
+                $user->user_login = (string) $id;
+            } elseif ( 'slug' === $type ) {
+                $user->user_nicename = (string) $id;
+            }
+
+            return $user;
+        }
+
+        return new \LD_User( is_numeric( $id ) ? (int) $id : 1 );
     }
 }
 
