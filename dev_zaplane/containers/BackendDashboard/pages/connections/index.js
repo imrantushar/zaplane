@@ -1,21 +1,16 @@
-// Connections.jsx
-
 import { Box, Button, VStack, Text, Flex } from "@chakra-ui/react";
 import { __ } from "@wordpress/i18n";
 import { FaSlack } from "react-icons/fa";
-import { IoIosArrowForward } from "react-icons/io";
 
-import TopBar from "@ZAPComponents/TopBar";
-import SubTopBar from "@ZAPComponents/SubTopBar";
-import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
 import ZAPInput from "@ZAPComponents/ZAPInput";
 import ConnectionTable from "./ConnectionTable";
 import { primaryBtn } from "../../../../../assets/scss/chakra/recipe";
-import { formatLabel, plugin_root_url } from "@ZAPUtils/helper";
+import { formatLabel } from "@ZAPUtils/helper";
 import ZAPDrawer from "@ZAPComponents/Drawer";
 import DrawerItemList from "../workflows/workFlowMotion/ActionDrawer/DrawerItemList";
 import useConnection from "@ZAPHooks/useConnection/useConnection";
 import ZAPLoading from "@ZAPComponents/Loading";
+import PageLayout from "@ZAPComponents/PageLayout";
 
 
 const Connections = () => {
@@ -40,30 +35,16 @@ const Connections = () => {
     } = useConnection();
 
     return (
-        <>
-            <TopBar
-                leftContent={() => (
-                    <>
-                        <Flex height="40px" width="40px" borderRadius="20px" gap="10px"
-                            background="var(--zaplane-second-primary)" alignItems="center" justifyContent="center">
-                            <img src={`${plugin_root_url}assets/images/zaplane.svg`} />
-                        </Flex>
-                        <IoIosArrowForward />
-                        <ZAPLabel as="h2" color="var(--zapplane-font-color)"
-                            type="subtitle" fontWeight="medium" label={__("Connections", "zaplane")} />
-                    </>
-                )}
-            />
-
-            <SubTopBar heading={__("Dashboard", "zaplane")}>
+        <PageLayout
+            title="Connections"
+            heading="Dashboard"
+            actions={
                 <Button {...primaryBtn} leftIcon={<FaSlack />} onClick={openDrawer}>
                     {__("Create credential", "zaplane")}
                 </Button>
-            </SubTopBar>
-
-            <div className="zaplane-page-content">
-                <ConnectionTable />
-            </div>
+            }
+        >
+            <ConnectionTable />
 
             <ZAPDrawer
                 open={isDrawerOpen}
@@ -144,7 +125,7 @@ const Connections = () => {
                     </Box>
                 )}
             </ZAPDrawer>
-        </>
+        </PageLayout>
     );
 };
 

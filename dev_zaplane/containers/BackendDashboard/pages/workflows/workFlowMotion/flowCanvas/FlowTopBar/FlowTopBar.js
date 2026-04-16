@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Button, Text, Flex, Input, Box, FileUpload, Image } from "@chakra-ui/react";
+import { Button, Text, Flex, Input } from "@chakra-ui/react";
 import TopBar from "@ZAPComponents/TopBar";
-import { FiArrowLeft, FiDownload, FiUpload } from "react-icons/fi";
+import {  FiDownload } from "react-icons/fi";
 import { TfiReload } from "react-icons/tfi";
 import { LuFullscreen, LuMinimize, LuSquarePlay } from "react-icons/lu";
 import { LucideHistory } from "lucide-react";

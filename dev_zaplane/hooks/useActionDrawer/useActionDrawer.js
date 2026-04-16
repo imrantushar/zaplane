@@ -30,10 +30,8 @@ export const useActionDrawer = (open, node, source, setFieldValue, isTrigger,val
   const [mode, setMode] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
   const [search, setSearch] = useState("");
-   console.log(values,'vv');
 
   useEffect(() => {
-    console.log('iam calling');
     if (!open || !node?.data || source === "add") return;
 
     const detectedItem = APPS.concat(TOOLS).find(
