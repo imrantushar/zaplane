@@ -246,7 +246,7 @@ class Gemcrm extends IntegrationBase {
 		$data = [];
 		if( ! empty( $q ) )
 			$data['search'] = $q;
-		$items  = \GemCrm\Database\Models\Contact::index( $data );
+		$items  = \GemCrm\Database\Models\Contact::index( $data, null );
 		$result = [];
 
 		foreach ( (array) $items['records'] as $item ) {
