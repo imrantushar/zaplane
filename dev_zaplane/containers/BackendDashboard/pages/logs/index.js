@@ -203,8 +203,8 @@ const Logs = () => {
 
     return (
         <PageLayout
-            title="Workflows Logs"
-            heading="Workflows Logs"
+            title="Logs"
+            heading="Logs"
         >
                 <ListTable
                     columns={columns}
