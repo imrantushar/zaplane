@@ -17,6 +17,7 @@ class CreateNodeRunsTable extends Migration {
 			$table->id();
 			$table->unsignedBigInteger( 'run_id' );
 			$table->unsignedInteger( 'node_key' );
+			$table->longText( 'node_meta_json' )->nullable();
 			$table->unsignedBigInteger( 'parent_node_run_id' )->nullable();
 			$table->integer( 'iteration' )->default( 0 );
 			$table->string( 'status', 20 )->default( 'pending' );
