@@ -13,7 +13,7 @@ import ZAPDivider from "@ZAPComponents/ZAPDivider";
 import { addWorkflowToFolder, getFolders } from "@ZAPRedux/Slices/folderSlice/folderSlice";
 import Select from "react-select";
 
-const CreateWorkflowModal = ({ isOpen, onClose, id }) => {
+const CreateWorkflowModal = ({ isOpen, onClose, id, onNavigateToEdit }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -51,9 +51,13 @@ const CreateWorkflowModal = ({ isOpen, onClose, id }) => {
     const res = await dispatch(createWorkflows({ title: workflowName }));
 
     if (res?.payload?.id) {
-      navigate(
-        `${route_path}admin.php?page=zaplane-workflows&action=edit&id=${res.payload.id}`
-      );
+      if (onNavigateToEdit) {
+        onNavigateToEdit(res.payload.id);
+      } else {
+        navigate(
+          `${route_path}admin.php?page=zaplane-workflows&action=edit&id=${res.payload.id}`
+        );
+      }
     }
     if (effectiveFolderId) {
       await dispatch(addWorkflowToFolder({ folder_id: effectiveFolderId, workflow_id: res?.payload?.id }));

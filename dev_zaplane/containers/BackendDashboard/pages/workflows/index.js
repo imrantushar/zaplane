@@ -1,41 +1,76 @@
 import { useState } from "react";
 import { __ } from "@wordpress/i18n";
-import { Button } from "@chakra-ui/react";
+import { Button, Flex, Image } from "@chakra-ui/react";
 
+import TopBar from "@ZAPComponents/TopBar";
+import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
 import CreateWorkflowModal from "@ZAPComponents/CreateWorkflowModal";
+import SubTopBar from "@ZAPComponents/SubTopBar";
+
 import { primaryBtn } from "../../../../../assets/scss/chakra/recipe";
+import { IoIosArrowForward } from "react-icons/io";
+import { plugin_root_url } from "@ZAPUtils/helper";
 import ImportWorkflow from "./workFlowMotion/ImportWorkflow";
 import WorkflowTable from "@ZAPComponents/WorkflowTable";
-import PageLayout from "@ZAPComponents/PageLayout";
 
 
 
-const CreateWorkflows = () => {
+const CreateWorkflows = ({ onNavigateToEdit, title = __('Flows', 'zaplane'), renderTopBar=null}) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
-    <PageLayout
-        title="Flows"
-        heading="Workflows"
-        actions={
+    <>
+      {renderTopBar ? renderTopBar({}) : (
+        <TopBar
+          leftContent={() => (
             <>
-                <ImportWorkflow />
-                <Button
-                    onClick={() => setIsModalOpen(true)}
-                    {...primaryBtn}
-                >
-                    {__("Create Workflow", "zaplane")}
-                </Button>
+              <Flex
+                height="40px"
+                width="40px"
+                borderRadius="20px"
+                background="var(--zaplane-second-primary)"
+                alignItems="center"
+                justifyContent="center"
+              >
+                <img
+                  src={`${plugin_root_url}assets/images/zaplane.svg`}
+                />
+              </Flex>
+  
+              <IoIosArrowForward />
+  
+              <ZAPLabel
+                as="h2"
+                color="var(--zapplane-font-color)"
+                type="subtitle"
+                fontWeight="medium"
+                label={title}
+              />
             </>
-        }
-    >
-        <WorkflowTable />
+          )}
+        />
+      )}
+
+      <SubTopBar heading={__("Workflows", "zaplane")}>
+        <ImportWorkflow />
+        <Button
+          onClick={() => setIsModalOpen(true)}
+          {...primaryBtn}
+        >
+          {__("Create Workflow", "zaplane")}
+        </Button>
+      </SubTopBar>
+
+      <div className="zaplane-page-content">
+        <WorkflowTable onNavigateToEdit={onNavigateToEdit} />
+      </div>
 
       <CreateWorkflowModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        onNavigateToEdit={onNavigateToEdit}
       />
-    </PageLayout>
+    </>
   );
 };
 

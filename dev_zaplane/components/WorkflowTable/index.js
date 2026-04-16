@@ -38,7 +38,7 @@ import ImportWorkflow from "@ZAPContainers/BackendDashboard/pages/workflows/work
 import { primaryBtn } from "../../../assets/scss/chakra/recipe";
 
 
-const WorkflowTable = ({ folderId = null, showHeader = false }) => {
+const WorkflowTable = ({ folderId = null, showHeader = false, onNavigateToEdit }) => {
   const navigate  = useNavigate();
   const dispatch  = useDispatch();
   const isFolder  = !!folderId;
@@ -139,8 +139,13 @@ const WorkflowTable = ({ folderId = null, showHeader = false }) => {
     setActiveRunId(null);
   };
 
-  const navigateToEdit = (id) =>
-    navigate(`${route_path}admin.php?page=zaplane-workflows&action=edit&id=${id}`);
+  const navigateToEdit = (id) => {
+    if (onNavigateToEdit) {
+      onNavigateToEdit(id);
+    } else {
+      navigate(`${route_path}admin.php?page=zaplane-workflows&action=edit&id=${id}`);
+    }
+  };
 
 
   const columns = [
@@ -291,6 +296,7 @@ const WorkflowTable = ({ folderId = null, showHeader = false }) => {
           isOpen={isCreateOpen}
           onClose={() => setIsCreateOpen(false)}
           id={folderId}
+          onNavigateToEdit={onNavigateToEdit}
         />
       )}
 
