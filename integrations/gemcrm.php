@@ -244,8 +244,8 @@ class Gemcrm extends IntegrationBase {
 		}
 
 		$data = [];
-		if( ! empty( $q ) )
-			$data['search'] = $q;
+		if( ! empty( $q['search'] ?? false ) )
+			$data['search'] = $q['search'];
 		$items  = \GemCrm\Database\Models\Contact::index( $data, null );
 		$result = [];
 
@@ -273,8 +273,8 @@ class Gemcrm extends IntegrationBase {
 		}
 
 		$data = [];
-		if( ! empty( $q ) )
-			$data['search'] = $q;
+		if( ! empty( $q['search'] ?? false ) )
+			$data['search'] = $q['search'];
 
 		$items = \GemCrm\Database\Models\Tag::index( $data, null, true );
 		$result = [];
@@ -297,8 +297,8 @@ class Gemcrm extends IntegrationBase {
 		}
 
 		$data = [];
-		if( ! empty( $q ) )
-			$data['search'] = $q;
+		if( ! empty( $q['search'] ?? false ) )
+			$data['search'] = $q['search'];
 
 		$items = \GemCrm\Database\Models\ListModel::index( $data, null, true );
 		$result = [];
