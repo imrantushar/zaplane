@@ -361,7 +361,7 @@ class Gemcrm extends IntegrationBase {
 				'required' => false,
 			],
 			[
-				'key'      => 'status',
+				'key'      => 'gemcrm_status',
 				'label'    => 'Status',
 				'type'     => 'select',
 				'required' => false,
@@ -480,10 +480,15 @@ class Gemcrm extends IntegrationBase {
 	private static function build_contact_data( array $config ): array {
 		$data = [];
 
-		foreach ( [ 'status', 'type', 'first_name', 'last_name', 'phone', 'email' ] as $field ) {
+		foreach ( [ 'type', 'first_name', 'last_name', 'phone', 'email' ] as $field ) {
 			if ( isset( $config[ $field ] ) && '' !== $config[ $field ] ) {
 				$data[ $field ] = sanitize_text_field( $config[ $field ] );
 			}
+		}
+
+		// 'gemcrm_status' is the schema key (avoids frontend key collision); maps to 'status' for GemCRM.
+		if ( isset( $config['gemcrm_status'] ) && '' !== $config['gemcrm_status'] ) {
+			$data['status'] = sanitize_text_field( $config['gemcrm_status'] );
 		}
 
 		foreach ( [ 'linked_id', 'photo_id' ] as $int_field ) {
