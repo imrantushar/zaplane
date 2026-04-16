@@ -195,16 +195,11 @@ class Automation {
 	}
 
 	public static function enqueue_node_run( int $node_run_id ): void {
-		if ( function_exists( 'as_enqueue_async_action' ) ) {
-			as_enqueue_async_action(
-				'zaplane_execute_node_run',
-				[ 'node_run_id' => $node_run_id ],
-				'zaplane'
-			);
-			return;
-		}
-
-		do_action( 'zaplane_execute_node_run', $node_run_id );
+		as_enqueue_async_action(
+			'zaplane_execute_node_run',
+			[ 'node_run_id' => $node_run_id ],
+			'zaplane'
+		);
 	}
 
 	public function resume_delayed_run( int $run_id, int $node_run_id, int $node_key, array $output ) {
