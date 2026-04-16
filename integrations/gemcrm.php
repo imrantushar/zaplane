@@ -19,7 +19,7 @@ class Gemcrm extends IntegrationBase {
 	}
 
 	public static function get_icon(): string {
-		return 'gemcrm-logo-icon.svg';
+		return 'crm.svg';
 	}
 
 	// -------------------------------------------------------------------------

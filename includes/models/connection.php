@@ -17,6 +17,7 @@ class Connection extends Model {
 	protected static array $fillable = [
 		'user_id',
 		'app',
+		'icon',
 		'name',
 		'auth_type',
 		'encrypted_credentials',

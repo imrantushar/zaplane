@@ -1,71 +1,136 @@
-import { createSlice } from "@reduxjs/toolkit";
-import {
-  createRecipeFolder,
-  deleteRecipe,
-  deleteRecipeFolder,
-  getRecipeFolders,
-  getRecipes,
-  updateRecipe,
-  workflowToRecipe,
-  updateRecipeFolder
-} from "./actions/recipe";
 
+import { createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk } from "@reduxjs/toolkit";
+import { __ } from "@wordpress/i18n";
+import { API, handleSliceError, handleSliceSuccess, namespace } from "@ZAPUtils/helper";
+ 
+export const getRecipes = createAsyncThunk(
+  "zaplane/getRecipes",
+  async (args = {}, thunkAPI) => {
+    try {
+      const query = {};
+      if (args.page) query.page = args.page;
+      if (args.per_page) query.per_page = args.per_page;
+ 
+      const res = await API.get(`${namespace}recipes`, { params: query });
+      return {
+        recipes: res?.data?.data || [],
+        pagination: res?.data?.pagination || null,
+      };
+    } catch (error) {
+      return handleSliceError(thunkAPI, error);
+    }
+  }
+);
+ 
+export const getRecipe = createAsyncThunk(
+  "zaplane/getRecipe",
+  async (id, thunkAPI) => {
+    try {
+      const res = await API.get(`${namespace}recipes/${id}`);
+      return res?.data;
+    } catch (error) {
+      return handleSliceError(thunkAPI, error);
+    }
+  }
+);
+ 
+export const updateRecipe = createAsyncThunk(
+  "zaplane/updateRecipe",
+  async ({ id, payload }, thunkAPI) => {
+    try {
+      const res = await API.put(`${namespace}recipes/${id}`, payload);
+      handleSliceSuccess(thunkAPI, __("Recipe updated successfully.", "zaplane"));
+      return res?.data;
+    } catch (error) {
+      return handleSliceError(thunkAPI, error);
+    }
+  }
+);
+ 
+export const deleteRecipe = createAsyncThunk(
+  "zaplane/deleteRecipe",
+  async (id, thunkAPI) => {
+    try {
+      await API.delete(`${namespace}recipes/${id}`);
+      handleSliceSuccess(thunkAPI, __("Recipe deleted successfully.", "zaplane"));
+      return id;
+    } catch (error) {
+      return handleSliceError(thunkAPI, error);
+    }
+  }
+);
+ 
+export const workflowToRecipe = createAsyncThunk(
+  "zaplane/workflowToRecipe",
+  async ({ workflowId, title, description, thumbnail_id }, thunkAPI) => {
+    try {
+      const payload = { title, description, thumbnail_id };
+      const res = await API.post(
+        `${namespace}workflows/${workflowId}/to-recipe`,
+        payload
+      );
+      handleSliceSuccess(thunkAPI, __("Recipe created successfully.", "zaplane"));
+      return res?.data;
+    } catch (error) {
+      return handleSliceError(thunkAPI, error);
+    }
+  }
+);
+ 
+export const recipeToWorkflow = createAsyncThunk(
+  "zaplane/recipeToWorkflow",
+  async ({ recipeId, payload }, thunkAPI) => {
+    try {
+      const res = await API.post(`${namespace}recipes/${recipeId}/to-workflow`, payload);
+      handleSliceSuccess(thunkAPI, __("Workflow created successfully.", "zaplane"));
+      return res?.data;
+    } catch (error) {
+      return handleSliceError(thunkAPI, error);
+    }
+  }
+);
+ 
 const recipeSlice = createSlice({
   name: "recipes",
   initialState: {
-    folders: [],
     recipes: [],
-    loadingFolders: false,
-    loadingRecipes: false,
+    pagination: null,
+    loadingRecipes: true,
   },
   reducers: {},
   extraReducers: (builder) => {
     builder
-     
-      .addCase(getRecipeFolders.fulfilled, (state, action) => {
-        state.loadingFolders = false;
-        state.folders = Array.isArray(action.payload) ? action.payload : [];
-      })
-     
+ 
+    
       .addCase(getRecipes.fulfilled, (state, action) => {
         state.loadingRecipes = false;
-        state.recipes = Array.isArray(action.payload) ? action.payload : [];
+        state.recipes = Array.isArray(action.payload.recipes) ? action.payload.recipes : [];
+        state.pagination = action.payload.pagination;
       })
-
+    
+ 
       .addCase(updateRecipe.fulfilled, (state, action) => {
         const item = action.payload;
-        if (!item?.id) {
-          return;
-        }
+        if (!item?.id) return;
         state.recipes = state.recipes.map((recipe) =>
           Number(recipe.id) === Number(item.id) ? item : recipe
         );
       })
+ 
       .addCase(deleteRecipe.fulfilled, (state, action) => {
         const deletedId = action.payload;
-        state.recipes = state.recipes.filter((item) => Number(item.id) !== Number(deletedId));
+        state.recipes = state.recipes.filter(
+          (item) => Number(item.id) !== Number(deletedId)
+        );
       })
-      .addCase(createRecipeFolder.fulfilled, (state) => {
-        // Collection is re-fetched from UI after create.
-      })
-      .addCase(deleteRecipeFolder.fulfilled, (state,action) => {
-        const deletedId = action.payload;
-        state.folders = state.folders.filter((item) => Number(item.id) !== Number(deletedId));
-      })
+ 
       .addCase(workflowToRecipe.fulfilled, (state, action) => {
         if (action.payload?.id) {
           state.recipes = [action.payload, ...state.recipes];
         }
-      })
-      .addCase(updateRecipeFolder.fulfilled, (state, action) => {
-        const item = action.payload;
-        if (!item?.id) return;
-
-        state.folders = state.folders.map((folder) =>
-          Number(folder.id) === Number(item.id) ? item : folder
-        );
-      })
+      });
   },
 });
-
+ 
 export default recipeSlice.reducer;

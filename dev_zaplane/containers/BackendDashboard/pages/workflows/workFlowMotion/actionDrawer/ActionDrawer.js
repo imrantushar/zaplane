@@ -31,7 +31,7 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, handleAddAction,
   const isTrigger = node?.data?.action === "trigger" && source === "node";
 
   const { mode, setMode, selectedItem, setSelectedItem, search, setSearch, list, searchList } =
-    useActionDrawer(open, node, source, setFieldValue, isTrigger);
+    useActionDrawer(open, node, source, setFieldValue, isTrigger,values);
 
 
   // Auto-set actionType if only one tool action

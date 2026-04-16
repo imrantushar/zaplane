@@ -203,6 +203,10 @@ return [
 			'file' => 'wpuserfrontend.php',
 			'class' => \Zaplane\Integrations\Wpuserfrontend::class
 		],
+		'wpfunnels'            => [
+			'file' => 'wpfunnels.php',
+			'class' => \Zaplane\Integrations\Wpfunnels::class
+		],
 		'metabox'            => [
 			'file' => 'metabox.php',
 			'class' => \Zaplane\Integrations\Metabox::class
@@ -218,6 +222,10 @@ return [
 		'kadenceblocks'      => [
 			'file' => 'kadenceblocks.php',
 			'class' => \Zaplane\Integrations\Kadenceblocks::class
+			],
+		'buddyboss'      => [
+			'file' => 'buddyboss.php', 
+			'class' => \Zaplane\Integrations\Buddyboss::class
 		],
 		'ultimatemember'      => [
 			'file' => 'ultimatemember.php', 
@@ -274,6 +282,10 @@ return [
 		'zoom'        => [
 			'file'  => 'zoom.php',
 			'class' => \Zaplane\Integrations\Zoom::class
+		],
+		'gamipress'        => [
+			'file'  => 'gamipress.php',
+			'class' => \Zaplane\Integrations\Gamipress::class
 		],
 	],
 ];

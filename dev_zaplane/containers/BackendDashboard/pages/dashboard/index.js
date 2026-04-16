@@ -1,10 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { __ } from '@wordpress/i18n';
-import TopBar from '@ZAPComponents/TopBar';
-import ZAPLabel from '@ZAPComponents/Labels/ZAPLabel';
-import { Box, Button, Flex, Image, Text } from '@chakra-ui/react';
-import { outlineBtn, primaryBtn } from '../../../../../assets/scss/chakra/recipe';
-import { FiHelpCircle } from 'react-icons/fi';
+import { Box, Button, Flex } from '@chakra-ui/react';
+import { primaryBtn } from '../../../../../assets/scss/chakra/recipe';
 import { useDispatch, useSelector } from 'react-redux';
 import RecentLogs from './RecentLogs';
 import ExecutedFlows from './ExecutedFlows';
@@ -13,10 +10,7 @@ import TotalExecutions from './TotalExecutions';
 import { deshboardSumary, topExecutedFlows } from '@ZAPRedux/Slices/dashboardSlice/dashboardSlice';
 import OverviewSection from './OverviewSection/OverviewSection';
 import CreateWorkflowModal from '@ZAPComponents/CreateWorkflowModal';
-import { IoIosArrowForward } from 'react-icons/io';
-import { plugin_root_url } from '@ZAPUtils/helper';
-import SubTopBar from '@ZAPComponents/SubTopBar';
-import WhatsNew from '@ZAPComponents/WhatsNew/WhatsNew';
+import PageLayout from '@ZAPComponents/PageLayout';
 
 export default function Dashboard() {
     const dispatch = useDispatch();
@@ -29,33 +23,15 @@ export default function Dashboard() {
     }, [dispatch]);
 
     return (
-        <React.Fragment>
-            <TopBar
-                leftContent={() => (
-                    <>
-                        <Flex height='40px' width='40px' borderRadius='20px' gap='10px' background='var(--zaplane-second-primary)' alignItems='center' justifyContent='center'>
-                            <Image
-                                src={`${plugin_root_url}assets/images/zaplane.svg`}
-                                boxSize="20px"
-                            />
-                        </Flex>
-                        <IoIosArrowForward />
-                        <ZAPLabel
-                            as="h2"
-                            color="var(--zapplane-font-color)"
-                            type="subtitle"
-                            fontWeight="medium"
-                            label={__('Dashboard', 'zaplane')}
-                        />
-                    </>
-                )}
-            />
-            <SubTopBar heading={__("Dashboard", "zaplane")}>
+        <PageLayout
+            title="Dashboard"
+            actions={
                 <Button onClick={() => setIsModalOpen(true)} {...primaryBtn}>
                     {__("Create Workflow", "zaplane")}
                 </Button>
-            </SubTopBar>
-            <Flex flexDirection='column' gap="24px" className="zaplane-page-content">
+            }
+        >
+            <Flex flexDirection='column' gap="24px">
                 <OverviewSection />
                 <TotalExecutions />
                 <Flex gap="24px">
@@ -75,6 +51,6 @@ export default function Dashboard() {
                 onClose={() => setIsModalOpen(false)}
             />
 
-        </React.Fragment>
+        </PageLayout>
     );
 };

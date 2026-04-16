@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
-import { createWorkflows, deleteWorkFlow, getSingleWorkFlow, getWorkFlow, updateWorkFlow, updateWorkFlowStatus } from './actions/workFlow';
+import { createWorkflows, deleteWorkFlow, getSingleWorkFlow, getWorkFlow, updateWorkFlow, updateWorkFlowStatus, updateWorkFlowTitle } from './actions/workFlow';
 import { getRunWorkFlow, getSingleRun } from './actions/workFlowRuns';
 import { getAllVersion, getPreviewOldVersion, versionActive } from './actions/workFlowVersion';
 import { nodeLogsRunDetails, getNodeLogDetails } from './actions/workFlowLogs';
@@ -81,13 +81,12 @@ const workflowsSlice = createSlice({
 				if (state.workFlow?.workflow?.id === id) {
 					state.workFlow.workflow.status = status;
 				}
-				state.allWorkFlows = Array.isArray(state.allWorkFlows)
-					? state.allWorkFlows.map((item) =>
-						Number(item.id) === Number(id)
-							? { ...item, status }
-							: item
-					)
-					: [];
+			})
+			.addCase(updateWorkFlowTitle.fulfilled, (state, action) => {
+				const { id, title } = action.payload || {};
+				if (Number(state.workFlow?.workflow?.id) === Number(id)) {
+					state.workFlow.workflow.title = title;
+				}
 			})
 			.addCase(getRunWorkFlow.fulfilled, (state, action) => {
 				// action.payload now has { data, currentPage, itemPerPage, totalItems, totalPages }
