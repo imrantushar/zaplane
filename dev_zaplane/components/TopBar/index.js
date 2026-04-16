@@ -1,14 +1,12 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { Button, Flex, Text } from '@chakra-ui/react';
 import { __ } from '@wordpress/i18n';
-
-import './styles.scss';
 import ZAPLabel from '@ZAPComponents/Labels/ZAPLabel';
 import { outlineBtn } from '../../../assets/scss/chakra/recipe';
 import { FiHelpCircle } from 'react-icons/fi';
 import WhatsNew from '@ZAPComponents/WhatsNew/WhatsNew';
 
+import './styles.scss';
 
 const TopBar = ({
 	title = '',
