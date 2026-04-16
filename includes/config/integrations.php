@@ -214,6 +214,10 @@ return [
 		'kadenceblocks'      => [
 			'file' => 'kadenceblocks.php',
 			'class' => \Zaplane\Integrations\Kadenceblocks::class
+			],
+		'buddyboss'      => [
+			'file' => 'buddyboss.php', 
+			'class' => \Zaplane\Integrations\Buddyboss::class
 		],
 		'ultimatemember'      => [
 			'file' => 'ultimatemember.php', 
