@@ -293,7 +293,7 @@ class Gemcrm extends IntegrationBase {
 
 		foreach ( (array) $items as $item ) {
 			$id    = is_object( $item ) ? ( $item->id ?? null ) : ( $item['id'] ?? null );
-			$name  = is_object( $item ) ? ( $item->name ?? '' ) : ( $item['name'] ?? '' );
+			$name  = is_object( $item ) ? ( $item->name ?? '' ) : ( $item['title'] ?? '' );
 
 			if ( $id ) {
 				$result[] = [ 'value' => $id, 'label' => $name ];
@@ -313,7 +313,7 @@ class Gemcrm extends IntegrationBase {
 
 		foreach ( (array) $items as $item ) {
 			$id   = is_object( $item ) ? ( $item->id ?? null ) : ( $item['id'] ?? null );
-			$name = is_object( $item ) ? ( $item->name ?? '' ) : ( $item['name'] ?? '' );
+			$name = is_object( $item ) ? ( $item->name ?? '' ) : ( $item['title'] ?? '' );
 
 			if ( $id ) {
 				$result[] = [ 'value' => $id, 'label' => $name ];
