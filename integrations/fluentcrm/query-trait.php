@@ -7,7 +7,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 trait QueryTrait {
 
-	public static function tag_query_types( $q ) {
+	public static function tag_query_types( $query ) {
 		$all_tag = [
 			[
 				'label' => 'Any Tag',
@@ -27,7 +27,7 @@ trait QueryTrait {
 		return $all_tag;
 	}
 
-	public static function list_query_types( $q ) {
+	public static function list_query_types( $query ) {
 		$all_list = [
 			[
 				'label' => 'Any List',
@@ -47,7 +47,7 @@ trait QueryTrait {
 		return $all_list;
 	}
 
-	public static function company_query_types( $q ) {
+	public static function company_query_types( $query ) {
 		global $wpdb;
 		$table = $wpdb->prefix . 'fc_companies';
 		$all_company = [

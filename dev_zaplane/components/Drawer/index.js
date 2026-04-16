@@ -50,9 +50,9 @@ const ZAPDrawer = ({
             </Drawer.Trigger>
 
             <Portal>
-                <Drawer.Positioner marginTop={isFullscreen ? '0' : "32px"}   height={isFullscreen ? '100%' : 'calc(100vh - 32px)'} zIndex={"9999"}
+                <Drawer.Positioner marginTop={isFullscreen ? '0' : "32px"} height={isFullscreen ? '100%' : 'calc(100vh - 32px)'} zIndex={"9999"}
                     pointerEvents="none">
-                    <Drawer.Content pointerEvents="auto"  maxWidth={maxWidth}>
+                    <Drawer.Content pointerEvents="auto" maxWidth={maxWidth}>
                         {title && (
                             <Drawer.Header>
                                 {
@@ -66,7 +66,7 @@ const ZAPDrawer = ({
                                 <Drawer.Title margin='0'>
                                     <ZAPLabel label={title} type={"bold"} />
                                 </Drawer.Title>
-                                <Drawer.CloseTrigger asChild>
+                                <Drawer.CloseTrigger asChild marginRight='20px'>
                                     <CloseButton size="sm" />
                                 </Drawer.CloseTrigger>
                             </Drawer.Header>
