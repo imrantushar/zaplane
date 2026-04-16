@@ -199,6 +199,10 @@ return [
 			'file' => 'wpuserfrontend.php',
 			'class' => \Zaplane\Integrations\Wpuserfrontend::class
 		],
+		'wpfunnels'            => [
+			'file' => 'wpfunnels.php',
+			'class' => \Zaplane\Integrations\Wpfunnels::class
+		],
 		'metabox'            => [
 			'file' => 'metabox.php',
 			'class' => \Zaplane\Integrations\Metabox::class
