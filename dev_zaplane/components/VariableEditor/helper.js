@@ -112,6 +112,16 @@ export const insertVariableAtRange = ({
     span.appendChild(removeSpan);
 
     restoreSelection(range);
+
+    if (range.startContainer.nodeType === Node.TEXT_NODE) {
+        const textContent = range.startContainer.textContent;
+        const startOffset = range.startOffset;
+        let atIndex = textContent.lastIndexOf("@", startOffset - 1);
+        if (atIndex !== -1) {
+            range.setStart(range.startContainer, atIndex);
+        }
+    }
+
     range.deleteContents();
     range.insertNode(span);
 
