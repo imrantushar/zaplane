@@ -273,24 +273,42 @@ class ListenerController extends WP_REST_Controller {
 		]);
 
 		$nodeRun = NodeRun::create([
-			'run_id' => $run->id,
-			'node_key' => (int) $triggerNode['id'],
+			'run_id'             => $run->id,
+			'node_key'           => (int) $triggerNode['id'],
+			'node_meta_json'     => [
+				'app'   => $triggerNode['data']['app'] ?? null,
+				'event' => $triggerNode['data']['event'] ?? null,
+				'label' => $triggerNode['data']['label'] ?? null,
+			],
 			'parent_node_run_id' => null,
-			'status' => 'completed',
-			'input_json' => $payload,
-			'output_json' => $payload,
-			'started_at' => current_time( 'mysql' ),
-			'finished_at' => current_time( 'mysql' ),
+			'status'             => 'completed',
+			'input_json'         => $payload,
+			'output_json'        => $payload,
+			'started_at'         => current_time( 'mysql' ),
+			'finished_at'        => current_time( 'mysql' ),
 		]);
 
-		$graph = $version->getGraph();
+		$graph      = $version->getGraph();
+		$graphNodeMap = [];
+		foreach ( $graph['nodes'] ?? [] as $n ) {
+			$graphNodeMap[ (int) $n['id'] ] = $n;
+		}
+
 		foreach ( $graph['edges'] as $edge ) {
 			if ( (int) $edge['source'] === (int) $triggerNode['id'] ) {
+				$targetKey  = (int) $edge['target'];
+				$targetNode = $graphNodeMap[ $targetKey ] ?? null;
+
 				$this->container->get( 'automation' )->spawn_node_run(
 					$run->id,
-					(int) $edge['target'],
+					$targetKey,
 					$payload,
-					$nodeRun->id
+					$nodeRun->id,
+					$targetNode ? [
+						'app'   => $targetNode['data']['app'] ?? null,
+						'event' => $targetNode['data']['event'] ?? null,
+						'label' => $targetNode['data']['label'] ?? null,
+					] : null
 				);
 			}
 		}

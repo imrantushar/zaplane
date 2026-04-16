@@ -243,21 +243,24 @@ class Gemcrm extends IntegrationBase {
 			return [];
 		}
 
-		$items  = \GemCrm\Database\Models\Contact::index( [], null, true );
+		$data = [];
+		if( ! empty( $q['search'] ?? false ) )
+			$data['search'] = $q['search'];
+		$items  = \GemCrm\Database\Models\Contact::index( $data, null );
 		$result = [];
 
-		foreach ( (array) $items as $item ) {
-			$id    = is_object( $item ) ? ( $item->id ?? null ) : ( $item['id'] ?? null );
-			$first = is_object( $item ) ? ( $item->first_name ?? '' ) : ( $item['first_name'] ?? '' );
-			$last  = is_object( $item ) ? ( $item->last_name ?? '' ) : ( $item['last_name'] ?? '' );
-			$email = is_object( $item ) ? ( $item->email ?? '' ) : ( $item['email'] ?? '' );
+		foreach ( (array) $items['records'] as $item ) {
+			$id    = $item['id'] ?? null ;
+			$first = $item['first_name'] ?? '' ;
+			$last  = $item['last_name'] ?? '' ;
+			$email = $item['email'] ?? '' ;
 
 			if ( ! $id ) {
 				continue;
 			}
 
-			$name     = trim( "$first $last" );
-			$label    = $name !== '' ? "$name ($email)" : $email;
+			$name     = trim( "{$first} {$last}" );
+			$label    = $name !== '' ? "{$name} ({$email})" : $email;
 			$result[] = [ 'value' => $id, 'label' => $label ];
 		}
 
@@ -269,12 +272,16 @@ class Gemcrm extends IntegrationBase {
 			return [];
 		}
 
-		$items = \GemCrm\Database\Models\Tag::index( [], null, true );
+		$data = [];
+		if( ! empty( $q['search'] ?? false ) )
+			$data['search'] = $q['search'];
+
+		$items = \GemCrm\Database\Models\Tag::index( $data, null, true );
 		$result = [];
 
 		foreach ( (array) $items as $item ) {
-			$id    = is_object( $item ) ? ( $item->id ?? null ) : ( $item['id'] ?? null );
-			$name  = is_object( $item ) ? ( $item->name ?? '' ) : ( $item['title'] ?? '' );
+			$id    = $item['id'] ?? null ;
+			$name  = $item['title'] ?? '' ;
 
 			if ( $id ) {
 				$result[] = [ 'value' => $id, 'label' => $name ];
@@ -289,12 +296,16 @@ class Gemcrm extends IntegrationBase {
 			return [];
 		}
 
-		$items = \GemCrm\Database\Models\ListModel::index( [], null, true );
+		$data = [];
+		if( ! empty( $q['search'] ?? false ) )
+			$data['search'] = $q['search'];
+
+		$items = \GemCrm\Database\Models\ListModel::index( $data, null, true );
 		$result = [];
 
 		foreach ( (array) $items as $item ) {
-			$id   = is_object( $item ) ? ( $item->id ?? null ) : ( $item['id'] ?? null );
-			$name = is_object( $item ) ? ( $item->name ?? '' ) : ( $item['title'] ?? '' );
+			$id   = $item['id'] ?? null ;
+			$name = $item['title'] ?? '' ;
 
 			if ( $id ) {
 				$result[] = [ 'value' => $id, 'label' => $name ];
@@ -361,7 +372,7 @@ class Gemcrm extends IntegrationBase {
 				'required' => false,
 			],
 			[
-				'key'      => 'status',
+				'key'      => 'gemcrm_status',
 				'label'    => 'Status',
 				'type'     => 'select',
 				'required' => false,
@@ -480,10 +491,15 @@ class Gemcrm extends IntegrationBase {
 	private static function build_contact_data( array $config ): array {
 		$data = [];
 
-		foreach ( [ 'status', 'type', 'first_name', 'last_name', 'phone', 'email' ] as $field ) {
+		foreach ( [ 'type', 'first_name', 'last_name', 'phone', 'email' ] as $field ) {
 			if ( isset( $config[ $field ] ) && '' !== $config[ $field ] ) {
 				$data[ $field ] = sanitize_text_field( $config[ $field ] );
 			}
+		}
+
+		// 'gemcrm_status' is the schema key (avoids frontend key collision); maps to 'status' for GemCRM.
+		if ( isset( $config['gemcrm_status'] ) && '' !== $config['gemcrm_status'] ) {
+			$data['status'] = sanitize_text_field( $config['gemcrm_status'] );
 		}
 
 		foreach ( [ 'linked_id', 'photo_id' ] as $int_field ) {

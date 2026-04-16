@@ -80,20 +80,38 @@ const ActionFieldRenderer = ({
           label={field.label}
           options={options}
           value={value}
-          onChange={(opt) =>
-            setFieldValue(field.key, opt?.value)
-          }
-          placeholder={
-            field.placeholder || `Select ${field.label}`
-          }
+          onChange={(opt) => setFieldValue(field.key, opt?.value)}
+          placeholder={field.placeholder || `Select ${field.label}`}
           isClearable
-          isLoading={
-            field.dynamic ? loadingFields[key] : false
-          }
+          isLoading={field.dynamic ? loadingFields[key] : false}
           onMenuOpen={
-            field.dynamic
-              ? () => fetchDynamicOptions(field)
-              : undefined
+            field.dynamic ? () => fetchDynamicOptions(field) : undefined
+          }
+        />
+      );
+    }
+
+    case "multi-select": {
+      const key = getKey?.(field);
+      const options = field.options
+        ? field.options.map((opt) => ({
+          label: opt.label,
+          value: opt.value
+        }))
+        : dynamicOptions[key] || [];
+
+      return (
+        <ZAPSelect
+          label={field.label}
+          options={options}
+          value={value || []}
+          onChange={(vals) => setFieldValue(field.key, vals)}
+          placeholder={field.placeholder || `Select ${field.label}`}
+          isClearable
+          isMulti
+          isLoading={field.dynamic ? loadingFields[key] : false}
+          onMenuOpen={
+            field.dynamic ? () => fetchDynamicOptions(field) : undefined
           }
         />
       );

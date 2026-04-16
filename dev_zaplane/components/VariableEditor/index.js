@@ -68,10 +68,10 @@ const VariableEditor = ({ value, setFieldValue, field, variables, label, placeho
   // open popover when @ typed
   const handleKeyDown = (e) => {
     if (e.key === "@") {
-      const range = saveSelection();
-      setActiveRange(range);
-      setPopoverOpen(true);
-      e.preventDefault();
+      setTimeout(() => {
+        setActiveRange(saveSelection());
+        setPopoverOpen(true);
+      }, 0);
     }
   };
 

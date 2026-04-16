@@ -169,20 +169,29 @@ class Automation {
 			'started_at' => current_time( 'mysql' ),
 		]);
 
-		$this->spawn_node_run( $run->id, $nodeKey, $payload, null );
+		$this->spawn_node_run( $run->id, $nodeKey, $payload, null, $this->extract_node_meta( $trigger['graph_node'] ) );
 	}
 
-	public function spawn_node_run( int $run_id, int $node_key, array $input, ?int $parent ) {
+	public function spawn_node_run( int $run_id, int $node_key, array $input, ?int $parent, ?array $node_meta = null ) {
 		$nodeRun = NodeRun::create([
-			'run_id' => $run_id,
-			'node_key' => $node_key,
+			'run_id'             => $run_id,
+			'node_key'           => $node_key,
+			'node_meta_json'     => $node_meta,
 			'parent_node_run_id' => $parent,
-			'status' => 'pending',
-			'input_json' => $input,
-			'started_at' => current_time( 'mysql' ),
+			'status'             => 'pending',
+			'input_json'         => $input,
+			'started_at'         => current_time( 'mysql' ),
 		]);
 
 		self::enqueue_node_run( $nodeRun->id );
+	}
+
+	private function extract_node_meta( array $node ): array {
+		return [
+			'app'   => $node['data']['app'] ?? null,
+			'event' => $node['data']['event'] ?? null,
+			'label' => $node['data']['label'] ?? null,
+		];
 	}
 
 	public static function enqueue_node_run( int $node_run_id ): void {
@@ -294,7 +303,8 @@ class Automation {
 						$run->id,
 						$nodeRun->node_key,
 						$iteratorInput,
-						$nodeRun->parent_node_run_id
+						$nodeRun->parent_node_run_id,
+						$nodeRun->node_meta_json
 					);
 				}
 
@@ -340,6 +350,11 @@ class Automation {
 		$port = $output['port'] ?? null;
 		$childInput = $port ? ( $output['data'] ?? $output ) : $output;
 
+		$graphNodeMap = [];
+		foreach ( $graph['nodes'] ?? [] as $n ) {
+			$graphNodeMap[ (int) $n['id'] ] = $n;
+		}
+
 		foreach ( $graph['edges'] as $edge ) {
 			if ( (int) $edge['source'] !== $nodeRun->node_key ) {
 				continue;
@@ -352,11 +367,15 @@ class Automation {
 				}
 			}
 
+			$targetKey  = (int) $edge['target'];
+			$targetNode = $graphNodeMap[ $targetKey ] ?? null;
+
 			$this->spawn_node_run(
 				$nodeRun->run_id,
-				(int) $edge['target'],
+				$targetKey,
 				$childInput,
-				$nodeRun->id
+				$nodeRun->id,
+				$targetNode ? $this->extract_node_meta( $targetNode ) : null
 			);
 		}
 	}
