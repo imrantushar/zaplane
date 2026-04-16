@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-04-16 07:39:08",
+    "generated_at": "2026-04-16 08:04:34",
     "apps": {
         "cartflows": {
             "slug": "cartflows",
@@ -16431,7 +16431,7 @@
                             "required": false
                         },
                         {
-                            "key": "status",
+                            "key": "gemcrm_status",
                             "label": "Status",
                             "type": "select",
                             "required": false,
@@ -16611,7 +16611,7 @@
                             "required": false
                         },
                         {
-                            "key": "status",
+                            "key": "gemcrm_status",
                             "label": "Status",
                             "type": "select",
                             "required": false,
