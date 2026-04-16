@@ -279,7 +279,7 @@ class Gemcrm extends IntegrationBase {
 		$items = \GemCrm\Database\Models\Tag::index( $data, null, true );
 		$result = [];
 
-		foreach ( (array) $items['records'] as $item ) {
+		foreach ( (array) $items as $item ) {
 			$id    = $item['id'] ?? null ;
 			$name  = $item['title'] ?? '' ;
 
@@ -303,7 +303,7 @@ class Gemcrm extends IntegrationBase {
 		$items = \GemCrm\Database\Models\ListModel::index( $data, null, true );
 		$result = [];
 
-		foreach ( (array) $items['records'] as $item ) {
+		foreach ( (array) $items as $item ) {
 			$id   = $item['id'] ?? null ;
 			$name = $item['title'] ?? '' ;
 
