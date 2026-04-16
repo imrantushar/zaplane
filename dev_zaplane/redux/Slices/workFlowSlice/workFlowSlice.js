@@ -21,7 +21,7 @@ const workflowsSlice = createSlice({
 		nodeDetails: [],
 		isLoading: true,
 		singleNodeExecution: {
-			
+
 		},
 		apiCountdown: 0,
 		apiRequestRunning: false,
@@ -81,6 +81,13 @@ const workflowsSlice = createSlice({
 				if (state.workFlow?.workflow?.id === id) {
 					state.workFlow.workflow.status = status;
 				}
+				state.allWorkFlows = Array.isArray(state.allWorkFlows)
+					? state.allWorkFlows.map((item) =>
+						Number(item.id) === Number(id)
+							? { ...item, status }
+							: item
+					)
+					: [];
 			})
 			.addCase(updateWorkFlowTitle.fulfilled, (state, action) => {
 				const { id, title } = action.payload || {};
@@ -135,7 +142,7 @@ const workflowsSlice = createSlice({
 			})
 			.addCase(workFLowSingeNodeExction.fulfilled, (state, action) => {
 				state.isLoading = false;
-				const node_id=action?.payload?.data?.node?.id
+				const node_id = action?.payload?.data?.node?.id
 				if (!state.singleNodeExecution[node_id]) {
 					state.singleNodeExecution[node_id] = {}
 				}
