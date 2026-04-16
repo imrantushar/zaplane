@@ -169,7 +169,7 @@ class Automation {
 			'started_at' => current_time( 'mysql' ),
 		]);
 
-		$this->spawn_node_run( $run->id, $nodeKey, $payload, null, $this->extract_node_meta( $trigger ) );
+		$this->spawn_node_run( $run->id, $nodeKey, $payload, null, $this->extract_node_meta( $trigger['graph_node'] ) );
 	}
 
 	public function spawn_node_run( int $run_id, int $node_key, array $input, ?int $parent, ?array $node_meta = null ) {
