@@ -111,7 +111,7 @@ export default function FlowTopBar({
   const currentTitle = values?.title ?? workFlow?.workflow?.title ?? "Untitled Flow";
 
   const rightActions = (
-    <Flex gap='12px' >
+    <Flex gap='12px'>
       {!apiRequestRunning ? (
         <Button {...secondPrimaryBtn} h="36px" onClick={() => {
           dispatch(startApiCountdown(120));
