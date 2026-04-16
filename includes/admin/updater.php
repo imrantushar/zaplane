@@ -9,7 +9,7 @@ class Updater {
 
 	protected static $client = null;
 
-	protected function register() {
+	public function register() {
 		if ( ! did_action( 'plugins_loaded' ) ) {
 			add_action( 'plugins_loaded', [ $this, 'get_sdk' ] );
 		} else {
