@@ -31,6 +31,10 @@ return [
 			'file' => 'cartflows.php',
 			'class' => \Zaplane\Integrations\Cartflows::class
 		],
+		'funnelkit'            => [
+			'file' => 'funnelkit.php',
+			'class' => \Zaplane\Integrations\Funnelkit::class
+		],
 		'wordpress'            => [
 			'file' => 'wordpress.php',
 			'class' => \Zaplane\Integrations\Wordpress::class
