@@ -70,6 +70,8 @@ final class Zaplane {
 	}
 
 	private function load_dependencies(): void {
+		require_once ZAPLANE_ROOT_DIR_PATH . 'vendor/autoload.php';
+		require_once ZAPLANE_ROOT_DIR_PATH . 'vendor/woocommerce/action-scheduler/action-scheduler.php';
 		require_once ZAPLANE_INCLUDES_DIR_PATH . 'autoload.php';
 		require_once ZAPLANE_FRAMEWORK_DIR_PATH . 'functions.php';
 		require_once ZAPLANE_INCLUDES_DIR_PATH . 'utils/functions.php';

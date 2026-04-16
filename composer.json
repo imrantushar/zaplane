@@ -2,7 +2,8 @@
     "name": "zaplane/zaplane",
     "description": "Automate your WordPress site management with Zaplane.",
     "require": {
-        "storeengine/wordpress-sdk": "^1.2"
+        "storeengine/wordpress-sdk": "^1.2",
+        "woocommerce/action-scheduler": "^3.8"
     },
     "repositories": [
         {
