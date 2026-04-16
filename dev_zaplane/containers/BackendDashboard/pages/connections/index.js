@@ -37,7 +37,7 @@ const Connections = () => {
     return (
         <PageLayout
             title="Connections"
-            heading="Dashboard"
+            heading="Connections"
             actions={
                 <Button {...primaryBtn} leftIcon={<FaSlack />} onClick={openDrawer}>
                     {__("Create credential", "zaplane")}

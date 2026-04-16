@@ -16,7 +16,7 @@ const TopBar = ({
 		<Button
 			{...outlineBtn}
 			onClick={() => {
-				window.open('https://zaplane.com/', '_blank');
+				window.open('https://community.kodezen.com/', '_blank');
 			}}
 		>
 			<FiHelpCircle color='var(--zaplane-font-color)' />
