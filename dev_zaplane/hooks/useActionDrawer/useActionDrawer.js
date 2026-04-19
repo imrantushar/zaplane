@@ -32,7 +32,16 @@ export const useActionDrawer = (open, node, source, setFieldValue, isTrigger,val
   const [search, setSearch] = useState("");
 
   useEffect(() => {
-    if (!open || !node?.data || source === "add") return;
+    if (!open) return;
+
+    if (source === "add") {
+      setMode(null);
+      setSelectedItem(null);
+      setSearch("");
+      return;
+    }
+
+    if (!node?.data) return;
 
     const detectedItem = APPS.concat(TOOLS).find(
       i => i.name === node.data.app || i.id === node.data.app
@@ -47,7 +56,7 @@ export const useActionDrawer = (open, node, source, setFieldValue, isTrigger,val
     if (node.data.config) {
       Object.entries(node.data.config).forEach(([k, v]) => setFieldValue(k, v));
     }
-  }, [open, node?.data,values.nodeClick]);
+  }, [open, node?.data, values.nodeClick, source]);
 
    const list = useMemo(() => {
     const base = mode === "app" ? APPS : mode === "tools" ? TOOLS : [];

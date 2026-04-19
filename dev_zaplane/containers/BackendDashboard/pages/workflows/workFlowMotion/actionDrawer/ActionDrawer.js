@@ -32,8 +32,15 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, handleAddAction,
   const { mode, setMode, selectedItem, setSelectedItem, search, setSearch, list, searchList } =
     useActionDrawer(open, node, source, setFieldValue, isTrigger,values);
 
-
   // Auto-set actionType if only one tool action
+  
+  useEffect(() => {
+    if (open && source === "add") {
+      setStep("select");
+      resetForm();
+      setFieldValue("actionType", "");
+    }
+  }, [open, context]);
 
   useEffect(() => {
     if (mode !== "tools" || !selectedItem) return;

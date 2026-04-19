@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-04-14 10:08:15",
+    "generated_at": "2026-04-19 08:23:09",
     "apps": {
         "cartflows": {
             "slug": "cartflows",
@@ -732,10 +732,634 @@
                 }
             }
         },
+        "funnelkit": {
+            "slug": "funnelkit",
+            "name": "FunnelKit",
+            "icon": "funnelkit.svg",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": {
+                "woofunnels_loaded": {
+                    "key": "woofunnels_loaded",
+                    "label": "WooFunnels Loaded",
+                    "hook": "woofunnels_loaded",
+                    "schema": [],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "core_modules_loaded": {
+                    "key": "core_modules_loaded",
+                    "label": "Core Modules Loaded",
+                    "hook": "wffn_core_modules_loaded",
+                    "schema": [],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "loaded": {
+                    "key": "loaded",
+                    "label": "FunnelKit Loaded",
+                    "hook": "wffn_loaded",
+                    "schema": [],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "funnel_created": {
+                    "key": "funnel_created",
+                    "label": "Funnel Created",
+                    "hook": "wffn_funnel_created",
+                    "schema": [
+                        {
+                            "key": "funnel_id",
+                            "label": "Funnel",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "funnelkit",
+                                "query": "funnels",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "duplicate_funnel": {
+                    "key": "duplicate_funnel",
+                    "label": "Funnel Duplicated",
+                    "hook": "wffn_duplicate_funnel",
+                    "schema": [
+                        {
+                            "key": "funnel_id",
+                            "label": "Funnel",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "funnelkit",
+                                "query": "funnels",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "funnel_imported": {
+                    "key": "funnel_imported",
+                    "label": "Funnel Imported",
+                    "hook": "wffn_funnel_imported",
+                    "schema": [
+                        {
+                            "key": "funnel_id",
+                            "label": "Funnel",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "funnelkit",
+                                "query": "funnels",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "funnel_updated": {
+                    "key": "funnel_updated",
+                    "label": "Funnel Updated",
+                    "hook": "wffn_funnel_update",
+                    "schema": [
+                        {
+                            "key": "funnel_id",
+                            "label": "Funnel",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "funnelkit",
+                                "query": "funnels",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "step_duplicated": {
+                    "key": "step_duplicated",
+                    "label": "Step Duplicated",
+                    "hook": "wffn_step_duplicated",
+                    "schema": [
+                        {
+                            "key": "step_id",
+                            "label": "Step",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "funnelkit",
+                                "query": "steps",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "step_viewed": {
+                    "key": "step_viewed",
+                    "label": "Step Viewed",
+                    "hook": "wffn_event_step_viewed",
+                    "schema": [
+                        {
+                            "key": "step_id",
+                            "label": "Step",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "funnelkit",
+                                "query": "steps",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "step_converted": {
+                    "key": "step_converted",
+                    "label": "Step Converted",
+                    "hook": "wffn_event_step_converted",
+                    "schema": [
+                        {
+                            "key": "step_id",
+                            "label": "Step",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "funnelkit",
+                                "query": "steps",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "funnel_ended": {
+                    "key": "funnel_ended",
+                    "label": "Funnel Ended",
+                    "hook": "wffn_funnel_ended_event",
+                    "schema": [
+                        {
+                            "key": "funnel_id",
+                            "label": "Funnel",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "funnelkit",
+                                "query": "funnels",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "ty_funnel_ended": {
+                    "key": "ty_funnel_ended",
+                    "label": "Thank You Funnel Ended",
+                    "hook": "wffn_ty_funnel_ended_event",
+                    "schema": [
+                        {
+                            "key": "funnel_id",
+                            "label": "Funnel",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "funnelkit",
+                                "query": "funnels",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "import_completed": {
+                    "key": "import_completed",
+                    "label": "Import Completed",
+                    "hook": "wffn_import_completed",
+                    "schema": [
+                        {
+                            "key": "funnel_id",
+                            "label": "Funnel",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "funnelkit",
+                                "query": "funnels",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "importing_completed": {
+                    "key": "importing_completed",
+                    "label": "Background Import Completed",
+                    "hook": "wffn_importing_completed",
+                    "schema": [],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "template_import_remote": {
+                    "key": "template_import_remote",
+                    "label": "Template Import Remote",
+                    "hook": "wffn_template_import_remote",
+                    "schema": [
+                        {
+                            "key": "funnel_id",
+                            "label": "Funnel",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "funnelkit",
+                                "query": "funnels",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "container": {
+                    "key": "container",
+                    "label": "Container Rendered",
+                    "hook": "woofunnels_container",
+                    "schema": [],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "container_top": {
+                    "key": "container_top",
+                    "label": "Container Top",
+                    "hook": "woofunnels_container_top",
+                    "schema": [],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "container_bottom": {
+                    "key": "container_bottom",
+                    "label": "Container Bottom",
+                    "hook": "woofunnels_container_bottom",
+                    "schema": [],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "wp_footer": {
+                    "key": "wp_footer",
+                    "label": "WooFunnels Footer",
+                    "hook": "woofunnels_wp_footer",
+                    "schema": [],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "checkout_loaded": {
+                    "key": "checkout_loaded",
+                    "label": "Checkout Module Loaded",
+                    "hook": "wfacp_loaded",
+                    "schema": [],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "template_body_top": {
+                    "key": "template_body_top",
+                    "label": "Template Body Top",
+                    "hook": "wfacp_template_body_top",
+                    "schema": [],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "template_container_top": {
+                    "key": "template_container_top",
+                    "label": "Template Container Top",
+                    "hook": "wfacp_template_container_top",
+                    "schema": [],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "template_container_bottom": {
+                    "key": "template_container_bottom",
+                    "label": "Template Container Bottom",
+                    "hook": "wfacp_template_container_bottom",
+                    "schema": [],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "template_wp_footer": {
+                    "key": "template_wp_footer",
+                    "label": "Template Footer",
+                    "hook": "wfacp_template_wp_footer",
+                    "schema": [],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                }
+            },
+            "actions": {
+                "get_funnel_single": {
+                    "key": "get_funnel_single",
+                    "label": "Get Funnel (Single)",
+                    "schema": [
+                        {
+                            "key": "funnel_id",
+                            "label": "Funnel",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "funnelkit",
+                                "query": "funnels",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "get_step_single": {
+                    "key": "get_step_single",
+                    "label": "Get Step (Single)",
+                    "schema": [
+                        {
+                            "key": "step_id",
+                            "label": "Step",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "funnelkit",
+                                "query": "steps",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "get_next_step": {
+                    "key": "get_next_step",
+                    "label": "Get Next Step",
+                    "schema": [
+                        {
+                            "key": "step_id",
+                            "label": "Step",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "funnelkit",
+                                "query": "steps",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "add_action": {
+                    "key": "add_action",
+                    "label": "Add Action Hook",
+                    "schema": [
+                        {
+                            "key": "hook_name",
+                            "label": "Hook Name",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "accepted_args",
+                            "label": "Accepted Args",
+                            "type": "number"
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "do_action": {
+                    "key": "do_action",
+                    "label": "Do Action Hook",
+                    "schema": [
+                        {
+                            "key": "hook_name",
+                            "label": "Hook Name",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "arg_1",
+                            "label": "Argument 1",
+                            "type": "expression"
+                        },
+                        {
+                            "key": "arg_2",
+                            "label": "Argument 2",
+                            "type": "expression"
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "add_filter": {
+                    "key": "add_filter",
+                    "label": "Add Filter Hook",
+                    "schema": [
+                        {
+                            "key": "hook_name",
+                            "label": "Hook Name",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "return_value",
+                            "label": "Return Value",
+                            "type": "expression"
+                        },
+                        {
+                            "key": "accepted_args",
+                            "label": "Accepted Args",
+                            "type": "number"
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "apply_filters": {
+                    "key": "apply_filters",
+                    "label": "Apply Filters Hook",
+                    "schema": [
+                        {
+                            "key": "hook_name",
+                            "label": "Hook Name",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "value",
+                            "label": "Value",
+                            "type": "expression"
+                        },
+                        {
+                            "key": "arg_1",
+                            "label": "Argument 1",
+                            "type": "expression"
+                        },
+                        {
+                            "key": "arg_2",
+                            "label": "Argument 2",
+                            "type": "expression"
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "remove_action": {
+                    "key": "remove_action",
+                    "label": "Remove All Hook Callbacks",
+                    "schema": [
+                        {
+                            "key": "hook_name",
+                            "label": "Hook Name",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "has_action": {
+                    "key": "has_action",
+                    "label": "Has Hook Callback",
+                    "schema": [
+                        {
+                            "key": "hook_name",
+                            "label": "Hook Name",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "current_filter": {
+                    "key": "current_filter",
+                    "label": "Get Current Filter",
+                    "schema": [],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                }
+            }
+        },
         "wordpress": {
             "slug": "wordpress",
             "name": "WordPress",
-            "icon": "WordPress.svg",
+            "icon": "wordpress.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -1888,20 +2512,16 @@
                     "schema": [
                         {
                             "key": "post_title",
-                            "label": "Title",
+                            "label": "Post Title",
                             "type": "expression",
                             "required": true
-                        },
-                        {
-                            "key": "post_content",
-                            "label": "Content",
-                            "type": "textarea"
                         },
                         {
                             "key": "post_type",
                             "label": "Post Type",
                             "type": "select",
                             "required": true,
+                            "placeholder": "any post type",
                             "dynamic": {
                                 "integration": "wordpress",
                                 "query": "post_types",
@@ -1913,8 +2533,10 @@
                         },
                         {
                             "key": "post_status",
-                            "label": "Status",
+                            "label": "Post Status",
                             "type": "select",
+                            "required": true,
+                            "placeholder": "any post status",
                             "options": [
                                 {
                                     "label": "Draft",
@@ -1923,6 +2545,157 @@
                                 {
                                     "label": "Publish",
                                     "value": "publish"
+                                },
+                                {
+                                    "label": "Pending",
+                                    "value": "pending"
+                                },
+                                {
+                                    "label": "Private",
+                                    "value": "private"
+                                },
+                                {
+                                    "label": "Future",
+                                    "value": "future"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "post_author",
+                            "label": "Post Author",
+                            "type": "select",
+                            "placeholder": "any post author",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "users",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "post_category",
+                            "label": "Post Category",
+                            "type": "select",
+                            "placeholder": "any post category",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "categories",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "post_tags",
+                            "label": "Select Post Tags",
+                            "type": "select",
+                            "required": true,
+                            "multiple": true,
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "tags",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "post_content",
+                            "label": "Post Content",
+                            "type": "textarea"
+                        },
+                        {
+                            "key": "post_excerpt",
+                            "label": "Post Excerpt",
+                            "type": "textarea"
+                        },
+                        {
+                            "key": "post_date",
+                            "label": "Post Date",
+                            "type": "expression"
+                        },
+                        {
+                            "key": "post_date_gmt",
+                            "label": "Post Date GMT",
+                            "type": "expression"
+                        },
+                        {
+                            "key": "post_name",
+                            "label": "Post Slug",
+                            "type": "expression"
+                        },
+                        {
+                            "key": "post_parent",
+                            "label": "Post Parent Id",
+                            "type": "expression",
+                            "description": "Provide the Id of the parent post if this is a child post."
+                        },
+                        {
+                            "key": "post_password",
+                            "label": "Post Password",
+                            "type": "expression",
+                            "description": "Only visible to those who know the password."
+                        },
+                        {
+                            "key": "featured_image_url",
+                            "label": "Post Featured Image URL",
+                            "type": "expression",
+                            "toggle": "use_featured_image_id"
+                        },
+                        {
+                            "key": "use_featured_image_id",
+                            "label": "Use Featured Image ID instead of URL",
+                            "type": "toggle",
+                            "description": "Enable to use Featured Image ID field instead of URL."
+                        },
+                        {
+                            "key": "taxonomy",
+                            "label": "Select Taxonomy",
+                            "type": "select",
+                            "placeholder": "any post Taxonomy",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "taxonomies",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "taxonomy_term",
+                            "label": "Select Taxonomy Term",
+                            "type": "select",
+                            "placeholder": "any post Taxonomy Term",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "taxonomy_terms",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "custom_fields",
+                            "label": "Post Custom Field Map",
+                            "type": "map",
+                            "fields": [
+                                {
+                                    "key": "key",
+                                    "label": "Key",
+                                    "type": "expression",
+                                    "required": true
+                                },
+                                {
+                                    "key": "value",
+                                    "label": "Value",
+                                    "type": "expression",
+                                    "required": true
                                 }
                             ]
                         }
@@ -3957,13 +4730,7 @@
                         },
                         {
                             "key": "post_title",
-                            "label": "New Post Title",
-                            "type": "expression",
-                            "required": true
-                        },
-                        {
-                            "key": "post_content",
-                            "label": "New Post Content",
+                            "label": "Post Title",
                             "type": "expression",
                             "required": true
                         },
@@ -3971,6 +4738,8 @@
                             "key": "post_type",
                             "label": "Post Type",
                             "type": "select",
+                            "required": true,
+                            "placeholder": "any post type",
                             "dynamic": {
                                 "integration": "wordpress",
                                 "query": "post_types",
@@ -3978,13 +4747,14 @@
                                     "name",
                                     "label"
                                 ]
-                            },
-                            "required": true
+                            }
                         },
                         {
                             "key": "post_status",
-                            "label": "Status",
+                            "label": "Post Status",
                             "type": "select",
+                            "required": true,
+                            "placeholder": "any post status",
                             "options": [
                                 {
                                     "label": "Draft",
@@ -3993,6 +4763,157 @@
                                 {
                                     "label": "Publish",
                                     "value": "publish"
+                                },
+                                {
+                                    "label": "Pending",
+                                    "value": "pending"
+                                },
+                                {
+                                    "label": "Private",
+                                    "value": "private"
+                                },
+                                {
+                                    "label": "Future",
+                                    "value": "future"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "post_author",
+                            "label": "Post Author",
+                            "type": "select",
+                            "placeholder": "any post author",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "users",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "post_category",
+                            "label": "Post Category",
+                            "type": "select",
+                            "placeholder": "any post category",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "categories",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "post_tags",
+                            "label": "Select Post Tags",
+                            "type": "select",
+                            "required": true,
+                            "multiple": true,
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "tags",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "post_content",
+                            "label": "Post Content",
+                            "type": "textarea"
+                        },
+                        {
+                            "key": "post_excerpt",
+                            "label": "Post Excerpt",
+                            "type": "textarea"
+                        },
+                        {
+                            "key": "post_date",
+                            "label": "Post Date",
+                            "type": "expression"
+                        },
+                        {
+                            "key": "post_date_gmt",
+                            "label": "Post Date GMT",
+                            "type": "expression"
+                        },
+                        {
+                            "key": "post_name",
+                            "label": "Post Slug",
+                            "type": "expression"
+                        },
+                        {
+                            "key": "post_parent",
+                            "label": "Post Parent Id",
+                            "type": "expression",
+                            "description": "Provide the Id of the parent post if this is a child post."
+                        },
+                        {
+                            "key": "post_password",
+                            "label": "Post Password",
+                            "type": "expression",
+                            "description": "Only visible to those who know the password."
+                        },
+                        {
+                            "key": "featured_image_url",
+                            "label": "Post Featured Image URL",
+                            "type": "expression",
+                            "toggle": "use_featured_image_id"
+                        },
+                        {
+                            "key": "use_featured_image_id",
+                            "label": "Use Featured Image ID instead of URL",
+                            "type": "toggle",
+                            "description": "Enable to use Featured Image ID field instead of URL."
+                        },
+                        {
+                            "key": "taxonomy",
+                            "label": "Select Taxonomy",
+                            "type": "select",
+                            "placeholder": "any post Taxonomy",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "taxonomies",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "taxonomy_term",
+                            "label": "Select Taxonomy Term",
+                            "type": "select",
+                            "placeholder": "any post Taxonomy Term",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "taxonomy_terms",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "custom_fields",
+                            "label": "Post Custom Field Map",
+                            "type": "map",
+                            "fields": [
+                                {
+                                    "key": "key",
+                                    "label": "Key",
+                                    "type": "expression",
+                                    "required": true
+                                },
+                                {
+                                    "key": "value",
+                                    "label": "Value",
+                                    "type": "expression",
+                                    "required": true
                                 }
                             ]
                         }
@@ -15500,6 +16421,7 @@
                             "key": "email",
                             "label": "Email",
                             "type": "expression",
+                            "subtype": "email",
                             "required": true
                         },
                         {
@@ -15509,18 +16431,60 @@
                             "required": false
                         },
                         {
-                            "key": "status",
+                            "key": "gemcrm_status",
                             "label": "Status",
-                            "type": "expression",
+                            "type": "select",
                             "required": false,
-                            "placeholder": "e.g. active"
+                            "options": [
+                                {
+                                    "value": "draft",
+                                    "label": "Draft"
+                                },
+                                {
+                                    "value": "pending",
+                                    "label": "Pending"
+                                },
+                                {
+                                    "value": "subscribed",
+                                    "label": "Subscribed"
+                                },
+                                {
+                                    "value": "unsubscribed",
+                                    "label": "Unsubscribed"
+                                },
+                                {
+                                    "value": "spamed",
+                                    "label": "Spamed"
+                                },
+                                {
+                                    "value": "bounced",
+                                    "label": "Bounced"
+                                },
+                                {
+                                    "value": "complained",
+                                    "label": "Complained"
+                                },
+                                {
+                                    "value": "transactional",
+                                    "label": "Transactional"
+                                }
+                            ]
                         },
                         {
                             "key": "type",
                             "label": "Type",
-                            "type": "expression",
+                            "type": "select",
                             "required": false,
-                            "placeholder": "e.g. customer"
+                            "options": [
+                                {
+                                    "value": "lead",
+                                    "label": "Lead"
+                                },
+                                {
+                                    "value": "customer",
+                                    "label": "Customer"
+                                }
+                            ]
                         },
                         {
                             "key": "linked_id",
@@ -15535,22 +16499,32 @@
                             "required": false
                         },
                         {
-                            "key": "company_ids",
-                            "label": "Company IDs (comma-separated)",
-                            "type": "expression",
-                            "required": false
-                        },
-                        {
                             "key": "tag_ids",
-                            "label": "Tag IDs (comma-separated)",
-                            "type": "expression",
-                            "required": false
+                            "label": "Tags",
+                            "type": "multi-select",
+                            "required": false,
+                            "dynamic": {
+                                "integration": "gemcrm",
+                                "query": "gemcrm_tag_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
                         },
                         {
                             "key": "list_ids",
-                            "label": "List IDs (comma-separated)",
-                            "type": "expression",
-                            "required": false
+                            "label": "Lists",
+                            "type": "multi-select",
+                            "required": false,
+                            "dynamic": {
+                                "integration": "gemcrm",
+                                "query": "gemcrm_list_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
                         },
                         {
                             "key": "addr_line_1",
@@ -15599,15 +16573,23 @@
                     "schema": [
                         {
                             "key": "contact_id",
-                            "label": "Contact ID",
-                            "type": "expression",
-                            "required": true
+                            "label": "Contact",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "gemcrm",
+                                "query": "gemcrm_contact_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
                         },
                         {
                             "key": "first_name",
                             "label": "First Name",
                             "type": "expression",
-                            "required": false
+                            "required": true
                         },
                         {
                             "key": "last_name",
@@ -15619,7 +16601,8 @@
                             "key": "email",
                             "label": "Email",
                             "type": "expression",
-                            "required": false
+                            "subtype": "email",
+                            "required": true
                         },
                         {
                             "key": "phone",
@@ -15628,18 +16611,60 @@
                             "required": false
                         },
                         {
-                            "key": "status",
+                            "key": "gemcrm_status",
                             "label": "Status",
-                            "type": "expression",
+                            "type": "select",
                             "required": false,
-                            "placeholder": "e.g. active"
+                            "options": [
+                                {
+                                    "value": "draft",
+                                    "label": "Draft"
+                                },
+                                {
+                                    "value": "pending",
+                                    "label": "Pending"
+                                },
+                                {
+                                    "value": "subscribed",
+                                    "label": "Subscribed"
+                                },
+                                {
+                                    "value": "unsubscribed",
+                                    "label": "Unsubscribed"
+                                },
+                                {
+                                    "value": "spamed",
+                                    "label": "Spamed"
+                                },
+                                {
+                                    "value": "bounced",
+                                    "label": "Bounced"
+                                },
+                                {
+                                    "value": "complained",
+                                    "label": "Complained"
+                                },
+                                {
+                                    "value": "transactional",
+                                    "label": "Transactional"
+                                }
+                            ]
                         },
                         {
                             "key": "type",
                             "label": "Type",
-                            "type": "expression",
+                            "type": "select",
                             "required": false,
-                            "placeholder": "e.g. customer"
+                            "options": [
+                                {
+                                    "value": "lead",
+                                    "label": "Lead"
+                                },
+                                {
+                                    "value": "customer",
+                                    "label": "Customer"
+                                }
+                            ]
                         },
                         {
                             "key": "linked_id",
@@ -15654,22 +16679,32 @@
                             "required": false
                         },
                         {
-                            "key": "company_ids",
-                            "label": "Company IDs (comma-separated)",
-                            "type": "expression",
-                            "required": false
-                        },
-                        {
                             "key": "tag_ids",
-                            "label": "Tag IDs (comma-separated)",
-                            "type": "expression",
-                            "required": false
+                            "label": "Tags",
+                            "type": "multi-select",
+                            "required": false,
+                            "dynamic": {
+                                "integration": "gemcrm",
+                                "query": "gemcrm_tag_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
                         },
                         {
                             "key": "list_ids",
-                            "label": "List IDs (comma-separated)",
-                            "type": "expression",
-                            "required": false
+                            "label": "Lists",
+                            "type": "multi-select",
+                            "required": false,
+                            "dynamic": {
+                                "integration": "gemcrm",
+                                "query": "gemcrm_list_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
                         },
                         {
                             "key": "addr_line_1",
@@ -15718,9 +16753,17 @@
                     "schema": [
                         {
                             "key": "contact_id",
-                            "label": "Contact ID",
-                            "type": "expression",
-                            "required": true
+                            "label": "Contact",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "gemcrm",
+                                "query": "gemcrm_contact_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
                         }
                     ],
                     "outputs": [
@@ -15733,9 +16776,17 @@
                     "schema": [
                         {
                             "key": "contact_id",
-                            "label": "Contact ID",
-                            "type": "expression",
-                            "required": true
+                            "label": "Contact",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "gemcrm",
+                                "query": "gemcrm_contact_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
                         },
                         {
                             "key": "tag_id",
@@ -15762,9 +16813,17 @@
                     "schema": [
                         {
                             "key": "contact_id",
-                            "label": "Contact ID",
-                            "type": "expression",
-                            "required": true
+                            "label": "Contact",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "gemcrm",
+                                "query": "gemcrm_contact_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
                         },
                         {
                             "key": "list_id",
@@ -15791,9 +16850,17 @@
                     "schema": [
                         {
                             "key": "contact_id",
-                            "label": "Contact ID",
-                            "type": "expression",
-                            "required": true
+                            "label": "Contact",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "gemcrm",
+                                "query": "gemcrm_contact_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
                         },
                         {
                             "key": "tag_id",
@@ -15820,9 +16887,17 @@
                     "schema": [
                         {
                             "key": "contact_id",
-                            "label": "Contact ID",
-                            "type": "expression",
-                            "required": true
+                            "label": "Contact",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "gemcrm",
+                                "query": "gemcrm_contact_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
                         },
                         {
                             "key": "list_id",
@@ -16063,6 +17138,611 @@
                 }
             },
             "actions": []
+        },
+        "wpfunnels": {
+            "slug": "wpfunnels",
+            "name": "WPFunnels",
+            "icon": "wpfunnels.svg",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": {
+                "loaded": {
+                    "key": "loaded",
+                    "label": "WPFunnels Loaded",
+                    "hook": "wpfunnels/loaded",
+                    "schema": [],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "init": {
+                    "key": "init",
+                    "label": "WPFunnels Initialized",
+                    "hook": "wpfunnels/init",
+                    "schema": [],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "pro_init": {
+                    "key": "pro_init",
+                    "label": "WPFunnels Pro Initialized",
+                    "hook": "wpfunnels/pro_init",
+                    "schema": [],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "import_complete": {
+                    "key": "import_complete",
+                    "label": "Import Complete",
+                    "hook": "wpfunnels/wpfnl_import_complete",
+                    "schema": [],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "after_funnel_creation": {
+                    "key": "after_funnel_creation",
+                    "label": "After Funnel Creation",
+                    "hook": "wpfunnels_after_funnel_creation",
+                    "schema": [
+                        {
+                            "key": "funnel_id",
+                            "label": "Funnel",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wpfunnels",
+                                "query": "funnels",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "after_step_creation": {
+                    "key": "after_step_creation",
+                    "label": "After Step Creation",
+                    "hook": "wpfunnels_after_step_creation",
+                    "schema": [],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "after_step_duplicate": {
+                    "key": "after_step_duplicate",
+                    "label": "After Step Duplicate",
+                    "hook": "wpfunnels/after_step_duplicate",
+                    "schema": [
+                        {
+                            "key": "step_id",
+                            "label": "Step",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wpfunnels",
+                                "query": "steps",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "funnel_journey_starts": {
+                    "key": "funnel_journey_starts",
+                    "label": "Funnel Journey Starts",
+                    "hook": "wpfunnels/funnel_journey_starts",
+                    "schema": [
+                        {
+                            "key": "step_id",
+                            "label": "Step",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wpfunnels",
+                                "query": "steps",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "funnel_journey_end": {
+                    "key": "funnel_journey_end",
+                    "label": "Funnel Journey Ends",
+                    "hook": "wpfunnels/funnel_journey_end",
+                    "schema": [
+                        {
+                            "key": "step_id",
+                            "label": "Step",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wpfunnels",
+                                "query": "steps",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "funnel_order_placed": {
+                    "key": "funnel_order_placed",
+                    "label": "Funnel Order Placed",
+                    "hook": "wpfunnels/funnel_order_placed",
+                    "schema": [
+                        {
+                            "key": "step_id",
+                            "label": "Step",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wpfunnels",
+                                "query": "steps",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "order_bump_accepted": {
+                    "key": "order_bump_accepted",
+                    "label": "Order Bump Accepted",
+                    "hook": "wpfunnels/order_bump_accepted",
+                    "schema": [
+                        {
+                            "key": "step_id",
+                            "label": "Step",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wpfunnels",
+                                "query": "steps",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "order_bump_rejected": {
+                    "key": "order_bump_rejected",
+                    "label": "Order Bump Rejected",
+                    "hook": "wpfunnels/order_bump_rejected",
+                    "schema": [
+                        {
+                            "key": "step_id",
+                            "label": "Step",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wpfunnels",
+                                "query": "steps",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "offer_accepted": {
+                    "key": "offer_accepted",
+                    "label": "Offer Accepted",
+                    "hook": "wpfunnels/offer_accepted",
+                    "schema": [
+                        {
+                            "key": "step_id",
+                            "label": "Step",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wpfunnels",
+                                "query": "steps",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "offer_rejected": {
+                    "key": "offer_rejected",
+                    "label": "Offer Rejected",
+                    "hook": "wpfunnels/offer_rejected",
+                    "schema": [
+                        {
+                            "key": "step_id",
+                            "label": "Step",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wpfunnels",
+                                "query": "steps",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "child_order_created": {
+                    "key": "child_order_created",
+                    "label": "Child Order Created",
+                    "hook": "wpfunnels/child_order_created",
+                    "schema": [],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "subscription_created": {
+                    "key": "subscription_created",
+                    "label": "Subscription Created",
+                    "hook": "wpfunnels/subscription_created",
+                    "schema": [
+                        {
+                            "key": "step_id",
+                            "label": "Step",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wpfunnels",
+                                "query": "steps",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "setup_wizard_complete": {
+                    "key": "setup_wizard_complete",
+                    "label": "Setup Wizard Completed",
+                    "hook": "wpfunnels_setup_wizard_complete",
+                    "schema": [
+                        {
+                            "key": "funnel_id",
+                            "label": "Funnel",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wpfunnels",
+                                "query": "funnels",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "template_body_top": {
+                    "key": "template_body_top",
+                    "label": "Template Body Top",
+                    "hook": "wpfunnels/template_body_top",
+                    "schema": [],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "template_container_top": {
+                    "key": "template_container_top",
+                    "label": "Template Container Top",
+                    "hook": "wpfunnels/template_container_top",
+                    "schema": [],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "template_container_bottom": {
+                    "key": "template_container_bottom",
+                    "label": "Template Container Bottom",
+                    "hook": "wpfunnels/template_container_bottom",
+                    "schema": [],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "template_wp_footer": {
+                    "key": "template_wp_footer",
+                    "label": "Template Footer",
+                    "hook": "wpfunnels/template_wp_footer",
+                    "schema": [],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                }
+            },
+            "actions": {
+                "get_funnel_single": {
+                    "key": "get_funnel_single",
+                    "label": "Get Funnel (Single)",
+                    "schema": [
+                        {
+                            "key": "funnel_id",
+                            "label": "Funnel",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wpfunnels",
+                                "query": "funnels",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "get_step_single": {
+                    "key": "get_step_single",
+                    "label": "Get Step (Single)",
+                    "schema": [
+                        {
+                            "key": "step_id",
+                            "label": "Step",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wpfunnels",
+                                "query": "steps",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "get_next_step": {
+                    "key": "get_next_step",
+                    "label": "Get Next Step",
+                    "schema": [
+                        {
+                            "key": "step_id",
+                            "label": "Step",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wpfunnels",
+                                "query": "steps",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "add_action": {
+                    "key": "add_action",
+                    "label": "Add Action",
+                    "schema": [
+                        {
+                            "key": "hook_name",
+                            "label": "Hook Name",
+                            "type": "text",
+                            "placeholder": "wpfunnels/custom_hook",
+                            "required": true
+                        },
+                        {
+                            "key": "accepted_args",
+                            "label": "Accepted Args",
+                            "type": "number",
+                            "placeholder": "1"
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "do_action": {
+                    "key": "do_action",
+                    "label": "Do Action",
+                    "schema": [
+                        {
+                            "key": "hook_name",
+                            "label": "Hook Name",
+                            "type": "text",
+                            "placeholder": "wpfunnels/custom_hook",
+                            "required": true
+                        },
+                        {
+                            "key": "arg_1",
+                            "label": "Argument 1",
+                            "type": "text"
+                        },
+                        {
+                            "key": "arg_2",
+                            "label": "Argument 2",
+                            "type": "text"
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "add_filter": {
+                    "key": "add_filter",
+                    "label": "Add Filter",
+                    "schema": [
+                        {
+                            "key": "hook_name",
+                            "label": "Hook Name",
+                            "type": "text",
+                            "placeholder": "wpfunnels/custom_hook",
+                            "required": true
+                        },
+                        {
+                            "key": "accepted_args",
+                            "label": "Accepted Args",
+                            "type": "number",
+                            "placeholder": "1"
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "apply_filters": {
+                    "key": "apply_filters",
+                    "label": "Apply Filters",
+                    "schema": [
+                        {
+                            "key": "hook_name",
+                            "label": "Hook Name",
+                            "type": "text",
+                            "placeholder": "wpfunnels/custom_hook",
+                            "required": true
+                        },
+                        {
+                            "key": "value",
+                            "label": "Value",
+                            "type": "text"
+                        },
+                        {
+                            "key": "arg_1",
+                            "label": "Argument 1",
+                            "type": "text"
+                        },
+                        {
+                            "key": "arg_2",
+                            "label": "Argument 2",
+                            "type": "text"
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "remove_action": {
+                    "key": "remove_action",
+                    "label": "Remove Action",
+                    "schema": [
+                        {
+                            "key": "hook_name",
+                            "label": "Hook Name",
+                            "type": "text",
+                            "placeholder": "wpfunnels/custom_hook",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "has_action": {
+                    "key": "has_action",
+                    "label": "Has Action",
+                    "schema": [
+                        {
+                            "key": "hook_name",
+                            "label": "Hook Name",
+                            "type": "text",
+                            "placeholder": "wpfunnels/custom_hook",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "current_filter": {
+                    "key": "current_filter",
+                    "label": "Current Filter",
+                    "schema": [
+                        {
+                            "key": "hook_name",
+                            "label": "Hook Name",
+                            "type": "text",
+                            "placeholder": "wpfunnels/custom_hook",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                }
+            }
         },
         "metabox": {
             "slug": "metabox",
@@ -16436,6 +18116,849 @@
                 }
             },
             "actions": []
+        },
+        "buddyboss": {
+            "slug": "buddyboss",
+            "name": "BuddyBoss",
+            "icon": "buddyboss.svg",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": {
+                "account_activated": {
+                    "key": "account_activated",
+                    "label": "Account Activated",
+                    "hook": "bp_core_activated_user",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "follower_gained": {
+                    "key": "follower_gained",
+                    "label": "New Follower Gained",
+                    "hook": "bp_start_following",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "sent_friend_request": {
+                    "key": "sent_friend_request",
+                    "label": "Sent Friend Request",
+                    "hook": "friends_friendship_requested",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "accepted_friend_request": {
+                    "key": "accepted_friend_request",
+                    "label": "Accepted Friend Request",
+                    "hook": "friends_friendship_accepted",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_groups": {
+                    "key": "create_groups",
+                    "label": "Create Group",
+                    "hook": "groups_group_create_complete",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "access_requested_private_group": {
+                    "key": "access_requested_private_group",
+                    "label": "Access Requested Private Group",
+                    "hook": "groups_membership_requested",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "joined_public_group": {
+                    "key": "joined_public_group",
+                    "label": "Joined Public Group",
+                    "hook": "groups_join_group",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "joined_private_group": {
+                    "key": "joined_private_group",
+                    "label": "Joined Private Group",
+                    "hook": "groups_membership_accepted",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "joined_specific_group": {
+                    "key": "joined_specific_group",
+                    "label": "Joined Specific Group",
+                    "hook": "groups_join_group",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "left_group": {
+                    "key": "left_group",
+                    "label": "Left Group",
+                    "hook": "groups_leave_group",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "left_private_group": {
+                    "key": "left_private_group",
+                    "label": "Left Private Group",
+                    "hook": "groups_leave_group",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "received_private_message": {
+                    "key": "received_private_message",
+                    "label": "Received Private Message",
+                    "hook": "messages_message_sent",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "profile_type_change": {
+                    "key": "profile_type_change",
+                    "label": "Profile Type Change",
+                    "hook": "bp_set_member_type",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "updated_profile": {
+                    "key": "updated_profile",
+                    "label": "Updated Profile",
+                    "hook": "xprofile_updated_profile",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": {
+                "create_activity_post": {
+                    "key": "create_activity_post",
+                    "label": "Create Activity Post",
+                    "schema": [
+                        {
+                            "key": "author_email",
+                            "label": "Author Email",
+                            "type": "email",
+                            "required": true
+                        },
+                        {
+                            "key": "content",
+                            "label": "Activity Content",
+                            "type": "textarea",
+                            "required": true
+                        },
+                        {
+                            "key": "action",
+                            "label": "Activity Action",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "action_link",
+                            "label": "Activity Action Link",
+                            "type": "url",
+                            "required": false
+                        },
+                        {
+                            "key": "hide_sitewide",
+                            "label": "Hide Sitewide",
+                            "type": "checkbox",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_group_post": {
+                    "key": "create_group_post",
+                    "label": "Create Group Post",
+                    "schema": [
+                        {
+                            "key": "group_id",
+                            "label": "Select Group",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "buddyboss",
+                                "query": "group_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "author_email",
+                            "label": "Author Email",
+                            "type": "email",
+                            "required": true
+                        },
+                        {
+                            "key": "content",
+                            "label": "Activity Content",
+                            "type": "textarea",
+                            "required": true
+                        },
+                        {
+                            "key": "action",
+                            "label": "Activity Action",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "action_link",
+                            "label": "Activity Action Link",
+                            "type": "url",
+                            "required": false
+                        },
+                        {
+                            "key": "hide_sitewide",
+                            "label": "Hide Sitewide",
+                            "type": "checkbox",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_user_activity_post": {
+                    "key": "create_user_activity_post",
+                    "label": "Create User Activity Post",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User Activity ID",
+                            "type": "number",
+                            "required": true
+                        },
+                        {
+                            "key": "author_email",
+                            "label": "Author Email",
+                            "type": "email",
+                            "required": true
+                        },
+                        {
+                            "key": "content",
+                            "label": "Activity Content",
+                            "type": "textarea",
+                            "required": true
+                        },
+                        {
+                            "key": "action",
+                            "label": "Activity Action",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "action_link",
+                            "label": "Activity Action Link",
+                            "type": "url",
+                            "required": false
+                        },
+                        {
+                            "key": "hide_sitewide",
+                            "label": "Hide Sitewide",
+                            "type": "checkbox",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add_user_to_group": {
+                    "key": "add_user_to_group",
+                    "label": "Add User To Group",
+                    "schema": [
+                        {
+                            "key": "user_email",
+                            "label": "User Email",
+                            "type": "email",
+                            "required": true
+                        },
+                        {
+                            "key": "group_id",
+                            "label": "Select Group",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "buddyboss",
+                                "query": "group_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_member_profile_type": {
+                    "key": "update_member_profile_type",
+                    "label": "Update Member Profile Type",
+                    "schema": [
+                        {
+                            "key": "user_email",
+                            "label": "User Email",
+                            "type": "email",
+                            "required": true
+                        },
+                        {
+                            "key": "profile_type",
+                            "label": "Profile Type",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "buddyboss",
+                                "query": "member_types_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_group": {
+                    "key": "create_group",
+                    "label": "Create Group",
+                    "schema": [
+                        {
+                            "key": "group_name",
+                            "label": "Group Name",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "group_status",
+                            "label": "Group Privacy Status",
+                            "type": "select",
+                            "required": true,
+                            "options": [
+                                {
+                                    "value": "public",
+                                    "label": "Public"
+                                },
+                                {
+                                    "value": "private",
+                                    "label": "Private"
+                                },
+                                {
+                                    "value": "hidden",
+                                    "label": "Hidden"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "creator_email",
+                            "label": "Creator Email",
+                            "type": "email",
+                            "required": true
+                        },
+                        {
+                            "key": "group_type",
+                            "label": "Group Type",
+                            "type": "select",
+                            "required": false,
+                            "dynamic": {
+                                "integration": "buddyboss",
+                                "query": "group_types_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "remove_friend_connection": {
+                    "key": "remove_friend_connection",
+                    "label": "Remove Friend Connection",
+                    "schema": [
+                        {
+                            "key": "user_email",
+                            "label": "User Email",
+                            "type": "email",
+                            "required": true
+                        },
+                        {
+                            "key": "friend_email",
+                            "label": "Friend Email",
+                            "type": "email",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "follow_user": {
+                    "key": "follow_user",
+                    "label": "Follow User",
+                    "schema": [
+                        {
+                            "key": "follower_email",
+                            "label": "Follower Email",
+                            "type": "email",
+                            "required": true
+                        },
+                        {
+                            "key": "leader_email",
+                            "label": "Leader Email",
+                            "type": "email",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_forum_subscribers": {
+                    "key": "get_forum_subscribers",
+                    "label": "Get Forum Subscribers",
+                    "schema": [
+                        {
+                            "key": "forum_id",
+                            "label": "Forum ID",
+                            "type": "number",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_forum_topic_reply": {
+                    "key": "create_forum_topic_reply",
+                    "label": "Create Forum Topic Reply",
+                    "schema": [
+                        {
+                            "key": "forum_id",
+                            "label": "Select Forum",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "buddyboss",
+                                "query": "forums_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "topic_id",
+                            "label": "Topic ID",
+                            "type": "number",
+                            "required": true
+                        },
+                        {
+                            "key": "reply_title",
+                            "label": "Reply Title",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "reply_content",
+                            "label": "Reply Content",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "author_email",
+                            "label": "Author Email",
+                            "type": "email",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_forum_topic": {
+                    "key": "create_forum_topic",
+                    "label": "Create Forum Topic",
+                    "schema": [
+                        {
+                            "key": "forum_id",
+                            "label": "Select Forum",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "buddyboss",
+                                "query": "forums_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "topic_title",
+                            "label": "Topic Title",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "topic_content",
+                            "label": "Topic Content",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "creator_email",
+                            "label": "Creator Email",
+                            "type": "email",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "remove_user_from_group": {
+                    "key": "remove_user_from_group",
+                    "label": "Remove User From Group",
+                    "schema": [
+                        {
+                            "key": "user_email",
+                            "label": "User Email",
+                            "type": "email",
+                            "required": true
+                        },
+                        {
+                            "key": "group_id",
+                            "label": "Select Group",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "buddyboss",
+                                "query": "group_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "send_friend_request": {
+                    "key": "send_friend_request",
+                    "label": "Send Friend Request",
+                    "schema": [
+                        {
+                            "key": "sender_email",
+                            "label": "Sender Email",
+                            "type": "email",
+                            "required": true
+                        },
+                        {
+                            "key": "receiver_email",
+                            "label": "Receiver Email",
+                            "type": "email",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "send_group_message": {
+                    "key": "send_group_message",
+                    "label": "Send Group Message",
+                    "schema": [
+                        {
+                            "key": "group_id",
+                            "label": "Select Group",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "buddyboss",
+                                "query": "group_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "sender_email",
+                            "label": "Sender Email",
+                            "type": "email",
+                            "required": true
+                        },
+                        {
+                            "key": "message_subject",
+                            "label": "Message Subject",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "message_content",
+                            "label": "Message Content",
+                            "type": "textarea",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "send_private_message": {
+                    "key": "send_private_message",
+                    "label": "Send Private Message",
+                    "schema": [
+                        {
+                            "key": "sender_email",
+                            "label": "Sender Email",
+                            "type": "email",
+                            "required": true
+                        },
+                        {
+                            "key": "receiver_email",
+                            "label": "Receiver Email",
+                            "type": "email",
+                            "required": true
+                        },
+                        {
+                            "key": "message_subject",
+                            "label": "Message Subject",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "message_content",
+                            "label": "Message Content",
+                            "type": "textarea",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "send_group_notification": {
+                    "key": "send_group_notification",
+                    "label": "Send Group Notification",
+                    "schema": [
+                        {
+                            "key": "group_id",
+                            "label": "Select Group",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "buddyboss",
+                                "query": "group_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "sender_email",
+                            "label": "Sender Email",
+                            "type": "email",
+                            "required": true
+                        },
+                        {
+                            "key": "notification_content",
+                            "label": "Notification Content",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "notification_link",
+                            "label": "Notification Link",
+                            "type": "url",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_extended_profile": {
+                    "key": "update_extended_profile",
+                    "label": "Update Extended Profile",
+                    "schema": [
+                        {
+                            "key": "user_email",
+                            "label": "User Email",
+                            "type": "email",
+                            "required": true
+                        },
+                        {
+                            "key": "first_name",
+                            "label": "First Name",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "last_name",
+                            "label": "Last Name",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "nick_name",
+                            "label": "Nickname",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "paragraph",
+                            "label": "Paragraph Text",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "number",
+                            "label": "Number",
+                            "type": "number",
+                            "required": false
+                        },
+                        {
+                            "key": "checkbox",
+                            "label": "Checkbox",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "drop_down",
+                            "label": "Drop Down",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "radio_buttons",
+                            "label": "Radio Buttons",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_user_status": {
+                    "key": "update_user_status",
+                    "label": "Update User Status",
+                    "schema": [
+                        {
+                            "key": "user_email",
+                            "label": "User Email",
+                            "type": "email",
+                            "required": true
+                        },
+                        {
+                            "key": "status",
+                            "label": "Status",
+                            "type": "select",
+                            "required": true,
+                            "options": [
+                                {
+                                    "value": "suspend",
+                                    "label": "Suspend"
+                                },
+                                {
+                                    "value": "unsuspend",
+                                    "label": "Unsuspend"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "stop_following_user": {
+                    "key": "stop_following_user",
+                    "label": "Stop Following User",
+                    "schema": [
+                        {
+                            "key": "follower_email",
+                            "label": "Follower Email",
+                            "type": "email",
+                            "required": true
+                        },
+                        {
+                            "key": "leader_email",
+                            "label": "Leader Email",
+                            "type": "email",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "subscribe_to_forum": {
+                    "key": "subscribe_to_forum",
+                    "label": "Subscribe To Forum",
+                    "schema": [
+                        {
+                            "key": "user_email",
+                            "label": "User Email",
+                            "type": "email",
+                            "required": true
+                        },
+                        {
+                            "key": "forum_id",
+                            "label": "Select Forum",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "buddyboss",
+                                "query": "forums_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
         },
         "ultimatemember": {
             "slug": "ultimatemember",
@@ -18526,6 +21049,157 @@
                     ]
                 }
             }
+        },
+        "gamipress": {
+            "slug": "gamipress",
+            "name": "GamiPress",
+            "icon": "gamipress.svg",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": {
+                "user_earns_rank": {
+                    "key": "user_earns_rank",
+                    "label": "User Earns Rank",
+                    "hook": "gamipress_update_user_rank",
+                    "schema": [
+                        {
+                            "key": "rank_type",
+                            "label": "Rank Type",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "gamipress",
+                                "query": "rank_type_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "rank_id",
+                            "label": "Rank",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "gamipress",
+                                "query": "rank_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ],
+                                "depends_on": [
+                                    "rank_type"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "user_earns_points": {
+                    "key": "user_earns_points",
+                    "label": "User Earns Points",
+                    "hook": "gamipress_update_user_points",
+                    "schema": [
+                        {
+                            "key": "achievement_type",
+                            "label": "Achievement Type",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "gamipress",
+                                "query": "achievement_type_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "user_earns_specific_achievement_type": {
+                    "key": "user_earns_specific_achievement_type",
+                    "label": "User Earns Specific Achievement Type",
+                    "hook": "gamipress_award_achievement",
+                    "schema": [
+                        {
+                            "key": "achievement_type",
+                            "label": "Achievement Type",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "gamipress",
+                                "query": "achievement_type_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "user_gains_achievement": {
+                    "key": "user_gains_achievement",
+                    "label": "User Gains Achievement",
+                    "hook": "gamipress_award_achievement",
+                    "schema": [
+                        {
+                            "key": "achievement_type",
+                            "label": "Achievement Type",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "gamipress",
+                                "query": "achievement_type_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "achievement_id",
+                            "label": "Achievement",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "gamipress",
+                                "query": "achievement_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ],
+                                "depends_on": [
+                                    "achievement_type"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "user_achievement_revoked": {
+                    "key": "user_achievement_revoked",
+                    "label": "User Achievement Was Revoked",
+                    "hook": "gamipress_revoke_achievement_to_user",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": []
         }
     },
     "tools": {

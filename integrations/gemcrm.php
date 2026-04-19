@@ -22,10 +22,6 @@ class Gemcrm extends IntegrationBase {
 		return 'crm.svg';
 	}
 
-	// -------------------------------------------------------------------------
-	// Triggers
-	// -------------------------------------------------------------------------
-
 	public static function get_triggers(): array {
 		return [
 			'contact_created' => [
@@ -51,12 +47,6 @@ class Gemcrm extends IntegrationBase {
 		];
 	}
 
-	/**
-	 * Optional config schema per trigger.
-	 *
-	 * Tag and list triggers let the user optionally scope them to a specific
-	 * tag/list ID. Leaving the field empty means "fire for any tag/list".
-	 */
 	public static function get_trigger_config_schema( string $trigger ): array {
 		switch ( $trigger ) {
 			case 'contact_tag_attached':
@@ -96,10 +86,6 @@ class Gemcrm extends IntegrationBase {
 
 		return [];
 	}
-
-	// -------------------------------------------------------------------------
-	// Trigger resolver
-	// -------------------------------------------------------------------------
 
 	public static function resolve_trigger( array $node, array $args ) {
 		$event = $node['event'] ?? '';
@@ -180,10 +166,6 @@ class Gemcrm extends IntegrationBase {
 		return false;
 	}
 
-	// -------------------------------------------------------------------------
-	// Actions
-	// -------------------------------------------------------------------------
-
 	public static function get_actions(): array {
 		return [
 			'create_contact'   => [ 'label' => 'Create Contact' ],
@@ -199,40 +181,21 @@ class Gemcrm extends IntegrationBase {
 	public static function get_action_config_schema( string $action ): array {
 		switch ( $action ) {
 			case 'create_contact':
-				return self::contact_fields( true );
+				return self::contact_fields();
 
 			case 'update_contact':
 				return array_merge(
-					[
-						[
-							'key'      => 'contact_id',
-							'label'    => 'Contact ID',
-							'type'     => 'expression',
-							'required' => true,
-						],
-					],
-					self::contact_fields( false )
+					[ self::contact_id_field( true ) ],
+					self::contact_fields()
 				);
 
 			case 'delete_contact':
-				return [
-					[
-						'key'      => 'contact_id',
-						'label'    => 'Contact ID',
-						'type'     => 'expression',
-						'required' => true,
-					],
-				];
+				return [ self::contact_id_field( true ) ];
 
 			case 'apply_tag':
 			case 'remove_from_tag':
 				return [
-					[
-						'key'      => 'contact_id',
-						'label'    => 'Contact ID',
-						'type'     => 'expression',
-						'required' => true,
-					],
+					self::contact_id_field( true ),
 					[
 						'key'      => 'tag_id',
 						'label'    => 'Tag',
@@ -249,12 +212,7 @@ class Gemcrm extends IntegrationBase {
 			case 'apply_list':
 			case 'remove_from_list':
 				return [
-					[
-						'key'      => 'contact_id',
-						'label'    => 'Contact ID',
-						'type'     => 'expression',
-						'required' => true,
-					],
+					self::contact_id_field( true ),
 					[
 						'key'      => 'list_id',
 						'label'    => 'List',
@@ -272,15 +230,41 @@ class Gemcrm extends IntegrationBase {
 		return [];
 	}
 
-	// -------------------------------------------------------------------------
-	// Dynamic queries
-	// -------------------------------------------------------------------------
-
 	public static function get_dynamic_queries(): array {
 		return [
-			'gemcrm_tag_query'  => [ self::class, 'query_tags' ],
-			'gemcrm_list_query' => [ self::class, 'query_lists' ],
+			'gemcrm_contact_query' => [ self::class, 'query_contacts' ],
+			'gemcrm_tag_query'     => [ self::class, 'query_tags' ],
+			'gemcrm_list_query'    => [ self::class, 'query_lists' ],
 		];
+	}
+
+	public static function query_contacts( $q = null ): array {
+		if ( ! class_exists( \GemCrm\Database\Models\Contact::class ) ) {
+			return [];
+		}
+
+		$data = [];
+		if( ! empty( $q['search'] ?? false ) )
+			$data['search'] = $q['search'];
+		$items  = \GemCrm\Database\Models\Contact::index( $data, null );
+		$result = [];
+
+		foreach ( (array) $items['records'] as $item ) {
+			$id    = $item['id'] ?? null ;
+			$first = $item['first_name'] ?? '' ;
+			$last  = $item['last_name'] ?? '' ;
+			$email = $item['email'] ?? '' ;
+
+			if ( ! $id ) {
+				continue;
+			}
+
+			$name     = trim( "{$first} {$last}" );
+			$label    = $name !== '' ? "{$name} ({$email})" : $email;
+			$result[] = [ 'value' => $id, 'label' => $label ];
+		}
+
+		return $result;
 	}
 
 	public static function query_tags( $q = null ): array {
@@ -288,12 +272,16 @@ class Gemcrm extends IntegrationBase {
 			return [];
 		}
 
-		$items = \GemCrm\Database\Models\Tag::index( [], null, true );
+		$data = [];
+		if( ! empty( $q['search'] ?? false ) )
+			$data['search'] = $q['search'];
+
+		$items = \GemCrm\Database\Models\Tag::index( $data, null, true );
 		$result = [];
 
 		foreach ( (array) $items as $item ) {
-			$id    = is_object( $item ) ? ( $item->id ?? null ) : ( $item['id'] ?? null );
-			$name  = is_object( $item ) ? ( $item->name ?? '' ) : ( $item['name'] ?? '' );
+			$id    = $item['id'] ?? null ;
+			$name  = $item['title'] ?? '' ;
 
 			if ( $id ) {
 				$result[] = [ 'value' => $id, 'label' => $name ];
@@ -308,12 +296,16 @@ class Gemcrm extends IntegrationBase {
 			return [];
 		}
 
-		$items = \GemCrm\Database\Models\ListModel::index( [], null, true );
+		$data = [];
+		if( ! empty( $q['search'] ?? false ) )
+			$data['search'] = $q['search'];
+
+		$items = \GemCrm\Database\Models\ListModel::index( $data, null, true );
 		$result = [];
 
 		foreach ( (array) $items as $item ) {
-			$id   = is_object( $item ) ? ( $item->id ?? null ) : ( $item['id'] ?? null );
-			$name = is_object( $item ) ? ( $item->name ?? '' ) : ( $item['name'] ?? '' );
+			$id   = $item['id'] ?? null ;
+			$name = $item['title'] ?? '' ;
 
 			if ( $id ) {
 				$result[] = [ 'value' => $id, 'label' => $name ];
@@ -322,10 +314,6 @@ class Gemcrm extends IntegrationBase {
 
 		return $result;
 	}
-
-	// -------------------------------------------------------------------------
-	// Node executor
-	// -------------------------------------------------------------------------
 
 	public static function execute_node( array $node, array $input ): array {
 		$event  = $node['data']['event'] ?? '';
@@ -342,17 +330,27 @@ class Gemcrm extends IntegrationBase {
 		];
 	}
 
-	// -------------------------------------------------------------------------
-	// Schema helpers
-	// -------------------------------------------------------------------------
+	private static function contact_id_field( bool $required = false ): array {
+		return [
+			'key'      => 'contact_id',
+			'label'    => 'Contact',
+			'type'     => 'select',
+			'required' => $required,
+			'dynamic'  => [
+				'integration' => 'gemcrm',
+				'query'       => 'gemcrm_contact_query',
+				'select'      => [ 'value', 'label' ],
+			],
+		];
+	}
 
-	private static function contact_fields( bool $required = false ): array {
+	private static function contact_fields(): array {
 		return [
 			[
 				'key'      => 'first_name',
 				'label'    => 'First Name',
 				'type'     => 'expression',
-				'required' => $required,
+				'required' => true,
 			],
 			[
 				'key'      => 'last_name',
@@ -361,10 +359,11 @@ class Gemcrm extends IntegrationBase {
 				'required' => false,
 			],
 			[
-				'key'      => 'email',
-				'label'    => 'Email',
-				'type'     => 'expression',
-				'required' => $required,
+				'key'     => 'email',
+				'label'   => 'Email',
+				'type'    => 'expression',
+				'subtype' => 'email',
+				'required' => true,
 			],
 			[
 				'key'      => 'phone',
@@ -373,18 +372,21 @@ class Gemcrm extends IntegrationBase {
 				'required' => false,
 			],
 			[
-				'key'         => 'status',
-				'label'       => 'Status',
-				'type'        => 'expression',
-				'required'    => false,
-				'placeholder' => 'e.g. active',
+				'key'      => 'gemcrm_status',
+				'label'    => 'Status',
+				'type'     => 'select',
+				'required' => false,
+				'options'  => self::get_contact_statuses(),
 			],
 			[
-				'key'         => 'type',
-				'label'       => 'Type',
-				'type'        => 'expression',
-				'required'    => false,
-				'placeholder' => 'e.g. customer',
+				'key'      => 'type',
+				'label'    => 'Type',
+				'type'     => 'select',
+				'required' => false,
+				'options'  => [
+					[ 'value' => 'lead',     'label' => 'Lead' ],
+					[ 'value' => 'customer', 'label' => 'Customer' ],
+				],
 			],
 			[
 				'key'      => 'linked_id',
@@ -399,22 +401,26 @@ class Gemcrm extends IntegrationBase {
 				'required' => false,
 			],
 			[
-				'key'      => 'company_ids',
-				'label'    => 'Company IDs (comma-separated)',
-				'type'     => 'expression',
-				'required' => false,
-			],
-			[
 				'key'      => 'tag_ids',
-				'label'    => 'Tag IDs (comma-separated)',
-				'type'     => 'expression',
+				'label'    => 'Tags',
+				'type'     => 'multi-select',
 				'required' => false,
+				'dynamic'  => [
+					'integration' => 'gemcrm',
+					'query'       => 'gemcrm_tag_query',
+					'select'      => [ 'value', 'label' ],
+				],
 			],
 			[
 				'key'      => 'list_ids',
-				'label'    => 'List IDs (comma-separated)',
-				'type'     => 'expression',
+				'label'    => 'Lists',
+				'type'     => 'multi-select',
 				'required' => false,
+				'dynamic'  => [
+					'integration' => 'gemcrm',
+					'query'       => 'gemcrm_list_query',
+					'select'      => [ 'value', 'label' ],
+				],
 			],
 			[
 				'key'      => 'addr_line_1',
@@ -455,9 +461,18 @@ class Gemcrm extends IntegrationBase {
 		];
 	}
 
-	// -------------------------------------------------------------------------
-	// Response helpers
-	// -------------------------------------------------------------------------
+	private static function get_contact_statuses(): array {
+		return [
+			[ 'value' => 'draft',         'label' => 'Draft' ],
+			[ 'value' => 'pending',       'label' => 'Pending' ],
+			[ 'value' => 'subscribed',    'label' => 'Subscribed' ],
+			[ 'value' => 'unsubscribed',  'label' => 'Unsubscribed' ],
+			[ 'value' => 'spamed',        'label' => 'Spamed' ],
+			[ 'value' => 'bounced',       'label' => 'Bounced' ],
+			[ 'value' => 'complained',    'label' => 'Complained' ],
+			[ 'value' => 'transactional', 'label' => 'Transactional' ],
+		];
+	}
 
 	private static function action_error( string $message, array $input ): array {
 		return [
@@ -473,17 +488,18 @@ class Gemcrm extends IntegrationBase {
 		];
 	}
 
-	// -------------------------------------------------------------------------
-	// Contact data builder
-	// -------------------------------------------------------------------------
-
 	private static function build_contact_data( array $config ): array {
 		$data = [];
 
-		foreach ( [ 'status', 'type', 'first_name', 'last_name', 'phone', 'email' ] as $field ) {
+		foreach ( [ 'type', 'first_name', 'last_name', 'phone', 'email' ] as $field ) {
 			if ( isset( $config[ $field ] ) && '' !== $config[ $field ] ) {
 				$data[ $field ] = sanitize_text_field( $config[ $field ] );
 			}
+		}
+
+		// 'gemcrm_status' is the schema key (avoids frontend key collision); maps to 'status' for GemCRM.
+		if ( isset( $config['gemcrm_status'] ) && '' !== $config['gemcrm_status'] ) {
+			$data['status'] = sanitize_text_field( $config['gemcrm_status'] );
 		}
 
 		foreach ( [ 'linked_id', 'photo_id' ] as $int_field ) {
@@ -492,12 +508,12 @@ class Gemcrm extends IntegrationBase {
 			}
 		}
 
-		foreach ( [ 'company_ids', 'tag_ids', 'list_ids' ] as $id_field ) {
+		foreach ( [ 'tag_ids', 'list_ids' ] as $id_field ) {
 			if ( ! empty( $config[ $id_field ] ) ) {
+				$raw = $config[ $id_field ];
+				// multi-select sends an array; fallback handles a single value.
 				$data[ $id_field ] = array_values(
-					array_filter(
-						array_map( 'intval', array_map( 'trim', explode( ',', $config[ $id_field ] ) ) )
-					)
+					array_filter( array_map( 'intval', (array) $raw ) )
 				);
 			}
 		}
@@ -515,10 +531,6 @@ class Gemcrm extends IntegrationBase {
 
 		return $data;
 	}
-
-	// -------------------------------------------------------------------------
-	// Action methods
-	// -------------------------------------------------------------------------
 
 	protected static function action_create_contact( array $config, array $input ): array {
 		if ( ! class_exists( \GemCrm\Database\Models\Contact::class ) ) {
