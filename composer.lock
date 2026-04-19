@@ -4,8 +4,140 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6e0ae330b41775a5691619522b06d94d",
-    "packages": [],
+    "content-hash": "0fed10f8e0f2f58bf630a2916d1cb824",
+    "packages": [
+        {
+            "name": "storeengine/wordpress-sdk",
+            "version": "v1.3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/imrantushar/storeengine-sdk-for-wordpress.git",
+                "reference": "4fbdfe0d9580d7d8eaa742581c65873b93cbbde2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/imrantushar/storeengine-sdk-for-wordpress/zipball/4fbdfe0d9580d7d8eaa742581c65873b93cbbde2",
+                "reference": "4fbdfe0d9580d7d8eaa742581c65873b93cbbde2",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.1"
+            },
+            "require-dev": {
+                "dealerdirect/phpcodesniffer-composer-installer": "dev-main",
+                "phpcompatibility/php-compatibility": "10.x-dev",
+                "phpcompatibility/phpcompatibility-wp": "dev-master",
+                "phpstan/extension-installer": "1.4.x-dev",
+                "squizlabs/php_codesniffer": "4.x-dev",
+                "szepeviktor/phpstan-wordpress": "2.x-dev",
+                "wp-coding-standards/wpcs": "dev-develop"
+            },
+            "type": "library",
+            "extra": {
+                "scripts-description": {
+                    "phpcs": "Analyze code against the WordPress coding standards with PHP_CodeSniffer",
+                    "phpcbf": "Fix coding standards warnings/errors automatically with PHP Code Beautifier",
+                    "phpstan": "Analyze code with static analyser"
+                }
+            },
+            "autoload": {
+                "files": [
+                    "init.php"
+                ]
+            },
+            "scripts": {
+                "phpcs": [
+                    "Composer\\Config::disableProcessTimeout",
+                    "phpcs -p -s --colors"
+                ],
+                "phpcs-pre-commit": [
+                    "Composer\\Config::disableProcessTimeout",
+                    "phpcs -s -p -n"
+                ],
+                "phpcbf": [
+                    "Composer\\Config::disableProcessTimeout",
+                    "phpcbf -p"
+                ],
+                "phpcs:ci": [
+                    "Composer\\Config::disableProcessTimeout",
+                    "phpcs --standard=phpcompat.xml -p -s --colors"
+                ],
+                "phpstan": [
+                    "./vendor/bin/phpstan analyse phpstan.neon --memory-limit 2G"
+                ]
+            },
+            "license": [
+                "GPL-3.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "Kodezen Limited",
+                    "email": "support@kodezen.com"
+                }
+            ],
+            "description": "StoreEngine license activation & insights sdk for WordPress plugin & theme.",
+            "homepage": "https://storeengine.pro",
+            "keywords": [
+                "insights",
+                "license",
+                "plugin",
+                "sdk",
+                "storeengine",
+                "theme",
+                "wordpress",
+                "wordpress-plugin",
+                "wordpress-theme"
+            ],
+            "support": {
+                "source": "https://github.com/imrantushar/storeengine-sdk-for-wordpress/tree/v1.3.0",
+                "issues": "https://github.com/imrantushar/storeengine-sdk-for-wordpress/issues"
+            },
+            "time": "2026-03-30T12:19:49+00:00"
+        },
+        {
+            "name": "woocommerce/action-scheduler",
+            "version": "3.9.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/woocommerce/action-scheduler.git",
+                "reference": "c58cdbab17651303d406cd3b22cf9d75c71c986c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/woocommerce/action-scheduler/zipball/c58cdbab17651303d406cd3b22cf9d75c71c986c",
+                "reference": "c58cdbab17651303d406cd3b22cf9d75c71c986c",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.2"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^8.5",
+                "woocommerce/woocommerce-sniffs": "0.1.0",
+                "wp-cli/wp-cli": "~2.5.0",
+                "yoast/phpunit-polyfills": "^2.0"
+            },
+            "type": "wordpress-plugin",
+            "extra": {
+                "scripts-description": {
+                    "test": "Run unit tests",
+                    "phpcs": "Analyze code against the WordPress coding standards with PHP_CodeSniffer",
+                    "phpcbf": "Fix coding standards warnings/errors automatically with PHP Code Beautifier"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-3.0-or-later"
+            ],
+            "description": "Action Scheduler for WordPress and WooCommerce",
+            "homepage": "https://actionscheduler.org/",
+            "support": {
+                "issues": "https://github.com/woocommerce/action-scheduler/issues",
+                "source": "https://github.com/woocommerce/action-scheduler/tree/3.9.3"
+            },
+            "time": "2025-07-15T09:32:30+00:00"
+        }
+    ],
     "packages-dev": [
         {
             "name": "dealerdirect/phpcodesniffer-composer-installer",
@@ -2282,5 +2414,5 @@
     "platform-overrides": {
         "php": "7.4.33"
     },
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.9.0"
 }
