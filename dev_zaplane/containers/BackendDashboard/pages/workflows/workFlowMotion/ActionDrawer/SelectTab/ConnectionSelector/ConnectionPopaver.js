@@ -10,7 +10,7 @@ import { formatLabel } from '@ZAPUtils/helper';
 import ZAPInput from '@ZAPComponents/ZAPInput';
 
 const ConnectionPopaver = (props) => {
-    const { isOpen, onClose, appSlug, onConnected  } = props
+    const { isOpen, onClose, appSlug, onConnected ,selectedIntegration } = props
     const dispatch = useDispatch()
     const { authFields } = useSelector(
         (state) => state.connections || []
@@ -35,6 +35,7 @@ const ConnectionPopaver = (props) => {
                     initOAuth({
                         app: appSlug,
                         name: appSlug,
+                        icon: selectedIntegration?.icon,
                         credentials,
                     })
                 ).unwrap();
@@ -70,6 +71,7 @@ const ConnectionPopaver = (props) => {
                     app: appSlug,
                     name: appSlug,
                     authType: selectedAuthType,
+                    icon: selectedIntegration?.icon,
                     credentials,
                 })
             )

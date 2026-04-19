@@ -7,7 +7,7 @@ import ConnectionPopaver from "./ConnectionPopaver";
 import { __ } from "@wordpress/i18n";
 import { secondPrimaryBtn } from "../../../../../../../../../assets/scss/chakra/recipe";
 
-const ConnectionSelector = ({ appSlug, values, setFieldValue }) => {
+const ConnectionSelector = ({ appSlug, values, setFieldValue,selectedIntegration }) => {
     const dispatch = useDispatch();
     const { appConnections } = useSelector((state) => state.workflows);
     const [isPopoverOpen, setPopoverOpen] = useState(false);
@@ -68,6 +68,7 @@ const ConnectionSelector = ({ appSlug, values, setFieldValue }) => {
                 isOpen={isPopoverOpen}
                 onClose={() => setPopoverOpen(false)}
                 onConnected={handleConnected}
+                selectedIntegration={selectedIntegration}
             />
         </>
     );
