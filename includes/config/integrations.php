@@ -287,5 +287,9 @@ return [
 			'file'  => 'gamipress.php',
 			'class' => \Zaplane\Integrations\Gamipress::class
 		],
+		'typeform'        => [
+			'file'  => 'typeform.php',
+			'class' => \Zaplane\Integrations\Typeform::class
+		],
 	],
 ];
