@@ -111,6 +111,7 @@ trait QueryTrait {
 			return [
 				'ID'          => $user_id,
 				'name'        => $user->display_name ?? $data['display_name'] ?? '',
+				'label'        => $user->display_name ?? $data['display_name'] ?? '',
 				'email'       => $user->user_email ?? $data['user_email'] ?? '',
 				'login'       => $user->user_login ?? $data['user_login'] ?? '',
 				'nicename'    => $user->user_nicename ?? $data['user_nicename'] ?? '',
