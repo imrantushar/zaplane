@@ -111,7 +111,7 @@ trait QueryTrait {
 			return [
 				'ID'          => $user_id,
 				'name'        => $user->display_name ?? $data['display_name'] ?? '',
-				'label'        => $user->display_name ?? $data['display_name'] ?? '',
+				'label'       => trim( ( $user->first_name ?? $data['first_name'] ?? '' ) . ' ' . ( $user->last_name ?? $data['last_name'] ?? '' ) ) ?: ( $user->display_name ?? $data['display_name'] ?? $user->user_login ?? $data['user_login'] ?? '' ),
 				'email'       => $user->user_email ?? $data['user_email'] ?? '',
 				'login'       => $user->user_login ?? $data['user_login'] ?? '',
 				'nicename'    => $user->user_nicename ?? $data['user_nicename'] ?? '',
