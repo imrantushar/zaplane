@@ -15,7 +15,7 @@ import WorkflowTable from "@ZAPComponents/WorkflowTable";
 
 
 
-const CreateWorkflows = ({ onNavigateToEdit, title = __('Flows', 'zaplane'), renderTopBar=null}) => {
+const CreateWorkflows = ({ onNavigateToEdit, title = __('Workflows', 'zaplane'), renderTopBar=null}) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (

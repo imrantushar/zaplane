@@ -251,7 +251,7 @@ export default function FlowTopBar({
             fontSize="14px"
             href={onNavigateBack ? undefined : `${route_path}admin.php?page=zaplane-workflows`}
             onClick={onNavigateBack ? (e) => { e.preventDefault(); onNavigateBack(); } : undefined}
-            label={__('Flows', 'zaplane')}
+            label={__('WorkFlows', 'zaplane')}
           />
           <IoIosArrowForward />
           {isEditingTitle ? (
