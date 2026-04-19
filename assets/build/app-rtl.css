@@ -1815,24 +1815,24 @@ h2.react-datepicker__current-month {
 /*!*********************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/@wordpress/scripts/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./assets/scss/backend.scss ***!
   \*********************************************************************************************************************************************************************************************************************************************************************************/
-.zaplane-chakra-scope *, .zaplane-chakra-scope *::before, .zaplane-chakra-scope *::after {
+.zaplane-scope *, .zaplane-scope *::before, .zaplane-scope *::after {
   box-sizing: border-box;
 }
 
-#adminmenuwrap *, #adminmenuwrap *::before, #adminmenuwrap *::after,
-#adminmenu *,
-#adminmenu *::before,
-#adminmenu *::after,
-#adminmenuback *,
-#adminmenuback *::before,
-#adminmenuback *::after {
+.toplevel_page_zaplane #adminmenuwrap *, .toplevel_page_zaplane #adminmenuwrap *::before, .toplevel_page_zaplane #adminmenuwrap *::after,
+.toplevel_page_zaplane #adminmenu *,
+.toplevel_page_zaplane #adminmenu *::before,
+.toplevel_page_zaplane #adminmenu *::after,
+.toplevel_page_zaplane #adminmenuback *,
+.toplevel_page_zaplane #adminmenuback *::before,
+.toplevel_page_zaplane #adminmenuback *::after {
   box-sizing: content-box;
   border: revert;
   outline: revert;
 }
 
-#adminmenu #collapse-menu,
-#adminmenu #collapse-button {
+.toplevel_page_zaplane #adminmenu #collapse-menu,
+.toplevel_page_zaplane #adminmenu #collapse-button {
   border: none !important;
   border-radius: 0 !important;
   outline: revert !important;
@@ -1840,9 +1840,9 @@ h2.react-datepicker__current-month {
   background: transparent !important;
 }
 
-#adminmenu #collapse-menu::before, #adminmenu #collapse-menu::after,
-#adminmenu #collapse-button::before,
-#adminmenu #collapse-button::after {
+.toplevel_page_zaplane #adminmenu #collapse-menu::before, .toplevel_page_zaplane #adminmenu #collapse-menu::after,
+.toplevel_page_zaplane #adminmenu #collapse-button::before,
+.toplevel_page_zaplane #adminmenu #collapse-button::after {
   border: none !important;
   box-sizing: content-box !important;
 }

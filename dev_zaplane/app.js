@@ -15,14 +15,14 @@ document.addEventListener('DOMContentLoaded', () => {
 	WorkFlowHook();
 	const container = document.getElementById('zaplane-app');
 	if (container) {
-		container.classList.add('zaplane-chakra-scope');
+		container.classList.add('zaplane-scope');
 
 		const root = createRoot(container);
 		const menuPage = document.getElementById('toplevel_page_zaplane');
 
 		function MenuPortal({ children }) {
 			menuPage.innerHTML = '';
-			menuPage.classList.add('zaplane-chakra-scope');
+			menuPage.classList.add('zaplane-scope');
 			return createPortal(children, menuPage);
 		}
 
