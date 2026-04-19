@@ -16,20 +16,18 @@ document.addEventListener('DOMContentLoaded', () => {
 	if (container) {
 		const root = createRoot(container);
 		const menuPage = document.getElementById('toplevel_page_zaplane');
+		if (menuPage) menuPage.innerHTML = '';
 		function MenuPortal({ children }) {
-			menuPage.innerHTML = '';
 			return createPortal(children, menuPage);
 		}
 		root.render(
 			<Provider store={store}>
-				<ChakraProvider value={theme}>
 					<Router>
 						<MenuPortal>
 							<AdminMenu />
 						</MenuPortal>
 						<BackendDashboard />
 					</Router>
-				</ChakraProvider>
 			</Provider>
 		);
 	}
