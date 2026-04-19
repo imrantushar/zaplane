@@ -1,3 +1,19 @@
+.zaplane-chakra-scope {
+    *, *::before, *::after {
+        box-sizing: border-box;
+    }
+}
+
+#adminmenuwrap,
+#adminmenu,
+#adminmenuback {
+    *, *::before, *::after {
+        box-sizing: content-box;
+        border: revert;
+        outline: revert;
+    }
+}
+
 @import './common/global';
 @import './common/notification';
 @import  './common/classLibrary';
