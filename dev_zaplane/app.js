@@ -1,5 +1,6 @@
 import { createPortal } from '@wordpress/element';
 import { createRoot } from 'react-dom/client';
+import { flushSync } from 'react-dom';
 import { ChakraProvider, createSystem, defaultConfig } from '@chakra-ui/react';
 import '../assets/scss/backend.scss';
 import { Provider } from 'react-redux';
@@ -20,15 +21,17 @@ document.addEventListener('DOMContentLoaded', () => {
 		function MenuPortal({ children }) {
 			return createPortal(children, menuPage);
 		}
-		root.render(
-			<Provider store={store}>
-					<Router>
-						<MenuPortal>
-							<AdminMenu />
-						</MenuPortal>
-						<BackendDashboard />
-					</Router>
-			</Provider>
-		);
+		flushSync(() => {
+			root.render(
+				<Provider store={store}>
+						<Router>
+							<MenuPortal>
+								<AdminMenu />
+							</MenuPortal>
+							<BackendDashboard />
+						</Router>
+				</Provider>
+			);
+		});
 	}
 });
