@@ -1831,6 +1831,22 @@ h2.react-datepicker__current-month {
   outline: revert;
 }
 
+#adminmenu #collapse-menu,
+#adminmenu #collapse-button {
+  border: none !important;
+  border-radius: 0 !important;
+  outline: revert !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+#adminmenu #collapse-menu::before, #adminmenu #collapse-menu::after,
+#adminmenu #collapse-button::before,
+#adminmenu #collapse-button::after {
+  border: none !important;
+  box-sizing: content-box !important;
+}
+
 :root {
   --zaplane-font: "Roboto", sans-serif;
   --zaplane-primary: #006BFF;
