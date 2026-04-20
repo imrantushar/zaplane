@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-04-19 12:30:52",
+    "generated_at": "2026-04-20 05:57:00",
     "apps": {
         "cartflows": {
             "slug": "cartflows",
@@ -21208,17 +21208,19 @@
             "category": "app",
             "requires_connection": true,
             "auth_type": "api_key",
-            "supports_webhook": false,
+            "supports_webhook": true,
             "triggers": {
                 "form_submitted": {
                     "key": "form_submitted",
                     "label": "Form Submitted",
-                    "hook": "tf_new_entry",
+                    "hook": "typeform_webhook_form_submitted",
                     "schema": [
                         {
                             "key": "form_id",
                             "label": "Form",
                             "type": "select",
+                            "required": true,
+                            "help": "Select the Typeform to watch. Choose \"Any Form\" to trigger on all submissions.",
                             "dynamic": {
                                 "integration": "typeform",
                                 "query": "form_query",
@@ -21226,8 +21228,7 @@
                                     "value",
                                     "label"
                                 ]
-                            },
-                            "required": true
+                            }
                         }
                     ],
                     "outputs": [
@@ -21244,12 +21245,15 @@
                             "key": "title",
                             "type": "text",
                             "label": "Form Title",
+                            "placeholder": "My New Form",
                             "required": true
                         },
                         {
                             "key": "workspace_id",
-                            "label": "Workspace",
                             "type": "select",
+                            "label": "Workspace",
+                            "required": false,
+                            "help": "Optional. Leave blank to use the default workspace.",
                             "dynamic": {
                                 "integration": "typeform",
                                 "query": "workspace_query",
@@ -21270,9 +21274,18 @@
                     "schema": [
                         {
                             "key": "form_id",
-                            "type": "text",
-                            "label": "Form ID",
-                            "required": true
+                            "type": "select",
+                            "label": "Form",
+                            "required": true,
+                            "help": "Select the form to delete. This cannot be undone.",
+                            "dynamic": {
+                                "integration": "typeform",
+                                "query": "form_query_no_any",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
                         }
                     ],
                     "outputs": [
