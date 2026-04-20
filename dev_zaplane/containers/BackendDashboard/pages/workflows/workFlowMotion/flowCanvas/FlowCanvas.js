@@ -136,7 +136,7 @@ export default function FlowCanvas({
       maxZoom: 1
     }} panOnDrag zoomOnScroll zoomOnDoubleClick nodesDraggable nodesConnectable elementsSelectable>
 
-                    <Background />
+                    <Background variant="dots" gap={24} size={1} color="#e2e8f0" />
                     <div className="zaplane-canvas-layout-icon flex">
                         <ZAPTooltip content={__("Vertical layout", "zaplane")} positioning={{
           placement: "top",
