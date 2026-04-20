@@ -71,12 +71,63 @@ const RecentLogs = ({
         </div>
     // columnWidth: "160px",
   }];
-  return <div width="100%" boxShadow='md' className="bg-#fff rounded-[4px]">
-      <span className="zaplane-heading p-[24px 24px 0 24px]">
-        {__("Recent Logs", "zaplane")}
-      </span>
+  const EmptyState = () => (
+    <div className="flex flex-col items-center justify-center p-12 text-center">
+      <div className="mb-6 opacity-40">
+        {/* Simple SVG illustration matching the mockup pattern */}
+        <svg width="240" height="120" viewBox="0 0 240 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="20" cy="20" r="4" fill="#68D391" />
+          <circle cx="35" cy="20" r="4" fill="#F6AD55" />
+          <circle cx="50" cy="20" r="4" fill="#FC8181" />
+          <rect x="20" y="40" width="40" height="4" rx="2" fill="#EDF2F7" />
+          <rect x="80" y="40" width="40" height="4" rx="2" fill="#EDF2F7" />
+          <rect x="140" y="40" width="40" height="4" rx="2" fill="#EDF2F7" />
+          <rect x="200" y="40" width="20" height="4" rx="2" fill="#EDF2F7" />
+          <circle cx="30" cy="65" r="8" fill="#E2E8F0" />
+          <rect x="50" y="65" width="30" height="4" rx="2" fill="#EDF2F7" />
+          <rect x="100" y="65" width="30" height="4" rx="2" fill="#EDF2F7" />
+          <rect x="150" y="65" width="30" height="4" rx="2" fill="#EDF2F7" />
+          <rect x="200" y="65" width="20" height="4" rx="2" fill="#EDF2F7" />
+          <circle cx="30" cy="95" r="8" fill="#E2E8F0" />
+          <rect x="50" y="95" width="30" height="4" rx="2" fill="#EDF2F7" />
+          <rect x="100" y="95" width="30" height="4" rx="2" fill="#EDF2F7" />
+          <rect x="150" y="95" width="30" height="4" rx="2" fill="#EDF2F7" />
+          <rect x="200" y="95" width="20" height="4" rx="2" fill="#EDF2F7" />
+        </svg>
+      </div>
+      <h3 className="text-[#2D3748] text-[20px] font-[600] mb-2">{__("No Data Available!!!", "zaplane")}</h3>
+      <p className="text-[#718096] text-[14px]">{__("Please, create data to see the available list here.", "zaplane")}</p>
+    </div>
+  );
 
-      <ListTable columns={columns} data={Array.isArray(data.runs) ? data.runs.slice(0, 5) : []} isRowSelectable={false} showSubHeader={false} showColumnFilter={false} noDataText={__("No logs found", "zaplane")} totalItems={data?.runs?.length || 0} dataFetchingStatus={false} suffix="recent-logs-table" />
-    </div>;
+  const tableData = Array.isArray(data.runs) ? data.runs.slice(0, 5) : [];
+
+  return (
+    <div className="bg-white rounded-[8px] border border-[#E2E8F0] w-full min-h-[400px] flex flex-col">
+      <div className="p-6">
+        <span className="text-[#4A5568] text-[16px] font-[500]">
+          {__("Recently Created Flow", "zaplane")}
+        </span>
+      </div>
+
+      <div className="flex-1">
+        {tableData.length > 0 ? (
+          <ListTable 
+            columns={columns} 
+            data={tableData} 
+            isRowSelectable={false} 
+            showSubHeader={false} 
+            showColumnFilter={false} 
+            totalItems={data?.runs?.length || 0} 
+            dataFetchingStatus={false} 
+            suffix="recent-logs-table" 
+          />
+        ) : (
+          <EmptyState />
+        )}
+      </div>
+    </div>
+  );
 };
+
 export default RecentLogs;

@@ -13,8 +13,9 @@ const ZAPInput = ({
 }) => {
   const isTextarea = type === "textarea";
   return <div style={{display:'flex', flexDirection:'column', gap:'8px', ...containerStyle}}>
-      {label && <span>{__(label, "zaplane")}</span>}
-      {isTextarea ? <textarea placeholder={__(placeholder, "zaplane")} value={value} onChange={onChange} onKeyDown={onKeyDown} style={{...inputStyle}} /> : <input ref={inputRef} type={type} placeholder={__(placeholder, "zaplane")} value={value} onKeyDown={onKeyDown} onChange={onChange} {...(type === "number" && {
+      {label && <span className='zaplane-label'>{__(label, "zaplane")}</span>}
+      {isTextarea ? <textarea className="zaplan-textarea" placeholder={__(placeholder, "zaplane")} value={value} onChange={onChange} onKeyDown={onKeyDown} style={{...inputStyle}} /> :
+       <input className="zalane-input" ref={inputRef} type={type} placeholder={__(placeholder, "zaplane")} value={value} onKeyDown={onKeyDown} onChange={onChange} {...(type === "number" && {
       inputMode: "numeric",
       pattern: "[0-9]*"
     })} style={{...inputStyle}} />}

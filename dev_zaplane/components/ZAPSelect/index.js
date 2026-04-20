@@ -20,8 +20,8 @@ const ZAPSelect = ({
       onChange?.(selected);
     }
   };
-      <div style={{display:'flex', flexDirection:'column', gap:'8px', ...containerStyle}}>
-      {label && <span>{__(label, "zaplane")}</span>}
+      <div style={{ display: "flex", flexDirection: "column", gap: "8px", ...containerStyle }}>
+      {label && <span className="zaplane-label">{__(label, "zaplane")}</span>}
 
       <Select className="zaplane-select" classNamePrefix="zaplane-select" options={options} isLoading={isLoading} placeholder={placeholder} isClearable={isClearable} isMulti={isMulti} value={selectedValue} onMenuOpen={onMenuOpen} onChange={handleChange} menuPortalTarget={document.body} menuPosition="fixed" styles={{
       menuPortal: base => ({

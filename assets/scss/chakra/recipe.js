@@ -1,9 +1,13 @@
+import { round } from "lodash"
+
 export const primaryBtn = {
     background: "var(--zaplane-primary)",
     color: "#fff",
     fontWeight: "500",
     fontSize: '14px',
     cursor: "pointer",
+    padding: "8px 16px",
+    borderRadius : "4px",
 }
 
 export const secondPrimaryBtn = {
