@@ -9,7 +9,7 @@ import { __ } from "@wordpress/i18n";
 import ZAPDrawer from "@ZAPComponents/Drawer";
 import RunsTable from "../RunsTable/RunsTable";
 import VersionHistoryTable from "../VersionHistoryTable/VersionHistoryTable";
-import { primaryBtn, secondPrimaryBtn } from "../../../../../../../../assets/scss/chakra/recipe";
+import { outlineBtn, primaryBtn, secondPrimaryBtn } from "../../../../../../../../assets/scss/chakra/recipe";
 import { getRunWorkFlow } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlowRuns";
 import { useDispatch, useSelector } from "react-redux";
 import { formatTime } from "../helper";
@@ -116,7 +116,7 @@ export default function FlowTopBar({
             dispatch(startApiCountdown(120));
             dispatch(workflowNodeListiner(id));
           }} 
-          className="flex items-center gap-2 h-9 px-4 bg-[var(--zaplane-second-primary)] text-[var(--zaplane-primary)] font-medium rounded-lg hover:opacity-90 transition-all"
+          className="flex items-center gap-2 h-9 px-4 bg-[var(--zaplane-second-primary)] text-[var(--zaplane-primary)] font-medium rounded-[4px] hover:opacity-90 transition-all"
         >
           <CiPlay1 className="text-lg" />
           <span>{__("Test Flow Once", "zaplane")}</span>
@@ -124,7 +124,7 @@ export default function FlowTopBar({
       ) : (
         <button 
           onClick={() => dispatch(workflowNodeListinerStop(id))} 
-          className="flex items-center gap-2 h-9 px-4 bg-red-50 text-red-600 font-medium rounded-lg hover:bg-red-100 transition-all"
+          className="flex items-center gap-2 h-9 px-4 bg-red-50 text-red-600 font-medium rounded-[4px] hover:bg-red-100 transition-all"
         >
           <LiaStopCircleSolid className="text-xl" />
           <span>{__("Stop", "zaplane")}</span>
@@ -145,7 +145,7 @@ export default function FlowTopBar({
       <ZAPTooltip content={'Full Screen'}>
         <button 
           onClick={toggleFullscreen}
-          className="flex items-center justify-center w-9 h-9 border border-gray-200 rounded-lg text-gray-600 hover:bg-gray-50 hover:border-gray-300 transition-all"
+          style={outlineBtn}
         >
           {isFullscreen ? <LuMinimize size={18} /> : <LuFullscreen size={18} />}
         </button>
@@ -160,7 +160,7 @@ export default function FlowTopBar({
         trigger={
           <button 
             onClick={() => setActiveDrawer("logs")} 
-            className={`h-9 px-4 border rounded-lg text-sm font-medium transition-all ${
+            className={`h-9 px-4 border rounded-[4px] text-sm font-medium transition-all ${
               activeDrawer === 'logs' 
               ? 'bg-[var(--zaplane-second-primary)] border-[var(--zaplane-primary)] text-[var(--zaplane-primary)]' 
               : 'border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-gray-300'
@@ -170,17 +170,17 @@ export default function FlowTopBar({
           </button>
         }
       >
-        <div className="flex gap-2 p-1 bg-gray-50 rounded-lg mb-4">
+        <div className="flex gap-2 p-1 bg-gray-50 rounded-[4px] mb-4">
           <button 
             onClick={() => dispatch(getRunWorkFlow({ id }))} 
-            className="flex-1 flex items-center justify-center gap-2 py-2 text-sm font-medium bg-white border border-gray-100 rounded-md text-gray-700 hover:bg-gray-50 shadow-sm"
+            className="flex-1 flex items-center justify-center gap-2 py-2 text-sm font-medium bg-white border border-gray-100 rounded-[4px] text-gray-700 hover:bg-gray-50 shadow-sm"
           >
             <TfiReload className={refreshing ? "zaplane-refresh-spin" : ""} />
             {__("Refresh", "zaplane")}
           </button>
           <button 
             onClick={() => dispatch(workFLowExction({ workflow_hash: workFlow?.version?.hash }))} 
-            className="flex-1 flex items-center justify-center gap-2 py-2 text-sm font-medium bg-white border border-gray-100 rounded-md text-gray-700 hover:bg-gray-50 shadow-sm"
+            className="flex-1 flex items-center justify-center gap-2 py-2 text-sm font-medium bg-white border border-gray-100 rounded-[4px] text-gray-700 hover:bg-gray-50 shadow-sm"
           >
             <LuSquarePlay /> 
             {__("Replay", "zaplane")}
@@ -198,7 +198,7 @@ export default function FlowTopBar({
           <ZAPTooltip content={'History'}>
             <button 
               onClick={() => setActiveDrawer("history")} 
-              className={`flex items-center justify-center w-9 h-9 border rounded-lg transition-all ${
+              className={`flex items-center justify-center w-9 h-9 border rounded-[4px] transition-all ${
                 activeDrawer === 'history' 
                 ? 'bg-[var(--zaplane-second-primary)] border-[var(--zaplane-primary)] text-[var(--zaplane-primary)]' 
                 : 'border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-gray-300'
@@ -225,7 +225,7 @@ export default function FlowTopBar({
             ...provided,
             minHeight: "36px",
             height: '36px',
-            borderRadius: '8px',
+            borderRadius: '4px',
             borderColor: state.isFocused ? 'var(--zaplane-primary)' : '#e5e7eb',
             boxShadow: 'none',
             '&:hover': {
@@ -244,7 +244,7 @@ export default function FlowTopBar({
       <button 
         disabled={!isFlowDirty} 
         onClick={handleSubmit} 
-        className="h-9 px-6 bg-[var(--zaplane-primary)] hover:opacity-90 active:scale-[0.98] text-white font-semibold rounded-lg transition-all shadow-sm shadow-blue-200 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="h-9 px-6 bg-[var(--zaplane-primary)] hover:opacity-90 active:scale-[0.98] text-white font-semibold rounded-[4px] transition-all shadow-sm shadow-blue-200 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {__("Update", "zaplane")}
       </button>

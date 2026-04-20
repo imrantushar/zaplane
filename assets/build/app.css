@@ -2981,6 +2981,12 @@ video {
 .rounded-xl {
   border-radius: 0.75rem;
 }
+.rounded-\[\] {
+  border-radius: ;
+}
+.rounded-\[4\] {
+  border-radius: 4;
+}
 .rounded-b-md {
   border-bottom-right-radius: 0.375rem;
   border-bottom-left-radius: 0.375rem;
@@ -3271,6 +3277,9 @@ video {
 }
 .pt-4 {
   padding-top: 1rem;
+}
+.pt-\[11px\] {
+  padding-top: 11px;
 }
 .text-left {
   text-align: left;
