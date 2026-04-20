@@ -31,6 +31,10 @@ return [
 			'file' => 'cartflows.php',
 			'class' => \Zaplane\Integrations\Cartflows::class
 		],
+		'dokan'                => [
+			'file' => 'dokan.php',
+			'class' => \Zaplane\Integrations\Dokan::class
+		],
 		'wordpress'            => [
 			'file' => 'wordpress.php',
 			'class' => \Zaplane\Integrations\Wordpress::class
