@@ -2632,6 +2632,9 @@ video {
 .h-full {
   height: 100%;
 }
+.h-9 {
+  height: 2.25rem;
+}
 .max-h-\[200px\] {
   max-height: 200px;
 }
@@ -2713,6 +2716,12 @@ video {
 .w-screen {
   width: 100vw;
 }
+.w-9 {
+  width: 2.25rem;
+}
+.w-auto {
+  width: auto;
+}
 .min-w-\[280px\] {
   min-width: 280px;
 }
@@ -2745,6 +2754,9 @@ video {
 }
 .max-w-\[700px\] {
   max-width: 700px;
+}
+.max-w-\[240px\] {
+  max-width: 240px;
 }
 .flex-1 {
   flex: 1 1 0%;
@@ -3043,6 +3055,9 @@ video {
   --tw-border-opacity: 1;
   border-color: rgb(250 204 21 / var(--tw-border-opacity, 1));
 }
+.border-\[var\(--zaplane-primary\)\] {
+  border-color: var(--zaplane-primary);
+}
 .bg-\[var\(--zaplane-background\)\] {
   background-color: var(--zaplane-background);
 }
@@ -3151,6 +3166,9 @@ video {
 }
 .p-\[7px\] {
   padding: 7px;
+}
+.p-1 {
+  padding: 0.25rem;
 }
 .px-2 {
   padding-right: 0.5rem;
@@ -3336,6 +3354,10 @@ video {
   font-size: 0.75rem;
   line-height: 1rem;
 }
+.text-lg {
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+}
 .font-\[400\] {
   font-weight: 400;
 }
@@ -3507,6 +3529,15 @@ video {
   --tw-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
   --tw-shadow-colored: 0 20px 25px -5px var(--tw-shadow-color), 0 8px 10px -6px var(--tw-shadow-color);
   box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+.shadow-inner {
+  --tw-shadow: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);
+  --tw-shadow-colored: inset 0 2px 4px 0 var(--tw-shadow-color);
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+.shadow-blue-200 {
+  --tw-shadow-color: #bfdbfe;
+  --tw-shadow: var(--tw-shadow-colored);
 }
 .outline-none {
   outline: 2px solid transparent;
@@ -4644,6 +4675,10 @@ video {
 .hover\:bg-red-50:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(254 242 242 / var(--tw-bg-opacity, 1));
+}
+.hover\:bg-red-100:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(254 226 226 / var(--tw-bg-opacity, 1));
 }
 .hover\:text-\[var\(--zaplane-primary\)\]:hover {
   color: var(--zaplane-primary);
