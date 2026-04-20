@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-04-19 08:23:09",
+    "generated_at": "2026-04-20 12:53:30",
     "apps": {
         "cartflows": {
             "slug": "cartflows",
@@ -21200,6 +21200,781 @@
                 }
             },
             "actions": []
+        },
+        "discord": {
+            "slug": "discord",
+            "name": "Discord",
+            "icon": "discord.svg",
+            "category": "app",
+            "requires_connection": true,
+            "auth_type": "bot_token",
+            "supports_webhook": false,
+            "triggers": {
+                "new_message_in_channel": {
+                    "key": "new_message_in_channel",
+                    "label": "New Message In Channel",
+                    "hook": "discord_webhook_new_message_in_channel",
+                    "schema": [
+                        {
+                            "key": "connection_id",
+                            "type": "select",
+                            "label": "Select Connection",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "discord",
+                                "query": "connection_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "channel_id",
+                            "type": "select",
+                            "label": "Select Channel",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "discord",
+                                "query": "channel_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "new_user_join_server": {
+                    "key": "new_user_join_server",
+                    "label": "New User Join Server",
+                    "hook": "discord_webhook_new_user_join_server",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": {
+                "create_channel": {
+                    "key": "create_channel",
+                    "label": "Create Channel",
+                    "schema": [
+                        {
+                            "key": "connection_id",
+                            "type": "select",
+                            "label": "Select Connection",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "discord",
+                                "query": "connection_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "name",
+                            "type": "text",
+                            "label": "Channel Name",
+                            "required": true
+                        },
+                        {
+                            "key": "type",
+                            "type": "select",
+                            "label": "Channel Type",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "discord",
+                                "query": "channel_type_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "topic",
+                            "type": "text",
+                            "label": "Channel Topic",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_channel": {
+                    "key": "update_channel",
+                    "label": "Update Channel",
+                    "schema": [
+                        {
+                            "key": "connection_id",
+                            "type": "select",
+                            "label": "Select Connection",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "discord",
+                                "query": "connection_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "channel_id",
+                            "type": "select",
+                            "label": "Select Channel",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "discord",
+                                "query": "channel_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "name",
+                            "type": "text",
+                            "label": "Channel Name",
+                            "required": true
+                        },
+                        {
+                            "key": "topic",
+                            "type": "text",
+                            "label": "Channel Topic",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_channel_by_name": {
+                    "key": "get_channel_by_name",
+                    "label": "Get Channel By Name",
+                    "schema": [
+                        {
+                            "key": "connection_id",
+                            "type": "select",
+                            "label": "Select Connection",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "discord",
+                                "query": "connection_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "name",
+                            "type": "text",
+                            "label": "Channel Name",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "send_channel_message": {
+                    "key": "send_channel_message",
+                    "label": "Send Channel Message",
+                    "schema": [
+                        {
+                            "key": "connection_id",
+                            "type": "select",
+                            "label": "Select Connection",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "discord",
+                                "query": "connection_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "channel_id",
+                            "type": "select",
+                            "label": "Select Channel",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "discord",
+                                "query": "channel_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "content",
+                            "label": "Message Content",
+                            "type": "textarea",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "find_channel": {
+                    "key": "find_channel",
+                    "label": "Find Channel",
+                    "schema": [
+                        {
+                            "key": "connection_id",
+                            "type": "select",
+                            "label": "Select Connection",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "discord",
+                                "query": "connection_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "search_query",
+                            "type": "text",
+                            "label": "Search Query (name or ID)",
+                            "required": true
+                        },
+                        {
+                            "key": "type",
+                            "type": "select",
+                            "label": "Channel Type",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "discord",
+                                "query": "channel_type_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_a_channel_invite": {
+                    "key": "create_a_channel_invite",
+                    "label": "Create A Channel Invite",
+                    "schema": [
+                        {
+                            "key": "connection_id",
+                            "type": "select",
+                            "label": "Select Connection",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "discord",
+                                "query": "connection_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "channel_id",
+                            "type": "select",
+                            "label": "Select Channel",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "discord",
+                                "query": "channel_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "max_age",
+                            "type": "number",
+                            "label": "Max Age (seconds, 0 = never expires)",
+                            "required": false,
+                            "default": 86400
+                        },
+                        {
+                            "key": "max_uses",
+                            "type": "number",
+                            "label": "Max Uses (0 = unlimited)",
+                            "required": false,
+                            "default": 0
+                        },
+                        {
+                            "key": "temporary",
+                            "type": "checkbox",
+                            "label": "Temporary Membership",
+                            "required": false,
+                            "default": false
+                        },
+                        {
+                            "key": "unique",
+                            "type": "checkbox",
+                            "label": "Unique Invite",
+                            "required": false,
+                            "default": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "send_direct_message": {
+                    "key": "send_direct_message",
+                    "label": "Send Direct Message",
+                    "schema": [
+                        {
+                            "key": "connection_id",
+                            "type": "select",
+                            "label": "Select Connection",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "discord",
+                                "query": "connection_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "user_id",
+                            "type": "select",
+                            "label": "Select User",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "discord",
+                                "query": "user_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "content",
+                            "label": "Message Content",
+                            "type": "textarea",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_message": {
+                    "key": "delete_message",
+                    "label": "Delete Message",
+                    "schema": [
+                        {
+                            "key": "connection_id",
+                            "type": "select",
+                            "label": "Select Connection",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "discord",
+                                "query": "connection_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "channel_id",
+                            "type": "select",
+                            "label": "Select Channel",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "discord",
+                                "query": "channel_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "message_id",
+                            "type": "text",
+                            "label": "Message ID",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_message": {
+                    "key": "get_message",
+                    "label": "Get Message",
+                    "schema": [
+                        {
+                            "key": "connection_id",
+                            "type": "select",
+                            "label": "Select Connection",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "discord",
+                                "query": "connection_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "channel_id",
+                            "type": "select",
+                            "label": "Select Channel",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "discord",
+                                "query": "channel_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "message_id",
+                            "type": "text",
+                            "label": "Message ID",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_many_message": {
+                    "key": "get_many_message",
+                    "label": "Get Many Messages",
+                    "schema": [
+                        {
+                            "key": "connection_id",
+                            "type": "select",
+                            "label": "Select Connection",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "discord",
+                                "query": "connection_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "channel_id",
+                            "type": "select",
+                            "label": "Select Channel",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "discord",
+                                "query": "channel_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "limit",
+                            "type": "number",
+                            "label": "Message Limit",
+                            "required": false,
+                            "default": 10,
+                            "min": 1,
+                            "max": 100
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "react_with_emoji_to_message": {
+                    "key": "react_with_emoji_to_message",
+                    "label": "React With Emoji To Message",
+                    "schema": [
+                        {
+                            "key": "connection_id",
+                            "type": "select",
+                            "label": "Select Connection",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "discord",
+                                "query": "connection_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "channel_id",
+                            "type": "select",
+                            "label": "Select Channel",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "discord",
+                                "query": "channel_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "message_id",
+                            "type": "text",
+                            "label": "Message ID",
+                            "required": true
+                        },
+                        {
+                            "key": "emoji",
+                            "type": "text",
+                            "label": "Emoji",
+                            "required": true,
+                            "placeholder": "e.g. \ud83d\udc4d or custom_name:emoji_id"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_many_member": {
+                    "key": "get_many_member",
+                    "label": "Get Many Members",
+                    "schema": [
+                        {
+                            "key": "connection_id",
+                            "type": "select",
+                            "label": "Select Connection",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "discord",
+                                "query": "connection_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "limit",
+                            "type": "number",
+                            "label": "Member Limit",
+                            "required": false,
+                            "default": 100,
+                            "min": 1,
+                            "max": 1000
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add_role_to_member": {
+                    "key": "add_role_to_member",
+                    "label": "Add Role To Member",
+                    "schema": [
+                        {
+                            "key": "connection_id",
+                            "type": "select",
+                            "label": "Select Connection",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "discord",
+                                "query": "connection_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "member_id",
+                            "type": "select",
+                            "label": "Select Member",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "discord",
+                                "query": "member_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "role_id",
+                            "type": "select",
+                            "label": "Select Role",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "discord",
+                                "query": "role_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "remove_role_from_member": {
+                    "key": "remove_role_from_member",
+                    "label": "Remove Role From Member",
+                    "schema": [
+                        {
+                            "key": "connection_id",
+                            "type": "select",
+                            "label": "Select Connection",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "discord",
+                                "query": "connection_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "member_id",
+                            "type": "select",
+                            "label": "Select Member",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "discord",
+                                "query": "member_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "role_id",
+                            "type": "select",
+                            "label": "Select Role",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "discord",
+                                "query": "role_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "find_user": {
+                    "key": "find_user",
+                    "label": "Find User",
+                    "schema": [
+                        {
+                            "key": "connection_id",
+                            "type": "select",
+                            "label": "Select Connection",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "discord",
+                                "query": "connection_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "search_query",
+                            "type": "text",
+                            "label": "Username or User ID",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_new_forum_post": {
+                    "key": "create_new_forum_post",
+                    "label": "Create New Forum Post",
+                    "schema": [
+                        {
+                            "key": "connection_id",
+                            "type": "select",
+                            "label": "Select Connection",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "discord",
+                                "query": "connection_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "channel_id",
+                            "type": "select",
+                            "label": "Select Channel",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "discord",
+                                "query": "channel_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "name",
+                            "type": "text",
+                            "label": "Post Title",
+                            "required": true
+                        },
+                        {
+                            "key": "content",
+                            "label": "Message Content",
+                            "type": "textarea",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
         }
     },
     "tools": {
