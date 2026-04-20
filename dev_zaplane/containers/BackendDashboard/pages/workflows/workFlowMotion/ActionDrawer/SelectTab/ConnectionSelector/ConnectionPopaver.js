@@ -3,161 +3,103 @@ import WPPopover from "@ZAPComponents/Popaver/WPPopover";
 import { __ } from "@wordpress/i18n";
 import { useDispatch, useSelector } from 'react-redux';
 import { createTokenConnection, fetchAuthFields, initOAuth } from '@ZAPRedux/Slices/connectionsSlice/connectionsSlice';
-import { Button, Flex,Text, VStack } from '@chakra-ui/react';
 import { primaryBtn } from '../../../../../../../../../assets/scss/chakra/recipe';
-import './styles.scss'
+import './styles.scss';
 import { formatLabel } from '@ZAPUtils/helper';
 import ZAPInput from '@ZAPComponents/ZAPInput';
-
-const ConnectionPopaver = (props) => {
-    const { isOpen, onClose, appSlug, onConnected  } = props
-    const dispatch = useDispatch()
-    const { authFields } = useSelector(
-        (state) => state.connections || []
-    )
-    const [loadingOAuth, setLoadingOAuth] = useState(false);
-    const [selectedAuthType, setSelectedAuthType] = useState("oauth2");
-    const [credentials, setCredentials] = useState({});
-    useEffect(() => {
-        dispatch(
-            fetchAuthFields({
-                app: appSlug,
-                authType: selectedAuthType || undefined,
-            })
-        );
-    }, [selectedAuthType, dispatch]);
-    const handleConnect = async () => {
-        if (!selectedAuthType) return;
-        setLoadingOAuth(true);
-        if (selectedAuthType === "oauth2") {
-            try {
-                const res = await dispatch(
-                    initOAuth({
-                        app: appSlug,
-                        name: appSlug,
-                        credentials,
-                    })
-                ).unwrap();
-
-                const popup = window.open(
-                    res.auth_url,
-                    "oauth_popup",
-                    "width=600,height=700"
-                );
-
-                const handler = (event) => {
-                    if (event.data?.type === "zaplane_oauth_callback") {
-                        window.removeEventallConnectionener("message", handler);
-                        popup?.close();
-
-                        if (event.data.data?.success) {
-                            onConnected?.(res);
-                            onclose()
-                        }
-                    }
-                };
-
-                window.addEventallConnectionener("message", handler);
-            } catch (e) {
-                console.error(e);
-            } finally {
-                setLoadingOAuth(false);
+const ConnectionPopaver = props => {
+  const {
+    isOpen,
+    onClose,
+    appSlug,
+    onConnected
+  } = props;
+  const dispatch = useDispatch();
+  const {
+    authFields
+  } = useSelector(state => state.connections || []);
+  const [loadingOAuth, setLoadingOAuth] = useState(false);
+  const [selectedAuthType, setSelectedAuthType] = useState("oauth2");
+  const [credentials, setCredentials] = useState({});
+  useEffect(() => {
+    dispatch(fetchAuthFields({
+      app: appSlug,
+      authType: selectedAuthType || undefined
+    }));
+  }, [selectedAuthType, dispatch]);
+  const handleConnect = async () => {
+    if (!selectedAuthType) return;
+    setLoadingOAuth(true);
+    if (selectedAuthType === "oauth2") {
+      try {
+        const res = await dispatch(initOAuth({
+          app: appSlug,
+          name: appSlug,
+          credentials
+        })).unwrap();
+        const popup = window.open(res.auth_url, "oauth_popup", "width=600,height=700");
+        const handler = event => {
+          if (event.data?.type === "zaplane_oauth_callback") {
+            window.removeEventallConnectionener("message", handler);
+            popup?.close();
+            if (event.data.data?.success) {
+              onConnected?.(res);
+              onclose();
             }
-        } else {
-
-            dispatch(
-                createTokenConnection({
-                    app: appSlug,
-                    name: appSlug,
-                    authType: selectedAuthType,
-                    credentials,
-                })
-            )
-                .then((action) => {
-                    if (action.type === "connections/createTokenConnection/fulfilled") {
-                        setCredentials({});
-                        onClose();
-                         onConnected?.(action);
-                    }
-                    setLoadingOAuth(false);
-
-                })
+          }
+        };
+        window.addEventallConnectionener("message", handler);
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setLoadingOAuth(false);
+      }
+    } else {
+      dispatch(createTokenConnection({
+        app: appSlug,
+        name: appSlug,
+        authType: selectedAuthType,
+        credentials
+      })).then(action => {
+        if (action.type === "connections/createTokenConnection/fulfilled") {
+          setCredentials({});
+          onClose();
+          onConnected?.(action);
         }
-    };
-
-    const authTypes = authFields?.available_auth_types || {};
-    return (
-        <WPPopover isOpen={isOpen} onClose={onClose} title={__("Create New Connection", 'zaplane')}
-            prefix='connection-popaver'>
-            <Flex gap='24px'>
-                {Object.keys(authTypes).map((key) => (
-                    <Button
-                        width='45%'
-                        key={key}
-                        className={`${selectedAuthType === key && 'zaplane-button-actve'}`}
-                        variant={selectedAuthType === key ? "solid" : "outline"}
-                        onClick={() => {
-                            setSelectedAuthType(key);
-                            setCredentials({});
-
-                        }}
-                    >
+        setLoadingOAuth(false);
+      });
+    }
+  };
+  const authTypes = authFields?.available_auth_types || {};
+  return <WPPopover isOpen={isOpen} onClose={onClose} title={__("Create New Connection", 'zaplane')} prefix='connection-popaver'>
+            <div gap='24px' className="flex">
+                {Object.keys(authTypes).map(key => <button width='45%' key={key} variant={selectedAuthType === key ? "solid" : "outline"} onClick={() => {
+        setSelectedAuthType(key);
+        setCredentials({});
+      }}>
                         {formatLabel(key)}
-                    </Button>
-                ))}
-            </Flex>
-            {authFields?.auth_fields && selectedAuthType && (
-                <VStack spacing={3} align="stretch" pt={3}>
-                    {Object.entries(authFields.auth_fields).map(
-                        ([fieldKey, field]) => {
-                            const value = credentials[fieldKey] || "";
+                    </button>)}
+            </div>
+            {authFields?.auth_fields && selectedAuthType && <div className="flex flex-col gap-3 pt-3">
+                    {Object.entries(authFields.auth_fields).map(([fieldKey, field]) => {
+        const value = credentials[fieldKey] || "";
+        return <div flexDirection="column" gap={"4px"} key={fieldKey} className="flex">
 
-                            return (
-                                <Flex flexDirection="column" gap={"4px"} key={fieldKey}>
-
-                                    <ZAPInput
-                                        label={field.label}
-                                        type={field.type === "password" ? "password" : "text"}
-                                        placeholder={field.placeholder || ""}
-                                        value={value}
-                                        onChange={(e) =>
-                                            setCredentials((prev) => ({
-                                                ...prev,
-                                                [fieldKey]: e.target.value,
-                                            }))
-                                        }
-                                    />
-                                    {field.help && (
-                                        <Text fontSize="sm" mt='7px' className="zaplane-sub-title" color="var(--zaplane-text-muted)">
+                                    <ZAPInput label={field.label} type={field.type === "password" ? "password" : "text"} placeholder={field.placeholder || ""} value={value} onChange={e => setCredentials(prev => ({
+            ...prev,
+            [fieldKey]: e.target.value
+          }))} />
+                                    {field.help && <span className="zaplane-sub-title text-[sm] mt-[7px] text-var(--zaplane-text-muted)">
 
                                             {__(field.help, "zaplane")}
-                                        </Text>
-                                    )}
-                                </Flex>
-                            );
-                        }
-                    )}
-                </VStack>
-            )}
+                                        </span>}
+                                </div>;
+      })}
+                </div>}
 
-            {selectedAuthType && (
-                <Button
-                    {...primaryBtn}
-                    mt='16px'
-                    width="220px"
-                    onClick={handleConnect}
-                    loading={loadingOAuth}       
-                    loadingText={selectedAuthType === "oauth2"
-                        ? __("Connecting...", "zaplane")
-                        : __("Saving...", "zaplane")}
-                >
-                    {selectedAuthType === "oauth2"
-                        ? __("Connect with OAuth", "zaplane")
-                        : __("Save Connection", "zaplane")}
-                </Button>
-            )}
-        </WPPopover>
-    );
+            {selectedAuthType && <button style={primaryBtn} width="220px" onClick={handleConnect} loading={loadingOAuth} loadingText={selectedAuthType === "oauth2" ? __("Connecting...", "zaplane") : __("Saving...", "zaplane")} className="mt-[16px]">
+                    {selectedAuthType === "oauth2" ? __("Connect with OAuth", "zaplane") : __("Save Connection", "zaplane")}
+                </button>}
+        </WPPopover>;
 };
-
 export default ConnectionPopaver;

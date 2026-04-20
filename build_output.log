@@ -1,0 +1,126 @@
+
+> zaplane@1.0.0 build
+> wp-scripts build
+
+assets by path *.css 190 KiB
+  asset app-rtl.css 94.8 KiB [emitted] (name: app)
+  asset app.css 94.8 KiB [emitted] (name: app)
+asset app.js 1.27 MiB [emitted] [minimized] [big] (name: app)
+asset app.asset.php 177 bytes [emitted] (name: app)
+Entrypoint app [big] 1.46 MiB = app.css 94.8 KiB app.js 1.27 MiB app-rtl.css 94.8 KiB app.asset.php 177 bytes
+orphan modules 21 MiB (javascript) 16.5 KiB (runtime) [orphan] 3170 modules
+runtime modules 2.18 KiB 6 modules
+built modules 18.9 MiB (javascript) 94.7 KiB (css/mini-extract) [built]
+  modules by path ./node_modules/lodash/*.js 188 KiB
+    ./node_modules/lodash/isPlainObject.js 1.61 KiB [built] [code generated]
+    + 240 modules
+  modules by path ./node_modules/es-toolkit/ 41.8 KiB 52 modules
+  modules by path ./node_modules/dagre/ 77.1 KiB 30 modules
+  modules by path ./node_modules/graphlib/ 28 KiB 20 modules
+  css modules 94.7 KiB 18 modules
+  modules by path ./node_modules/use-sync-external-store/ 7.84 KiB 6 modules
+  modules by path ./node_modules/hoist-non-react-statics/ 5.36 KiB
+    ./node_modules/hoist-non-react-statics/dist/hoist-non-react-statics.cjs.js 2.68 KiB [built] [code generated]
+    + 2 modules
+  + 10 modules
+
+WARNING in ./assets/scss/backend.scss (./assets/scss/backend.scss.webpack[javascript/auto]!=!./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[3].use[2]!./node_modules/@wordpress/scripts/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[3].use[3]!./assets/scss/backend.scss)
+Module Warning (from ./node_modules/@wordpress/scripts/node_modules/sass-loader/dist/cjs.js):
+Deprecation Warning on line 4, column 8 of file:///Users/fahimhasan/Local%20Sites/kodezen/app/public/wp-content/plugins/zaplane/assets/scss/backend.scss:4:8:
+Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+4 | @import './common/global';
+
+
+assets/scss/backend.scss 5:9  root stylesheet
+ @ ./assets/scss/backend.scss
+ @ ./dev_zaplane/app.js 4:0-37
+
+WARNING in ./assets/scss/backend.scss (./assets/scss/backend.scss.webpack[javascript/auto]!=!./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[3].use[2]!./node_modules/@wordpress/scripts/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[3].use[3]!./assets/scss/backend.scss)
+Module Warning (from ./node_modules/@wordpress/scripts/node_modules/sass-loader/dist/cjs.js):
+Deprecation Warning on line 5, column 8 of file:///Users/fahimhasan/Local%20Sites/kodezen/app/public/wp-content/plugins/zaplane/assets/scss/backend.scss:5:8:
+Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+5 | @import './common/notification';
+
+
+assets/scss/backend.scss 6:9  root stylesheet
+ @ ./assets/scss/backend.scss
+ @ ./dev_zaplane/app.js 4:0-37
+
+WARNING in ./assets/scss/backend.scss (./assets/scss/backend.scss.webpack[javascript/auto]!=!./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[3].use[2]!./node_modules/@wordpress/scripts/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[3].use[3]!./assets/scss/backend.scss)
+Module Warning (from ./node_modules/@wordpress/scripts/node_modules/sass-loader/dist/cjs.js):
+Deprecation Warning on line 6, column 9 of file:///Users/fahimhasan/Local%20Sites/kodezen/app/public/wp-content/plugins/zaplane/assets/scss/backend.scss:6:9:
+Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+6 | @import  './common/classLibrary';
+
+
+assets/scss/backend.scss 7:10  root stylesheet
+ @ ./assets/scss/backend.scss
+ @ ./dev_zaplane/app.js 4:0-37
+
+WARNING in ./assets/scss/backend.scss (./assets/scss/backend.scss.webpack[javascript/auto]!=!./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[3].use[2]!./node_modules/@wordpress/scripts/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[3].use[3]!./assets/scss/backend.scss)
+Module Warning (from ./node_modules/@wordpress/scripts/node_modules/sass-loader/dist/cjs.js):
+Deprecation Warning on line 7, column 8 of file:///Users/fahimhasan/Local%20Sites/kodezen/app/public/wp-content/plugins/zaplane/assets/scss/backend.scss:7:8:
+Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+7 | @import './common/button';
+
+
+assets/scss/backend.scss 8:9  root stylesheet
+ @ ./assets/scss/backend.scss
+ @ ./dev_zaplane/app.js 4:0-37
+
+WARNING in ./assets/scss/backend.scss (./assets/scss/backend.scss.webpack[javascript/auto]!=!./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[3].use[2]!./node_modules/@wordpress/scripts/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[3].use[3]!./assets/scss/backend.scss)
+Module Warning (from ./node_modules/@wordpress/scripts/node_modules/sass-loader/dist/cjs.js):
+Deprecation Warning on line 8, column 8 of file:///Users/fahimhasan/Local%20Sites/kodezen/app/public/wp-content/plugins/zaplane/assets/scss/backend.scss:8:8:
+Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+8 | @import './common/listTable';
+
+assets/scss/backend.scss 9:9  root stylesheet
+ @ ./assets/scss/backend.scss
+ @ ./dev_zaplane/app.js 4:0-37
+
+WARNING in ./node_modules/react-datepicker/dist/index.es.js 138:20-48
+Critical dependency: the request of a dependency is an expression
+ @ ./dev_zaplane/components/ZAPDatePicker/index.js 2:0-42 19:26-36
+ @ ./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/ActionFieldRenderer/ActionFieldRenderer.js 5:0-57 52:31-44
+ @ ./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/ActionDrawer.js 17:0-76 255:109-128
+ @ ./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/FlowCanvas/FlowCanvas.js 6:0-56 216:26-38
+ @ ./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/index.js 3:0-49 97:32-42
+ @ ./dev_zaplane/containers/BackendDashboard/index.js 4:0-57 21:33-42
+ @ ./dev_zaplane/app.js 7:0-61 30:32-48
+
+WARNING in asset size limit: The following asset(s) exceed the recommended size limit (244 KiB).
+This can impact web performance.
+Assets: 
+  app.js (1.27 MiB)
+
+WARNING in entrypoint size limit: The following entrypoint(s) combined asset size exceeds the recommended limit (244 KiB). This can impact web performance.
+Entrypoints:
+  app (1.46 MiB)
+      app.css
+      app.js
+      app-rtl.css
+      app.asset.php
+
+WARNING in webpack performance recommendations: 
+You can limit the size of your bundles by using import() or require.ensure to lazy load some parts of your application.
+For more info visit https://webpack.js.org/guides/code-splitting/
+
+1 warning has detailed information that is not shown.
+Use 'stats.errorDetails: true' resp. '--stats-error-details' to show it.
+
+webpack 5.106.2 compiled with 9 warnings in 16806 ms

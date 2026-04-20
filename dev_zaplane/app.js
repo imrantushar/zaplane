@@ -1,13 +1,11 @@
 import { createPortal } from '@wordpress/element';
 import { createRoot } from 'react-dom/client';
 import { flushSync } from 'react-dom';
-import { ChakraProvider, createSystem, defaultConfig } from '@chakra-ui/react';
 import '../assets/scss/backend.scss';
 import { Provider } from 'react-redux';
 import { BrowserRouter as Router } from 'react-router-dom';
 import BackendDashboard from './containers/BackendDashboard';
 import AdminMenu from '@ZAPContainers/BackendDashboard/AdminMenu';
-import { theme } from '../assets/scss/chakra/theme';
 import { store } from '@ZAPRedux/store';
 import { WorkFlowHook } from '@ZAPContainers/BackendDashboard/pages/workflows/WorkFlowHook';
 

@@ -1,32 +1,23 @@
-import { Button, Flex, Text } from "@chakra-ui/react";
 import { sprintf, __ } from "@wordpress/i18n";
 import ZAPIcon from "@ZAPComponents/ZAPIcon";
-
-const DrawerItemButton = ({ item, onClick, showType = true, arrowIcon, icon, }) => {
-
-  return (
-    <Button
-      w="100%"
-      p='4px'
-      height='50px'
-      borderRadius="4px"
-      background="var(--zaplane-background)"
-      color="var(--zaplane-font-color)"
-      justifyContent="space-between"
-      _hover={{ bg: "#F6F7F8" }}
-      onClick={onClick}
-    >
-      <Flex gap="8px">
-        <ZAPIcon icon={icon} name={item.name} isAction={true}/>
-        <Text className="zaplane-label" fontWeight="400" as="span" display='flex' alignItems="center">{sprintf(__("%s", "zaplane"), item.name)}</Text>
-      </Flex>
+const DrawerItemButton = ({
+  item,
+  onClick,
+  showType = true,
+  arrowIcon,
+  icon
+}) => {
+  return <button height='50px' _hover={{
+    bg: "#F6F7F8"
+  }} onClick={onClick} className="w-[full] p-[4px] rounded-[4px] bg-var(--zaplane-background) text-var(--zaplane-font-color) justify-between">
+      <div gap="8px" className="flex">
+        <ZAPIcon icon={icon} name={item.name} isAction={true} />
+        <span as="span" className="zaplane-label font-[400] flex items-center">{sprintf(__("%s", "zaplane"), item.name)}</span>
+      </div>
       {arrowIcon && arrowIcon}
-      {showType && item.type && (
-        <Text fontSize="xs" className="zaplane-label" >
+      {showType && item.type && <span className="zaplane-label text-[xs]">
           {item.type === "tools" ? __('Tool', 'zaplane') : __('App', 'zaplane')}
-        </Text>
-      )}
-    </Button>
-  );
-}
-export default DrawerItemButton
+        </span>}
+    </button>;
+};
+export default DrawerItemButton;

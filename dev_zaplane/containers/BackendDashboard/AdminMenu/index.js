@@ -8,8 +8,6 @@ import {
 } from '@ZAPUtils/helper';
 import { useSelector } from 'react-redux';
 import MenuItem from './MenuItem';
-import { ChakraProvider } from '@chakra-ui/react';
-import { theme } from '../../../../assets/scss/chakra/theme';
 
 const AdminMenu = () => {
 	const adminmenu = useSelector( ( state ) => state.adminmenu.data );
@@ -22,7 +20,6 @@ const AdminMenu = () => {
 	}, [ page ] );
 
 	return (
-		<ChakraProvider value={theme}>
 		<React.Fragment>
 				<Link
 					to={ `${ route_path }admin.php?page=zaplane` }
@@ -108,7 +105,6 @@ const AdminMenu = () => {
 					</> */}
 				</ul>
 		</React.Fragment>
-		</ChakraProvider>
 	);
 };
 

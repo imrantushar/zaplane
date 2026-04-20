@@ -12,8 +12,6 @@ import { __ } from '@wordpress/i18n';
 import RecipesPage from './pages/recipes';
 import Folders from './pages/Folders';
 import Folder from './pages/Folders/Folder';
-import { ChakraProvider } from '@chakra-ui/react';
-import { theme } from '../../../assets/scss/chakra/theme';
 
 
 
@@ -50,7 +48,6 @@ export default function BackendDashboard() {
 	const query = useQuery();
 
 	return (
-		<ChakraProvider value={theme}>
 			<div className="zaplane-admin-content">
 				<Notification />
 				{renderSwitch(
@@ -60,6 +57,5 @@ export default function BackendDashboard() {
 					query.get('path')
 				)}
 			</div>
-		</ChakraProvider>
 	);
 }
