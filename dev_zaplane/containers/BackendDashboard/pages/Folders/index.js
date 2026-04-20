@@ -20,10 +20,15 @@ const Folders = () => {
   useEffect(() => {
     dispatch(getFolders());
   }, []);
-  return <PageLayout title="Folders" isLoading={isLoading} skeleton={FolderSkeleton} actions={<button onClick={() => setIsFolderModalOpen(true)} style={primaryBtn}>
+  return <PageLayout title="Folders" isLoading={isLoading} skeleton={FolderSkeleton} actions={
+                <button 
+                    onClick={() => setIsFolderModalOpen(true)} 
+                    className="bg-[var(--zaplane-primary)] hover:opacity-90 text-white font-medium py-2 px-6 rounded-lg transition-all shadow-sm active:scale-95"
+                >
                     {__("Create Folder", "zaplane")}
-                </button>}>
-            {allFolders.length ? <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                </button>
+            }>
+            {allFolders.length ? <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {allFolders?.map(folder => <FolderCard key={folder.id} folder={folder} />)}
                 </div> : <WorkflowFolderEmptyState />}
 

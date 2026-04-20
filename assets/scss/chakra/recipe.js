@@ -31,10 +31,10 @@ export const primaryClearBtn = {
 export const outlineBtn = {
     background: "transparent",
     color: "var(--zaplane-font-color)",
-    borderColor: "var(--zaplane-border-color)",
-    borderWidth: "1px",
-    borderStyle: "solid",
+    border: "1px solid var(--zaplane-border-color)",
     cursor: "pointer",
+    padding: "8px 16px",
+    borderRadius: "4px",
 }
 
 export const removeBtn = {
