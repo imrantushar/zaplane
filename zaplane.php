@@ -61,6 +61,7 @@ final class Zaplane {
 		define( 'ZAPLANE_PLUGIN_FILE', __FILE__ );
 		define( 'ZAPLANE_PLUGIN_ROOT_URI', plugins_url( '/', __FILE__ ) );
 		define( 'ZAPLANE_ROOT_DIR_PATH', plugin_dir_path( __FILE__ ) );
+		define( 'ZAPLANE_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
 		define( 'ZAPLANE_INCLUDES_DIR_PATH', ZAPLANE_ROOT_DIR_PATH . 'includes/' );
 		define( 'ZAPLANE_FRAMEWORK_DIR_PATH', ZAPLANE_ROOT_DIR_PATH . 'includes/framework/' );
 		define( 'ZAPLANE_INTEGRATION_DIR_PATH', ZAPLANE_ROOT_DIR_PATH . 'integration/' );
@@ -69,6 +70,8 @@ final class Zaplane {
 	}
 
 	private function load_dependencies(): void {
+		require_once ZAPLANE_ROOT_DIR_PATH . 'vendor/autoload.php';
+		require_once ZAPLANE_ROOT_DIR_PATH . 'vendor/woocommerce/action-scheduler/action-scheduler.php';
 		require_once ZAPLANE_INCLUDES_DIR_PATH . 'autoload.php';
 		require_once ZAPLANE_FRAMEWORK_DIR_PATH . 'functions.php';
 		require_once ZAPLANE_INCLUDES_DIR_PATH . 'utils/functions.php';

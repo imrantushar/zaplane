@@ -2,6 +2,39 @@
 @tailwind components;
 @tailwind utilities;
 
+.zaplane-scope {
+    *, *::before, *::after {
+        box-sizing: border-box;
+    }
+}
+
+.toplevel_page_zaplane {
+    #adminmenuwrap,
+    #adminmenu,
+    #adminmenuback {
+        *, *::before, *::after {
+            box-sizing: content-box;
+            border: revert;
+            outline: revert;
+        }
+    }
+    
+    #adminmenu #collapse-menu,
+    #adminmenu #collapse-button {
+        border: none !important;
+        border-radius: 0 !important;
+        outline: revert !important;
+        box-shadow: none !important;
+        background: transparent !important;
+        
+        &::before,
+        &::after {
+            border: none !important;
+            box-sizing: content-box !important;
+        }
+    }
+}
+
 @import './common/global';
 @import './common/notification';
 @import  './common/classLibrary';

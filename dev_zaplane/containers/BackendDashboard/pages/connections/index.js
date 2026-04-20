@@ -5,7 +5,6 @@ import ConnectionTable from "./ConnectionTable";
 import { primaryBtn } from "../../../../../assets/scss/chakra/recipe";
 import { formatLabel } from "@ZAPUtils/helper";
 import ZAPDrawer from "@ZAPComponents/Drawer";
-import DrawerItemList from "../workflows/workFlowMotion/ActionDrawer/DrawerItemList";
 import useConnection from "@ZAPHooks/useConnection/useConnection";
 import ZAPLoading from "@ZAPComponents/Loading";
 import PageLayout from "@ZAPComponents/PageLayout";
