@@ -1359,7 +1359,7 @@
         "wordpress": {
             "slug": "wordpress",
             "name": "WordPress",
-            "icon": "WordPress.svg",
+            "icon": "wordpress.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
