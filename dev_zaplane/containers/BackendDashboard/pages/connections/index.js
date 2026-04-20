@@ -8,6 +8,7 @@ import ZAPDrawer from "@ZAPComponents/Drawer";
 import useConnection from "@ZAPHooks/useConnection/useConnection";
 import ZAPLoading from "@ZAPComponents/Loading";
 import PageLayout from "@ZAPComponents/PageLayout";
+import DrawerItemList from "@ZAPComponents/SearchableDrawerList/DrawerItemList";
 const Connections = () => {
   const {
     isDrawerOpen,
