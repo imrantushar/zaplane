@@ -4,11 +4,29 @@ const ZAPIcon = ({
   name,
   isAction = false
 }) => {
-  const isSvg = icon?.endsWith(".svg");
-  const size = isAction ? '40px' : '32px';
-  const imgSize = isAction ? '20px' : '16px';
-  return <div style={{width: size, height: size, background: isAction ? undefined : '#F6F7F8', flexShrink: 0}} className="flex justify-center items-center p-[7px] rounded-[4px] border">
-      {isSvg ? <img src={`${plugin_root_url}assets/images/icons/${icon}`} alt={name} style={{width: imgSize, height: imgSize}} /> : <span className={`zaplane-icon zaplane-icon--${icon} m-0`} />}
+  const isSvg = icon?.endsWith(".svg") || icon?.includes("http");
+  const size = isAction ? '48px' : '32px';
+  const imgSize = isAction ? '24px' : '18px';
+  
+  return <div 
+    style={{
+        width: size, 
+        height: size, 
+        background: isAction ? '#FFFFFF' : '#F6F7F8', 
+        flexShrink: 0,
+        borderColor: 'var(--zaplane-border-color)'
+    }} 
+    className="flex justify-center items-center p-2 rounded-lg border shadow-sm"
+  >
+      {isSvg ? (
+        <img 
+          src={icon?.includes("http") ? icon : `${plugin_root_url}assets/images/icons/${icon}`} 
+          alt={name} 
+          style={{width: imgSize, height: imgSize, objectFit: 'contain'}} 
+        />
+      ) : (
+        <span className={`zaplane-icon zaplane-icon--${icon} m-0`} style={{fontSize: imgSize}} />
+      )}
     </div>;
 };
 export default ZAPIcon;

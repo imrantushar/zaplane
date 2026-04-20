@@ -74,9 +74,7 @@ const VariableEditor = ({
     setActiveRange(range);
   };
   return <>
-      <div style={{display:'flex', flexDirection:'column', gap:'8px', ...style}}>
-      ...containerStyle
-    }} className="flex">
+      <div style={{display:'flex', flexDirection:'column', gap:'8px', ...containerStyle}}>
         <span>{__(label, "zaplane")}</span>
 
         <div ref={editorRef} onInput={handleInput} className={`zaplane-variable-editor ${isEmpty ? "zaplane-empty" : ""}`} contentEditable suppressContentEditableWarning onKeyDown={handleKeyDown} onClick={handleCursorSave} onKeyUp={handleCursorSave} onBlur={() => syncValue(editorRef, field.key, setFieldValue)} data-placeholder={placeholder} />

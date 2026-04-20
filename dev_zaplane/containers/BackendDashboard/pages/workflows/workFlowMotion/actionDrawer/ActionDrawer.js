@@ -22,6 +22,7 @@ import DrawerModeList from "@ZAPComponents/SearchableDrawerList/DrawerItemList/D
 import DrawerItemList from "@ZAPComponents/SearchableDrawerList/DrawerItemList";
 import ActionFieldRenderer from "./ActionFieldRenderer/ActionFieldRenderer";
 import TestRun from "./TestRun/TestRun";
+import DrawerSearchList from "@ZAPComponents/SearchableDrawerList/DrawerSearchList/DrawerSearchList";
 
 const ActionDrawer = ({
   open,
@@ -170,31 +171,46 @@ const ActionDrawer = ({
     };
     dispatch(conditionVariables(payload));
   }, [node?.id]);
-  return <ZAPDrawer open={open} isFullscreen={isFullscreen} onClose={resetAll} arrowClose={['tools', 'app'].includes(mode)} maxWidth='500px' {...['filter', 'if'].includes(values?.actionType) && {
-    maxWidth: '700px'
-  }} arrowOnClick={() => {
-    setSelectedItem(null);
-    setMode(null);
-    setStep("select");
-    setFieldValue("actionType", "");
-  }}
-  // closeOnOverlayClick
-  title={!mode ? "Add Action" : selectedItem?.name || __('App', 'zaplane')} placement="end"
-  // size={["filter", "condition"].includes(values?.actionType) ? "xl" : "md"}
-  footer={<div className="flex flex-row items-center justify-between">
-          <button variant="outline" onClick={resetAll}>{__("Cancel", "zaplane")}</button>
-          <button style={primaryBtn} disabled={!values.actionType} onClick={handleContinue}>{step === 'test' ? __('Save', 'zaplane') : __('Continue', 'zaplane')}
-          </button>
-        </div>}>
-    
+  return <ZAPDrawer open={open} isFullscreen={isFullscreen} onClose={resetAll}
+    arrowClose={['tools', 'app'].includes(mode)}
+    maxWidth={['filter', 'if'].includes(values?.actionType) ? 'max-w-[700px]' : 'max-w-[500px]'}
+    arrowOnClick={() => {
+      setSelectedItem(null);
+      setMode(null);
+      setStep("select");
+      setFieldValue("actionType", "");
+    }}
+    // closeOnOverlayClick
+    title={!mode ? "Add Action" : selectedItem?.name || __('App', 'zaplane')} placement="end"
+    // size={["filter", "condition"].includes(values?.actionType) ? "xl" : "md"}
+    footer={<div className="flex items-center justify-end gap-3">
+      <button
+        className="px-6 py-2 border border-[var(--zaplane-border-color)] rounded-lg text-[var(--zaplane-font-color)] font-medium hover:bg-gray-50 transition-colors"
+        onClick={resetAll}
+      >
+        {__("Cancel", "zaplane")}
+      </button>
+      <button
+        className="px-6 py-2 bg-[var(--zaplane-primary)] hover:opacity-90 text-white font-medium rounded-lg transition-all shadow-sm active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+        disabled={!values.actionType}
+        onClick={handleContinue}
+      >
+        {step === 'test' ? __('Save', 'zaplane') : __('Continue', 'zaplane')}
+      </button>
+    </div>}>
+
+    {!selectedItem && (
+      <>
         <Search placeholder={__("Search apps or tools...", "zaplane")} defaultValue={search} onSearchHandler={value => setSearch(value)} />
-      {search && <DrawerSearchList searchList={searchList} setMode={setMode} setSelectedItem={setSelectedItem} setSearch={setSearch} />}
+        {search && <DrawerSearchList searchList={searchList} setMode={setMode} setSelectedItem={setSelectedItem} setSearch={setSearch} />}
+      </>
+    )}
 
-      {!mode && !search && !selectedItem && <DrawerModeList setMode={setMode} setSelectedItem={setSelectedItem} isTrigger={isTrigger} source={source} TOOLS={TOOLS} />}
+    {!mode && !search && !selectedItem && <DrawerModeList setMode={setMode} setSelectedItem={setSelectedItem} isTrigger={isTrigger} source={source} TOOLS={TOOLS} />}
 
-      {mode && !selectedItem && !search && <DrawerItemList list={list} setSelectedItem={setSelectedItem} setMode={setMode} />}
+    {mode && !selectedItem && !search && <DrawerItemList list={list} setSelectedItem={setSelectedItem} setMode={setMode} />}
 
-      {selectedItem && <ZAPTab value={step} onChange={values?.actionType && setStep} tabs={[{
+    {selectedItem && <ZAPTab value={step} onChange={values?.actionType && setStep} tabs={[{
       value: "select",
       label: "Select",
       content: <SelectTab isTrigger={isTrigger} actionOptions={actionOptions} selectedActionFields={selectedActionFields} values={values} setFieldValue={setFieldValue} dynamicOptions={dynamicOptions} loadingFields={loadingFields} fetchDynamicOptions={fetchDynamicOptions} getKey={getKey} node={node} workFlow={workFlow} selectedIntegration={selectedIntegration} appSlug={selectedItem?.id} />
@@ -202,15 +218,15 @@ const ActionDrawer = ({
       value: "configure",
       label: "Configure",
       content: <>
-                <div className="action-drowar-lists flex flex-col gap-4">
-                  {selectedActionFields?.length > 0 ? selectedActionFields.map(field => <ActionFieldRenderer key={field.key} field={field} value={values?.[field.key]} setFieldValue={setFieldValue} getKey={getKey} dynamicOptions={dynamicOptions} loadingFields={loadingFields} fetchDynamicOptions={fetchDynamicOptions} nodeId={node?.id} workFlow={workFlow} nodes={nodes} edges={edges} />) : <ZAPLabel label={__("No configuration required for this action.", "zaplane")} type="simple" />}
-                </div>
-              </>
+        <div className="action-drowar-lists flex flex-col gap-4">
+          {selectedActionFields?.length > 0 ? selectedActionFields.map(field => <ActionFieldRenderer key={field.key} field={field} value={values?.[field.key]} setFieldValue={setFieldValue} getKey={getKey} dynamicOptions={dynamicOptions} loadingFields={loadingFields} fetchDynamicOptions={fetchDynamicOptions} nodeId={node?.id} workFlow={workFlow} nodes={nodes} edges={edges} />) : <ZAPLabel label={__("No configuration required for this action.", "zaplane")} type="simple" />}
+        </div>
+      </>
     }, {
       value: "test",
       label: "Test",
       content: <TestRun nodes={nodes} edges={edges} source={source} node={node} workFlow={workFlow} values={values} />
     }]} />}
-    </ZAPDrawer>;
+  </ZAPDrawer>;
 };
 export default ActionDrawer;

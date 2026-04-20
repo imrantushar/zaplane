@@ -8,7 +8,7 @@ const DrawerModeList = ({
   source,
   TOOLS
 }) => {
-  return <div gap="16px" className="flex flex-col">
+  return <div className="flex flex-col gap-4">
       <DrawerItemButton item={{
       name: "Apps"
     }} onClick={() => setMode("app")} arrowIcon={<IoIosArrowForward />} showType={false} icon={'apps'} />
