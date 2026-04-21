@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-04-20 12:53:30",
+    "generated_at": "2026-04-21 11:35:35",
     "apps": {
         "cartflows": {
             "slug": "cartflows",
@@ -21216,13 +21216,13 @@
                     "hook": "discord_webhook_new_message_in_channel",
                     "schema": [
                         {
-                            "key": "connection_id",
+                            "key": "guild_id",
                             "type": "select",
-                            "label": "Select Connection",
+                            "label": "Select Server",
                             "required": true,
                             "dynamic": {
                                 "integration": "discord",
-                                "query": "connection_query",
+                                "query": "guild_query",
                                 "select": [
                                     "value",
                                     "label"
@@ -21240,8 +21240,17 @@
                                 "select": [
                                     "value",
                                     "label"
+                                ],
+                                "depends_on": [
+                                    "guild_id"
                                 ]
                             }
+                        },
+                        {
+                            "key": "webhook_url",
+                            "type": "webhook_url",
+                            "label": "Webhook URL",
+                            "readonly": true
                         }
                     ],
                     "outputs": [
@@ -21252,7 +21261,28 @@
                     "key": "new_user_join_server",
                     "label": "New User Join Server",
                     "hook": "discord_webhook_new_user_join_server",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "guild_id",
+                            "type": "select",
+                            "label": "Select Server",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "discord",
+                                "query": "guild_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "webhook_url",
+                            "type": "webhook_url",
+                            "label": "Webhook URL",
+                            "readonly": true
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -21264,13 +21294,13 @@
                     "label": "Create Channel",
                     "schema": [
                         {
-                            "key": "connection_id",
+                            "key": "guild_id",
                             "type": "select",
-                            "label": "Select Connection",
+                            "label": "Select Server",
                             "required": true,
                             "dynamic": {
                                 "integration": "discord",
-                                "query": "connection_query",
+                                "query": "guild_query",
                                 "select": [
                                     "value",
                                     "label"
@@ -21294,6 +21324,9 @@
                                 "select": [
                                     "value",
                                     "label"
+                                ],
+                                "depends_on": [
+                                    "guild_id"
                                 ]
                             }
                         },
@@ -21313,13 +21346,13 @@
                     "label": "Update Channel",
                     "schema": [
                         {
-                            "key": "connection_id",
+                            "key": "guild_id",
                             "type": "select",
-                            "label": "Select Connection",
+                            "label": "Select Server",
                             "required": true,
                             "dynamic": {
                                 "integration": "discord",
-                                "query": "connection_query",
+                                "query": "guild_query",
                                 "select": [
                                     "value",
                                     "label"
@@ -21337,6 +21370,9 @@
                                 "select": [
                                     "value",
                                     "label"
+                                ],
+                                "depends_on": [
+                                    "guild_id"
                                 ]
                             }
                         },
@@ -21362,13 +21398,13 @@
                     "label": "Get Channel By Name",
                     "schema": [
                         {
-                            "key": "connection_id",
+                            "key": "guild_id",
                             "type": "select",
-                            "label": "Select Connection",
+                            "label": "Select Server",
                             "required": true,
                             "dynamic": {
                                 "integration": "discord",
-                                "query": "connection_query",
+                                "query": "guild_query",
                                 "select": [
                                     "value",
                                     "label"
@@ -21391,13 +21427,13 @@
                     "label": "Send Channel Message",
                     "schema": [
                         {
-                            "key": "connection_id",
+                            "key": "guild_id",
                             "type": "select",
-                            "label": "Select Connection",
+                            "label": "Select Server",
                             "required": true,
                             "dynamic": {
                                 "integration": "discord",
-                                "query": "connection_query",
+                                "query": "guild_query",
                                 "select": [
                                     "value",
                                     "label"
@@ -21415,13 +21451,16 @@
                                 "select": [
                                     "value",
                                     "label"
+                                ],
+                                "depends_on": [
+                                    "guild_id"
                                 ]
                             }
                         },
                         {
                             "key": "content",
-                            "label": "Message Content",
                             "type": "textarea",
+                            "label": "Message Content",
                             "required": true
                         }
                     ],
@@ -21434,13 +21473,13 @@
                     "label": "Find Channel",
                     "schema": [
                         {
-                            "key": "connection_id",
+                            "key": "guild_id",
                             "type": "select",
-                            "label": "Select Connection",
+                            "label": "Select Server",
                             "required": true,
                             "dynamic": {
                                 "integration": "discord",
-                                "query": "connection_query",
+                                "query": "guild_query",
                                 "select": [
                                     "value",
                                     "label"
@@ -21464,6 +21503,9 @@
                                 "select": [
                                     "value",
                                     "label"
+                                ],
+                                "depends_on": [
+                                    "guild_id"
                                 ]
                             }
                         }
@@ -21477,13 +21519,13 @@
                     "label": "Create A Channel Invite",
                     "schema": [
                         {
-                            "key": "connection_id",
+                            "key": "guild_id",
                             "type": "select",
-                            "label": "Select Connection",
+                            "label": "Select Server",
                             "required": true,
                             "dynamic": {
                                 "integration": "discord",
-                                "query": "connection_query",
+                                "query": "guild_query",
                                 "select": [
                                     "value",
                                     "label"
@@ -21501,6 +21543,9 @@
                                 "select": [
                                     "value",
                                     "label"
+                                ],
+                                "depends_on": [
+                                    "guild_id"
                                 ]
                             }
                         },
@@ -21542,20 +21587,6 @@
                     "label": "Send Direct Message",
                     "schema": [
                         {
-                            "key": "connection_id",
-                            "type": "select",
-                            "label": "Select Connection",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "discord",
-                                "query": "connection_query",
-                                "select": [
-                                    "value",
-                                    "label"
-                                ]
-                            }
-                        },
-                        {
                             "key": "user_id",
                             "type": "select",
                             "label": "Select User",
@@ -21571,8 +21602,8 @@
                         },
                         {
                             "key": "content",
-                            "label": "Message Content",
                             "type": "textarea",
+                            "label": "Message Content",
                             "required": true
                         }
                     ],
@@ -21585,13 +21616,13 @@
                     "label": "Delete Message",
                     "schema": [
                         {
-                            "key": "connection_id",
+                            "key": "guild_id",
                             "type": "select",
-                            "label": "Select Connection",
+                            "label": "Select Server",
                             "required": true,
                             "dynamic": {
                                 "integration": "discord",
-                                "query": "connection_query",
+                                "query": "guild_query",
                                 "select": [
                                     "value",
                                     "label"
@@ -21609,6 +21640,9 @@
                                 "select": [
                                     "value",
                                     "label"
+                                ],
+                                "depends_on": [
+                                    "guild_id"
                                 ]
                             }
                         },
@@ -21628,13 +21662,13 @@
                     "label": "Get Message",
                     "schema": [
                         {
-                            "key": "connection_id",
+                            "key": "guild_id",
                             "type": "select",
-                            "label": "Select Connection",
+                            "label": "Select Server",
                             "required": true,
                             "dynamic": {
                                 "integration": "discord",
-                                "query": "connection_query",
+                                "query": "guild_query",
                                 "select": [
                                     "value",
                                     "label"
@@ -21652,6 +21686,9 @@
                                 "select": [
                                     "value",
                                     "label"
+                                ],
+                                "depends_on": [
+                                    "guild_id"
                                 ]
                             }
                         },
@@ -21671,13 +21708,13 @@
                     "label": "Get Many Messages",
                     "schema": [
                         {
-                            "key": "connection_id",
+                            "key": "guild_id",
                             "type": "select",
-                            "label": "Select Connection",
+                            "label": "Select Server",
                             "required": true,
                             "dynamic": {
                                 "integration": "discord",
-                                "query": "connection_query",
+                                "query": "guild_query",
                                 "select": [
                                     "value",
                                     "label"
@@ -21695,6 +21732,9 @@
                                 "select": [
                                     "value",
                                     "label"
+                                ],
+                                "depends_on": [
+                                    "guild_id"
                                 ]
                             }
                         },
@@ -21717,13 +21757,13 @@
                     "label": "React With Emoji To Message",
                     "schema": [
                         {
-                            "key": "connection_id",
+                            "key": "guild_id",
                             "type": "select",
-                            "label": "Select Connection",
+                            "label": "Select Server",
                             "required": true,
                             "dynamic": {
                                 "integration": "discord",
-                                "query": "connection_query",
+                                "query": "guild_query",
                                 "select": [
                                     "value",
                                     "label"
@@ -21741,6 +21781,9 @@
                                 "select": [
                                     "value",
                                     "label"
+                                ],
+                                "depends_on": [
+                                    "guild_id"
                                 ]
                             }
                         },
@@ -21755,7 +21798,7 @@
                             "type": "text",
                             "label": "Emoji",
                             "required": true,
-                            "placeholder": "e.g. \ud83d\udc4d or custom_name:emoji_id"
+                            "placeholder": "e.g. or custom_name:emoji_id"
                         }
                     ],
                     "outputs": [
@@ -21767,13 +21810,13 @@
                     "label": "Get Many Members",
                     "schema": [
                         {
-                            "key": "connection_id",
+                            "key": "guild_id",
                             "type": "select",
-                            "label": "Select Connection",
+                            "label": "Select Server",
                             "required": true,
                             "dynamic": {
                                 "integration": "discord",
-                                "query": "connection_query",
+                                "query": "guild_query",
                                 "select": [
                                     "value",
                                     "label"
@@ -21799,13 +21842,13 @@
                     "label": "Add Role To Member",
                     "schema": [
                         {
-                            "key": "connection_id",
+                            "key": "guild_id",
                             "type": "select",
-                            "label": "Select Connection",
+                            "label": "Select Server",
                             "required": true,
                             "dynamic": {
                                 "integration": "discord",
-                                "query": "connection_query",
+                                "query": "guild_query",
                                 "select": [
                                     "value",
                                     "label"
@@ -21823,6 +21866,9 @@
                                 "select": [
                                     "value",
                                     "label"
+                                ],
+                                "depends_on": [
+                                    "guild_id"
                                 ]
                             }
                         },
@@ -21837,6 +21883,9 @@
                                 "select": [
                                     "value",
                                     "label"
+                                ],
+                                "depends_on": [
+                                    "guild_id"
                                 ]
                             }
                         }
@@ -21850,13 +21899,13 @@
                     "label": "Remove Role From Member",
                     "schema": [
                         {
-                            "key": "connection_id",
+                            "key": "guild_id",
                             "type": "select",
-                            "label": "Select Connection",
+                            "label": "Select Server",
                             "required": true,
                             "dynamic": {
                                 "integration": "discord",
-                                "query": "connection_query",
+                                "query": "guild_query",
                                 "select": [
                                     "value",
                                     "label"
@@ -21874,6 +21923,9 @@
                                 "select": [
                                     "value",
                                     "label"
+                                ],
+                                "depends_on": [
+                                    "guild_id"
                                 ]
                             }
                         },
@@ -21888,6 +21940,9 @@
                                 "select": [
                                     "value",
                                     "label"
+                                ],
+                                "depends_on": [
+                                    "guild_id"
                                 ]
                             }
                         }
@@ -21901,13 +21956,13 @@
                     "label": "Find User",
                     "schema": [
                         {
-                            "key": "connection_id",
+                            "key": "guild_id",
                             "type": "select",
-                            "label": "Select Connection",
+                            "label": "Select Server",
                             "required": true,
                             "dynamic": {
                                 "integration": "discord",
-                                "query": "connection_query",
+                                "query": "guild_query",
                                 "select": [
                                     "value",
                                     "label"
@@ -21930,13 +21985,13 @@
                     "label": "Create New Forum Post",
                     "schema": [
                         {
-                            "key": "connection_id",
+                            "key": "guild_id",
                             "type": "select",
-                            "label": "Select Connection",
+                            "label": "Select Server",
                             "required": true,
                             "dynamic": {
                                 "integration": "discord",
-                                "query": "connection_query",
+                                "query": "guild_query",
                                 "select": [
                                     "value",
                                     "label"
@@ -21954,6 +22009,9 @@
                                 "select": [
                                     "value",
                                     "label"
+                                ],
+                                "depends_on": [
+                                    "guild_id"
                                 ]
                             }
                         },
@@ -21965,8 +22023,8 @@
                         },
                         {
                             "key": "content",
-                            "label": "Message Content",
                             "type": "textarea",
+                            "label": "Message Content",
                             "required": true
                         }
                     ],

@@ -7,10 +7,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use Zaplane\Framework\Classes\IntegrationBase;
+use Zaplane\Framework\Classes\ConnectionManager;
 
 class Discord extends IntegrationBase {
 
-	// ✅ FIX #1: Correct Discord API base URL (was 'https://api.discord.com')
 	private const API_BASE_URL = 'https://discord.com/api/v10';
 
 	public static function get_slug(): string {
@@ -29,93 +29,48 @@ class Discord extends IntegrationBase {
 		return true;
 	}
 
-	// ✅ FIX #2: Discord uses Bot token auth, not generic 'api_key'
 	public static function get_auth_type(): string {
 		return 'bot_token';
 	}
 
-	// ✅ FIX #3: Removed Typeform copy-paste help text; correct Discord fields
 	public static function get_auth_fields( ?string $auth_type = null ): array {
 		return [
 			'bot_token' => [
 				'type'     => 'password',
 				'label'    => 'Bot Token',
 				'required' => true,
-				'help'     => 'Go to Discord Developer Portal → Your App → Bot → Reset Token.',
-			],
-			'guild_id'  => [
-				'type'     => 'text',
-				'label'    => 'Server (Guild) ID',
-				'required' => true,
-				'help'     => 'Right-click your Discord server icon → Copy Server ID (enable Developer Mode first).',
+				'help'     => 'Discord Developer Portal → Your App → Bot → Reset Token.',
 			],
 		];
 	}
 
-	// ✅ FIX #4: Correct test_connection using Discord /users/@me with Bot token
 	public static function test_connection( array $credentials ): array {
 		$bot_token = $credentials['bot_token'] ?? '';
-		$guild_id  = $credentials['guild_id'] ?? '';
 
 		if ( empty( $bot_token ) ) {
 			return [ 'success' => false, 'message' => 'Bot token is required.', 'details' => [] ];
 		}
 
-		if ( empty( $guild_id ) ) {
-			return [ 'success' => false, 'message' => 'Guild ID is required.', 'details' => [] ];
+		$body = self::api_request( $bot_token, 'GET', '/users/@me' );
+
+		if ( isset( $body['error'] ) ) {
+			return [
+				'success' => false,
+				'message' => 'Invalid bot token: ' . $body['error'],
+				'details' => [],
+			];
 		}
 
-		// Verify bot token by fetching bot's own user info
-		$response = wp_remote_get(
-			self::API_BASE_URL . '/users/@me',
-			[
-				'headers' => [
-					'Authorization' => 'Bot ' . $bot_token,
-					'Content-Type'  => 'application/json',
-				],
-				'timeout' => 15,
-			]
-		);
-
-		if ( is_wp_error( $response ) ) {
-			return [ 'success' => false, 'message' => 'Connection failed: ' . $response->get_error_message(), 'details' => [] ];
-		}
-
-		$code = (int) wp_remote_retrieve_response_code( $response );
-		$body = json_decode( wp_remote_retrieve_body( $response ), true ) ?? [];
-
-		if ( $code !== 200 ) {
-			$error_msg = $body['message'] ?? ( 'HTTP ' . $code );
-			return [ 'success' => false, 'message' => 'Invalid bot token: ' . $error_msg, 'details' => [] ];
-		}
-
-		// Also verify guild access
-		$guild_response = wp_remote_get(
-			self::API_BASE_URL . '/guilds/' . $guild_id,
-			[
-				'headers' => [
-					'Authorization' => 'Bot ' . $bot_token,
-					'Content-Type'  => 'application/json',
-				],
-				'timeout' => 15,
-			]
-		);
-
-		$guild_code = (int) wp_remote_retrieve_response_code( $guild_response );
-		$guild_body = json_decode( wp_remote_retrieve_body( $guild_response ), true ) ?? [];
-
-		if ( $guild_code !== 200 ) {
-			return [ 'success' => false, 'message' => 'Bot does not have access to this server/guild.', 'details' => [] ];
-		}
+		$guilds      = self::fetch_bot_guilds( $bot_token );
+		$guild_count = count( $guilds );
 
 		return [
 			'success' => true,
-			'message' => 'Connected as: ' . ( $body['username'] ?? 'Unknown Bot' ) . ' | Server: ' . ( $guild_body['name'] ?? $guild_id ),
+			'message' => 'Connected as: ' . ( $body['username'] ?? 'Unknown Bot' ) . ' | Servers: ' . $guild_count,
 			'details' => [
 				'bot_username' => $body['username'] ?? '',
-				'bot_id'       => $body['id'] ?? '',
-				'guild_name'   => $guild_body['name'] ?? '',
-				'guild_id'     => $guild_id,
+				'bot_id'       => $body['id']       ?? '',
+				'guild_count'  => $guild_count,
 			],
 		];
 	}
@@ -126,7 +81,7 @@ class Discord extends IntegrationBase {
 				'label' => 'New Message In Channel',
 				'hook'  => 'discord_webhook_new_message_in_channel',
 			],
-			'new_user_join_server'   => [
+			'new_user_join_server' => [
 				'label' => 'New User Join Server',
 				'hook'  => 'discord_webhook_new_user_join_server',
 			],
@@ -136,8 +91,26 @@ class Discord extends IntegrationBase {
 	public static function get_trigger_config_schema( string $trigger ): array {
 		if ( 'new_message_in_channel' === $trigger ) {
 			return [
-				...self::connection_id(),
+				...self::guild_id(),
 				...self::channel_id(),
+				[
+					'key'      => 'webhook_url',
+					'type'     => 'webhook_url',
+					'label'    => 'Webhook URL',
+					'readonly' => true,
+				],
+			];
+		}
+
+		if ( 'new_user_join_server' === $trigger ) {
+			return [
+				...self::guild_id(),
+				[
+					'key'      => 'webhook_url',
+					'type'     => 'webhook_url',
+					'label'    => 'Webhook URL',
+					'readonly' => true,
+				],
 			];
 		}
 
@@ -145,12 +118,29 @@ class Discord extends IntegrationBase {
 	}
 
 	public static function resolve_trigger( array $node, array $args ) {
-		switch ( $node['event'] ) {
+		$config   = $node['data']['config'] ?? [];
+		$event    = $node['data']['event'] ?? $node['event'] ?? '';
+		$guild_id = $config['guild_id']    ?? '';
+
+		switch ( $event ) {
+
 			case 'new_message_in_channel':
-				// TODO: match channel_id from webhook payload
+				$channel_id = $config['channel_id'] ?? '';
+
+				if ( ! empty( $channel_id ) && ( $args['channel_id'] ?? '' ) !== $channel_id ) {
+					return false;
+				}
+				if ( ! empty( $guild_id ) && ( $args['guild_id'] ?? '' ) !== $guild_id ) {
+					return false;
+				}
+
 				return $args;
 
 			case 'new_user_join_server':
+				if ( ! empty( $guild_id ) && ( $args['guild_id'] ?? '' ) !== $guild_id ) {
+					return false;
+				}
+
 				return $args;
 		}
 
@@ -178,18 +168,16 @@ class Discord extends IntegrationBase {
 		];
 	}
 
-	// ─── Field schema helpers ───────────────────────────────────────────────
-
-	private static function connection_id(): array {
+	private static function guild_id(): array {
 		return [
 			[
-				'key'      => 'connection_id',
+				'key'      => 'guild_id',
 				'type'     => 'select',
-				'label'    => 'Select Connection',
+				'label'    => 'Select Server',
 				'required' => true,
 				'dynamic'  => [
 					'integration' => 'discord',
-					'query'       => 'connection_query',
+					'query'       => 'guild_query',
 					'select'      => [ 'value', 'label' ],
 				],
 			],
@@ -207,6 +195,7 @@ class Discord extends IntegrationBase {
 					'integration' => 'discord',
 					'query'       => 'channel_query',
 					'select'      => [ 'value', 'label' ],
+					'depends_on'  => ['guild_id'],
 				],
 			],
 		];
@@ -234,6 +223,7 @@ class Discord extends IntegrationBase {
 					'integration' => 'discord',
 					'query'       => 'channel_type_query',
 					'select'      => [ 'value', 'label' ],
+					'depends_on'  => ['guild_id'],
 				],
 			],
 		];
@@ -254,8 +244,8 @@ class Discord extends IntegrationBase {
 		return [
 			[
 				'key'      => 'content',
-				'label'    => 'Message Content',
 				'type'     => 'textarea',
+				'label'    => 'Message Content',
 				'required' => true,
 			],
 		];
@@ -299,6 +289,7 @@ class Discord extends IntegrationBase {
 					'integration' => 'discord',
 					'query'       => 'member_query',
 					'select'      => [ 'value', 'label' ],
+					'depends_on'  => ['guild_id'],
 				],
 			],
 		];
@@ -315,19 +306,18 @@ class Discord extends IntegrationBase {
 					'integration' => 'discord',
 					'query'       => 'role_query',
 					'select'      => [ 'value', 'label' ],
+					'depends_on'  => ['guild_id'],
 				],
 			],
 		];
 	}
-
-	// ─── Action config schemas ───────────────────────────────────────────────
 
 	public static function get_action_config_schema( string $action ): array {
 		switch ( $action ) {
 
 			case 'create_channel':
 				return [
-					...self::connection_id(),
+					...self::guild_id(),
 					...self::channel_name(),
 					...self::channel_type(),
 					...self::channel_topic(),
@@ -335,7 +325,7 @@ class Discord extends IntegrationBase {
 
 			case 'update_channel':
 				return [
-					...self::connection_id(),
+					...self::guild_id(),
 					...self::channel_id(),
 					...self::channel_name(),
 					...self::channel_topic(),
@@ -343,20 +333,20 @@ class Discord extends IntegrationBase {
 
 			case 'get_channel_by_name':
 				return [
-					...self::connection_id(),
+					...self::guild_id(),
 					...self::channel_name(),
 				];
 
 			case 'send_channel_message':
 				return [
-					...self::connection_id(),
+					...self::guild_id(),
 					...self::channel_id(),
 					...self::message_content(),
 				];
 
 			case 'find_channel':
 				return [
-					...self::connection_id(),
+					...self::guild_id(),
 					[
 						'key'      => 'search_query',
 						'type'     => 'text',
@@ -366,10 +356,9 @@ class Discord extends IntegrationBase {
 					...self::channel_type(),
 				];
 
-			// ✅ FIX #5: Complete invite schema (max_uses was missing)
 			case 'create_a_channel_invite':
 				return [
-					...self::connection_id(),
+					...self::guild_id(),
 					...self::channel_id(),
 					[
 						'key'      => 'max_age',
@@ -403,23 +392,21 @@ class Discord extends IntegrationBase {
 
 			case 'send_direct_message':
 				return [
-					...self::connection_id(),
 					...self::user_id(),
 					...self::message_content(),
 				];
 
-			// ✅ FIX #6: Was [ 'delete_message', 'get_message' ] === $action (always false!)
 			case 'delete_message':
 			case 'get_message':
 				return [
-					...self::connection_id(),
+					...self::guild_id(),
 					...self::channel_id(),
 					...self::message_id(),
 				];
 
 			case 'get_many_message':
 				return [
-					...self::connection_id(),
+					...self::guild_id(),
 					...self::channel_id(),
 					[
 						'key'      => 'limit',
@@ -434,7 +421,7 @@ class Discord extends IntegrationBase {
 
 			case 'react_with_emoji_to_message':
 				return [
-					...self::connection_id(),
+					...self::guild_id(),
 					...self::channel_id(),
 					...self::message_id(),
 					[
@@ -442,13 +429,13 @@ class Discord extends IntegrationBase {
 						'type'        => 'text',
 						'label'       => 'Emoji',
 						'required'    => true,
-						'placeholder' => 'e.g. 👍 or custom_name:emoji_id',
+						'placeholder' => 'e.g. or custom_name:emoji_id',
 					],
 				];
 
 			case 'get_many_member':
 				return [
-					...self::connection_id(),
+					...self::guild_id(),
 					[
 						'key'      => 'limit',
 						'type'     => 'number',
@@ -460,18 +447,17 @@ class Discord extends IntegrationBase {
 					],
 				];
 
-			// ✅ FIX #7: Was [ 'add_role_to_member', 'remove_role_from_member' ] === $action (always false!)
 			case 'add_role_to_member':
 			case 'remove_role_from_member':
 				return [
-					...self::connection_id(),
+					...self::guild_id(),
 					...self::member_id(),
 					...self::role_id(),
 				];
 
 			case 'find_user':
 				return [
-					...self::connection_id(),
+					...self::guild_id(),
 					[
 						'key'      => 'search_query',
 						'type'     => 'text',
@@ -482,7 +468,7 @@ class Discord extends IntegrationBase {
 
 			case 'create_new_forum_post':
 				return [
-					...self::connection_id(),
+					...self::guild_id(),
 					...self::channel_id(),
 					[
 						'key'      => 'name',
@@ -497,19 +483,18 @@ class Discord extends IntegrationBase {
 		return [];
 	}
 
-	// ─── Execute node ────────────────────────────────────────────────────────
-
-	// ✅ FIX #8: All cases now actually call Discord API (were all empty before)
 	public static function execute_node( array $node, array $input ): array {
 		$config    = $node['data']['config'] ?? [];
-		$event     = $node['data']['event'] ?? '';
-		$conn_id   = $config['connection_id'] ?? '';
-		$creds     = self::get_connection_credentials( $conn_id );
-		$bot_token = $creds['bot_token'] ?? '';
-		$guild_id  = $creds['guild_id'] ?? '';
+		$event     = $node['data']['event']  ?? '';
+		$creds     = self::get_connection_credentials( $node );
+		$bot_token = $creds['bot_token']     ?? '';
+		$guild_id  = $config['guild_id']     ?? '';
 
 		if ( empty( $bot_token ) ) {
-			return [ 'port' => 'main', 'data' => array_merge( $input, [ 'error' => 'Bot token missing from connection.' ] ) ];
+			return [
+				'port' => 'main',
+				'data' => array_merge( $input, [ 'error' => 'Bot token missing from connection.' ] ),
+			];
 		}
 
 		$result = [];
@@ -517,25 +502,40 @@ class Discord extends IntegrationBase {
 		switch ( $event ) {
 
 			case 'create_channel':
-				$result = self::api_request( $bot_token, 'POST', "/guilds/{$guild_id}/channels", [
-					'name'  => $config['name'] ?? '',
-					'type'  => (int) ( $config['type'] ?? 0 ),
-					'topic' => $config['topic'] ?? '',
-				] );
+				$name = trim( $config['name'] ?? '' );
+				if ( empty( $name ) ) {
+					$result = [ 'error' => 'Channel name is required.' ];
+					break;
+				}
+				$payload = [
+					'name' => $name,
+					'type' => (int) ( $config['type'] ?? 0 ),
+				];
+				if ( ! empty( $config['topic'] ) ) {
+					$payload['topic'] = $config['topic'];
+				}
+				$result = self::api_request( $bot_token, 'POST', "/guilds/{$guild_id}/channels", $payload );
 				break;
 
 			case 'update_channel':
+
+				$name       = trim( $config['name'] ?? '' );
 				$channel_id = $config['channel_id'] ?? '';
-				$result     = self::api_request( $bot_token, 'PATCH', "/channels/{$channel_id}", [
-					'name'  => $config['name'] ?? '',
-					'topic' => $config['topic'] ?? '',
-				] );
+				if ( empty( $name ) ) {
+					$result = [ 'error' => 'Channel name is required.' ];
+					break;
+				}
+				$payload = [ 'name' => $name ];
+				if ( ! empty( $config['topic'] ) ) {
+					$payload['topic'] = $config['topic'];
+				}
+				$result = self::api_request( $bot_token, 'PATCH', "/channels/{$channel_id}", $payload );
 				break;
 
 			case 'get_channel_by_name':
 				$channels = self::api_request( $bot_token, 'GET', "/guilds/{$guild_id}/channels" );
 				$name     = $config['name'] ?? '';
-				$result   = [];
+				$result   = [ 'error' => 'Channel not found', 'searched_name' => $name ];
 				if ( is_array( $channels ) ) {
 					foreach ( $channels as $ch ) {
 						if ( isset( $ch['name'] ) && $ch['name'] === $name ) {
@@ -556,13 +556,13 @@ class Discord extends IntegrationBase {
 			case 'find_channel':
 				$channels = self::api_request( $bot_token, 'GET', "/guilds/{$guild_id}/channels" );
 				$query    = $config['search_query'] ?? '';
-				$type     = $config['type'] ?? '';
+				$type     = $config['type']         ?? '';
 				$result   = [];
 				if ( is_array( $channels ) ) {
 					foreach ( $channels as $ch ) {
 						$matches_name = isset( $ch['name'] ) && stripos( $ch['name'], $query ) !== false;
 						$matches_id   = isset( $ch['id'] ) && $ch['id'] === $query;
-						$matches_type = empty( $type ) || ( isset( $ch['type'] ) && (string) $ch['type'] === (string) $type );
+						$matches_type = $type === '' || ( isset( $ch['type'] ) && (string) $ch['type'] === (string) $type );
 						if ( ( $matches_name || $matches_id ) && $matches_type ) {
 							$result[] = $ch;
 						}
@@ -573,22 +573,24 @@ class Discord extends IntegrationBase {
 			case 'create_a_channel_invite':
 				$channel_id = $config['channel_id'] ?? '';
 				$result     = self::api_request( $bot_token, 'POST', "/channels/{$channel_id}/invites", [
-					'max_age'   => (int) ( $config['max_age'] ?? 86400 ),
-					'max_uses'  => (int) ( $config['max_uses'] ?? 0 ),
+					'max_age'   => (int)  ( $config['max_age']   ?? 86400 ),
+					'max_uses'  => (int)  ( $config['max_uses']  ?? 0 ),
 					'temporary' => (bool) ( $config['temporary'] ?? false ),
-					'unique'    => (bool) ( $config['unique'] ?? false ),
+					'unique'    => (bool) ( $config['unique']    ?? false ),
 				] );
 				break;
 
 			case 'send_direct_message':
-				$user_id  = $config['user_id'] ?? '';
-				// Step 1: Open DM channel
 				$dm_channel = self::api_request( $bot_token, 'POST', '/users/@me/channels', [
-					'recipient_id' => $user_id,
+					'recipient_id' => $config['user_id'] ?? '',
 				] );
-				$dm_channel_id = $dm_channel['id'] ?? '';
-				// Step 2: Send message in DM channel
-				$result = self::api_request( $bot_token, 'POST', "/channels/{$dm_channel_id}/messages", [
+
+				if ( isset( $dm_channel['error'] ) || empty( $dm_channel['id'] ) ) {
+					$result = [ 'error' => 'Failed to open DM channel: ' . ( $dm_channel['error'] ?? 'No channel id returned' ) ];
+					break;
+				}
+
+				$result = self::api_request( $bot_token, 'POST', "/channels/{$dm_channel['id']}/messages", [
 					'content' => $config['content'] ?? '',
 				] );
 				break;
@@ -615,7 +617,8 @@ class Discord extends IntegrationBase {
 			case 'react_with_emoji_to_message':
 				$channel_id = $config['channel_id'] ?? '';
 				$message_id = $config['message_id'] ?? '';
-				$emoji      = urlencode( $config['emoji'] ?? '' );
+	
+				$emoji      = rawurlencode( $config['emoji'] ?? '' );
 				self::api_request( $bot_token, 'PUT', "/channels/{$channel_id}/messages/{$message_id}/reactions/{$emoji}/@me" );
 				$result = [ 'reacted' => true ];
 				break;
@@ -627,40 +630,45 @@ class Discord extends IntegrationBase {
 
 			case 'add_role_to_member':
 				$member_id = $config['member_id'] ?? '';
-				$role_id   = $config['role_id'] ?? '';
+				$role_id   = $config['role_id']   ?? '';
 				self::api_request( $bot_token, 'PUT', "/guilds/{$guild_id}/members/{$member_id}/roles/{$role_id}" );
 				$result = [ 'success' => true, 'action' => 'role_added', 'member_id' => $member_id, 'role_id' => $role_id ];
 				break;
 
 			case 'remove_role_from_member':
 				$member_id = $config['member_id'] ?? '';
-				$role_id   = $config['role_id'] ?? '';
+				$role_id   = $config['role_id']   ?? '';
 				self::api_request( $bot_token, 'DELETE', "/guilds/{$guild_id}/members/{$member_id}/roles/{$role_id}" );
 				$result = [ 'success' => true, 'action' => 'role_removed', 'member_id' => $member_id, 'role_id' => $role_id ];
 				break;
 
 			case 'find_user':
 				$query   = $config['search_query'] ?? '';
-				$members = self::api_request( $bot_token, 'GET', "/guilds/{$guild_id}/members?limit=1000" );
+				$members = self::fetch_all_members( $bot_token, $guild_id );
 				$result  = [];
-				if ( is_array( $members ) ) {
-					foreach ( $members as $member ) {
-						$user           = $member['user'] ?? [];
-						$matches_name   = isset( $user['username'] ) && stripos( $user['username'], $query ) !== false;
-						$matches_id     = isset( $user['id'] ) && $user['id'] === $query;
-						if ( $matches_name || $matches_id ) {
-							$result[] = $member;
-						}
+				foreach ( $members as $member ) {
+					$user         = $member['user'] ?? [];
+					$matches_name = isset( $user['username'] ) && stripos( $user['username'], $query ) !== false;
+					$matches_id   = isset( $user['id'] ) && $user['id'] === $query;
+					if ( $matches_name || $matches_id ) {
+						$result[] = $member;
 					}
 				}
 				break;
 
 			case 'create_new_forum_post':
 				$channel_id = $config['channel_id'] ?? '';
-				$result     = self::api_request( $bot_token, 'POST', "/channels/{$channel_id}/threads", [
-					'name'    => $config['name'] ?? '',
-					'message' => [ 'content' => $config['content'] ?? '' ],
+				$result = self::api_request( $bot_token, 'POST', "/channels/{$channel_id}/threads", [
+					'name'                  => $config['name']    ?? '',
+					'auto_archive_duration' => 1440,
+					'message'               => [
+						'content' => $config['content'] ?? '',
+					],
 				] );
+				break;
+
+			default:
+				$result = [ 'error' => "Unknown action: {$event}" ];
 				break;
 		}
 
@@ -670,11 +678,9 @@ class Discord extends IntegrationBase {
 		];
 	}
 
-	// ─── Dynamic queries ─────────────────────────────────────────────────────
-
 	public static function get_dynamic_queries(): array {
 		return [
-			'connection_query'   => [ self::class, 'query_connection' ],
+			'guild_query'        => [ self::class, 'query_guild' ],
 			'channel_type_query' => [ self::class, 'query_channel_type' ],
 			'channel_query'      => [ self::class, 'query_channel' ],
 			'user_query'         => [ self::class, 'query_user' ],
@@ -683,8 +689,42 @@ class Discord extends IntegrationBase {
 		];
 	}
 
-	public static function query_channel_type(): array {
-		// Discord channel types: https://discord.com/developers/docs/resources/channel#channel-object-channel-types
+	public static function get_dynamic_fields(): array {
+		return self::get_dynamic_queries();
+	}
+
+	public static function query_guild( array $query ): array {
+		$options   = [];
+		$creds     = self::extract_credentials( $query );
+		$bot_token = $creds['bot_token'] ?? '';
+		if ( empty( $bot_token ) ) {
+			return [];
+		}
+
+		$guilds = self::fetch_bot_guilds( $bot_token );
+
+		$seen = [];
+
+		foreach ( $guilds as $guild ) {
+			$id   = $guild['id']   ?? '';
+			$name = $guild['name'] ?? 'Unknown Server';
+
+			if ( empty( $id ) || isset( $seen[ $id ] ) ) {
+				continue;
+			}
+
+			$seen[ $id ] = true;
+
+			$options[] = [
+				'label' => $name,
+				'value' => $id,
+			];
+		}
+
+		return $options;
+	}
+
+	public static function query_channel_type( array $query = [] ): array {
 		return [
 			[ 'value' => '0',  'label' => 'Text Channel' ],
 			[ 'value' => '2',  'label' => 'Voice Channel' ],
@@ -695,23 +735,76 @@ class Discord extends IntegrationBase {
 		];
 	}
 
-	public static function query_channel( array $params ): array {
-		$options   = [];
-		$creds     = self::extract_credentials( $params );
-		$bot_token = $creds['bot_token'] ?? '';
-		$guild_id  = $creds['guild_id'] ?? '';
+	private static function get_channel_type_label( int $type ): string {
+		return match ( $type ) {
+			0  => 'Text Channel',
+			1  => 'DM Channel',
+			2  => 'Voice Channel',
+			3  => 'Group DM',
+			4  => 'Category',
+			5  => 'Announcement Channel',
+			10 => 'Announcement Thread',
+			11 => 'Public Thread',
+			12 => 'Private Thread',
+			13 => 'Stage Voice',
+			15 => 'Forum Channel',
+			16 => 'Media Channel',
+			default => 'Unknown Type (' . $type . ')',
+		};
+	}
 
-		if ( empty( $bot_token ) || empty( $guild_id ) ) {
-			return $options;
+	public static function query_channel( array $query ): array {
+		$options   = [];
+		$creds     = self::extract_credentials( $query );
+		$bot_token = $creds['bot_token'] ?? '';
+
+		if ( empty( $bot_token ) ) {
+			return [];
 		}
 
-		$channels = self::api_request( $bot_token, 'GET', "/guilds/{$guild_id}/channels" );
+		$guild_id = $query['where']['guild_id'] ?? $query['guild_id'] ?? '';
 
-		if ( is_array( $channels ) ) {
+		$guilds = $guild_id
+			? [ [ 'id' => $guild_id, 'name' => '' ] ]
+			: self::fetch_bot_guilds( $bot_token );
+
+		$multi = count( $guilds ) > 1;
+
+		foreach ( $guilds as $guild ) {
+			$gid   = $guild['id']   ?? '';
+			$gname = $guild['name'] ?? '';
+
+			if ( empty( $gid ) ) {
+				continue;
+			}
+
+			$channels = self::api_request( $bot_token, 'GET', "/guilds/{$gid}/channels" );
+
+			if ( ! is_array( $channels ) || isset( $channels['error'] ) ) {
+				continue;
+			}
+
+			usort( $channels, fn( $a, $b ) => strcmp(
+				strtolower( $a['name'] ?? '' ),
+				strtolower( $b['name'] ?? '' )
+			) );
+
 			foreach ( $channels as $ch ) {
+				$id   = $ch['id']   ?? '';
+				$name = $ch['name'] ?? '';
+
+				if ( empty( $id ) ) {
+					continue;
+				}
+
+				$label = '#' . ( $name ?: 'Unknown Channel' );
+				if ( $multi && $gname ) {
+					$label = '[' . $gname . '] ' . $label;
+				}
+
 				$options[] = [
-					'label' => $ch['name'] ?? 'Unknown',
-					'value' => $ch['id'] ?? '',
+					'label' => $label,
+					'value' => $id,
 				];
 			}
 		}
@@ -719,55 +812,53 @@ class Discord extends IntegrationBase {
 		return $options;
 	}
 
-	public static function query_member( array $params ): array {
-		$options   = [];
-		$creds     = self::extract_credentials( $params );
-		$bot_token = $creds['bot_token'] ?? '';
-		$guild_id  = $creds['guild_id'] ?? '';
 
-		if ( empty( $bot_token ) || empty( $guild_id ) ) {
-			return $options;
+	public static function query_member( array $query ): array {
+		$options   = [];
+		$creds     = self::extract_credentials( $query );
+		$bot_token = $creds['bot_token'] ?? '';
+
+		if ( empty( $bot_token ) ) {
+			return [];
 		}
 
-		$members = self::api_request( $bot_token, 'GET', "/guilds/{$guild_id}/members?limit=1000" );
+		$guild_id = $query['where']['guild_id'] ?? $query['guild_id'] ?? '';
 
-		if ( is_array( $members ) ) {
+		$guilds = $guild_id
+			? [ [ 'id' => $guild_id, 'name' => '' ] ]
+			: self::fetch_bot_guilds( $bot_token );
+
+		$multi = count( $guilds ) > 1;
+		$seen  = [];
+
+		foreach ( $guilds as $guild ) {
+			$gid   = $guild['id']   ?? '';
+			$gname = $guild['name'] ?? '';
+
+			if ( empty( $gid ) ) {
+				continue;
+			}
+
+			$members = self::fetch_all_members( $bot_token, $gid );
+
 			foreach ( $members as $member ) {
 				$user = $member['user'] ?? [];
-				if ( ! empty( $user['id'] ) ) {
-					$options[] = [
-						'label' => $user['username'] ?? $user['id'],
-						'value' => $user['id'],
-					];
+				$uid  = $user['id']    ?? '';
+
+				if ( empty( $uid ) || isset( $seen[ $uid ] ) ) {
+					continue;
 				}
-			}
-		}
+				$seen[ $uid ] = true;
 
-		return $options;
-	}
+				$name  = $user['global_name'] ?? $user['username'] ?? $uid;
+				$label = $name;
+				if ( $multi && $gname ) {
+					$label = '[' . $gname . '] ' . $name;
+				}
 
-	public static function query_user( array $params ): array {
-		// Users and members share the same endpoint for guild context
-		return self::query_member( $params );
-	}
-
-	public static function query_role( array $params ): array {
-		$options   = [];
-		$creds     = self::extract_credentials( $params );
-		$bot_token = $creds['bot_token'] ?? '';
-		$guild_id  = $creds['guild_id'] ?? '';
-
-		if ( empty( $bot_token ) || empty( $guild_id ) ) {
-			return $options;
-		}
-
-		$roles = self::api_request( $bot_token, 'GET', "/guilds/{$guild_id}/roles" );
-
-		if ( is_array( $roles ) ) {
-			foreach ( $roles as $role ) {
 				$options[] = [
-					'label' => $role['name'] ?? 'Unknown',
-					'value' => $role['id'] ?? '',
+					'label' => $label,
+					'value' => $uid,
 				];
 			}
 		}
@@ -775,23 +866,127 @@ class Discord extends IntegrationBase {
 		return $options;
 	}
 
-	// ─── Internal helpers ────────────────────────────────────────────────────
+	public static function query_user( array $query ): array {
+		return self::query_member( $query );
+	}
 
-	/**
-	 * Reusable Discord API request helper using wp_remote_request.
-	 */
-	private static function api_request( string $bot_token, string $method, string $endpoint, array $payload = [] ): array {
+	public static function query_role( array $query ): array {
+		$options   = [];
+		$creds     = self::extract_credentials( $query );
+		$bot_token = $creds['bot_token'] ?? '';
+
+		if ( empty( $bot_token ) ) {
+			return [];
+		}
+
+		$guild_id = $query['where']['guild_id'] ?? $query['guild_id'] ?? '';
+
+		$guilds = $guild_id
+			? [ [ 'id' => $guild_id, 'name' => '' ] ]
+			: self::fetch_bot_guilds( $bot_token );
+
+		$multi = count( $guilds ) > 1;
+
+		foreach ( $guilds as $guild ) {
+			$gid   = $guild['id']   ?? '';
+			$gname = $guild['name'] ?? '';
+
+			if ( empty( $gid ) ) {
+				continue;
+			}
+
+			$roles = self::api_request( $bot_token, 'GET', "/guilds/{$gid}/roles" );
+
+			if ( ! is_array( $roles ) || isset( $roles['error'] ) ) {
+				continue;
+			}
+
+			usort( $roles, fn( $a, $b ) => ( $b['position'] ?? 0 ) <=> ( $a['position'] ?? 0 ) );
+
+			foreach ( $roles as $role ) {
+				$id   = $role['id']   ?? '';
+				$name = $role['name'] ?? '';
+
+				if ( empty( $id ) || $id === $gid ) {
+					continue;
+				}
+
+				$label = $name ?: 'Unknown Role';
+				if ( $multi && $gname ) {
+					$label = '[' . $gname . '] ' . $label;
+				}
+
+				$options[] = [
+					'label' => $label,
+					'value' => $id,
+				];
+			}
+		}
+
+		return $options;
+	}
+
+	private static function fetch_all_members( string $bot_token, string $guild_id ): array {
+		$all   = [];
+		$after = null;
+
+		do {
+			$endpoint = "/guilds/{$guild_id}/members?limit=1000";
+			if ( $after ) {
+				$endpoint .= '&after=' . $after;
+			}
+
+			$page = self::api_request( $bot_token, 'GET', $endpoint );
+
+			if ( ! is_array( $page ) || isset( $page['error'] ) || empty( $page ) ) {
+				break;
+			}
+
+			foreach ( $page as $member ) {
+				$all[] = $member;
+			}
+
+			$last  = end( $page );
+			$after = $last['user']['id'] ?? null;
+
+		} while ( count( $page ) === 1000 && $after );
+
+		return $all;
+	}
+
+	private static function fetch_bot_guilds( string $bot_token ): array {
+		$guilds = self::api_request( $bot_token, 'GET', '/users/@me/guilds' );
+
+		if ( ! is_array( $guilds ) || isset( $guilds['error'] ) ) {
+			return [];
+		}
+
+		return $guilds;
+	}
+
+	private static function api_request(
+		string $bot_token,
+		string $method,
+		string $endpoint,
+		array $payload = [],
+		int $retry_count = 0
+	): array {
+		$method_upper = strtoupper( $method );
+
+		$body_methods = [ 'POST', 'PATCH', 'PUT' ];
+		$sends_body   = in_array( $method_upper, $body_methods, true ) && ! empty( $payload );
+
 		$args = [
-			'method'  => strtoupper( $method ),
+			'method'  => $method_upper,
 			'timeout' => 20,
 			'headers' => [
 				'Authorization' => 'Bot ' . $bot_token,
-				'Content-Type'  => 'application/json',
 			],
 		];
 
-		if ( ! empty( $payload ) && in_array( strtoupper( $method ), [ 'POST', 'PATCH', 'PUT' ], true ) ) {
-			$args['body'] = wp_json_encode( $payload );
+		if ( $sends_body ) {
+			$args['headers']['Content-Type'] = 'application/json';
+			$args['body']                    = wp_json_encode( $payload );
 		}
 
 		$response = wp_remote_request( self::API_BASE_URL . $endpoint, $args );
@@ -803,12 +998,31 @@ class Discord extends IntegrationBase {
 		$code = (int) wp_remote_retrieve_response_code( $response );
 		$raw  = wp_remote_retrieve_body( $response );
 
-		// 204 No Content (e.g. DELETE success)
-		if ( $code === 204 || empty( $raw ) ) {
+		if ( $code === 204 || $raw === '' ) {
 			return [];
 		}
 
-		$body = json_decode( $raw, true ) ?? [];
+		$body = json_decode( $raw, true );
+
+		if ( json_last_error() !== JSON_ERROR_NONE ) {
+			return [ 'error' => 'Invalid JSON response', 'raw' => $raw ];
+		}
+
+		if ( $code === 429 ) {
+			if ( $retry_count >= 3 ) {
+				return [ 'error' => 'Discord rate limit — max retries exceeded.', 'code' => 429 ];
+			}
+
+			$retry_after = isset( $body['retry_after'] ) ? (float) $body['retry_after'] : 1.0;
+
+			if ( $retry_after > 10 ) {
+				$retry_after = $retry_after / 1000;
+			}
+
+			sleep( (int) ceil( $retry_after ) );
+
+			return self::api_request( $bot_token, $method, $endpoint, $payload, $retry_count + 1 );
+		}
 
 		if ( $code >= 400 ) {
 			$msg = $body['message'] ?? ( 'Discord API error HTTP ' . $code );
@@ -818,46 +1032,64 @@ class Discord extends IntegrationBase {
 		return $body;
 	}
 
-	/**
-	 * Extract bot_token and guild_id from dynamic query params.
-	 * Tries multiple shapes the framework may pass credentials in.
-	 */
 	private static function extract_credentials( array $params ): array {
-		$paths = [
-			[ 'credentials' ],
-			[ 'connection', 'credentials' ],
-			[ 'auth' ],
-		];
+		$connection_id = $params['where']['connection_id']
+			?? $params['connection_id']
+			?? 0;
 
-		foreach ( $paths as $path ) {
-			$val = $params;
-			foreach ( $path as $key ) {
-				if ( ! is_array( $val ) || ! array_key_exists( $key, $val ) ) {
-					$val = null;
-					break;
+		return self::get_decrypted_credentials( (int) $connection_id );
+	}
+
+	private static function get_connection_credentials( array $node ): array {
+		$connection_id = (int) (
+			$node['data']['connection_id']
+			?? $node['connection_id']
+			?? 0
+		);
+
+		return self::get_decrypted_credentials( $connection_id );
+	}
+
+	private static function get_decrypted_credentials( int $connection_id = 0 ): array {
+		try {
+			$cm = new ConnectionManager();
+
+			if ( $connection_id <= 0 ) {
+				$connection_id = self::get_discord_connection_id();
+			}
+
+			if ( $connection_id <= 0 ) {
+				return [];
+			}
+
+			$creds = $cm->get_execution_credentials( $connection_id );
+
+			if ( is_array( $creds ) && ! empty( $creds['bot_token'] ) ) {
+				return $creds;
+			}
+
+			if ( is_object( $creds ) ) {
+				$creds = (array) $creds;
+				if ( ! empty( $creds['bot_token'] ) ) {
+					return $creds;
 				}
-				$val = $val[ $key ];
 			}
+		} catch ( \Throwable $e ) {
 
-			if ( is_array( $val ) && ! empty( $val['bot_token'] ) ) {
-				return $val;
-			}
 		}
 
 		return [];
 	}
 
-	/**
-	 * Retrieve stored credentials for a given connection ID.
-	 * Adjust to match your framework's connection storage API.
-	 */
-	private static function get_connection_credentials( string $connection_id ): array {
-		if ( empty( $connection_id ) ) {
-			return [];
-		}
-
-		// TODO: Replace with actual framework method to load connection credentials
-		// e.g. return ConnectionRepository::find( $connection_id )->getCredentials();
-		return [];
+	private static function get_discord_connection_id(): int {
+		global $wpdb;
+		$table = $wpdb->prefix . 'zaplane_connections';
+		$id    = $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT id FROM `{$table}` WHERE app = %s AND status = 'active' ORDER BY id DESC LIMIT 1",
+				'discord'
+			)
+		);
+		return (int) $id;
 	}
 }
