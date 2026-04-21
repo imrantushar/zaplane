@@ -59,7 +59,7 @@ export const useActionDrawer = (open, node, source, setFieldValue, isTrigger,val
   }, [open, node?.data, values.nodeClick, source]);
 
    const list = useMemo(() => {
-    const base = mode === "app" ? APPS : mode === "tools" ? TOOLS : [];
+    const base = mode === "app" ? APPS : mode === "tools" ? TOOLS : TOOLS.filter(item => item.show_trigger === true);
 
     if (isTrigger) return base;
 
@@ -76,7 +76,7 @@ export const useActionDrawer = (open, node, source, setFieldValue, isTrigger,val
     if (!search) return [];
     const q = search.toLowerCase();
     const combined = isTrigger
-      ? APPS
+      ? APPS.concat(TOOLS.filter(t => t.show_trigger === true).map(t => ({ ...t, type: "tools" })))
       : APPS.concat(TOOLS.map(t => ({ ...t, type: "tools" })));
 
     return combined.filter(item => item.name.toLowerCase().includes(q));

@@ -21457,6 +21457,7 @@
             "name": "Action Scheduler",
             "icon": "action-scheduler.svg",
             "category": "tool",
+            "show_trigger": true,
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
