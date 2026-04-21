@@ -92,7 +92,7 @@ namespace GemCrm\Database\Models {
 			 * Returns a paginated campaign list.
 			 * Supports 'per_page' and 'search' params to mirror the real model.
 			 */
-			public static function index( array $params = [] ): array {
+			public static function index( array $params = [], ?int $logged_user_id = null ): array {
 				$all = [
 					[ 'id' => 1, 'title' => 'Welcome Series'   ],
 					[ 'id' => 2, 'title' => 'Black Friday Sale' ],

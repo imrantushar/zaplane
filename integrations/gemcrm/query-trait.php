@@ -128,7 +128,7 @@ trait QueryTrait {
 			$params['search'] = $q['search'];
 		}
 
-		$items  = \GemCrm\Database\Models\Campaign::index( $params );
+		$items  = \GemCrm\Database\Models\Campaign::index( $params, null );
 		$result = [];
 
 		foreach ( (array) ( $items['records'] ?? $items ) as $item ) {
