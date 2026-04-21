@@ -18,7 +18,7 @@ const ZAPMenu = ({
         <MenuButton as={React.Fragment}>
           {trigger ? trigger : (isIcon ? (
             <button 
-             style={{...outlineBtn,paddingTop: '12px'}}
+             style={{...outlineBtn, padding: '8px 10px'}}
               onClick={e => e.stopPropagation()} 
               aria-label="More options"
             >

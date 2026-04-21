@@ -23,7 +23,7 @@ const Folders = () => {
   return <PageLayout title="Folders" isLoading={isLoading} skeleton={FolderSkeleton} actions={
                 <button 
                     onClick={() => setIsFolderModalOpen(true)} 
-                    className="bg-[var(--zaplane-primary)] hover:opacity-90 text-white font-medium py-2 px-6 rounded-lg transition-all shadow-sm active:scale-95"
+                    style={primaryBtn}
                 >
                     {__("Create Folder", "zaplane")}
                 </button>

@@ -34,7 +34,7 @@ const Connections = () => {
             heading="Connections" 
             actions={
                 <button 
-                    className="bg-[var(--zaplane-primary)] hover:opacity-90 text-white font-medium py-2 px-6 rounded-lg transition-all shadow-sm active:scale-95" 
+                    style={primaryBtn}
                     onClick={openDrawer}
                 >
                     {__("Create credential", "zaplane")}

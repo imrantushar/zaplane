@@ -1,12 +1,12 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { ReactFlowProvider, useEdgesState, useNodesState } from "@xyflow/react";
-import FlowCanvas from "./FlowCanvas/FlowCanvas";
+import FlowCanvas from "./flowCanvas/FlowCanvas";
 import { Formik } from "formik";
 import { extractIntegrationIcons, generateFlowHash, mapEdgesForBackend, mapNodesForBackend } from "./helper";
 import { useDispatch, useSelector } from "react-redux";
 import { updateWorkFlow } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow";
 import NavigationBlocker from "@ZAPComponents/NavigationBlocker";
-import { createNodeIdGenerator } from "./FlowCanvas/helper";
+import { createNodeIdGenerator } from "./flowCanvas/helper";
 export default function Workflows({
   id,
   onNavigateBack,

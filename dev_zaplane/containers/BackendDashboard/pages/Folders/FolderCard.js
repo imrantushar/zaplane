@@ -8,8 +8,9 @@ import { BsThreeDotsVertical } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
 import ZAPMenu from "@ZAPComponents/ZapMenu";
 import WPModal from "@ZAPComponents/Modal/WPModal";
-import { primaryBtn } from '../../../../../assets/scss/chakra/recipe';
+import { outlineBtn, primaryBtn } from '../../../../../assets/scss/chakra/recipe';
 import { updateFolder, deleteFolder } from '@ZAPRedux/Slices/folderSlice/folderSlice';
+import ZAPInput from '@ZAPComponents/ZAPInput';
 const FolderCard = ({
   folder
 }) => {
@@ -36,12 +37,12 @@ const FolderCard = ({
   return <>
       <div 
         onClick={() => goToFolder(folder?.id)} 
-        className="bg-[var(--zaplane-background)] border border-[var(--zaplane-border-color)] rounded-xl p-6 transition-all duration-200 cursor-pointer shadow-sm hover:shadow-md hover:border-[var(--zaplane-primary)] group"
+        className="bg-[var(--zaplane-background)] border border-[var(--zaplane-border-color)] rounded-xl p-6 transition-all duration-200 cursor-pointer shadow-sm hover:shadow-md  group"
       >
         {/* Top Section */}
         <div className="flex justify-between items-start mb-6">
           <div className="flex items-center gap-3 overflow-hidden">
-            <div className="p-2 bg-[var(--zaplane-second-primary)] rounded-lg text-[var(--zaplane-primary)] transition-colors">
+            <div className="p-2 rounded-[4px] transition-colors">
               <FiFolder className="w-5 h-5" />
             </div>
             <span className="font-semibold text-[var(--zaplane-font-color)] text-[16px] truncate">
@@ -50,14 +51,7 @@ const FolderCard = ({
           </div>
 
           <ZAPMenu 
-            trigger={
-              <button 
-                className="flex items-center justify-center p-1.5 rounded-md border border-[var(--zaplane-border-color)] hover:bg-[var(--zaplane-secondary-color)] transition-colors" 
-                onClick={e => e.stopPropagation()}
-              >
-                <BsThreeDotsVertical className="text-[var(--zaplane-font-secondary-color)]" />
-              </button>
-            }
+            isIcon
             items={[{
               label: __("Rename", "zaplane"),
               onClick: () => setIsRenameOpen(true)
@@ -79,7 +73,7 @@ const FolderCard = ({
           </div>
           <button 
             aria-label={sprintf(__("View %s", "zaplane"), folder?.title)} 
-            className="p-2 text-[var(--zaplane-font-secondary-color)] hover:text-[var(--zaplane-primary)] hover:bg-[var(--zaplane-second-primary)] rounded-lg transition-all" 
+            className="p-2  rounded-[4px] transition-all" 
             onClick={(e) => {
               e.stopPropagation();
               goToFolder(folder?.id);
@@ -92,14 +86,21 @@ const FolderCard = ({
 
 
       <WPModal title={__("Rename Folder", "zaplane")} isOpen={isRenameOpen} onRequestClose={() => setIsRenameOpen(false)} size="large">
-        <input value={title} onChange={e => setTitle(e.target.value)} placeholder={__("Enter folder name", "zaplane")} className="zaplane-input mb-4" />
+    
         <div justify="flex-end" gap={3} className="flex">
-          <button variant="outline" onClick={() => setIsRenameOpen(false)}>
+          <div className='flex flex-col gap-6'>
+            <ZAPInput
+              placeholder={__("Enter folder name", "zaplane")}
+              value={title}
+              onChange={e => setTitle(e.target.value)}
+            />
+            <button style={outlineBtn} onClick={() => setIsRenameOpen(false)}>
             {__("Cancel", "zaplane")}
           </button>
           <button style={primaryBtn} onClick={handleRename} disabled={!title.trim()}>
             {__("Update", "zaplane")}
           </button>
+          </div>
         </div>
       </WPModal>
 

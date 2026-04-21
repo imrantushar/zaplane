@@ -813,7 +813,7 @@ svg.react-flow__connectionline {
 }
 
 /*!******************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/@wordpress/scripts/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/CustomEdge/styles.scss ***!
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/@wordpress/scripts/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/customEdge/styles.scss ***!
   \******************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
 .zaplane-custom-edge .zaplane-edge-actions {
   opacity: 0;
@@ -870,13 +870,13 @@ svg.react-flow__connectionline {
   overflow-y: auto;
 }
 /*!*************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/@wordpress/scripts/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/ConnectionSelector/styles.scss ***!
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/@wordpress/scripts/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/SelectTab/ConnectionSelector/styles.scss ***!
   \*************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
 .connection-popaver {
   left: 510px !important;
 }
 /*!********************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/@wordpress/scripts/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/styles.scss ***!
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/@wordpress/scripts/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/styles.scss ***!
   \********************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
 .action-drowar-lists span:empty {
   display: none;
@@ -1779,11 +1779,11 @@ h2.react-datepicker__current-month {
   position: absolute;
 }
 /*!****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/@wordpress/scripts/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/ActionFieldRenderer/styles.scss ***!
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/@wordpress/scripts/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionFieldRenderer/styles.scss ***!
   \****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
 
 /*!******************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/@wordpress/scripts/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/FlowCanvas/styles.scss ***!
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/@wordpress/scripts/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/styles.scss ***!
   \******************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
 .zaplane-canvas-controls {
   gap: 5px;
@@ -2461,6 +2461,10 @@ video {
   margin-top: 0.5rem;
   margin-bottom: 0.5rem;
 }
+.-mx-5 {
+  margin-right: -1.25rem;
+  margin-left: -1.25rem;
+}
 .mb-2 {
   margin-bottom: 0.5rem;
 }
@@ -2566,6 +2570,15 @@ video {
 .mt-\[\] {
   margin-top: ;
 }
+.mt-1 {
+  margin-top: 0.25rem;
+}
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
 .block {
   display: block;
 }
@@ -2643,6 +2656,12 @@ video {
 }
 .h-\[40px\] {
   height: 40px;
+}
+.h-8 {
+  height: 2rem;
+}
+.h-\[18px\] {
+  height: 18px;
 }
 .max-h-\[200px\] {
   max-height: 200px;
@@ -2722,11 +2741,27 @@ video {
 .w-screen {
   width: 100vw;
 }
+.w-fit {
+  width: -moz-fit-content;
+  width: fit-content;
+}
+.w-8 {
+  width: 2rem;
+}
+.w-\[18px\] {
+  width: 18px;
+}
+.w-\[100px\] {
+  width: 100px;
+}
 .min-w-\[280px\] {
   min-width: 280px;
 }
 .min-w-full {
   min-width: 100%;
+}
+.min-w-\[40px\] {
+  min-width: 40px;
 }
 .max-w-2xl {
   max-width: 42rem;
@@ -2839,6 +2874,9 @@ video {
 .grid-cols-1 {
   grid-template-columns: repeat(1, minmax(0, 1fr));
 }
+.grid-cols-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
 .flex-row {
   flex-direction: row;
 }
@@ -2928,6 +2966,9 @@ video {
   margin-top: calc(1rem * calc(1 - var(--tw-space-y-reverse)));
   margin-bottom: calc(1rem * var(--tw-space-y-reverse));
 }
+.self-end {
+  align-self: flex-end;
+}
 .overflow-hidden {
   overflow: hidden;
 }
@@ -2996,6 +3037,12 @@ video {
 .rounded-\[4\] {
   border-radius: 4;
 }
+.rounded-\[12px\] {
+  border-radius: 12px;
+}
+.rounded-\[px\] {
+  border-radius: px;
+}
 .rounded-b-md {
   border-bottom-left-radius: 0.375rem;
   border-bottom-right-radius: 0.375rem;
@@ -3021,6 +3068,9 @@ video {
 }
 .border-t-0 {
   border-top-width: 0px;
+}
+.border-l {
+  border-right-width: 1px;
 }
 .border-dashed {
   border-style: dashed;
@@ -3069,6 +3119,22 @@ video {
 .border-yellow-400 {
   --tw-border-opacity: 1;
   border-color: rgb(250 204 21 / var(--tw-border-opacity, 1));
+}
+.border-\[\#E5E7EB\] {
+  --tw-border-opacity: 1;
+  border-color: rgb(229 231 235 / var(--tw-border-opacity, 1));
+}
+.border-\[\#F3F4F6\] {
+  --tw-border-opacity: 1;
+  border-color: rgb(243 244 246 / var(--tw-border-opacity, 1));
+}
+.border-\[\#6366F1\] {
+  --tw-border-opacity: 1;
+  border-color: rgb(99 102 241 / var(--tw-border-opacity, 1));
+}
+.border-\[\#A7F3D0\] {
+  --tw-border-opacity: 1;
+  border-color: rgb(167 243 208 / var(--tw-border-opacity, 1));
 }
 .bg-\[var\(--zaplane-background\)\] {
   background-color: var(--zaplane-background);
@@ -3142,6 +3208,18 @@ video {
 .bg-yellow-50 {
   --tw-bg-opacity: 1;
   background-color: rgb(254 252 232 / var(--tw-bg-opacity, 1));
+}
+.bg-\[\#F3F4F6\] {
+  --tw-bg-opacity: 1;
+  background-color: rgb(243 244 246 / var(--tw-bg-opacity, 1));
+}
+.bg-\[\#F9FAFB\] {
+  --tw-bg-opacity: 1;
+  background-color: rgb(249 250 251 / var(--tw-bg-opacity, 1));
+}
+.bg-\[\#ECFDF5\] {
+  --tw-bg-opacity: 1;
+  background-color: rgb(236 253 245 / var(--tw-bg-opacity, 1));
 }
 .p-0 {
   padding: 0px;
@@ -3370,6 +3448,9 @@ video {
   font-size: 0.75rem;
   line-height: 1rem;
 }
+.text-\[18px\] {
+  font-size: 18px;
+}
 .font-\[400\] {
   font-weight: 400;
 }
@@ -3411,6 +3492,12 @@ video {
 }
 .tracking-wider {
   letter-spacing: 0.05em;
+}
+.tracking-wide {
+  letter-spacing: 0.025em;
+}
+.tracking-widest {
+  letter-spacing: 0.1em;
 }
 .text-\[\#1A202C\] {
   --tw-text-opacity: 1;
@@ -3503,6 +3590,37 @@ video {
 .text-yellow-800 {
   --tw-text-opacity: 1;
   color: rgb(133 77 14 / var(--tw-text-opacity, 1));
+}
+.text-\[\#6B7280\] {
+  --tw-text-opacity: 1;
+  color: rgb(107 114 128 / var(--tw-text-opacity, 1));
+}
+.text-\[\#111827\] {
+  --tw-text-opacity: 1;
+  color: rgb(17 24 39 / var(--tw-text-opacity, 1));
+}
+.text-\[\#374151\] {
+  --tw-text-opacity: 1;
+  color: rgb(55 65 81 / var(--tw-text-opacity, 1));
+}
+.text-\[\#6366F1\] {
+  --tw-text-opacity: 1;
+  color: rgb(99 102 241 / var(--tw-text-opacity, 1));
+}
+.text-\[\#10B981\] {
+  --tw-text-opacity: 1;
+  color: rgb(16 185 129 / var(--tw-text-opacity, 1));
+}
+.text-\[\#9CA3AF\] {
+  --tw-text-opacity: 1;
+  color: rgb(156 163 175 / var(--tw-text-opacity, 1));
+}
+.text-\[\] {
+  color: ;
+}
+.text-\[\#006BFF\] {
+  --tw-text-opacity: 1;
+  color: rgb(0 107 255 / var(--tw-text-opacity, 1));
 }
 .underline {
   text-decoration-line: underline;
@@ -4675,6 +4793,10 @@ video {
   --tw-border-opacity: 1;
   border-color: rgb(129 140 248 / var(--tw-border-opacity, 1));
 }
+.hover\:border-\[\#D1D5DB\]:hover {
+  --tw-border-opacity: 1;
+  border-color: rgb(209 213 219 / var(--tw-border-opacity, 1));
+}
 .hover\:bg-\[var\(--zaplane-second-primary\)\]:hover {
   background-color: var(--zaplane-second-primary);
 }
@@ -4696,6 +4818,14 @@ video {
 .hover\:bg-red-50:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(254 242 242 / var(--tw-bg-opacity, 1));
+}
+.hover\:bg-\[\#F9FAFB\]:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(249 250 251 / var(--tw-bg-opacity, 1));
+}
+.hover\:bg-gray-100:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(243 244 246 / var(--tw-bg-opacity, 1));
 }
 .hover\:text-\[var\(--zaplane-primary\)\]:hover {
   color: var(--zaplane-primary);

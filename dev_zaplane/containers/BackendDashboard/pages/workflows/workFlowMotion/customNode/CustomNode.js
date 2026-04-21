@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Handle, Position, NodeToolbar, useReactFlow } from "@xyflow/react";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import { FaRegCopy, FaPlus } from "react-icons/fa";
-import FloatingEdge from "../FloatingEdge/FloatingEdge";
+import FloatingEdge from "../floatingEdge/FloatingEdge";
 import { __, sprintf } from "@wordpress/i18n";
 import { formatLabel } from "@ZAPUtils/helper";
 import ZAPIcon from "@ZAPComponents/ZAPIcon";
