@@ -49,6 +49,9 @@ class Automation {
 	}
 
 	public function reload_triggers() {
+		// Cancel all existing AS trigger schedules so they are cleanly re-registered.
+		$this->cancel_all_as_trigger_schedules();
+
 		foreach ( $this->registered_hooks as $event => $cb ) {
 			if ( is_array( $cb ) ) {
 				remove_action( $event, $cb, 10 );
@@ -67,6 +70,63 @@ class Automation {
 				$this->registered_hooks[ $event ] = $cb;
 			}
 		}
+
+		// Register Action Scheduler recurring/cron actions for AS-triggered workflows.
+		$this->dispatch_as_trigger_schedules();
+	}
+
+	/**
+	 * For every active workflow that uses the Action Scheduler trigger, ensure
+	 * a corresponding AS recurring or cron action is scheduled.
+	 */
+	private function dispatch_as_trigger_schedules(): void {
+		if ( ! function_exists( 'as_has_scheduled_action' ) ) {
+			return;
+		}
+
+		try {
+			$active_workflows = \Zaplane\Models\Workflow::active();
+		} catch ( \Throwable $e ) {
+			return;
+		}
+
+		foreach ( $active_workflows as $workflow ) {
+			$version = $workflow->activeVersion();
+			if ( ! $version ) {
+				continue;
+			}
+
+			$graph = $version->getGraph();
+			foreach ( $graph['nodes'] ?? [] as $node ) {
+				if ( ( $node['type'] ?? '' ) !== 'trigger' ) {
+					continue;
+				}
+				if ( strtolower( $node['data']['app'] ?? '' ) !== 'actionscheduler' ) {
+					continue;
+				}
+
+				$event  = $node['data']['event'] ?? '';
+				$config = $node['data']['config'] ?? [];
+
+				\Zaplane\Integrations\ActionScheduler::ensure_scheduled(
+					(int) $workflow->id,
+					$event,
+					$config
+				);
+			}
+		}
+	}
+
+	/**
+	 * Cancel all AS actions in the zaplane_trigger group.
+	 * Called before re-dispatching so schedules are rebuilt from current config.
+	 */
+	private function cancel_all_as_trigger_schedules(): void {
+		if ( ! function_exists( 'as_unschedule_all_actions' ) ) {
+			return;
+		}
+		as_unschedule_all_actions( 'zaplane_as_interval_trigger', [], 'zaplane_trigger' );
+		as_unschedule_all_actions( 'zaplane_as_cron_trigger', [], 'zaplane_trigger' );
 	}
 
 	public function dispatch_active_listeners(): void {
@@ -147,7 +207,12 @@ class Automation {
 			}
 
 			$integration = $this->container->get( 'integrations' )->get( strtolower( $trigger['app'] ) );
-			$payload = $integration::resolve_trigger( $trigger['graph_node']['data'], $args );
+
+			// Inject workflow_id so resolve_trigger() can discriminate (e.g. Action Scheduler).
+			$node_data                  = $trigger['graph_node']['data'];
+			$node_data['_workflow_id']  = $trigger['workflow_id'];
+
+			$payload = $integration::resolve_trigger( $node_data, $args );
 			if ( ! $payload ) {
 				continue;
 			}

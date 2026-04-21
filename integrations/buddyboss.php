@@ -89,7 +89,7 @@ class Buddyboss extends IntegrationBase {
 		];
 	}
 
-	public static function resolve_trigger( array $node, array $args ): array|false {
+	public static function resolve_trigger( array $node, array $args ) {
 
 		switch ( $node['event'] ) {
 
