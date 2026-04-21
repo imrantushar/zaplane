@@ -435,7 +435,7 @@ class Gamipress extends IntegrationBase {
 		return $all_achievement;
 	}
 
-	public static function resolve_user_payload( int|string $user_id ): array|false {
+	public static function resolve_user_payload( $user_id ) {
 		$user = get_userdata( (int) $user_id );
 
 		if ( ! $user ) {
