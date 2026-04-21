@@ -2757,6 +2757,9 @@ video {
 .max-w-sm {
   max-width: 24rem;
 }
+.max-w-\[00px\] {
+  max-width: 00px;
+}
 .flex-1 {
   flex: 1 1 0%;
 }
@@ -2988,12 +2991,6 @@ video {
 }
 .rounded-xl {
   border-radius: 0.75rem;
-}
-.rounded-\[\] {
-  border-radius: ;
-}
-.rounded-\[4\] {
-  border-radius: 4;
 }
 .rounded-b-md {
   border-bottom-right-radius: 0.375rem;

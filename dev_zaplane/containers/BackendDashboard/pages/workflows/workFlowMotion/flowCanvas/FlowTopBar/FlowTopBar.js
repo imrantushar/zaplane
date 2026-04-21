@@ -153,7 +153,7 @@ export default function FlowTopBar({
 
       <ZAPDrawer 
         title={__("Log History", "zaplane")} 
-        size="md" 
+        maxWidth='max-w-[700px]'
         isFullscreen={isFullscreen} 
         open={activeDrawer === "logs"} 
         onClose={() => setActiveDrawer(null)} 
