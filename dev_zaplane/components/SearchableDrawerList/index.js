@@ -1,5 +1,4 @@
 import React from "react";
-import { Flex } from "@chakra-ui/react";
 import Search from "@ZAPComponents/Search";
 import DrawerSearchList from "./DrawerSearchList/DrawerSearchList";
 import DrawerItemList from "./DrawerItemList";
@@ -16,7 +15,7 @@ const SearchableDrawerList = ({
     children,
 }) => {
     return (
-        <Flex flexDirection="column" gap='16px'>
+        <div className="flex flex-col gap-[16px]">
             <Search
                 placeholder={placeholder || "Search apps..."}
                 defaultValue={search}
@@ -32,7 +31,7 @@ const SearchableDrawerList = ({
             ) : (
                 children || <DrawerItemList list={list} setSelectedItem={onSelect} setMode={setMode} />
             )}
-        </Flex>
+        </div>
     );
 };
 

@@ -5,8 +5,8 @@ const ZAPIcon = ({
   isAction = false
 }) => {
   const isSvg = icon?.endsWith(".svg") || icon?.includes("http");
-  const size = isAction ? '48px' : '32px';
-  const imgSize = isAction ? '24px' : '18px';
+  const size = isAction ? '40px' : '32px';
+  const imgSize = isAction ? '20px' : '18px';
   
   return <div 
     style={{

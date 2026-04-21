@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
 import ZAPTab from "@ZAPComponents/Tab";
 import { __ } from "@wordpress/i18n";
-import { primaryBtn } from "../../../../../../../assets/scss/chakra/recipe";
+import { outlineBtn, primaryBtn } from "../../../../../../../assets/scss/chakra/recipe";
 import { useActionDrawer } from "@ZAPHooks/useActionDrawer/useActionDrawer";
 import { TOOLS } from "@ZAPHooks/useActionDrawer/helper";
 import { getIntegration } from "./helper";
@@ -185,13 +185,13 @@ const ActionDrawer = ({
     // size={["filter", "condition"].includes(values?.actionType) ? "xl" : "md"}
     footer={<div className="flex items-center justify-end gap-3">
       <button
-        className="px-6 py-2 border border-[var(--zaplane-border-color)] rounded-lg text-[var(--zaplane-font-color)] font-medium hover:bg-gray-50 transition-colors"
+       style={outlineBtn}
         onClick={resetAll}
       >
         {__("Cancel", "zaplane")}
       </button>
       <button
-        className="px-6 py-2 bg-[var(--zaplane-primary)] hover:opacity-90 text-white font-medium rounded-lg transition-all shadow-sm active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+        style={primaryBtn}
         disabled={!values.actionType}
         onClick={handleContinue}
       >
@@ -199,34 +199,36 @@ const ActionDrawer = ({
       </button>
     </div>}>
 
-    {!selectedItem && (
-      <>
-        <Search placeholder={__("Search apps or tools...", "zaplane")} defaultValue={search} onSearchHandler={value => setSearch(value)} />
-        {search && <DrawerSearchList searchList={searchList} setMode={setMode} setSelectedItem={setSelectedItem} setSearch={setSearch} />}
-      </>
-    )}
+    <div className="flex flex-col gap-[16px]">
+      {!selectedItem && (
+        <>
+          <Search placeholder={__("Search apps or tools...", "zaplane")} defaultValue={search} onSearchHandler={value => setSearch(value)} />
+          {search && <DrawerSearchList searchList={searchList} setMode={setMode} setSelectedItem={setSelectedItem} setSearch={setSearch} />}
+        </>
+      )}
 
-    {!mode && !search && !selectedItem && <DrawerModeList setMode={setMode} setSelectedItem={setSelectedItem} isTrigger={isTrigger} source={source} TOOLS={TOOLS} />}
+      {!mode && !search && !selectedItem && <DrawerModeList setMode={setMode} setSelectedItem={setSelectedItem} isTrigger={isTrigger} source={source} TOOLS={TOOLS} />}
 
-    {mode && !selectedItem && !search && <DrawerItemList list={list} setSelectedItem={setSelectedItem} setMode={setMode} />}
+      {mode && !selectedItem && !search && <DrawerItemList list={list} setSelectedItem={setSelectedItem} setMode={setMode} />}
 
-    {selectedItem && <ZAPTab value={step} onChange={values?.actionType && setStep} tabs={[{
-      value: "select",
-      label: "Select",
-      content: <SelectTab isTrigger={isTrigger} actionOptions={actionOptions} selectedActionFields={selectedActionFields} values={values} setFieldValue={setFieldValue} dynamicOptions={dynamicOptions} loadingFields={loadingFields} fetchDynamicOptions={fetchDynamicOptions} getKey={getKey} node={node} workFlow={workFlow} selectedIntegration={selectedIntegration} appSlug={selectedItem?.id} />
-    }, {
-      value: "configure",
-      label: "Configure",
-      content: <>
-        <div className="action-drowar-lists flex flex-col gap-4">
-          {selectedActionFields?.length > 0 ? selectedActionFields.map(field => <ActionFieldRenderer key={field.key} field={field} value={values?.[field.key]} setFieldValue={setFieldValue} getKey={getKey} dynamicOptions={dynamicOptions} loadingFields={loadingFields} fetchDynamicOptions={fetchDynamicOptions} nodeId={node?.id} workFlow={workFlow} nodes={nodes} edges={edges} />) : <ZAPLabel label={__("No configuration required for this action.", "zaplane")} type="simple" />}
-        </div>
-      </>
-    }, {
-      value: "test",
-      label: "Test",
-      content: <TestRun nodes={nodes} edges={edges} source={source} node={node} workFlow={workFlow} values={values} />
-    }]} />}
+      {selectedItem && <ZAPTab value={step} onChange={values?.actionType && setStep} tabs={[{
+        value: "select",
+        label: "Select",
+        content: <SelectTab isTrigger={isTrigger} actionOptions={actionOptions} selectedActionFields={selectedActionFields} values={values} setFieldValue={setFieldValue} dynamicOptions={dynamicOptions} loadingFields={loadingFields} fetchDynamicOptions={fetchDynamicOptions} getKey={getKey} node={node} workFlow={workFlow} selectedIntegration={selectedIntegration} appSlug={selectedItem?.id} />
+      }, {
+        value: "configure",
+        label: "Configure",
+        content: <>
+          <div className="action-drowar-lists flex flex-col gap-4">
+            {selectedActionFields?.length > 0 ? selectedActionFields.map(field => <ActionFieldRenderer key={field.key} field={field} value={values?.[field.key]} setFieldValue={setFieldValue} getKey={getKey} dynamicOptions={dynamicOptions} loadingFields={loadingFields} fetchDynamicOptions={fetchDynamicOptions} nodeId={node?.id} workFlow={workFlow} nodes={nodes} edges={edges} />) : <ZAPLabel label={__("No configuration required for this action.", "zaplane")} type="simple" />}
+          </div>
+        </>
+      }, {
+        value: "test",
+        label: "Test",
+        content: <TestRun nodes={nodes} edges={edges} source={source} node={node} workFlow={workFlow} values={values} />
+      }]} />}
+    </div>
   </ZAPDrawer>;
 };
 export default ActionDrawer;
