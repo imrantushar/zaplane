@@ -10,6 +10,8 @@ const ZAPSelect = ({
   onChange,
   isLoading = false,
   onMenuOpen,
+  onInputChange,
+  inputValue,
   placeholder,
   isClearable = false,
   isMulti = false,
@@ -43,6 +45,8 @@ const ZAPSelect = ({
         isMulti={isMulti}
         value={selectedValue}
         onMenuOpen={onMenuOpen}
+        onInputChange={onInputChange}
+        inputValue={inputValue}
         onChange={handleChange}
         menuPortalTarget={document.body}
         menuPosition="fixed"

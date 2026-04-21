@@ -1,4 +1,4 @@
-import {  useRef,  } from "react";
+import {  useRef, useState, useMemo  } from "react";
 import {  useSelector } from "react-redux";
 import ZAPInput from "@ZAPComponents/ZAPInput";
 import ZAPSelect from "@ZAPComponents/ZAPSelect";
@@ -7,6 +7,7 @@ import ConditionGroupField from "../ConditionGroupField/ConditionGroupField";
 import './styles.scss'
 import { __ } from "@wordpress/i18n";
 import VariableEditor from "@ZAPComponents/VariableEditor/index.js";
+import { reactDebounce } from "@ZAPUtils/helper";
 
 const ActionFieldRenderer = ({
   field,
@@ -18,10 +19,26 @@ const ActionFieldRenderer = ({
   fetchDynamicOptions,
 }) => {
 
+  const [searchTerm, setSearchTerm] = useState("");
   const inputRef = useRef(null);
   const { workflowVariables } = useSelector(
     (state) => state.workflows
   );
+
+  const debouncedFetch = useMemo(
+    () => reactDebounce((f, s) => fetchDynamicOptions(f, s), 500),
+    [fetchDynamicOptions]
+  );
+
+  const handleInputChange = (val, { action }) => {
+    if (action === "input-change") {
+      setSearchTerm(val);
+      if (field.dynamic) {
+        debouncedFetch(field, val);
+      }
+    }
+  };
+
   switch (field.type) {
 
     case "number":
@@ -67,7 +84,7 @@ const ActionFieldRenderer = ({
       );
 
     case "select": {
-      const key = getKey?.(field);
+      const key = getKey?.(field, searchTerm);
       const options = field.options
         ? field.options.map((opt) => ({
           label: opt.label,
@@ -85,14 +102,16 @@ const ActionFieldRenderer = ({
           isClearable
           isLoading={field.dynamic ? loadingFields[key] : false}
           onMenuOpen={
-            field.dynamic ? () => fetchDynamicOptions(field) : undefined
+            field.dynamic ? () => fetchDynamicOptions(field, searchTerm) : undefined
           }
+          onInputChange={handleInputChange}
+          inputValue={searchTerm}
         />
       );
     }
 
     case "multi-select": {
-      const key = getKey?.(field);
+      const key = getKey?.(field, searchTerm);
       const options = field.options
         ? field.options.map((opt) => ({
           label: opt.label,
@@ -111,8 +130,10 @@ const ActionFieldRenderer = ({
           isMulti
           isLoading={field.dynamic ? loadingFields[key] : false}
           onMenuOpen={
-            field.dynamic ? () => fetchDynamicOptions(field) : undefined
+            field.dynamic ? () => fetchDynamicOptions(field, searchTerm) : undefined
           }
+          onInputChange={handleInputChange}
+          inputValue={searchTerm}
         />
       );
     }
