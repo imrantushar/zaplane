@@ -1,15 +1,14 @@
-import {  Button, Flex, HStack,  } from "@chakra-ui/react";
+import { Button, Flex, HStack } from "@chakra-ui/react";
 import ZAPDrawer from "@ZAPComponents/Drawer";
-import { integrations } from "@ZAPUtils/helper";
 import { useFormikContext } from "formik";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import ZAPTab from "@ZAPComponents/Tab";
 import { __ } from "@wordpress/i18n";
 import { primaryBtn } from "../../../../../../../assets/scss/chakra/recipe";
 import { useActionDrawer } from "@ZAPHooks/useActionDrawer/useActionDrawer";
 import { TOOLS } from "@ZAPHooks/useActionDrawer/helper";
-import { getIntegration } from "./helper";
+import { buildContinuePayload } from "./helper";
 import SelectTab from "./SelectTab/SelectTab";
 import TestRun from "./TestRun/TestRun";
 import DrawerSearchList from "./DrawerSearchList/DrawerSearchList";
@@ -27,71 +26,22 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, handleAddAction,
   const { source, node } = context;
   const dispatch = useDispatch();
   const { values, setFieldValue, resetForm } = useFormikContext();
-  const [step, setStep] = useState("select");
   const isTrigger = node?.data?.action === "trigger" && source === "node";
 
-  const { mode, setMode, selectedItem, setSelectedItem, search, setSearch, list, searchList } =
-    useActionDrawer(open, node, source, setFieldValue, isTrigger,values);
-
-  // Auto-set actionType if only one tool action
-  
-  useEffect(() => {
-    if (open && source === "add") {
-      setStep("select");
-      resetForm();
-      setFieldValue("actionType", "");
-    }
-  }, [open, context]);
-
-  useEffect(() => {
-    if (mode !== "tools" || !selectedItem) return;
-    const tool = integrations.tools?.[selectedItem.id];
-    const actions = Object.values(tool?.actions || {});
-    if (actions.length === 1) setFieldValue("actionType", actions[0].key);
-  }, [mode, selectedItem, setFieldValue]);
-
-  //Generate action options for the selected item
-
-  const actionOptions = useMemo(() => {
-    const integration = getIntegration(mode, selectedItem);
-    if (!integration) return [];
-    const list = mode === "tools"
-      ? Object.values(integration.actions || {})
-      : isTrigger
-        ? Object.values(integration.triggers || {})
-        : Object.values(integration.actions || {});
-    return list.map(i => ({ label: i.label, value: i.key, hook: i.hook }));
-  }, [mode, selectedItem, isTrigger]);
-  //Get schema fields for the selected action
-
-  const selectedActionFields = useMemo(() => {
-    const integration = getIntegration(mode, selectedItem);
-    if (!integration || !values?.actionType) return [];
-    if (mode === "tools") return integration.actions?.[values.actionType]?.schema || [];
-    if (isTrigger) return integration.triggers?.[values.actionType]?.schema || [];
-    return integration.actions?.[values.actionType]?.schema || [];
-  }, [mode, selectedItem, values?.actionType, isTrigger]);
-
-  const visibleFields = useMemo(() => {
-    return selectedActionFields.filter((f) => {
-      if (!f.depends_on) return true;
-      return Object.entries(f.depends_on).every(([k, v]) => values[k] === v);
-    });
-  }, [selectedActionFields, values]);
-
-  // Apply default values when fields become visible
-  useEffect(() => {
-    if (!visibleFields.length) return;
-    visibleFields.forEach((field) => {
-      const currentValue = values?.[field.key];
-      if (
-        field.default !== undefined &&
-        (currentValue === undefined || currentValue === "")
-      ) {
-        setFieldValue(field.key, field.default);
-      }
-    });
-  }, [visibleFields, setFieldValue]);
+  const {
+    mode, setMode,
+    selectedItem, setSelectedItem,
+    search, setSearch,
+    step, setStep,
+    list, searchList,
+    selectedIntegration,
+    actionOptions,
+    selectedActionFields,
+    visibleFields,
+    resetAll,
+  } = useActionDrawer({
+    open, node, source, setFieldValue, isTrigger, values, resetForm, onClose,
+  });
 
   // NOW call dynamic hook
   const {
@@ -106,38 +56,16 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, handleAddAction,
     values,
   });
 
-  const resetAll = () => {
-    setMode(null);
-    setStep("select");
-    setSelectedItem(null);
-    setSearch("");
-    resetForm();
-    onClose();
-  };
-
   const handleContinue = () => {
     if (step === "select") {
       return setStep("configure");
     }
     if (step === "configure") {
+      const payload = buildContinuePayload(selectedItem, values, visibleFields);
 
-      const payload = {
-        icon: selectedItem.icon,
-        app: selectedItem.id,
-        name: selectedItem.name,
-        event: values.actionType,
-        config: visibleFields.reduce((acc, f) => {
-          acc[f.key] = values[f.key];
-          return acc;
-        }, {}),
-        ...(selectedItem.mode && { mode: selectedItem.mode }),
-        ...(values.hook && { hook: values.hook }),
-        ...(values.connection_id && { connection_id: values.connection_id }),
-      };
       if (context?.source !== "node") {
         handleAddAction(payload);
-      }
-      else {
+      } else {
         updateNodeData(payload);
       }
 
@@ -147,12 +75,7 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, handleAddAction,
     if (step === "test") {
       resetAll();
     }
-
   };
-  // seleted intregation
-  const selectedIntegration = useMemo(() => {
-    return getIntegration(mode, selectedItem);
-  }, [mode, selectedItem]);
 
   // get global variable
   useEffect(() => {
@@ -170,7 +93,7 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, handleAddAction,
 
     dispatch(conditionVariables(payload));
   }, [node?.id]);
-  
+
   return (
     <ZAPDrawer
       open={open}
@@ -187,7 +110,6 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, handleAddAction,
       // closeOnOverlayClick
       title={!mode ? "Add Action" : selectedItem?.name || __('App', 'zaplane')}
       placement="end"
-      // size={["filter", "condition"].includes(values?.actionType) ? "xl" : "md"}
       footer={
         <HStack justify="space-between">
           <Button variant="outline" onClick={resetAll}>{__("Cancel", "zaplane")}</Button>
@@ -198,7 +120,7 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, handleAddAction,
         </HStack>
       }
     >
-    
+
         <Search
           placeholder={__("Search apps or tools...", "zaplane")}
           defaultValue={search}
@@ -302,4 +224,4 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, handleAddAction,
     </ZAPDrawer>
   );
 }
-export default ActionDrawer
+export default ActionDrawer
