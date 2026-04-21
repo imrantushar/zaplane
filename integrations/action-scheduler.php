@@ -22,6 +22,10 @@ class ActionScheduler extends IntegrationBase {
 		return 'tool';
 	}
 
+	public static function show_trigger(): bool {
+		return true;
+	}
+
 	public static function get_icon(): string {
 		return 'action-scheduler.svg';
 	}

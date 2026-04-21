@@ -30,6 +30,10 @@ abstract class IntegrationBase {
 		return [];
 	}
 
+	public static function show_trigger(): bool {
+		return false;
+	}
+
 
 
 	public static function get_actions(): array {

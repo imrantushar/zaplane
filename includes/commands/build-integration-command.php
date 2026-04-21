@@ -42,12 +42,13 @@ class BuildIntegrationCommand extends Command {
 				'requires_connection' => $class::requires_connection(),
 				'auth_type'          => $class::get_auth_type(),
 				'supports_webhook'   => $class::supports_webhook(),
+				'show_trigger'       => $class::show_trigger(),
 				'triggers'           => [],
 				'actions'            => [],
 			];
 
 			foreach ( $class::get_triggers() as $key => $trigger ) {
-				if ( 'tool' === $category ) {
+				if ( 'tool' === $category && ! $class::show_trigger() ) {
 					continue;
 				}
 
