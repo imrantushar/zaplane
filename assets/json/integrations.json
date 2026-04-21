@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-04-19 08:23:09",
+    "generated_at": "2026-04-21 06:44:39",
     "apps": {
         "cartflows": {
             "slug": "cartflows",
@@ -21444,6 +21444,199 @@
                             "label": "Amount",
                             "type": "number",
                             "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
+        },
+        "actionscheduler": {
+            "slug": "actionscheduler",
+            "name": "Action Scheduler",
+            "icon": "action-scheduler.svg",
+            "category": "tool",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": [],
+            "actions": {
+                "schedule_single": {
+                    "key": "schedule_single",
+                    "label": "Schedule Single Action",
+                    "schema": [
+                        {
+                            "key": "hook",
+                            "label": "Hook Name",
+                            "type": "expression",
+                            "required": true,
+                            "placeholder": "my_custom_hook",
+                            "description": "The WordPress action hook that will be fired."
+                        },
+                        {
+                            "key": "scheduled_at",
+                            "label": "Schedule At",
+                            "type": "expression",
+                            "required": true,
+                            "placeholder": "+1 hour",
+                            "description": "Unix timestamp or a strtotime-compatible string (e.g. \"+1 hour\", \"+2 days\")."
+                        },
+                        {
+                            "key": "args",
+                            "label": "Arguments (JSON)",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "{\"key\": \"value\"}",
+                            "description": "JSON-encoded arguments to pass to the action hook."
+                        },
+                        {
+                            "key": "group",
+                            "label": "Group",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "zaplane",
+                            "description": "Optional group name for organizing actions."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "schedule_recurring": {
+                    "key": "schedule_recurring",
+                    "label": "Schedule Recurring Action",
+                    "schema": [
+                        {
+                            "key": "hook",
+                            "label": "Hook Name",
+                            "type": "expression",
+                            "required": true,
+                            "placeholder": "my_custom_hook",
+                            "description": "The WordPress action hook that will be fired."
+                        },
+                        {
+                            "key": "interval_amount",
+                            "label": "Repeat Every",
+                            "type": "number",
+                            "required": true,
+                            "default": 1,
+                            "placeholder": "1"
+                        },
+                        {
+                            "key": "interval_unit",
+                            "label": "Unit",
+                            "type": "select",
+                            "required": true,
+                            "default": "hours",
+                            "options": [
+                                {
+                                    "value": "minutes",
+                                    "label": "Minutes"
+                                },
+                                {
+                                    "value": "hours",
+                                    "label": "Hours"
+                                },
+                                {
+                                    "value": "days",
+                                    "label": "Days"
+                                },
+                                {
+                                    "value": "weeks",
+                                    "label": "Weeks"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "first_run",
+                            "label": "First Run At",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "now",
+                            "description": "When to start. Leave empty to start immediately. Accepts strtotime-compatible strings."
+                        },
+                        {
+                            "key": "args",
+                            "label": "Arguments (JSON)",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "{\"key\": \"value\"}",
+                            "description": "JSON-encoded arguments to pass to the action hook."
+                        },
+                        {
+                            "key": "group",
+                            "label": "Group",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "zaplane",
+                            "description": "Optional group name for organizing actions."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "cancel_actions": {
+                    "key": "cancel_actions",
+                    "label": "Cancel Scheduled Actions",
+                    "schema": [
+                        {
+                            "key": "hook",
+                            "label": "Hook Name",
+                            "type": "expression",
+                            "required": true,
+                            "placeholder": "my_custom_hook",
+                            "description": "The WordPress action hook that will be fired."
+                        },
+                        {
+                            "key": "args",
+                            "label": "Arguments (JSON)",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "{\"key\": \"value\"}",
+                            "description": "JSON-encoded arguments to pass to the action hook."
+                        },
+                        {
+                            "key": "group",
+                            "label": "Group",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "zaplane",
+                            "description": "Optional group name for organizing actions."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "has_scheduled": {
+                    "key": "has_scheduled",
+                    "label": "Check If Action Is Scheduled",
+                    "schema": [
+                        {
+                            "key": "hook",
+                            "label": "Hook Name",
+                            "type": "expression",
+                            "required": true,
+                            "placeholder": "my_custom_hook",
+                            "description": "The WordPress action hook that will be fired."
+                        },
+                        {
+                            "key": "args",
+                            "label": "Arguments (JSON)",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "{\"key\": \"value\"}",
+                            "description": "JSON-encoded arguments to pass to the action hook."
+                        },
+                        {
+                            "key": "group",
+                            "label": "Group",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "zaplane",
+                            "description": "Optional group name for organizing actions."
                         }
                     ],
                     "outputs": [

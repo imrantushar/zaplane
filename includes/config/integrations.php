@@ -19,6 +19,10 @@ return [
 			'file' => 'delay.php',
 			'class' => \Zaplane\Integrations\Delay::class
 		],
+		'actionscheduler'      => [
+			'file'  => 'action-scheduler.php',
+			'class' => \Zaplane\Integrations\ActionScheduler::class
+		],
 		'iterator'             => [
 			'file' => 'iterator.php',
 			'class' => \Zaplane\Integrations\Iterator::class
