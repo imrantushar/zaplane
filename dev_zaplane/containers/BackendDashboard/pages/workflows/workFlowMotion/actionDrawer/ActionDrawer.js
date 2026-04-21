@@ -72,6 +72,27 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, handleAddAction,
     return integration.actions?.[values.actionType]?.schema || [];
   }, [mode, selectedItem, values?.actionType, isTrigger]);
 
+  const visibleFields = useMemo(() => {
+    return selectedActionFields.filter((f) => {
+      if (!f.depends_on) return true;
+      return Object.entries(f.depends_on).every(([k, v]) => values[k] === v);
+    });
+  }, [selectedActionFields, values]);
+
+  // Apply default values when fields become visible
+  useEffect(() => {
+    if (!visibleFields.length) return;
+    visibleFields.forEach((field) => {
+      const currentValue = values?.[field.key];
+      if (
+        field.default !== undefined &&
+        (currentValue === undefined || currentValue === "")
+      ) {
+        setFieldValue(field.key, field.default);
+      }
+    });
+  }, [visibleFields, setFieldValue]);
+
   // NOW call dynamic hook
   const {
     dynamicOptions,
@@ -81,7 +102,7 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, handleAddAction,
   } = useDynamicFields({
     selectedItem,
     mode,
-    selectedActionFields,
+    selectedActionFields: visibleFields,
     values,
   });
 
@@ -105,7 +126,7 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, handleAddAction,
         app: selectedItem.id,
         name: selectedItem.name,
         event: values.actionType,
-        config: selectedActionFields.reduce((acc, f) => {
+        config: visibleFields.reduce((acc, f) => {
           acc[f.key] = values[f.key];
           return acc;
         }, {}),
@@ -238,8 +259,8 @@ const ActionDrawer = ({ open, context, onClose, updateNodeData, handleAddAction,
             {
               value: "configure", label: "Configure", content: <>
                 <Flex direction="column" className="action-drowar-lists" gap={4}>
-                  {selectedActionFields?.length > 0 ? (
-                    selectedActionFields.map((field) => (
+                  {visibleFields?.length > 0 ? (
+                    visibleFields.map((field) => (
                       <ActionFieldRenderer
                         key={field.key}
                         field={field}
