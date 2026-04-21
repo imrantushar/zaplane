@@ -210,7 +210,18 @@ const WorkflowTable = ({
           </button>
         </SubTopBar>}
 
-      <ListTable columns={columns} data={workflows} isRowSelectable getSelectRowValue={rows => setSelection(rows || [])} showPagination={totalCount > 10} noDataText={__("No workflows found", "zaplane")} dataFetchingStatus={loading} totalItems={totalCount} currentPageNumber={activePage} perPage={activePerPage} onChangePage={handlePageChange} onChangeItemsPerPage={handlePerPageChange} />
+      <ListTable 
+      columns={columns} 
+      data={workflows} 
+      isRowSelectable 
+      getSelectRowValue={rows => setSelection(rows || [])} 
+      showPagination={totalCount > 10} noDataText={__("No workflows found", "zaplane")} 
+      dataFetchingStatus={loading} 
+      totalItems={totalCount} 
+      currentPageNumber={activePage} 
+      perPage={activePerPage} 
+      onChangePage={handlePageChange} 
+      onChangeItemsPerPage={handlePerPageChange} />
 
       <ZAPActionBar selection={selection} onDelete={handleDeleteSelected} onClose={() => setSelection([])} />
 
