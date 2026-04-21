@@ -28,7 +28,7 @@ export default function CustomNode({
   const handleStyle = {
     width: 8,
     height: 8,
-    borderRadius: "50%",
+    borderRadius: "8px",
     background: "#6366f1", // purple-dot color
     border: "none",
   };
@@ -51,7 +51,7 @@ export default function CustomNode({
       {/* DELETE TOOLBAR */}
       {data.action !== "trigger" && hasPort && (
         <NodeToolbar isVisible={hovered} position={Position.Bottom} align="center" offset={-3}>
-          <div style={{ marginTop: '4px', marginLeft: isLR ? '0' : '100px', pointerEvents: 'auto', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} className="flex flex-row items-center bg-[var(--zaplane-border-color)] text-[var(--zaplane-font-color)] p-[6px] rounded-full cursor-pointer">
+          <div style={{ marginTop: '4px', marginLeft: isLR ? '0' : '100px', pointerEvents: 'auto', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} className="flex flex-row items-center bg-[var(--zaplane-border-color)] text-[var(--zaplane-font-color)] p-[6px] rounded-[4px] cursor-pointer">
             <RiDeleteBin5Line style={{ width: "16px", height: "16px" }} onClick={e => {
               e.stopPropagation();
               data?.deleteNode(id);
@@ -69,7 +69,7 @@ export default function CustomNode({
           minHeight: '64px',
           background: '#F9FAFB',
           border: '1px solid #E5E7EB',
-          borderRadius: '12px',
+          borderRadius: '8px',
           boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
           display: 'flex',
           alignItems: 'center',
@@ -175,4 +175,4 @@ export default function CustomNode({
       )}
     </div>
   );
-}
+}

@@ -52,7 +52,7 @@ const VersionHistoryTable = ({
         date,
         time
       } = formatDateTime(row.created_at);
-      return <div>
+      return <div className="text-center flex flex-col items-center">
             <ZAPLabel label={date} type={"simple"} />
             <span className="zaplane-sub-title ml-[-40px] text-var(--zaplane-text-muted)">
               {__(time, 'zaplane')}

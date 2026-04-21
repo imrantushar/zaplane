@@ -16,7 +16,7 @@ const ZAPIcon = ({
         flexShrink: 0,
         borderColor: 'var(--zaplane-border-color)'
     }} 
-    className="flex justify-center items-center p-2 rounded-lg border shadow-sm"
+    className="flex justify-center items-center p-2 rounded-[4px] border shadow-sm"
   >
       {isSvg ? (
         <img 

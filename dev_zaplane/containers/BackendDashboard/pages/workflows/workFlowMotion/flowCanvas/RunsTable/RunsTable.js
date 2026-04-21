@@ -98,7 +98,22 @@ const RunsTable = ({
     textAlign: "center"
   }];
   return <>
-      <ListTable columns={columns} isRowSelectable={false} data={runs} showSubHeader={false} showColumnFilter={false} showPagination={totalItems >= 10} noDataText={__("No history found", "zaplane")} totalItems={totalItems} dataFetchingStatus={loading} suffix="history-table" currentPageNumber={currentPage} perPage={perPage} rowsPerPage={itemPerPage} onChangePage={handlePageChange} onChangeItemsPerPage={handlePerPageChange} />
+      <ListTable 
+      columns={columns} 
+      isRowSelectable={false}
+       data={runs} 
+       showSubHeader={false} 
+       showColumnFilter={false} 
+       showPagination={totalItems >= 10} 
+       noDataText={__("No history found", "zaplane")} 
+       totalItems={totalItems} 
+       dataFetchingStatus={loading} 
+       suffix="history-table" 
+       currentPageNumber={currentPage} 
+       perPage={perPage} 
+       rowsPerPage={itemPerPage} 
+       onChangePage={handlePageChange} 
+       onChangeItemsPerPage={handlePerPageChange} />
       <ZAPDrawer open={drawerOpen} arrowClose={true} onClose={() => {
       setDrawerOpen(false);
       setActiveRunId(null);
