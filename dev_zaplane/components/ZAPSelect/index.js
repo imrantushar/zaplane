@@ -1,6 +1,4 @@
-
-import { Box, Flex, Text } from "@chakra-ui/react";
-import { __, sprintf } from "@wordpress/i18n";
+import { __ } from "@wordpress/i18n";
 import Select from "react-select";
 
 const ZAPSelect = ({
@@ -15,12 +13,15 @@ const ZAPSelect = ({
   placeholder,
   isClearable = false,
   isMulti = false,
-  containerStyle,
+  containerStyle = {}
 }) => {
+
+  // Handle selected value properly
   const selectedValue = isMulti
     ? options.filter((o) => Array.isArray(value) && value.includes(o.value))
     : options.find((o) => o.value === value) || null;
 
+  // Handle change properly
   const handleChange = (selected) => {
     if (isMulti) {
       onChange?.(selected ? selected.map((o) => o.value) : []);
@@ -30,9 +31,18 @@ const ZAPSelect = ({
   };
 
   return (
-    <Flex direction="column" gap={2} style={containerStyle}>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: "8px",
+        ...containerStyle
+      }}
+    >
       {label && (
-        <Text className="zaplane-label">{__(label, "zaplane")}</Text>
+        <span className="zaplane-label">
+          {__(label, "zaplane")}
+        </span>
       )}
 
       <Select
@@ -51,15 +61,18 @@ const ZAPSelect = ({
         menuPortalTarget={document.body}
         menuPosition="fixed"
         styles={{
-          menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+          menuPortal: (base) => ({
+            ...base,
+            zIndex: 9999
+          }),
           menuList: (base) => ({
             ...base,
             maxHeight: 250,
-            overflowY: "auto",
-          }),
+            overflowY: "auto"
+          })
         }}
       />
-    </Flex>
+    </div>
   );
 };
 
