@@ -84,17 +84,17 @@ export default function FlowTopBar({
     updateStatusAndTitle();
   }, [values?.status, values?.title, workFlow, dispatch, id]);
   //listiner
-  useEffect(() => {
-    if (activeDrawer !== "logs") return;
-    const interval = setInterval(async () => {
-      setRefreshing(true);
-      await dispatch(getRunWorkFlow({
-        id
-      }));
-      setRefreshing(false);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [activeDrawer, dispatch, id]);
+  // useEffect(() => {
+  //   if (activeDrawer !== "logs") return;
+  //   const interval = setInterval(async () => {
+  //     setRefreshing(true);
+  //     await dispatch(getRunWorkFlow({
+  //       id
+  //     }));
+  //     setRefreshing(false);
+  //   }, 5000);
+  //   return () => clearInterval(interval);
+  // }, [activeDrawer, dispatch, id]);
 
   // export work folw
   const handleExport = async () => {
@@ -154,7 +154,7 @@ export default function FlowTopBar({
 
     <ZAPDrawer
       title={__("Log History", "zaplane")}
-      maxWidth='max-w-[700px]'
+      maxWidth='max-w-[600px]'
       isFullscreen={isFullscreen}
       open={activeDrawer === "logs"}
       onClose={() => setActiveDrawer(null)}
@@ -162,25 +162,28 @@ export default function FlowTopBar({
         <button
           onClick={() => setActiveDrawer("logs")}
           className={`h-9 px-4 border rounded-[4px] text-sm font-medium transition-all ${activeDrawer === 'logs'
-              ? 'bg-[var(--zaplane-second-primary)] border-[var(--zaplane-primary)] text-[var(--zaplane-primary)]'
-              : 'border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-gray-300'
+            ? 'bg-[var(--zaplane-second-primary)] border-[var(--zaplane-primary)] text-[var(--zaplane-primary)]'
+            : 'border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-gray-300'
             }`}
         >
           {__("Logs", "zaplane")}
         </button>
       }
     >
-      <div className="flex gap-2 p-1 bg-gray-50 rounded-[4px] mb-4">
+      <div className="flex gap-[5px] mb-[12px]">
         <button
           onClick={() => dispatch(getRunWorkFlow({ id }))}
-          className="flex-1 flex items-center justify-center gap-2 py-2 text-sm font-medium bg-white border border-gray-100 rounded-[4px] text-gray-700 hover:bg-gray-50 shadow-sm"
+          className="flex items-center gap-1 px-3 py-1 text-sm font-medium text-[#454F59] border-0 bg-transparent hover:bg-gray-100 rounded"
         >
-          <TfiReload className={refreshing ? "zaplane-refresh-spin" : ""} />
+          <TfiReload className={refreshing ? "animate-spin" : ""} />
           {__("Refresh", "zaplane")}
         </button>
+
         <button
-          onClick={() => dispatch(workFLowExction({ workflow_hash: workFlow?.version?.hash }))}
-          className="flex-1 flex items-center justify-center gap-2 py-2 text-sm font-medium bg-white border border-gray-100 rounded-[4px] text-gray-700 hover:bg-gray-50 shadow-sm"
+          onClick={() =>
+            dispatch(workFLowExction({ workflow_hash: workFlow?.version?.hash }))
+          }
+          className="flex items-center gap-1 px-3 py-1 text-sm font-medium text-[#454F59] border-0 bg-transparent hover:bg-gray-100 rounded"
         >
           <LuSquarePlay />
           {__("Replay", "zaplane")}
@@ -199,8 +202,8 @@ export default function FlowTopBar({
           <button
             onClick={() => setActiveDrawer("history")}
             className={`flex items-center justify-center w-9 h-9 border rounded-[4px] transition-all ${activeDrawer === 'history'
-                ? 'bg-[var(--zaplane-second-primary)] border-[var(--zaplane-primary)] text-[var(--zaplane-primary)]'
-                : 'border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-gray-300'
+              ? 'bg-[var(--zaplane-second-primary)] border-[var(--zaplane-primary)] text-[var(--zaplane-primary)]'
+              : 'border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-gray-300'
               }`}
           >
             <LucideHistory size={18} />

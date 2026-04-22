@@ -40,10 +40,10 @@ const RunsTable = ({
   useEffect(() => {
     if (activeDrawer !== "logs") return;
     handleRefresh(currentPage, itemPerPage);
-    const interval = setInterval(() => {
-      handleRefresh(currentPage, itemPerPage);
-    }, 8000);
-    return () => clearInterval(interval);
+    // const interval = setInterval(() => {
+    //   handleRefresh(currentPage, itemPerPage);
+    // }, 8000);
+    // return () => clearInterval(interval);
   }, [currentPage, itemPerPage, activeDrawer]);
   const handlePageChange = newPage => {
     handleRefresh(newPage, perPage);
@@ -61,7 +61,7 @@ const RunsTable = ({
     cell: row => <span textTransform="capitalize" {...statusStyle(row.status)} className="px-2 py-0.5 rounded-md text-[xs]">
           {__(row.status, "zaplane")}
         </span>,
-    columnWidth: "120px"
+    columnWidth: "100px"
   }, {
     name: __('DURATION', 'zaplane'),
     cell: row => <span>
@@ -82,12 +82,12 @@ const RunsTable = ({
           setActiveRunId(row.id);
           setDrawerOpen(true);
           dispatch(nodeLogsRunDetails(row.id));
-        }} className="flex p-[5px 6px] justify-center items-center rounded-[2.917px] border">
+        }} className="flex px-[8px] py-[4px] justify-center items-center rounded-[2.917px] border">
               <HistoryIcon height="20px" width="20px" />
             </div>
           </ZAPTooltip>
           <ZAPTooltip content={__("Re-Try", 'zaplane')}>
-            <div onClick={() => dispatch(getSingleRun(row.id))} className="flex p-[5px 6px] justify-center items-center rounded-[2.917px] border">
+            <div onClick={() => dispatch(getSingleRun(row.id))} className="flex px-[8px] py-[4px] justify-center items-center rounded-[2.917px] border">
               <ReExcutionIcon height="20px" width="20px" />
             </div>
           </ZAPTooltip>
