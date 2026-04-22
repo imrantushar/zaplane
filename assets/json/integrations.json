@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-04-16 10:25:21",
+    "generated_at": "2026-04-22 05:51:12",
     "apps": {
         "cartflows": {
             "slug": "cartflows",
@@ -10021,297 +10021,6 @@
                             "type": "boolean"
                         }
                     ],
-                    "outputs": [
-                        "main"
-                    ]
-                }
-            }
-        },
-        "slack": {
-            "slug": "slack",
-            "name": "Slack",
-            "icon": "slack.svg",
-            "category": "app",
-            "requires_connection": true,
-            "auth_type": "both",
-            "supports_webhook": true,
-            "triggers": {
-                "message_received": {
-                    "key": "message_received",
-                    "label": "Message Received",
-                    "hook": "slack_webhook_message",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "app_mention": {
-                    "key": "app_mention",
-                    "label": "App Mentioned",
-                    "hook": "slack_webhook_app_mention",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "reaction_added": {
-                    "key": "reaction_added",
-                    "label": "Reaction Added",
-                    "hook": "slack_webhook_reaction_added",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "channel_created": {
-                    "key": "channel_created",
-                    "label": "Channel Created",
-                    "hook": "slack_webhook_channel_created",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "file_shared": {
-                    "key": "file_shared",
-                    "label": "File Shared",
-                    "hook": "slack_webhook_file_shared",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                }
-            },
-            "actions": {
-                "send_message": {
-                    "key": "send_message",
-                    "label": "Send Message",
-                    "schema": [
-                        {
-                            "key": "channel",
-                            "type": "text",
-                            "label": "Channel",
-                            "placeholder": "#general or channel ID",
-                            "required": true
-                        },
-                        {
-                            "key": "text",
-                            "type": "textarea",
-                            "label": "Message",
-                            "placeholder": "Enter your message... Use {{variable}} for dynamic values",
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "send_dm": {
-                    "key": "send_dm",
-                    "label": "Send Direct Message",
-                    "schema": [
-                        {
-                            "key": "user_id",
-                            "type": "text",
-                            "label": "User ID",
-                            "placeholder": "Slack user ID (e.g. U012AB3CD)",
-                            "required": true
-                        },
-                        {
-                            "key": "text",
-                            "type": "textarea",
-                            "label": "Message",
-                            "placeholder": "Enter your message... Use {{variable}} for dynamic values",
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "create_channel": {
-                    "key": "create_channel",
-                    "label": "Create Channel",
-                    "schema": [
-                        {
-                            "key": "name",
-                            "type": "text",
-                            "label": "Channel Name",
-                            "placeholder": "my-new-channel",
-                            "required": true,
-                            "help": "Lowercase letters, numbers and hyphens only."
-                        },
-                        {
-                            "key": "is_private",
-                            "type": "select",
-                            "label": "Visibility",
-                            "options": [
-                                {
-                                    "value": "false",
-                                    "label": "Public"
-                                },
-                                {
-                                    "value": "true",
-                                    "label": "Private"
-                                }
-                            ]
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "invite_to_channel": {
-                    "key": "invite_to_channel",
-                    "label": "Invite User to Channel",
-                    "schema": [
-                        {
-                            "key": "channel",
-                            "type": "text",
-                            "label": "Channel ID",
-                            "placeholder": "C012AB3CD",
-                            "required": true
-                        },
-                        {
-                            "key": "user_ids",
-                            "type": "text",
-                            "label": "User IDs",
-                            "placeholder": "U012AB3CD,U012AB3CE",
-                            "required": true,
-                            "help": "Comma-separated Slack user IDs."
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "set_topic": {
-                    "key": "set_topic",
-                    "label": "Set Channel Topic",
-                    "schema": [
-                        {
-                            "key": "channel",
-                            "type": "text",
-                            "label": "Channel ID",
-                            "placeholder": "C012AB3CD",
-                            "required": true
-                        },
-                        {
-                            "key": "topic",
-                            "type": "text",
-                            "label": "Topic",
-                            "placeholder": "New channel topic...",
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "add_reaction": {
-                    "key": "add_reaction",
-                    "label": "Add Reaction",
-                    "schema": [
-                        {
-                            "key": "channel",
-                            "type": "text",
-                            "label": "Channel ID",
-                            "placeholder": "C012AB3CD",
-                            "required": true
-                        },
-                        {
-                            "key": "timestamp",
-                            "type": "text",
-                            "label": "Message Timestamp",
-                            "placeholder": "{{slack_message_ts}}",
-                            "required": true,
-                            "help": "The ts of the message to react to."
-                        },
-                        {
-                            "key": "emoji",
-                            "type": "text",
-                            "label": "Emoji Name",
-                            "placeholder": "thumbsup",
-                            "required": true,
-                            "help": "Emoji name without colons (e.g. thumbsup)."
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "get_user_info": {
-                    "key": "get_user_info",
-                    "label": "Get User Info",
-                    "schema": [
-                        {
-                            "key": "user_id",
-                            "type": "text",
-                            "label": "User ID",
-                            "placeholder": "U012AB3CD or {{user_id}}",
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                }
-            }
-        },
-        "trello": {
-            "slug": "trello",
-            "name": "Trello",
-            "icon": "trello-icon.svg",
-            "category": "app",
-            "requires_connection": false,
-            "auth_type": "none",
-            "supports_webhook": false,
-            "triggers": {
-                "card_created": {
-                    "key": "card_created",
-                    "label": "Card Created",
-                    "hook": "trello_webhook",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                }
-            },
-            "actions": {
-                "create_card": {
-                    "key": "create_card",
-                    "label": "Create Card",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                }
-            }
-        },
-        "stripe": {
-            "slug": "stripe",
-            "name": "Stripe",
-            "icon": "stripe.svg",
-            "category": "app",
-            "requires_connection": false,
-            "auth_type": "none",
-            "supports_webhook": false,
-            "triggers": {
-                "payment_succeeded": {
-                    "key": "payment_succeeded",
-                    "label": "Payment Succeeded",
-                    "hook": "stripe_webhook",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                }
-            },
-            "actions": {
-                "charge_customer": {
-                    "key": "charge_customer",
-                    "label": "Charge Customer",
-                    "schema": [],
                     "outputs": [
                         "main"
                     ]
@@ -21200,6 +20909,54 @@
                 }
             },
             "actions": []
+        },
+        "brevo": {
+            "slug": "brevo",
+            "name": "Brevo",
+            "icon": "https://www.brevo.com/wp-content/uploads/2023/01/brevo-logo.svg",
+            "category": "email-marketing",
+            "requires_connection": true,
+            "auth_type": "api_key",
+            "supports_webhook": false,
+            "triggers": [],
+            "actions": [
+                {
+                    "key": 0,
+                    "label": "Create Contact",
+                    "schema": [],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                {
+                    "key": 1,
+                    "label": "Add Contact to List",
+                    "schema": [],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                {
+                    "key": 2,
+                    "label": "Delete Contact",
+                    "schema": [],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                {
+                    "key": 3,
+                    "label": "Remove Contact from List",
+                    "schema": [],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                }
+            ]
         }
     },
     "tools": {

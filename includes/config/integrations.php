@@ -224,11 +224,11 @@ return [
 			'class' => \Zaplane\Integrations\Kadenceblocks::class
 			],
 		'buddyboss'      => [
-			'file' => 'buddyboss.php', 
+			'file' => 'buddyboss.php',
 			'class' => \Zaplane\Integrations\Buddyboss::class
 		],
 		'ultimatemember'      => [
-			'file' => 'ultimatemember.php', 
+			'file' => 'ultimatemember.php',
 			'class' => \Zaplane\Integrations\Ultimatemember::class
 		],
 		'bitform'      => [
@@ -244,15 +244,15 @@ return [
 			'class' => \Zaplane\Integrations\Suremail::class
 		],
 		'bookingcalendar'      => [
-			'file' => 'bookingcalendar.php', 
+			'file' => 'bookingcalendar.php',
 			'class' => \Zaplane\Integrations\Bookingcalendar::class
 		],
 		'weforms'      => [
-			'file' => 'weforms.php', 
+			'file' => 'weforms.php',
 			'class' => \Zaplane\Integrations\Weforms::class
 		],
 		'suremembers'      => [
-			'file' => 'suremembers.php', 
+			'file' => 'suremembers.php',
 			'class' => \Zaplane\Integrations\Suremembers::class
 		],
 		'arform'      => [
@@ -286,6 +286,10 @@ return [
 		'gamipress'        => [
 			'file'  => 'gamipress.php',
 			'class' => \Zaplane\Integrations\Gamipress::class
+		],
+		'brevo'        => [
+			'file'  => 'brevo.php',
+			'class' => \Zaplane\Integrations\Brevo::class
 		],
 	],
 ];
