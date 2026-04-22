@@ -3,16 +3,25 @@ import { useSelector, useDispatch } from 'react-redux';
 import { __ } from '@wordpress/i18n';
 import { createPortal } from 'react-dom';
 import { showNotification } from '@ZAPRedux/Slices/notificationSlice/notificationSlice';
-const iconType = type => {
+import {
+  CheckCircle,
+  AlertCircle,
+  Info,
+  AlertTriangle,
+  X,
+} from "lucide-react";
+
+// 🔹 Icon component
+const getIcon = (type) => {
   switch (type) {
-    case 'error':
-      return 'badge-alert';
-    case 'info':
-      return 'info';
-    case 'warning':
-      return 'circle-alert';
+    case "error":
+      return <AlertCircle className="w-5 h-5 text-red-600" />;
+    case "info":
+      return <Info className="w-5 h-5 text-blue-600" />;
+    case "warning":
+      return <AlertTriangle className="w-5 h-5 text-yellow-600" />;
     default:
-      return 'round-checkmark';
+      return <CheckCircle className="w-5 h-5 text-green-600" />;
   }
 };
 const Notification = () => {
@@ -52,17 +61,19 @@ const Notification = () => {
     }));
   };
   return <>
-			{isShowNotification && createPortal(<div className={`zaplaness-notification ${notification.type && `zaplaness-notification--${notification.type}`}`} ref={notificationRef}>
-						<div className="zaplaness-notification__message">
-							<span className={`zaplaness-icon zaplaness-icon--${iconType(notification.type)} has-zaplaness-blue-bg`} aria-hidden={true} />
-							{notification.isHtml ? <div dangerouslySetInnerHTML={{
+    {isShowNotification && createPortal(<div className={`zaplaness-notification ${notification.type && `zaplaness-notification--${notification.type}`}`} ref={notificationRef}>
+      <div className="zaplaness-notification__message">
+        <div className="flex items-center justify-center w-6 h-6 rounded-full bg-gray-100">
+          {getIcon(notification.type)}
+        </div>
+        {notification.isHtml ? <div dangerouslySetInnerHTML={{
           __html: notification.message
         }} /> : notification.message}
-						</div>
-						<button onClick={closeHandler} aria-label={__('Close notification', 'zaplaness')} className="bg-transparent">
-							<span className="zaplaness-icon zaplaness-icon--close has-zaplaness-blue-bg" />
-						</button>
-					</div>, document.body)}
-		</>;
+      </div>
+      <button onClick={closeHandler} aria-label={__('Close notification', 'zaplaness')} className="bg-transparent">
+        <span className="zaplaness-icon zaplaness-icon--close has-zaplaness-blue-bg" />
+      </button>
+    </div>, document.body)}
+  </>;
 };
 export default Notification;
