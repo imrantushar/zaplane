@@ -1,3 +1,5 @@
+import { Background } from "@xyflow/react";
+
 export const statusOptions = [
     { value: "active", label: "Active" },
     { value: "paused", label: "Paused" },
@@ -8,25 +10,25 @@ export const statusStyle = (status) => {
     case "completed":
       return {
         color: "#16A34A",
-        bg: "#DCFCE7",
+        backgroundColor: "#DCFCE7",
       };
 
     case "running":
       return {
         color: "#2563EB",
-        bg: "#DBEAFE",
+        backgroundColor: "#DBEAFE",
       };
 
     case "failed":
       return {
         color: "#DC2626",
-        bg: "#FEE2E2",
+        backgroundColor: "#FEE2E2",
       };
 
     default:
       return {
         color: "#4B5563", 
-        bg: "#F3F4F6",
+        backgroundColor: "#F3F4F6",
       };
   }
 };

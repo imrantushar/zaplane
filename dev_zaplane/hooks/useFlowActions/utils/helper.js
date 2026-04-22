@@ -30,8 +30,8 @@ export const createActionNode = ({
     actionData,
 }) => {
     const layoutLR = canvasLayout === "LR";
-    const LRGap = 250;
-    const TBGap = 98;
+    const LRGap = 300;
+    const TBGap = 140;
 
     const { edge, node } = drawerContext;
 
@@ -63,7 +63,7 @@ export const createActionNode = ({
         },
     };
 
-    const branchNodes = edge?.sourceHandle ? getBranchNodes(edge.target, edges) : null;
+    const branchNodes = edge ? getBranchNodes(edge.target, edges) : null;
 
     const updatedNodes = nodes.map((n) => {
         if (!branchNodes || !branchNodes.has(n.id)) return n;

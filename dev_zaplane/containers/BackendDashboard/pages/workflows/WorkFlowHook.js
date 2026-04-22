@@ -1,18 +1,14 @@
 import CreateWorkflows from ".";
 import Workflows from "./workFlowMotion";
-import { ChakraProvider } from '@chakra-ui/react';
 import { Provider } from 'react-redux';
 import { BrowserRouter as Router } from 'react-router-dom';
-import { theme } from '../../../../../assets/scss/chakra/theme';
 import { store } from '@ZAPRedux/store';
 
 const ZaplaneWrapper = ({ children }) => (
 	<Provider store={store}>
-		<ChakraProvider value={theme}>
-			<Router>
-				{children}
-			</Router>
-		</ChakraProvider>
+		<Router>
+			{children}
+		</Router>
 	</Provider>
 );
 
