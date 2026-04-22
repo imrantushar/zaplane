@@ -2642,15 +2642,6 @@ video {
 .h-full {
   height: 100%;
 }
-.h-\[\] {
-  height: ;
-}
-.h-\[40\] {
-  height: 40;
-}
-.h-\[40px\] {
-  height: 40px;
-}
 .max-h-\[200px\] {
   max-height: 200px;
 }
@@ -2765,9 +2756,6 @@ video {
 }
 .max-w-sm {
   max-width: 24rem;
-}
-.max-w-\[00px\] {
-  max-width: 00px;
 }
 .flex-1 {
   flex: 1 1 0%;

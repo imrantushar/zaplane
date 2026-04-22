@@ -6,8 +6,9 @@ export const primaryBtn = {
     fontWeight: "500",
     fontSize: '14px',
     cursor: "pointer",
-    padding: "8px 16px",
+    padding: "2px 14px",
     borderRadius : "4px",
+    height: "36px",
 }
 
 export const secondPrimaryBtn = {
@@ -33,8 +34,9 @@ export const outlineBtn = {
     color: "var(--zaplane-font-color)",
     border: "1px solid var(--zaplane-border-color)",
     cursor: "pointer",
-    padding: "8px 16px",
+    padding: "2px 14px",
     borderRadius: "4px",
+    height: "36px",
 }
 
 export const removeBtn = {
