@@ -190,7 +190,7 @@ const {
         label: "Configure",
         content: <>
           <div className="action-drowar-lists flex flex-col gap-4">
-            {selectedActionFields?.length > 0 ? selectedActionFields.map(field => <ActionFieldRenderer key={field.key} field={field} value={values?.[field.key]} setFieldValue={setFieldValue} getKey={getKey} dynamicOptions={dynamicOptions} loadingFields={loadingFields} fetchDynamicOptions={fetchDynamicOptions} nodeId={node?.id} workFlow={workFlow} nodes={nodes} edges={edges} />) : <ZAPLabel label={__("No configuration required for this action.", "zaplane")} type="simple" />}
+            {selectedActionFields?.length > 0 ? visibleFields.map(field => <ActionFieldRenderer key={field.key} field={field} value={values?.[field.key]} setFieldValue={setFieldValue} getKey={getKey} dynamicOptions={dynamicOptions} loadingFields={loadingFields} fetchDynamicOptions={fetchDynamicOptions} nodeId={node?.id} workFlow={workFlow} nodes={nodes} edges={edges} />) : <ZAPLabel label={__("No configuration required for this action.", "zaplane")} type="simple" />}
           </div>
         </>
       }, {
