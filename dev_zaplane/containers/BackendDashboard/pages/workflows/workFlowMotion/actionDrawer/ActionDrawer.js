@@ -1,7 +1,7 @@
 import ZAPDrawer from "@ZAPComponents/Drawer";
 import { integrations } from "@ZAPUtils/helper";
 import { useFormikContext } from "formik";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import { useDispatch } from "react-redux";
 import ZAPTab from "@ZAPComponents/Tab";
 import { __ } from "@wordpress/i18n";
@@ -61,6 +61,7 @@ const ActionDrawer = ({
     open, node, source, setFieldValue, isTrigger, values, resetForm, onClose,
   });
 
+  const [configErrors, setConfigErrors] = useState({});
 
   // NOW call dynamic hook
 const {
@@ -77,9 +78,29 @@ const {
  
   const handleContinue = () => {
     if (step === "select") {
+      setConfigErrors({});
       return setStep("configure");
     }
     if (step === "configure") {
+      // Validate required fields
+      const errors = {};
+      visibleFields.forEach((field) => {
+        if (!field.required) return;
+        const val = values?.[field.key];
+        const isEmpty =
+          val === undefined ||
+          val === null ||
+          val === "" ||
+          (Array.isArray(val) && val.length === 0);
+        if (isEmpty) errors[field.key] = __("This field is required", "zaplane");
+      });
+
+      if (Object.keys(errors).length > 0) {
+        setConfigErrors(errors);
+        return;
+      }
+
+      setConfigErrors({});
       const payload = buildContinuePayload(selectedItem, values, visibleFields);
 
       if (context?.source !== "node") {
@@ -152,7 +173,24 @@ const {
 
       {mode && !selectedItem && !search && <DrawerItemList list={list} setSelectedItem={setSelectedItem} setMode={setMode} />}
 
-      {selectedItem && <ZAPTab value={step}  onChange={values?.actionType && setStep} tabs={[{
+      {selectedItem && <ZAPTab value={step} onChange={values?.actionType ? (newStep) => {
+        // Validate required fields before jumping to "test" via tab click
+        if (step === "configure" && newStep === "test") {
+          const errors = {};
+          visibleFields.forEach((field) => {
+            if (!field.required) return;
+            const val = values?.[field.key];
+            const isEmpty = val === undefined || val === null || val === "" || (Array.isArray(val) && val.length === 0);
+            if (isEmpty) errors[field.key] = __("This field is required", "zaplane");
+          });
+          if (Object.keys(errors).length > 0) {
+            setConfigErrors(errors);
+            return;
+          }
+          setConfigErrors({});
+        }
+        setStep(newStep);
+      } : undefined} tabs={[{
         value: "select",
         label: "Select",
         content: <SelectTab isTrigger={isTrigger} actionOptions={actionOptions} selectedActionFields={selectedActionFields} values={values} setFieldValue={setFieldValue} dynamicOptions={dynamicOptions} loadingFields={loadingFields} fetchDynamicOptions={fetchDynamicOptions} getKey={getKey} node={node} workFlow={workFlow} selectedIntegration={selectedIntegration} appSlug={selectedItem?.id} />
@@ -161,7 +199,7 @@ const {
         label: "Configure",
         content: <>
           <div className="action-drowar-lists flex flex-col gap-4">
-            {selectedActionFields?.length > 0 ? selectedActionFields.map(field => <ActionFieldRenderer key={field.key} field={field} value={values?.[field.key]} setFieldValue={setFieldValue} getKey={getKey} dynamicOptions={dynamicOptions} loadingFields={loadingFields} fetchDynamicOptions={fetchDynamicOptions} nodeId={node?.id} workFlow={workFlow} nodes={nodes} edges={edges} />) : <ZAPLabel label={__("No configuration required for this action.", "zaplane")} type="simple" />}
+            {selectedActionFields?.length > 0 ? selectedActionFields.map(field => <ActionFieldRenderer key={field.key} field={field} value={values?.[field.key]} setFieldValue={(k, v) => { setFieldValue(k, v); if (configErrors[k]) setConfigErrors(prev => ({ ...prev, [k]: undefined })); }} getKey={getKey} dynamicOptions={dynamicOptions} loadingFields={loadingFields} fetchDynamicOptions={fetchDynamicOptions} nodeId={node?.id} workFlow={workFlow} nodes={nodes} edges={edges} error={configErrors[field.key]} />) : <ZAPLabel label={__("No configuration required for this action.", "zaplane")} type="simple" />}
           </div>
         </>
       }, {

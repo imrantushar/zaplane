@@ -1,5 +1,5 @@
-import {  useRef, useState, useMemo  } from "react";
-import {  useSelector } from "react-redux";
+import { useRef, useState, useMemo } from "react";
+import { useSelector } from "react-redux";
 import ZAPInput from "@ZAPComponents/ZAPInput";
 import ZAPSelect from "@ZAPComponents/ZAPSelect";
 import ZAPDatePicker from "@ZAPComponents/ZAPDatePicker";
@@ -17,6 +17,7 @@ const ActionFieldRenderer = ({
   dynamicOptions,
   loadingFields,
   fetchDynamicOptions,
+  error,
 }) => {
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -39,26 +40,37 @@ const ActionFieldRenderer = ({
     }
   };
 
+  const ErrorMsg = () => {
+    error && (
+      <p className="text-red-500 text-xs mt-1">
+        {error}
+      </p>
+    )
+  }
+
   switch (field.type) {
 
     case "number":
     case "email":
     case "url":
 
-      return <>
+      return <div>
         <ZAPInput
           type={field.type}
           label={field.label}
           value={value || ""}
           inputRef={inputRef}
           onChange={(e) => setFieldValue(field.key, e.target.value)}
-        /></>
+        />
+        <ErrorMsg />
+      </div>;
+
     case "text":
     case "expression":
 
     case "textarea":
       return (
-        <>
+        <div>
           <VariableEditor
             label={field.label}
             value={value || ""}
@@ -68,19 +80,23 @@ const ActionFieldRenderer = ({
             setFieldValue={setFieldValue}
             placeholder={__('Type "@" here to add dynamic', "zaplane")}
           />
-        </>
+          <ErrorMsg />
+        </div>
       );
 
     case "date":
       return (
-        <ZAPDatePicker
-          label={field.label}
-          value={value}
-          onChange={(date) =>
-            setFieldValue(field.key, date?.toISOString().split("T")[0])
-          }
-          placeholder={field.placeholder}
-        />
+        <div>
+          <ZAPDatePicker
+            label={field.label}
+            value={value}
+            onChange={(date) =>
+              setFieldValue(field.key, date?.toISOString().split("T")[0])
+            }
+            placeholder={field.placeholder}
+          />
+          <ErrorMsg />
+        </div>
       );
 
     case "select": {
@@ -93,20 +109,23 @@ const ActionFieldRenderer = ({
         : dynamicOptions[key] || [];
 
       return (
-        <ZAPSelect
-          label={field.label}
-          options={options}
-          value={value}
-          onChange={(opt) => setFieldValue(field.key, opt?.value)}
-          placeholder={field.placeholder || `Select ${field.label}`}
-          isClearable
-          isLoading={field.dynamic ? loadingFields[key] : false}
-          onMenuOpen={
-            field.dynamic ? () => fetchDynamicOptions(field, searchTerm) : undefined
-          }
-          onInputChange={handleInputChange}
-          inputValue={searchTerm}
-        />
+        <div>
+          <ZAPSelect
+            label={field.label}
+            options={options}
+            value={value}
+            onChange={(opt) => setFieldValue(field.key, opt?.value)}
+            placeholder={field.placeholder || `Select ${field.label}`}
+            isClearable
+            isLoading={field.dynamic ? loadingFields[key] : false}
+            onMenuOpen={
+              field.dynamic ? () => fetchDynamicOptions(field, searchTerm) : undefined
+            }
+            onInputChange={handleInputChange}
+            inputValue={searchTerm}
+          />
+          <ErrorMsg />
+        </div>
       );
     }
 
@@ -120,21 +139,24 @@ const ActionFieldRenderer = ({
         : dynamicOptions[key] || [];
 
       return (
-        <ZAPSelect
-          label={field.label}
-          options={options}
-          value={value || []}
-          onChange={(vals) => setFieldValue(field.key, vals)}
-          placeholder={field.placeholder || `Select ${field.label}`}
-          isClearable
-          isMulti
-          isLoading={field.dynamic ? loadingFields[key] : false}
-          onMenuOpen={
-            field.dynamic ? () => fetchDynamicOptions(field, searchTerm) : undefined
-          }
-          onInputChange={handleInputChange}
-          inputValue={searchTerm}
-        />
+        <div>
+          <ZAPSelect
+            label={field.label}
+            options={options}
+            value={value || []}
+            onChange={(vals) => setFieldValue(field.key, vals)}
+            placeholder={field.placeholder || `Select ${field.label}`}
+            isClearable
+            isMulti
+            isLoading={field.dynamic ? loadingFields[key] : false}
+            onMenuOpen={
+              field.dynamic ? () => fetchDynamicOptions(field, searchTerm) : undefined
+            }
+            onInputChange={handleInputChange}
+            inputValue={searchTerm}
+          />
+          <ErrorMsg />
+        </div>
       );
     }
 
