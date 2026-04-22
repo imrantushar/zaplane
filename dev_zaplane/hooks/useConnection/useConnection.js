@@ -15,6 +15,7 @@ const INITIAL_STATE = {
     selectedApp: null,
     selectedAuthType: null,
     credentials: {},
+    search: "",
 };
 
 const useConnection = () => {
@@ -22,7 +23,7 @@ const useConnection = () => {
     const { authFields, loading } = useSelector((state) => state.connections || []);
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const [loadingOAuth, setLoadingOAuth] = useState(false);
-    const [{ drawerStep, selectedApp, selectedAuthType, credentials }, setDrawerState] =
+    const [{ drawerStep, selectedApp, selectedAuthType, credentials, search }, setDrawerState] =
         useState(INITIAL_STATE);
 
 
@@ -49,6 +50,18 @@ const useConnection = () => {
                     type: "app",
                 })),
         []
+    );
+
+    const searchList = useMemo(() => {
+        if (!search) return [];
+        return appList.filter((app) =>
+            app.name.toLowerCase().includes(search.toLowerCase())
+        );
+    }, [appList, search]);
+
+    const setDrawerSearch = useCallback(
+        (value) => patchState({ search: value }),
+        [patchState]
     );
 
 
@@ -207,6 +220,9 @@ const useConnection = () => {
         selectAuthType,
         updateCredential,
         saveConnection,
+        search,
+        searchList,
+        setDrawerSearch,
     };
 };
 
