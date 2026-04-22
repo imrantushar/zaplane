@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-04-19 08:23:09",
+    "generated_at": "2026-04-21 07:14:15",
     "apps": {
         "cartflows": {
             "slug": "cartflows",
@@ -16912,6 +16912,153 @@
                                     "label"
                                 ]
                             }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "send_campaign": {
+                    "key": "send_campaign",
+                    "label": "Send Email Campaign",
+                    "schema": [
+                        {
+                            "key": "campaign_id",
+                            "label": "Email Campaign",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "gemcrm",
+                                "query": "gemcrm_campaign_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "send_email": {
+                    "key": "send_email",
+                    "label": "Send Email",
+                    "schema": [
+                        {
+                            "key": "recipient_type",
+                            "label": "Send To",
+                            "type": "select",
+                            "required": true,
+                            "default": "contact",
+                            "options": [
+                                {
+                                    "value": "contact",
+                                    "label": "Specific Contact"
+                                },
+                                {
+                                    "value": "list",
+                                    "label": "Contact List"
+                                },
+                                {
+                                    "value": "custom",
+                                    "label": "Custom Email"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "contact_id",
+                            "label": "Contact",
+                            "type": "select",
+                            "required": false,
+                            "depends_on": {
+                                "recipient_type": "contact"
+                            },
+                            "dynamic": {
+                                "integration": "gemcrm",
+                                "query": "gemcrm_contact_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "list_id",
+                            "label": "Contact List",
+                            "type": "select",
+                            "required": false,
+                            "depends_on": {
+                                "recipient_type": "list"
+                            },
+                            "dynamic": {
+                                "integration": "gemcrm",
+                                "query": "gemcrm_list_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "custom_email",
+                            "label": "Email Address",
+                            "type": "expression",
+                            "subtype": "email",
+                            "required": false,
+                            "depends_on": {
+                                "recipient_type": "custom"
+                            },
+                            "placeholder": "someone@example.com or use @ to pick a variable"
+                        },
+                        {
+                            "key": "subject",
+                            "label": "Subject",
+                            "type": "expression",
+                            "required": true,
+                            "placeholder": "Your subject line\u2026"
+                        },
+                        {
+                            "key": "body",
+                            "label": "Email Body",
+                            "type": "richtext",
+                            "required": true,
+                            "placeholder": "Write your email here\u2026"
+                        },
+                        {
+                            "key": "pre_header",
+                            "label": "Pre-header Text",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "Short preview text shown in inbox\u2026"
+                        },
+                        {
+                            "key": "from_email",
+                            "label": "From Email",
+                            "type": "expression",
+                            "subtype": "email",
+                            "required": false,
+                            "placeholder": "Leave empty to use system default"
+                        },
+                        {
+                            "key": "from_name",
+                            "label": "From Name",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "Leave empty to use system default"
+                        },
+                        {
+                            "key": "reply_to_email",
+                            "label": "Reply-To Email",
+                            "type": "expression",
+                            "subtype": "email",
+                            "required": false
+                        },
+                        {
+                            "key": "reply_to_name",
+                            "label": "Reply-To Name",
+                            "type": "expression",
+                            "required": false
                         }
                     ],
                     "outputs": [
