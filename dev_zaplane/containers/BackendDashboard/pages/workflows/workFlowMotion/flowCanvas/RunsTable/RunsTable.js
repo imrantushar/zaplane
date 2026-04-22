@@ -40,10 +40,10 @@ const RunsTable = ({
   useEffect(() => {
     if (activeDrawer !== "logs") return;
     handleRefresh(currentPage, itemPerPage);
-    // const interval = setInterval(() => {
-    //   handleRefresh(currentPage, itemPerPage);
-    // }, 8000);
-    // return () => clearInterval(interval);
+    const interval = setInterval(() => {
+      handleRefresh(currentPage, itemPerPage);
+    }, 8000);
+    return () => clearInterval(interval);
   }, [currentPage, itemPerPage, activeDrawer]);
   const handlePageChange = newPage => {
     handleRefresh(newPage, perPage);
@@ -58,7 +58,7 @@ const RunsTable = ({
     textAlign: "center"
   }, {
     name: __('Status', 'zaplane'),
-    cell: row => <span textTransform="capitalize" {...statusStyle(row.status)} className="px-2 py-0.5 rounded-md text-[xs]">
+    cell: row => <span textTransform="capitalize" style={statusStyle(row.status)} className="px-2 py-0.5 rounded-md text-[xs]">
           {__(row.status, "zaplane")}
         </span>,
     columnWidth: "100px"

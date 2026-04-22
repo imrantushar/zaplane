@@ -63,7 +63,11 @@ const VersionHistoryTable = ({
     textAlign: "center"
   }, {
     name: __('Status', 'zaplane'),
-    cell: row => <span color={row.is_active ? "#16A34A" : "#4B5563"} bg={row.is_active ? "#DCFCE7" : "#F3F4F6"} className="px-2 py-0.5 rounded-md text-[xs]">
+    cell: row => <span className={` ${
+      row.is_active
+        ? "text-green-500 bg-green-100"
+        : "text-gray-500 bg-gray-100"
+    } px-2 py-0.5 rounded-md text-[xs] $`}>
           {row.is_active ? "Active" : "Inactive"}
         </span>,
     columnWidth: "120px"

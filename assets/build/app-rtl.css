@@ -116,7 +116,6 @@
   align-items: center;
 }
 .zaplane-oops__button {
-  max-width: -moz-fit-content;
   max-width: fit-content;
   margin-top: 24px;
 }
@@ -132,7 +131,6 @@
   align-items: center;
   justify-content: space-between;
   min-width: 125px;
-  width: -moz-fit-content;
   width: fit-content;
   margin: 0 auto;
 }
@@ -1623,6 +1621,7 @@ h2.react-datepicker__current-month {
 .react-datepicker__month-year-option:last-of-type {
   -webkit-user-select: none;
   -moz-user-select: none;
+  -ms-user-select: none;
   user-select: none;
   border-bottom-right-radius: 0.3rem;
   border-bottom-left-radius: 0.3rem;
@@ -1767,9 +1766,7 @@ h2.react-datepicker__current-month {
 }
 
 .zaplane-variable-label {
-  -webkit-user-select: none;
-     -moz-user-select: none;
-          user-select: none;
+  user-select: none;
 }
 
 .zaplane-variable-editor.zaplane-empty::before {
@@ -3538,6 +3535,10 @@ video {
 .text-yellow-800 {
   --tw-text-opacity: 1;
   color: rgb(133 77 14 / var(--tw-text-opacity, 1));
+}
+.text-green-500 {
+  --tw-text-opacity: 1;
+  color: rgb(34 197 94 / var(--tw-text-opacity, 1));
 }
 .opacity-0 {
   opacity: 0;
