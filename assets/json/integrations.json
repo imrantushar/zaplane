@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-04-19 08:23:09",
+    "generated_at": "2026-04-21 11:22:21",
     "apps": {
         "cartflows": {
             "slug": "cartflows",
@@ -14957,6 +14957,1419 @@
                     ],
                     "outputs": [
                         "main"
+                    ]
+                }
+            }
+        },
+        "fluentcart": {
+            "slug": "fluentcart",
+            "name": "FluentCart",
+            "icon": "fluent-cart.svg",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": {
+                "order_created": {
+                    "key": "order_created",
+                    "label": "Order Created",
+                    "hook": "fluent_cart/order_created",
+                    "schema": [
+                        {
+                            "key": "order_id",
+                            "label": "Order",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "orders",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        },
+                        {
+                            "key": "customer_id",
+                            "label": "Customer",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "customers",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "order_paid": {
+                    "key": "order_paid",
+                    "label": "Order Paid",
+                    "hook": "fluent_cart/order_paid",
+                    "schema": [
+                        {
+                            "key": "order_id",
+                            "label": "Order",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "orders",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        },
+                        {
+                            "key": "customer_id",
+                            "label": "Customer",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "customers",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "order_paid_done": {
+                    "key": "order_paid_done",
+                    "label": "Order Paid Done",
+                    "hook": "fluent_cart/order_paid_done",
+                    "schema": [
+                        {
+                            "key": "order_id",
+                            "label": "Order",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "orders",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        },
+                        {
+                            "key": "customer_id",
+                            "label": "Customer",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "customers",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "order_payment_failed": {
+                    "key": "order_payment_failed",
+                    "label": "Order Payment Failed",
+                    "hook": "fluent_cart/order_payment_failed",
+                    "schema": [
+                        {
+                            "key": "order_id",
+                            "label": "Order",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "orders",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        },
+                        {
+                            "key": "customer_id",
+                            "label": "Customer",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "customers",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "order_updated": {
+                    "key": "order_updated",
+                    "label": "Order Updated",
+                    "hook": "fluent_cart/order_updated",
+                    "schema": [
+                        {
+                            "key": "order_id",
+                            "label": "Order",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "orders",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        },
+                        {
+                            "key": "customer_id",
+                            "label": "Customer",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "customers",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "order_canceled": {
+                    "key": "order_canceled",
+                    "label": "Order Canceled",
+                    "hook": "fluent_cart/order_canceled",
+                    "schema": [
+                        {
+                            "key": "order_id",
+                            "label": "Order",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "orders",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        },
+                        {
+                            "key": "customer_id",
+                            "label": "Customer",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "customers",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "order_deleted": {
+                    "key": "order_deleted",
+                    "label": "Order Deleted",
+                    "hook": "fluent_cart/order_deleted",
+                    "schema": [
+                        {
+                            "key": "order_id",
+                            "label": "Order",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "orders",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        },
+                        {
+                            "key": "customer_id",
+                            "label": "Customer",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "customers",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "renewal_order_deleted": {
+                    "key": "renewal_order_deleted",
+                    "label": "Renewal Order Deleted",
+                    "hook": "fluent_cart/renewal_order_deleted",
+                    "schema": [
+                        {
+                            "key": "order_id",
+                            "label": "Order",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "orders",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        },
+                        {
+                            "key": "customer_id",
+                            "label": "Customer",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "customers",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "order_refunded": {
+                    "key": "order_refunded",
+                    "label": "Order Refunded",
+                    "hook": "fluent_cart/order_refunded",
+                    "schema": [
+                        {
+                            "key": "order_id",
+                            "label": "Order",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "orders",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        },
+                        {
+                            "key": "customer_id",
+                            "label": "Customer",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "customers",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "order_fully_refunded": {
+                    "key": "order_fully_refunded",
+                    "label": "Order Fully Refunded",
+                    "hook": "fluent_cart/order_fully_refunded",
+                    "schema": [
+                        {
+                            "key": "order_id",
+                            "label": "Order",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "orders",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        },
+                        {
+                            "key": "customer_id",
+                            "label": "Customer",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "customers",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "order_partially_refunded": {
+                    "key": "order_partially_refunded",
+                    "label": "Order Partially Refunded",
+                    "hook": "fluent_cart/order_partially_refunded",
+                    "schema": [
+                        {
+                            "key": "order_id",
+                            "label": "Order",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "orders",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        },
+                        {
+                            "key": "customer_id",
+                            "label": "Customer",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "customers",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "order_status_changed": {
+                    "key": "order_status_changed",
+                    "label": "Order Status Changed",
+                    "hook": "fluent_cart/order_status_changed",
+                    "schema": [
+                        {
+                            "key": "order_id",
+                            "label": "Order",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "orders",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        },
+                        {
+                            "key": "customer_id",
+                            "label": "Customer",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "customers",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "payment_status_changed": {
+                    "key": "payment_status_changed",
+                    "label": "Payment Status Changed",
+                    "hook": "fluent_cart/payment_status_changed",
+                    "schema": [
+                        {
+                            "key": "order_id",
+                            "label": "Order",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "orders",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        },
+                        {
+                            "key": "customer_id",
+                            "label": "Customer",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "customers",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "shipping_status_changed": {
+                    "key": "shipping_status_changed",
+                    "label": "Shipping Status Changed",
+                    "hook": "fluent_cart/shipping_status_changed",
+                    "schema": [
+                        {
+                            "key": "order_id",
+                            "label": "Order",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "orders",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        },
+                        {
+                            "key": "customer_id",
+                            "label": "Customer",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "customers",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "subscription_activated": {
+                    "key": "subscription_activated",
+                    "label": "Subscription Activated",
+                    "hook": "fluent_cart/subscription_activated",
+                    "schema": [
+                        {
+                            "key": "subscription_id",
+                            "label": "Subscription",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "subscriptions",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        },
+                        {
+                            "key": "order_id",
+                            "label": "Order",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "orders",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        },
+                        {
+                            "key": "customer_id",
+                            "label": "Customer",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "customers",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "subscription_canceled": {
+                    "key": "subscription_canceled",
+                    "label": "Subscription Canceled",
+                    "hook": "fluent_cart/subscription_canceled",
+                    "schema": [
+                        {
+                            "key": "subscription_id",
+                            "label": "Subscription",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "subscriptions",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        },
+                        {
+                            "key": "order_id",
+                            "label": "Order",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "orders",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        },
+                        {
+                            "key": "customer_id",
+                            "label": "Customer",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "customers",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "subscription_renewed": {
+                    "key": "subscription_renewed",
+                    "label": "Subscription Renewed",
+                    "hook": "fluent_cart/subscription_renewed",
+                    "schema": [
+                        {
+                            "key": "subscription_id",
+                            "label": "Subscription",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "subscriptions",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        },
+                        {
+                            "key": "order_id",
+                            "label": "Order",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "orders",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        },
+                        {
+                            "key": "customer_id",
+                            "label": "Customer",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "customers",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "subscription_eot": {
+                    "key": "subscription_eot",
+                    "label": "Subscription End Of Term",
+                    "hook": "fluent_cart/subscription_eot",
+                    "schema": [
+                        {
+                            "key": "subscription_id",
+                            "label": "Subscription",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "subscriptions",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        },
+                        {
+                            "key": "order_id",
+                            "label": "Order",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "orders",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        },
+                        {
+                            "key": "customer_id",
+                            "label": "Customer",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "customers",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "subscription_expired_validity": {
+                    "key": "subscription_expired_validity",
+                    "label": "Subscription Validity Expired",
+                    "hook": "fluent_cart/subscription_expired_validity",
+                    "schema": [
+                        {
+                            "key": "subscription_id",
+                            "label": "Subscription",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "subscriptions",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        },
+                        {
+                            "key": "order_id",
+                            "label": "Order",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "orders",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        },
+                        {
+                            "key": "customer_id",
+                            "label": "Customer",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "customers",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "product_created": {
+                    "key": "product_created",
+                    "label": "Product Created",
+                    "hook": "save_post_fluent-products",
+                    "schema": [
+                        {
+                            "key": "product_id",
+                            "label": "Product",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "products",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "product_updated": {
+                    "key": "product_updated",
+                    "label": "Product Updated",
+                    "hook": "fluent_cart/product_updated",
+                    "schema": [
+                        {
+                            "key": "product_id",
+                            "label": "Product",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "products",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "product_duplicated": {
+                    "key": "product_duplicated",
+                    "label": "Product Duplicated",
+                    "hook": "fluent_cart/product_duplicated",
+                    "schema": [
+                        {
+                            "key": "product_id",
+                            "label": "Product",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "products",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "product_stock_changed": {
+                    "key": "product_stock_changed",
+                    "label": "Product Stock Changed",
+                    "hook": "fluent_cart/product_stock_changed",
+                    "schema": [
+                        {
+                            "key": "product_id",
+                            "label": "Product",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "products",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                }
+            },
+            "actions": {
+                "get_order_single": {
+                    "key": "get_order_single",
+                    "label": "Get Order (Single)",
+                    "schema": [
+                        {
+                            "key": "order_id",
+                            "label": "Order",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "orders",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "get_orders_all": {
+                    "key": "get_orders_all",
+                    "label": "Get Orders (All)",
+                    "schema": [
+                        {
+                            "key": "limit",
+                            "label": "Limit",
+                            "type": "number",
+                            "default": 20
+                        },
+                        {
+                            "key": "page",
+                            "label": "Page",
+                            "type": "number",
+                            "default": 1
+                        },
+                        {
+                            "key": "search",
+                            "label": "Search",
+                            "type": "text"
+                        },
+                        {
+                            "key": "customer_id",
+                            "label": "Customer",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "customers",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        },
+                        {
+                            "key": "order_status",
+                            "label": "Order Status",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "order_statuses",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        },
+                        {
+                            "key": "payment_status",
+                            "label": "Payment Status",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "payment_statuses",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "get_customer_single": {
+                    "key": "get_customer_single",
+                    "label": "Get Customer (Single)",
+                    "schema": [
+                        {
+                            "key": "customer_id",
+                            "label": "Customer",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "customers",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "get_customers_all": {
+                    "key": "get_customers_all",
+                    "label": "Get Customers (All)",
+                    "schema": [
+                        {
+                            "key": "limit",
+                            "label": "Limit",
+                            "type": "number",
+                            "default": 20
+                        },
+                        {
+                            "key": "page",
+                            "label": "Page",
+                            "type": "number",
+                            "default": 1
+                        },
+                        {
+                            "key": "search",
+                            "label": "Search",
+                            "type": "text"
+                        },
+                        {
+                            "key": "customer_status",
+                            "label": "Customer Status",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "customer_statuses",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "get_subscription_single": {
+                    "key": "get_subscription_single",
+                    "label": "Get Subscription (Single)",
+                    "schema": [
+                        {
+                            "key": "subscription_id",
+                            "label": "Subscription",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "subscriptions",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "get_subscriptions_all": {
+                    "key": "get_subscriptions_all",
+                    "label": "Get Subscriptions (All)",
+                    "schema": [
+                        {
+                            "key": "limit",
+                            "label": "Limit",
+                            "type": "number",
+                            "default": 20
+                        },
+                        {
+                            "key": "page",
+                            "label": "Page",
+                            "type": "number",
+                            "default": 1
+                        },
+                        {
+                            "key": "search",
+                            "label": "Search",
+                            "type": "text"
+                        },
+                        {
+                            "key": "customer_id",
+                            "label": "Customer",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "customers",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        },
+                        {
+                            "key": "subscription_status",
+                            "label": "Subscription Status",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "subscription_statuses",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "get_product_single": {
+                    "key": "get_product_single",
+                    "label": "Get Product (Single)",
+                    "schema": [
+                        {
+                            "key": "product_id",
+                            "label": "Product",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "products",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "get_products_all": {
+                    "key": "get_products_all",
+                    "label": "Get Products (All)",
+                    "schema": [
+                        {
+                            "key": "limit",
+                            "label": "Limit",
+                            "type": "number",
+                            "default": 20
+                        },
+                        {
+                            "key": "page",
+                            "label": "Page",
+                            "type": "number",
+                            "default": 1
+                        },
+                        {
+                            "key": "search",
+                            "label": "Search",
+                            "type": "text"
+                        },
+                        {
+                            "key": "post_status",
+                            "label": "Post Status",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "post_statuses",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "create_product": {
+                    "key": "create_product",
+                    "label": "Create Product",
+                    "schema": [
+                        {
+                            "key": "post_title",
+                            "label": "Product Title",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "post_name",
+                            "label": "Product Slug",
+                            "type": "text"
+                        },
+                        {
+                            "key": "post_content",
+                            "label": "Product Description",
+                            "type": "textarea"
+                        },
+                        {
+                            "key": "post_excerpt",
+                            "label": "Short Description",
+                            "type": "textarea"
+                        },
+                        {
+                            "key": "post_status",
+                            "label": "Post Status",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "post_statuses",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "default": "draft",
+                            "required": false
+                        },
+                        {
+                            "key": "fulfillment_type",
+                            "label": "Fulfillment Type",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "fulfillment_types",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "default": "physical",
+                            "required": false
+                        },
+                        {
+                            "key": "stock_status",
+                            "label": "Stock Status",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "stock_statuses",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "default": "in-stock",
+                            "required": false
+                        },
+                        {
+                            "key": "payment_type",
+                            "label": "Payment Type",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "payment_types",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "default": "onetime",
+                            "required": false
+                        },
+                        {
+                            "key": "total_stock",
+                            "label": "Total Stock",
+                            "type": "number",
+                            "default": 1
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "update_product": {
+                    "key": "update_product",
+                    "label": "Update Product",
+                    "schema": [
+                        {
+                            "key": "product_id",
+                            "label": "Product",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "products",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "post_title",
+                            "label": "Product Title",
+                            "type": "text"
+                        },
+                        {
+                            "key": "post_status",
+                            "label": "Post Status",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "post_statuses",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "add_action": {
+                    "key": "add_action",
+                    "label": "Add Action Hook",
+                    "schema": [
+                        {
+                            "key": "hook_name",
+                            "label": "Hook Name",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "accepted_args",
+                            "label": "Accepted Args",
+                            "type": "number"
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "do_action": {
+                    "key": "do_action",
+                    "label": "Do Action Hook",
+                    "schema": [
+                        {
+                            "key": "hook_name",
+                            "label": "Hook Name",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "arg_1",
+                            "label": "Argument 1",
+                            "type": "expression"
+                        },
+                        {
+                            "key": "arg_2",
+                            "label": "Argument 2",
+                            "type": "expression"
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
                     ]
                 }
             }

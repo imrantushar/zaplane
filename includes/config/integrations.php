@@ -115,6 +115,10 @@ return [
 			'file' => 'fluent-smtp.php',
 			'class' => \Zaplane\Integrations\FluentSmtp::class
 		],
+		'fluentcart'           => [
+			'file' => 'fluent-cart.php',
+			'class' => \Zaplane\Integrations\FluentCart::class
+		],
 		'gravityforms'         => [
 			'file' => 'gravityforms.php',
 			'class' => \Zaplane\Integrations\Gravityforms::class
