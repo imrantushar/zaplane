@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-04-21 11:35:35",
+    "generated_at": "2026-04-22 05:21:11",
     "apps": {
         "cartflows": {
             "slug": "cartflows",
@@ -21208,7 +21208,7 @@
             "category": "app",
             "requires_connection": true,
             "auth_type": "bot_token",
-            "supports_webhook": false,
+            "supports_webhook": true,
             "triggers": {
                 "new_message_in_channel": {
                     "key": "new_message_in_channel",
@@ -21245,12 +21245,6 @@
                                     "guild_id"
                                 ]
                             }
-                        },
-                        {
-                            "key": "webhook_url",
-                            "type": "webhook_url",
-                            "label": "Webhook URL",
-                            "readonly": true
                         }
                     ],
                     "outputs": [
@@ -21275,12 +21269,30 @@
                                     "label"
                                 ]
                             }
-                        },
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "channel_created": {
+                    "key": "channel_created",
+                    "label": "Channel Created",
+                    "hook": "discord_webhook_channel_created",
+                    "schema": [
                         {
-                            "key": "webhook_url",
-                            "type": "webhook_url",
-                            "label": "Webhook URL",
-                            "readonly": true
+                            "key": "guild_id",
+                            "type": "select",
+                            "label": "Select Server",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "discord",
+                                "query": "guild_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
                         }
                     ],
                     "outputs": [

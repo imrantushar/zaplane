@@ -39,7 +39,7 @@ class Discord extends IntegrationBase {
 				'type'     => 'password',
 				'label'    => 'Bot Token',
 				'required' => true,
-				'help'     => 'Discord Developer Portal → Your App → Bot → Reset Token.',
+				'help'     => 'Go To Discord Developer Portal (discord.com/developers/applications) → Your App → Bot → Reset Token.',
 			],
 		];
 	}
@@ -48,7 +48,11 @@ class Discord extends IntegrationBase {
 		$bot_token = $credentials['bot_token'] ?? '';
 
 		if ( empty( $bot_token ) ) {
-			return [ 'success' => false, 'message' => 'Bot token is required.', 'details' => [] ];
+			return [
+				'success' => false,
+				'message' => 'Bot token is required.',
+				'details' => []
+			];
 		}
 
 		$body = self::api_request( $bot_token, 'GET', '/users/@me' );
@@ -69,82 +73,10 @@ class Discord extends IntegrationBase {
 			'message' => 'Connected as: ' . ( $body['username'] ?? 'Unknown Bot' ) . ' | Servers: ' . $guild_count,
 			'details' => [
 				'bot_username' => $body['username'] ?? '',
-				'bot_id'       => $body['id']       ?? '',
+				'bot_id'       => $body['id'] ?? '',
 				'guild_count'  => $guild_count,
 			],
 		];
-	}
-
-	public static function get_triggers(): array {
-		return [
-			'new_message_in_channel' => [
-				'label' => 'New Message In Channel',
-				'hook'  => 'discord_webhook_new_message_in_channel',
-			],
-			'new_user_join_server' => [
-				'label' => 'New User Join Server',
-				'hook'  => 'discord_webhook_new_user_join_server',
-			],
-		];
-	}
-
-	public static function get_trigger_config_schema( string $trigger ): array {
-		if ( 'new_message_in_channel' === $trigger ) {
-			return [
-				...self::guild_id(),
-				...self::channel_id(),
-				[
-					'key'      => 'webhook_url',
-					'type'     => 'webhook_url',
-					'label'    => 'Webhook URL',
-					'readonly' => true,
-				],
-			];
-		}
-
-		if ( 'new_user_join_server' === $trigger ) {
-			return [
-				...self::guild_id(),
-				[
-					'key'      => 'webhook_url',
-					'type'     => 'webhook_url',
-					'label'    => 'Webhook URL',
-					'readonly' => true,
-				],
-			];
-		}
-
-		return [];
-	}
-
-	public static function resolve_trigger( array $node, array $args ) {
-		$config   = $node['data']['config'] ?? [];
-		$event    = $node['data']['event'] ?? $node['event'] ?? '';
-		$guild_id = $config['guild_id']    ?? '';
-
-		switch ( $event ) {
-
-			case 'new_message_in_channel':
-				$channel_id = $config['channel_id'] ?? '';
-
-				if ( ! empty( $channel_id ) && ( $args['channel_id'] ?? '' ) !== $channel_id ) {
-					return false;
-				}
-				if ( ! empty( $guild_id ) && ( $args['guild_id'] ?? '' ) !== $guild_id ) {
-					return false;
-				}
-
-				return $args;
-
-			case 'new_user_join_server':
-				if ( ! empty( $guild_id ) && ( $args['guild_id'] ?? '' ) !== $guild_id ) {
-					return false;
-				}
-
-				return $args;
-		}
-
-		return false;
 	}
 
 	public static function get_actions(): array {
@@ -195,7 +127,7 @@ class Discord extends IntegrationBase {
 					'integration' => 'discord',
 					'query'       => 'channel_query',
 					'select'      => [ 'value', 'label' ],
-					'depends_on'  => ['guild_id'],
+					'depends_on'  => [ 'guild_id' ],
 				],
 			],
 		];
@@ -223,7 +155,7 @@ class Discord extends IntegrationBase {
 					'integration' => 'discord',
 					'query'       => 'channel_type_query',
 					'select'      => [ 'value', 'label' ],
-					'depends_on'  => ['guild_id'],
+					'depends_on'  => [ 'guild_id' ],
 				],
 			],
 		];
@@ -289,7 +221,7 @@ class Discord extends IntegrationBase {
 					'integration' => 'discord',
 					'query'       => 'member_query',
 					'select'      => [ 'value', 'label' ],
-					'depends_on'  => ['guild_id'],
+					'depends_on'  => [ 'guild_id' ],
 				],
 			],
 		];
@@ -306,7 +238,7 @@ class Discord extends IntegrationBase {
 					'integration' => 'discord',
 					'query'       => 'role_query',
 					'select'      => [ 'value', 'label' ],
-					'depends_on'  => ['guild_id'],
+					'depends_on'  => [ 'guild_id' ],
 				],
 			],
 		];
@@ -478,17 +410,17 @@ class Discord extends IntegrationBase {
 					],
 					...self::message_content(),
 				];
-		}
+		}//end switch
 
 		return [];
 	}
 
 	public static function execute_node( array $node, array $input ): array {
 		$config    = $node['data']['config'] ?? [];
-		$event     = $node['data']['event']  ?? '';
+		$event     = $node['data']['event'] ?? '';
 		$creds     = self::get_connection_credentials( $node );
-		$bot_token = $creds['bot_token']     ?? '';
-		$guild_id  = $config['guild_id']     ?? '';
+		$bot_token = $creds['bot_token'] ?? '';
+		$guild_id  = $config['guild_id'] ?? '';
 
 		if ( empty( $bot_token ) ) {
 			return [
@@ -518,7 +450,6 @@ class Discord extends IntegrationBase {
 				break;
 
 			case 'update_channel':
-
 				$name       = trim( $config['name'] ?? '' );
 				$channel_id = $config['channel_id'] ?? '';
 				if ( empty( $name ) ) {
@@ -535,7 +466,10 @@ class Discord extends IntegrationBase {
 			case 'get_channel_by_name':
 				$channels = self::api_request( $bot_token, 'GET', "/guilds/{$guild_id}/channels" );
 				$name     = $config['name'] ?? '';
-				$result   = [ 'error' => 'Channel not found', 'searched_name' => $name ];
+				$result   = [
+					'error' => 'Channel not found',
+					'searched_name' => $name
+				];
 				if ( is_array( $channels ) ) {
 					foreach ( $channels as $ch ) {
 						if ( isset( $ch['name'] ) && $ch['name'] === $name ) {
@@ -556,13 +490,13 @@ class Discord extends IntegrationBase {
 			case 'find_channel':
 				$channels = self::api_request( $bot_token, 'GET', "/guilds/{$guild_id}/channels" );
 				$query    = $config['search_query'] ?? '';
-				$type     = $config['type']         ?? '';
+				$type     = $config['type'] ?? '';
 				$result   = [];
 				if ( is_array( $channels ) ) {
 					foreach ( $channels as $ch ) {
 						$matches_name = isset( $ch['name'] ) && stripos( $ch['name'], $query ) !== false;
 						$matches_id   = isset( $ch['id'] ) && $ch['id'] === $query;
-						$matches_type = $type === '' || ( isset( $ch['type'] ) && (string) $ch['type'] === (string) $type );
+						$matches_type = '' === $type || ( isset( $ch['type'] ) && (string) $ch['type'] === (string) $type );
 						if ( ( $matches_name || $matches_id ) && $matches_type ) {
 							$result[] = $ch;
 						}
@@ -573,10 +507,10 @@ class Discord extends IntegrationBase {
 			case 'create_a_channel_invite':
 				$channel_id = $config['channel_id'] ?? '';
 				$result     = self::api_request( $bot_token, 'POST', "/channels/{$channel_id}/invites", [
-					'max_age'   => (int)  ( $config['max_age']   ?? 86400 ),
-					'max_uses'  => (int)  ( $config['max_uses']  ?? 0 ),
+					'max_age'   => (int) ( $config['max_age'] ?? 86400 ),
+					'max_uses'  => (int) ( $config['max_uses'] ?? 0 ),
 					'temporary' => (bool) ( $config['temporary'] ?? false ),
-					'unique'    => (bool) ( $config['unique']    ?? false ),
+					'unique'    => (bool) ( $config['unique'] ?? false ),
 				] );
 				break;
 
@@ -599,7 +533,10 @@ class Discord extends IntegrationBase {
 				$channel_id = $config['channel_id'] ?? '';
 				$message_id = $config['message_id'] ?? '';
 				self::api_request( $bot_token, 'DELETE', "/channels/{$channel_id}/messages/{$message_id}" );
-				$result = [ 'deleted' => true, 'message_id' => $message_id ];
+				$result = [
+					'deleted' => true,
+					'message_id' => $message_id
+				];
 				break;
 
 			case 'get_message':
@@ -617,7 +554,7 @@ class Discord extends IntegrationBase {
 			case 'react_with_emoji_to_message':
 				$channel_id = $config['channel_id'] ?? '';
 				$message_id = $config['message_id'] ?? '';
-	
+
 				$emoji      = rawurlencode( $config['emoji'] ?? '' );
 				self::api_request( $bot_token, 'PUT', "/channels/{$channel_id}/messages/{$message_id}/reactions/{$emoji}/@me" );
 				$result = [ 'reacted' => true ];
@@ -630,16 +567,26 @@ class Discord extends IntegrationBase {
 
 			case 'add_role_to_member':
 				$member_id = $config['member_id'] ?? '';
-				$role_id   = $config['role_id']   ?? '';
+				$role_id   = $config['role_id'] ?? '';
 				self::api_request( $bot_token, 'PUT', "/guilds/{$guild_id}/members/{$member_id}/roles/{$role_id}" );
-				$result = [ 'success' => true, 'action' => 'role_added', 'member_id' => $member_id, 'role_id' => $role_id ];
+				$result = [
+					'success' => true,
+					'action' => 'role_added',
+					'member_id' => $member_id,
+					'role_id' => $role_id
+				];
 				break;
 
 			case 'remove_role_from_member':
 				$member_id = $config['member_id'] ?? '';
-				$role_id   = $config['role_id']   ?? '';
+				$role_id   = $config['role_id'] ?? '';
 				self::api_request( $bot_token, 'DELETE', "/guilds/{$guild_id}/members/{$member_id}/roles/{$role_id}" );
-				$result = [ 'success' => true, 'action' => 'role_removed', 'member_id' => $member_id, 'role_id' => $role_id ];
+				$result = [
+					'success' => true,
+					'action' => 'role_removed',
+					'member_id' => $member_id,
+					'role_id' => $role_id
+				];
 				break;
 
 			case 'find_user':
@@ -659,7 +606,7 @@ class Discord extends IntegrationBase {
 			case 'create_new_forum_post':
 				$channel_id = $config['channel_id'] ?? '';
 				$result = self::api_request( $bot_token, 'POST', "/channels/{$channel_id}/threads", [
-					'name'                  => $config['name']    ?? '',
+					'name'                  => $config['name'] ?? '',
 					'auto_archive_duration' => 1440,
 					'message'               => [
 						'content' => $config['content'] ?? '',
@@ -670,7 +617,7 @@ class Discord extends IntegrationBase {
 			default:
 				$result = [ 'error' => "Unknown action: {$event}" ];
 				break;
-		}
+		}//end switch
 
 		return [
 			'port' => 'main',
@@ -706,7 +653,7 @@ class Discord extends IntegrationBase {
 		$seen = [];
 
 		foreach ( $guilds as $guild ) {
-			$id   = $guild['id']   ?? '';
+			$id   = $guild['id'] ?? '';
 			$name = $guild['name'] ?? 'Unknown Server';
 
 			if ( empty( $id ) || isset( $seen[ $id ] ) ) {
@@ -726,12 +673,30 @@ class Discord extends IntegrationBase {
 
 	public static function query_channel_type( array $query = [] ): array {
 		return [
-			[ 'value' => '0',  'label' => 'Text Channel' ],
-			[ 'value' => '2',  'label' => 'Voice Channel' ],
-			[ 'value' => '4',  'label' => 'Category' ],
-			[ 'value' => '5',  'label' => 'Announcement Channel' ],
-			[ 'value' => '15', 'label' => 'Forum Channel' ],
-			[ 'value' => '16', 'label' => 'Media Channel' ],
+			[
+				'value' => '0',
+				'label' => 'Text Channel'
+			],
+			[
+				'value' => '2',
+				'label' => 'Voice Channel'
+			],
+			[
+				'value' => '4',
+				'label' => 'Category'
+			],
+			[
+				'value' => '5',
+				'label' => 'Announcement Channel'
+			],
+			[
+				'value' => '15',
+				'label' => 'Forum Channel'
+			],
+			[
+				'value' => '16',
+				'label' => 'Media Channel'
+			],
 		];
 	}
 
@@ -765,13 +730,18 @@ class Discord extends IntegrationBase {
 		$guild_id = $query['where']['guild_id'] ?? $query['guild_id'] ?? '';
 
 		$guilds = $guild_id
-			? [ [ 'id' => $guild_id, 'name' => '' ] ]
+			? [
+				[
+					'id' => $guild_id,
+					'name' => ''
+				]
+			]
 			: self::fetch_bot_guilds( $bot_token );
 
 		$multi = count( $guilds ) > 1;
 
 		foreach ( $guilds as $guild ) {
-			$gid   = $guild['id']   ?? '';
+			$gid   = $guild['id'] ?? '';
 			$gname = $guild['name'] ?? '';
 
 			if ( empty( $gid ) ) {
@@ -790,7 +760,7 @@ class Discord extends IntegrationBase {
 			) );
 
 			foreach ( $channels as $ch ) {
-				$id   = $ch['id']   ?? '';
+				$id   = $ch['id'] ?? '';
 				$name = $ch['name'] ?? '';
 
 				if ( empty( $id ) ) {
@@ -807,7 +777,7 @@ class Discord extends IntegrationBase {
 					'value' => $id,
 				];
 			}
-		}
+		}//end foreach
 
 		return $options;
 	}
@@ -825,14 +795,19 @@ class Discord extends IntegrationBase {
 		$guild_id = $query['where']['guild_id'] ?? $query['guild_id'] ?? '';
 
 		$guilds = $guild_id
-			? [ [ 'id' => $guild_id, 'name' => '' ] ]
+			? [
+				[
+					'id' => $guild_id,
+					'name' => ''
+				]
+			]
 			: self::fetch_bot_guilds( $bot_token );
 
 		$multi = count( $guilds ) > 1;
 		$seen  = [];
 
 		foreach ( $guilds as $guild ) {
-			$gid   = $guild['id']   ?? '';
+			$gid   = $guild['id'] ?? '';
 			$gname = $guild['name'] ?? '';
 
 			if ( empty( $gid ) ) {
@@ -843,7 +818,7 @@ class Discord extends IntegrationBase {
 
 			foreach ( $members as $member ) {
 				$user = $member['user'] ?? [];
-				$uid  = $user['id']    ?? '';
+				$uid  = $user['id'] ?? '';
 
 				if ( empty( $uid ) || isset( $seen[ $uid ] ) ) {
 					continue;
@@ -861,7 +836,7 @@ class Discord extends IntegrationBase {
 					'value' => $uid,
 				];
 			}
-		}
+		}//end foreach
 
 		return $options;
 	}
@@ -882,13 +857,18 @@ class Discord extends IntegrationBase {
 		$guild_id = $query['where']['guild_id'] ?? $query['guild_id'] ?? '';
 
 		$guilds = $guild_id
-			? [ [ 'id' => $guild_id, 'name' => '' ] ]
+			? [
+				[
+					'id' => $guild_id,
+					'name' => ''
+				]
+			]
 			: self::fetch_bot_guilds( $bot_token );
 
 		$multi = count( $guilds ) > 1;
 
 		foreach ( $guilds as $guild ) {
-			$gid   = $guild['id']   ?? '';
+			$gid   = $guild['id'] ?? '';
 			$gname = $guild['name'] ?? '';
 
 			if ( empty( $gid ) ) {
@@ -904,7 +884,7 @@ class Discord extends IntegrationBase {
 			usort( $roles, fn( $a, $b ) => ( $b['position'] ?? 0 ) <=> ( $a['position'] ?? 0 ) );
 
 			foreach ( $roles as $role ) {
-				$id   = $role['id']   ?? '';
+				$id   = $role['id'] ?? '';
 				$name = $role['name'] ?? '';
 
 				if ( empty( $id ) || $id === $gid ) {
@@ -921,7 +901,7 @@ class Discord extends IntegrationBase {
 					'value' => $id,
 				];
 			}
-		}
+		}//end foreach
 
 		return $options;
 	}
@@ -998,19 +978,25 @@ class Discord extends IntegrationBase {
 		$code = (int) wp_remote_retrieve_response_code( $response );
 		$raw  = wp_remote_retrieve_body( $response );
 
-		if ( $code === 204 || $raw === '' ) {
+		if ( 204 === $code || '' === $raw ) {
 			return [];
 		}
 
 		$body = json_decode( $raw, true );
 
 		if ( json_last_error() !== JSON_ERROR_NONE ) {
-			return [ 'error' => 'Invalid JSON response', 'raw' => $raw ];
+			return [
+				'error' => 'Invalid JSON response',
+				'raw' => $raw
+			];
 		}
 
-		if ( $code === 429 ) {
+		if ( 429 === $code ) {
 			if ( $retry_count >= 3 ) {
-				return [ 'error' => 'Discord rate limit — max retries exceeded.', 'code' => 429 ];
+				return [
+					'error' => 'Discord rate limit — max retries exceeded.',
+					'code' => 429
+				];
 			}
 
 			$retry_after = isset( $body['retry_after'] ) ? (float) $body['retry_after'] : 1.0;
@@ -1026,7 +1012,10 @@ class Discord extends IntegrationBase {
 
 		if ( $code >= 400 ) {
 			$msg = $body['message'] ?? ( 'Discord API error HTTP ' . $code );
-			return [ 'error' => $msg, 'code' => $code ];
+			return [
+				'error' => $msg,
+				'code' => $code
+			];
 		}
 
 		return $body;
@@ -1076,7 +1065,7 @@ class Discord extends IntegrationBase {
 			}
 		} catch ( \Throwable $e ) {
 
-		}
+		}//end try
 
 		return [];
 	}
