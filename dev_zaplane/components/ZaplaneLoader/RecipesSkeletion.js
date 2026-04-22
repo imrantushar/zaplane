@@ -14,7 +14,7 @@ const RecipesSkeleton = () => {
       </div>
     </div>
 
-    <div>
+    <div className="zaplane-page-content">
       <div className="flex justify-between items-center mb-6">
         <SkeletonBox style={{height:'28px', width:'140px'}} />
         <SkeletonBox className="rounded-md" style={{height:'40px', width:'150px'}} />

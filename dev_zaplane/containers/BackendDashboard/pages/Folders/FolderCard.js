@@ -4,11 +4,13 @@ import { __, sprintf } from "@wordpress/i18n";
 import { useDispatch } from "react-redux";
 import { route_path } from "@ZAPUtils/helper";
 import { FiEye, FiFolder } from "react-icons/fi";
+import { BsThreeDotsVertical } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
 import ZAPMenu from "@ZAPComponents/ZapMenu";
 import WPModal from "@ZAPComponents/Modal/WPModal";
-import { primaryBtn } from '../../../../../assets/scss/chakra/recipe';
+import { outlineBtn, primaryBtn } from '../../../../../assets/scss/chakra/recipe';
 import { updateFolder, deleteFolder } from '@ZAPRedux/Slices/folderSlice/folderSlice';
+import ZAPInput from '@ZAPComponents/ZAPInput';
 const FolderCard = ({
   folder
 }) => {
@@ -33,53 +35,72 @@ const FolderCard = ({
     setIsRenameOpen(false);
   };
   return <>
-      <div position="relative" boxShadow={'var(--zaplane-shadow-2)'} transition="border-color 0.18s, box-shadow 0.18s" onClick={() => goToFolder(folder?.id)} _hover={{
-      boxShadow: "var(--zaplane-shadow)"
-    }} className="bg-var(--zaplane-background) rounded-[8px] p-4 min-h-[104px]">
-
-        <div justify="space-between" align="flex-start" gap={3} className="flex mb-3">
-          <div minW={0} align="flex-start" className="flex flex-row items-center gap-2">
-            <FiFolder style={{width:"20px", height:"20px"}} className="shrink-0 mt-0.5" />
-            <span noOfLines={2} className="font-[600] text-[15px] m-0 cursor-pointer">
+      <div 
+        onClick={() => goToFolder(folder?.id)} 
+        className="bg-[var(--zaplane-background)] border border-[var(--zaplane-border-color)] rounded-xl p-6 transition-all duration-200 cursor-pointer shadow-sm hover:shadow-md  group"
+      >
+        {/* Top Section */}
+        <div className="flex justify-between items-start mb-6">
+          <div className="flex items-center gap-3 overflow-hidden">
+            <div className="p-2 rounded-[4px] transition-colors">
+              <FiFolder className="w-5 h-5" />
+            </div>
+            <span className="font-semibold text-[var(--zaplane-font-color)] text-[16px] truncate">
               {folder?.title}
             </span>
           </div>
 
-
-          <ZAPMenu isIcon items={[{
-          label: __("Rename", "zaplane"),
-          onClick: () => setIsRenameOpen(true)
-        }, {
-          label: __("Delete", "zaplane"),
-          onClick: () => {
-            if (window.confirm("Are you sure you want to delete this folder?")) {
-              dispatch(deleteFolder(folder?.id));
-            }
-          }
-        }]} />
+          <ZAPMenu 
+            isIcon
+            items={[{
+              label: __("Rename", "zaplane"),
+              onClick: () => setIsRenameOpen(true)
+            }, {
+              label: __("Delete", "zaplane"),
+              onClick: () => {
+                if (window.confirm("Are you sure you want to delete this folder?")) {
+                  dispatch(deleteFolder(folder?.id));
+                }
+              }
+            }]} 
+          />
         </div>
 
-
-        <div justify="space-between" align="center" className="flex">
-          <span className="text-[13px] text-gray-500 m-0">
+        {/* Bottom Section */}
+        <div className="flex justify-between items-end">
+          <div className="text-sm text-[var(--zaplane-font-secondary-color)] font-medium tracking-tight">
             {workflowLabel}
-          </span>
-          <button aria-label={sprintf(__("View %s", "zaplane"), folder?.title)} className="p-2 hover:bg-gray-100 rounded-md" onClick={() => goToFolder(folder?.id)}>
-            <FiEye style={{width:"16px", height:"16px"}} />
+          </div>
+          <button 
+            aria-label={sprintf(__("View %s", "zaplane"), folder?.title)} 
+            className="p-2  rounded-[4px] transition-all" 
+            onClick={(e) => {
+              e.stopPropagation();
+              goToFolder(folder?.id);
+            }}
+          >
+            <FiEye className="w-5 h-5" />
           </button>
         </div>
       </div>
 
 
       <WPModal title={__("Rename Folder", "zaplane")} isOpen={isRenameOpen} onRequestClose={() => setIsRenameOpen(false)} size="large">
-        <input value={title} onChange={e => setTitle(e.target.value)} placeholder={__("Enter folder name", "zaplane")} className="zaplane-input mb-4" />
+    
         <div justify="flex-end" gap={3} className="flex">
-          <button variant="outline" onClick={() => setIsRenameOpen(false)}>
+          <div className='flex flex-col gap-6'>
+            <ZAPInput
+              placeholder={__("Enter folder name", "zaplane")}
+              value={title}
+              onChange={e => setTitle(e.target.value)}
+            />
+            <button style={outlineBtn} onClick={() => setIsRenameOpen(false)}>
             {__("Cancel", "zaplane")}
           </button>
           <button style={primaryBtn} onClick={handleRename} disabled={!title.trim()}>
             {__("Update", "zaplane")}
           </button>
+          </div>
         </div>
       </WPModal>
 

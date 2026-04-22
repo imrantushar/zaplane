@@ -1,9 +1,14 @@
+import { round } from "lodash"
+
 export const primaryBtn = {
     background: "var(--zaplane-primary)",
     color: "#fff",
     fontWeight: "500",
     fontSize: '14px',
     cursor: "pointer",
+    padding: "2px 14px",
+    borderRadius : "4px",
+    height: "36px",
 }
 
 export const secondPrimaryBtn = {
@@ -27,10 +32,11 @@ export const primaryClearBtn = {
 export const outlineBtn = {
     background: "transparent",
     color: "var(--zaplane-font-color)",
-    borderColor: "var(--zaplane-border-color)",
-    borderWidth: "1px",
-    borderStyle: "solid",
+    border: "1px solid var(--zaplane-border-color)",
     cursor: "pointer",
+    padding: "2px 14px",
+    borderRadius: "4px",
+    height: "36px",
 }
 
 export const removeBtn = {

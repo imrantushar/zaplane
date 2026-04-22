@@ -7,38 +7,59 @@ const TotalExecutions = () => {
     summary
   } = useSelector(state => state.dashboard);
   const monthly_executions = summary?.monthly_executions || [];
-  return <div boxShadow="md" className="bg-var(--zaplane-background) rounded-[4px] w-[full] h-[388px]">
-            <span className="zaplane-label text-[14px] p-[24px]">
-                {__("Total Executions", "zaplane")}
-            </span>
+  return (
+    <div className="bg-white rounded-[8px] border border-[#E2E8F0] w-full h-[388px] flex flex-col">
+      <div className="p-6">
+        <span className="text-[#4A5568] text-[16px] font-[500]">
+          {__("Total Executions", "zaplane")}
+        </span>
+      </div>
 
-            <div className="h-[315px] px-[16px] pb-[16px]">
-                <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={monthly_executions}>
+      <div className="flex-1 px-4 pb-6">
+        <ResponsiveContainer width="100%" height="100%">
+          <AreaChart data={monthly_executions} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+            <defs>
+              <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#3182CE" stopOpacity={0.1} />
+                <stop offset="95%" stopColor="#3182CE" stopOpacity={0} />
+              </linearGradient>
+            </defs>
 
-                        <defs>
-                            <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="#90CDF4" stopOpacity={0.6} />
-                                <stop offset="95%" stopColor="#90CDF4" stopOpacity={0} />
-                            </linearGradient>
-                        </defs>
+            <CartesianGrid strokeDasharray="0" vertical={false} stroke="#EDF2F7" />
 
-                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
+            <XAxis 
+              dataKey="month" 
+              tick={{ fontSize: 12, fill: '#718096' }} 
+              axisLine={false} 
+              tickLine={false} 
+              dy={10}
+            />
 
-                        <XAxis dataKey="month" tick={{
-            fontSize: 12
-          }} axisLine={false} tickLine={false} />
+            <YAxis 
+              allowDecimals={false} 
+              tick={{ fontSize: 12, fill: '#718096' }} 
+              axisLine={false} 
+              tickLine={false} 
+            />
 
-                        <YAxis allowDecimals={false} tick={{
-            fontSize: 12
-          }} axisLine={false} tickLine={false} />
+            <Tooltip 
+              contentStyle={{ borderRadius: '8px', border: '1px solid #E2E8F0', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}
+            />
 
-                        <Tooltip />
-
-                        <Area type="monotone" dataKey="runs" name="Runs" stroke="#63B3ED" fill="url(#colorValue)" strokeWidth={2} dot={false} />
-                    </AreaChart>
-                </ResponsiveContainer>
-            </div>
-        </div>;
+            <Area 
+              type="monotone" 
+              dataKey="runs" 
+              name="Runs" 
+              stroke="#3182CE" 
+              fill="url(#colorValue)" 
+              strokeWidth={3} 
+              dot={false} 
+              activeDot={{ r: 6, strokeWidth: 0, fill: '#3182CE' }}
+            />
+          </AreaChart>
+        </ResponsiveContainer>
+      </div>
+    </div>
+  );
 };
-export default TotalExecutions;
+export default TotalExecutions;

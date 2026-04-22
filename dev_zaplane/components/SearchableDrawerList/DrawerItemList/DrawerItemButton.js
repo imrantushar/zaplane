@@ -7,17 +7,28 @@ const DrawerItemButton = ({
   arrowIcon,
   icon
 }) => {
-  return <button height='50px' _hover={{
-    bg: "#F6F7F8"
-  }} onClick={onClick} className="w-[full] p-[4px] rounded-[4px] bg-var(--zaplane-background) text-var(--zaplane-font-color) justify-between">
-      <div gap="8px" className="flex">
+
+  return (
+    <button 
+      onClick={onClick} 
+      className="w-full flex items-center justify-between p-[4px] rounded-[4px] transition-colors hover:bg-[var(--zaplane-secondary-color)]"
+    >
+      <div className="flex items-center gap-4">
         <ZAPIcon icon={icon} name={item.name} isAction={true} />
-        <span as="span" className="zaplane-label font-[400] flex items-center">{sprintf(__("%s", "zaplane"), item.name)}</span>
+        <span className="zaplane-label">
+          {sprintf(__("%s", "zaplane"), item.name)}
+        </span>
       </div>
-      {arrowIcon && arrowIcon}
-      {showType && item.type && <span className="zaplane-label text-[xs]">
-          {item.type === "tools" ? __('Tool', 'zaplane') : __('App', 'zaplane')}
-        </span>}
-    </button>;
+      
+      <div className="flex items-center pr-2">
+        {arrowIcon && <div className="text-[var(--zaplane-font-secondary-color)]">{arrowIcon}</div>}
+        {showType && (
+          <span className="zaplane-label">
+            {item.type === "tools" ? __('Tool', 'zaplane') : __('App', 'zaplane')}
+          </span>
+        )}
+      </div>
+    </button>
+  );
 };
 export default DrawerItemButton;

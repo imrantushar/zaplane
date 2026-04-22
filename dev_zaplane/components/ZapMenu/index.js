@@ -3,6 +3,7 @@ import { __, sprintf } from "@wordpress/i18n";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { Menu, MenuButton, MenuItem, MenuItems, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
+import { outlineBtn } from "../../../assets/scss/chakra/recipe";
 
 const ZAPMenu = ({
   triggerLabel,
@@ -17,7 +18,7 @@ const ZAPMenu = ({
         <MenuButton as={React.Fragment}>
           {trigger ? trigger : (isIcon ? (
             <button 
-              className="flex items-center justify-center p-2 rounded-md hover:bg-gray-100" 
+             style={{...outlineBtn, padding: '8px 10px'}}
               onClick={e => e.stopPropagation()} 
               aria-label="More options"
             >

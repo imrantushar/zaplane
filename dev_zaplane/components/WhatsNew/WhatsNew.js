@@ -42,7 +42,7 @@ const SectionTag = ({ type }) => {
 const WhatsNew = () => {
   const [open, setOpen] = useState(false);
   return <ZAPDrawer open={open} onClose={() => setOpen(false)} closeOnOverlayClick trigger={
-    <button style={outlineBtn} onClick={() => setOpen(true)}>
+    <button className='flex items-center gap-2' style={outlineBtn}  onClick={() => setOpen(true)}>
       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--zaplane-font-color)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <g transform="scale(0.9) translate(1.5,1.5)">
           <path d="M11 6a13 13 0 0 0 8.4-2.8A1 1 0 0 1 21 4v12a1 1 0 0 1-1.6.8A13 13 0 0 0 11 14H5a2 2 0 0 1-2-2V8a2 2 0 0 1 5-2z" />

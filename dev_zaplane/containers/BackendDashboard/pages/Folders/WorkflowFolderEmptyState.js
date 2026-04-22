@@ -8,20 +8,25 @@ const WorkflowFolderEmptyState = ({
 }) => {
   const [isFolderModalOpen, setIsFolderModalOpen] = useState(false);
   return <>
-            <div px={{
-      base: 6,
-      md: 12
-    }} className="bg-white border border-var(--zaplane-border-color, #CBD1D7) rounded-[lg] py-10 w-[full] text-center">
-                <div gap='18px' className="flex flex-col">
-                    <FolderPlus style={{width:"32px", height:"32px", strokeWidth:1.5}} className="text-var(--zaplane-font-color)" />
+            <div className="bg-[var(--zaplane-background)] border border-[var(--zaplane-border-color)] rounded-xl py-12 px-6 text-center max-w-2xl mx-auto shadow-sm">
+                <div className="flex flex-col items-center gap-6">
+                    <div className="p-4 bg-[var(--zaplane-second-primary)] rounded-full text-[var(--zaplane-primary)]">
+                        <FolderPlus className="w-10 h-10" strokeWidth={1.5} />
+                    </div>
 
-                    <span className="zaplane-label font-[700] text-[lg] text-var(--zaplane-font-color)">
-                        {__('Create Folders for your Workflows', 'zaplane')}
-                    </span>
-                    <span lineHeight="tall" className="zaplane-label text-[sm] text-var(--zaplane-font-secondary-color) max-w-[sm]">
-                        {__('Create folders to categories your workflows and also share with your workspace', 'zaplane')}
-                    </span>
-                    <button onClick={() => setIsFolderModalOpen(true)} style={primaryBtn}>
+                    <div className="space-y-2">
+                        <h3 className="text-xl font-bold text-[var(--zaplane-font-color)]">
+                            {__('Create Folders for your Workflows', 'zaplane')}
+                        </h3>
+                        <p className="text-[var(--zaplane-font-secondary-color)] max-w-sm mx-auto leading-relaxed">
+                            {__('Create folders to categorize your workflows and easily share them with your workspace.', 'zaplane')}
+                        </p>
+                    </div>
+
+                    <button 
+                        onClick={() => setIsFolderModalOpen(true)} 
+                        className="bg-[var(--zaplane-primary)] hover:opacity-90 text-white font-medium py-2.5 px-8 rounded-lg transition-all shadow-md active:scale-95"
+                    >
                         {__("Create Folder", "zaplane")}
                     </button>
 

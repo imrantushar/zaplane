@@ -74,7 +74,7 @@ const ConnectionTable = () => {
                     {__("App / Name", "zaplane")}
                 </span>,
     cell: row => {
-      return <div gap='12px' className="flex items-center">
+      return <div className="flex items-center gap-3">
                     <ZAPIconGroup icons={[row?.icon]} />
                     <span textOverflow="ellipsis" className="zaplane-label font-[400]">
                         {row.name}
@@ -99,7 +99,7 @@ const ConnectionTable = () => {
         date,
         time
       } = formatDateTime(row.created_at);
-      return <div className="text-center">
+      return <div className="text-center flex flex-col items-center">
                         <ZAPLabel label={date} type={"simple"} />
                         <span className="zaplane-sub-title ml-[-38px] text-var(--zaplane-text-muted)">
                             {__(time, 'zaplane')}
@@ -117,7 +117,7 @@ const ConnectionTable = () => {
         date,
         time
       } = formatDateTime(row.updated_at);
-      return <div className="text-center">
+      return <div className="text-center flex flex-col items-center">
                         <ZAPLabel label={date} type={"simple"} />
                         <span className="zaplane-sub-title ml-[-38px] text-var(--zaplane-text-muted)">
                             {__(time, 'zaplane')}

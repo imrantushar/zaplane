@@ -21,26 +21,33 @@ export default function Dashboard() {
     dispatch(topExecutedFlows());
     dispatch(deshboardSumary());
   }, [dispatch]);
-  return <PageLayout title="Dashboard" actions={<button onClick={() => setIsModalOpen(true)} style={primaryBtn}>
-                    {__("Create Workflow", "zaplane")}
-                </button>}>
-            <div flexDirection='column' gap="24px" className="flex">
-                <OverviewSection />
-                <TotalExecutions />
-                <div gap="24px" className="flex">
-                    <div width='40%'>
-                        <ExecutedFlows />
-                    </div>
-                    <div width='60%'>
-                        <RecentLogs data={data} />
-                    </div>
-
-
-                </div>
-
-            </div>
-            <CreateWorkflowModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
-
-        </PageLayout>;
+  return (
+    <PageLayout 
+      title="Dashboard" 
+      actions={
+        <button 
+          onClick={() => setIsModalOpen(true)} 
+          style={primaryBtn}
+        >
+          {__("Create New Workflow", "zaplane")}
+        </button>
+      }
+    >
+      <div className="flex flex-col gap-6">
+        <OverviewSection />
+        
+        <TotalExecutions />
+        
+        <div className="flex gap-6 items-start">
+          <div className="w-[35%]">
+            <ExecutedFlows />
+          </div>
+          <div className="w-[65%]">
+            <RecentLogs data={data} />
+          </div>
+        </div>
+      </div>
+      <CreateWorkflowModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+    </PageLayout>
+  );
 }
-;

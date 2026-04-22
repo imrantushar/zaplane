@@ -6,37 +6,37 @@ import { FiHelpCircle } from 'react-icons/fi';
 import WhatsNew from '@ZAPComponents/WhatsNew/WhatsNew';
 import './styles.scss';
 const TopBar = ({
-  title = '',
-  render = () => null,
-  rightContent = () => <div className="flex items-center gap-3">
+	title = '',
+	render = () => null,
+	rightContent = () => <div className="flex items-center gap-3">
 		<WhatsNew />
-		<button style={outlineBtn} onClick={() => {
-      window.open('https://community.kodezen.com/', '_blank');
-    }}>
+		<button className='flex items-center gap-2' style={outlineBtn} onClick={() => {
+			window.open('https://community.kodezen.com/', '_blank');
+		}}>
 			<FiHelpCircle color='var(--zaplane-font-color)' />
 			{__("Help")}
 		</button>
 	</div>,
-  middleContent = () => null,
-  leftContent = () => null,
-  topBarStyles = {}
+	middleContent = () => null,
+	leftContent = () => null,
+	topBarStyles = {}
 }) => {
-  const [isDark, setIsDark] = React.useState(false);
+	const [isDark, setIsDark] = React.useState(false);
 
-  // if (!is_admin) return null;
-  return <React.Fragment>
-			<div style={{position:'sticky', top:'32px', zIndex:999, height:'72px', width:'100%', borderBottom:'1px solid var(--zaplane-border-color)', background:'var(--zaplane-background)', boxShadow:'var(--zaplane-shadow)', ...topBarStyles}} className="zaplane-topbar flex justify-between items-center px-6 py-4 mb-[32px]">
-				<div className="flex items-center flex-wrap gap-3">
-					{render()}
-					{title ? <ZAPLabel label={title} fontSize="md" fontWeight="medium" /> : null}
-					{leftContent()}
-				</div>
+	// if (!is_admin) return null;
+	return <React.Fragment>
+		<div style={{ position: 'sticky', top: '32px', zIndex: 999, height: '72px', width: '100%', borderBottom: '1px solid var(--zaplane-border-color)', background: 'var(--zaplane-background)', ...topBarStyles }} className="zaplane-topbar flex justify-between items-center px-6 py-4 mb-[32px]">
+			<div className="flex items-center flex-wrap gap-3">
+				{render()}
+				{title ? <ZAPLabel label={title} fontSize="md" fontWeight="medium" /> : null}
+				{leftContent()}
+			</div>
 
-				{middleContent()}
+			{middleContent()}
 
-				<div className="flex items-center gap-2">
-					{rightContent()}
-					{/* <Button
+			<div className="flex items-center gap-2">
+				{rightContent()}
+				{/* <Button
       bg="transparent"
       borderWidth="1px"
       borderColor="var(--zaplane-border-color)"
@@ -54,8 +54,8 @@ const TopBar = ({
       	</svg>
       )}
       </Button> */}
-				</div>
 			</div>
-		</React.Fragment>;
+		</div>
+	</React.Fragment>;
 };
 export default TopBar;

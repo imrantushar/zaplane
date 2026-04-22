@@ -58,10 +58,10 @@ const RunsTable = ({
     textAlign: "center"
   }, {
     name: __('Status', 'zaplane'),
-    cell: row => <span textTransform="capitalize" {...statusStyle(row.status)} className="px-2 py-0.5 rounded-md text-[xs]">
+    cell: row => <span textTransform="capitalize" style={statusStyle(row.status)} className="px-2 py-0.5 rounded-md text-[xs]">
           {__(row.status, "zaplane")}
         </span>,
-    columnWidth: "120px"
+    columnWidth: "100px"
   }, {
     name: __('DURATION', 'zaplane'),
     cell: row => <span>
@@ -82,12 +82,12 @@ const RunsTable = ({
           setActiveRunId(row.id);
           setDrawerOpen(true);
           dispatch(nodeLogsRunDetails(row.id));
-        }} className="flex p-[5px 6px] justify-center items-center rounded-[2.917px] border">
+        }} className="flex px-[8px] py-[4px] justify-center items-center rounded-[2.917px] border">
               <HistoryIcon height="20px" width="20px" />
             </div>
           </ZAPTooltip>
           <ZAPTooltip content={__("Re-Try", 'zaplane')}>
-            <div onClick={() => dispatch(getSingleRun(row.id))} className="flex p-[5px 6px] justify-center items-center rounded-[2.917px] border">
+            <div onClick={() => dispatch(getSingleRun(row.id))} className="flex px-[8px] py-[4px] justify-center items-center rounded-[2.917px] border">
               <ReExcutionIcon height="20px" width="20px" />
             </div>
           </ZAPTooltip>
@@ -98,7 +98,22 @@ const RunsTable = ({
     textAlign: "center"
   }];
   return <>
-      <ListTable columns={columns} isRowSelectable={false} data={runs} showSubHeader={false} showColumnFilter={false} showPagination={totalItems >= 10} noDataText={__("No history found", "zaplane")} totalItems={totalItems} dataFetchingStatus={loading} suffix="history-table" currentPageNumber={currentPage} perPage={perPage} rowsPerPage={itemPerPage} onChangePage={handlePageChange} onChangeItemsPerPage={handlePerPageChange} />
+      <ListTable 
+      columns={columns} 
+      isRowSelectable={false}
+       data={runs} 
+       showSubHeader={false} 
+       showColumnFilter={false} 
+       showPagination={totalItems >= 10} 
+       noDataText={__("No history found", "zaplane")} 
+       totalItems={totalItems} 
+       dataFetchingStatus={loading} 
+       suffix="history-table" 
+       currentPageNumber={currentPage} 
+       perPage={perPage} 
+       rowsPerPage={itemPerPage} 
+       onChangePage={handlePageChange} 
+       onChangeItemsPerPage={handlePerPageChange} />
       <ZAPDrawer open={drawerOpen} arrowClose={true} onClose={() => {
       setDrawerOpen(false);
       setActiveRunId(null);

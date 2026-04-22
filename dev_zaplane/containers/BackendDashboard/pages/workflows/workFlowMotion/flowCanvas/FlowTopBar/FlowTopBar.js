@@ -9,7 +9,7 @@ import { __ } from "@wordpress/i18n";
 import ZAPDrawer from "@ZAPComponents/Drawer";
 import RunsTable from "../RunsTable/RunsTable";
 import VersionHistoryTable from "../VersionHistoryTable/VersionHistoryTable";
-import { primaryBtn, secondPrimaryBtn } from "../../../../../../../../assets/scss/chakra/recipe";
+import { outlineBtn, primaryBtn, secondPrimaryBtn } from "../../../../../../../../assets/scss/chakra/recipe";
 import { getRunWorkFlow } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlowRuns";
 import { useDispatch, useSelector } from "react-redux";
 import { formatTime } from "../helper";
@@ -29,6 +29,7 @@ import { exportWorkflows } from "@ZAPRedux/Slices/workFlowSlice/actions/ExportIm
 import { IoIosArrowForward } from "react-icons/io";
 import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
 import ZAPTooltip from "@ZAPComponents/ZAPTooltip";
+import { BsThreeDotsVertical } from "react-icons/bs";
 export default function FlowTopBar({
   workFlow,
   isFullscreen,
@@ -83,17 +84,17 @@ export default function FlowTopBar({
     updateStatusAndTitle();
   }, [values?.status, values?.title, workFlow, dispatch, id]);
   //listiner
-  useEffect(() => {
-    if (activeDrawer !== "logs") return;
-    const interval = setInterval(async () => {
-      setRefreshing(true);
-      await dispatch(getRunWorkFlow({
-        id
-      }));
-      setRefreshing(false);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [activeDrawer, dispatch, id]);
+  // useEffect(() => {
+  //   if (activeDrawer !== "logs") return;
+  //   const interval = setInterval(async () => {
+  //     setRefreshing(true);
+  //     await dispatch(getRunWorkFlow({
+  //       id
+  //     }));
+  //     setRefreshing(false);
+  //   }, 5000);
+  //   return () => clearInterval(interval);
+  // }, [activeDrawer, dispatch, id]);
 
   // export work folw
   const handleExport = async () => {
@@ -109,88 +110,147 @@ export default function FlowTopBar({
     }
   };
   const currentTitle = values?.title ?? workFlow?.workflow?.title ?? "Untitled Flow";
-  const rightActions = <div gap='12px' className="flex">
-      {!apiRequestRunning ? <button style={secondPrimaryBtn} onClick={() => {
-      dispatch(startApiCountdown(120));
-      dispatch(workflowNodeListiner(id));
-    }} className="h-[36px]">
-          <CiPlay1 />{__("Test Flow Once", "zaplane")}
-        </button> : <button style={secondPrimaryBtn} onClick={() => dispatch(workflowNodeListinerStop(id))} className="h-[36px]">
-          <LiaStopCircleSolid />{__("Stop", "zaplane")}
-        </button>}
-
-      {apiRequestRunning && <div gap='4px' className="flex items-center">
-          <span>
-            {__("Listening...", "zaplane")}
-          </span>
-          <span className="zaplane-label text-var(--zaplane-text-muted)">
-            {formatTime(apiCountdown)}
-          </span>
-        </div>}
-      <ZAPTooltip content={'Full Screen'} positioning={{
-      placement: "buttom",
-      offset: {
-        mainAxis: 45,
-        crossAxis: -5
-      }
-    }}>
-        <button size="sm" variant="outline" onClick={toggleFullscreen}>
-          {isFullscreen ? <LuMinimize /> : <LuFullscreen />}
-        </button>
-      </ZAPTooltip>
-
-      {/* Logs Drawer */}
-      <ZAPDrawer title={__("Log History", "zaplane")} size="md" isFullscreen={isFullscreen} open={activeDrawer === "logs"} onClose={() => setActiveDrawer(null)} trigger={<button size="sm" variant="outline" onClick={() => setActiveDrawer("logs")} className={`${`zaplane-label ${activeDrawer === 'logs' && 'zaplane-button-actve'}`} text-#454F59`}>
-            {__("Logs", "zaplane")}
-          </button>}>
-        <div gap="5px" className="flex">
-          <button size="sm" variant="outline" onClick={() => dispatch(getRunWorkFlow({
-          id
-        }))} className="text-#454F59 font-[500] border">
-            <TfiReload className={refreshing ? "zaplane-refresh-spin" : ""} />{__("Refresh", "zaplane")}
-          </button>
-          <button size="sm" variant="outline" onClick={() => dispatch(workFLowExction({
-          workflow_hash: workFlow?.version?.hash
-        }))} className="text-#454F59 font-[500] border">
-            <LuSquarePlay /> {__("Replay", "zaplane")}
-          </button>
-        </div>
-        <RunsTable id={id} activeDrawer={activeDrawer} setRefreshing={setRefreshing} />
-      </ZAPDrawer>
-
-      {/* Version Drawer */}
-      <ZAPDrawer title={__("Version History", "zaplane")} open={activeDrawer === "history"} isFullscreen={isFullscreen} onClose={() => setActiveDrawer(null)} trigger={<ZAPTooltip content={'History'} positioning={{
-      placement: "buttom",
-      offset: {
-        mainAxis: 45,
-        crossAxis: -5
-      }
-    }}>
-            <button size="sm" variant="outline" onClick={() => setActiveDrawer("history")}>
-              <LucideHistory />
-            </button>
-          </ZAPTooltip>}>
-        <VersionHistoryTable id={id} />
-      </ZAPDrawer>
-
-      {/* Status Select */}
-      <Select options={statusOptions} value={values?.status ? statusOptions.find(opt => opt.value === values.status) : statusOptions.find(opt => opt.value === workFlow?.workflow?.status)} onChange={selected => setFieldValue("status", selected.value)} isClearable={false} isSearchable={false} placeholder="Select status" styles={{
-      control: provided => ({
-        ...provided,
-        minHeight: "36px",
-        height: '36px'
-      })
-    }} />
-
-      <button style={primaryBtn} disabled={!isFlowDirty} size="sm" onClick={handleSubmit} className="h-[36px]">
-        {__("Update", "zaplane")}
+  const rightActions = <div className="flex items-center gap-3">
+    {!apiRequestRunning ? (
+      <button
+        onClick={() => {
+          dispatch(startApiCountdown(120));
+          dispatch(workflowNodeListiner(id));
+        }}
+        className="flex items-center gap-2 h-9 px-4 bg-[var(--zaplane-second-primary)] text-[var(--zaplane-primary)] font-medium rounded-[4px] hover:opacity-90 transition-all"
+      >
+        <CiPlay1 className="text-lg" />
+        <span>{__("Test Flow Once", "zaplane")}</span>
       </button>
-      <ZAPMenu isIcon items={[{
-      label: "Export",
-      icon: FiDownload,
-      onClick: handleExport
-    }]} />
-    </div>;
+    ) : (
+      <button
+        onClick={() => dispatch(workflowNodeListinerStop(id))}
+        className="flex items-center gap-2 h-9 px-4 bg-red-50 text-red-600 font-medium rounded-[4px] hover:bg-red-100 transition-all"
+      >
+        <LiaStopCircleSolid className="text-xl" />
+        <span>{__("Stop", "zaplane")}</span>
+      </button>
+    )}
+
+    {apiRequestRunning && (
+      <div className="flex items-center gap-2">
+        <span className="text-[13px] font-medium text-gray-500">
+          {__("Listening...", "zaplane")}
+        </span>
+        <span className="text-[13px] font-bold text-[var(--zaplane-primary)]">
+          {formatTime(apiCountdown)}
+        </span>
+      </div>
+    )}
+
+    <ZAPTooltip content={'Full Screen'}>
+      <button
+        onClick={toggleFullscreen}
+        style={outlineBtn}
+      >
+        {isFullscreen ? <LuMinimize size={18} /> : <LuFullscreen size={18} />}
+      </button>
+    </ZAPTooltip>
+
+    <ZAPDrawer
+      title={__("Log History", "zaplane")}
+      maxWidth='max-w-[600px]'
+      isFullscreen={isFullscreen}
+      open={activeDrawer === "logs"}
+      onClose={() => setActiveDrawer(null)}
+      trigger={
+        <button
+          onClick={() => setActiveDrawer("logs")}
+          className={`h-9 px-4 border rounded-[4px] text-sm font-medium transition-all ${activeDrawer === 'logs'
+            ? 'bg-[var(--zaplane-second-primary)] border-[var(--zaplane-primary)] text-[var(--zaplane-primary)]'
+            : 'border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-gray-300'
+            }`}
+        >
+          {__("Logs", "zaplane")}
+        </button>
+      }
+    >
+      <div className="flex gap-[5px] mb-[12px]">
+        <button
+          onClick={() => dispatch(getRunWorkFlow({ id }))}
+          className="flex items-center gap-1 px-3 py-1 text-sm font-medium text-[#454F59] border-0 bg-transparent hover:bg-gray-100 rounded"
+        >
+          <TfiReload className={refreshing ? "animate-spin" : ""} />
+          {__("Refresh", "zaplane")}
+        </button>
+
+        <button
+          onClick={() =>
+            dispatch(workFLowExction({ workflow_hash: workFlow?.version?.hash }))
+          }
+          className="flex items-center gap-1 px-3 py-1 text-sm font-medium text-[#454F59] border-0 bg-transparent hover:bg-gray-100 rounded"
+        >
+          <LuSquarePlay />
+          {__("Replay", "zaplane")}
+        </button>
+      </div>
+      <RunsTable id={id} activeDrawer={activeDrawer} setRefreshing={setRefreshing} />
+    </ZAPDrawer>
+
+    <ZAPDrawer
+      title={__("Version History", "zaplane")}
+      maxWidth='max-w-[600px]'
+      open={activeDrawer === "history"}
+      isFullscreen={isFullscreen}
+      onClose={() => setActiveDrawer(null)}
+      trigger={
+        <ZAPTooltip content={'History'}>
+          <button
+            onClick={() => setActiveDrawer("history")}
+            className={`flex items-center justify-center w-9 h-9 border rounded-[4px] transition-all ${activeDrawer === 'history'
+              ? 'bg-[var(--zaplane-second-primary)] border-[var(--zaplane-primary)] text-[var(--zaplane-primary)]'
+              : 'border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-gray-300'
+              }`}
+          >
+            <LucideHistory size={18} />
+          </button>
+        </ZAPTooltip>
+      }
+    >
+      <VersionHistoryTable id={id} />
+    </ZAPDrawer>
+
+    {/* Status Select */}
+    <Select
+      options={statusOptions}
+      value={values?.status ? statusOptions.find(opt => opt.value === values.status) : statusOptions.find(opt => opt.value === workFlow?.workflow?.status)}
+      onChange={selected => setFieldValue("status", selected.value)}
+      isClearable={false}
+      isSearchable={false}
+      placeholder="Select status"
+      className="zaplane-selete"
+    />
+
+    <button
+      disabled={!isFlowDirty}
+      onClick={handleSubmit}
+      className="h-9 px-6 bg-[var(--zaplane-primary)] hover:opacity-90 active:scale-[0.98] text-white font-semibold rounded-[4px] transition-all shadow-sm shadow-blue-200 disabled:opacity-50 disabled:cursor-not-allowed"
+    >
+      {__("Update", "zaplane")}
+    </button>
+
+    <ZAPMenu
+      trigger={
+        <button
+          style={{ ...outlineBtn, padding: '11px' }}
+          onClick={e => e.stopPropagation()}
+          aria-label="More options"
+        >
+          <BsThreeDotsVertical />
+        </button>
+      }
+      items={[{
+        label: "Export",
+        icon: FiDownload,
+        onClick: handleExport
+      }]}
+    />
+  </div>;
   if (renderTopBar) {
     return renderTopBar({
       rightActions,
@@ -201,20 +261,55 @@ export default function FlowTopBar({
       titleInputRef
     });
   }
-  return <TopBar leftContent={() => <>
-          <div height='40px' width='40px' gap='10px' className="flex rounded-[20px] bg-var(--zaplane-second-primary) items-center justify-center">
-            <img src={`${plugin_root_url}assets/images/zaplane.svg`} />
-          </div>
-          <IoIosArrowForward />
-          <ZAPLabel as="h2" color="var(--zapplane-font-color)" type="subtitle" fontWeight="medium" fontSize="14px" href={onNavigateBack ? undefined : `${route_path}admin.php?page=zaplane-workflows`} onClick={onNavigateBack ? e => {
-      e.preventDefault();
-      onNavigateBack();
-    } : undefined} label={__('WorkFlows', 'zaplane')} />
-          <IoIosArrowForward />
-          {isEditingTitle ? <input ref={titleInputRef} height="28px" value={currentTitle} onChange={e => setFieldValue("title", e.target.value)} onBlur={() => setIsEditingTitle(false)} onKeyDown={e => {
-      if (e.key === "Enter" || e.key === "Escape") setIsEditingTitle(false);
-    }} variant="outline" minW="80px" className="text-[14px] font-[500] border rounded-[4px] px-[6px] w-[auto] max-w-[200px]" /> : <span as="h2" onClick={() => setIsEditingTitle(true)} noOfLines={1} textOverflow="ellipsis" className="m-0 text-[14px] font-[500] text-var(--zapplane-font-color) cursor-pointer max-w-[200px]">
-              {currentTitle}
-            </span>}
-        </>} rightContent={() => rightActions} />;
+  return <TopBar leftContent={() => (
+    <div className="flex items-center gap-3">
+      <div className="w-10 h-10 rounded-full bg-[var(--zaplane-second-primary)] flex items-center justify-center shadow-inner">
+        <img
+          src={`${plugin_root_url}assets/images/zaplane.svg`}
+          className="w-5 h-5"
+          alt="Zaplane logo"
+        />
+      </div>
+
+      <IoIosArrowForward className="text-gray-400 text-xs" />
+
+      <ZAPLabel
+        as="h2"
+        color="var(--zaplane-font-color)"
+        type="subtitle"
+        fontWeight="medium"
+        fontSize="14px"
+        href={onNavigateBack ? undefined : `${route_path}admin.php?page=zaplane-workflows`}
+        onClick={onNavigateBack ? e => {
+          e.preventDefault();
+          onNavigateBack();
+        } : undefined}
+        label={__('Flows', 'zaplane')}
+        className="hover:text-[var(--zaplane-primary)] transition-colors"
+      />
+
+      <IoIosArrowForward className="text-gray-400 text-xs" />
+
+      {isEditingTitle ? (
+        <input
+          ref={titleInputRef}
+          height="28px"
+          value={currentTitle}
+          onChange={e => setFieldValue("title", e.target.value)}
+          onBlur={() => setIsEditingTitle(false)}
+          onKeyDown={e => {
+            if (e.key === "Enter" || e.key === "Escape") setIsEditingTitle(false);
+          }}
+          className="text-[14px] font-semibold border-b-2 border-primary-500 focus:outline-none bg-transparent px-1 w-auto max-w-[200px]"
+        />
+      ) : (
+        <span
+          onClick={() => setIsEditingTitle(true)}
+          className="m-0 text-[14px] font-semibold text-[var(--zaplane-font-color)] truncate cursor-pointer max-w-[240px] hover:bg-gray-50 px-2 py-1 rounded transition-colors"
+        >
+          {currentTitle}
+        </span>
+      )}
+    </div>
+  )} rightContent={() => rightActions} />;
 }

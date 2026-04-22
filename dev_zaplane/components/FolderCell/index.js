@@ -98,26 +98,37 @@ const FolderCell = ({
     onClick: () => setModalOpen(true)
   }];
   if (assigning) {
-    return <div className="flex justify-center items-center min-h-[32px]">
-                <div size="sm" />
-            </div>;
+    return (
+      <div className="flex items-center justify-center h-[36px] w-[100px] border border-[#E5E7EB] bg-white rounded-full">
+        <svg className="animate-spin h-4 w-4 text-[#006BFF]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+      </div>
+    );
   }
   return <>
-            {selectedFolder ? <ZAPMenu items={menuItems} trigger={<div onClick={e => e.stopPropagation()} className="flex flex-row items-center gap-1 px-[14px] py-1 h-[36px] rounded-full border border-gray-200 bg-gray-50 inline-flex items-center max-w-[160px] cursor-pointer">
-                            <LuFolderOpen style={{width:"14px", height:"14px"}} className="text-gray-500 shrink-0" />
-                            <span isTruncated className="zaplane-label flex-[1]">
+            {selectedFolder ? <ZAPMenu items={menuItems} trigger={<div onClick={e => e.stopPropagation()} className="flex flex-row items-center gap-2 px-4 h-[36px] rounded-full border border-[#E5E7EB] bg-white group hover:border-[#D1D5DB] transition-all cursor-pointer max-w-[160px]">
+                            <LuFolderOpen size={14} className="text-[#6B7280] shrink-0" />
+                            <span className="text-[13px] font-semibold text-[#111827] truncate flex-[1]">
                                 {selectedFolder.title}
                             </span>
-                            <div as="span" _hover={{
-        bg: "gray.200"
-      }} onClick={e => {
-        e.stopPropagation();
-        handleRemove();
-      }} aria-label={__("Remove from folder", "zaplane")} className="flex items-center justify-center w-[16px] h-[16px] rounded-sm shrink-0">
-                                <LuMinus style={{width:"11px", height:"11px"}} className="text-gray-500" />
+                            <div 
+                              onClick={e => {
+                                e.stopPropagation();
+                                handleRemove();
+                              }} 
+                              className="flex items-center justify-center w-[18px] h-[18px] rounded-full bg-gray-50 hover:bg-gray-100 shrink-0 transition-colors"
+                              title={__("Remove from folder", "zaplane")}
+                            >
+                                <LuMinus size={11} className="text-[#6B7280]" />
                             </div>
-                        </div>} /> : <ZAPMenu items={menuItems} trigger={<button size="14px" variant="outline" onClick={e => e.stopPropagation()} aria-label={__("Add to folder", "zaplane")} className="text-[14px] font-[500] py-1 gap-1 h-[36px] rounded-full px-[16px]">
-                            <LuFolderOpen style={{width:"14px", height:"14px"}} className="text-gray-500 mr-1" />
+                        </div>} /> : <ZAPMenu items={menuItems} trigger={<button 
+                            onClick={e => e.stopPropagation()} 
+                            className="flex items-center gap-2 px-4 h-[36px] rounded-full border border-[#E5E7EB] bg-white text-[13px] font-semibold text-[#374151] hover:bg-[#F9FAFB] hover:border-[#D1D5DB] transition-all"
+                            aria-label={__("Add to folder", "zaplane")}
+                        >
+                            <LuFolderOpen size={14} className="text-[#6B7280]" />
                             {__("Add", "zaplane")}
                         </button>} />}
 

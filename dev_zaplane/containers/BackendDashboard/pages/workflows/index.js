@@ -27,10 +27,12 @@ const CreateWorkflows = ({
             </>} />}
 
       <SubTopBar heading={__("Workflows", "zaplane")}>
-        <ImportWorkflow />
+        <div className="flex items-center gap-2">
+          <ImportWorkflow />
         <button onClick={() => setIsModalOpen(true)} style={primaryBtn}>
           {__("Create Workflow", "zaplane")}
         </button>
+        </div>
       </SubTopBar>
 
       <div className="zaplane-page-content">

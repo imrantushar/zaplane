@@ -5,7 +5,7 @@ const DrawerItemList = ({
   setSelectedItem
 }) => {
   // app list item 
-  return <div overflow="hidden" gap='16px' className="flex flex-col items-left">
+  return <div  className="flex flex-col items-center gap-[16px]">
       {list.map(item => <DrawerItemButton icon={item?.icon} key={item.id} item={item} onClick={() => setSelectedItem(item)} />)}
     </div>;
 };

@@ -6,6 +6,7 @@ import { importWorkflows } from "@ZAPRedux/Slices/workFlowSlice/actions/ExportIm
 import { FiUpload } from "react-icons/fi";
 import { getWorkFlow } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow";
 import ZAPTooltip from "@ZAPComponents/ZAPTooltip";
+import { outlineBtn } from "../../../../../../../assets/scss/chakra/recipe";
 const ImportWorkflow = () => {
   const dispatch = useDispatch();
   const [isOpen, setIsOpen] = useState(false);
@@ -32,7 +33,7 @@ const ImportWorkflow = () => {
   };
   return <>
             <ZAPTooltip content={__("Import Workflow", "zaplane")}>
-                <button variant='outline' onClick={() => setIsOpen(true)}>
+                <button style={outlineBtn}  onClick={() => setIsOpen(true)}>
                     <FiUpload />
                 </button>
             </ZAPTooltip>
