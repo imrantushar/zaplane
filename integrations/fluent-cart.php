@@ -2,24 +2,32 @@
 namespace Zaplane\Integrations;
 
 use Zaplane\Framework\Classes\IntegrationBase;
-use Zaplane\Integrations\Fluentcart\Helper;
+use Zaplane\Integrations\Fluentcart\CreateProductHelperTrait;
+use Zaplane\Integrations\Fluentcart\DynamicQueriesTrait;
 use Zaplane\Integrations\Fluentcart\OrderActionsTrait;
 use Zaplane\Integrations\Fluentcart\CustomerActionsTrait;
 use Zaplane\Integrations\Fluentcart\SubscriptionActionsTrait;
 use Zaplane\Integrations\Fluentcart\ProductActionsTrait;
 use Zaplane\Integrations\Fluentcart\HookActionsTrait;
+use Zaplane\Integrations\Fluentcart\TriggerResolverTrait;
+use Zaplane\Integrations\Fluentcart\ModelHelperTrait;
+use Zaplane\Integrations\Fluentcart\NodeHelperTrait;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
 class FluentCart extends IntegrationBase {
-	use Helper;
+	use CreateProductHelperTrait;
+	use DynamicQueriesTrait;
 	use OrderActionsTrait;
 	use CustomerActionsTrait;
 	use SubscriptionActionsTrait;
 	use ProductActionsTrait;
 	use HookActionsTrait;
+	use TriggerResolverTrait;
+	use ModelHelperTrait;
+	use NodeHelperTrait;
 
 	private const INTRODUCTION = 'Track FluentCart order, payment, subscription, and stock events and run hook-based actions without webhooks.';
 
@@ -625,5 +633,6 @@ class FluentCart extends IntegrationBase {
 
 		return self::main_response( $input );
 	}
+
 
 }
