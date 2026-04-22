@@ -71,7 +71,7 @@ const VersionHistoryTable = ({
     name: __('Action', 'zaplane'),
     cell: row => <div justify="flex-end" className="flex flex-row items-center gap-1">
           {!row.is_active && <ZAPTooltip content={__("Active version", 'zaplane')}>
-              <button size="xs" variant="outline" onClick={() => dispatch(versionActive({
+              <button className="flex px-[8px] py-[4px] justify-center items-center rounded-[2.917px] border" onClick={() => dispatch(versionActive({
           id,
           versionID: row.id
         }))}>
@@ -79,7 +79,7 @@ const VersionHistoryTable = ({
               </button>
             </ZAPTooltip>}
           <ZAPTooltip content={__("Prevew Version", 'zaplane')}>
-            <button size="xs" variant="ghost" onClick={() => dispatch(getPreviewOldVersion({
+            <button className="flex px-[8px] py-[4px] justify-center items-center rounded-[2.917px] border" onClick={() => dispatch(getPreviewOldVersion({
           id,
           versionID: row.id
         }))}>

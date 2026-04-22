@@ -45,7 +45,7 @@ const Logs = () => {
       {__("App Name", "zaplane")}
     </span>,
     cell: row => {
-      return <div>
+      return <div className="flex flex-col ">
         <ZAPLabel label={row?.node?.app} type={"simple"} />
         <span className="zaplane-sub-title text-var(--zaplane-text-muted)">
           {__(formatLabel(row?.node?.event), 'zaplane')}
@@ -63,7 +63,7 @@ const Logs = () => {
         date,
         time
       } = formatDateTime(row.started_at);
-      return <div className="ml-[-12px]">
+      return <div className="flex flex-col">
         <ZAPLabel label={date} type={"simple"} />
         <span className="zaplane-sub-title ml-[-38px] text-var(--zaplane-text-muted)">
           {__(time, 'zaplane')}
@@ -81,7 +81,7 @@ const Logs = () => {
         date,
         time
       } = formatDateTime(row.finished_at);
-      return <div className="ml-[-12px]">
+      return <div className="flex flex-col">
         <ZAPLabel label={date} type={"simple"} />
         <span className="zaplane-sub-title ml-[-38px] text-var(--zaplane-text-muted)">
           {__(time, 'zaplane')}
@@ -121,7 +121,7 @@ const Logs = () => {
           setActiveRunId(row.id);
           setDrawerOpen(true);
           dispatch(nodeLogsRunDetails(row.id));
-        }} className="flex p-[5px 6px] justify-center items-center rounded-[2.917px] border">
+        }} className="flex px-[8px] py-[4px] justify-center items-center rounded-[2.917px] border">
           <HistoryIcon style={{ height: "20px", width: "20px" }} />
         </div>
       </ZAPTooltip>

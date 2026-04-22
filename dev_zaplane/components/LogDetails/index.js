@@ -29,7 +29,7 @@ const LogDetails = ({
             <Disclosure key={log.id} as="div" className="border border-gray-200 p-3 rounded-lg my-2">
               {({ open }) => (
                 <>
-                  <DisclosureButton className="flex w-full justify-between items-center bg-white px-2 py-2 text-left text-sm font-medium focus:outline-none">
+                  <DisclosureButton className="flex w-full justify-between items-center bg-white px-2  text-left text-sm font-medium focus:outline-none">
                     <div className="flex flex-col flex-1">
                       <span className="zaplane-label font-medium">
                         {sprintf(__('%s', 'zaplane'), log?.node?.app)}
