@@ -122,50 +122,50 @@ export default function FlowCanvas({
   // console.log(nodes, 'all nodes',);
   // console.log(edges, 'all edges');
   return <div ref={containerRef} height="100vh"
-  // marginRight={activeDrawer ? "600px" : "0px"}
-  transition="margin-right 0.4s ease" className="zaplane_flowcanvas flex-[1]">
+    // marginRight={activeDrawer ? "600px" : "0px"}
+    transition="margin-right 0.4s ease" className="zaplane_flowcanvas flex-[1]">
 
-            <FlowTopBar workFlow={workFlow} isFullscreen={isFullscreen} toggleFullscreen={() => toggleFullscreenMode(containerRef, isFullscreen, setIsFullscreen)} id={id} values={values} setFieldValue={setFieldValue} handleSubmit={handleSubmit} activeDrawer={activeDrawer} setActiveDrawer={setActiveDrawer} isFlowDirty={isFlowDirty} onNavigateBack={onNavigateBack} renderTopBar={renderTopBar} />
+    <FlowTopBar workFlow={workFlow} isFullscreen={isFullscreen} toggleFullscreen={() => toggleFullscreenMode(containerRef, isFullscreen, setIsFullscreen)} id={id} values={values} setFieldValue={setFieldValue} handleSubmit={handleSubmit} activeDrawer={activeDrawer} setActiveDrawer={setActiveDrawer} isFlowDirty={isFlowDirty} onNavigateBack={onNavigateBack} renderTopBar={renderTopBar} />
 
-            {loading ? <ZAPLoading /> : <ReactFlow nodes={nodes} edges={edges} nodeTypes={nodeTypes} edgeTypes={edgeTypes} isValidConnection={isValidConnection} onNodesChange={onNodesChange} onEdgesChange={onEdgesChange} onConnect={onConnect}
-    // fitView
-    // fitViewOnInit
-    //  defaultViewport={{ x: 0, y: 0, zoom: 1 }}
-    fitViewOptions={{
-      minZoom: 0.5,
-      maxZoom: 1
-    }} panOnDrag zoomOnScroll zoomOnDoubleClick nodesDraggable nodesConnectable elementsSelectable>
+    {loading ? <ZAPLoading /> : <ReactFlow nodes={nodes} edges={edges} nodeTypes={nodeTypes} edgeTypes={edgeTypes} isValidConnection={isValidConnection} onNodesChange={onNodesChange} onEdgesChange={onEdgesChange} onConnect={onConnect}
+      // fitView
+      // fitViewOnInit
+      //  defaultViewport={{ x: 0, y: 0, zoom: 1 }}
+      fitViewOptions={{
+        minZoom: 0.5,
+        maxZoom: 1
+      }} panOnDrag zoomOnScroll zoomOnDoubleClick nodesDraggable nodesConnectable elementsSelectable>
 
-                    <Background variant="dots" gap={24} size={1} color="#e2e8f0" />
-                    <div className="zaplane-canvas-layout-icon flex">
-                        <ZAPTooltip content={__("Vertical layout", "zaplane")} positioning={{
+      <Background  />
+      <div className="zaplane-canvas-layout-icon flex">
+        <ZAPTooltip content={__("Vertical layout", "zaplane")} positioning={{
           placement: "top",
           offset: {
             mainAxis: 8,
             crossAxis: 25
           }
         }}>
-                            <ControlButton onClick={() => onLayout("TB")} className={`react-flow__controls-button ${canvasLayout === "TB" ? "zaplane-layout-active" : ""}`}>
-                                <IoSwapVerticalOutline size={16} />
-                            </ControlButton>
-                        </ZAPTooltip>
-                        <ZAPTooltip content={__("Horizontal layout", "zaplane")} positioning={{
+          <ControlButton onClick={() => onLayout("TB")} className={`react-flow__controls-button ${canvasLayout === "TB" ? "zaplane-layout-active" : ""}`}>
+            <IoSwapVerticalOutline size={16} />
+          </ControlButton>
+        </ZAPTooltip>
+        <ZAPTooltip content={__("Horizontal layout", "zaplane")} positioning={{
           placement: "top",
           offset: {
             mainAxis: 8,
             crossAxis: 25
           }
         }}>
-                            <ControlButton onClick={() => onLayout("LR")} className={`react-flow__controls-button ${canvasLayout === "LR" ? "zaplane-layout-active" : ""}`}>
-                                <IoSwapHorizontal size={16} />
-                            </ControlButton>
-                        </ZAPTooltip>
+          <ControlButton onClick={() => onLayout("LR")} className={`react-flow__controls-button ${canvasLayout === "LR" ? "zaplane-layout-active" : ""}`}>
+            <IoSwapHorizontal size={16} />
+          </ControlButton>
+        </ZAPTooltip>
 
-                    </div>
-                    <Controls position="top-left" className="zaplane-canvas-controls" />
-                </ReactFlow>}
+      </div>
+      <Controls position="top-left" className="zaplane-canvas-controls" />
+    </ReactFlow>}
 
-            <ActionDrawer open={drawerOpen} isFullscreen={isFullscreen} onClose={() => {
+    <ActionDrawer open={drawerOpen} isFullscreen={isFullscreen} onClose={() => {
       setDrawerOpen(false);
       setDrawerContext({
         source: null,
@@ -174,5 +174,5 @@ export default function FlowCanvas({
       });
     }} context={drawerContext} handleAddAction={handleAddAction} updateNodeData={updateNodeData} workFlow={workFlow} nodes={nodes} edges={edges} />
 
-        </div>;
+  </div>;
 }
