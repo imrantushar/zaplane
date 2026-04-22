@@ -219,25 +219,7 @@ export default function FlowTopBar({
       isClearable={false}
       isSearchable={false}
       placeholder="Select status"
-      styles={{
-        control: (provided, state) => ({
-          ...provided,
-          minHeight: "36px",
-          height: '36px',
-          borderRadius: '4px',
-          borderColor: state.isFocused ? 'var(--zaplane-primary)' : '#e5e7eb',
-          boxShadow: 'none',
-          '&:hover': {
-            borderColor: '#d1d5db'
-          }
-        }),
-        singleValue: (provided) => ({
-          ...provided,
-          fontSize: '14px',
-          fontWeight: '500',
-          color: '#374151'
-        })
-      }}
+      className="zaplane-selete"
     />
 
     <button
