@@ -28,7 +28,7 @@ class Brevo extends IntegrationBase
 
     public static function get_icon(): string
     {
-        return 'https://www.brevo.com/wp-content/uploads/2023/01/brevo-logo.svg';
+        return 'brevo.svg';
     }
 
     public static function get_category(): string
