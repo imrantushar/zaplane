@@ -32,11 +32,13 @@
 import { useState, useMemo, useEffect } from "react";
 import { APPS, TOOLS } from "./helper";
 import { integrations } from "@ZAPUtils/helper";
-import {   
+import {
   getIntegration,
   getActionOptions,
   getSelectedActionFields,
-  getVisibleFields,} from "@ZAPContainers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/helper";
+  getVisibleFields
+} from "@ZAPContainers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/helper";
+
 
 
 export const useActionDrawer = ({
