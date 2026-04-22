@@ -28,7 +28,6 @@ class Eventscalendar extends IntegrationBase {
     }
 
     public static function resolve_trigger(array $node, array $args) {
-       
         switch ($node['event']) {
             
             case 'attendEvent':
@@ -40,9 +39,11 @@ class Eventscalendar extends IntegrationBase {
                 if ( ! $attendee ) {
                     return false;
                 }
-                $user_id  = get_post_meta( $attendee_id, '_tribe_tickets_meta_user_id', true );
-                $event_id = get_post_meta( $attendee_id, '_tribe_tickets_checkin_event_id', true )
-                         ?: get_post_meta( $attendee_id, '_tribe_rsvp_event', true );
+                $user_id  = get_post_meta( $attendee_id, '_tribe_tickets_meta_user_id', true )
+                         ?: get_post_meta( $attendee_id, '_tribe_rsvp_user_id', true );
+                $event_id = ! empty( $args[1] ) ? $args[1]
+                         : ( get_post_meta( $attendee_id, '_tribe_rsvp_event', true )
+                         ?: get_post_meta( $attendee_id, '_tribe_tickets_checkin_event_id', true ) );
                 $user     = $user_id ? get_user_by( 'id', $user_id ) : null;
                 $event    = $event_id ? get_post( $event_id ) : null;
                 return [
