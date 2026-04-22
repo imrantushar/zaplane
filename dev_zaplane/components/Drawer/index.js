@@ -44,7 +44,7 @@ const ZAPDrawer = ({
             <div className="fixed inset-0 bg-black/25" />
           </TransitionChild>
 
-          <div className={`fixed inset-y-0 ${placement === 'start' ? 'left-0' : 'right-0'} flex max-w-full ${isFullscreen ? '' : 'mt-8 '} ${isFullscreen ? 'w-full' : ''}`}>
+          <div className={`fixed inset-y-0 ${placement === 'start' ? 'left-0' : 'right-0'} flex max-w-full ${isFullscreen ? '' : 'mt-8 '}`}>
             <TransitionChild
               as={Fragment}
               enter="transform transition ease-in-out duration-300 sm:duration-500"
