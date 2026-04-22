@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-04-22 05:21:11",
+    "generated_at": "2026-04-22 06:23:20",
     "apps": {
         "cartflows": {
             "slug": "cartflows",
@@ -21208,98 +21208,8 @@
             "category": "app",
             "requires_connection": true,
             "auth_type": "bot_token",
-            "supports_webhook": true,
-            "triggers": {
-                "new_message_in_channel": {
-                    "key": "new_message_in_channel",
-                    "label": "New Message In Channel",
-                    "hook": "discord_webhook_new_message_in_channel",
-                    "schema": [
-                        {
-                            "key": "guild_id",
-                            "type": "select",
-                            "label": "Select Server",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "discord",
-                                "query": "guild_query",
-                                "select": [
-                                    "value",
-                                    "label"
-                                ]
-                            }
-                        },
-                        {
-                            "key": "channel_id",
-                            "type": "select",
-                            "label": "Select Channel",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "discord",
-                                "query": "channel_query",
-                                "select": [
-                                    "value",
-                                    "label"
-                                ],
-                                "depends_on": [
-                                    "guild_id"
-                                ]
-                            }
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "new_user_join_server": {
-                    "key": "new_user_join_server",
-                    "label": "New User Join Server",
-                    "hook": "discord_webhook_new_user_join_server",
-                    "schema": [
-                        {
-                            "key": "guild_id",
-                            "type": "select",
-                            "label": "Select Server",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "discord",
-                                "query": "guild_query",
-                                "select": [
-                                    "value",
-                                    "label"
-                                ]
-                            }
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "channel_created": {
-                    "key": "channel_created",
-                    "label": "Channel Created",
-                    "hook": "discord_webhook_channel_created",
-                    "schema": [
-                        {
-                            "key": "guild_id",
-                            "type": "select",
-                            "label": "Select Server",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "discord",
-                                "query": "guild_query",
-                                "select": [
-                                    "value",
-                                    "label"
-                                ]
-                            }
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                }
-            },
+            "supports_webhook": false,
+            "triggers": [],
             "actions": {
                 "create_channel": {
                     "key": "create_channel",

@@ -8,8 +8,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 use Zaplane\Framework\Classes\IntegrationBase;
 use Zaplane\Framework\Classes\ConnectionManager;
+use Zaplane\Traits\ActionResponseTrait;
+
 
 class Discord extends IntegrationBase {
+
+	use ActionResponseTrait;
 
 	private const API_BASE_URL = 'https://discord.com/api/v10';
 
@@ -429,15 +433,12 @@ class Discord extends IntegrationBase {
 			];
 		}
 
-		$result = [];
-
 		switch ( $event ) {
 
 			case 'create_channel':
 				$name = trim( $config['name'] ?? '' );
 				if ( empty( $name ) ) {
-					$result = [ 'error' => 'Channel name is required.' ];
-					break;
+					return self::error( __( 'Channel name is required.', 'zaplane' ), $input );
 				}
 				$payload = [
 					'name' => $name,
@@ -446,73 +447,75 @@ class Discord extends IntegrationBase {
 				if ( ! empty( $config['topic'] ) ) {
 					$payload['topic'] = $config['topic'];
 				}
-				$result = self::api_request( $bot_token, 'POST', "/guilds/{$guild_id}/channels", $payload );
-				break;
+
+				return self::success( array_merge( $input, [
+					'channel' => self::api_request( $bot_token, 'POST', "/guilds/{$guild_id}/channels", $payload ),
+				] ) );
 
 			case 'update_channel':
 				$name       = trim( $config['name'] ?? '' );
 				$channel_id = $config['channel_id'] ?? '';
 				if ( empty( $name ) ) {
-					$result = [ 'error' => 'Channel name is required.' ];
-					break;
+					return self::error( __( 'Channel name is required.', 'zaplane' ), $input );
 				}
 				$payload = [ 'name' => $name ];
 				if ( ! empty( $config['topic'] ) ) {
 					$payload['topic'] = $config['topic'];
 				}
-				$result = self::api_request( $bot_token, 'PATCH', "/channels/{$channel_id}", $payload );
-				break;
+				return self::success( array_merge( $input, [
+					'channel' => self::api_request( $bot_token, 'PATCH', "/channels/{$channel_id}", $payload ),
+				] ) );
 
 			case 'get_channel_by_name':
 				$channels = self::api_request( $bot_token, 'GET', "/guilds/{$guild_id}/channels" );
 				$name     = $config['name'] ?? '';
-				$result   = [
-					'error' => 'Channel not found',
-					'searched_name' => $name
-				];
 				if ( is_array( $channels ) ) {
-					foreach ( $channels as $ch ) {
-						if ( isset( $ch['name'] ) && $ch['name'] === $name ) {
-							$result = $ch;
-							break;
+					foreach ( $channels as $channel ) {
+						if ( isset( $channel['name'] ) && $channel['name'] === $name ) {
+							return self::success( array_merge( $input, [
+								'channel' => $channel,
+							] ) );
 						}
 					}
 				}
-				break;
+				return self::error( __( 'Channel not found.', 'zaplane' ), $input );
 
 			case 'send_channel_message':
 				$channel_id = $config['channel_id'] ?? '';
-				$result     = self::api_request( $bot_token, 'POST', "/channels/{$channel_id}/messages", [
-					'content' => $config['content'] ?? '',
-				] );
-				break;
+				return self::success( array_merge( $input, [
+					'channel' => self::api_request( $bot_token, 'POST', "/channels/{$channel_id}/messages", [
+						'content' => $config['content'] ?? '',
+					] ),
+				] ) );
 
 			case 'find_channel':
 				$channels = self::api_request( $bot_token, 'GET', "/guilds/{$guild_id}/channels" );
 				$query    = $config['search_query'] ?? '';
 				$type     = $config['type'] ?? '';
-				$result   = [];
 				if ( is_array( $channels ) ) {
-					foreach ( $channels as $ch ) {
-						$matches_name = isset( $ch['name'] ) && stripos( $ch['name'], $query ) !== false;
-						$matches_id   = isset( $ch['id'] ) && $ch['id'] === $query;
-						$matches_type = '' === $type || ( isset( $ch['type'] ) && (string) $ch['type'] === (string) $type );
+					foreach ( $channels as $channel ) {
+						$matches_name = isset( $channel['name'] ) && stripos( $channel['name'], $query ) !== false;
+						$matches_id   = isset( $channel['id'] ) && $channel['id'] === $query;
+						$matches_type = '' === $type || ( isset( $channel['type'] ) && (string) $channel['type'] === (string) $type );
 						if ( ( $matches_name || $matches_id ) && $matches_type ) {
-							$result[] = $ch;
+							return self::success( array_merge( $input, [
+								'channel' => $channel,
+							] ) );
 						}
 					}
 				}
-				break;
+				return self::error( __( 'Channel not found.', 'zaplane' ), $input );
 
 			case 'create_a_channel_invite':
 				$channel_id = $config['channel_id'] ?? '';
-				$result     = self::api_request( $bot_token, 'POST', "/channels/{$channel_id}/invites", [
-					'max_age'   => (int) ( $config['max_age'] ?? 86400 ),
-					'max_uses'  => (int) ( $config['max_uses'] ?? 0 ),
-					'temporary' => (bool) ( $config['temporary'] ?? false ),
-					'unique'    => (bool) ( $config['unique'] ?? false ),
-				] );
-				break;
+				return self::success( array_merge( $input, [
+					'channel' => self::api_request( $bot_token, 'POST', "/channels/{$channel_id}/invites", [
+						'max_age'   => (int) ( $config['max_age'] ?? 86400 ),
+						'max_uses'  => (int) ( $config['max_uses'] ?? 0 ),
+						'temporary' => (bool) ( $config['temporary'] ?? false ),
+						'unique'    => (bool) ( $config['unique'] ?? false ),
+					] ),
+				] ) );
 
 			case 'send_direct_message':
 				$dm_channel = self::api_request( $bot_token, 'POST', '/users/@me/channels', [
@@ -520,36 +523,43 @@ class Discord extends IntegrationBase {
 				] );
 
 				if ( isset( $dm_channel['error'] ) || empty( $dm_channel['id'] ) ) {
-					$result = [ 'error' => 'Failed to open DM channel: ' . ( $dm_channel['error'] ?? 'No channel id returned' ) ];
-					break;
+					return self::error(
+						sprintf(
+							esc_html__( 'Failed to open DM channel: %s', 'zaplane' ),
+							$dm_channel['error'] ?? 'No channel id returned'
+						),
+						$input
+					);
 				}
 
-				$result = self::api_request( $bot_token, 'POST', "/channels/{$dm_channel['id']}/messages", [
-					'content' => $config['content'] ?? '',
-				] );
-				break;
+				return self::success( array_merge( $input, [
+					'channel' => self::api_request( $bot_token, 'POST', "/channels/{$dm_channel['id']}/messages", [
+						'content' => $config['content'] ?? '',
+					] ),
+				] ) );
 
 			case 'delete_message':
 				$channel_id = $config['channel_id'] ?? '';
 				$message_id = $config['message_id'] ?? '';
 				self::api_request( $bot_token, 'DELETE', "/channels/{$channel_id}/messages/{$message_id}" );
-				$result = [
+				return self::success( array_merge( $input, [
 					'deleted' => true,
-					'message_id' => $message_id
-				];
-				break;
+					'message_id' => $message_id,
+				] ) );
 
 			case 'get_message':
 				$channel_id = $config['channel_id'] ?? '';
 				$message_id = $config['message_id'] ?? '';
-				$result     = self::api_request( $bot_token, 'GET', "/channels/{$channel_id}/messages/{$message_id}" );
-				break;
+				return self::success( array_merge( $input, [
+					'message' => self::api_request( $bot_token, 'GET', "/channels/{$channel_id}/messages/{$message_id}" ),
+				] ) );
 
 			case 'get_many_message':
 				$channel_id = $config['channel_id'] ?? '';
 				$limit      = max( 1, min( 100, (int) ( $config['limit'] ?? 10 ) ) );
-				$result     = self::api_request( $bot_token, 'GET', "/channels/{$channel_id}/messages?limit={$limit}" );
-				break;
+				return self::success( array_merge( $input, [
+					'messages' => self::api_request( $bot_token, 'GET', "/channels/{$channel_id}/messages?limit={$limit}" ),
+				] ) );
 
 			case 'react_with_emoji_to_message':
 				$channel_id = $config['channel_id'] ?? '';
@@ -557,71 +567,68 @@ class Discord extends IntegrationBase {
 
 				$emoji      = rawurlencode( $config['emoji'] ?? '' );
 				self::api_request( $bot_token, 'PUT', "/channels/{$channel_id}/messages/{$message_id}/reactions/{$emoji}/@me" );
-				$result = [ 'reacted' => true ];
-				break;
+				return self::success( array_merge( $input, [
+					'reacted' => true,
+				] ) );
 
 			case 'get_many_member':
 				$limit  = max( 1, min( 1000, (int) ( $config['limit'] ?? 100 ) ) );
-				$result = self::api_request( $bot_token, 'GET', "/guilds/{$guild_id}/members?limit={$limit}" );
-				break;
+				return self::success( array_merge( $input, [
+					'members' => self::api_request( $bot_token, 'GET', "/guilds/{$guild_id}/members?limit={$limit}" ),
+				] ) );
 
 			case 'add_role_to_member':
 				$member_id = $config['member_id'] ?? '';
 				$role_id   = $config['role_id'] ?? '';
 				self::api_request( $bot_token, 'PUT', "/guilds/{$guild_id}/members/{$member_id}/roles/{$role_id}" );
-				$result = [
-					'success' => true,
+				return self::success( array_merge( $input, [
 					'action' => 'role_added',
 					'member_id' => $member_id,
-					'role_id' => $role_id
-				];
-				break;
+					'role_id' => $role_id,
+				] ) );
 
 			case 'remove_role_from_member':
 				$member_id = $config['member_id'] ?? '';
 				$role_id   = $config['role_id'] ?? '';
 				self::api_request( $bot_token, 'DELETE', "/guilds/{$guild_id}/members/{$member_id}/roles/{$role_id}" );
-				$result = [
-					'success' => true,
+				return self::success( array_merge( $input, [
 					'action' => 'role_removed',
 					'member_id' => $member_id,
-					'role_id' => $role_id
-				];
-				break;
+					'role_id' => $role_id,
+				] ) );
 
 			case 'find_user':
 				$query   = $config['search_query'] ?? '';
 				$members = self::fetch_all_members( $bot_token, $guild_id );
-				$result  = [];
 				foreach ( $members as $member ) {
 					$user         = $member['user'] ?? [];
 					$matches_name = isset( $user['username'] ) && stripos( $user['username'], $query ) !== false;
 					$matches_id   = isset( $user['id'] ) && $user['id'] === $query;
 					if ( $matches_name || $matches_id ) {
-						$result[] = $member;
+						return self::success( array_merge( $input, [
+							'member' => $member,
+						] ) );
 					}
 				}
-				break;
+				return self::error( __( 'User not found.', 'zaplane' ), $input );
 
 			case 'create_new_forum_post':
 				$channel_id = $config['channel_id'] ?? '';
-				$result = self::api_request( $bot_token, 'POST', "/channels/{$channel_id}/threads", [
-					'name'                  => $config['name'] ?? '',
-					'auto_archive_duration' => 1440,
-					'message'               => [
-						'content' => $config['content'] ?? '',
-					],
-				] );
-				break;
+				return self::success( array_merge( $input, [
+					'thread' => self::api_request( $bot_token, 'POST', "/channels/{$channel_id}/threads", [
+						'name'                  => $config['name'] ?? '',
+						'auto_archive_duration' => 1440,
+						'message'               => [
+							'content' => $config['content'] ?? '',
+						],
+					] ),
+				] ) );
 
-			default:
-				$result = [ 'error' => "Unknown action: {$event}" ];
-				break;
 		}//end switch
 
 		return [
 			'port' => 'main',
-			'data' => array_merge( $input, is_array( $result ) ? $result : [ 'response' => $result ] ),
+			'data' => $input
 		];
 	}
 
@@ -759,15 +766,15 @@ class Discord extends IntegrationBase {
 				strtolower( $b['name'] ?? '' )
 			) );
 
-			foreach ( $channels as $ch ) {
-				$id   = $ch['id'] ?? '';
-				$name = $ch['name'] ?? '';
+			foreach ( $channels as $channel ) {
+				$id   = $channel['id'] ?? '';
+				$name = $channel['name'] ?? '';
 
 				if ( empty( $id ) ) {
 					continue;
 				}
 
-				$label = '#' . ( $name ?: 'Unknown Channel' );
+				$label = '#' . ( ! empty( $name ) ? $name : 'Unknown Channel' );
 				if ( $multi && $gname ) {
 					$label = '[' . $gname . '] ' . $label;
 				}
@@ -891,7 +898,7 @@ class Discord extends IntegrationBase {
 					continue;
 				}
 
-				$label = $name ?: 'Unknown Role';
+				$label = ! empty( $name ) ? $name : 'Unknown Role';
 				if ( $multi && $gname ) {
 					$label = '[' . $gname . '] ' . $label;
 				}
@@ -907,8 +914,9 @@ class Discord extends IntegrationBase {
 	}
 
 	private static function fetch_all_members( string $bot_token, string $guild_id ): array {
-		$all   = [];
-		$after = null;
+		$all        = [];
+		$after      = null;
+		$page_count = 0;
 
 		do {
 			$endpoint = "/guilds/{$guild_id}/members?limit=1000";
@@ -926,10 +934,11 @@ class Discord extends IntegrationBase {
 				$all[] = $member;
 			}
 
-			$last  = end( $page );
-			$after = $last['user']['id'] ?? null;
+			$page_count = count( $page );
+			$last       = end( $page );
+			$after      = $last['user']['id'] ?? null;
 
-		} while ( count( $page ) === 1000 && $after );
+		} while ( 1000 === $page_count && $after );
 
 		return $all;
 	}
@@ -1064,7 +1073,7 @@ class Discord extends IntegrationBase {
 				}
 			}
 		} catch ( \Throwable $e ) {
-
+			unset( $e );
 		}//end try
 
 		return [];
@@ -1073,9 +1082,11 @@ class Discord extends IntegrationBase {
 	private static function get_discord_connection_id(): int {
 		global $wpdb;
 		$table = $wpdb->prefix . 'zaplane_connections';
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is built from $wpdb->prefix, not user input.
 		$id    = $wpdb->get_var(
 			$wpdb->prepare(
-				"SELECT id FROM `{$table}` WHERE app = %s AND status = 'active' ORDER BY id DESC LIMIT 1",
+				// phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnquotedComplexPlaceholder
+				'SELECT id FROM `' . esc_sql( $table ) . "` WHERE app = %s AND status = 'active' ORDER BY id DESC LIMIT 1",
 				'discord'
 			)
 		);
