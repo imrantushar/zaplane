@@ -57,7 +57,7 @@ const ZAPDrawer = ({
               <DialogPanel className={`pointer-events-auto w-screen ${isFullscreen ? 'max-w-full' : maxWidth}`}>
                 <div className="flex h-full flex-col overflow-y-scroll bg-white shadow-xl">
                   {title && (
-                    <div className="px-4 py-6 sm:px-6 flex items-center justify-between border-b border-gray-200">
+                    <div className="px-4 py-6 sm:px-6 flex items-center justify-between ">
                       <div className="flex items-center">
                         {arrowClose && (
                           <button
@@ -86,7 +86,7 @@ const ZAPDrawer = ({
                       </div>
                     </div>
                   )}
-                  <div className="relative flex-1 px-4 py-6 sm:px-6 overflow-x-hidden">
+                  <div className="relative flex-1 px-4 pb-6 sm:px-6 overflow-x-hidden">
                     {typeof children === "function" ? children({ onClose }) : children}
                   </div>
                   {footer && (
