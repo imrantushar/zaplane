@@ -41,11 +41,11 @@ const ActionFieldRenderer = ({
   };
 
   const ErrorMsg = () => {
-    error && (
-      <p className="text-red-500 text-xs mt-1">
-        {error}
-      </p>
-    )
+    return error ? (
+  <p className="text-red-500 text-xs mt-1">
+    {error}
+  </p>
+    ) : null;
   }
 
   switch (field.type) {
