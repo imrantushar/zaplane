@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-04-20 05:57:00",
+    "generated_at": "2026-04-23 12:32:55",
     "apps": {
         "cartflows": {
             "slug": "cartflows",
@@ -21207,7 +21207,7 @@
             "icon": "typeform.svg",
             "category": "app",
             "requires_connection": true,
-            "auth_type": "api_key",
+            "auth_type": "token_key",
             "supports_webhook": true,
             "triggers": {
                 "form_submitted": {
@@ -21242,7 +21242,7 @@
                     "label": "Create Form",
                     "schema": [
                         {
-                            "key": "title",
+                            "key": "form_title",
                             "type": "text",
                             "label": "Form Title",
                             "placeholder": "My New Form",
@@ -21252,8 +21252,7 @@
                             "key": "workspace_id",
                             "type": "select",
                             "label": "Workspace",
-                            "required": false,
-                            "help": "Optional. Leave blank to use the default workspace.",
+                            "required": true,
                             "dynamic": {
                                 "integration": "typeform",
                                 "query": "workspace_query",
@@ -21277,10 +21276,9 @@
                             "type": "select",
                             "label": "Form",
                             "required": true,
-                            "help": "Select the form to delete. This cannot be undone.",
                             "dynamic": {
                                 "integration": "typeform",
-                                "query": "form_query_no_any",
+                                "query": "form_query",
                                 "select": [
                                     "value",
                                     "label"

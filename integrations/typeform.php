@@ -7,8 +7,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use Zaplane\Framework\Classes\IntegrationBase;
+use Zaplane\Framework\Classes\ConnectionManager;
+use Zaplane\Traits\ActionResponseTrait;
 
 class Typeform extends IntegrationBase {
+
+	use ActionResponseTrait;
 
 	private const API_BASE_URL = 'https://api.typeform.com';
 
@@ -29,7 +33,7 @@ class Typeform extends IntegrationBase {
 	}
 
 	public static function get_auth_type(): string {
-		return 'api_key';
+		return 'token_key';
 	}
 
 	public static function get_auth_fields( ?string $auth_type = null ): array {
@@ -38,7 +42,7 @@ class Typeform extends IntegrationBase {
 				'type'     => 'password',
 				'label'    => 'Personal Access Token',
 				'required' => true,
-				'help'     => 'Generate from Typeform → Account → Personal tokens.',
+				'help'     => 'Generate from Typeform (admin.typeform.com/user/tokens) → Account → Personal tokens.',
 			],
 		];
 	}
@@ -47,7 +51,11 @@ class Typeform extends IntegrationBase {
 		$token = $credentials['access_token'] ?? '';
 
 		if ( empty( $token ) ) {
-			return [ 'success' => false, 'message' => 'access_token is required', 'details' => [] ];
+			return [
+				'success' => false,
+				'message' => 'access_token is required',
+				'details' => [],
+			];
 		}
 
 		$response = wp_remote_get(
@@ -59,14 +67,22 @@ class Typeform extends IntegrationBase {
 		);
 
 		if ( is_wp_error( $response ) ) {
-			return [ 'success' => false, 'message' => 'Connection failed: ' . $response->get_error_message(), 'details' => [] ];
+			return [
+				'success' => false,
+				'message' => 'Connection failed: ' . $response->get_error_message(),
+				'details' => [],
+			];
 		}
 
 		$code = (int) wp_remote_retrieve_response_code( $response );
 		$body = json_decode( wp_remote_retrieve_body( $response ), true ) ?? [];
 
-		if ( $code !== 200 || empty( $body['email'] ) ) {
-			return [ 'success' => false, 'message' => 'Invalid token (HTTP ' . $code . ')', 'details' => [] ];
+		if ( 200 !== $code || empty( $body['email'] ) ) {
+			return [
+				'success' => false,
+				'message' => 'Invalid token (HTTP ' . $code . ')',
+				'details' => [],
+			];
 		}
 
 		return [
@@ -110,33 +126,43 @@ class Typeform extends IntegrationBase {
 	}
 
 	public static function resolve_trigger( array $node, array $args ) {
-		$payload       = $args[0] ?? [];
-		$form_response = $payload['form_response'] ?? [];
-		$form_id       = $form_response['form_id'] ?? '';
 
-		if ( empty( $form_id ) ) {
-			return false;
-		}
+		switch ( $node['event'] ) {
+			case 'form_submitted':
+				$payload       = $args[0] ?? [];
+				$form_response = $payload['form_response'] ?? ( $payload['payload']['form_response'] ?? [] );
 
-		// Filter: only run if the user selected this specific form (or "any")
-		$selected = $node['data']['config']['form_id'] ?? 'any';
+				if ( empty( $form_response ) ) {
+					return false;
+				}
 
-		if ( ! empty( $selected ) && $selected !== 'any' && $selected !== $form_id ) {
-			return false;
-		}
+				$form_id = $form_response['form_id'] ?? '';
 
-		$definition = $form_response['definition'] ?? [];
+				if ( empty( $form_id ) ) {
+					return false;
+				}
 
-		return [
-			'typeform_form_id'      => $form_id,
-			'typeform_form_title'   => $definition['title'] ?? '',
-			'typeform_entry_token'  => $form_response['token'] ?? '',
-			'typeform_landed_at'    => $form_response['landed_at'] ?? '',
-			'typeform_submitted_at' => $form_response['submitted_at'] ?? '',
-			'typeform_answers'      => self::parse_answers( $form_response['answers'] ?? [] ),
-			'typeform_variables'    => $form_response['variables'] ?? [],
-			'typeform_hidden'       => $form_response['hidden'] ?? [],
-		];
+				$selected = $node['data']['config']['form_id'] ?? 'any';
+
+				if ( ! empty( $selected ) && 'any' !== $selected && $selected !== $form_id ) {
+					return false;
+				}
+
+				$definition = $form_response['definition'] ?? [];
+
+				return [
+					'typeform_form_id'      => $form_id,
+					'typeform_form_title'   => $definition['title'] ?? '',
+					'typeform_entry_token'  => $form_response['token'] ?? '',
+					'typeform_landed_at'    => $form_response['landed_at'] ?? '',
+					'typeform_submitted_at' => $form_response['submitted_at'] ?? '',
+					'typeform_answers'      => self::parse_answers( $form_response['answers'] ?? [] ),
+					'typeform_variables'    => $form_response['variables'] ?? [],
+					'typeform_hidden'       => $form_response['hidden'] ?? [],
+				];
+		}//end switch
+
+		return false;
 	}
 
 	public static function get_actions(): array {
@@ -150,7 +176,7 @@ class Typeform extends IntegrationBase {
 		if ( 'create_form' === $action ) {
 			return [
 				[
-					'key'         => 'title',
+					'key'         => 'form_title',
 					'type'        => 'text',
 					'label'       => 'Form Title',
 					'placeholder' => 'My New Form',
@@ -160,8 +186,7 @@ class Typeform extends IntegrationBase {
 					'key'      => 'workspace_id',
 					'type'     => 'select',
 					'label'    => 'Workspace',
-					'required' => false,
-					'help'     => 'Optional. Leave blank to use the default workspace.',
+					'required' => true,
 					'dynamic'  => [
 						'integration' => 'typeform',
 						'query'       => 'workspace_query',
@@ -169,7 +194,7 @@ class Typeform extends IntegrationBase {
 					],
 				],
 			];
-		}
+		}//end if
 
 		if ( 'delete_form' === $action ) {
 			return [
@@ -178,10 +203,9 @@ class Typeform extends IntegrationBase {
 					'type'     => 'select',
 					'label'    => 'Form',
 					'required' => true,
-					'help'     => 'Select the form to delete. This cannot be undone.',
 					'dynamic'  => [
 						'integration' => 'typeform',
-						'query'       => 'form_query_no_any',
+						'query'       => 'form_query',
 						'select'      => [ 'value', 'label' ],
 					],
 				],
@@ -192,76 +216,124 @@ class Typeform extends IntegrationBase {
 	}
 
 	public static function execute_node( array $node, array $input ): array {
-		$event       = $node['data']['event'] ?? '';
-		$credentials = $node['_connection_credentials'] ?? null;
+		$config = $node['data']['config'] ?? [];
+		$event  = $node['data']['event'] ?? '';
 
-		if ( ! $credentials ) {
-			throw new \Exception( 'No Typeform credentials found on this node.' );
-		}
-
-		$token = $credentials['access_token'] ?? '';
+		$creds = self::get_connection_credentials( $node );
+		$token = $creds['access_token'] ?? '';
 
 		if ( empty( $token ) ) {
-			throw new \Exception( 'Typeform access_token is required.' );
+			return self::error( __( 'Typeform access_token is required.', 'zaplane' ), $input );
 		}
 
-		if ( 'create_form' === $event ) {
-			return self::action_create_form( $node, $input, $token );
-		}
+		switch ( $event ) {
 
-		if ( 'delete_form' === $event ) {
-			return self::action_delete_form( $node, $input, $token );
-		}
+			case 'create_form':
+				$title        = $config['form_title'] ?? '';
+				$workspace_id = $config['workspace_id'] ?? '';
 
-		return [ 'port' => 'main', 'data' => $input ];
+				if ( empty( $title ) ) {
+					return self::error( __( 'Typeform: form title is required.', 'zaplane' ), $input );
+				}
+
+				$payload = [ 'title' => $title ];
+
+				if ( ! empty( $workspace_id ) ) {
+					$payload['workspace'] = [
+						'href' => self::API_BASE_URL . '/workspaces/' . rawurlencode( $workspace_id ),
+					];
+				}
+
+				try {
+					$body    = self::typeform_request( $token, 'POST', '/forms', $payload );
+					$form_id = $body['id'] ?? '';
+
+					if ( ! empty( $form_id ) ) {
+						self::ensure_webhook( $token, $form_id );
+					}
+
+					return self::success( array_merge( $input, [
+						'typeform_form_id'    => $form_id,
+						'typeform_form_title' => $body['title'] ?? '',
+						'typeform_form_url'   => $body['_links']['display'] ?? '',
+					] ) );
+				} catch ( \Exception $error ) {
+					return self::error( $error->getMessage(), $input );
+				}
+
+			case 'delete_form':
+				$form_id = $config['form_id'] ?? '';
+
+				if ( empty( $form_id ) ) {
+					return self::error( __( 'Typeform: form_id is required to delete a form.', 'zaplane' ), $input );
+				}
+
+				try {
+					self::typeform_request( $token, 'DELETE', '/forms/' . rawurlencode( $form_id ) );
+
+					return self::success( array_merge( $input, [
+						'typeform_deleted_form_id' => $form_id,
+						'typeform_status'          => 'deleted',
+					] ) );
+				} catch ( \Exception $error ) {
+					return self::error( $error->getMessage(), $input );
+				}
+		}//end switch
+
+		return [
+			'port' => 'main',
+			'data' => $input,
+		];
 	}
 
 	public static function get_dynamic_queries(): array {
 		return [
-			'form_query'        => [ self::class, 'query_forms' ],
-			'form_query_no_any' => [ self::class, 'query_forms_no_any' ],
-			'workspace_query'   => [ self::class, 'query_workspaces' ],
+			'form_query'      => [ self::class, 'query_form' ],
+			'workspace_query' => [ self::class, 'query_workspace' ],
 		];
 	}
 
-	public static function query_forms( array $params ): array {
-		$options = [ [ 'label' => 'Any Form', 'value' => 'any' ] ];
+	public static function get_dynamic_fields(): array {
+		return self::get_dynamic_queries();
+	}
 
-		$token = self::extract_token( $params );
+	public static function query_form( array $query ): array {
+		$options = [];
+
+		$creds = self::extract_credentials( $query );
+		$token = $creds['access_token'] ?? '';
+
 		if ( empty( $token ) ) {
 			return $options;
 		}
 
+		$options[] = [
+			'label' => 'Any Form',
+			'value' => 'any',
+		];
+
 		foreach ( self::fetch_forms( $token ) as $form ) {
+			$form_id = $form['id'] ?? '';
+
+			if ( empty( $form_id ) ) {
+				continue;
+			}
+
 			$options[] = [
 				'label' => $form['title'] ?? 'Untitled',
-				'value' => $form['id'] ?? '',
+				'value' => $form_id,
 			];
 		}
 
 		return $options;
 	}
 
-	public static function query_forms_no_any( array $params ): array {
+	public static function query_workspace( array $query ): array {
 		$options = [];
-		$token   = self::extract_token( $params );
-		if ( empty( $token ) ) {
-			return $options;
-		}
 
-		foreach ( self::fetch_forms( $token ) as $form ) {
-			$options[] = [
-				'label' => $form['title'] ?? 'Untitled',
-				'value' => $form['id'] ?? '',
-			];
-		}
+		$creds = self::extract_credentials( $query );
+		$token = $creds['access_token'] ?? '';
 
-		return $options;
-	}
-
-	public static function query_workspaces( array $params ): array {
-		$options = [];
-		$token   = self::extract_token( $params );
 		if ( empty( $token ) ) {
 			return $options;
 		}
@@ -281,13 +353,18 @@ class Typeform extends IntegrationBase {
 		$code = (int) wp_remote_retrieve_response_code( $response );
 		$body = json_decode( wp_remote_retrieve_body( $response ), true ) ?? [];
 
-		if ( $code !== 200 ) {
+		if ( 200 !== $code ) {
 			return $options;
 		}
 
 		foreach ( ( $body['items'] ?? [] ) as $ws ) {
-			// Typeform workspace id lives inside self.href: /workspaces/{id}
-			$ws_id = $ws['id'] ?? basename( rtrim( $ws['self']['href'] ?? '', '/' ) );
+			$ws_id = '';
+
+			if ( ! empty( $ws['id'] ) ) {
+				$ws_id = $ws['id'];
+			} elseif ( ! empty( $ws['self']['href'] ) ) {
+				$ws_id = basename( rtrim( $ws['self']['href'], '/' ) );
+			}
 
 			if ( empty( $ws_id ) ) {
 				continue;
@@ -319,56 +396,66 @@ class Typeform extends IntegrationBase {
 		];
 	}
 
-	private static function action_create_form( array $node, array $input, string $token ): array {
-		$config       = $node['data']['config'] ?? [];
-		$title        = $config['title'] ?? '';
-		$workspace_id = $config['workspace_id'] ?? '';
+	private static function get_connection_credentials( array $node ): array {
+		$connection_id = (int) (
+			$node['data']['connection_id']
+			?? $node['connection_id']
+			?? 0
+		);
 
-		if ( empty( $title ) ) {
-			throw new \Exception( 'Typeform: form title is required.' );
-		}
-
-		$payload = [ 'title' => $title ];
-
-		if ( ! empty( $workspace_id ) ) {
-			$payload['workspace'] = [
-				'href' => self::API_BASE_URL . '/workspaces/' . rawurlencode( $workspace_id ),
-			];
-		}
-
-		$body    = self::typeform_request( $token, 'POST', '/forms', $payload );
-		$form_id = $body['id'] ?? '';
-
-		if ( ! empty( $form_id ) ) {
-			self::ensure_webhook( $token, $form_id );
-		}
-
-		return [
-			'port' => 'main',
-			'data' => array_merge( $input, [
-				'typeform_form_id'    => $form_id,
-				'typeform_form_title' => $body['title'] ?? '',
-				'typeform_form_url'   => $body['_links']['display'] ?? '',
-			] ),
-		];
+		return self::get_decrypted_credentials( $connection_id );
 	}
 
-	private static function action_delete_form( array $node, array $input, string $token ): array {
-		$form_id = $node['data']['config']['form_id'] ?? '';
+	private static function extract_credentials( array $params ): array {
+		$connection_id = $params['where']['connection_id']
+			?? $params['connection_id']
+			?? 0;
 
-		if ( empty( $form_id ) ) {
-			throw new \Exception( 'Typeform: form_id is required to delete a form.' );
-		}
+		return self::get_decrypted_credentials( (int) $connection_id );
+	}
 
-		self::typeform_request( $token, 'DELETE', '/forms/' . rawurlencode( $form_id ) );
+	private static function get_decrypted_credentials( int $connection_id = 0 ): array {
+		try {
+			$cm = new ConnectionManager();
 
-		return [
-			'port' => 'main',
-			'data' => array_merge( $input, [
-				'typeform_deleted_form_id' => $form_id,
-				'typeform_status'          => 'deleted',
-			] ),
-		];
+			if ( $connection_id <= 0 ) {
+				$connection_id = self::get_typeform_connection_id();
+			}
+
+			if ( $connection_id <= 0 ) {
+				return [];
+			}
+
+			$creds = $cm->get_execution_credentials( $connection_id );
+
+			if ( is_array( $creds ) && ! empty( $creds['access_token'] ) ) {
+				return $creds;
+			}
+
+			if ( is_object( $creds ) ) {
+				$creds = (array) $creds;
+				if ( ! empty( $creds['access_token'] ) ) {
+					return $creds;
+				}
+			}
+		} catch ( \Throwable $error ) {
+			unset( $error );
+		}//end try
+
+		return [];
+	}
+
+	private static function get_typeform_connection_id(): int {
+		global $wpdb;
+		$table = $wpdb->prefix . 'zaplane_connections';
+		$id    = $wpdb->get_var(
+			$wpdb->prepare(
+				// phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnquotedComplexPlaceholder
+				'SELECT id FROM `' . esc_sql( $table ) . "` WHERE app = %s AND status = 'active' ORDER BY id DESC LIMIT 1",
+				'typeform'
+			)
+		);
+		return (int) $id;
 	}
 
 	private static function fetch_forms( string $token ): array {
@@ -387,33 +474,7 @@ class Typeform extends IntegrationBase {
 		$code = (int) wp_remote_retrieve_response_code( $response );
 		$body = json_decode( wp_remote_retrieve_body( $response ), true ) ?? [];
 
-		return ( $code === 200 ) ? ( $body['items'] ?? [] ) : [];
-	}
-
-	private static function extract_token( array $params ): string {
-		$paths = [
-			[ 'credentials', 'access_token' ],   // ← primary (standard Zaplane shape)
-			[ 'access_token' ],                   // ← flat fallback
-			[ 'auth', 'access_token' ],           // ← alternate key
-			[ 'connection', 'credentials', 'access_token' ],
-			[ 'connection', 'access_token' ],
-		];
-
-		foreach ( $paths as $path ) {
-			$val = $params;
-			foreach ( $path as $key ) {
-				if ( ! is_array( $val ) || ! array_key_exists( $key, $val ) ) {
-					$val = null;
-					break;
-				}
-				$val = $val[ $key ];
-			}
-			if ( ! empty( $val ) && is_string( $val ) ) {
-				return $val;
-			}
-		}
-
-		return '';
+		return ( 200 === $code ) ? ( $body['items'] ?? [] ) : [];
 	}
 
 	private static function parse_answers( array $answers ): array {
@@ -443,7 +504,22 @@ class Typeform extends IntegrationBase {
 	}
 
 	private static function ensure_webhook( string $token, string $form_id ): void {
-		if ( empty( $form_id ) || $form_id === 'any' ) {
+		if ( empty( $form_id ) || 'any' === $form_id ) {
+			return;
+		}
+
+		$webhook_url = home_url( '/wp-json/zaplane/v1/webhook/typeform' );
+		$host        = wp_parse_url( $webhook_url, PHP_URL_HOST );
+
+		$is_local = (
+			'localhost' === $host
+			|| '127.0.0.1' === $host
+			|| str_ends_with( (string) $host, '.local' )
+			|| str_ends_with( (string) $host, '.test' )
+			|| str_ends_with( (string) $host, '.localhost' )
+		);
+
+		if ( $is_local ) {
 			return;
 		}
 
@@ -455,13 +531,12 @@ class Typeform extends IntegrationBase {
 				'PUT',
 				'/forms/' . rawurlencode( $form_id ) . '/webhooks/' . $tag,
 				[
-					'url'     => home_url( '/wp-json/zaplane/v1/webhook/typeform' ),
+					'url'     => $webhook_url,
 					'enabled' => true,
 				]
 			);
-		} catch ( \Exception $e ) {
-			// Non-fatal — form was created; just log the webhook failure.
-			error_log( '[Zaplane][Typeform] ensure_webhook failed for ' . $form_id . ': ' . $e->getMessage() );
+		} catch ( \Exception $error ) {
+			unset( $error );
 		}
 	}
 
@@ -488,8 +563,8 @@ class Typeform extends IntegrationBase {
 		$code = (int) wp_remote_retrieve_response_code( $response );
 		$body = json_decode( wp_remote_retrieve_body( $response ), true ) ?? [];
 
-		if ( $code === 204 ) {
-			return []; // DELETE success — no body
+		if ( 204 === $code ) {
+			return [];
 		}
 
 		if ( $code >= 400 ) {
