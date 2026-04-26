@@ -384,11 +384,13 @@ class Gemcrm extends IntegrationBase {
 
 	private static function contact_id_field( bool $required = false ): array {
 		return [
-			'key'      => 'contact_id',
-			'label'    => 'Contact',
-			'type'     => 'select',
-			'required' => $required,
-			'dynamic'  => [
+			'key'         => 'contact_id',
+			'label'       => 'Contact ID',
+			'type'        => 'expression',
+			'subtype'     => 'number',
+			'required'    => $required,
+			'placeholder' => 'Enter ID or use {{previous_node.contact_id}}',
+			'dynamic'     => [
 				'integration' => 'gemcrm',
 				'query'       => 'gemcrm_contact_query',
 				'select'      => [ 'value', 'label' ],
