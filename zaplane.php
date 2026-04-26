@@ -3,7 +3,7 @@
  * Plugin Name:     Zaplane
  * Plugin URI:      http://zaplane.pro
  * Description:     WordPress Automation Plugin
- * Version:         0.0.1
+ * Version:0.0.2
  * Author:          kodezen
  * Author URI:      http://kodezen.com
  * License:         GPL-3.0+

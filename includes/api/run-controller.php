@@ -88,6 +88,7 @@ class RunController extends WP_REST_Controller {
 			'callback' => [ $this, 'execute_single_node' ],
 			'permission_callback' => [ $this, 'permissions' ]
 		]);
+
 	}
 
 	public function permissions() {
@@ -311,7 +312,9 @@ class RunController extends WP_REST_Controller {
 		$workflowVersionId = (int) ( $req['workflow_version_id'] ?? 0 );
 		$input             = $req['input'] ?? [];
 
-		if ( $targetNode && is_array( $input ) ) {
+		// For action nodes, merge input into config so expression fields receive values.
+		// Trigger nodes skip this — their input is the raw hook args, not config.
+		if ( $targetNode && is_array( $input ) && 'trigger' !== ( $targetNode['type'] ?? '' ) ) {
 			$targetNode['data']['config'] = array_merge( $targetNode['data']['config'] ?? [], $input );
 		}
 
@@ -373,7 +376,17 @@ class RunController extends WP_REST_Controller {
 
 		try {
 			if ( 'trigger' === $targetNode['type'] ) {
-				$output = $input;
+				$app         = strtolower( $targetNode['data']['app'] ?? '' );
+				$integration = $this->container->get( 'integrations' )->get( $app );
+
+				if ( ! $integration ) {
+					throw new \Exception( 'Integration not found: ' . ( $targetNode['data']['app'] ?? 'unknown' ) );
+				}
+
+				// $input is the simulated hook args (positional array from the frontend).
+				// resolve_trigger() returns the structured payload or false when filtered.
+				$resolved = $integration::resolve_trigger( $targetNode['data'], array_values( $input ) );
+				$output   = ( false !== $resolved ) ? $resolved : [];
 			} else {
 				$integration = $this->container->get( 'integrations' )->get( strtolower( $targetNode['data']['app'] ) );
 

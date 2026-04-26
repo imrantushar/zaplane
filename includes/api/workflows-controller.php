@@ -560,7 +560,7 @@ class WorkflowsController extends WP_REST_Controller {
 			}
 
 			$nodeType = $node['type'] ?? '';
-			if ( ! in_array( $nodeType, [ 'action', 'condition', 'filter' ], true ) ) {
+			if ( ! in_array( $nodeType, [ 'trigger', 'action', 'condition', 'filter' ], true ) ) {
 				continue;
 			}
 
