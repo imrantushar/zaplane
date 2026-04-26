@@ -22,10 +22,10 @@ const CopyInput = ({ label, value, help }) => {
   return (
     <div className="flex flex-col gap-2">
       {label && <span className="zaplane-label">{__(label, "zaplane")}</span>}
-      <div className="flex items-stretch border border-slate-200 rounded-md overflow-hidden">
+      <div className="flex items-stretch overflow-hidden">
         <input
           type="text"
-          className="zaplane-input !border-none !rounded-none !shadow-none flex-1 bg-white px-3 py-2 focus:outline-none"
+          className="zaplane-input "
           value={value || ""}
           readOnly
         />
