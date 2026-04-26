@@ -1,224 +1,165 @@
 import { useState, useEffect } from "react";
 import { __ } from "@wordpress/i18n";
-import { Box, Text, Icon, HStack, Input, Button, Spinner } from "@chakra-ui/react";
 import { useDispatch, useSelector } from "react-redux";
 import { LuFolderOpen, LuFolderPlus, LuMinus } from "react-icons/lu";
-import {
-    getFolders,
-    createFolder,
-    addWorkflowToFolder,
-    removeWorkflowFromFolder,
-    getFolderWorkflows,
-} from "@ZAPRedux/Slices/folderSlice/folderSlice";
+import { getFolders, createFolder, addWorkflowToFolder, removeWorkflowFromFolder, getFolderWorkflows } from "@ZAPRedux/Slices/folderSlice/folderSlice";
 import WPModal from "@ZAPComponents/Modal/WPModal";
 import { getWorkFlow } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow";
 import ZAPMenu from "@ZAPComponents/ZapMenu";
 import { primaryBtn } from "../../../assets/scss/chakra/recipe";
-
-
-const FolderCell = ({ row, isFolder = false }) => {
-    const dispatch = useDispatch();
-    const { folders } = useSelector((state) => state.folder);
-    const allFolders = folders?.data || [];
-
-    const [modalOpen, setModalOpen] = useState(false);
-    const [folderName, setFolderName] = useState("");
-    const [creating, setCreating] = useState(false);
-    const [assigning, setAssigning] = useState(false);
-
-    const selectedFolder = allFolders.find((f) => f.id === row?.folder_id);
-
-    useEffect(() => {
-        if (!allFolders.length) {
-            dispatch(getFolders());
-        }
-    }, []);
-    const handleSelectFolder = async (folder) => {
-        setAssigning(true);
-        try {
-            await dispatch(addWorkflowToFolder({ folder_id: folder.id, workflow_id: row.id }));
-
-            if (isFolder) {
-                await dispatch(getFolderWorkflows({
-                    folder_id: row?.folder_id,
-                }));
-            } else {
-                await dispatch(getWorkFlow());
-            }
-        } finally {
-            setAssigning(false);
-        }
-    };
-
-    const handleRemove = async () => {
-        if (!selectedFolder) return;
-        setAssigning(true);
-        try {
-            await dispatch(removeWorkflowFromFolder({ folder_id: selectedFolder.id, workflow_id: row.id }));
-            if (isFolder) {
-                await dispatch(getFolderWorkflows({
-                    folder_id: row?.folder_id,
-                }));
-            } else {
-                await dispatch(getWorkFlow());
-            }
-
-        } finally {
-            setAssigning(false);
-        }
-    };
-
-    const handleCreateFolder = async () => {
-        const trimmed = folderName.trim();
-        if (!trimmed) return;
-        setCreating(true);
-        try {
-            const res = await dispatch(createFolder({ title: trimmed }));
-            const newFolder = res?.payload?.data || res?.payload;
-            if (newFolder?.id) {
-                await dispatch(addWorkflowToFolder({ folder_id: newFolder.id, workflow_id: row.id }));
-                dispatch(getFolders());
-                dispatch(getWorkFlow());
-            }
-        } finally {
-            setCreating(false);
-            setFolderName("");
-            setModalOpen(false);
-        }
-    };
-    const menuItems = [
-        ...allFolders.map((folder) => ({
-            label: folder.title,
-            icon: LuFolderOpen,
-            onClick: () => handleSelectFolder(folder),
-        })),
-        ...(allFolders.length ? [{ type: "divider" }] : []),
-        {
-            label: __("Create New", "zaplane"),
-            icon: LuFolderPlus,
-            onClick: () => setModalOpen(true),
-        },
-    ];
-
-    if (assigning) {
-        return (
-            <Box display="flex" justifyContent="center" alignItems="center" minH="32px">
-                <Spinner size="sm" />
-            </Box>
-        );
+const FolderCell = ({
+  row,
+  isFolder = false
+}) => {
+  const dispatch = useDispatch();
+  const {
+    folders
+  } = useSelector(state => state.folder);
+  const allFolders = folders?.data || [];
+  const [modalOpen, setModalOpen] = useState(false);
+  const [folderName, setFolderName] = useState("");
+  const [creating, setCreating] = useState(false);
+  const [assigning, setAssigning] = useState(false);
+  const selectedFolder = allFolders.find(f => f.id === row?.folder_id);
+  useEffect(() => {
+    if (!allFolders.length) {
+      dispatch(getFolders());
     }
-
+  }, []);
+  const handleSelectFolder = async folder => {
+    setAssigning(true);
+    try {
+      await dispatch(addWorkflowToFolder({
+        folder_id: folder.id,
+        workflow_id: row.id
+      }));
+      if (isFolder) {
+        await dispatch(getFolderWorkflows({
+          folder_id: row?.folder_id
+        }));
+      } else {
+        await dispatch(getWorkFlow());
+      }
+    } finally {
+      setAssigning(false);
+    }
+  };
+  const handleRemove = async () => {
+    if (!selectedFolder) return;
+    setAssigning(true);
+    try {
+      await dispatch(removeWorkflowFromFolder({
+        folder_id: selectedFolder.id,
+        workflow_id: row.id
+      }));
+      if (isFolder) {
+        await dispatch(getFolderWorkflows({
+          folder_id: row?.folder_id
+        }));
+      } else {
+        await dispatch(getWorkFlow());
+      }
+    } finally {
+      setAssigning(false);
+    }
+  };
+  const handleCreateFolder = async () => {
+    const trimmed = folderName.trim();
+    if (!trimmed) return;
+    setCreating(true);
+    try {
+      const res = await dispatch(createFolder({
+        title: trimmed
+      }));
+      const newFolder = res?.payload?.data || res?.payload;
+      if (newFolder?.id) {
+        await dispatch(addWorkflowToFolder({
+          folder_id: newFolder.id,
+          workflow_id: row.id
+        }));
+        dispatch(getFolders());
+        dispatch(getWorkFlow());
+      }
+    } finally {
+      setCreating(false);
+      setFolderName("");
+      setModalOpen(false);
+    }
+  };
+  const menuItems = [...allFolders.map(folder => ({
+    label: folder.title,
+    icon: LuFolderOpen,
+    onClick: () => handleSelectFolder(folder)
+  })), ...(allFolders.length ? [{
+    type: "divider"
+  }] : []), {
+    label: __("Create New", "zaplane"),
+    icon: LuFolderPlus,
+    onClick: () => setModalOpen(true)
+  }];
+  if (assigning) {
     return (
-        <>
-            {selectedFolder ? (
-                <ZAPMenu
-                    items={menuItems}
-                    trigger={
-                        <HStack
-                            spacing={1}
-                            px={'14px'}
-                            py={1}
-                            h='36px'
-                             borderRadius="999px"
-                            border="0.5px solid"
-                            borderColor="gray.200"
-                            bg="gray.50"
-                            display="inline-flex"
-                            alignItems="center"
-                            maxW="160px"
-                            cursor="pointer"
-                            onClick={(e) => e.stopPropagation()}
-                        >
-                            <Icon as={LuFolderOpen} boxSize="14px" color="gray.500" flexShrink={0} />
-                            <Text className="zaplane-label" flex={1} isTruncated>
+      <div className="flex items-center justify-center h-[36px] w-[100px] border border-[#E5E7EB] bg-white rounded-full">
+        <svg className="animate-spin h-4 w-4 text-[#006BFF]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+      </div>
+    );
+  }
+  return <>
+            {selectedFolder ? <ZAPMenu items={menuItems} trigger={<div onClick={e => e.stopPropagation()} className="flex flex-row items-center gap-2 px-4 h-[36px] rounded-full border border-[#E5E7EB] bg-white group hover:border-[#D1D5DB] transition-all cursor-pointer max-w-[160px]">
+                            <LuFolderOpen size={14} className="text-[#6B7280] shrink-0" />
+                            <span className="text-[13px] font-semibold text-[#111827] truncate flex-[1]">
                                 {selectedFolder.title}
-                            </Text>
-                            <Box
-                                as="span"
-                                display="flex"
-                                alignItems="center"
-                                justifyContent="center"
-                                w="16px"
-                                h="16px"
-                                borderRadius="sm"
-                                flexShrink={0}
-                                _hover={{ bg: "gray.200" }}
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleRemove();
-                                }}
-                                aria-label={__("Remove from folder", "zaplane")}
+                            </span>
+                            <div 
+                              onClick={e => {
+                                e.stopPropagation();
+                                handleRemove();
+                              }} 
+                              className="flex items-center justify-center w-[18px] h-[18px] rounded-full bg-gray-50 hover:bg-gray-100 shrink-0 transition-colors"
+                              title={__("Remove from folder", "zaplane")}
                             >
-                                <Icon as={LuMinus} boxSize="11px" color="gray.500" />
-                            </Box>
-                        </HStack>
-                    }
-                />
-            ) : (
-                <ZAPMenu
-                    items={menuItems}
-                    trigger={
-                        <Button
-                            size="14px"
-                            variant="outline"
-                            fontSize="14px"
-                            fontWeight="500"
-                            py={1}
-                            spacing={1}
-                            h="36px"
-                            borderRadius="999px"
-                            px={'16px'}
-                            onClick={(e) => e.stopPropagation()}
+                                <LuMinus size={11} className="text-[#6B7280]" />
+                            </div>
+                        </div>} /> : <ZAPMenu items={menuItems} trigger={<button 
+                            onClick={e => e.stopPropagation()} 
+                            className="flex items-center gap-2 px-4 h-[36px] rounded-full border border-[#E5E7EB] bg-white text-[13px] font-semibold text-[#374151] hover:bg-[#F9FAFB] hover:border-[#D1D5DB] transition-all"
                             aria-label={__("Add to folder", "zaplane")}
                         >
-                            <Icon as={LuFolderOpen} boxSize="14px" color="gray.500" mr={1} />
+                            <LuFolderOpen size={14} className="text-[#6B7280]" />
                             {__("Add", "zaplane")}
-                        </Button>
-                    }
-                />
-            )}
+                        </button>} />}
 
-            <WPModal
-                isOpen={modalOpen}
-                title={__("Create Folder", "zaplane")}
-                onRequestClose={() => { setModalOpen(false); setFolderName(""); }}
-                shouldCloseOnClickOutside
-                size="medium"
-                suffix="create-folder"
-            >
-                <Text className="zaplane-label" mb={4}>
+            <WPModal isOpen={modalOpen} title={__("Create Folder", "zaplane")} onRequestClose={() => {
+      setModalOpen(false);
+      setFolderName("");
+    }} shouldCloseOnClickOutside size="medium" suffix="create-folder">
+                <span className="zaplane-label mb-4">
                     {__("Streamline your workflows by organizing them into folders.", "zaplane")}
-                </Text>
+                </span>
 
-                <Input
-                    placeholder={__("Folder Name", "zaplane")}
-                    value={folderName}
-                    onChange={(e) => setFolderName(e.target.value)}
-                    className="zaplane-input"
-                    onKeyDown={(e) => {
-                        if (e.key === "Enter") handleCreateFolder();
-                        if (e.key === "Escape") { setModalOpen(false); setFolderName(""); }
-                    }}
-                    autoFocus
-                    mb={5}
-                />
+                <input placeholder={__("Folder Name", "zaplane")} value={folderName} onChange={e => setFolderName(e.target.value)} onKeyDown={e => {
+        if (e.key === "Enter") handleCreateFolder();
+        if (e.key === "Escape") {
+          setModalOpen(false);
+          setFolderName("");
+        }
+      }} autoFocus className="zaplane-input mb-5" />
 
-                <HStack justifyContent="flex-end" spacing={3}>
-                    <Button variant="outline" size="sm" onClick={() => { setModalOpen(false); setFolderName(""); }}>
+                <div className="flex flex-row items-center justify-end gap-3">
+                    <button variant="outline" size="sm" onClick={() => {
+          setModalOpen(false);
+          setFolderName("");
+        }}>
                         {__("Cancel", "zaplane")}
-                    </Button>
-                    <Button
-                        {...primaryBtn}
-                        isLoading={creating}
-                        isDisabled={!folderName.trim()}
-                        onClick={handleCreateFolder}
-                    >
+                    </button>
+                    <button style={primaryBtn} disabled={!folderName.trim()} onClick={handleCreateFolder}>
                         {__("Create", "zaplane")}
-                    </Button>
-                </HStack>
+                    </button>
+                </div>
             </WPModal>
-        </>
-    );
+        </>;
 };
-
 export default FolderCell;

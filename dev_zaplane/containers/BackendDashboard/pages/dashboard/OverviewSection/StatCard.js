@@ -1,46 +1,41 @@
 import React from "react";
-import { Box, Flex, Text, Icon, Skeleton, SkeletonText } from "@chakra-ui/react";
+const StatCard = ({
+  title,
+  value,
+  icon,
+  isLoading
+}) => {
+  return (
+    <div className="flex flex-[1] bg-white p-6 rounded-[8px] border border-[#E2E8F0] h-[130px] min-w-[280px]">
+      <div className="w-full flex flex-col justify-between">
+        <div className="flex justify-between items-start">
+          {isLoading ? (
+            <div className="h-4 w-24 bg-gray-100 animate-pulse rounded" />
+          ) : (
+            <span className="text-[#4A5568] text-[16px] font-[500]">
+              {title}
+            </span>
+          )}
 
-const StatCard = ({ title, value, icon, isLoading }) => {
-    return (
-        <Flex
-            flex="1"
-            bg="white"
-            p={6}
-            borderRadius="4px"
-            boxShadow="sm"
-            align="center"
-            justify="space-between"
-            width="410px"
-            height="130px"
-        >
-            <Box w="100%">
-                <Flex justifyContent="space-between" mb={5}>
-                    {isLoading ? (
-                        <Skeleton height="16px" width="120px" />
-                    ) : (
-                        <Text className="zaplane-label" fontSize="16px" fontWeight="400">
-                            {title}
-                        </Text>
-                    )}
+          {isLoading ? (
+            <div className="w-6 h-6 bg-gray-100 animate-pulse rounded" />
+          ) : (
+            <div className="text-[#2D3748]">
+              {React.createElement(icon, { size: 24 })}
+            </div>
+          )}
+        </div>
 
-                    {isLoading ? (
-                        <Skeleton boxSize="24px" borderRadius="4px" />
-                    ) : (
-                        <Icon as={icon} boxSize="24px" />
-                    )}
-                </Flex>
+        {isLoading ? (
+          <div className="h-10 w-16 bg-gray-100 animate-pulse rounded" />
+        ) : (
+          <span className="text-[#1A202C] text-[32px] font-[600] leading-none">
+            {value ?? 0}
+          </span>
+        )}
+      </div>
+    </div>
+  );
 
-                {isLoading ? (
-                    <Skeleton height="30px" width="80px" />
-                ) : (
-                    <Text className="zaplane-label" fontSize="30px">
-                        {value ?? 0}
-                    </Text>
-                )}
-            </Box>
-        </Flex>
-    );
 };
-
 export default StatCard;
