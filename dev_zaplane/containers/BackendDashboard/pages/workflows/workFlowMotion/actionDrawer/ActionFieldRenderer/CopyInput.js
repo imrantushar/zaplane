@@ -28,7 +28,7 @@ const CopyInput = ({ label, value, help }) => {
           className="zaplane-input "
           value={value || ""}
           readOnly
-        />n
+        />
         <button
           type="button"
           onClick={handleCopy}

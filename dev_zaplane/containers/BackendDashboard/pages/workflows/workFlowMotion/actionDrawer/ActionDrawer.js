@@ -139,6 +139,7 @@ const {
   return <ZAPDrawer open={open} isFullscreen={isFullscreen} onClose={resetAll}
     arrowClose={['tools', 'app'].includes(mode)}
     maxWidth={['filter', 'if'].includes(values?.actionType) ? 'max-w-[700px]' : 'max-w-[500px]'}
+    hasOverlay={false}
     arrowOnClick={() => {
       setSelectedItem(null);
       setMode(null);

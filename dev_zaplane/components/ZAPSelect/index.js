@@ -51,17 +51,18 @@ const ZAPSelect = ({
       ? variable 
       : `{{${variable.key || variable.replace("{{", "").replace("}}", "")}}}`;
     
-    if (isMulti) {
-      const currentValues = Array.isArray(value) ? value : [];
-      if (!currentValues.includes(varString)) {
-        onChange?.([...currentValues, varString]);
-      }
-    } else {
-      onChange?.({ label: varString, value: varString });
+    // Replace the last '@' in the input value with the selected variable
+    const currentInput = inputValue || "";
+    const lastAtIndex = currentInput.lastIndexOf("@");
+    let newInputValue = varString;
+    if (lastAtIndex !== -1) {
+       newInputValue = currentInput.substring(0, lastAtIndex) + varString;
     }
     
     setPopoverOpen(false);
-    onInputChange?.("", { action: "set-value" });
+    
+    // Send the new string into the search input so the user can continue typing or press Enter
+    onInputChange?.(newInputValue, { action: "input-change" });
   };
 
   return (
