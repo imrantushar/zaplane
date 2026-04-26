@@ -5,6 +5,8 @@ import { workFLowSingeNodeExction } from "@ZAPRedux/Slices/workFlowSlice/actions
 import TestDetails from "../TestDetails/TestDetails";
 import ZAPAlert from "@ZAPComponents/ZAPAlert";
 import { primaryBtn } from "../../../../../../../../assets/scss/chakra/recipe";
+import ZAPInput from "@ZAPComponents/ZAPInput";
+
 const TestRun = ({
   source,
   node,
@@ -14,12 +16,11 @@ const TestRun = ({
   const dispatch = useDispatch();
   const [showWarning, setShowWarning] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [triggerArgs, setTriggerArgs] = useState("[\n  1\n]");
+
   const handleTest = async () => {
     if (isLoading) return;
-    if (node.data.action === "trigger") {
-      setShowWarning(true);
-      return;
-    }
+    
     setShowWarning(false);
     setIsLoading(true);
     try {
@@ -27,6 +28,19 @@ const TestRun = ({
         layout,
         ...inputData
       } = values || {};
+
+      let parsedArgs = [];
+      if (node?.data?.action === "trigger") {
+        try {
+          parsedArgs = JSON.parse(triggerArgs);
+          if (!Array.isArray(parsedArgs)) {
+            parsedArgs = [parsedArgs];
+          }
+        } catch (e) {
+          parsedArgs = [1];
+        }
+      }
+
       const payload = {
         workflow_id: workFlow?.workflow?.id,
         workflow_hash: workFlow?.version?.hash,
@@ -36,21 +50,36 @@ const TestRun = ({
           type: node?.data?.action,
           id: node?.id
         },
-        input: inputData
+        input: node?.data?.action === "trigger" ? parsedArgs : inputData
       };
       await dispatch(workFLowSingeNodeExction(payload));
     } finally {
       setIsLoading(false);
     }
   };
+
   return <>
+      {node?.data?.action === "trigger" && (
+        <div className="mb-4">
+          <ZAPInput
+            type="textarea"
+            label={__("Mock Hook Arguments (JSON Array)", "zaplane")}
+            value={triggerArgs}
+            onChange={(e) => setTriggerArgs(e.target.value)}
+            inputStyle={{ fontFamily: "monospace", minHeight: "100px" }}
+          />
+          <p className="text-gray-500 text-xs mt-1">
+            {__("Provide a JSON array representing the positional arguments fired by the webhook/hook.", "zaplane")}
+          </p>
+        </div>
+      )}
+
       <button style={primaryBtn} onClick={handleTest} className="mb-4">
-        {__("Test Action", "zaplane")}
+        {node?.data?.action === "trigger" ? __("Test Trigger", "zaplane") : __("Test Action", "zaplane")}
       </button>
 
-      {showWarning && <ZAPAlert status="warning" title={__("Trigger Node Cannot Be Tested", "zaplane")} description={__("This is a trigger node. Trigger nodes cannot be tested individually.", "zaplane")} mt={4} />}
-
-      {source === "node" && <TestDetails id={node?.id} workFlow={workFlow} source={source} isLoading={isLoading} />}
+      {source === "node" && <TestDetails id={node?.id} workFlow={workFlow} source={source} isLoading={isLoading} nodeType={node?.data?.action} />}
     </>;
 };
+
 export default TestRun;

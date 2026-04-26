@@ -34,9 +34,9 @@ const ActionFieldRenderer = ({
   );
 
   const handleInputChange = (val, { action }) => {
-    if (action === "input-change") {
+    if (action === "input-change" || action === "set-value") {
       setSearchTerm(val);
-      if (field.dynamic) {
+      if (field.dynamic && action === "input-change") {
         debouncedFetch(field, val);
       }
     }
@@ -66,8 +66,6 @@ const ActionFieldRenderer = ({
       </div>;
 
     case "text":
-    case "expression":
-
     case "textarea":
       return (
         <div>
@@ -83,6 +81,57 @@ const ActionFieldRenderer = ({
           <ErrorMsg />
         </div>
       );
+
+    case "expression": {
+      // If the expression field has dynamic options or static options, render a Creatable Select
+      // This fulfills the backend request to provide autocomplete while allowing custom expression entry.
+      if (field.dynamic || field.options) {
+        const key = getKey?.(field, searchTerm);
+        const options = field.options
+          ? field.options.map((opt) => ({
+            label: opt.label,
+            value: opt.value
+          }))
+          : dynamicOptions[key] || [];
+
+        return (
+          <div>
+            <ZAPSelect
+              label={field.label}
+              options={options}
+              value={value}
+              onChange={(opt) => { setFieldValue(field.key, opt?.value); clearError(); }}
+              placeholder={field.placeholder || `Type or select ${field.label}`}
+              isClearable
+              isLoading={field.dynamic ? loadingFields[key] : false}
+              onMenuOpen={
+                field.dynamic ? () => fetchDynamicOptions(field, searchTerm) : undefined
+              }
+              onInputChange={handleInputChange}
+              inputValue={searchTerm}
+              variables={workflowVariables?.data || []}
+            />
+            <ErrorMsg />
+          </div>
+        );
+      }
+
+      // Fallback for simple expressions without autocomplete
+      return (
+        <div>
+          <VariableEditor
+            label={field.label}
+            value={value || ""}
+            setValue={(val) => { setFieldValue(field.key, val); clearError(); }}
+            variables={workflowVariables?.data || []}
+            field={field}
+            setFieldValue={setFieldValue}
+            placeholder={__('Type "@" here to add dynamic', "zaplane")}
+          />
+          <ErrorMsg />
+        </div>
+      );
+    }
 
     case "date":
       return (
@@ -124,6 +173,7 @@ const ActionFieldRenderer = ({
             }
             onInputChange={handleInputChange}
             inputValue={searchTerm}
+            variables={workflowVariables?.data || []}
           />
           <ErrorMsg />
         </div>
@@ -155,6 +205,7 @@ const ActionFieldRenderer = ({
             }
             onInputChange={handleInputChange}
             inputValue={searchTerm}
+            variables={workflowVariables?.data || []}
           />
           <ErrorMsg />
         </div>
