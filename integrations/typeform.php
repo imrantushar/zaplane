@@ -38,11 +38,11 @@ class Typeform extends IntegrationBase {
 
 	public static function get_auth_fields( ?string $auth_type = null ): array {
 		return [
-			'access_token' => [
+			'access_token'     => [
 				'type'     => 'password',
 				'label'    => 'Personal Access Token',
 				'required' => true,
-				'help'     => 'Generate from Typeform (admin.typeform.com/user/tokens) → Account → Personal tokens.',
+				'help'     => 'Generate from Typeform → Account → Personal tokens (admin.typeform.com/user/tokens).',
 			],
 		];
 	}
@@ -53,7 +53,7 @@ class Typeform extends IntegrationBase {
 		if ( empty( $token ) ) {
 			return [
 				'success' => false,
-				'message' => 'access_token is required',
+				'message' => 'access_token is required.',
 				'details' => [],
 			];
 		}
@@ -80,7 +80,7 @@ class Typeform extends IntegrationBase {
 		if ( 200 !== $code || empty( $body['email'] ) ) {
 			return [
 				'success' => false,
-				'message' => 'Invalid token (HTTP ' . $code . ')',
+				'message' => 'Invalid token (HTTP ' . $code . ').',
 				'details' => [],
 			];
 		}
@@ -89,8 +89,9 @@ class Typeform extends IntegrationBase {
 			'success' => true,
 			'message' => 'Connected as: ' . $body['email'],
 			'details' => [
-				'email' => $body['email'],
-				'alias' => $body['alias'] ?? '',
+				'email'       => $body['email'],
+				'alias'       => $body['alias'] ?? '',
+				'webhook_url' => self::get_webhook_url(),
 			],
 		];
 	}
@@ -99,7 +100,7 @@ class Typeform extends IntegrationBase {
 		return [
 			'form_submitted' => [
 				'label' => 'Form Submitted',
-				'hook'  => 'typeform_webhook_form_submitted',
+				'hook'  => 'zaplane_typeform_webhook_form_submitted',
 			],
 		];
 	}
@@ -112,15 +113,22 @@ class Typeform extends IntegrationBase {
 					'label'    => 'Form',
 					'type'     => 'select',
 					'required' => true,
-					'help'     => 'Select the Typeform to watch. Choose "Any Form" to trigger on all submissions.',
 					'dynamic'  => [
 						'integration' => 'typeform',
 						'query'       => 'form_query',
 						'select'      => [ 'value', 'label' ],
 					],
 				],
+				[
+					'key'      => 'webhook_endpoint',
+					'label'    => 'Webhook Endpoint URL',
+					'type'     => 'copy',
+					'value'    => self::get_webhook_url(),
+					'readonly' => true,
+					'help'     => 'Copy this URL → Typeform Dashboard → Your Form → Connect → Webhooks → Add a webhook → Paste & Save.',
+				],
 			];
-		}
+		}//end if
 
 		return [];
 	}
@@ -129,8 +137,15 @@ class Typeform extends IntegrationBase {
 
 		switch ( $node['event'] ) {
 			case 'form_submitted':
-				$payload       = $args[0] ?? [];
-				$form_response = $payload['form_response'] ?? ( $payload['payload']['form_response'] ?? [] );
+				$payload = $args[0] ?? [];
+
+				if ( isset( $payload['payload']['form_response'] ) ) {
+					$form_response = $payload['payload']['form_response'];
+				} elseif ( isset( $payload['form_response'] ) ) {
+					$form_response = $payload['form_response'];
+				} else {
+					$form_response = [];
+				}
 
 				if ( empty( $form_response ) ) {
 					return false;
@@ -383,17 +398,112 @@ class Typeform extends IntegrationBase {
 		return true;
 	}
 
+	public static function get_webhook_url(): string {
+		return rest_url( 'zaplane/v1/webhook/typeform' );
+	}
+
 	public static function parse_webhook_event( \WP_REST_Request $request ): ?array {
 		$payload = $request->get_json_params();
 
-		if ( empty( $payload['form_response'] ) ) {
+		if ( empty( $payload ) ) {
+			$body = $request->get_body();
+			if ( ! empty( $body ) ) {
+				$payload = json_decode( $body, true );
+			}
+		}
+
+		if ( empty( $payload ) || empty( $payload['form_response'] ) ) {
 			return null;
 		}
+
+		do_action( 'zaplane_typeform_webhook_form_submitted', $payload );
 
 		return [
 			'event'   => 'form_submitted',
 			'payload' => $payload,
 		];
+	}
+
+	public static function register_webhooks_for_all_forms(): array {
+		$results = [];
+
+		$connection_id = self::get_typeform_connection_id();
+		$creds         = self::get_decrypted_credentials( $connection_id );
+		$token         = $creds['access_token'] ?? '';
+
+		if ( empty( $token ) ) {
+			return [ 'error' => 'No active Typeform connection found.' ];
+		}
+
+		$forms = self::fetch_forms( $token );
+
+		if ( empty( $forms ) ) {
+			return [ 'error' => 'No forms found in Typeform account.' ];
+		}
+
+		foreach ( $forms as $form ) {
+			$form_id = $form['id'] ?? '';
+
+			if ( empty( $form_id ) ) {
+				continue;
+			}
+
+			try {
+				self::ensure_webhook( $token, $form_id );
+
+				$results[] = [
+					'form_id' => $form_id,
+					'title'   => $form['title'] ?? 'Untitled',
+					'status'  => self::is_local_environment() ? 'skipped_local' : 'webhook_registered',
+				];
+			} catch ( \Exception $e ) {
+				$results[] = [
+					'form_id' => $form_id,
+					'title'   => $form['title'] ?? 'Untitled',
+					'status'  => 'failed: ' . $e->getMessage(),
+				];
+			}
+		}//end foreach
+
+		return $results;
+	}
+
+	private static function is_local_environment(): bool {
+		$host = wp_parse_url( home_url(), PHP_URL_HOST );
+
+		return (
+			'localhost' === $host
+			|| '127.0.0.1' === $host
+			|| str_ends_with( (string) $host, '.local' )
+			|| str_ends_with( (string) $host, '.test' )
+			|| str_ends_with( (string) $host, '.localhost' )
+		);
+	}
+
+	private static function ensure_webhook( string $token, string $form_id ): void {
+		if ( empty( $form_id ) || 'any' === $form_id ) {
+			return;
+		}
+
+		if ( self::is_local_environment() ) {
+			return;
+		}
+
+		$tag = 'zaplane_' . sanitize_key( $form_id );
+
+		try {
+			self::typeform_request(
+				$token,
+				'PUT',
+				'/forms/' . rawurlencode( $form_id ) . '/webhooks/' . $tag,
+				[
+					'url'     => self::get_webhook_url(),
+					'enabled' => true,
+				]
+			);
+		} catch ( \Exception $error ) {
+			unset( $error );
+		}
 	}
 
 	private static function get_connection_credentials( array $node ): array {
@@ -482,6 +592,7 @@ class Typeform extends IntegrationBase {
 
 		foreach ( $answers as $answer ) {
 			$key = $answer['field']['ref'] ?? $answer['field']['id'] ?? null;
+
 			if ( null === $key ) {
 				continue;
 			}
@@ -501,43 +612,6 @@ class Typeform extends IntegrationBase {
 		}
 
 		return $data;
-	}
-
-	private static function ensure_webhook( string $token, string $form_id ): void {
-		if ( empty( $form_id ) || 'any' === $form_id ) {
-			return;
-		}
-
-		$webhook_url = home_url( '/wp-json/zaplane/v1/webhook/typeform' );
-		$host        = wp_parse_url( $webhook_url, PHP_URL_HOST );
-
-		$is_local = (
-			'localhost' === $host
-			|| '127.0.0.1' === $host
-			|| str_ends_with( (string) $host, '.local' )
-			|| str_ends_with( (string) $host, '.test' )
-			|| str_ends_with( (string) $host, '.localhost' )
-		);
-
-		if ( $is_local ) {
-			return;
-		}
-
-		$tag = 'zaplane_' . sanitize_key( $form_id );
-
-		try {
-			self::typeform_request(
-				$token,
-				'PUT',
-				'/forms/' . rawurlencode( $form_id ) . '/webhooks/' . $tag,
-				[
-					'url'     => $webhook_url,
-					'enabled' => true,
-				]
-			);
-		} catch ( \Exception $error ) {
-			unset( $error );
-		}
 	}
 
 	private static function typeform_request( string $token, string $method, string $endpoint, array $payload = [] ): array {
@@ -575,3 +649,26 @@ class Typeform extends IntegrationBase {
 		return $body;
 	}
 }
+
+add_action( 'rest_api_init', static function () {
+
+	register_rest_route(
+		'zaplane/v1',
+		'/webhook/typeform',
+		[
+			'methods'             => \WP_REST_Server::CREATABLE, // POST only
+			'callback'            => static function ( \WP_REST_Request $request ) {
+
+				$result = \Zaplane\Integrations\Typeform::parse_webhook_event( $request );
+
+				if ( null === $result ) {
+					return new \WP_REST_Response( [ 'status' => 'ignored' ], 200 );
+				}
+
+				return new \WP_REST_Response( [ 'status' => 'ok' ], 200 );
+			},
+			'permission_callback' => '__return_true',
+		]
+	);
+
+} );
