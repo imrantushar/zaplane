@@ -20,7 +20,7 @@ const ExecutedFlows = () => {
       <div className="border-t border-[#E2E8F0]" />
       <div className="p-6">
         <div className="flex flex-col gap-4">
-          {!flows.length ? (
+          {!flows?.length ? (
             <span className="text-center text-[14px] text-[#718096]">
               {__('No executed flows found.', 'zaplane')}
             </span>
@@ -41,4 +41,4 @@ const ExecutedFlows = () => {
     </div>
   );
 };
-export default ExecutedFlows;
+export default ExecutedFlows;
