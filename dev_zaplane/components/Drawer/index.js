@@ -11,7 +11,7 @@ const ZAPDrawer = ({
   footer,
   placement = "end",
   size = "md",
-  closeOnOverlayClick = false,
+  closeOnOverlayClick = true,
   zIndex = 9999,
   onClose,
   open,
@@ -23,13 +23,13 @@ const ZAPDrawer = ({
   return (
     <>
       <div onClick={() => open = true}>
-          {trigger}
+        {trigger}
       </div>
       <Transition appear show={open} as={Fragment}>
-        <Dialog 
-          as="div" 
-          className="relative z-50" 
-          onClose={closeOnOverlayClick ? onClose : () => {}}
+        <Dialog
+          as="div"
+          className="relative z-50"
+          onClose={closeOnOverlayClick ? onClose : () => { }}
           style={{ zIndex }}
         >
           <TransitionChild

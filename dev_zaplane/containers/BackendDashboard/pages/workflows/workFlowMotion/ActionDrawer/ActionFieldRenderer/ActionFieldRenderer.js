@@ -124,6 +124,7 @@ const ActionFieldRenderer = ({
             }
             onInputChange={handleInputChange}
             inputValue={searchTerm}
+            variables={workflowVariables?.data || []}
           />
           <ErrorMsg />
         </div>
@@ -155,6 +156,7 @@ const ActionFieldRenderer = ({
             }
             onInputChange={handleInputChange}
             inputValue={searchTerm}
+            variables={workflowVariables?.data || []}
           />
           <ErrorMsg />
         </div>
