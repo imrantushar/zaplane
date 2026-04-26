@@ -9,6 +9,7 @@ import './styles.scss'
 import { __ } from "@wordpress/i18n";
 import VariableEditor from "@ZAPComponents/VariableEditor/index.js";
 import { reactDebounce } from "@ZAPUtils/helper";
+import CopyInput from "./CopyInput";
 
 const ActionFieldRenderer = ({
   field,
@@ -49,6 +50,14 @@ const ActionFieldRenderer = ({
   }
 
   switch (field.type) {
+    case "copy":
+      return (
+        <CopyInput
+          label={field.label}
+          value={field.value || value}
+          help={field.help}
+        />
+      );
 
     case "number":
     case "email":
