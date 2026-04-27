@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import WPPopover from "@ZAPComponents/Popaver/WPPopover";
 import ZAPTab from "@ZAPComponents/Tab";
 import { __ } from "@wordpress/i18n";
-import { formatVariableKey, insertVariableIntoGroup } from "./helper";
+import { formatVariableKey, getContextVariableGroups, insertVariableIntoGroup } from "./helper";
 import { Disclosure, DisclosureButton, DisclosurePanel } from "@headlessui/react";
 import { LuChevronDown } from "react-icons/lu";
 
@@ -10,6 +10,7 @@ export default function VariablePopover({
   isOpen,
   onClose,
   data,
+  contextData,
   onSelectVariable,
   activeInput,
   groups,
@@ -26,8 +27,9 @@ export default function VariablePopover({
     }
   }, [isOpen]);
 
-  const handleClick = (item, variable) => {
-    const formattedValue = `{{${item.node_id}.${variable.key}}}`;
+  const handleClick = (item, variable, source = "app") => {
+    const prefix = source === "context" ? item.prefix : item.node_id;
+    const formattedValue = `{{${prefix}.${variable.key}}}`;
     if (onSelectVariable) {
       onSelectVariable(formattedValue);
     } else if (activeInput && groups && groupHelpers) {
@@ -42,22 +44,22 @@ export default function VariablePopover({
     }
   };
 
-  const appsContent = (
+  const renderVariableAccordion = (items, source = "app") => (
     <div>
-      {!data || data.length === 0 ? (
+      {!items || items.length === 0 ? (
         <div className="flex justify-center items-center py-4">
           <span className="text-sm text-gray-500">
             {__("No data available yet", "zaplane")}
           </span>
         </div>
       ) : (
-        data.map((item, index) => (
+        items.map((item, index) => (
           <Disclosure
-            key={item.node_id}
+            key={item.node_id || item.key}
             as="div"
             className={`border border-gray-200 
                 ${index === 0 ? "rounded-t-md" : ""} 
-                ${index === data.length - 1 ? "rounded-b-md" : ""} 
+                ${index === items.length - 1 ? "rounded-b-md" : ""} 
                 ${index !== 0 ? "border-t-0" : ""}
               `}
           >
@@ -65,7 +67,7 @@ export default function VariablePopover({
               <>
                 <DisclosureButton className="flex w-full items-center justify-between bg-gray-50 px-3 py-2 text-left focus:outline-none">
                   <span className="zaplane-label flex-1 font-medium">
-                    {item.node_name}
+                    {source === "context" ? item.label : item.node_name}
                   </span>
 
                   <LuChevronDown
@@ -81,7 +83,7 @@ export default function VariablePopover({
                       item.variables.map((v, vi) => (
                         <div
                           key={vi}
-                          onClick={() => handleClick(item, v)}
+                          onClick={() => handleClick(item, v, source)}
                           className="flex items-center px-4 py-2 cursor-pointer hover:bg-gray-50 text-sm"
                         >
                           <span className="zaplane-label font-medium mr-1">
@@ -109,16 +111,18 @@ export default function VariablePopover({
     </div>
   );
 
+  const contextGroups = getContextVariableGroups(contextData);
+
   const tabs = [
     {
       value: "apps",
       label: __("Apps", "zaplane"),
-      content: appsContent,
+      content: renderVariableAccordion(data, "app"),
     },
     {
       value: "context",
       label: __("Context", "zaplane"),
-      content: <div className="min-h-[40px]" />,
+      content: renderVariableAccordion(contextGroups, "context"),
     },
   ];
 

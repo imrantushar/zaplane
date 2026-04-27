@@ -7,7 +7,8 @@ import VariableEditor from "@ZAPComponents/VariableEditor";
 export default function ConditionGroupField({
   value,
   field,
-  variables
+  variables,
+  variableContext
 }) {
   const ruleFields = field?.fields;
   const EMPTY_RULE = buildEmptyRule(ruleFields);
@@ -43,7 +44,7 @@ export default function ConditionGroupField({
                   }
                   return <VariableEditor containerStyle={{
                     width: '30%'
-                  }} label={f.label} placeholder={__('Type "@" here to...', "zaplane")} value={rule[f.key]} variables={variables} field={{
+                  }} label={f.label} placeholder={__('Type "@" here to...', "zaplane")} value={rule[f.key]} variables={variables} variableContext={variableContext} field={{
                     key: `${field.key}.${gIndex}.${rIndex}.${f.key}`
                   }} setFieldValue={(key, val) => {
                     ruleHelpers.replace(rIndex, {
