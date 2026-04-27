@@ -6,10 +6,10 @@ use WP_REST_Controller;
 use WP_Error;
 use Zaplane\Framework\Classes\Container;
 use Zaplane\Framework\Classes\Expression;
+use Zaplane\Framework\Classes\GlobalContext;
 use Zaplane\Framework\Core\Automation;
 use Zaplane\Models\Run;
 use Zaplane\Models\NodeRun;
-use Zaplane\Models\Workflow;
 use Zaplane\Models\WorkflowVersion;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -374,24 +374,12 @@ class RunController extends WP_REST_Controller {
 			$testContext[ (string) $nodeKey ] = is_array( $out ) ? $out : [ 'value' => $out ];
 		}
 
-		$workflow = Workflow::find( $version->workflow_id );
-		if ( $workflow ) {
-			$testContext['workflow'] = [
-				'workflow_id'     => $workflow->id,
-				'workflow_name'   => $workflow->title ?? $workflow->name ?? '',
-				'workflow_status' => $workflow->status ?? 'active',
-			];
+		// Only inject global context groups that this node's config actually references.
+		// Test execution: $run = null so GlobalContext falls back to wp_get_current_user() (admin).
+		$prefixes = GlobalContext::detect_prefixes( $targetNode['data']['config'] ?? [] );
+		if ( $prefixes ) {
+			$testContext = array_merge( $testContext, GlobalContext::build( $prefixes ) );
 		}
-
-		$wpUser = wp_get_current_user();
-		$testContext['wp'] = [
-			'wp_version'       => get_bloginfo( 'version' ),
-			'user_id'          => (int) $wpUser->ID,
-			'username'         => $wpUser->user_login,
-			'user_email'       => $wpUser->user_email,
-			'timestamp'        => current_time( 'mysql' ),
-			'total_post_count' => (int) wp_count_posts()->publish,
-		];
 
 		$effectiveInput = $input + $testContext;
 

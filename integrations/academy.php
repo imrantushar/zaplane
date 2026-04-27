@@ -129,6 +129,7 @@ class Academy extends IntegrationBase {
 			case 'user_enroll_course':
 				$course_id = $args[0] ?? null;
 				$enroll_id = $args[1] ?? null;
+				$user_id   = $args[2] ?? null;
 
 				if ( ! $course_id || ! $enroll_id ) {
 					return false;
@@ -140,10 +141,17 @@ class Academy extends IntegrationBase {
 					return false;
 				}
 
+				$user = $user_id ? get_userdata( (int) $user_id ) : null;
+
 				return [
-					'success'   => true,
-					'course_id' => $course_id,
-					'enroll_id' => $enroll_id,
+					'success'    => true,
+					'course_id'  => (int) $course_id,
+					'enroll_id'  => (int) $enroll_id,
+					'user_id'    => $user ? (int) $user->ID : null,
+					'user_email' => $user ? $user->user_email : null,
+					'first_name' => $user ? $user->first_name : null,
+					'last_name'  => $user ? $user->last_name : null,
+					'username'   => $user ? $user->user_login : null,
 				];
 
 			case 'course_complete':
