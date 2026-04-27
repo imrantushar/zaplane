@@ -126,7 +126,7 @@ export default function VariablePopover({
     <WPPopover
       isOpen={isOpen}
       onClose={onClose}
-      title={__("Insert data for Dynamic content", "zaplane")}
+      title={null}
       prefix={prefix}
     >
       <ZAPTab value={activeTab} tabs={tabs} onChange={setActiveTab} />
