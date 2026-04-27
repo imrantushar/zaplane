@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-04-21 07:14:15",
+    "generated_at": "2026-04-22 07:11:25",
     "apps": {
         "cartflows": {
             "slug": "cartflows",
@@ -19294,6 +19294,366 @@
                 }
             },
             "actions": []
+        },
+        "paymattic": {
+            "slug": "paymattic",
+            "name": "Paymattic",
+            "icon": "paymattic.svg",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": {
+                "form_submitted": {
+                    "key": "form_submitted",
+                    "label": "Form Submitted",
+                    "hook": "wppayform/after_form_submission_complete",
+                    "schema": [
+                        {
+                            "key": "form_id",
+                            "label": "Form",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "paymattic",
+                                "query": "forms",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": {
+                        "main": "Main output",
+                        "error": "Error output"
+                    }
+                },
+                "payment_success": {
+                    "key": "payment_success",
+                    "label": "Payment Success",
+                    "hook": "wppayform/form_payment_success",
+                    "schema": [
+                        {
+                            "key": "form_id",
+                            "label": "Form",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "paymattic",
+                                "query": "forms",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": {
+                        "main": "Main output",
+                        "error": "Error output"
+                    }
+                },
+                "payment_failed": {
+                    "key": "payment_failed",
+                    "label": "Payment Failed",
+                    "hook": "wppayform/form_payment_failed",
+                    "schema": [
+                        {
+                            "key": "form_id",
+                            "label": "Form",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "paymattic",
+                                "query": "forms",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": {
+                        "main": "Main output",
+                        "error": "Error output"
+                    }
+                },
+                "payment_status_changed": {
+                    "key": "payment_status_changed",
+                    "label": "Payment Status Changed",
+                    "hook": "wppayform/after_payment_status_change",
+                    "schema": [
+                        {
+                            "key": "form_id",
+                            "label": "Form",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "paymattic",
+                                "query": "forms",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "payment_status",
+                            "label": "Payment Status",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Any Status",
+                                    "value": "any"
+                                },
+                                {
+                                    "label": "Paid",
+                                    "value": "paid"
+                                },
+                                {
+                                    "label": "Pending",
+                                    "value": "pending"
+                                },
+                                {
+                                    "label": "Failed",
+                                    "value": "failed"
+                                },
+                                {
+                                    "label": "Refunded",
+                                    "value": "refunded"
+                                },
+                                {
+                                    "label": "Partially Refunded",
+                                    "value": "partially_refunded"
+                                }
+                            ],
+                            "required": false
+                        }
+                    ],
+                    "outputs": {
+                        "main": "Main output",
+                        "error": "Error output"
+                    }
+                },
+                "payment_refunded": {
+                    "key": "payment_refunded",
+                    "label": "Payment Refunded",
+                    "hook": "wppayform/payment_refunded",
+                    "schema": [
+                        {
+                            "key": "form_id",
+                            "label": "Form",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "paymattic",
+                                "query": "forms",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": {
+                        "main": "Main output",
+                        "error": "Error output"
+                    }
+                }
+            },
+            "actions": {
+                "get_form_single": {
+                    "key": "get_form_single",
+                    "label": "Get Form (Single)",
+                    "schema": [
+                        {
+                            "key": "form_id",
+                            "label": "Form",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "paymattic",
+                                "query": "forms",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": {
+                        "main": "Main output",
+                        "error": "Error output"
+                    }
+                },
+                "get_forms_all": {
+                    "key": "get_forms_all",
+                    "label": "Get Forms (All)",
+                    "schema": [
+                        {
+                            "key": "limit",
+                            "label": "Limit",
+                            "type": "number",
+                            "default": 50
+                        },
+                        {
+                            "key": "search",
+                            "label": "Search",
+                            "type": "text"
+                        }
+                    ],
+                    "outputs": {
+                        "main": "Main output",
+                        "error": "Error output"
+                    }
+                },
+                "get_submission_single": {
+                    "key": "get_submission_single",
+                    "label": "Get Submission (Single)",
+                    "schema": [
+                        {
+                            "key": "submission_id",
+                            "label": "Submission",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "paymattic",
+                                "query": "submissions",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": {
+                        "main": "Main output",
+                        "error": "Error output"
+                    }
+                },
+                "get_submissions_all": {
+                    "key": "get_submissions_all",
+                    "label": "Get Submissions (All)",
+                    "schema": [
+                        {
+                            "key": "form_id",
+                            "label": "Form",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "paymattic",
+                                "query": "forms",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        },
+                        {
+                            "key": "payment_status",
+                            "label": "Payment Status",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Any Status",
+                                    "value": "any"
+                                },
+                                {
+                                    "label": "Paid",
+                                    "value": "paid"
+                                },
+                                {
+                                    "label": "Pending",
+                                    "value": "pending"
+                                },
+                                {
+                                    "label": "Failed",
+                                    "value": "failed"
+                                },
+                                {
+                                    "label": "Refunded",
+                                    "value": "refunded"
+                                }
+                            ],
+                            "required": false
+                        },
+                        {
+                            "key": "limit",
+                            "label": "Limit",
+                            "type": "number",
+                            "default": 20
+                        },
+                        {
+                            "key": "page",
+                            "label": "Page",
+                            "type": "number",
+                            "default": 1
+                        },
+                        {
+                            "key": "search",
+                            "label": "Search",
+                            "type": "text"
+                        }
+                    ],
+                    "outputs": {
+                        "main": "Main output",
+                        "error": "Error output"
+                    }
+                },
+                "update_submission_payment_status": {
+                    "key": "update_submission_payment_status",
+                    "label": "Update Submission Payment Status",
+                    "schema": [
+                        {
+                            "key": "submission_id",
+                            "label": "Submission",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "paymattic",
+                                "query": "submissions",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "payment_status",
+                            "label": "Payment Status",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Paid",
+                                    "value": "paid"
+                                },
+                                {
+                                    "label": "Pending",
+                                    "value": "pending"
+                                },
+                                {
+                                    "label": "Failed",
+                                    "value": "failed"
+                                },
+                                {
+                                    "label": "Refunded",
+                                    "value": "refunded"
+                                },
+                                {
+                                    "label": "Partially Refunded",
+                                    "value": "partially_refunded"
+                                }
+                            ],
+                            "required": true
+                        }
+                    ],
+                    "outputs": {
+                        "main": "Main output",
+                        "error": "Error output"
+                    }
+                }
+            }
         },
         "bookingcalendar": {
             "slug": "bookingcalendar",
