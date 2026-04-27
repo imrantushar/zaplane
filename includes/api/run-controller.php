@@ -9,6 +9,7 @@ use Zaplane\Framework\Classes\Expression;
 use Zaplane\Framework\Core\Automation;
 use Zaplane\Models\Run;
 use Zaplane\Models\NodeRun;
+use Zaplane\Models\Workflow;
 use Zaplane\Models\WorkflowVersion;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -372,6 +373,26 @@ class RunController extends WP_REST_Controller {
 			$out = $prevNodeRun->getOutput();
 			$testContext[ (string) $nodeKey ] = is_array( $out ) ? $out : [ 'value' => $out ];
 		}
+
+		$workflow = Workflow::find( $version->workflow_id );
+		if ( $workflow ) {
+			$testContext['workflow'] = [
+				'workflow_id'     => $workflow->id,
+				'workflow_name'   => $workflow->title ?? $workflow->name ?? '',
+				'workflow_status' => $workflow->status ?? 'active',
+			];
+		}
+
+		$wpUser = wp_get_current_user();
+		$testContext['wp'] = [
+			'wp_version'       => get_bloginfo( 'version' ),
+			'user_id'          => (int) $wpUser->ID,
+			'username'         => $wpUser->user_login,
+			'user_email'       => $wpUser->user_email,
+			'timestamp'        => current_time( 'mysql' ),
+			'total_post_count' => (int) wp_count_posts()->publish,
+		];
+
 		$effectiveInput = $input + $testContext;
 
 		try {

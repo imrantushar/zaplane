@@ -11,6 +11,7 @@ use Zaplane\Framework\Exceptions\IntegrationException;
 use Zaplane\Framework\Models\Option;
 use Zaplane\Models\Run;
 use Zaplane\Models\NodeRun;
+use Zaplane\Models\Workflow;
 use Zaplane\Models\WorkflowVersion;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -247,7 +248,7 @@ class Automation {
 
 		$app = strtolower( $node['data']['app'] ?? '' );
 
-		$context = $this->buildNodeContext( $run->id );
+		$context = $this->buildNodeContext( $run->id, $run );
 		$resolveData = $input + $context;
 
 		$node['_run_id'] = $run->id;
@@ -407,7 +408,7 @@ class Automation {
 
 
 
-	private function buildNodeContext( int $run_id ): array {
+	private function buildNodeContext( int $run_id, ?Run $run = null ): array {
 		$nodeRuns = NodeRun::where( 'run_id', $run_id )
 			->where( 'status', 'completed' )
 			->orderBy( 'id', 'asc' )
@@ -419,6 +420,27 @@ class Automation {
 			$output = $nr->getOutput();
 
 			$context[ (string) $nr->node_key ] = is_array( $output ) ? $output : [ 'value' => $output ];
+		}
+
+		if ( $run ) {
+			$workflow = Workflow::find( $run->workflow_id );
+			if ( $workflow ) {
+				$context['workflow'] = [
+					'workflow_id'     => $workflow->id,
+					'workflow_name'   => $workflow->title ?? $workflow->name ?? '',
+					'workflow_status' => $workflow->status ?? 'active',
+				];
+			}
+
+			$wpUser = wp_get_current_user();
+			$context['wp'] = [
+				'wp_version'       => get_bloginfo( 'version' ),
+				'user_id'          => (int) $wpUser->ID,
+				'username'         => $wpUser->user_login,
+				'user_email'       => $wpUser->user_email,
+				'timestamp'        => current_time( 'mysql' ),
+				'total_post_count' => (int) wp_count_posts()->publish,
+			];
 		}
 
 		return $context;

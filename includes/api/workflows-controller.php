@@ -589,10 +589,40 @@ class WorkflowsController extends WP_REST_Controller {
 			}//end if
 		}//end foreach
 
+		$context = [];
+
+		$workflow = Workflow::find( $workflowId );
+		if ( $workflow ) {
+			$context['workflow'] = [
+				'label'     => 'Workflow',
+				'prefix'    => 'workflow',
+				'variables' => [
+					[ 'key' => 'workflow_id',     'type' => 'integer', 'sample' => $workflow->id ],
+					[ 'key' => 'workflow_name',   'type' => 'string',  'sample' => $workflow->title ?? $workflow->name ?? '' ],
+					[ 'key' => 'workflow_status', 'type' => 'string',  'sample' => $workflow->status ?? 'active' ],
+				],
+			];
+		}
+
+		$wpUser = wp_get_current_user();
+		$context['wp'] = [
+			'label'     => 'WordPress',
+			'prefix'    => 'wp',
+			'variables' => [
+				[ 'key' => 'wp_version',       'type' => 'string',  'sample' => get_bloginfo( 'version' ) ],
+				[ 'key' => 'user_id',          'type' => 'integer', 'sample' => (int) $wpUser->ID ],
+				[ 'key' => 'username',         'type' => 'string',  'sample' => $wpUser->user_login ],
+				[ 'key' => 'user_email',       'type' => 'string',  'sample' => $wpUser->user_email ],
+				[ 'key' => 'timestamp',        'type' => 'string',  'sample' => current_time( 'mysql' ) ],
+				[ 'key' => 'total_post_count', 'type' => 'integer', 'sample' => (int) wp_count_posts()->publish ],
+			],
+		];
+
 		return rest_ensure_response([
-			'status' => 'success',
-			'code' => 'SUCCESS',
-			'data' => $data,
+			'status'  => 'success',
+			'code'    => 'SUCCESS',
+			'data'    => $data,
+			'context' => $context,
 		]);
 	}
 
