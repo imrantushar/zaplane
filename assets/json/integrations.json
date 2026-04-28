@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-04-26 11:31:09",
+    "generated_at": "2026-04-28 09:21:45",
     "apps": {
         "cartflows": {
             "slug": "cartflows",
@@ -21380,7 +21380,7 @@
                             "key": "webhook_endpoint",
                             "label": "Webhook Endpoint URL",
                             "type": "copy",
-                            "value": "http://localhost:10016/wp-json/zaplane/v1/webhook/typeform",
+                            "value": "https://franticjellyfish.s2-tastewp.com/wp-json/zaplane/v1/incoming/typeform",
                             "readonly": true,
                             "help": "Copy this URL \u2192 Typeform Dashboard \u2192 Your Form \u2192 Connect \u2192 Webhooks \u2192 Add a webhook \u2192 Paste & Save."
                         }

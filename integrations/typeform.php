@@ -399,7 +399,7 @@ class Typeform extends IntegrationBase {
 	}
 
 	public static function get_webhook_url(): string {
-		return rest_url( 'zaplane/v1/webhook/typeform' );
+		return rest_url( 'zaplane/v1/incoming/' . self::get_slug() );
 	}
 
 	public static function parse_webhook_event( \WP_REST_Request $request ): ?array {
@@ -416,12 +416,15 @@ class Typeform extends IntegrationBase {
 			return null;
 		}
 
-		do_action( 'zaplane_typeform_webhook_form_submitted', $payload );
 
 		return [
 			'event'   => 'form_submitted',
 			'payload' => $payload,
 		];
+	}
+
+	public static function verify_webhook_signature( \WP_REST_Request $request ): bool {
+		return true;
 	}
 
 	public static function register_webhooks_for_all_forms(): array {
@@ -649,26 +652,3 @@ class Typeform extends IntegrationBase {
 		return $body;
 	}
 }
-
-add_action( 'rest_api_init', static function () {
-
-	register_rest_route(
-		'zaplane/v1',
-		'/webhook/typeform',
-		[
-			'methods'             => \WP_REST_Server::CREATABLE, // POST only
-			'callback'            => static function ( \WP_REST_Request $request ) {
-
-				$result = \Zaplane\Integrations\Typeform::parse_webhook_event( $request );
-
-				if ( null === $result ) {
-					return new \WP_REST_Response( [ 'status' => 'ignored' ], 200 );
-				}
-
-				return new \WP_REST_Response( [ 'status' => 'ok' ], 200 );
-			},
-			'permission_callback' => '__return_true',
-		]
-	);
-
-} );
