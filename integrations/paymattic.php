@@ -282,10 +282,13 @@ class Paymattic extends IntegrationBase {
 		];
 	}
 
-	public static function query_forms(): array {
+	public static function query_forms( $q = [] ): array {
+		$q = is_array( $q ) ? $q : [];
+
 		$options = [
 			[
 				'name'  => 'any',
+				'value' => 'any',
 				'label' => 'Any Form',
 			],
 		];
@@ -303,6 +306,7 @@ class Paymattic extends IntegrationBase {
 		foreach ( $forms as $form ) {
 			$options[] = [
 				'name'  => (string) ( $form->ID ?? 0 ),
+				'value' => (string) ( $form->ID ?? 0 ),
 				'label' => (string) ( $form->post_title ?? 'Form' ) . ' (#' . (int) ( $form->ID ?? 0 ) . ')',
 			];
 		}
@@ -316,6 +320,7 @@ class Paymattic extends IntegrationBase {
 		$options = [
 			[
 				'name'  => 'any',
+				'value' => 'any',
 				'label' => 'Any Submission',
 			],
 		];
@@ -340,6 +345,7 @@ class Paymattic extends IntegrationBase {
 
 			$options[] = [
 				'name'  => (string) $submission_id,
+				'value' => (string) $submission_id,
 				'label' => $label,
 			];
 		}
