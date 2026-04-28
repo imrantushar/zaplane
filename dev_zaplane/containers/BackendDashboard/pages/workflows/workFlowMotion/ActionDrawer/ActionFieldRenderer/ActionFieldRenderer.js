@@ -50,14 +50,26 @@ const ActionFieldRenderer = ({
   }
 
   switch (field.type) {
-    case "copy":
+    case "copy": {
+      let displayValue = field.value || value || "";
+      // Dynamically force the URL to match the current live site's origin
+      if (typeof displayValue === "string" && displayValue.startsWith("http")) {
+        try {
+          const urlObj = new URL(displayValue);
+          displayValue = displayValue.replace(urlObj.origin, window.location.origin);
+        } catch (e) {
+          // Ignore invalid URLs
+        }
+      }
+
       return (
         <CopyInput
           label={field.label}
-          value={field.value || value}
+          value={displayValue}
           help={field.help}
         />
       );
+    }
 
     case "number":
     case "email":
