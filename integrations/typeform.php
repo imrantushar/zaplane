@@ -399,7 +399,8 @@ class Typeform extends IntegrationBase {
 	}
 
 	public static function get_webhook_url(): string {
-		return rest_url( 'zaplane/v1/incoming/' . self::get_slug() );
+		$url = rest_url( 'zaplane/v1/incoming/' . self::get_slug() );
+		return set_url_scheme( $url, 'https' );
 	}
 
 	public static function parse_webhook_event( \WP_REST_Request $request ): ?array {
