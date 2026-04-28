@@ -178,8 +178,9 @@ class Gemcrm extends IntegrationBase {
 			'apply_list'       => [ 'label' => 'Add Contact To List' ],
 			'remove_from_tag'  => [ 'label' => 'Remove Tag From Contact' ],
 			'remove_from_list' => [ 'label' => 'Remove Contact From List' ],
-			'send_campaign'    => [ 'label' => 'Send Email Campaign' ],
-			'send_email'       => [ 'label' => 'Send Email' ],
+			'send_campaign'       => [ 'label' => 'Send Email Campaign' ],
+			'send_email'          => [ 'label' => 'Send Email' ],
+			'reapply_sequence'    => [ 'label' => 'Re Apply A Sequence' ],
 		];
 	}
 
@@ -248,6 +249,21 @@ class Gemcrm extends IntegrationBase {
 
 			case 'send_email':
 				return self::send_email_fields();
+
+			case 'reapply_sequence':
+				return [
+					[
+						'key'      => 'sequence_id',
+						'label'    => 'Email Sequence',
+						'type'     => 'select',
+						'required' => true,
+						'dynamic'  => [
+							'integration' => 'gemcrm',
+							'query'       => 'gemcrm_sequence_query',
+							'select'      => [ 'value', 'label' ],
+						],
+					],
+				];
 		}
 
 		return [];
@@ -259,6 +275,7 @@ class Gemcrm extends IntegrationBase {
 			'gemcrm_tag_query'      => [ self::class, 'query_tags' ],
 			'gemcrm_list_query'     => [ self::class, 'query_lists' ],
 			'gemcrm_campaign_query' => [ self::class, 'query_campaigns' ],
+			'gemcrm_sequence_query' => [ self::class, 'query_sequences' ],
 		];
 	}
 
@@ -913,6 +930,28 @@ class Gemcrm extends IntegrationBase {
 		} while ( count( $records ) === $per_page );
 
 		return [ 'sent' => $sent, 'failed' => $failed ];
+	}
+
+	protected static function action_reapply_sequence( array $config, array $input ): array {
+		if ( ! class_exists( \GemCrmPro\Database\Models\EmailSequence::class ) ) {
+			return self::action_error( 'GemCRM Pro is not installed', $input );
+		}
+
+		$sequence_id = (int) ( $config['sequence_id'] ?? 0 );
+
+		if ( ! $sequence_id ) {
+			return self::action_error( 'Email sequence is required', $input );
+		}
+
+		$result = \GemCrmPro\Database\Models\EmailSequence::refresh_campaigns( $sequence_id );
+
+		if ( ! $result ) {
+			return self::action_error( 'Failed to re-apply sequence', $input );
+		}
+
+		return self::action_success( array_merge( $input, [
+			'sequence_id' => $sequence_id,
+		] ) );
 	}
 
 	protected static function action_send_campaign( array $config, array $input ): array {

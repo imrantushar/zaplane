@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-04-21 07:14:15",
+    "generated_at": "2026-04-28 09:48:03",
     "apps": {
         "cartflows": {
             "slug": "cartflows",
@@ -16573,9 +16573,11 @@
                     "schema": [
                         {
                             "key": "contact_id",
-                            "label": "Contact",
-                            "type": "select",
+                            "label": "Contact ID",
+                            "type": "expression",
+                            "subtype": "number",
                             "required": true,
+                            "placeholder": "Enter ID or use {{previous_node.contact_id}}",
                             "dynamic": {
                                 "integration": "gemcrm",
                                 "query": "gemcrm_contact_query",
@@ -16753,9 +16755,11 @@
                     "schema": [
                         {
                             "key": "contact_id",
-                            "label": "Contact",
-                            "type": "select",
+                            "label": "Contact ID",
+                            "type": "expression",
+                            "subtype": "number",
                             "required": true,
+                            "placeholder": "Enter ID or use {{previous_node.contact_id}}",
                             "dynamic": {
                                 "integration": "gemcrm",
                                 "query": "gemcrm_contact_query",
@@ -16776,9 +16780,11 @@
                     "schema": [
                         {
                             "key": "contact_id",
-                            "label": "Contact",
-                            "type": "select",
+                            "label": "Contact ID",
+                            "type": "expression",
+                            "subtype": "number",
                             "required": true,
+                            "placeholder": "Enter ID or use {{previous_node.contact_id}}",
                             "dynamic": {
                                 "integration": "gemcrm",
                                 "query": "gemcrm_contact_query",
@@ -16813,9 +16819,11 @@
                     "schema": [
                         {
                             "key": "contact_id",
-                            "label": "Contact",
-                            "type": "select",
+                            "label": "Contact ID",
+                            "type": "expression",
+                            "subtype": "number",
                             "required": true,
+                            "placeholder": "Enter ID or use {{previous_node.contact_id}}",
                             "dynamic": {
                                 "integration": "gemcrm",
                                 "query": "gemcrm_contact_query",
@@ -16850,9 +16858,11 @@
                     "schema": [
                         {
                             "key": "contact_id",
-                            "label": "Contact",
-                            "type": "select",
+                            "label": "Contact ID",
+                            "type": "expression",
+                            "subtype": "number",
                             "required": true,
+                            "placeholder": "Enter ID or use {{previous_node.contact_id}}",
                             "dynamic": {
                                 "integration": "gemcrm",
                                 "query": "gemcrm_contact_query",
@@ -16887,9 +16897,11 @@
                     "schema": [
                         {
                             "key": "contact_id",
-                            "label": "Contact",
-                            "type": "select",
+                            "label": "Contact ID",
+                            "type": "expression",
+                            "subtype": "number",
                             "required": true,
+                            "placeholder": "Enter ID or use {{previous_node.contact_id}}",
                             "dynamic": {
                                 "integration": "gemcrm",
                                 "query": "gemcrm_contact_query",
@@ -17059,6 +17071,29 @@
                             "label": "Reply-To Name",
                             "type": "expression",
                             "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "reapply_sequence": {
+                    "key": "reapply_sequence",
+                    "label": "Re Apply A Sequence",
+                    "schema": [
+                        {
+                            "key": "sequence_id",
+                            "label": "Email Sequence",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "gemcrm",
+                                "query": "gemcrm_sequence_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
                         }
                     ],
                     "outputs": [

@@ -112,6 +112,38 @@ trait QueryTrait {
 	}
 
 	/**
+	 * Returns the latest 10 email sequences by default; search narrows results.
+	 */
+	public static function query_sequences( $q = null ): array {
+		if ( ! class_exists( \GemCrmPro\Database\Models\EmailSequence::class ) ) {
+			return [];
+		}
+
+		$params = [
+			'per_page' => 10,
+			'page'     => 1,
+		];
+
+		if ( ! empty( $q['search'] ?? '' ) ) {
+			$params['search'] = $q['search'];
+		}
+
+		$items  = \GemCrmPro\Database\Models\EmailSequence::index( $params, null );
+		$result = [];
+
+		foreach ( (array) ( $items['records'] ?? $items ) as $item ) {
+			$id   = $item['id'] ?? null;
+			$name = $item['title'] ?? $item['name'] ?? '';
+
+			if ( $id ) {
+				$result[] = [ 'value' => $id, 'label' => $name ];
+			}
+		}
+
+		return $result;
+	}
+
+	/**
 	 * Returns the latest 10 campaigns by default; search narrows results.
 	 */
 	public static function query_campaigns( $q = null ): array {
