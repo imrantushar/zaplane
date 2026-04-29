@@ -9,6 +9,12 @@ if (!function_exists('wp_remote_get')) {
     }
 }
 
+if (!function_exists('set_url_scheme')) {
+    function set_url_scheme($url, $scheme = null) {
+        return $url;
+    }
+}
+
 if (!function_exists('wp_remote_request')) {
     function wp_remote_request($url, $args = []) {
 

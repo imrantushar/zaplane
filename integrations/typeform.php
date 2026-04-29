@@ -417,7 +417,6 @@ class Typeform extends IntegrationBase {
 			return null;
 		}
 
-
 		return [
 			'event'   => 'form_submitted',
 			'payload' => $payload,

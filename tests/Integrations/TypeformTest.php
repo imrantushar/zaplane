@@ -30,7 +30,10 @@ class TypeformTest extends IntegrationTestCase
     public function test_get_webhook_url() {
         $url = Typeform::get_webhook_url();
 
-        $this->assertStringContainsString( '/wp-json/zaplane/v1/webhook/typeform', $url );
+        $this->assertStringContainsString(
+            '/wp-json/zaplane/v1/incoming/typeform',
+            $url
+        );
     }
 
     public function test_parse_webhook_event_valid() {
