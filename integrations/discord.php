@@ -707,24 +707,6 @@ class Discord extends IntegrationBase {
 		];
 	}
 
-	private static function get_channel_type_label( int $type ): string {
-		return match ( $type ) {
-			0  => 'Text Channel',
-			1  => 'DM Channel',
-			2  => 'Voice Channel',
-			3  => 'Group DM',
-			4  => 'Category',
-			5  => 'Announcement Channel',
-			10 => 'Announcement Thread',
-			11 => 'Public Thread',
-			12 => 'Private Thread',
-			13 => 'Stage Voice',
-			15 => 'Forum Channel',
-			16 => 'Media Channel',
-			default => 'Unknown Type (' . $type . ')',
-		};
-	}
-
 	public static function query_channel( array $query ): array {
 		$options   = [];
 		$creds     = self::extract_credentials( $query );
