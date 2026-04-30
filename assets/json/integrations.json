@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-04-30 06:13:36",
+    "generated_at": "2026-04-30 09:48:23",
     "apps": {
         "cartflows": {
             "slug": "cartflows",
@@ -21382,7 +21382,7 @@
                             "type": "copy",
                             "value": "https://localhost:10016/wp-json/zaplane/v1/incoming/fillout",
                             "readonly": true,
-                            "help": "Copy this URL \u2192 Fillout Dashboard \u2192 Your Form \u2192 Integrations \u2192 Webhooks \u2192 Add Webhook \u2192 Paste & Save."
+                            "help": "Copy this URL \u2192 Fillout Dashboard \u2192 Your Form \u2192 Integrate \u2192 Webhooks \u2192 Add Webhook \u2192 Paste & Save."
                         }
                     ],
                     "outputs": [

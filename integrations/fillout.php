@@ -16,6 +16,8 @@ class Fillout extends IntegrationBase {
 
 	private const API_BASE_URL = 'https://api.fillout.com/v1/api';
 
+	private static array $processed_submissions = [];
+
 	public static function get_slug(): string {
 		return 'fillout';
 	}
@@ -75,7 +77,6 @@ class Fillout extends IntegrationBase {
 		}
 
 		$code = (int) wp_remote_retrieve_response_code( $response );
-		$body = json_decode( wp_remote_retrieve_body( $response ), true ) ?? [];
 
 		if ( 200 !== $code ) {
 			return [
@@ -123,35 +124,41 @@ class Fillout extends IntegrationBase {
 					'type'     => 'copy',
 					'value'    => self::get_webhook_url(),
 					'readonly' => true,
-					'help'     => 'Copy this URL → Fillout Dashboard → Your Form → Integrations → Webhooks → Add Webhook → Paste & Save.',
+					'help'     => 'Copy this URL → Fillout Dashboard → Your Form → Integrate → Webhooks → Add Webhook → Paste & Save.',
 				],
 			];
-		}
+		}//end if
 
 		return [];
 	}
 
 	public static function resolve_trigger( array $node, array $args ) {
-
 		switch ( $node['event'] ) {
 			case 'form_submitted':
-				$payload = $args[0] ?? [];
+				$args_data = $args[0] ?? [];
 
-				if ( isset( $payload['payload'] ) ) {
-					$submission = $payload['payload'];
-				} else {
-					$submission = $payload;
-				}
+				$raw = isset( $args_data['payload'] ) ? $args_data['payload'] : $args_data;
 
-				if ( empty( $submission ) ) {
+				$form_id       = $raw['formId'] ?? '';
+				$form_name     = $raw['formName'] ?? '';
+				$submission    = $raw['submission'] ?? [];
+				$submission_id = $submission['submissionId'] ?? '';
+
+				if ( empty( $form_id ) || empty( $submission ) ) {
 					return false;
 				}
 
-				$form_id = $submission['formId'] ?? '';
-
-				if ( empty( $form_id ) ) {
+				if ( empty( $submission_id ) ) {
 					return false;
 				}
+
+				$dedup_key = $form_id . '|' . $submission_id;
+
+				if ( isset( self::$processed_submissions[ $dedup_key ] ) ) {
+					return false;
+				}
+
+				self::$processed_submissions[ $dedup_key ] = true;
 
 				$selected = $node['data']['config']['form_id'] ?? 'any';
 
@@ -161,15 +168,19 @@ class Fillout extends IntegrationBase {
 
 				return [
 					'fillout_form_id'       => $form_id,
-					'fillout_form_name'     => $submission['formName'] ?? '',
-					'fillout_submission_id' => $submission['submissionId'] ?? '',
+					'fillout_form_name'     => $form_name,
+					'fillout_submission_id' => $submission_id,
 					'fillout_submitted_at'  => $submission['submissionTime'] ?? '',
-					'fillout_answers'       => self::parse_answers( $submission['questions'] ?? [] ),
+					'fillout_last_updated'  => $submission['lastUpdatedAt'] ?? '',
+					'fillout_questions'     => self::parse_questions( $submission['questions'] ?? [] ),
+					'fillout_calculations'  => $submission['calculations'] ?? [],
 					'fillout_url_params'    => $submission['urlParameters'] ?? [],
 					'fillout_quiz'          => $submission['quiz'] ?? [],
-					'fillout_calc'          => $submission['calculations'] ?? [],
+					'fillout_documents'     => $submission['documents'] ?? [],
+					'fillout_scheduling'    => $submission['scheduling'] ?? [],
+					'fillout_payments'      => $submission['payments'] ?? [],
 				];
-		}
+		}//end switch
 
 		return false;
 	}
@@ -193,7 +204,16 @@ class Fillout extends IntegrationBase {
 			}
 		}
 
-		if ( empty( $payload ) || empty( $payload['formId'] ) ) {
+		if (
+			empty( $payload )
+			|| empty( $payload['formId'] )
+			|| ! isset( $payload['submission'] )
+			|| ! is_array( $payload['submission'] )
+		) {
+			return null;
+		}
+
+		if ( empty( $payload['submission']['submissionId'] ) ) {
 			return null;
 		}
 
@@ -272,14 +292,60 @@ class Fillout extends IntegrationBase {
 				continue;
 			}
 
-			$results[] = [
-				'form_id' => $form_id,
-				'title'   => $form['name'] ?? 'Untitled',
-				'status'  => 'webhook_registered',
-			];
-		}
+			try {
+				self::ensure_webhook( $token, $form_id );
+
+				$results[] = [
+					'form_id' => $form_id,
+					'title'   => $form['name'] ?? 'Untitled',
+					'status'  => self::is_local_environment() ? 'skipped_local' : 'webhook_registered',
+				];
+			} catch ( \Exception $e ) {
+				$results[] = [
+					'form_id' => $form_id,
+					'title'   => $form['name'] ?? 'Untitled',
+					'status'  => 'failed: ' . $e->getMessage(),
+				];
+			}
+		}//end foreach
 
 		return $results;
+	}
+
+	private static function is_local_environment(): bool {
+		$host = wp_parse_url( home_url(), PHP_URL_HOST );
+
+		return (
+			'localhost' === $host
+			|| '127.0.0.1' === $host
+			|| str_ends_with( (string) $host, '.local' )
+			|| str_ends_with( (string) $host, '.test' )
+			|| str_ends_with( (string) $host, '.localhost' )
+		);
+	}
+
+	private static function ensure_webhook( string $token, string $form_id ): void {
+		if ( empty( $form_id ) || 'any' === $form_id ) {
+			return;
+		}
+
+		if ( self::is_local_environment() ) {
+			return;
+		}
+
+		try {
+			self::fillout_request(
+				$token,
+				'POST',
+				'/webhook/create',
+				[
+					'formId' => $form_id,
+					'url'    => self::get_webhook_url(),
+				]
+			);
+		} catch ( \Exception $error ) {
+			unset( $error );
+		}
 	}
 
 	private static function extract_credentials( array $params ): array {
@@ -316,7 +382,7 @@ class Fillout extends IntegrationBase {
 			}
 		} catch ( \Throwable $error ) {
 			unset( $error );
-		}
+		}//end try
 
 		return [];
 	}
@@ -331,6 +397,7 @@ class Fillout extends IntegrationBase {
 				'fillout'
 			)
 		);
+
 		return (int) $id;
 	}
 
@@ -348,12 +415,16 @@ class Fillout extends IntegrationBase {
 		}
 
 		$code = (int) wp_remote_retrieve_response_code( $response );
-		$body = json_decode( wp_remote_retrieve_body( $response ), true ) ?? [];
+		$body = json_decode( wp_remote_retrieve_body( $response ), true );
 
-		return ( 200 === $code ) ? ( $body ?? [] ) : [];
+		if ( 200 !== $code || ! is_array( $body ) ) {
+			return [];
+		}
+
+		return $body;
 	}
 
-	private static function parse_answers( array $questions ): array {
+	private static function parse_questions( array $questions ): array {
 		$data = [];
 
 		foreach ( $questions as $question ) {
@@ -371,5 +442,40 @@ class Fillout extends IntegrationBase {
 		}
 
 		return $data;
+	}
+
+	private static function fillout_request( string $token, string $method, string $endpoint, array $payload = [] ): array {
+		$args = [
+			'method'  => strtoupper( $method ),
+			'timeout' => 20,
+			'headers' => [
+				'Authorization' => 'Bearer ' . $token,
+				'Content-Type'  => 'application/json',
+			],
+		];
+
+		if ( ! empty( $payload ) ) {
+			$args['body'] = wp_json_encode( $payload );
+		}
+
+		$response = wp_remote_request( self::API_BASE_URL . $endpoint, $args );
+
+		if ( is_wp_error( $response ) ) {
+			throw new \Exception( 'Fillout API request failed: ' . esc_html( $response->get_error_message() ) );
+		}
+
+		$code = (int) wp_remote_retrieve_response_code( $response );
+		$body = json_decode( wp_remote_retrieve_body( $response ), true ) ?? [];
+
+		if ( 204 === $code ) {
+			return [];
+		}
+
+		if ( $code >= 400 ) {
+			$message = $body['message'] ?? $body['error'] ?? ( 'HTTP ' . $code );
+			throw new \Exception( 'Fillout API error: ' . esc_html( $message ) );
+		}
+
+		return $body;
 	}
 }
