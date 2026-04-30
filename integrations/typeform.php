@@ -477,10 +477,18 @@ class Typeform extends IntegrationBase {
 		return (
 			'localhost' === $host
 			|| '127.0.0.1' === $host
-			|| str_ends_with( (string) $host, '.local' )
-			|| str_ends_with( (string) $host, '.test' )
-			|| str_ends_with( (string) $host, '.localhost' )
+			|| self::string_ends_with( (string) $host, '.local' )
+			|| self::string_ends_with( (string) $host, '.test' )
+			|| self::string_ends_with( (string) $host, '.localhost' )
 		);
+	}
+
+	private static function string_ends_with( string $haystack, string $needle ): bool {
+		if ( '' === $needle ) {
+			return true;
+		}
+
+		return substr( $haystack, -strlen( $needle ) ) === $needle;
 	}
 
 	private static function ensure_webhook( string $token, string $form_id ): void {
@@ -602,16 +610,39 @@ class Typeform extends IntegrationBase {
 
 			$type = $answer['type'] ?? '';
 
-			$data[ $key ] = match ( $type ) {
-				'choice'   => $answer['choice']['label'] ?? '',
-				'choices'  => $answer['choices']['labels'] ?? [],
-				'boolean'  => (bool) ( $answer['boolean'] ?? false ),
-				'number'   => $answer['number'] ?? null,
-				'date'     => $answer['date'] ?? null,
-				'file_url' => $answer['file_url'] ?? null,
-				'payment'  => $answer['payment'] ?? null,
-				default    => $answer[ $type ] ?? null,
-			};
+			switch ( $type ) {
+				case 'choice':
+					$data[ $key ] = $answer['choice']['label'] ?? '';
+					break;
+
+				case 'choices':
+					$data[ $key ] = $answer['choices']['labels'] ?? [];
+					break;
+
+				case 'boolean':
+					$data[ $key ] = (bool) ( $answer['boolean'] ?? false );
+					break;
+
+				case 'number':
+					$data[ $key ] = $answer['number'] ?? null;
+					break;
+
+				case 'date':
+					$data[ $key ] = $answer['date'] ?? null;
+					break;
+
+				case 'file_url':
+					$data[ $key ] = $answer['file_url'] ?? null;
+					break;
+
+				case 'payment':
+					$data[ $key ] = $answer['payment'] ?? null;
+					break;
+
+				default:
+					$data[ $key ] = $answer[ $type ] ?? null;
+					break;
+			}
 		}
 
 		return $data;
