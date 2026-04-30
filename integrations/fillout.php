@@ -318,10 +318,18 @@ class Fillout extends IntegrationBase {
 		return (
 			'localhost' === $host
 			|| '127.0.0.1' === $host
-			|| str_ends_with( (string) $host, '.local' )
-			|| str_ends_with( (string) $host, '.test' )
-			|| str_ends_with( (string) $host, '.localhost' )
+			|| self::string_ends_with( (string) $host, '.local' )
+			|| self::string_ends_with( (string) $host, '.test' )
+			|| self::string_ends_with( (string) $host, '.localhost' )
 		);
+	}
+
+	private static function string_ends_with( string $haystack, string $needle ): bool {
+		if ( '' === $needle ) {
+			return true;
+		}
+
+		return substr( $haystack, -strlen( $needle ) ) === $needle;
 	}
 
 	private static function ensure_webhook( string $token, string $form_id ): void {
