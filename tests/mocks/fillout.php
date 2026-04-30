@@ -5,3 +5,9 @@ if (!function_exists('set_url_scheme')) {
         return $url;
     }
 }
+
+if (!function_exists('__')) {
+    function __($text, $domain = null) {
+        return $text;
+    }
+}
