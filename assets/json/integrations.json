@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-04-21 07:14:15",
+    "generated_at": "2026-04-30 06:13:36",
     "apps": {
         "cartflows": {
             "slug": "cartflows",
@@ -21341,6 +21341,50 @@
                     "label": "User Achievement Was Revoked",
                     "hook": "gamipress_revoke_achievement_to_user",
                     "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": []
+        },
+        "fillout": {
+            "slug": "fillout",
+            "name": "Fillout",
+            "icon": "fillout.svg",
+            "category": "app",
+            "requires_connection": true,
+            "auth_type": "token_key",
+            "supports_webhook": true,
+            "triggers": {
+                "form_submitted": {
+                    "key": "form_submitted",
+                    "label": "Form Submitted",
+                    "hook": "zaplane_fillout_webhook_form_submitted",
+                    "schema": [
+                        {
+                            "key": "form_id",
+                            "label": "Form",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "fillout",
+                                "query": "form_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "webhook_endpoint",
+                            "label": "Webhook Endpoint URL",
+                            "type": "copy",
+                            "value": "https://localhost:10016/wp-json/zaplane/v1/incoming/fillout",
+                            "readonly": true,
+                            "help": "Copy this URL \u2192 Fillout Dashboard \u2192 Your Form \u2192 Integrations \u2192 Webhooks \u2192 Add Webhook \u2192 Paste & Save."
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
