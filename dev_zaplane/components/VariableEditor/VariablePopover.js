@@ -70,6 +70,12 @@ export default function VariablePopover({
                     {source === "context" ? item.label : item.node_name}
                   </span>
 
+                  {source === "app" && item.is_sample && (
+                    <span className="mr-2 rounded border border-amber-200 bg-amber-50 px-1.5 py-0.5 text-xs text-amber-600">
+                      {__("Sample Data", "zaplane")}
+                    </span>
+                  )}
+
                   <LuChevronDown
                     className={`h-5 w-5 text-gray-500 transition-transform duration-200 ${
                       open ? "rotate-180" : ""
@@ -102,6 +108,15 @@ export default function VariablePopover({
                       </div>
                     )}
                   </div>
+
+                  {source === "app" && item.is_sample && (
+                    <p className="px-4 pb-2 text-xs italic text-gray-400">
+                      {__(
+                        "Sample data - run a test to see real values",
+                        "zaplane"
+                      )}
+                    </p>
+                  )}
                 </DisclosurePanel>
               </>
             )}
