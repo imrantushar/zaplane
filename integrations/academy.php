@@ -124,6 +124,53 @@ class Academy extends IntegrationBase {
 	}
 
 
+	public static function get_trigger_sample_output( string $trigger ): array {
+		$samples = [
+			'user_enroll_course'           => [
+				'success'    => true,
+				'course_id'  => 1,
+				'enroll_id'  => 1,
+				'user_id'    => 1,
+				'user_email' => 'student@example.com',
+				'first_name' => 'Jane',
+				'last_name'  => 'Smith',
+				'username'   => 'janesmith',
+			],
+			'course_complete'              => [
+				'success'      => true,
+				'course_id'    => 1,
+				'course_title' => 'Sample Course',
+				'course_url'   => 'https://example.com/course/sample-course',
+				'user_id'      => 1,
+				'user_email'   => 'student@example.com',
+				'first_name'   => 'Jane',
+				'last_name'    => 'Smith',
+			],
+			'lesson_complete'              => [
+				'success'   => true,
+				'lesson_id' => 1,
+				'user_id'   => 1,
+			],
+			'academy_quiz_course_attempt'  => [
+				'success' => true,
+				'quiz_id' => 1,
+				'user_id' => 1,
+				'score'   => 8,
+				'total'   => 10,
+			],
+			'quiz_target'                  => [
+				'success'     => true,
+				'quiz_id'     => 1,
+				'user_id'     => 1,
+				'score'       => 8,
+				'total_marks' => 10,
+				'percentage'  => 80.00,
+			],
+		];
+
+		return $samples[ $trigger ] ?? [];
+	}
+
 	public static function resolve_trigger( array $node, array $args ) {
 		switch ( $node['event'] ) {
 			case 'user_enroll_course':

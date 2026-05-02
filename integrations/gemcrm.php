@@ -90,6 +90,40 @@ class Gemcrm extends IntegrationBase {
 		return [];
 	}
 
+	public static function get_trigger_sample_output( string $trigger ): array {
+		$contact_base = [
+			'contact_id'      => 1,
+			'id'              => 1,
+			'user_id'         => 1,
+			'first_name'      => 'John',
+			'last_name'       => 'Doe',
+			'email'           => 'john.doe@example.com',
+			'phone'           => '+1234567890',
+			'status'          => 'subscribed',
+			'type'            => 'lead',
+			'clicks'          => 0,
+			'total_mail_sent' => 0,
+			'email_open_rate' => 0,
+			'meta'            => [],
+			'lists'           => [],
+			'tags'            => [],
+			'companies'       => [],
+			'creator'         => [],
+			'created_at'      => '2024-01-01 00:00:00',
+			'updated_at'      => '2024-01-01 00:00:00',
+		];
+
+		$samples = [
+			'contact_created'       => $contact_base,
+			'contact_tag_attached'  => [ 'contact_id' => 1, 'tag_ids' => [ 1 ] ],
+			'contact_tag_removed'   => [ 'contact_id' => 1, 'tag_ids' => [ 1 ] ],
+			'contact_list_attached' => [ 'contact_id' => 1, 'list_ids' => [ 1 ] ],
+			'contact_list_removed'  => [ 'contact_id' => 1, 'list_ids' => [ 1 ] ],
+		];
+
+		return $samples[ $trigger ] ?? [];
+	}
+
 	public static function resolve_trigger( array $node, array $args ) {
 		$event = $node['event'] ?? '';
 

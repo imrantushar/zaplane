@@ -12,6 +12,7 @@ use Zaplane\Models\WorkflowVersion;
 use Zaplane\Models\Run;
 use Zaplane\Models\NodeRun;
 use Zaplane\Utils\VariableExtractor;
+use Zaplane\Framework\Core\IntegrationLoader;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -575,17 +576,35 @@ class WorkflowsController extends WP_REST_Controller {
 				}
 
 				$data[] = [
-					'node_id' => $nodeId,
-					'node_name' => $node['data']['name'] ?? '',
+					'node_id'    => $nodeId,
+					'node_name'  => $node['data']['name'] ?? '',
 					'node_event' => $node['data']['event'] ?? '',
-					'variables' => VariableExtractor::extract( $output ),
+					'variables'  => VariableExtractor::extract( $output ),
+					'is_sample'  => false,
 				];
 			} else {
+				$variables = [];
+				$isSample  = false;
+
+				if ( $nodeType === 'trigger' ) {
+					$integration = $node['data']['integration'] ?? '';
+					$event       = $node['data']['event'] ?? '';
+					$instance    = IntegrationLoader::get( $integration );
+					if ( $instance ) {
+						$sample = get_class( $instance )::get_trigger_sample_output( $event );
+						if ( ! empty( $sample ) ) {
+							$variables = VariableExtractor::extract( $sample );
+							$isSample  = true;
+						}
+					}
+				}
+
 				$data[] = [
-					'node_id' => $nodeId,
-					'node_name' => $node['data']['name'] ?? '',
+					'node_id'    => $nodeId,
+					'node_name'  => $node['data']['name'] ?? '',
 					'node_event' => $node['data']['event'] ?? '',
-					'variables' => [],
+					'variables'  => $variables,
+					'is_sample'  => $isSample,
 				];
 			}//end if
 		}//end foreach

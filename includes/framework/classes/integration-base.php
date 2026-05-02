@@ -103,6 +103,22 @@ abstract class IntegrationBase {
 
 
 
+	/**
+	 * Return a sample output array for a trigger event.
+	 *
+	 * Keys must mirror what resolve_trigger() returns for the same event.
+	 * The condition-variables API uses this when no real test run exists yet,
+	 * so users can still pick trigger fields in the condition builder.
+	 *
+	 * To add sample output for a new integration, override this method and
+	 * return a keyed array: [ 'trigger_slug' => [ 'field' => 'sample', ... ], ... ]
+	 */
+	public static function get_trigger_sample_output( string $trigger ): array {
+		return [];
+	}
+
+
+
 	public static function get_action_config_schema( string $action ): array {
 		return [];
 	}
