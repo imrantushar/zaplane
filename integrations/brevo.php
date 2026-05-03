@@ -235,7 +235,7 @@ class Brevo extends IntegrationBase
             $body['listIds'] = [$list_id];
         }
 
-        [$response_body, $status_code] = self::http_post(
+        [$response_body, $status_code] = self::https_post(
             self::BASE_URL . '/contacts',
             $body,
             self::auth_headers($api_key)
@@ -274,7 +274,7 @@ class Brevo extends IntegrationBase
             throw new \Exception('Brevo add_contact_to_list: at least one email address is required.');
         }
 
-        [$response_body, $status_code] = self::http_post(
+        [$response_body, $status_code] = self::https_post(
             self::BASE_URL . '/contacts/lists/' . $list_id . '/contacts/add',
             ['emails' => $emails],
             self::auth_headers($api_key)
@@ -352,7 +352,7 @@ class Brevo extends IntegrationBase
             $body = ['emails' => $emails];
         }
 
-        [$response_body, $status_code] = self::http_post(
+        [$response_body, $status_code] = self::https_post(
             self::BASE_URL . '/contacts/lists/' . $list_id . '/contacts/remove',
             $body,
             self::auth_headers($api_key)
@@ -506,7 +506,7 @@ class Brevo extends IntegrationBase
      *
      * @return array{ 0: array, 1: int }
      */
-    private static function http_post(string $url, array $body, array $headers): array
+    private static function https_post(string $url, array $body, array $headers): array
     {
         $response = wp_remote_post(
             $url,
