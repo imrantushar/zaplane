@@ -1,20 +1,13 @@
 import React from 'react';
-import { Skeleton, Table } from '@chakra-ui/react';
-
-const TableSkeleton = ({ makeItems = 5 }) => {
-    return (
-        <Table.Root>
-            <Table.Body>
-                {[...Array(makeItems)].map((_, i) => (
-                    <Table.Row>
-                        {[...Array(makeItems)].map((_, i) => (
-                            <Table.Cell key={i}><Skeleton height="4" width="100%" /></Table.Cell>
-                        ))}
-                    </Table.Row>
-                ))}
-            </Table.Body>
-        </Table.Root>
-    );
+const TableSkeleton = ({
+  makeItems = 5
+}) => {
+  return <table className="min-w-full">
+            <tbody>
+                {[...Array(makeItems)].map((_, i) => <tr key={i} className="border-b border-gray-200">
+                        {[...Array(makeItems)].map((_, j) => <td key={j} className="px-4 py-3"><div className="h-4 w-full bg-gray-200 rounded animate-pulse" /></td>)}
+                    </tr>)}
+            </tbody>
+        </table>;
 };
-
 export default TableSkeleton;
