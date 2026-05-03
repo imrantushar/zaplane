@@ -2393,6 +2393,9 @@ video {
   white-space: nowrap;
   border-width: 0;
 }
+.pointer-events-none {
+  pointer-events: none;
+}
 .pointer-events-auto {
   pointer-events: auto;
 }
@@ -2438,6 +2441,9 @@ video {
 }
 .right-0 {
   left: 0px;
+}
+.bottom-full {
+  bottom: 100%;
 }
 .z-50 {
   z-index: 50;
@@ -2784,6 +2790,9 @@ video {
 .origin-top-right {
   transform-origin: top left;
 }
+.origin-bottom-right {
+  transform-origin: bottom left;
+}
 .-translate-x-1\/2 {
   --tw-translate-x: -50%;
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
@@ -3000,6 +3009,10 @@ video {
 .border-2 {
   border-width: 2px;
 }
+.\!border-y-0 {
+  border-top-width: 0px !important;
+  border-bottom-width: 0px !important;
+}
 .border-b {
   border-bottom-width: 1px;
 }
@@ -3011,6 +3024,15 @@ video {
 }
 .border-t-0 {
   border-top-width: 0px;
+}
+.\!border-l {
+  border-right-width: 1px !important;
+}
+.\!border-r-0 {
+  border-left-width: 0px !important;
+}
+.border-solid {
+  border-style: solid;
 }
 .border-dashed {
   border-style: dashed;
@@ -3075,6 +3097,10 @@ video {
 .border-yellow-400 {
   --tw-border-opacity: 1;
   border-color: rgb(250 204 21 / var(--tw-border-opacity, 1));
+}
+.border-slate-200 {
+  --tw-border-opacity: 1;
+  border-color: rgb(226 232 240 / var(--tw-border-opacity, 1));
 }
 .bg-\[\#ECFDF5\] {
   --tw-bg-opacity: 1;
@@ -3547,6 +3573,10 @@ video {
 .text-yellow-800 {
   --tw-text-opacity: 1;
   color: rgb(133 77 14 / var(--tw-text-opacity, 1));
+}
+.text-slate-500 {
+  --tw-text-opacity: 1;
+  color: rgb(100 116 139 / var(--tw-text-opacity, 1));
 }
 .opacity-0 {
   opacity: 0;
@@ -4737,6 +4767,10 @@ video {
 .hover\:bg-red-50:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(254 242 242 / var(--tw-bg-opacity, 1));
+}
+.hover\:bg-slate-50:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(248 250 252 / var(--tw-bg-opacity, 1));
 }
 .hover\:text-\[var\(--zaplane-primary\)\]:hover {
   color: var(--zaplane-primary);
