@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-04-21 07:14:15",
+    "generated_at": "2026-05-03 10:00:30",
     "apps": {
         "cartflows": {
             "slug": "cartflows",
@@ -21347,6 +21347,104 @@
                 }
             },
             "actions": []
+        },
+        "makeforms": {
+            "slug": "makeforms",
+            "name": "MakeForms",
+            "icon": "makeforms.svg",
+            "category": "app",
+            "requires_connection": true,
+            "auth_type": "token_key",
+            "supports_webhook": true,
+            "triggers": {
+                "form_submitted": {
+                    "key": "form_submitted",
+                    "label": "Form Submitted",
+                    "hook": "zaplane_makeforms_webhook_form_submitted",
+                    "schema": [
+                        {
+                            "key": "form_id",
+                            "label": "Form",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "makeforms",
+                                "query": "form_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "webhook_endpoint",
+                            "label": "Webhook Endpoint URL",
+                            "type": "copy",
+                            "value": "https://localhost:10016/wp-json/zaplane/v1/incoming/makeforms",
+                            "readonly": true,
+                            "help": "Copy this URL \u2192 MakeForms Dashboard \u2192 Your Form \u2192 Connect \u2192 Webhooks \u2192 Add a webhook \u2192 Paste & Save."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": {
+                "create_form": {
+                    "key": "create_form",
+                    "label": "Create Form",
+                    "schema": [
+                        {
+                            "key": "form_title",
+                            "type": "text",
+                            "label": "Form Title",
+                            "placeholder": "My New Form",
+                            "required": true
+                        },
+                        {
+                            "key": "workspace_id",
+                            "type": "select",
+                            "label": "Workspace",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "makeforms",
+                                "query": "workspace_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_form": {
+                    "key": "delete_form",
+                    "label": "Delete Form",
+                    "schema": [
+                        {
+                            "key": "form_id",
+                            "type": "select",
+                            "label": "Form",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "makeforms",
+                                "query": "form_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
         }
     },
     "tools": {

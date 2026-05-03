@@ -287,5 +287,9 @@ return [
 			'file'  => 'gamipress.php',
 			'class' => \Zaplane\Integrations\Gamipress::class
 		],
+		'makeforms'        => [
+			'file'  => 'makeforms.php',
+			'class' => \Zaplane\Integrations\Makeforms::class
+		],
 	],
 ];
