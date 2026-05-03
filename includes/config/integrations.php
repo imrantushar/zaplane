@@ -243,6 +243,10 @@ return [
 			'file' => 'suremail.php',
 			'class' => \Zaplane\Integrations\Suremail::class
 		],
+		'paymattic'      => [
+			'file' => 'paymattic.php',
+			'class' => \Zaplane\Integrations\Paymattic::class
+		],
 		'bookingcalendar'      => [
 			'file' => 'bookingcalendar.php', 
 			'class' => \Zaplane\Integrations\Bookingcalendar::class
