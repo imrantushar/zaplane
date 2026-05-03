@@ -1,8 +1,9 @@
 import React from "react";
-import { Accordion, Text, Flex } from "@chakra-ui/react";
 import WPPopover from "@ZAPComponents/Popaver/WPPopover";
 import { __ } from "@wordpress/i18n";
 import { formatVariableKey, insertVariableIntoGroup } from "./helper";
+import { Disclosure, DisclosureButton, DisclosurePanel } from "@headlessui/react";
+import { LuChevronDown } from "react-icons/lu";
 
 export default function VariablePopover({
   isOpen,
@@ -33,70 +34,76 @@ export default function VariablePopover({
   };
 
   return (
-    <WPPopover isOpen={isOpen} onClose={onClose}
-      title={__("Insert data for Dynamic content", 'zaplane')}
-      prefix={prefix}>
-      <Accordion.Root type="single" collapsible>
+    <WPPopover
+      isOpen={isOpen}
+      onClose={onClose}
+      title={__("Insert data for Dynamic content", "zaplane")}
+      prefix={prefix}
+    >
+      <div>
         {!data || data.length === 0 ? (
-          <Flex
-            justify="center"
-            align="center"
-          >
-            <Text fontSize="sm" fontWeight="400" m='0'>
-              {__("No data available yet", 'zaplane')}
-            </Text>
-          </Flex>
+          <div className="flex justify-center items-center py-4">
+            <span className="text-sm text-gray-500">
+              {__("No data available yet", "zaplane")}
+            </span>
+          </div>
         ) : (
           data.map((item, index) => (
-            <Accordion.Item
+            <Disclosure
               key={item.node_id}
-              value={`node-${item.node_id}`}
-              border="1px solid var(--zaplane-border-color)"
-              borderBottom={index === data.length - 1 ? "1px solid var(--zaplane-border-color)" : "0"}
-              borderRadius={index === 0 ? "4px 4px 0 0" : index === data.length - 1 ? "0 0 4px 4px" : "0"}
+              as="div"
+              className={`border border-gray-200 
+                ${index === 0 ? "rounded-t-md" : ""} 
+                ${index === data.length - 1 ? "rounded-b-md" : ""} 
+                ${index !== 0 ? "border-t-0" : ""}
+              `}
             >
-              <Accordion.ItemTrigger
-                px="12px"
-                py="10px"
-                bg="var(--zaplane-body-background)"
-                _focus={{ boxShadow: "none", outline: "none" }}
-                _focusVisible={{ boxShadow: "none", outline: "none" }}
-                _expanded={{ bg: "var(--zaplane-body-background)" }}
-              >
-                <Flex align="center" w="100%">
-                  <Text flex='1' className="zaplane-label">{item.node_name}</Text>
-                  <Accordion.ItemIndicator />
-                </Flex>
-              </Accordion.ItemTrigger>
-              <Accordion.ItemContent>
-                <Accordion.ItemBody py="10px" bg="var(--zaplane-background)" maxH="200px" overflowY="auto">
-                  {item.variables?.length > 0 ? item.variables.map((v, vi) => (
-                    <Flex
-                      key={vi}
-                      p='8px 15px'
-                      alignItems="center"
-                      cursor="pointer"
-                      _hover={{ background: "var(--zaplane-body-background)" }}
-                      onClick={() => handleClick(item, v)}
-                    >
-                      <Text as="span" fontSize="sm" className="zaplane-label">
-                        {__(formatVariableKey(v.key), 'zaplane')}
-                      </Text>
-                      <Text as="p" m='0' fontWeight="400" color="#64748b" textOverflow="ellipsis" overflow='hidden'>
-                        {" : "}{__(v.sample, 'zaplane')}
-                      </Text>
-                    </Flex>
-                  )) : (
-                    <Text textAlign="center" color="#64748b" fontSize="sm">
-                      {__("No fields available", 'zaplane')}
-                    </Text>
-                  )}
-                </Accordion.ItemBody>
-              </Accordion.ItemContent>
-            </Accordion.Item>
+              {({ open }) => (
+                <>
+                  <DisclosureButton className="flex w-full items-center justify-between bg-gray-50 px-3 py-2 text-left focus:outline-none">
+                    <span className="zaplane-label flex-1 font-medium">
+                      {item.node_name}
+                    </span>
+
+                    <LuChevronDown
+                      className={`h-5 w-5 text-gray-500 transition-transform duration-200 ${
+                        open ? "rotate-180" : ""
+                      }`}
+                    />
+                  </DisclosureButton>
+
+                  <DisclosurePanel className="bg-white max-h-[200px] overflow-y-auto">
+                    <div className="py-2">
+                      {item.variables?.length > 0 ? (
+                        item.variables.map((v, vi) => (
+                          <div
+                            key={vi}
+                            onClick={() => handleClick(item, v)}
+                            className="flex items-center px-4 py-2 cursor-pointer hover:bg-gray-50 text-sm"
+                          >
+                            <span className="zaplane-label font-medium mr-1">
+                              {__(formatVariableKey(v.key), "zaplane")}
+                            </span>
+
+                            <span className="text-gray-500 truncate whitespace-nowrap overflow-hidden font-normal">
+                              {" : "}
+                              {__(v.sample, "zaplane")}
+                            </span>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="text-center text-gray-500 text-sm py-2">
+                          {__("No fields available", "zaplane")}
+                        </div>
+                      )}
+                    </div>
+                  </DisclosurePanel>
+                </>
+              )}
+            </Disclosure>
           ))
         )}
-      </Accordion.Root>
+      </div>
     </WPPopover>
   );
 }

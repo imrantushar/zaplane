@@ -1,79 +1,39 @@
-import { Flex, Text, Image } from "@chakra-ui/react";
 import { plugin_root_url } from "@ZAPUtils/helper";
+const ZAPIconGroup = ({
+  icons = [],
+  maxVisible = 2
+}) => {
+  const safeIcons = Array.isArray(icons) ? icons : [];
+  const visibleIcons = safeIcons.slice(0, maxVisible);
+  const remaining = Math.max(0, safeIcons.length - maxVisible);
 
-const ZAPIconGroup = ({ icons = [], maxVisible = 3 }) => {
-    const safeIcons = Array.isArray(icons) ? icons : [];
-    const visibleIcons = safeIcons.slice(0, maxVisible);
-    const remaining = Math.max(0, safeIcons.length - maxVisible);
-    const totalItems = visibleIcons.length + (remaining > 0 ? 1 : 0);
-        if (safeIcons.length === 0) {
-        return (
-                <Image
-                    src={`${plugin_root_url}assets/images/button.svg`}
-                    boxSize="40px"
-                />
-        );
-    }
-    return (
-        <Flex
-            border="1px solid var(--zaplane-border-color)"
-            borderRadius="6px"
-            overflow="hidden"
-            display="inline-flex"
-        >
-            {visibleIcons.map((icon, index) => {
-                const isSvg = icon?.endsWith(".svg");
-                const isLast = index === totalItems - 1;
-                return (
-                    <Flex
-                        key={index}
-                        h="32px"
-                        w='36px'
-                        justifyContent="center"
-                        alignItems="center"
-                        bg="var(--zaplane-background)"
-                        p="4px 8px"
-                        borderRight={
-                            isLast ? "none" : "1px solid var(--zaplane-border-color)"
-                        }
-                    >
-                        {isSvg ? (
-                            <Image
-                                src={`${plugin_root_url}assets/images/icons/${icon}`}
-                                alt={icon}
-                                boxSize="20px"
-                            />
-                        ) : (
-                            <Text
-                                as="span"
-                                m="0"
-                                className={`zaplane-icon zaplane-icon--${icon}`}
-                            />
-                        )}
-                    </Flex>
-                );
-            })}
+  if (safeIcons.length === 0) {
+    return <img src={`${plugin_root_url}assets/images/button.svg`} style={{ width: '40px', height: '40px' }} />;
+  }
 
-            {remaining > 0 && (
-                <Flex
-                   w='36px'
-                    h="32px"
-                    justifyContent="center"
-                    alignItems="center"
-                    bg="var(--zaplane-background)"
-                >
-                    <Text
-                        className="zapane-title"
-                        fontWeight="400"
-                        color="var(--zaplane-text-muted, #888)"
-                        m="0"
-                    >
-                        +{remaining}
-                    </Text>
-                </Flex>
-            )}
-        </Flex>
-    );
+  return <div className="flex border border-[#E5E7EB] rounded-[4px] overflow-hidden bg-white w-fit">
+    {visibleIcons.map((icon, index) => {
+      const isSvg = icon?.endsWith(".svg");
+      const isLast = index === visibleIcons.length - 1 && remaining === 0;
+
+      return <div key={index} style={{
+        borderRight: isLast ? 'none' : '1px solid #E5E7EB',
+        padding: '4px 10px'
+      }} className="flex h-[36px] min-w-[40px] justify-center items-center bg-[#F9FAFB]">
+        {isSvg ? <img src={`${plugin_root_url}assets/images/icons/${icon}`} alt={icon} style={{
+          width: '20px',
+          height: '20px',
+          objectFit: 'contain'
+        }} /> : <span className={`zaplane-icon zaplane-icon--${icon} m-0`} />}
+      </div>;
+    })}
+
+    {remaining > 0 && <div className="flex px-3 h-[36px] justify-center items-center bg-[#F9FAFB] min-w-[40px]">
+      <span className="zaplane-sub-title">
+        +{remaining}
+      </span>
+    </div>}
+  </div>;
 };
 
 export default ZAPIconGroup;

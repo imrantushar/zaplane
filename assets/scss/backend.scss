@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 .zaplane-scope {
     *, *::before, *::after {
         box-sizing: border-box;

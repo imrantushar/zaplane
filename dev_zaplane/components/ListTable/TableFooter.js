@@ -1,6 +1,6 @@
 import React from 'react';
 import { __, sprintf } from '@wordpress/i18n';
-import { Text } from '@chakra-ui/react';
+
 import Pagination from '@ZAPComponents/Pagination';
 import Select from 'react-select';
 
