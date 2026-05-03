@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-04-21 07:14:15",
+    "generated_at": "2026-05-02 10:35:04",
     "apps": {
         "cartflows": {
             "slug": "cartflows",
@@ -21344,6 +21344,63 @@
                     "outputs": [
                         "main"
                     ]
+                }
+            },
+            "actions": []
+        },
+        "newsletter": {
+            "slug": "newsletter",
+            "name": "Newsletter",
+            "icon": "newsletter.svg",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": {
+                "newsletter_user_post_subscribe": {
+                    "key": "newsletter_user_post_subscribe",
+                    "label": "Subscription Form Submitted",
+                    "hook": "newsletter_user_post_subscribe",
+                    "schema": [],
+                    "outputs": {
+                        "main": "Main output"
+                    }
+                },
+                "newsletter_user_confirmed": {
+                    "key": "newsletter_user_confirmed",
+                    "label": "User Confirmed",
+                    "hook": "newsletter_user_confirmed",
+                    "schema": [],
+                    "outputs": {
+                        "main": "Main output"
+                    }
+                },
+                "newsletter_user_unsubscribed": {
+                    "key": "newsletter_user_unsubscribed",
+                    "label": "User Unsubscribed",
+                    "hook": "newsletter_user_unsubscribed",
+                    "schema": [],
+                    "outputs": {
+                        "main": "Main output"
+                    }
+                },
+                "newsletter_user_reactivated": {
+                    "key": "newsletter_user_reactivated",
+                    "label": "User Reactivated",
+                    "hook": "newsletter_user_reactivated",
+                    "schema": [],
+                    "outputs": {
+                        "main": "Main output"
+                    }
+                },
+                "newsletter_send_end": {
+                    "key": "newsletter_send_end",
+                    "label": "Newsletter Send End",
+                    "hook": "newsletter_send_end",
+                    "schema": [],
+                    "outputs": {
+                        "main": "Main output"
+                    }
                 }
             },
             "actions": []

@@ -287,5 +287,9 @@ return [
 			'file'  => 'gamipress.php',
 			'class' => \Zaplane\Integrations\Gamipress::class
 		],
+		'newsletter'        => [
+			'file'  => 'newsletter.php',
+			'class' => \Zaplane\Integrations\Newsletter::class
+		],
 	],
 ];
