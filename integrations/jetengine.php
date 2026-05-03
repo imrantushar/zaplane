@@ -141,7 +141,7 @@ class Jetengine extends IntegrationBase {
 		];
 	}
 
-	public static function post_type_query( $q ) {
+	public static function post_type_query( $query ) {
 		$types = get_post_types( [ 'public' => true ], 'objects' );
 		$all_list = [
 			[

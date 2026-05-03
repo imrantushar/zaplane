@@ -32,6 +32,10 @@ class Installer {
 			$this->migrate();
 			update_option( $this->db_version_option, $this->plugin_version );
 		}
+
+		if ( ! get_option( 'zaplane_first_install_time' ) ) {
+			add_option( 'zaplane_first_install_time', time() );
+		}
 	}
 
 	protected function migrate(): void {

@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
-import { createWorkflows, deleteWorkFlow, getSingleWorkFlow, getWorkFlow, updateWorkFlow, updateWorkFlowStatus } from './actions/workFlow';
+import { createWorkflows, deleteWorkFlow, getSingleWorkFlow, getWorkFlow, updateWorkFlow, updateWorkFlowStatus, updateWorkFlowTitle } from './actions/workFlow';
 import { getRunWorkFlow, getSingleRun } from './actions/workFlowRuns';
 import { getAllVersion, getPreviewOldVersion, versionActive } from './actions/workFlowVersion';
 import { nodeLogsRunDetails, getNodeLogDetails } from './actions/workFlowLogs';
@@ -21,7 +21,7 @@ const workflowsSlice = createSlice({
 		nodeDetails: [],
 		isLoading: true,
 		singleNodeExecution: {
-			
+
 		},
 		apiCountdown: 0,
 		apiRequestRunning: false,
@@ -89,6 +89,12 @@ const workflowsSlice = createSlice({
 					)
 					: [];
 			})
+			.addCase(updateWorkFlowTitle.fulfilled, (state, action) => {
+				const { id, title } = action.payload || {};
+				if (Number(state.workFlow?.workflow?.id) === Number(id)) {
+					state.workFlow.workflow.title = title;
+				}
+			})
 			.addCase(getRunWorkFlow.fulfilled, (state, action) => {
 				// action.payload now has { data, currentPage, itemPerPage, totalItems, totalPages }
 				const { data, currentPage, itemPerPage, totalItems, totalPages } = action.payload;
@@ -136,7 +142,7 @@ const workflowsSlice = createSlice({
 			})
 			.addCase(workFLowSingeNodeExction.fulfilled, (state, action) => {
 				state.isLoading = false;
-				const node_id=action?.payload?.data?.node?.id
+				const node_id = action?.payload?.data?.node?.id
 				if (!state.singleNodeExecution[node_id]) {
 					state.singleNodeExecution[node_id] = {}
 				}

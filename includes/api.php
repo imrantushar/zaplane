@@ -36,6 +36,9 @@ class API implements ModuleInterface {
 		( new \Zaplane\API\ListenerController( $this->container ) )->register_routes();
 		( new \Zaplane\API\IncomingWebhookController( $this->container ) )->register_routes();
 		( new \Zaplane\API\DashboardController( $this->container ) )->register_routes();
+		( new \Zaplane\API\ImportExportController( $this->container ) )->register_routes();
+		( new \Zaplane\API\FolderController( $this->container ) )->register_routes();
+		( new \Zaplane\API\RecipeController( $this->container ) )->register_routes();
 
 		register_rest_route('zaplane/v1', '/runs/(?P<id>\d+)', [
 			'methods'  => 'GET',

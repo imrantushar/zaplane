@@ -1,6 +1,8 @@
 import { createSystem, defaultConfig } from '@chakra-ui/react';
 
 export const theme = createSystem(defaultConfig, {
+	disableLayers: false,
+	disableGlobalStyle: true,
 	theme: {
 		tokens: {
 			fonts: {
@@ -17,12 +19,9 @@ export const theme = createSystem(defaultConfig, {
 					disabled: { value: 'var(--zaplane-text-disable)' },
 					bgGray: { value: 'var(--zaplane-background-gray-color)' },
 					warning: { value: 'var(--zaplane-warning-color)' },
-
-					// New
 					blue: { value: 'var(--zaplane-primary)' },
 				},
 			},
 		},
-	}
-})
-
+	},
+});

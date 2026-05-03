@@ -1,16 +1,11 @@
 import React from 'react';
-
-
+import PageLayout from "@ZAPComponents/PageLayout";
+import { __ } from "@wordpress/i18n";
 const Setting = () => {
-	
-
-	return (
-		<div >
-			<h2 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '20px' }}>
-				This Featured not ready Yet
-			</h2>
-		</div>
-	);
+  return <PageLayout title="Settings">
+			<span className="text-[24px] font-[bold] mb-[20px]">
+				{__("This feature is not ready yet", "zaplane")}
+			</span>
+		</PageLayout>;
 };
-
 export default Setting;

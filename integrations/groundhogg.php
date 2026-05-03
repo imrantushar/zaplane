@@ -141,7 +141,7 @@ class Groundhogg extends IntegrationBase {
 		];
 	}
 
-	public static function grounhogg_query_types( $q ) {
+	public static function grounhogg_query_types( $query ) {
 		$options = [
 			[
 				'label' => 'Any Tag',

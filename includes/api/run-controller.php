@@ -160,13 +160,19 @@ class RunController extends WP_REST_Controller {
 
 		$nodeRuns = NodeRun::forRun( $id )->map(function ( $nodeRun ) use ( $graphNodes ) {
 			$data = $nodeRun->toArray();
-			$graphNode = $graphNodes[ $nodeRun->node_key ] ?? null;
 
-			$data['node'] = $graphNode ? [
-				'app' => $graphNode['data']['app'] ?? null,
-				'event' => $graphNode['data']['event'] ?? null,
-				'label' => $graphNode['data']['label'] ?? null,
-			] : null;
+			// Prefer the snapshot stored at execution time; fall back to current
+			// graph for node runs created before node_meta_json was introduced.
+			if ( ! empty( $nodeRun->node_meta_json ) ) {
+				$data['node'] = $nodeRun->node_meta_json;
+			} else {
+				$graphNode    = $graphNodes[ $nodeRun->node_key ] ?? null;
+				$data['node'] = $graphNode ? [
+					'app'   => $graphNode['data']['app'] ?? null,
+					'event' => $graphNode['data']['event'] ?? null,
+					'label' => $graphNode['data']['label'] ?? null,
+				] : null;
+			}
 
 			return $data;
 		})->toArray();
@@ -334,12 +340,17 @@ class RunController extends WP_REST_Controller {
 		]);
 
 		$nodeRun = NodeRun::create([
-			'run_id' => $run->id,
-			'node_key' => (int) $targetNode['id'],
+			'run_id'             => $run->id,
+			'node_key'           => (int) $targetNode['id'],
+			'node_meta_json'     => [
+				'app'   => $targetNode['data']['app'] ?? null,
+				'event' => $targetNode['data']['event'] ?? null,
+				'label' => $targetNode['data']['label'] ?? null,
+			],
 			'parent_node_run_id' => null,
-			'status' => 'running',
-			'input_json' => $input,
-			'started_at' => current_time( 'mysql' ),
+			'status'             => 'running',
+			'input_json'         => $input,
+			'started_at'         => current_time( 'mysql' ),
 		]);
 
 		$connectionId = $targetNode['data']['connection_id'] ?? null;

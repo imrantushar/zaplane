@@ -1,38 +1,66 @@
 /**
  * useActionDrawer
  * ----------------
- * A custom React hook for managing the state and behavior of an Action Drawer in a flow canvas .
- * 
+ * A custom React hook for managing the state and behavior of an Action Drawer in a flow canvas.
+ *
  * Features:
  * - Tracks the drawer mode ("app" or "tools") and selected item.
  * - Manages search input and generates filtered search results.
  * - Pre-populates form values based on the selected node (app, event, config).
- * - Provides convenient setters for mode, selected item, and search.
- * 
- * 
+ * - Auto-sets actionType when a tool has only one action.
+ * - Applies default field values when fields become visible.
+ * - Provides a resetAll() to close and clear the drawer.
+ * - Exposes selectedIntegration as a computed value.
+ *
  * Parameters:
- * @param {boolean} open         - Whether the drawer is open.
- * @param {object} node           - Current node data (app, event, config).
- * @param {string} source         - Drawer context ("add" or "node").
- * @param {function} setFieldValue- Function to update form field values (e.g., Formik).
- * @param {boolean} isTrigger     - Whether this drawer is for a trigger action.
- * 
+ * @param {object} options
+ * @param {boolean} options.open           - Whether the drawer is open.
+ * @param {object}  options.node           - Current node data (app, event, config).
+ * @param {string}  options.source         - Drawer context ("add" or "node").
+ * @param {function} options.setFieldValue - Function to update form field values (e.g., Formik).
+ * @param {boolean} options.isTrigger      - Whether this drawer is for a trigger action.
+ * @param {object}  options.values         - Current form values.
+ * @param {function} options.resetForm     - Formik resetForm function.
+ * @param {function} options.onClose       - Callback to close the drawer.
+ *
  * Returns:
  * @returns {object} - {
- *   mode, setMode, selectedItem, setSelectedItem, search, setSearch, list, searchList
+ *   mode, setMode, selectedItem, setSelectedItem, search, setSearch,
+ *   list, searchList, selectedIntegration, visibleFields, resetAll, step, setStep
  * }
  */
 import { useState, useMemo, useEffect } from "react";
 import { APPS, TOOLS } from "./helper";
 import { integrations } from "@ZAPUtils/helper";
+import {
+  getIntegration,
+  getActionOptions,
+  getSelectedActionFields,
+  getVisibleFields
+} from "@ZAPContainers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/helper";
 
-export const useActionDrawer = (open, node, source, setFieldValue, isTrigger) => {
+
+
+export const useActionDrawer = ({
+  open, node, source, setFieldValue, isTrigger, values, resetForm, onClose,
+}) => {
   const [mode, setMode] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
   const [search, setSearch] = useState("");
+  const [step, setStep] = useState("select");
 
+  // ── Reset on "add" source / pre-populate on "node" source ──
   useEffect(() => {
-    if (!open || !node?.data || source === "add") return;
+    if (!open) return;
+
+    if (source === "add") {
+      setMode(null);
+      setSelectedItem(null);
+      setSearch("");
+      return;
+    }
+
+    if (!node?.data) return;
 
     const detectedItem = APPS.concat(TOOLS).find(
       i => i.name === node.data.app || i.id === node.data.app
@@ -47,9 +75,65 @@ export const useActionDrawer = (open, node, source, setFieldValue, isTrigger) =>
     if (node.data.config) {
       Object.entries(node.data.config).forEach(([k, v]) => setFieldValue(k, v));
     }
-  }, [open, node?.data]);
+  }, [open, node?.data, values.nodeClick, source]);
 
-   const list = useMemo(() => {
+  // ── Reset step + form when opened via "add" ──
+  useEffect(() => {
+    if (open && source === "add") {
+      setStep("select");
+      resetForm();
+      setFieldValue("actionType", "");
+    }
+  }, [open, source]);
+
+  // ── Auto-set actionType if tool has only one action ──
+  useEffect(() => {
+    if (mode !== "tools" || !selectedItem) return;
+    const tool = integrations.tools?.[selectedItem.id];
+    const actions = Object.values(tool?.actions || {});
+    if (actions.length === 1) setFieldValue("actionType", actions[0].key);
+  }, [mode, selectedItem, setFieldValue]);
+
+  // ── Derived: integration object ──
+  const selectedIntegration = useMemo(
+    () => getIntegration(mode, selectedItem),
+    [mode, selectedItem]
+  );
+
+  // ── Derived: action options ──
+  const actionOptions = useMemo(
+    () => getActionOptions(mode, selectedItem, isTrigger),
+    [mode, selectedItem, isTrigger]
+  );
+
+  // ── Derived: schema fields for selected action ──
+  const selectedActionFields = useMemo(
+    () => getSelectedActionFields(mode, selectedItem, values?.actionType, isTrigger),
+    [mode, selectedItem, values?.actionType, isTrigger]
+  );
+
+  // ── Derived: visible fields (filtered by depends_on) ──
+  const visibleFields = useMemo(
+    () => getVisibleFields(selectedActionFields, values),
+    [selectedActionFields, values]
+  );
+
+  // ── Apply default values when fields become visible ──
+  useEffect(() => {
+    if (!visibleFields.length) return;
+    visibleFields.forEach((field) => {
+      const currentValue = values?.[field.key];
+      if (
+        field.default !== undefined &&
+        (currentValue === undefined || currentValue === "")
+      ) {
+        setFieldValue(field.key, field.default);
+      }
+    });
+  }, [visibleFields, setFieldValue]);
+
+  // ── Filtered item list ──
+  const list = useMemo(() => {
     const base = mode === "app" ? APPS : mode === "tools" ? TOOLS : [];
 
     if (isTrigger) return base;
@@ -63,6 +147,7 @@ export const useActionDrawer = (open, node, source, setFieldValue, isTrigger) =>
     });
   }, [mode, isTrigger]);
 
+  // ── Search results ──
   const searchList = useMemo(() => {
     if (!search) return [];
     const q = search.toLowerCase();
@@ -73,6 +158,27 @@ export const useActionDrawer = (open, node, source, setFieldValue, isTrigger) =>
     return combined.filter(item => item.name.toLowerCase().includes(q));
   }, [search, isTrigger]);
 
+  // ── resetAll: close drawer and clear all state ──
+  const resetAll = () => {
+    setMode(null);
+    setStep("select");
+    setSelectedItem(null);
+    setSearch("");
+    resetForm();
+    onClose();
+  };
 
-  return { mode, setMode, selectedItem, setSelectedItem, search, setSearch, list, searchList };
+  return {
+    mode, setMode,
+    selectedItem, setSelectedItem,
+    search, setSearch,
+    step, setStep,
+    list, searchList,
+    selectedIntegration,
+    actionOptions,
+    selectedActionFields,
+    visibleFields,
+    resetAll,
+  };
 };
+
