@@ -235,7 +235,7 @@ class Brevo extends IntegrationBase
             $body['listIds'] = [$list_id];
         }
 
-        [$response_body, $status_code] = self::http_post(
+        [$response_body, $status_code] = self::https_post(
             self::BASE_URL . '/contacts',
             $body,
             self::auth_headers($api_key)
@@ -274,7 +274,7 @@ class Brevo extends IntegrationBase
             throw new \Exception('Brevo add_contact_to_list: at least one email address is required.');
         }
 
-        [$response_body, $status_code] = self::http_post(
+        [$response_body, $status_code] = self::https_post(
             self::BASE_URL . '/contacts/lists/' . $list_id . '/contacts/add',
             ['emails' => $emails],
             self::auth_headers($api_key)
@@ -288,9 +288,9 @@ class Brevo extends IntegrationBase
         return [
             'port' => 'main',
             'data' => array_merge($input, [
-                'brevo_list_id'          => $list_id,
-                'brevo_contacts_added'   => $response_body['contacts']['success'] ?? $emails,
-                'brevo_contacts_failed'  => $response_body['contacts']['failure'] ?? [],
+                'brevo_list_id'         => $list_id,
+                'brevo_contacts_added'  => $response_body['contacts']['success'] ?? $emails,
+                'brevo_contacts_failed' => $response_body['contacts']['failure'] ?? [],
             ]),
         ];
     }
@@ -308,7 +308,7 @@ class Brevo extends IntegrationBase
             throw new \Exception('Brevo delete_contact: email is required.');
         }
 
-        [, $status_code] = self::http_delete(
+        [, $status_code] = self::https_delete(
             self::BASE_URL . '/contacts/' . rawurlencode($email),
             self::auth_headers($api_key)
         );
@@ -352,7 +352,7 @@ class Brevo extends IntegrationBase
             $body = ['emails' => $emails];
         }
 
-        [$response_body, $status_code] = self::http_post(
+        [$response_body, $status_code] = self::https_post(
             self::BASE_URL . '/contacts/lists/' . $list_id . '/contacts/remove',
             $body,
             self::auth_headers($api_key)
@@ -366,9 +366,9 @@ class Brevo extends IntegrationBase
         return [
             'port' => 'main',
             'data' => array_merge($input, [
-                'brevo_list_id'           => $list_id,
-                'brevo_contacts_removed'  => $response_body['contacts']['success'] ?? [],
-                'brevo_contacts_failed'   => $response_body['contacts']['failure'] ?? [],
+                'brevo_list_id'          => $list_id,
+                'brevo_contacts_removed' => $response_body['contacts']['success'] ?? [],
+                'brevo_contacts_failed'  => $response_body['contacts']['failure'] ?? [],
             ]),
         ];
     }
@@ -506,7 +506,7 @@ class Brevo extends IntegrationBase
      *
      * @return array{ 0: array, 1: int }
      */
-    protected static function http_post(string $url, array $body, array $headers): array
+    protected static function https_post(string $url, array $body, array $headers): array
     {
         $response = wp_remote_post(
             $url,
@@ -521,8 +521,8 @@ class Brevo extends IntegrationBase
             throw new \Exception('Brevo HTTP request failed: ' . esc_html($response->get_error_message()));
         }
 
-        $status        = (int) wp_remote_retrieve_response_code($response);
-        $decoded_body  = json_decode(wp_remote_retrieve_body($response), true) ?? [];
+        $status       = (int) wp_remote_retrieve_response_code($response);
+        $decoded_body = json_decode(wp_remote_retrieve_body($response), true) ?? [];
 
         return [$decoded_body, $status];
     }
@@ -532,7 +532,7 @@ class Brevo extends IntegrationBase
      *
      * @return array{ 0: array, 1: int }
      */
-    protected static function http_delete(string $url, array $headers): array
+    protected static function https_delete(string $url, array $headers): array
     {
         $response = wp_remote_request(
             $url,
