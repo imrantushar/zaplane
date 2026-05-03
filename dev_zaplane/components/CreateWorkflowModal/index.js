@@ -1,9 +1,7 @@
 import { useEffect, useState, useMemo } from "react";
-import { Box, Flex, Button, Text } from "@chakra-ui/react";
 import { __ } from "@wordpress/i18n";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-
 import WPModal from "@ZAPComponents/Modal/WPModal";
 import ZAPInput from "@ZAPComponents/ZAPInput";
 import { createWorkflows } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow";
@@ -12,119 +10,94 @@ import { primaryBtn } from "../../../assets/scss/chakra/recipe";
 import ZAPDivider from "@ZAPComponents/ZAPDivider";
 import { addWorkflowToFolder, getFolders } from "@ZAPRedux/Slices/folderSlice/folderSlice";
 import Select from "react-select";
-
-const CreateWorkflowModal = ({ isOpen, onClose, id }) => {
+const CreateWorkflowModal = ({
+  isOpen,
+  onClose,
+  id,
+  onNavigateToEdit
+}) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
   const [workflowName, setWorkflowName] = useState("");
   const [folderId, setFolderId] = useState(null);
-
-  const { folders } = useSelector((state) => state.folder);
+  const {
+    folders
+  } = useSelector(state => state.folder);
   const allFolders = folders?.data || [];
-
   useEffect(() => {
     dispatch(getFolders());
   }, [dispatch]);
-
   const effectiveFolderId = folderId ?? id ?? null;
-
   const options = useMemo(() => {
-    return allFolders.map((f) => ({
+    return allFolders.map(f => ({
       label: f.title,
-      value: f.id,
+      value: f.id
     }));
   }, [allFolders]);
-
   const selectedOption = useMemo(() => {
-    return options.find((opt) => opt.value === effectiveFolderId) || null;
+    return options.find(opt => opt.value === effectiveFolderId) || null;
   }, [options, effectiveFolderId]);
-
   const handleCreate = async () => {
     if (!workflowName.trim()) return;
-
     const payload = {
-
-      ...(effectiveFolderId && { folderId: effectiveFolderId }),
+      ...(effectiveFolderId && {
+        folderId: effectiveFolderId
+      })
     };
-
-    const res = await dispatch(createWorkflows({ title: workflowName }));
-
+    const res = await dispatch(createWorkflows({
+      title: workflowName
+    }));
     if (res?.payload?.id) {
-      navigate(
-        `${route_path}admin.php?page=zaplane-workflows&action=edit&id=${res.payload.id}`
-      );
+      if (onNavigateToEdit) {
+        onNavigateToEdit(res.payload.id);
+      } else {
+        navigate(`${route_path}admin.php?page=zaplane-workflows&action=edit&id=${res.payload.id}`);
+      }
     }
     if (effectiveFolderId) {
-      await dispatch(addWorkflowToFolder({ folder_id: effectiveFolderId, workflow_id: res?.payload?.id }));
+      await dispatch(addWorkflowToFolder({
+        folder_id: effectiveFolderId,
+        workflow_id: res?.payload?.id
+      }));
     }
-
-
     setWorkflowName("");
     setFolderId(null);
     onClose();
   };
+  return <WPModal title={__("Create Workflow", "zaplane")} isOpen={isOpen} onRequestClose={onClose} size="medium">
+    <ZAPDivider mb="24px" />
 
-  return (
-    <WPModal
-      title={__("Create Workflow", "zaplane")}
-      isOpen={isOpen}
-      onRequestClose={onClose}
-      size="medium"
-    >
-      <ZAPDivider mb="24px" />
-
-      <Flex flexDirection="column" gap="8px">
-        <ZAPInput
-          label={__("Workflow Name", "zaplane")}
-          placeholder={__("Enter workflow name", "zaplane")}
-          value={workflowName}
-          onChange={(e) => setWorkflowName(e.target.value)}
-        />
-        {!!allFolders.length &&
-          (
-            <Flex direction="column" gap={2}>
-              <Text className="zaplane-label">
+    <div flexDirection="column" gap="8px" className="flex flex-col gap-2">
+      <ZAPInput label={__("Workflow Name", "zaplane")} placeholder={__("Enter workflow name", "zaplane")} value={workflowName} onChange={e => setWorkflowName(e.target.value)} />
+      {!!allFolders.length && <div direction="column" gap={2} className="flex">
+        <div className="flex flex-col gap-2 w-full">
+               <span className="zaplane-label">
                 {__("Select Folder", "zaplane")}
-              </Text>
+              </span>
 
-              <Select
-                className="zaplane-select"
-                options={options}
-                isClearable
-                value={selectedOption}
-                onChange={(val) => setFolderId(val?.value || null)}
-                styles={{
-                  menu: (base) => ({
-                    ...base,
-                    position: "static",
-                  }),
-                }}
-              />
-            </Flex>
-          )
-        }
+              <Select className="zaplane-select" options={options} isClearable value={selectedOption} onChange={val => setFolderId(val?.value || null)} styles={{
+          menu: base => ({
+            ...base,
+            position: "static"
+          })
+        }} />
+        </div>
+      </div>}
 
 
 
-        <ZAPDivider mt="24px" />
+      <ZAPDivider mt="24px" />
 
-        <Flex justify="flex-start" mt={5}>
-          <Button variant="outline" mr={3} onClick={onClose}>
-            {__("Cancel", "zaplane")}
-          </Button>
+      <div className="flex mt-5 gap-3">
+        <button variant="outline" onClick={onClose} className="mr-3 px-4 py-2 border border-[var(--zaplane-border-color)] rounded text-sm">
+          {__("Cancel", "zaplane")}
+        </button>
 
-          <Button
-            {...primaryBtn}
-            onClick={handleCreate}
-            isDisabled={!workflowName.trim()}
-          >
-            {__("Create", "zaplane")}
-          </Button>
-        </Flex>
-      </Flex>
-    </WPModal>
-  );
+        <button style={primaryBtn} onClick={handleCreate} disabled={!workflowName.trim()}>
+          {__("Create", "zaplane")}
+        </button>
+      </div>
+    </div>
+  </WPModal>;
 };
-
 export default CreateWorkflowModal;

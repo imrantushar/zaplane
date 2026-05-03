@@ -1,259 +1,161 @@
 import { useEffect, useState } from 'react';
-import {
-  Text,
-  Flex,
-  Button,
-  Input,
-  VStack,
-  HStack
-} from '@chakra-ui/react';
 import { __ } from '@wordpress/i18n';
-
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { route_path } from '@ZAPUtils/helper';
 import WPModal from '@ZAPComponents/Modal/WPModal';
-
-import {
-  deleteRecipe,
-  recipeToWorkflow,
-  updateRecipe
-} from '@ZAPRedux/Slices/recipeSlice/recipeSlice';
-
-import { primaryBtn } from '../../../../../assets/scss/chakra/recipe';
+import { deleteRecipe, recipeToWorkflow, updateRecipe } from '@ZAPRedux/Slices/recipeSlice/recipeSlice';
+import { outlineBtn, primaryBtn } from '../../../../../assets/scss/chakra/recipe';
 import ZAPDivider from '@ZAPComponents/ZAPDivider';
 import { IoIosPlay } from 'react-icons/io';
 import ZAPTooltip from '@ZAPComponents/ZAPTooltip';
 import ZAPIconGroup from '@ZAPComponents/ZAPIconGroup/ZAPIconGroup';
 import ZAPMenu from '@ZAPComponents/ZapMenu';
-
-const RecipeCard = ({ recipe }) => {
+import ZAPInput from '@ZAPComponents/ZAPInput';
+const RecipeCard = ({
+  recipe
+}) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [isConvertOpen, setIsConvertOpen] = useState(false);
   const [isRenameOpen, setIsRenameOpen] = useState(false);
   const [titleOverride, setTitleOverride] = useState(recipe?.title || '');
   const [title, setTitle] = useState(recipe?.title || '');
-
   const [loading, setLoading] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const [showFullDesc, setShowFullDesc] = useState(false);
-
   useEffect(() => {
     setTitleOverride(recipe?.title || '');
     setTitle(recipe?.title || '');
   }, [recipe]);
-
   const handleDelete = () => {
     if (window.confirm("Are you sure you want to delete this recipe?")) {
       dispatch(deleteRecipe(recipe.id));
     }
   };
-
   const handleConvert = async () => {
     setLoading(true);
     try {
-      const response = await dispatch(
-        recipeToWorkflow({
-          recipeId: recipe.id,
-          payload: {
-            title: titleOverride?.trim() || undefined,
-          },
-        })
-      ).unwrap();
-
+      const response = await dispatch(recipeToWorkflow({
+        recipeId: recipe.id,
+        payload: {
+          title: titleOverride?.trim() || undefined
+        }
+      })).unwrap();
       if (response?.workflow_id) {
-        navigate(
-          `${route_path}admin.php?page=zaplane-workflows&action=edit&id=${response.workflow_id}`
-        );
+        navigate(`${route_path}admin.php?page=zaplane-workflows&action=edit&id=${response.workflow_id}`);
       }
-
       setIsConvertOpen(false);
     } catch (err) {
       console.error(err);
     }
     setLoading(false);
   };
-
   const handleRename = async () => {
     if (!title.trim()) return;
-
     setIsUpdating(true);
     try {
-      await dispatch(
-        updateRecipe({
-          id: recipe.id,
-          payload: { title: title.trim() },
-        })
-      ).unwrap();
-
+      await dispatch(updateRecipe({
+        id: recipe.id,
+        payload: {
+          title: title.trim()
+        }
+      })).unwrap();
       setIsRenameOpen(false);
     } catch (err) {
       console.error(err);
     }
     setIsUpdating(false);
   };
+  return <>
+    <div className="flex flex-col rounded-[12px] p-5 bg-white border border-[#E5E7EB] shadow-sm hover:shadow-md transition-all duration-200 group h-full">
+      <div className="flex justify-between items-center mb-4">
+        <ZAPIconGroup icons={recipe?.integration_icons} maxVisible={3} />
 
-  return (
-    <>
-      <Flex
-        borderRadius="8px"
-        p="16px"
-        bg="white"
-        boxShadow={'var(--zaplane-shadow-2)'}
-        transition="0.2s"
-        flexDirection='column'
-        gap='8px'
-        _hover={{ boxShadow: "var(--zaplane-shadow)" }}
-        minH='190px'
-      >
-        <Flex justify="space-between" align="center">
-          <ZAPIconGroup icons={recipe?.integration_icons} />
+        <div className="flex flex-row items-center gap-2">
+          <ZAPTooltip content='Use Recipe'>
+            <button
+              onClick={() => setIsConvertOpen(true)}
+              className="flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#E5E7EB] text-[13px] font-semibold text-[#374151] hover:bg-[#F9FAFB] hover:border-[#D1D5DB] transition-all"
+            >
+              <IoIosPlay className="text-[#6366F1]" size={14} />
+              {__('Try now', 'zaplane')}
+            </button>
+          </ZAPTooltip>
 
-          <HStack spacing="6px">
-            <ZAPTooltip content='Use Recipe'>
-              <Button
-                size="sm"
-                variant="outline"
-                color='var(--zaplane-font-secondary-color)'
-                fontWeight='500'
-                onClick={() => setIsConvertOpen(true)}
-              >
-                <IoIosPlay />
-                {__('Try now', 'zaplane')}
-              </Button>
-            </ZAPTooltip>
+          <ZAPMenu isIcon items={[{
+            label: __("Rename", "zaplane"),
+            onClick: () => setIsRenameOpen(true)
+          }, {
+            label: __("Delete", "zaplane"),
+            onClick: handleDelete
+          }]} />
+        </div>
+      </div>
 
-            <ZAPMenu
-              isIcon
-              items={[
-                {
-                  label: __("Rename", "zaplane"),
-                  onClick: () => setIsRenameOpen(true),
-                },
-                {
-                  label: __("Delete", "zaplane"),
-                  onClick: handleDelete,
-                }
-              ]}
-            />
-          </HStack>
-        </Flex>
+      <div className="border-t border-[#F3F4F6] -mx-5 mb-4"></div>
 
-        <ZAPDivider m='12px 0 8px -16px' w='109%' />
-
-        <Text
-          w={"80%"}
-          className='zaplane-label'
-          style={{
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-          }}
-          title={recipe?.title}
-        >
+      <div className="flex flex-col gap-2 flex-grow">
+        <h3 className='zaplane-label' title={recipe?.title}>
           {recipe?.title}
-        </Text>
+        </h3>
 
-        <>
-          <Text
-            className='zaplane-sub-title'
-            color='#454F59'
-            style={
-              !showFullDesc
-                ? {
-                  display: '-webkit-box',
-                  WebkitLineClamp: 2,
-                  WebkitBoxOrient: 'vertical',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                }
-                : {}
-            }
-            title={recipe?.description}
-          >
+        <div className="flex flex-col gap-[16px]">
+          <p className={`text-[13px] text-[#6B7280] leading-relaxed ${!showFullDesc ? 'line-clamp-2' : ''}`} title={recipe?.description}>
             {recipe?.description || __('No description', 'zaplane')}
-          </Text>
+          </p>
 
           {recipe?.description && recipe.description.length > 100 && (
-            <Text
-              as="span"
-              fontSize="12px"
-              color="var(--zaplane-primary-color)"
-              cursor="pointer"
-              fontWeight="500"
-              textAlign={'right'}
-              onClick={() => setShowFullDesc((prev) => !prev)}
-              _hover={{ textDecoration: 'underline' }}
+            <button
+              onClick={() => setShowFullDesc(prev => !prev)}
+              className="text-[12px] text-[#6366F1] hover:underline self-end font-semibold mt-1"
             >
               {showFullDesc ? __('See less', 'zaplane') : __('See more', 'zaplane')}
-            </Text>
+            </button>
           )}
-        </>
-      </Flex>
+        </div>
+      </div>
+    </div>
 
-      {/* Convert Modal */}
-      <WPModal
-        title={__('Convert Workflow', 'zaplane')}
-        isOpen={isConvertOpen}
-        onRequestClose={() => setIsConvertOpen(false)}
-        size="small"
-      >
-        <VStack align="stretch" spacing={4}>
-          <Text className='zaplane-label'>
-            {__('Workflow title (optional)', 'zaplane')}
-          </Text>
+    {/* Convert Modal */}
+    <WPModal title={__('Convert Workflow', 'zaplane')} isOpen={isConvertOpen} onRequestClose={() => setIsConvertOpen(false)} size="small">
+      <div align="stretch" className="flex flex-col gap-4">
+        <ZAPInput
+          label={__('Workflow title (optional)', 'zaplane')}
+          value={titleOverride} onChange={e => setTitleOverride(e.target.value)} />
 
-          <Input
-            className='zaplane-input'
-            value={titleOverride}
-            onChange={(e) => setTitleOverride(e.target.value)}
-          />
 
-          <Flex justify="flex-end" gap={3}>
-            <Button variant="outline" onClick={() => setIsConvertOpen(false)}>
-              {__('Cancel', 'zaplane')}
-            </Button>
+        <div className="flex gap-3">
+          <button style={outlineBtn} onClick={() => setIsConvertOpen(false)}>
+            {__('Cancel', 'zaplane')}
+          </button>
 
-            <Button {...primaryBtn} onClick={handleConvert} isLoading={loading}>
-              {__('Convert', 'zaplane')}
-            </Button>
-          </Flex>
-        </VStack>
-      </WPModal>
+          <button style={primaryBtn} onClick={handleConvert}>
+            {__('Convert', 'zaplane')}
+          </button>
+        </div>
+      </div>
+    </WPModal>
 
-      {/* Rename Modal  */}
-      <WPModal
-        title={__("Rename Recipe", "zaplane")}
-        isOpen={isRenameOpen}
-        onRequestClose={() => setIsRenameOpen(false)}
-        size="small"
-      >
-        <Input
-          className='zaplane-input'
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
+    {/* Rename Modal  */}
+    <WPModal title={__("Rename Recipe", "zaplane")} isOpen={isRenameOpen} onRequestClose={() => setIsRenameOpen(false)} size="small">
+      <div className='flex flex-col gap-6'>
+        <ZAPInput
           placeholder={__("Enter recipe name", "zaplane")}
-          mb={4}
-        />
-
-        <Flex justify="flex-end" gap={3}>
-          <Button variant="outline" onClick={() => setIsRenameOpen(false)}>
+          label={__('Enter recipe name', 'zaplane')}
+          value={title}
+          onChange={e => setTitle(e.target.value)} />
+        <div className="flex gap-3">
+          <button style={outlineBtn} onClick={() => setIsRenameOpen(false)}>
             {__("Cancel", "zaplane")}
-          </Button>
+          </button>
 
-          <Button
-            {...primaryBtn}
-            onClick={handleRename}
-            isLoading={isUpdating}
-            isDisabled={!title.trim()}
-          >
+          <button style={primaryBtn} onClick={handleRename} disabled={!title.trim()}>
             {__("Update", "zaplane")}
-          </Button>
-        </Flex>
-      </WPModal>
-    </>
-  );
+          </button>
+        </div>
+      </div>
+    </WPModal>
+  </>;
 };
-
 export default RecipeCard;

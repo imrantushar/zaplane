@@ -16,6 +16,7 @@ class NodeRun extends Model {
 	protected static array $fillable = [
 		'run_id',
 		'node_key',
+		'node_meta_json',
 		'parent_node_run_id',
 		'iteration',
 		'status',
@@ -29,15 +30,16 @@ class NodeRun extends Model {
 	];
 
 	protected static array $casts = [
-		'id' => 'integer',
-		'run_id' => 'integer',
-		'node_key' => 'integer',
+		'id'                 => 'integer',
+		'run_id'             => 'integer',
+		'node_key'           => 'integer',
 		'parent_node_run_id' => 'integer',
-		'iteration' => 'integer',
-		'attempts' => 'integer',
-		'max_attempts' => 'integer',
-		'input_json' => 'json',
-		'output_json' => 'json',
+		'iteration'          => 'integer',
+		'attempts'           => 'integer',
+		'max_attempts'       => 'integer',
+		'input_json'         => 'json',
+		'output_json'        => 'json',
+		'node_meta_json'     => 'json',
 	];
 
 	protected static bool $timestamps = false;

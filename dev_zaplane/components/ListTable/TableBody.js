@@ -1,6 +1,6 @@
 import React from 'react';
 import { __ } from '@wordpress/i18n';
-import { Table, Checkbox } from '@chakra-ui/react';
+
 
 const TableBody = ({
 	copyDataArr,
@@ -10,48 +10,46 @@ const TableBody = ({
 	bodyRef,
 }) => {
 	return (
-		<Table.Body ref={bodyRef}>
+		<tbody ref={bodyRef}>
 			{copyDataArr.length > 0 && copyDataArr.map((row, rowIndex) => (
-				<Table.Row
+				<tr
 					key={rowIndex}
 					role="group"
-					borderBottomWidth="1px" borderColor="var(--zaplane-border-color)"
+					className="border-b border-gray-200 hover:bg-gray-50 transition-colors"
 				>
 					{isCheckboxColumnVisible && (
-						<Table.Cell width="40px">
-							<Checkbox.Root
-								size="sm"
-								mt="0.5"
-								aria-label="Select row"
+						<td style={{ width: '40px' }} className="px-4 py-3">
+							<input 
+								type="checkbox" 
+								className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-600"
 								checked={row.select}
-								onCheckedChange={(changes) =>
+								onChange={(e) =>
 									selectRowChange({
 										row,
-										select: changes.checked,
+										select: e.target.checked,
 									})
 								}
-							>
-								<Checkbox.HiddenInput />
-								<Checkbox.Control />
-							</Checkbox.Root>
-						</Table.Cell>
+							/>
+						</td>
 					)}
 
 					{visibleColumn.map(
 						(column, columnIndex) => (
-							<Table.Cell
+							<td
 								key={columnIndex}
-								position="relative"
-								textAlign={column?.textAlign ? column?.textAlign : "center"}
-								width={column?.width}
+								style={{
+									textAlign: column?.textAlign || 'center',
+									width: column?.width,
+								}}
+								className="px-4 py-3 text-sm"
 							>
 								{column?.cell(row, rowIndex)}
-							</Table.Cell>
+							</td>
 						)
 					)}
-				</Table.Row>
+				</tr>
 			))}
-		</Table.Body>
+		</tbody>
 	);
 };
 

@@ -34,6 +34,9 @@ return [
 		'dokan'                => [
 			'file' => 'dokan.php',
 			'class' => \Zaplane\Integrations\Dokan::class
+		'funnelkit'            => [
+			'file' => 'funnelkit.php',
+			'class' => \Zaplane\Integrations\Funnelkit::class
 		],
 		'wordpress'            => [
 			'file' => 'wordpress.php',
@@ -114,6 +117,10 @@ return [
 		'fluentsmtp'           => [
 			'file' => 'fluent-smtp.php',
 			'class' => \Zaplane\Integrations\FluentSmtp::class
+		],
+		'fluentcart'           => [
+			'file' => 'fluent-cart.php',
+			'class' => \Zaplane\Integrations\FluentCart::class
 		],
 		'gravityforms'         => [
 			'file' => 'gravityforms.php',
@@ -203,6 +210,10 @@ return [
 			'file' => 'wpuserfrontend.php',
 			'class' => \Zaplane\Integrations\Wpuserfrontend::class
 		],
+		'wpfunnels'            => [
+			'file' => 'wpfunnels.php',
+			'class' => \Zaplane\Integrations\Wpfunnels::class
+		],
 		'metabox'            => [
 			'file' => 'metabox.php',
 			'class' => \Zaplane\Integrations\Metabox::class
@@ -218,6 +229,10 @@ return [
 		'kadenceblocks'      => [
 			'file' => 'kadenceblocks.php',
 			'class' => \Zaplane\Integrations\Kadenceblocks::class
+			],
+		'buddyboss'      => [
+			'file' => 'buddyboss.php', 
+			'class' => \Zaplane\Integrations\Buddyboss::class
 		],
 		'ultimatemember'      => [
 			'file' => 'ultimatemember.php', 
@@ -234,6 +249,10 @@ return [
 		'suremail'      => [
 			'file' => 'suremail.php',
 			'class' => \Zaplane\Integrations\Suremail::class
+		],
+		'paymattic'      => [
+			'file' => 'paymattic.php',
+			'class' => \Zaplane\Integrations\Paymattic::class
 		],
 		'bookingcalendar'      => [
 			'file' => 'bookingcalendar.php', 
@@ -274,6 +293,20 @@ return [
 		'zoom'        => [
 			'file'  => 'zoom.php',
 			'class' => \Zaplane\Integrations\Zoom::class
+		],
+		'gamipress'        => [
+			'file'  => 'gamipress.php',
+			'class' => \Zaplane\Integrations\Gamipress::class
+		],
+		'fillout'        => [
+			'file'  => 'fillout.php',
+			'class' => \Zaplane\Integrations\Fillout::class
+		'typeform'        => [
+			'file'  => 'typeform.php',
+			'class' => \Zaplane\Integrations\Typeform::class
+		'discord'        => [
+			'file'  => 'discord.php',
+			'class' => \Zaplane\Integrations\Discord::class
 		],
 	],
 ];

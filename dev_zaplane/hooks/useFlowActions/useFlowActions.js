@@ -87,7 +87,7 @@ export const useFlowActions = ({
         setDrawerOpen(true);
     };
 
-    const { fitView } = useReactFlow();
+    const { fitView, getZoom } = useReactFlow();
     const updateNodeInternals = useUpdateNodeInternals();
 
     const onLayout = useCallback(
@@ -104,7 +104,8 @@ export const useFlowActions = ({
                     updateNodeInternals(node.id);
                 });
 
-                fitView({ padding: 0.2, duration: 300 });
+                const currentZoom = getZoom();
+                fitView({ padding: 0.2, duration: 300, minZoom: currentZoom, maxZoom: currentZoom });
                 setCanvasLayOut(direction)
             });
         },

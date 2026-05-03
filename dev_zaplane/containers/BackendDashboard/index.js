@@ -48,14 +48,14 @@ export default function BackendDashboard() {
 	const query = useQuery();
 
 	return (
-		<div className="zaplane-admin-content">
-			<Notification />
-			{renderSwitch(
-				query.get('page'),
-				parseInt(query.get('id')),
-				query.get('action'),
-				query.get('path')
-			)}
-		</div>
+			<div className="zaplane-admin-content">
+				<Notification />
+				{renderSwitch(
+					query.get('page'),
+					parseInt(query.get('id')),
+					query.get('action'),
+					query.get('path')
+				)}
+			</div>
 	);
 }

@@ -3,12 +3,15 @@
 namespace Zaplane\Integrations;
 
 use Zaplane\Framework\Classes\IntegrationBase;
+use Zaplane\Integrations\Gemcrm\QueryTrait;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
 class Gemcrm extends IntegrationBase {
+
+	use QueryTrait;
 
 	public static function get_slug(): string {
 		return 'gemcrm';
@@ -21,10 +24,6 @@ class Gemcrm extends IntegrationBase {
 	public static function get_icon(): string {
 		return 'crm.svg';
 	}
-
-	// -------------------------------------------------------------------------
-	// Triggers
-	// -------------------------------------------------------------------------
 
 	public static function get_triggers(): array {
 		return [
@@ -51,12 +50,6 @@ class Gemcrm extends IntegrationBase {
 		];
 	}
 
-	/**
-	 * Optional config schema per trigger.
-	 *
-	 * Tag and list triggers let the user optionally scope them to a specific
-	 * tag/list ID. Leaving the field empty means "fire for any tag/list".
-	 */
 	public static function get_trigger_config_schema( string $trigger ): array {
 		switch ( $trigger ) {
 			case 'contact_tag_attached':
@@ -96,10 +89,6 @@ class Gemcrm extends IntegrationBase {
 
 		return [];
 	}
-
-	// -------------------------------------------------------------------------
-	// Trigger resolver
-	// -------------------------------------------------------------------------
 
 	public static function resolve_trigger( array $node, array $args ) {
 		$event = $node['event'] ?? '';
@@ -180,10 +169,6 @@ class Gemcrm extends IntegrationBase {
 		return false;
 	}
 
-	// -------------------------------------------------------------------------
-	// Actions
-	// -------------------------------------------------------------------------
-
 	public static function get_actions(): array {
 		return [
 			'create_contact'   => [ 'label' => 'Create Contact' ],
@@ -193,46 +178,29 @@ class Gemcrm extends IntegrationBase {
 			'apply_list'       => [ 'label' => 'Add Contact To List' ],
 			'remove_from_tag'  => [ 'label' => 'Remove Tag From Contact' ],
 			'remove_from_list' => [ 'label' => 'Remove Contact From List' ],
+			'send_campaign'    => [ 'label' => 'Send Email Campaign' ],
+			'send_email'       => [ 'label' => 'Send Email' ],
 		];
 	}
 
 	public static function get_action_config_schema( string $action ): array {
 		switch ( $action ) {
 			case 'create_contact':
-				return self::contact_fields( true );
+				return self::contact_fields();
 
 			case 'update_contact':
 				return array_merge(
-					[
-						[
-							'key'      => 'contact_id',
-							'label'    => 'Contact ID',
-							'type'     => 'expression',
-							'required' => true,
-						],
-					],
-					self::contact_fields( false )
+					[ self::contact_id_field( true ) ],
+					self::contact_fields()
 				);
 
 			case 'delete_contact':
-				return [
-					[
-						'key'      => 'contact_id',
-						'label'    => 'Contact ID',
-						'type'     => 'expression',
-						'required' => true,
-					],
-				];
+				return [ self::contact_id_field( true ) ];
 
 			case 'apply_tag':
 			case 'remove_from_tag':
 				return [
-					[
-						'key'      => 'contact_id',
-						'label'    => 'Contact ID',
-						'type'     => 'expression',
-						'required' => true,
-					],
+					self::contact_id_field( true ),
 					[
 						'key'      => 'tag_id',
 						'label'    => 'Tag',
@@ -249,12 +217,7 @@ class Gemcrm extends IntegrationBase {
 			case 'apply_list':
 			case 'remove_from_list':
 				return [
-					[
-						'key'      => 'contact_id',
-						'label'    => 'Contact ID',
-						'type'     => 'expression',
-						'required' => true,
-					],
+					self::contact_id_field( true ),
 					[
 						'key'      => 'list_id',
 						'label'    => 'List',
@@ -267,65 +230,37 @@ class Gemcrm extends IntegrationBase {
 						],
 					],
 				];
+
+			case 'send_campaign':
+				return [
+					[
+						'key'      => 'campaign_id',
+						'label'    => 'Email Campaign',
+						'type'     => 'select',
+						'required' => true,
+						'dynamic'  => [
+							'integration' => 'gemcrm',
+							'query'       => 'gemcrm_campaign_query',
+							'select'      => [ 'value', 'label' ],
+						],
+					],
+				];
+
+			case 'send_email':
+				return self::send_email_fields();
 		}
 
 		return [];
 	}
 
-	// -------------------------------------------------------------------------
-	// Dynamic queries
-	// -------------------------------------------------------------------------
-
 	public static function get_dynamic_queries(): array {
 		return [
-			'gemcrm_tag_query'  => [ self::class, 'query_tags' ],
-			'gemcrm_list_query' => [ self::class, 'query_lists' ],
+			'gemcrm_contact_query'  => [ self::class, 'query_contacts' ],
+			'gemcrm_tag_query'      => [ self::class, 'query_tags' ],
+			'gemcrm_list_query'     => [ self::class, 'query_lists' ],
+			'gemcrm_campaign_query' => [ self::class, 'query_campaigns' ],
 		];
 	}
-
-	public static function query_tags( $q = null ): array {
-		if ( ! class_exists( \GemCrm\Database\Models\Tag::class ) ) {
-			return [];
-		}
-
-		$items = \GemCrm\Database\Models\Tag::index( [], null, true );
-		$result = [];
-
-		foreach ( (array) $items as $item ) {
-			$id    = is_object( $item ) ? ( $item->id ?? null ) : ( $item['id'] ?? null );
-			$name  = is_object( $item ) ? ( $item->name ?? '' ) : ( $item['name'] ?? '' );
-
-			if ( $id ) {
-				$result[] = [ 'value' => $id, 'label' => $name ];
-			}
-		}
-
-		return $result;
-	}
-
-	public static function query_lists( $q = null ): array {
-		if ( ! class_exists( \GemCrm\Database\Models\ListModel::class ) ) {
-			return [];
-		}
-
-		$items = \GemCrm\Database\Models\ListModel::index( [], null, true );
-		$result = [];
-
-		foreach ( (array) $items as $item ) {
-			$id   = is_object( $item ) ? ( $item->id ?? null ) : ( $item['id'] ?? null );
-			$name = is_object( $item ) ? ( $item->name ?? '' ) : ( $item['name'] ?? '' );
-
-			if ( $id ) {
-				$result[] = [ 'value' => $id, 'label' => $name ];
-			}
-		}
-
-		return $result;
-	}
-
-	// -------------------------------------------------------------------------
-	// Node executor
-	// -------------------------------------------------------------------------
 
 	public static function execute_node( array $node, array $input ): array {
 		$event  = $node['data']['event'] ?? '';
@@ -342,17 +277,132 @@ class Gemcrm extends IntegrationBase {
 		];
 	}
 
-	// -------------------------------------------------------------------------
-	// Schema helpers
-	// -------------------------------------------------------------------------
+	private static function send_email_fields(): array {
+		return [
+			// ── Recipient ────────────────────────────────────────────────────
+			[
+				'key'      => 'recipient_type',
+				'label'    => 'Send To',
+				'type'     => 'select',
+				'required' => true,
+				'default'  => 'contact',
+				'options'  => [
+					[ 'value' => 'contact', 'label' => 'Specific Contact' ],
+					[ 'value' => 'list',    'label' => 'Contact List'     ],
+					[ 'value' => 'custom',  'label' => 'Custom Email'     ],
+				],
+			],
+			// Shown when recipient_type = contact
+			[
+				'key'        => 'contact_id',
+				'label'      => 'Contact',
+				'type'       => 'select',
+				'required'   => false,
+				'depends_on' => [ 'recipient_type' => 'contact' ],
+				'dynamic'    => [
+					'integration' => 'gemcrm',
+					'query'       => 'gemcrm_contact_query',
+					'select'      => [ 'value', 'label' ],
+				],
+			],
+			// Shown when recipient_type = list
+			[
+				'key'        => 'list_id',
+				'label'      => 'Contact List',
+				'type'       => 'select',
+				'required'   => false,
+				'depends_on' => [ 'recipient_type' => 'list' ],
+				'dynamic'    => [
+					'integration' => 'gemcrm',
+					'query'       => 'gemcrm_list_query',
+					'select'      => [ 'value', 'label' ],
+				],
+			],
+			// Shown when recipient_type = custom
+			[
+				'key'        => 'custom_email',
+				'label'      => 'Email Address',
+				'type'       => 'expression',
+				'subtype'    => 'email',
+				'required'   => false,
+				'depends_on' => [ 'recipient_type' => 'custom' ],
+				'placeholder' => 'someone@example.com or use @ to pick a variable',
+			],
+			// ── Content ──────────────────────────────────────────────────────
+			[
+				'key'      => 'subject',
+				'label'    => 'Subject',
+				'type'     => 'expression',
+				'required' => true,
+				'placeholder' => 'Your subject line…',
+			],
+			[
+				'key'         => 'body',
+				'label'       => 'Email Body',
+				'type'        => 'richtext',  // frontend renders a rich text / HTML editor
+				'required'    => true,
+				'placeholder' => 'Write your email here…',
+			],
+			[
+				'key'      => 'pre_header',
+				'label'    => 'Pre-header Text',
+				'type'     => 'expression',
+				'required' => false,
+				'placeholder' => 'Short preview text shown in inbox…',
+			],
+			// ── Sender ───────────────────────────────────────────────────────
+			[
+				'key'      => 'from_email',
+				'label'    => 'From Email',
+				'type'     => 'expression',
+				'subtype'  => 'email',
+				'required' => false,
+				'placeholder' => 'Leave empty to use system default',
+			],
+			[
+				'key'      => 'from_name',
+				'label'    => 'From Name',
+				'type'     => 'expression',
+				'required' => false,
+				'placeholder' => 'Leave empty to use system default',
+			],
+			[
+				'key'      => 'reply_to_email',
+				'label'    => 'Reply-To Email',
+				'type'     => 'expression',
+				'subtype'  => 'email',
+				'required' => false,
+			],
+			[
+				'key'      => 'reply_to_name',
+				'label'    => 'Reply-To Name',
+				'type'     => 'expression',
+				'required' => false,
+			],
+		];
+	}
 
-	private static function contact_fields( bool $required = false ): array {
+	private static function contact_id_field( bool $required = false ): array {
+		return [
+			'key'      => 'contact_id',
+			'label'    => 'Contact',
+			'type'     => 'select',
+			'required' => $required,
+			'dynamic'  => [
+				'integration' => 'gemcrm',
+				'query'       => 'gemcrm_contact_query',
+				'select'      => [ 'value', 'label' ],
+			],
+		];
+	}
+
+	private static function contact_fields(): array {
 		return [
 			[
 				'key'      => 'first_name',
 				'label'    => 'First Name',
 				'type'     => 'expression',
-				'required' => $required,
+				'required' => true,
 			],
 			[
 				'key'      => 'last_name',
@@ -361,10 +411,11 @@ class Gemcrm extends IntegrationBase {
 				'required' => false,
 			],
 			[
-				'key'      => 'email',
-				'label'    => 'Email',
-				'type'     => 'expression',
-				'required' => $required,
+				'key'     => 'email',
+				'label'   => 'Email',
+				'type'    => 'expression',
+				'subtype' => 'email',
+				'required' => true,
 			],
 			[
 				'key'      => 'phone',
@@ -373,18 +424,21 @@ class Gemcrm extends IntegrationBase {
 				'required' => false,
 			],
 			[
-				'key'         => 'status',
-				'label'       => 'Status',
-				'type'        => 'expression',
-				'required'    => false,
-				'placeholder' => 'e.g. active',
+				'key'      => 'gemcrm_status',
+				'label'    => 'Status',
+				'type'     => 'select',
+				'required' => false,
+				'options'  => self::get_contact_statuses(),
 			],
 			[
-				'key'         => 'type',
-				'label'       => 'Type',
-				'type'        => 'expression',
-				'required'    => false,
-				'placeholder' => 'e.g. customer',
+				'key'      => 'type',
+				'label'    => 'Type',
+				'type'     => 'select',
+				'required' => false,
+				'options'  => [
+					[ 'value' => 'lead',     'label' => 'Lead' ],
+					[ 'value' => 'customer', 'label' => 'Customer' ],
+				],
 			],
 			[
 				'key'      => 'linked_id',
@@ -399,22 +453,26 @@ class Gemcrm extends IntegrationBase {
 				'required' => false,
 			],
 			[
-				'key'      => 'company_ids',
-				'label'    => 'Company IDs (comma-separated)',
-				'type'     => 'expression',
-				'required' => false,
-			],
-			[
 				'key'      => 'tag_ids',
-				'label'    => 'Tag IDs (comma-separated)',
-				'type'     => 'expression',
+				'label'    => 'Tags',
+				'type'     => 'multi-select',
 				'required' => false,
+				'dynamic'  => [
+					'integration' => 'gemcrm',
+					'query'       => 'gemcrm_tag_query',
+					'select'      => [ 'value', 'label' ],
+				],
 			],
 			[
 				'key'      => 'list_ids',
-				'label'    => 'List IDs (comma-separated)',
-				'type'     => 'expression',
+				'label'    => 'Lists',
+				'type'     => 'multi-select',
 				'required' => false,
+				'dynamic'  => [
+					'integration' => 'gemcrm',
+					'query'       => 'gemcrm_list_query',
+					'select'      => [ 'value', 'label' ],
+				],
 			],
 			[
 				'key'      => 'addr_line_1',
@@ -455,9 +513,18 @@ class Gemcrm extends IntegrationBase {
 		];
 	}
 
-	// -------------------------------------------------------------------------
-	// Response helpers
-	// -------------------------------------------------------------------------
+	private static function get_contact_statuses(): array {
+		return [
+			[ 'value' => 'draft',         'label' => 'Draft' ],
+			[ 'value' => 'pending',       'label' => 'Pending' ],
+			[ 'value' => 'subscribed',    'label' => 'Subscribed' ],
+			[ 'value' => 'unsubscribed',  'label' => 'Unsubscribed' ],
+			[ 'value' => 'spamed',        'label' => 'Spamed' ],
+			[ 'value' => 'bounced',       'label' => 'Bounced' ],
+			[ 'value' => 'complained',    'label' => 'Complained' ],
+			[ 'value' => 'transactional', 'label' => 'Transactional' ],
+		];
+	}
 
 	private static function action_error( string $message, array $input ): array {
 		return [
@@ -473,17 +540,18 @@ class Gemcrm extends IntegrationBase {
 		];
 	}
 
-	// -------------------------------------------------------------------------
-	// Contact data builder
-	// -------------------------------------------------------------------------
-
 	private static function build_contact_data( array $config ): array {
 		$data = [];
 
-		foreach ( [ 'status', 'type', 'first_name', 'last_name', 'phone', 'email' ] as $field ) {
+		foreach ( [ 'type', 'first_name', 'last_name', 'phone', 'email' ] as $field ) {
 			if ( isset( $config[ $field ] ) && '' !== $config[ $field ] ) {
 				$data[ $field ] = sanitize_text_field( $config[ $field ] );
 			}
+		}
+
+		// 'gemcrm_status' is the schema key (avoids frontend key collision); maps to 'status' for GemCRM.
+		if ( isset( $config['gemcrm_status'] ) && '' !== $config['gemcrm_status'] ) {
+			$data['status'] = sanitize_text_field( $config['gemcrm_status'] );
 		}
 
 		foreach ( [ 'linked_id', 'photo_id' ] as $int_field ) {
@@ -492,12 +560,12 @@ class Gemcrm extends IntegrationBase {
 			}
 		}
 
-		foreach ( [ 'company_ids', 'tag_ids', 'list_ids' ] as $id_field ) {
+		foreach ( [ 'tag_ids', 'list_ids' ] as $id_field ) {
 			if ( ! empty( $config[ $id_field ] ) ) {
+				$raw = $config[ $id_field ];
+				// multi-select sends an array; fallback handles a single value.
 				$data[ $id_field ] = array_values(
-					array_filter(
-						array_map( 'intval', array_map( 'trim', explode( ',', $config[ $id_field ] ) ) )
-					)
+					array_filter( array_map( 'intval', (array) $raw ) )
 				);
 			}
 		}
@@ -515,10 +583,6 @@ class Gemcrm extends IntegrationBase {
 
 		return $data;
 	}
-
-	// -------------------------------------------------------------------------
-	// Action methods
-	// -------------------------------------------------------------------------
 
 	protected static function action_create_contact( array $config, array $input ): array {
 		if ( ! class_exists( \GemCrm\Database\Models\Contact::class ) ) {
@@ -668,6 +732,207 @@ class Gemcrm extends IntegrationBase {
 		return self::action_success( array_merge( $input, [
 			'contact_id' => $contact_id,
 			'list_id'    => $list_id,
+		] ) );
+	}
+
+	protected static function action_send_email( array $config, array $input ): array {
+		if ( ! class_exists( \GemCrm\Classes\EmailSender::class ) ) {
+			return self::action_error( 'GemCRM EmailSender is not available', $input );
+		}
+
+		$subject        = trim( $config['subject'] ?? '' );
+		$body           = $config['body'] ?? '';
+		$pre_header     = $config['pre_header'] ?? null;
+		$from_email     = $config['from_email'] ?? null;
+		$from_name      = $config['from_name'] ?? null;
+		$reply_to_email = $config['reply_to_email'] ?? null;
+		$reply_to_name  = $config['reply_to_name'] ?? null;
+		$recipient_type = $config['recipient_type'] ?? 'contact';
+
+		if ( ! $subject ) {
+			return self::action_error( 'Email subject is required', $input );
+		}
+		if ( ! $body ) {
+			return self::action_error( 'Email body is required', $input );
+		}
+
+		switch ( $recipient_type ) {
+
+			case 'contact':
+				$contact_id = (int) ( $config['contact_id'] ?? 0 );
+				if ( ! $contact_id ) {
+					return self::action_error( 'Contact is required', $input );
+				}
+
+				$to = self::find_contact_email( $contact_id );
+				if ( ! $to || ! is_email( $to ) ) {
+					return self::action_error( 'Contact not found or has no valid email', $input );
+				}
+
+				try {
+					( new \GemCrm\Classes\EmailSender( $subject, $body, $pre_header ?: null ) )
+						->from( $from_email ?: null, $from_name ?: null )
+						->reply_to( $reply_to_email ?: null, $reply_to_name ?: null )
+						->to( $to )
+						->send();
+				} catch ( \Throwable $e ) {
+					return self::action_error( 'Failed to send email: ' . $e->getMessage(), $input );
+				}
+
+				return self::action_success( array_merge( $input, [
+					'recipient_type' => 'contact',
+					'sent_to'        => $to,
+					'sent_count'     => 1,
+				] ) );
+
+			case 'list':
+				$list_id = (int) ( $config['list_id'] ?? 0 );
+				if ( ! $list_id ) {
+					return self::action_error( 'Contact list is required', $input );
+				}
+
+				$stats = self::send_to_list_contacts(
+					$list_id, $subject, $body,
+					$pre_header ?: null,
+					$from_email ?: null, $from_name ?: null,
+					$reply_to_email ?: null, $reply_to_name ?: null
+				);
+
+				return self::action_success( array_merge( $input, [
+					'recipient_type' => 'list',
+					'list_id'        => $list_id,
+					'sent_count'     => $stats['sent'],
+					'failed_count'   => count( $stats['failed'] ),
+					'failed_emails'  => $stats['failed'],
+				] ) );
+
+			case 'custom':
+			default:
+				$to = sanitize_email( $config['custom_email'] ?? '' );
+				if ( ! $to || ! is_email( $to ) ) {
+					return self::action_error( 'A valid custom email address is required', $input );
+				}
+
+				try {
+					( new \GemCrm\Classes\EmailSender( $subject, $body, $pre_header ?: null ) )
+						->from( $from_email ?: null, $from_name ?: null )
+						->reply_to( $reply_to_email ?: null, $reply_to_name ?: null )
+						->to( $to )
+						->send();
+				} catch ( \Throwable $e ) {
+					return self::action_error( 'Failed to send email: ' . $e->getMessage(), $input );
+				}
+
+				return self::action_success( array_merge( $input, [
+					'recipient_type' => 'custom',
+					'sent_to'        => $to,
+					'sent_count'     => 1,
+				] ) );
+		}
+	}
+
+	/**
+	 * Fetch a contact's email address by ID.
+	 * Tries Contact::find() first (ORM pattern), falls back to index().
+	 */
+	private static function find_contact_email( int $contact_id ): ?string {
+		if ( ! class_exists( \GemCrm\Database\Models\Contact::class ) ) {
+			return null;
+		}
+
+		if ( method_exists( \GemCrm\Database\Models\Contact::class, 'find' ) ) {
+			$contact = \GemCrm\Database\Models\Contact::find( $contact_id );
+			if ( $contact ) {
+				return is_array( $contact )
+					? ( $contact['email'] ?? null )
+					: ( $contact->email ?? null );
+			}
+			return null;
+		}
+
+		// Fallback: search by ID via index
+		$result = \GemCrm\Database\Models\Contact::index( [
+			'id'       => $contact_id,
+			'per_page' => 1,
+		], null );
+
+		return $result['records'][0]['email'] ?? null;
+	}
+
+	/**
+	 * Send the email to every contact in a list, paginating 100 at a time
+	 * so large lists don't exhaust memory or hit the API in a single burst.
+	 *
+	 * @return array{ sent: int, failed: string[] }
+	 */
+	private static function send_to_list_contacts(
+		int $list_id,
+		string $subject,
+		string $body,
+		?string $pre_header,
+		?string $from_email,
+		?string $from_name,
+		?string $reply_to_email,
+		?string $reply_to_name
+	): array {
+		$page     = 1;
+		$per_page = 100;
+		$sent     = 0;
+		$failed   = [];
+
+		do {
+			$result  = \GemCrm\Database\Models\Contact::index( [
+				'list_id'  => $list_id,
+				'page'     => $page,
+				'per_page' => $per_page,
+			], null );
+
+			$records = $result['records'] ?? [];
+
+			foreach ( $records as $contact ) {
+				$to = sanitize_email( $contact['email'] ?? '' );
+				if ( ! is_email( $to ) ) {
+					continue;
+				}
+
+				try {
+					( new \GemCrm\Classes\EmailSender( $subject, $body, $pre_header ) )
+						->from( $from_email, $from_name )
+						->reply_to( $reply_to_email, $reply_to_name )
+						->to( $to )
+						->send();
+					$sent++;
+				} catch ( \Throwable $e ) {
+					$failed[] = $to;
+				}
+			}
+
+			$page++;
+		} while ( count( $records ) === $per_page );
+
+		return [ 'sent' => $sent, 'failed' => $failed ];
+	}
+
+	protected static function action_send_campaign( array $config, array $input ): array {
+		if ( ! class_exists( \GemCrm\Database\Models\Campaign::class ) ) {
+			return self::action_error( 'GemCRM is not installed', $input );
+		}
+
+		$campaign_id = (int) ( $config['campaign_id'] ?? 0 );
+
+		if ( ! $campaign_id ) {
+			return self::action_error( 'Campaign is required', $input );
+		}
+
+		$campaign = \GemCrm\Database\Models\Campaign::update( $campaign_id, [ 'status' => 'pending' ] );
+
+		if ( ! $campaign ) {
+			return self::action_error( 'Failed to start campaign', $input );
+		}
+
+		return self::action_success( array_merge( $input, [
+			'campaign_id' => $campaign_id,
+			'campaign'    => $campaign,
 		] ) );
 	}
 }

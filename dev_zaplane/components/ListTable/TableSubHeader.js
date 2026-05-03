@@ -1,40 +1,23 @@
 import React from 'react';
 import SortableColumns from './SortableColumns';
-import { Box, Flex } from '@chakra-ui/react';
-
 const TableSubHeader = ({
-	subHeaderComponent,
-	setTempCopyColumns,
-	tempCopyColumns,
-	showColumnFilter,
-	checkedChange,
-	setCopyColumns,
-	copyColumns,
-	suffix,
+  subHeaderComponent,
+  setTempCopyColumns,
+  tempCopyColumns,
+  showColumnFilter,
+  checkedChange,
+  setCopyColumns,
+  copyColumns,
+  suffix
 }) => {
-	return (
-		<Flex className="zaplane-table__sub-header" justifyContent={'space-between'} width={'100%'}>
-			<Flex justifyContent={'space-between'} className="zaplane-table__sub-header-left" width={'100%'}>
+  return <div width={'100%'} className="zaplane-table__sub-header flex justify-between">
+			<div width={'100%'} className="zaplane-table__sub-header-left flex justify-between">
 				{subHeaderComponent && subHeaderComponent}
-			</Flex>
+			</div>
 
-			{showColumnFilter ? (
-				<Box className="zaplane-table__sub-header-right">
-					<SortableColumns
-						setTempCopyColumns={setTempCopyColumns}
-						tempCopyColumns={tempCopyColumns}
-						showColumnFilter={showColumnFilter}
-						checkedChange={checkedChange}
-						setCopyColumns={setCopyColumns}
-						copyColumns={copyColumns}
-						suffix={suffix}
-					/>
-				</Box>
-			) : (
-				null
-			)}
-		</Flex>
-	);
+			{showColumnFilter ? <div>
+					<SortableColumns setTempCopyColumns={setTempCopyColumns} tempCopyColumns={tempCopyColumns} showColumnFilter={showColumnFilter} checkedChange={checkedChange} setCopyColumns={setCopyColumns} copyColumns={copyColumns} suffix={suffix} />
+				</div> : null}
+		</div>;
 };
-
 export default TableSubHeader;
