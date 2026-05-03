@@ -31,6 +31,9 @@ return [
 			'file' => 'cartflows.php',
 			'class' => \Zaplane\Integrations\Cartflows::class
 		],
+		'dokan'                => [
+			'file' => 'dokan.php',
+			'class' => \Zaplane\Integrations\Dokan::class
 		'funnelkit'            => [
 			'file' => 'funnelkit.php',
 			'class' => \Zaplane\Integrations\Funnelkit::class
