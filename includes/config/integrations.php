@@ -287,6 +287,9 @@ return [
 			'file'  => 'gamipress.php',
 			'class' => \Zaplane\Integrations\Gamipress::class
 		],
+		'fillout'        => [
+			'file'  => 'fillout.php',
+			'class' => \Zaplane\Integrations\Fillout::class
 		'typeform'        => [
 			'file'  => 'typeform.php',
 			'class' => \Zaplane\Integrations\Typeform::class
