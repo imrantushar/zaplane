@@ -290,6 +290,9 @@ return [
 		'typeform'        => [
 			'file'  => 'typeform.php',
 			'class' => \Zaplane\Integrations\Typeform::class
+		'discord'        => [
+			'file'  => 'discord.php',
+			'class' => \Zaplane\Integrations\Discord::class
 		],
 	],
 ];
