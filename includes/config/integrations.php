@@ -31,6 +31,10 @@ return [
 			'file' => 'cartflows.php',
 			'class' => \Zaplane\Integrations\Cartflows::class
 		],
+		'dokan'                => [
+			'file' => 'dokan.php',
+			'class' => \Zaplane\Integrations\Dokan::class
+		],
 		'funnelkit'            => [
 			'file' => 'funnelkit.php',
 			'class' => \Zaplane\Integrations\Funnelkit::class
@@ -114,6 +118,10 @@ return [
 		'fluentsmtp'           => [
 			'file' => 'fluent-smtp.php',
 			'class' => \Zaplane\Integrations\FluentSmtp::class
+		],
+		'fluentcart'           => [
+			'file' => 'fluent-cart.php',
+			'class' => \Zaplane\Integrations\FluentCart::class
 		],
 		'gravityforms'         => [
 			'file' => 'gravityforms.php',
@@ -223,6 +231,10 @@ return [
 			'file' => 'kadenceblocks.php',
 			'class' => \Zaplane\Integrations\Kadenceblocks::class
 			],
+		'eventscalendar'      => [
+			'file' => 'eventscalendar.php', 
+			'class' => \Zaplane\Integrations\Eventscalendar::class
+			],
 		'buddyboss'      => [
 			'file' => 'buddyboss.php', 
 			'class' => \Zaplane\Integrations\Buddyboss::class
@@ -242,6 +254,10 @@ return [
 		'suremail'      => [
 			'file' => 'suremail.php',
 			'class' => \Zaplane\Integrations\Suremail::class
+		],
+		'paymattic'      => [
+			'file' => 'paymattic.php',
+			'class' => \Zaplane\Integrations\Paymattic::class
 		],
 		'bookingcalendar'      => [
 			'file' => 'bookingcalendar.php', 
@@ -287,9 +303,17 @@ return [
 			'file'  => 'gamipress.php',
 			'class' => \Zaplane\Integrations\Gamipress::class
 		],
-		'makeforms'        => [
-			'file'  => 'makeforms.php',
-			'class' => \Zaplane\Integrations\Makeforms::class
+		'fillout'        => [
+			'file'  => 'fillout.php',
+			'class' => \Zaplane\Integrations\Fillout::class
+		],
+		'typeform'        => [
+			'file'  => 'typeform.php',
+			'class' => \Zaplane\Integrations\Typeform::class
+		],
+		'discord'        => [
+			'file'  => 'discord.php',
+			'class' => \Zaplane\Integrations\Discord::class
 		],
 	],
 ];

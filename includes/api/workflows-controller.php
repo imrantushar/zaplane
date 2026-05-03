@@ -6,11 +6,13 @@ use WP_REST_Controller;
 use WP_REST_Server;
 use WP_Error;
 use Zaplane\Framework\Classes\Container;
+use Zaplane\Framework\Classes\GlobalContext;
 use Zaplane\Models\Workflow;
 use Zaplane\Models\WorkflowVersion;
 use Zaplane\Models\Run;
 use Zaplane\Models\NodeRun;
 use Zaplane\Utils\VariableExtractor;
+use Zaplane\Framework\Core\IntegrationLoader;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -560,7 +562,7 @@ class WorkflowsController extends WP_REST_Controller {
 			}
 
 			$nodeType = $node['type'] ?? '';
-			if ( ! in_array( $nodeType, [ 'action', 'condition', 'filter' ], true ) ) {
+			if ( ! in_array( $nodeType, [ 'trigger', 'action', 'condition', 'filter' ], true ) ) {
 				continue;
 			}
 
@@ -574,25 +576,47 @@ class WorkflowsController extends WP_REST_Controller {
 				}
 
 				$data[] = [
-					'node_id' => $nodeId,
-					'node_name' => $node['data']['name'] ?? '',
+					'node_id'    => $nodeId,
+					'node_name'  => $node['data']['name'] ?? '',
 					'node_event' => $node['data']['event'] ?? '',
-					'variables' => VariableExtractor::extract( $output ),
+					'variables'  => VariableExtractor::extract( $output ),
+					'is_sample'  => false,
 				];
 			} else {
+				$variables = [];
+				$isSample  = false;
+
+				if ( $nodeType === 'trigger' ) {
+					$integration = $node['data']['integration'] ?? '';
+					$event       = $node['data']['event'] ?? '';
+					$instance    = IntegrationLoader::get( $integration );
+					if ( $instance ) {
+						$sample = get_class( $instance )::get_trigger_sample_output( $event );
+						if ( ! empty( $sample ) ) {
+							$variables = VariableExtractor::extract( $sample );
+							$isSample  = true;
+						}
+					}
+				}
+
 				$data[] = [
-					'node_id' => $nodeId,
-					'node_name' => $node['data']['name'] ?? '',
+					'node_id'    => $nodeId,
+					'node_name'  => $node['data']['name'] ?? '',
 					'node_event' => $node['data']['event'] ?? '',
-					'variables' => [],
+					'variables'  => $variables,
+					'is_sample'  => $isSample,
 				];
 			}//end if
 		}//end foreach
 
+		$workflow = Workflow::find( $workflowId );
+		$context  = GlobalContext::all_for_picker( $workflow ?: null );
+
 		return rest_ensure_response([
-			'status' => 'success',
-			'code' => 'SUCCESS',
-			'data' => $data,
+			'status'  => 'success',
+			'code'    => 'SUCCESS',
+			'data'    => $data,
+			'context' => $context,
 		]);
 	}
 

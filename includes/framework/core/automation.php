@@ -5,6 +5,7 @@ namespace Zaplane\Framework\Core;
 use Zaplane\Framework\Classes\Container;
 use Zaplane\Framework\Classes\ConnectionManager;
 use Zaplane\Framework\Classes\Expression;
+use Zaplane\Framework\Classes\GlobalContext;
 use Zaplane\Framework\Classes\Query;
 use Zaplane\Framework\Exceptions\WorkflowException;
 use Zaplane\Framework\Exceptions\IntegrationException;
@@ -161,14 +162,18 @@ class Automation {
 
 		$run = Run::create([
 			'workflow_version_id' => $trigger['workflow_version_id'],
-			'workflow_id' => $trigger['workflow_id'],
-			'trigger_data' => $payload,
-			'status' => 'running',
-			'start_node_key' => $nodeKey,
-			'target_node_key' => null,
-			'started_at' => current_time( 'mysql' ),
+			'workflow_id'         => $trigger['workflow_id'],
+			// Capture the current WordPress user synchronously at hook-fire time.
+			// Action Scheduler runs nodes async (no logged-in user), so we store the
+			// user ID here and re-hydrate it in GlobalContext::build_wp() at execution time.
+			'trigger_data'        => array_merge( $payload, [ '__wp_user_id' => get_current_user_id() ] ),
+			'status'              => 'running',
+			'start_node_key'      => $nodeKey,
+			'target_node_key'     => null,
+			'started_at'          => current_time( 'mysql' ),
 		]);
 
+		// NodeRun gets the clean payload — __wp_user_id must not appear in node outputs.
 		$this->spawn_node_run( $run->id, $nodeKey, $payload, null, $this->extract_node_meta( $trigger['graph_node'] ) );
 	}
 
@@ -247,7 +252,7 @@ class Automation {
 
 		$app = strtolower( $node['data']['app'] ?? '' );
 
-		$context = $this->buildNodeContext( $run->id );
+		$context = $this->buildNodeContext( $run->id, $run, $node );
 		$resolveData = $input + $context;
 
 		$node['_run_id'] = $run->id;
@@ -407,7 +412,7 @@ class Automation {
 
 
 
-	private function buildNodeContext( int $run_id ): array {
+	private function buildNodeContext( int $run_id, ?Run $run = null, array $node = [] ): array {
 		$nodeRuns = NodeRun::where( 'run_id', $run_id )
 			->where( 'status', 'completed' )
 			->orderBy( 'id', 'asc' )
@@ -419,6 +424,13 @@ class Automation {
 			$output = $nr->getOutput();
 
 			$context[ (string) $nr->node_key ] = is_array( $output ) ? $output : [ 'value' => $output ];
+		}
+
+		// Only inject global context groups that this node's config actually references.
+		// e.g. if config has {{wp.user_email}} we build the 'wp' group; if not, we skip it.
+		$prefixes = GlobalContext::detect_prefixes( $node['data']['config'] ?? [] );
+		if ( $prefixes ) {
+			$context = array_merge( $context, GlobalContext::build( $prefixes, $run ) );
 		}
 
 		return $context;

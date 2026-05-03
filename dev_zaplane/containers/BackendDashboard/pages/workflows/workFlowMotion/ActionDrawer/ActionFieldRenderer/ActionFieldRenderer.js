@@ -9,6 +9,7 @@ import './styles.scss'
 import { __ } from "@wordpress/i18n";
 import VariableEditor from "@ZAPComponents/VariableEditor/index.js";
 import { reactDebounce } from "@ZAPUtils/helper";
+import CopyInput from "./CopyInput";
 
 const ActionFieldRenderer = ({
   field,
@@ -49,6 +50,26 @@ const ActionFieldRenderer = ({
   }
 
   switch (field.type) {
+    case "copy": {
+      let displayValue = field.value || value || "";
+      // Dynamically force the URL to match the current live site's origin
+      if (typeof displayValue === "string" && displayValue.startsWith("http")) {
+        try {
+          const urlObj = new URL(displayValue);
+          displayValue = displayValue.replace(urlObj.origin, window.location.origin);
+        } catch (e) {
+          // Ignore invalid URLs
+        }
+      }
+
+      return (
+        <CopyInput
+          label={field.label}
+          value={displayValue}
+          help={field.help}
+        />
+      );
+    }
 
     case "number":
     case "email":
@@ -76,6 +97,7 @@ const ActionFieldRenderer = ({
             value={value || ""}
             setValue={(val) => { setFieldValue(field.key, val); clearError(); }}
             variables={workflowVariables?.data || []}
+            variableContext={workflowVariables?.context || {}}
             field={field}
             setFieldValue={setFieldValue}
             placeholder={__('Type "@" here to add dynamic', "zaplane")}
@@ -167,6 +189,7 @@ const ActionFieldRenderer = ({
           value={value}
           field={field}
           variables={workflowVariables?.data}
+          variableContext={workflowVariables?.context || {}}
         />
       );
 

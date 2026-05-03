@@ -4,6 +4,7 @@
 .gitignore
 .DS_Store
 .claude
+.codex
 
 # Dev tooling
 .eslintrc.js

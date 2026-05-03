@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-05-03 10:00:30",
+    "generated_at": "2026-05-03 12:59:41",
     "apps": {
         "cartflows": {
             "slug": "cartflows",
@@ -726,6 +726,572 @@
                     "key": "current_filter",
                     "label": "Get Current Filter",
                     "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
+        },
+        "dokan": {
+            "slug": "dokan",
+            "name": "Dokan",
+            "icon": "dokan.svg",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": {
+                "new_seller_created": {
+                    "key": "new_seller_created",
+                    "label": "New Seller Created",
+                    "hook": "dokan_new_seller_created",
+                    "schema": [
+                        {
+                            "key": "vendor_id",
+                            "label": "Vendor",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "dokan",
+                                "query": "vendors",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "store_profile_saved": {
+                    "key": "store_profile_saved",
+                    "label": "Store Profile Saved",
+                    "hook": "dokan_store_profile_saved",
+                    "schema": [
+                        {
+                            "key": "vendor_id",
+                            "label": "Vendor",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "dokan",
+                                "query": "vendors",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "new_product_added": {
+                    "key": "new_product_added",
+                    "label": "New Product Added",
+                    "hook": "dokan_new_product_added",
+                    "schema": [
+                        {
+                            "key": "vendor_id",
+                            "label": "Vendor",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "dokan",
+                                "query": "vendors",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        },
+                        {
+                            "key": "product_id",
+                            "label": "Product",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "dokan",
+                                "query": "products",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "product_updated": {
+                    "key": "product_updated",
+                    "label": "Product Updated",
+                    "hook": "dokan_product_updated",
+                    "schema": [
+                        {
+                            "key": "vendor_id",
+                            "label": "Vendor",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "dokan",
+                                "query": "vendors",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        },
+                        {
+                            "key": "product_id",
+                            "label": "Product",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "dokan",
+                                "query": "products",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "product_deleted": {
+                    "key": "product_deleted",
+                    "label": "Product Deleted",
+                    "hook": "dokan_product_deleted",
+                    "schema": [
+                        {
+                            "key": "vendor_id",
+                            "label": "Vendor",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "dokan",
+                                "query": "vendors",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        },
+                        {
+                            "key": "product_id",
+                            "label": "Product",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "dokan",
+                                "query": "products",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "checkout_update_order_meta": {
+                    "key": "checkout_update_order_meta",
+                    "label": "Checkout Order Meta Updated",
+                    "hook": "dokan_checkout_update_order_meta",
+                    "schema": [
+                        {
+                            "key": "vendor_id",
+                            "label": "Vendor",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "dokan",
+                                "query": "vendors",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "vendor_enabled": {
+                    "key": "vendor_enabled",
+                    "label": "Vendor Enabled",
+                    "hook": "dokan_vendor_enabled",
+                    "schema": [
+                        {
+                            "key": "vendor_id",
+                            "label": "Vendor",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "dokan",
+                                "query": "vendors",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "vendor_disabled": {
+                    "key": "vendor_disabled",
+                    "label": "Vendor Disabled",
+                    "hook": "dokan_vendor_disabled",
+                    "schema": [
+                        {
+                            "key": "vendor_id",
+                            "label": "Vendor",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "dokan",
+                                "query": "vendors",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "withdraw_request_created": {
+                    "key": "withdraw_request_created",
+                    "label": "Withdraw Request Created",
+                    "hook": "dokan_after_withdraw_request",
+                    "schema": [
+                        {
+                            "key": "vendor_id",
+                            "label": "Vendor",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "dokan",
+                                "query": "vendors",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "withdraw_created": {
+                    "key": "withdraw_created",
+                    "label": "Withdraw Created",
+                    "hook": "dokan_withdraw_created",
+                    "schema": [
+                        {
+                            "key": "vendor_id",
+                            "label": "Vendor",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "dokan",
+                                "query": "vendors",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "withdraw_request_pending": {
+                    "key": "withdraw_request_pending",
+                    "label": "Withdraw Request Pending",
+                    "hook": "dokan_withdraw_request_pending",
+                    "schema": [
+                        {
+                            "key": "vendor_id",
+                            "label": "Vendor",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "dokan",
+                                "query": "vendors",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "withdraw_request_approved": {
+                    "key": "withdraw_request_approved",
+                    "label": "Withdraw Request Approved",
+                    "hook": "dokan_withdraw_request_approved",
+                    "schema": [
+                        {
+                            "key": "vendor_id",
+                            "label": "Vendor",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "dokan",
+                                "query": "vendors",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "withdraw_request_cancelled": {
+                    "key": "withdraw_request_cancelled",
+                    "label": "Withdraw Request Cancelled",
+                    "hook": "dokan_withdraw_request_cancelled",
+                    "schema": [
+                        {
+                            "key": "vendor_id",
+                            "label": "Vendor",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "dokan",
+                                "query": "vendors",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "withdraw_status_updated": {
+                    "key": "withdraw_status_updated",
+                    "label": "Withdraw Status Updated",
+                    "hook": "dokan_withdraw_status_updated",
+                    "schema": [
+                        {
+                            "key": "vendor_id",
+                            "label": "Vendor",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "dokan",
+                                "query": "vendors",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": {
+                "get_vendor_single": {
+                    "key": "get_vendor_single",
+                    "label": "Get Vendor (Single)",
+                    "schema": [
+                        {
+                            "key": "vendor_id",
+                            "label": "Vendor",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "dokan",
+                                "query": "vendors",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_vendors_all": {
+                    "key": "get_vendors_all",
+                    "label": "Get Vendors (All)",
+                    "schema": [
+                        {
+                            "key": "limit",
+                            "label": "Limit",
+                            "type": "number",
+                            "default": 20
+                        },
+                        {
+                            "key": "page",
+                            "label": "Page",
+                            "type": "number",
+                            "default": 1
+                        },
+                        {
+                            "key": "search",
+                            "label": "Search",
+                            "type": "text"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_withdraw_single": {
+                    "key": "get_withdraw_single",
+                    "label": "Get Withdraw (Single)",
+                    "schema": [
+                        {
+                            "key": "withdraw_id",
+                            "label": "Withdraw",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "dokan",
+                                "query": "withdraws",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_withdraws_all": {
+                    "key": "get_withdraws_all",
+                    "label": "Get Withdraws (All)",
+                    "schema": [
+                        {
+                            "key": "vendor_id",
+                            "label": "Vendor",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "dokan",
+                                "query": "vendors",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        },
+                        {
+                            "key": "withdraw_status",
+                            "label": "Withdraw Status",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Any",
+                                    "value": "any"
+                                },
+                                {
+                                    "label": "Pending",
+                                    "value": "pending"
+                                },
+                                {
+                                    "label": "Approved",
+                                    "value": "approved"
+                                },
+                                {
+                                    "label": "Cancelled",
+                                    "value": "cancelled"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "limit",
+                            "label": "Limit",
+                            "type": "number",
+                            "default": 20
+                        },
+                        {
+                            "key": "page",
+                            "label": "Page",
+                            "type": "number",
+                            "default": 1
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add_action": {
+                    "key": "add_action",
+                    "label": "Add Action Hook",
+                    "schema": [
+                        {
+                            "key": "hook_name",
+                            "label": "Hook Name",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "accepted_args",
+                            "label": "Accepted Args",
+                            "type": "number"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "do_action": {
+                    "key": "do_action",
+                    "label": "Do Action Hook",
+                    "schema": [
+                        {
+                            "key": "hook_name",
+                            "label": "Hook Name",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "arg_1",
+                            "label": "Argument 1",
+                            "type": "expression"
+                        },
+                        {
+                            "key": "arg_2",
+                            "label": "Argument 2",
+                            "type": "expression"
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -14961,6 +15527,1419 @@
                 }
             }
         },
+        "fluentcart": {
+            "slug": "fluentcart",
+            "name": "FluentCart",
+            "icon": "fluent-cart.svg",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": {
+                "order_created": {
+                    "key": "order_created",
+                    "label": "Order Created",
+                    "hook": "fluent_cart/order_created",
+                    "schema": [
+                        {
+                            "key": "order_id",
+                            "label": "Order",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "orders",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        },
+                        {
+                            "key": "customer_id",
+                            "label": "Customer",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "customers",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "order_paid": {
+                    "key": "order_paid",
+                    "label": "Order Paid",
+                    "hook": "fluent_cart/order_paid",
+                    "schema": [
+                        {
+                            "key": "order_id",
+                            "label": "Order",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "orders",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        },
+                        {
+                            "key": "customer_id",
+                            "label": "Customer",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "customers",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "order_paid_done": {
+                    "key": "order_paid_done",
+                    "label": "Order Paid Done",
+                    "hook": "fluent_cart/order_paid_done",
+                    "schema": [
+                        {
+                            "key": "order_id",
+                            "label": "Order",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "orders",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        },
+                        {
+                            "key": "customer_id",
+                            "label": "Customer",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "customers",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "order_payment_failed": {
+                    "key": "order_payment_failed",
+                    "label": "Order Payment Failed",
+                    "hook": "fluent_cart/order_payment_failed",
+                    "schema": [
+                        {
+                            "key": "order_id",
+                            "label": "Order",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "orders",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        },
+                        {
+                            "key": "customer_id",
+                            "label": "Customer",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "customers",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "order_updated": {
+                    "key": "order_updated",
+                    "label": "Order Updated",
+                    "hook": "fluent_cart/order_updated",
+                    "schema": [
+                        {
+                            "key": "order_id",
+                            "label": "Order",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "orders",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        },
+                        {
+                            "key": "customer_id",
+                            "label": "Customer",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "customers",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "order_canceled": {
+                    "key": "order_canceled",
+                    "label": "Order Canceled",
+                    "hook": "fluent_cart/order_canceled",
+                    "schema": [
+                        {
+                            "key": "order_id",
+                            "label": "Order",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "orders",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        },
+                        {
+                            "key": "customer_id",
+                            "label": "Customer",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "customers",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "order_deleted": {
+                    "key": "order_deleted",
+                    "label": "Order Deleted",
+                    "hook": "fluent_cart/order_deleted",
+                    "schema": [
+                        {
+                            "key": "order_id",
+                            "label": "Order",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "orders",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        },
+                        {
+                            "key": "customer_id",
+                            "label": "Customer",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "customers",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "renewal_order_deleted": {
+                    "key": "renewal_order_deleted",
+                    "label": "Renewal Order Deleted",
+                    "hook": "fluent_cart/renewal_order_deleted",
+                    "schema": [
+                        {
+                            "key": "order_id",
+                            "label": "Order",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "orders",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        },
+                        {
+                            "key": "customer_id",
+                            "label": "Customer",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "customers",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "order_refunded": {
+                    "key": "order_refunded",
+                    "label": "Order Refunded",
+                    "hook": "fluent_cart/order_refunded",
+                    "schema": [
+                        {
+                            "key": "order_id",
+                            "label": "Order",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "orders",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        },
+                        {
+                            "key": "customer_id",
+                            "label": "Customer",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "customers",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "order_fully_refunded": {
+                    "key": "order_fully_refunded",
+                    "label": "Order Fully Refunded",
+                    "hook": "fluent_cart/order_fully_refunded",
+                    "schema": [
+                        {
+                            "key": "order_id",
+                            "label": "Order",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "orders",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        },
+                        {
+                            "key": "customer_id",
+                            "label": "Customer",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "customers",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "order_partially_refunded": {
+                    "key": "order_partially_refunded",
+                    "label": "Order Partially Refunded",
+                    "hook": "fluent_cart/order_partially_refunded",
+                    "schema": [
+                        {
+                            "key": "order_id",
+                            "label": "Order",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "orders",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        },
+                        {
+                            "key": "customer_id",
+                            "label": "Customer",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "customers",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "order_status_changed": {
+                    "key": "order_status_changed",
+                    "label": "Order Status Changed",
+                    "hook": "fluent_cart/order_status_changed",
+                    "schema": [
+                        {
+                            "key": "order_id",
+                            "label": "Order",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "orders",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        },
+                        {
+                            "key": "customer_id",
+                            "label": "Customer",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "customers",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "payment_status_changed": {
+                    "key": "payment_status_changed",
+                    "label": "Payment Status Changed",
+                    "hook": "fluent_cart/payment_status_changed",
+                    "schema": [
+                        {
+                            "key": "order_id",
+                            "label": "Order",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "orders",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        },
+                        {
+                            "key": "customer_id",
+                            "label": "Customer",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "customers",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "shipping_status_changed": {
+                    "key": "shipping_status_changed",
+                    "label": "Shipping Status Changed",
+                    "hook": "fluent_cart/shipping_status_changed",
+                    "schema": [
+                        {
+                            "key": "order_id",
+                            "label": "Order",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "orders",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        },
+                        {
+                            "key": "customer_id",
+                            "label": "Customer",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "customers",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "subscription_activated": {
+                    "key": "subscription_activated",
+                    "label": "Subscription Activated",
+                    "hook": "fluent_cart/subscription_activated",
+                    "schema": [
+                        {
+                            "key": "subscription_id",
+                            "label": "Subscription",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "subscriptions",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        },
+                        {
+                            "key": "order_id",
+                            "label": "Order",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "orders",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        },
+                        {
+                            "key": "customer_id",
+                            "label": "Customer",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "customers",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "subscription_canceled": {
+                    "key": "subscription_canceled",
+                    "label": "Subscription Canceled",
+                    "hook": "fluent_cart/subscription_canceled",
+                    "schema": [
+                        {
+                            "key": "subscription_id",
+                            "label": "Subscription",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "subscriptions",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        },
+                        {
+                            "key": "order_id",
+                            "label": "Order",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "orders",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        },
+                        {
+                            "key": "customer_id",
+                            "label": "Customer",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "customers",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "subscription_renewed": {
+                    "key": "subscription_renewed",
+                    "label": "Subscription Renewed",
+                    "hook": "fluent_cart/subscription_renewed",
+                    "schema": [
+                        {
+                            "key": "subscription_id",
+                            "label": "Subscription",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "subscriptions",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        },
+                        {
+                            "key": "order_id",
+                            "label": "Order",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "orders",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        },
+                        {
+                            "key": "customer_id",
+                            "label": "Customer",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "customers",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "subscription_eot": {
+                    "key": "subscription_eot",
+                    "label": "Subscription End Of Term",
+                    "hook": "fluent_cart/subscription_eot",
+                    "schema": [
+                        {
+                            "key": "subscription_id",
+                            "label": "Subscription",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "subscriptions",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        },
+                        {
+                            "key": "order_id",
+                            "label": "Order",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "orders",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        },
+                        {
+                            "key": "customer_id",
+                            "label": "Customer",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "customers",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "subscription_expired_validity": {
+                    "key": "subscription_expired_validity",
+                    "label": "Subscription Validity Expired",
+                    "hook": "fluent_cart/subscription_expired_validity",
+                    "schema": [
+                        {
+                            "key": "subscription_id",
+                            "label": "Subscription",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "subscriptions",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        },
+                        {
+                            "key": "order_id",
+                            "label": "Order",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "orders",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        },
+                        {
+                            "key": "customer_id",
+                            "label": "Customer",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "customers",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "product_created": {
+                    "key": "product_created",
+                    "label": "Product Created",
+                    "hook": "save_post_fluent-products",
+                    "schema": [
+                        {
+                            "key": "product_id",
+                            "label": "Product",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "products",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "product_updated": {
+                    "key": "product_updated",
+                    "label": "Product Updated",
+                    "hook": "fluent_cart/product_updated",
+                    "schema": [
+                        {
+                            "key": "product_id",
+                            "label": "Product",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "products",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "product_duplicated": {
+                    "key": "product_duplicated",
+                    "label": "Product Duplicated",
+                    "hook": "fluent_cart/product_duplicated",
+                    "schema": [
+                        {
+                            "key": "product_id",
+                            "label": "Product",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "products",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "product_stock_changed": {
+                    "key": "product_stock_changed",
+                    "label": "Product Stock Changed",
+                    "hook": "fluent_cart/product_stock_changed",
+                    "schema": [
+                        {
+                            "key": "product_id",
+                            "label": "Product",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "products",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                }
+            },
+            "actions": {
+                "get_order_single": {
+                    "key": "get_order_single",
+                    "label": "Get Order (Single)",
+                    "schema": [
+                        {
+                            "key": "order_id",
+                            "label": "Order",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "orders",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "get_orders_all": {
+                    "key": "get_orders_all",
+                    "label": "Get Orders (All)",
+                    "schema": [
+                        {
+                            "key": "limit",
+                            "label": "Limit",
+                            "type": "number",
+                            "default": 20
+                        },
+                        {
+                            "key": "page",
+                            "label": "Page",
+                            "type": "number",
+                            "default": 1
+                        },
+                        {
+                            "key": "search",
+                            "label": "Search",
+                            "type": "text"
+                        },
+                        {
+                            "key": "customer_id",
+                            "label": "Customer",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "customers",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        },
+                        {
+                            "key": "order_status",
+                            "label": "Order Status",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "order_statuses",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        },
+                        {
+                            "key": "payment_status",
+                            "label": "Payment Status",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "payment_statuses",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "get_customer_single": {
+                    "key": "get_customer_single",
+                    "label": "Get Customer (Single)",
+                    "schema": [
+                        {
+                            "key": "customer_id",
+                            "label": "Customer",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "customers",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "get_customers_all": {
+                    "key": "get_customers_all",
+                    "label": "Get Customers (All)",
+                    "schema": [
+                        {
+                            "key": "limit",
+                            "label": "Limit",
+                            "type": "number",
+                            "default": 20
+                        },
+                        {
+                            "key": "page",
+                            "label": "Page",
+                            "type": "number",
+                            "default": 1
+                        },
+                        {
+                            "key": "search",
+                            "label": "Search",
+                            "type": "text"
+                        },
+                        {
+                            "key": "customer_status",
+                            "label": "Customer Status",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "customer_statuses",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "get_subscription_single": {
+                    "key": "get_subscription_single",
+                    "label": "Get Subscription (Single)",
+                    "schema": [
+                        {
+                            "key": "subscription_id",
+                            "label": "Subscription",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "subscriptions",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "get_subscriptions_all": {
+                    "key": "get_subscriptions_all",
+                    "label": "Get Subscriptions (All)",
+                    "schema": [
+                        {
+                            "key": "limit",
+                            "label": "Limit",
+                            "type": "number",
+                            "default": 20
+                        },
+                        {
+                            "key": "page",
+                            "label": "Page",
+                            "type": "number",
+                            "default": 1
+                        },
+                        {
+                            "key": "search",
+                            "label": "Search",
+                            "type": "text"
+                        },
+                        {
+                            "key": "customer_id",
+                            "label": "Customer",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "customers",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        },
+                        {
+                            "key": "subscription_status",
+                            "label": "Subscription Status",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "subscription_statuses",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "get_product_single": {
+                    "key": "get_product_single",
+                    "label": "Get Product (Single)",
+                    "schema": [
+                        {
+                            "key": "product_id",
+                            "label": "Product",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "products",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "get_products_all": {
+                    "key": "get_products_all",
+                    "label": "Get Products (All)",
+                    "schema": [
+                        {
+                            "key": "limit",
+                            "label": "Limit",
+                            "type": "number",
+                            "default": 20
+                        },
+                        {
+                            "key": "page",
+                            "label": "Page",
+                            "type": "number",
+                            "default": 1
+                        },
+                        {
+                            "key": "search",
+                            "label": "Search",
+                            "type": "text"
+                        },
+                        {
+                            "key": "post_status",
+                            "label": "Post Status",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "post_statuses",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "create_product": {
+                    "key": "create_product",
+                    "label": "Create Product",
+                    "schema": [
+                        {
+                            "key": "post_title",
+                            "label": "Product Title",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "post_name",
+                            "label": "Product Slug",
+                            "type": "text"
+                        },
+                        {
+                            "key": "post_content",
+                            "label": "Product Description",
+                            "type": "textarea"
+                        },
+                        {
+                            "key": "post_excerpt",
+                            "label": "Short Description",
+                            "type": "textarea"
+                        },
+                        {
+                            "key": "post_status",
+                            "label": "Post Status",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "post_statuses",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "default": "draft",
+                            "required": false
+                        },
+                        {
+                            "key": "fulfillment_type",
+                            "label": "Fulfillment Type",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "fulfillment_types",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "default": "physical",
+                            "required": false
+                        },
+                        {
+                            "key": "stock_status",
+                            "label": "Stock Status",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "stock_statuses",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "default": "in-stock",
+                            "required": false
+                        },
+                        {
+                            "key": "payment_type",
+                            "label": "Payment Type",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "payment_types",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "default": "onetime",
+                            "required": false
+                        },
+                        {
+                            "key": "total_stock",
+                            "label": "Total Stock",
+                            "type": "number",
+                            "default": 1
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "update_product": {
+                    "key": "update_product",
+                    "label": "Update Product",
+                    "schema": [
+                        {
+                            "key": "product_id",
+                            "label": "Product",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "products",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "post_title",
+                            "label": "Product Title",
+                            "type": "text"
+                        },
+                        {
+                            "key": "post_status",
+                            "label": "Post Status",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "fluentcart",
+                                "query": "post_statuses",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "add_action": {
+                    "key": "add_action",
+                    "label": "Add Action Hook",
+                    "schema": [
+                        {
+                            "key": "hook_name",
+                            "label": "Hook Name",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "accepted_args",
+                            "label": "Accepted Args",
+                            "type": "number"
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "do_action": {
+                    "key": "do_action",
+                    "label": "Do Action Hook",
+                    "schema": [
+                        {
+                            "key": "hook_name",
+                            "label": "Hook Name",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "arg_1",
+                            "label": "Argument 1",
+                            "type": "expression"
+                        },
+                        {
+                            "key": "arg_2",
+                            "label": "Argument 2",
+                            "type": "expression"
+                        }
+                    ],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                }
+            }
+        },
         "gravityforms": {
             "slug": "gravityforms",
             "name": "Gravity Forms",
@@ -16573,9 +18552,11 @@
                     "schema": [
                         {
                             "key": "contact_id",
-                            "label": "Contact",
-                            "type": "select",
+                            "label": "Contact ID",
+                            "type": "expression",
+                            "subtype": "number",
                             "required": true,
+                            "placeholder": "Enter ID or use {{previous_node.contact_id}}",
                             "dynamic": {
                                 "integration": "gemcrm",
                                 "query": "gemcrm_contact_query",
@@ -16753,9 +18734,11 @@
                     "schema": [
                         {
                             "key": "contact_id",
-                            "label": "Contact",
-                            "type": "select",
+                            "label": "Contact ID",
+                            "type": "expression",
+                            "subtype": "number",
                             "required": true,
+                            "placeholder": "Enter ID or use {{previous_node.contact_id}}",
                             "dynamic": {
                                 "integration": "gemcrm",
                                 "query": "gemcrm_contact_query",
@@ -16776,9 +18759,11 @@
                     "schema": [
                         {
                             "key": "contact_id",
-                            "label": "Contact",
-                            "type": "select",
+                            "label": "Contact ID",
+                            "type": "expression",
+                            "subtype": "number",
                             "required": true,
+                            "placeholder": "Enter ID or use {{previous_node.contact_id}}",
                             "dynamic": {
                                 "integration": "gemcrm",
                                 "query": "gemcrm_contact_query",
@@ -16813,9 +18798,11 @@
                     "schema": [
                         {
                             "key": "contact_id",
-                            "label": "Contact",
-                            "type": "select",
+                            "label": "Contact ID",
+                            "type": "expression",
+                            "subtype": "number",
                             "required": true,
+                            "placeholder": "Enter ID or use {{previous_node.contact_id}}",
                             "dynamic": {
                                 "integration": "gemcrm",
                                 "query": "gemcrm_contact_query",
@@ -16850,9 +18837,11 @@
                     "schema": [
                         {
                             "key": "contact_id",
-                            "label": "Contact",
-                            "type": "select",
+                            "label": "Contact ID",
+                            "type": "expression",
+                            "subtype": "number",
                             "required": true,
+                            "placeholder": "Enter ID or use {{previous_node.contact_id}}",
                             "dynamic": {
                                 "integration": "gemcrm",
                                 "query": "gemcrm_contact_query",
@@ -16887,9 +18876,11 @@
                     "schema": [
                         {
                             "key": "contact_id",
-                            "label": "Contact",
-                            "type": "select",
+                            "label": "Contact ID",
+                            "type": "expression",
+                            "subtype": "number",
                             "required": true,
+                            "placeholder": "Enter ID or use {{previous_node.contact_id}}",
                             "dynamic": {
                                 "integration": "gemcrm",
                                 "query": "gemcrm_contact_query",
@@ -17059,6 +19050,29 @@
                             "label": "Reply-To Name",
                             "type": "expression",
                             "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "reapply_sequence": {
+                    "key": "reapply_sequence",
+                    "label": "Re Apply A Sequence",
+                    "schema": [
+                        {
+                            "key": "sequence_id",
+                            "label": "Email Sequence",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "gemcrm",
+                                "query": "gemcrm_sequence_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
                         }
                     ],
                     "outputs": [
@@ -18264,6 +20278,54 @@
             },
             "actions": []
         },
+        "eventscalendar": {
+            "slug": "eventscalendar",
+            "name": "Events Calendar",
+            "icon": "events-calendar.svg",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": {
+                "attendEvent": {
+                    "key": "attendEvent",
+                    "label": "User attended an event",
+                    "hook": "event_tickets_checkin",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "attendeeRegistered": {
+                    "key": "attendeeRegistered",
+                    "label": "Attendee registered for an event",
+                    "hook": "event_tickets_rsvp_attendee_created",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "newAttendee": {
+                    "key": "newAttendee",
+                    "label": "New attendee registered",
+                    "hook": "event_tickets_rsvp_tickets_generated_for_product",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "attendeeRegisteredWc": {
+                    "key": "attendeeRegisteredWc",
+                    "label": "Attendee registered via WooCommerce",
+                    "hook": "tribe_tickets_attendee_repository_create_attendee_for_ticket_after_create",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": []
+        },
         "buddyboss": {
             "slug": "buddyboss",
             "name": "BuddyBoss",
@@ -19294,6 +21356,366 @@
                 }
             },
             "actions": []
+        },
+        "paymattic": {
+            "slug": "paymattic",
+            "name": "Paymattic",
+            "icon": "paymattic.svg",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": {
+                "form_submitted": {
+                    "key": "form_submitted",
+                    "label": "Form Submitted",
+                    "hook": "wppayform/after_form_submission_complete",
+                    "schema": [
+                        {
+                            "key": "form_id",
+                            "label": "Form",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "paymattic",
+                                "query": "forms",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": {
+                        "main": "Main output",
+                        "error": "Error output"
+                    }
+                },
+                "payment_success": {
+                    "key": "payment_success",
+                    "label": "Payment Success",
+                    "hook": "wppayform/form_payment_success",
+                    "schema": [
+                        {
+                            "key": "form_id",
+                            "label": "Form",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "paymattic",
+                                "query": "forms",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": {
+                        "main": "Main output",
+                        "error": "Error output"
+                    }
+                },
+                "payment_failed": {
+                    "key": "payment_failed",
+                    "label": "Payment Failed",
+                    "hook": "wppayform/form_payment_failed",
+                    "schema": [
+                        {
+                            "key": "form_id",
+                            "label": "Form",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "paymattic",
+                                "query": "forms",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": {
+                        "main": "Main output",
+                        "error": "Error output"
+                    }
+                },
+                "payment_status_changed": {
+                    "key": "payment_status_changed",
+                    "label": "Payment Status Changed",
+                    "hook": "wppayform/after_payment_status_change",
+                    "schema": [
+                        {
+                            "key": "form_id",
+                            "label": "Form",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "paymattic",
+                                "query": "forms",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "payment_status",
+                            "label": "Payment Status",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Any Status",
+                                    "value": "any"
+                                },
+                                {
+                                    "label": "Paid",
+                                    "value": "paid"
+                                },
+                                {
+                                    "label": "Pending",
+                                    "value": "pending"
+                                },
+                                {
+                                    "label": "Failed",
+                                    "value": "failed"
+                                },
+                                {
+                                    "label": "Refunded",
+                                    "value": "refunded"
+                                },
+                                {
+                                    "label": "Partially Refunded",
+                                    "value": "partially_refunded"
+                                }
+                            ],
+                            "required": false
+                        }
+                    ],
+                    "outputs": {
+                        "main": "Main output",
+                        "error": "Error output"
+                    }
+                },
+                "payment_refunded": {
+                    "key": "payment_refunded",
+                    "label": "Payment Refunded",
+                    "hook": "wppayform/payment_refunded",
+                    "schema": [
+                        {
+                            "key": "form_id",
+                            "label": "Form",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "paymattic",
+                                "query": "forms",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": {
+                        "main": "Main output",
+                        "error": "Error output"
+                    }
+                }
+            },
+            "actions": {
+                "get_form_single": {
+                    "key": "get_form_single",
+                    "label": "Get Form (Single)",
+                    "schema": [
+                        {
+                            "key": "form_id",
+                            "label": "Form",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "paymattic",
+                                "query": "forms",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": {
+                        "main": "Main output",
+                        "error": "Error output"
+                    }
+                },
+                "get_forms_all": {
+                    "key": "get_forms_all",
+                    "label": "Get Forms (All)",
+                    "schema": [
+                        {
+                            "key": "limit",
+                            "label": "Limit",
+                            "type": "number",
+                            "default": 50
+                        },
+                        {
+                            "key": "search",
+                            "label": "Search",
+                            "type": "text"
+                        }
+                    ],
+                    "outputs": {
+                        "main": "Main output",
+                        "error": "Error output"
+                    }
+                },
+                "get_submission_single": {
+                    "key": "get_submission_single",
+                    "label": "Get Submission (Single)",
+                    "schema": [
+                        {
+                            "key": "submission_id",
+                            "label": "Submission",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "paymattic",
+                                "query": "submissions",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": {
+                        "main": "Main output",
+                        "error": "Error output"
+                    }
+                },
+                "get_submissions_all": {
+                    "key": "get_submissions_all",
+                    "label": "Get Submissions (All)",
+                    "schema": [
+                        {
+                            "key": "form_id",
+                            "label": "Form",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "paymattic",
+                                "query": "forms",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": false
+                        },
+                        {
+                            "key": "payment_status",
+                            "label": "Payment Status",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Any Status",
+                                    "value": "any"
+                                },
+                                {
+                                    "label": "Paid",
+                                    "value": "paid"
+                                },
+                                {
+                                    "label": "Pending",
+                                    "value": "pending"
+                                },
+                                {
+                                    "label": "Failed",
+                                    "value": "failed"
+                                },
+                                {
+                                    "label": "Refunded",
+                                    "value": "refunded"
+                                }
+                            ],
+                            "required": false
+                        },
+                        {
+                            "key": "limit",
+                            "label": "Limit",
+                            "type": "number",
+                            "default": 20
+                        },
+                        {
+                            "key": "page",
+                            "label": "Page",
+                            "type": "number",
+                            "default": 1
+                        },
+                        {
+                            "key": "search",
+                            "label": "Search",
+                            "type": "text"
+                        }
+                    ],
+                    "outputs": {
+                        "main": "Main output",
+                        "error": "Error output"
+                    }
+                },
+                "update_submission_payment_status": {
+                    "key": "update_submission_payment_status",
+                    "label": "Update Submission Payment Status",
+                    "schema": [
+                        {
+                            "key": "submission_id",
+                            "label": "Submission",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "paymattic",
+                                "query": "submissions",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "payment_status",
+                            "label": "Payment Status",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Paid",
+                                    "value": "paid"
+                                },
+                                {
+                                    "label": "Pending",
+                                    "value": "pending"
+                                },
+                                {
+                                    "label": "Failed",
+                                    "value": "failed"
+                                },
+                                {
+                                    "label": "Refunded",
+                                    "value": "refunded"
+                                },
+                                {
+                                    "label": "Partially Refunded",
+                                    "value": "partially_refunded"
+                                }
+                            ],
+                            "required": true
+                        }
+                    ],
+                    "outputs": {
+                        "main": "Main output",
+                        "error": "Error output"
+                    }
+                }
+            }
         },
         "bookingcalendar": {
             "slug": "bookingcalendar",
@@ -21348,10 +23770,10 @@
             },
             "actions": []
         },
-        "makeforms": {
-            "slug": "makeforms",
-            "name": "MakeForms",
-            "icon": "makeforms.svg",
+        "fillout": {
+            "slug": "fillout",
+            "name": "Fillout",
+            "icon": "fillout.svg",
             "category": "app",
             "requires_connection": true,
             "auth_type": "token_key",
@@ -21360,7 +23782,7 @@
                 "form_submitted": {
                     "key": "form_submitted",
                     "label": "Form Submitted",
-                    "hook": "zaplane_makeforms_webhook_form_submitted",
+                    "hook": "zaplane_fillout_webhook_form_submitted",
                     "schema": [
                         {
                             "key": "form_id",
@@ -21368,7 +23790,7 @@
                             "type": "select",
                             "required": true,
                             "dynamic": {
-                                "integration": "makeforms",
+                                "integration": "fillout",
                                 "query": "form_query",
                                 "select": [
                                     "value",
@@ -21380,9 +23802,53 @@
                             "key": "webhook_endpoint",
                             "label": "Webhook Endpoint URL",
                             "type": "copy",
-                            "value": "https://localhost:10016/wp-json/zaplane/v1/incoming/makeforms",
+                            "value": "https://localhost:10016/index.php?rest_route=/zaplane/v1/incoming/fillout",
                             "readonly": true,
-                            "help": "Copy this URL \u2192 MakeForms Dashboard \u2192 Your Form \u2192 Connect \u2192 Webhooks \u2192 Add a webhook \u2192 Paste & Save."
+                            "help": "Copy this URL \u2192 Fillout Dashboard \u2192 Your Form \u2192 Integrate \u2192 Webhooks \u2192 Add Webhook \u2192 Paste & Save."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": []
+        },
+        "typeform": {
+            "slug": "typeform",
+            "name": "Typeform",
+            "icon": "typeform.svg",
+            "category": "app",
+            "requires_connection": true,
+            "auth_type": "token_key",
+            "supports_webhook": true,
+            "triggers": {
+                "form_submitted": {
+                    "key": "form_submitted",
+                    "label": "Form Submitted",
+                    "hook": "zaplane_typeform_webhook_form_submitted",
+                    "schema": [
+                        {
+                            "key": "form_id",
+                            "label": "Form",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "typeform",
+                                "query": "form_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "webhook_endpoint",
+                            "label": "Webhook Endpoint URL",
+                            "type": "copy",
+                            "value": "https://localhost:10016/index.php?rest_route=/zaplane/v1/incoming/typeform",
+                            "readonly": true,
+                            "help": "Copy this URL \u2192 Typeform Dashboard \u2192 Your Form \u2192 Connect \u2192 Webhooks \u2192 Add a webhook \u2192 Paste & Save."
                         }
                     ],
                     "outputs": [
@@ -21408,7 +23874,7 @@
                             "label": "Workspace",
                             "required": true,
                             "dynamic": {
-                                "integration": "makeforms",
+                                "integration": "typeform",
                                 "query": "workspace_query",
                                 "select": [
                                     "value",
@@ -21431,13 +23897,768 @@
                             "label": "Form",
                             "required": true,
                             "dynamic": {
-                                "integration": "makeforms",
+                                "integration": "typeform",
                                 "query": "form_query",
                                 "select": [
                                     "value",
                                     "label"
                                 ]
                             }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
+        },
+        "discord": {
+            "slug": "discord",
+            "name": "Discord",
+            "icon": "discord.svg",
+            "category": "app",
+            "requires_connection": true,
+            "auth_type": "bot_token",
+            "supports_webhook": false,
+            "triggers": [],
+            "actions": {
+                "create_channel": {
+                    "key": "create_channel",
+                    "label": "Create Channel",
+                    "schema": [
+                        {
+                            "key": "guild_id",
+                            "type": "select",
+                            "label": "Select Server",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "discord",
+                                "query": "guild_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "name",
+                            "type": "text",
+                            "label": "Channel Name",
+                            "required": true
+                        },
+                        {
+                            "key": "type",
+                            "type": "select",
+                            "label": "Channel Type",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "discord",
+                                "query": "channel_type_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ],
+                                "depends_on": [
+                                    "guild_id"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "topic",
+                            "type": "text",
+                            "label": "Channel Topic",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_channel": {
+                    "key": "update_channel",
+                    "label": "Update Channel",
+                    "schema": [
+                        {
+                            "key": "guild_id",
+                            "type": "select",
+                            "label": "Select Server",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "discord",
+                                "query": "guild_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "channel_id",
+                            "type": "select",
+                            "label": "Select Channel",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "discord",
+                                "query": "channel_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ],
+                                "depends_on": [
+                                    "guild_id"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "name",
+                            "type": "text",
+                            "label": "Channel Name",
+                            "required": true
+                        },
+                        {
+                            "key": "topic",
+                            "type": "text",
+                            "label": "Channel Topic",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_channel_by_name": {
+                    "key": "get_channel_by_name",
+                    "label": "Get Channel By Name",
+                    "schema": [
+                        {
+                            "key": "guild_id",
+                            "type": "select",
+                            "label": "Select Server",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "discord",
+                                "query": "guild_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "name",
+                            "type": "text",
+                            "label": "Channel Name",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "send_channel_message": {
+                    "key": "send_channel_message",
+                    "label": "Send Channel Message",
+                    "schema": [
+                        {
+                            "key": "guild_id",
+                            "type": "select",
+                            "label": "Select Server",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "discord",
+                                "query": "guild_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "channel_id",
+                            "type": "select",
+                            "label": "Select Channel",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "discord",
+                                "query": "channel_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ],
+                                "depends_on": [
+                                    "guild_id"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "content",
+                            "type": "textarea",
+                            "label": "Message Content",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "find_channel": {
+                    "key": "find_channel",
+                    "label": "Find Channel",
+                    "schema": [
+                        {
+                            "key": "guild_id",
+                            "type": "select",
+                            "label": "Select Server",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "discord",
+                                "query": "guild_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "search_query",
+                            "type": "text",
+                            "label": "Search Query (name or ID)",
+                            "required": true
+                        },
+                        {
+                            "key": "type",
+                            "type": "select",
+                            "label": "Channel Type",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "discord",
+                                "query": "channel_type_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ],
+                                "depends_on": [
+                                    "guild_id"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_a_channel_invite": {
+                    "key": "create_a_channel_invite",
+                    "label": "Create A Channel Invite",
+                    "schema": [
+                        {
+                            "key": "guild_id",
+                            "type": "select",
+                            "label": "Select Server",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "discord",
+                                "query": "guild_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "channel_id",
+                            "type": "select",
+                            "label": "Select Channel",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "discord",
+                                "query": "channel_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ],
+                                "depends_on": [
+                                    "guild_id"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "max_age",
+                            "type": "number",
+                            "label": "Max Age (seconds, 0 = never expires)",
+                            "required": false,
+                            "default": 86400
+                        },
+                        {
+                            "key": "max_uses",
+                            "type": "number",
+                            "label": "Max Uses (0 = unlimited)",
+                            "required": false,
+                            "default": 0
+                        },
+                        {
+                            "key": "temporary",
+                            "type": "checkbox",
+                            "label": "Temporary Membership",
+                            "required": false,
+                            "default": false
+                        },
+                        {
+                            "key": "unique",
+                            "type": "checkbox",
+                            "label": "Unique Invite",
+                            "required": false,
+                            "default": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "send_direct_message": {
+                    "key": "send_direct_message",
+                    "label": "Send Direct Message",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "type": "select",
+                            "label": "Select User",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "discord",
+                                "query": "user_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "content",
+                            "type": "textarea",
+                            "label": "Message Content",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_message": {
+                    "key": "delete_message",
+                    "label": "Delete Message",
+                    "schema": [
+                        {
+                            "key": "guild_id",
+                            "type": "select",
+                            "label": "Select Server",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "discord",
+                                "query": "guild_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "channel_id",
+                            "type": "select",
+                            "label": "Select Channel",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "discord",
+                                "query": "channel_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ],
+                                "depends_on": [
+                                    "guild_id"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "message_id",
+                            "type": "text",
+                            "label": "Message ID",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_message": {
+                    "key": "get_message",
+                    "label": "Get Message",
+                    "schema": [
+                        {
+                            "key": "guild_id",
+                            "type": "select",
+                            "label": "Select Server",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "discord",
+                                "query": "guild_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "channel_id",
+                            "type": "select",
+                            "label": "Select Channel",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "discord",
+                                "query": "channel_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ],
+                                "depends_on": [
+                                    "guild_id"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "message_id",
+                            "type": "text",
+                            "label": "Message ID",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_many_message": {
+                    "key": "get_many_message",
+                    "label": "Get Many Messages",
+                    "schema": [
+                        {
+                            "key": "guild_id",
+                            "type": "select",
+                            "label": "Select Server",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "discord",
+                                "query": "guild_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "channel_id",
+                            "type": "select",
+                            "label": "Select Channel",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "discord",
+                                "query": "channel_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ],
+                                "depends_on": [
+                                    "guild_id"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "limit",
+                            "type": "number",
+                            "label": "Message Limit",
+                            "required": false,
+                            "default": 10,
+                            "min": 1,
+                            "max": 100
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "react_with_emoji_to_message": {
+                    "key": "react_with_emoji_to_message",
+                    "label": "React With Emoji To Message",
+                    "schema": [
+                        {
+                            "key": "guild_id",
+                            "type": "select",
+                            "label": "Select Server",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "discord",
+                                "query": "guild_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "channel_id",
+                            "type": "select",
+                            "label": "Select Channel",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "discord",
+                                "query": "channel_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ],
+                                "depends_on": [
+                                    "guild_id"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "message_id",
+                            "type": "text",
+                            "label": "Message ID",
+                            "required": true
+                        },
+                        {
+                            "key": "emoji",
+                            "type": "text",
+                            "label": "Emoji",
+                            "required": true,
+                            "placeholder": "e.g. or custom_name:emoji_id"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_many_member": {
+                    "key": "get_many_member",
+                    "label": "Get Many Members",
+                    "schema": [
+                        {
+                            "key": "guild_id",
+                            "type": "select",
+                            "label": "Select Server",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "discord",
+                                "query": "guild_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "limit",
+                            "type": "number",
+                            "label": "Member Limit",
+                            "required": false,
+                            "default": 100,
+                            "min": 1,
+                            "max": 1000
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add_role_to_member": {
+                    "key": "add_role_to_member",
+                    "label": "Add Role To Member",
+                    "schema": [
+                        {
+                            "key": "guild_id",
+                            "type": "select",
+                            "label": "Select Server",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "discord",
+                                "query": "guild_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "member_id",
+                            "type": "select",
+                            "label": "Select Member",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "discord",
+                                "query": "member_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ],
+                                "depends_on": [
+                                    "guild_id"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "role_id",
+                            "type": "select",
+                            "label": "Select Role",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "discord",
+                                "query": "role_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ],
+                                "depends_on": [
+                                    "guild_id"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "remove_role_from_member": {
+                    "key": "remove_role_from_member",
+                    "label": "Remove Role From Member",
+                    "schema": [
+                        {
+                            "key": "guild_id",
+                            "type": "select",
+                            "label": "Select Server",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "discord",
+                                "query": "guild_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "member_id",
+                            "type": "select",
+                            "label": "Select Member",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "discord",
+                                "query": "member_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ],
+                                "depends_on": [
+                                    "guild_id"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "role_id",
+                            "type": "select",
+                            "label": "Select Role",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "discord",
+                                "query": "role_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ],
+                                "depends_on": [
+                                    "guild_id"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "find_user": {
+                    "key": "find_user",
+                    "label": "Find User",
+                    "schema": [
+                        {
+                            "key": "guild_id",
+                            "type": "select",
+                            "label": "Select Server",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "discord",
+                                "query": "guild_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "search_query",
+                            "type": "text",
+                            "label": "Username or User ID",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_new_forum_post": {
+                    "key": "create_new_forum_post",
+                    "label": "Create New Forum Post",
+                    "schema": [
+                        {
+                            "key": "guild_id",
+                            "type": "select",
+                            "label": "Select Server",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "discord",
+                                "query": "guild_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "channel_id",
+                            "type": "select",
+                            "label": "Select Channel",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "discord",
+                                "query": "channel_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ],
+                                "depends_on": [
+                                    "guild_id"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "name",
+                            "type": "text",
+                            "label": "Post Title",
+                            "required": true
+                        },
+                        {
+                            "key": "content",
+                            "type": "textarea",
+                            "label": "Message Content",
+                            "required": true
                         }
                     ],
                     "outputs": [
