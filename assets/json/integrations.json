@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-05-03 12:59:41",
+    "generated_at": "2026-05-03 13:13:32",
     "apps": {
         "cartflows": {
             "slug": "cartflows",
@@ -24666,6 +24666,50 @@
                     ]
                 }
             }
+        },
+        "makeforms": {
+            "slug": "makeforms",
+            "name": "MakeForms",
+            "icon": "makeforms.svg",
+            "category": "app",
+            "requires_connection": true,
+            "auth_type": "token_key",
+            "supports_webhook": true,
+            "triggers": {
+                "form_submitted": {
+                    "key": "form_submitted",
+                    "label": "Form Submitted",
+                    "hook": "zaplane_makeforms_webhook_form_submitted",
+                    "schema": [
+                        {
+                            "key": "form_id",
+                            "label": "Form",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "makeforms",
+                                "query": "form_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "webhook_endpoint",
+                            "label": "Webhook Endpoint URL",
+                            "type": "copy",
+                            "value": "https://localhost:10016/index.php?rest_route=/zaplane/v1/incoming/makeforms",
+                            "readonly": true,
+                            "help": "Copy this URL \u2192 MakeForms Dashboard \u2192 Your Form \u2192 Connect \u2192 Webhooks \u2192 Add a webhook \u2192 Paste & Save."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": []
         }
     },
     "tools": {

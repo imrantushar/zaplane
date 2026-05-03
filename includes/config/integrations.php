@@ -315,5 +315,9 @@ return [
 			'file'  => 'discord.php',
 			'class' => \Zaplane\Integrations\Discord::class
 		],
+		'makeforms'        => [
+			'file'  => 'makeforms.php',
+			'class' => \Zaplane\Integrations\Makeforms::class
+		],
 	],
 ];
