@@ -230,6 +230,10 @@ return [
 			'file' => 'kadenceblocks.php',
 			'class' => \Zaplane\Integrations\Kadenceblocks::class
 			],
+		'eventscalendar'      => [
+			'file' => 'eventscalendar.php', 
+			'class' => \Zaplane\Integrations\Eventscalendar::class
+			],
 		'buddyboss'      => [
 			'file' => 'buddyboss.php', 
 			'class' => \Zaplane\Integrations\Buddyboss::class
