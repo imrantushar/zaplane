@@ -287,5 +287,9 @@ return [
 			'file'  => 'gamipress.php',
 			'class' => \Zaplane\Integrations\Gamipress::class
 		],
+		'discord'        => [
+			'file'  => 'discord.php',
+			'class' => \Zaplane\Integrations\Discord::class
+		],
 	],
 ];
