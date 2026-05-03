@@ -8,8 +8,8 @@ import { __ } from "@wordpress/i18n";
 import { outlineBtn, primaryBtn } from "../../../../../../../assets/scss/chakra/recipe";
 import { useActionDrawer } from "@ZAPHooks/useActionDrawer/useActionDrawer";
 import { TOOLS } from "@ZAPHooks/useActionDrawer/helper";
-import { buildContinuePayload } from "./helper";
-import SelectTab from "./SelectTab/SelectTab";
+import { buildContinuePayload } from "../ActionDrawer/helper";
+import SelectTab from "../ActionDrawer/SelectTab/SelectTab";
 
 
 import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
@@ -20,8 +20,8 @@ import './styles.scss';
 import Search from "@ZAPComponents/Search";
 import DrawerModeList from "@ZAPComponents/SearchableDrawerList/DrawerItemList/DrawerModeList";
 import DrawerItemList from "@ZAPComponents/SearchableDrawerList/DrawerItemList";
-import ActionFieldRenderer from "./ActionFieldRenderer/ActionFieldRenderer";
-import TestRun from "./TestRun/TestRun";
+import ActionFieldRenderer from "../ActionDrawer/ActionFieldRenderer/ActionFieldRenderer";
+import TestRun from "../ActionDrawer/TestRun/TestRun";
 import DrawerSearchList from "@ZAPComponents/SearchableDrawerList/DrawerSearchList/DrawerSearchList";
 
 const ActionDrawer = ({

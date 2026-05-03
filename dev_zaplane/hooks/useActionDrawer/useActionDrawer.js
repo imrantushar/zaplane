@@ -37,7 +37,7 @@ import {
   getActionOptions,
   getSelectedActionFields,
   getVisibleFields
-} from "@ZAPContainers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/helper";
+} from "@ZAPContainers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/helper";
 
 
 
@@ -181,4 +181,3 @@ export const useActionDrawer = ({
     resetAll,
   };
 };
-

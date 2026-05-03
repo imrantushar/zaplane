@@ -36,6 +36,44 @@ export const formatVariableKey = (key) => {
         .replace(/_/g, " ")
         .replace(/\b\w/g, (c) => c.toUpperCase());
 };
+export const getContextVariableGroups = (context = {}) => (
+    ["workflow", "wp"].map((key) => {
+        const group = context?.[key] || {};
+
+        return {
+            key,
+            label: group.label || formatVariableKey(key),
+            prefix: group.prefix || key,
+            variables: group.variables || [],
+        };
+    })
+);
+
+export const getVariableDisplayLabel = (variableKey, variables = [], context = {}) => {
+    const contextVariable = getContextVariableGroups(context)
+        .flatMap((group) => (
+            (group.variables || []).map((variable) => ({
+                ...variable,
+                variableKey: `${group.prefix}.${variable.key}`,
+            }))
+        ))
+        .find((variable) => variable.variableKey === variableKey);
+
+    if (contextVariable) {
+        return contextVariable.label || formatVariableKey(contextVariable.key);
+    }
+
+    const appVariable = (variables || [])
+        .flatMap((item) => (
+            (item.variables || []).map((variable) => ({
+                ...variable,
+                variableKey: `${item.node_id}.${variable.key}`,
+            }))
+        ))
+        .find((variable) => variable.variableKey === variableKey || variable.key === variableKey);
+
+    return appVariable?.label || formatVariableKey(appVariable?.key || variableKey);
+};
 // Save current cursor/selection position from the editor
 export const saveSelection = () => {
     const sel = window.getSelection();
@@ -59,7 +97,7 @@ export const syncValue = (editorRef, fieldKey, setFieldValue) => {
     setFieldValue(fieldKey, backendValue);
 };
 // Convert backend text containing {{variables}} into styled HTML variable tags
-export const renderVariableHTML = (val, vars = []) => {
+export const renderVariableHTML = (val, vars = [], context = {}) => {
     if (!val) return "";
 
     return val
@@ -68,11 +106,7 @@ export const renderVariableHTML = (val, vars = []) => {
             const match = word.match(/^{{(.+)}}$/);
             if (match) {
                 const key = match[1];
-                const variableObj = (vars || [])
-                    .flatMap((v) => v.variables || [])
-                    .find((v) => v.key === key);
-
-                const displayLabel = variableObj?.label || key;
+                const displayLabel = getVariableDisplayLabel(key, vars, context);
 
                 return `<span class="zaplane-variable-item" data-variable="${key}">
                     <span class="zaplane-variable-label">${displayLabel}</span>
@@ -88,13 +122,13 @@ export const insertVariableAtRange = ({
     range,
     variableKey,
     variables,
+    variableContext,
     editorRef,
     setActiveRange,
     setPopoverOpen,
     syncValueFn,
 }) => {
-    const variableObj = variables.flatMap((v) => v.variables || []).find((v) => v.key === variableKey);
-    const displayLabel = variableObj?.label || variableKey;
+    const displayLabel = getVariableDisplayLabel(variableKey, variables, variableContext);
 
     const span = document.createElement("span");
     span.className = "zaplane-variable-item";
