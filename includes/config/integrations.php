@@ -247,6 +247,10 @@ return [
 			'file' => 'suremail.php',
 			'class' => \Zaplane\Integrations\Suremail::class
 		],
+		'paymattic'      => [
+			'file' => 'paymattic.php',
+			'class' => \Zaplane\Integrations\Paymattic::class
+		],
 		'bookingcalendar'      => [
 			'file' => 'bookingcalendar.php', 
 			'class' => \Zaplane\Integrations\Bookingcalendar::class
@@ -290,6 +294,16 @@ return [
 		'gamipress'        => [
 			'file'  => 'gamipress.php',
 			'class' => \Zaplane\Integrations\Gamipress::class
+		],
+		'fillout'        => [
+			'file'  => 'fillout.php',
+			'class' => \Zaplane\Integrations\Fillout::class
+		'typeform'        => [
+			'file'  => 'typeform.php',
+			'class' => \Zaplane\Integrations\Typeform::class
+		'discord'        => [
+			'file'  => 'discord.php',
+			'class' => \Zaplane\Integrations\Discord::class
 		],
 	],
 ];

@@ -3,15 +3,15 @@
   width: 500px;
   background: var(--zaplane-background);
   border: 1px solid var(--zaplane-border-color);
-  border-radius: 4px;
-  // box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-radius: 12px;
+  box-shadow: var(--zaplane-shadow);
   z-index: 9999;
   right: 510px !important;
   left: unset !important;
   position: fixed !important;
   top: 110px !important;
   transform: unset !important;
-  z-index: 9999;
+  transition: all 0.2s ease-in-out;
 
   .components-popover__content {
     padding: 24px;

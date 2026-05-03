@@ -22,7 +22,9 @@ class Menu {
 	}
 	public function get_toplevel_menu_icon_url() {
         // phpcs:disable
-        if (isset($_GET['page']) && 'zaplane' === $_GET['page']) {
+        $current_page = isset($_GET['page']) ? $_GET['page'] : '';
+        $is_zaplane_page = ( $current_page === ZAPLANE_PLUGIN_SLUG || strpos( $current_page, ZAPLANE_PLUGIN_SLUG . '-' ) === 0 );
+        if ( $is_zaplane_page ) {
             $icon_url = 'data:image/svg+xml;base64, ' . base64_encode(file_get_contents(ZAPLANE_ASSETS_DIR_PATH . 'images/menu-icon.svg'));
             return apply_filters('zaplane/admin/toplevel_active_menu_icon', $icon_url);
         }

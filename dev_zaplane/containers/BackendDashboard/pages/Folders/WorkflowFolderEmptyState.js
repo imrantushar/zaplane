@@ -1,72 +1,37 @@
-import {
-    Box,
-    VStack,
-    Text,
-    Button,
-    Icon,
-} from "@chakra-ui/react";
 import { FolderPlus } from "lucide-react";
 import { primaryBtn } from "../../../../../assets/scss/chakra/recipe";
 import { useState } from "react";
 import { __ } from "@wordpress/i18n";
 import CreateFolderModal from "@ZAPComponents/CreateFolderModal";
+const WorkflowFolderEmptyState = ({
+  onCreateFolder
+}) => {
+  const [isFolderModalOpen, setIsFolderModalOpen] = useState(false);
+  return <>
+            <div className="bg-[var(--zaplane-background)] border border-[var(--zaplane-border-color)] rounded-xl py-12 px-6 text-center max-w-2xl mx-auto shadow-sm">
+                <div className="flex flex-col items-center gap-6">
+                    <div className="p-4 bg-[var(--zaplane-second-primary)] rounded-full text-[var(--zaplane-primary)]">
+                        <FolderPlus className="w-10 h-10" strokeWidth={1.5} />
+                    </div>
 
+                    <div className="space-y-2">
+                        <h3 className="text-xl font-bold text-[var(--zaplane-font-color)]">
+                            {__('Create Folders for your Workflows', 'zaplane')}
+                        </h3>
+                        <p className="text-[var(--zaplane-font-secondary-color)] max-w-sm mx-auto leading-relaxed">
+                            {__('Create folders to categorize your workflows and easily share them with your workspace.', 'zaplane')}
+                        </p>
+                    </div>
 
-const WorkflowFolderEmptyState = ({ onCreateFolder }) => {
-    const [isFolderModalOpen, setIsFolderModalOpen] = useState(false);
-    return (
-        <>
-            <Box
-                bg="white"
-                border="1px solid"
-                borderColor="var(--zaplane-border-color, #CBD1D7)"
-                borderRadius="lg"
-                px={{ base: 6, md: 12 }}
-                py={10}
-                w="full"
-                textAlign="center"
-            >
-                <VStack gap='18px'>
-                    <Icon
-                        as={FolderPlus}
-                        boxSize={8}
-                        color="var(--zaplane-font-color)"
-                        strokeWidth={1.5}
-                    />
-
-                    <Text
-                        fontWeight="700"
-                        fontSize="lg"
-                        className="zaplane-label"
-                        color="var(--zaplane-font-color)"
-                    >
-                        {__('Create Folders for your Workflows', 'zaplane')}
-                    </Text>
-                    <Text
-                        fontSize="sm"
-                        color="var(--zaplane-font-secondary-color)"
-                        maxW="sm"
-                        lineHeight="tall"
-                        className="zaplane-label"
-
-                    >
-                        {__('Create folders to categories your workflows and also share with your workspace', 'zaplane')}
-                    </Text>
-                    <Button
-                        onClick={() => setIsFolderModalOpen(true)}
-                        {...primaryBtn}
+                    <button 
+                        onClick={() => setIsFolderModalOpen(true)} 
+                        className="bg-[var(--zaplane-primary)] hover:opacity-90 text-white font-medium py-2.5 px-8 rounded-lg transition-all shadow-md active:scale-95"
                     >
                         {__("Create Folder", "zaplane")}
-                    </Button>
+                    </button>
 
-                </VStack>
-            </Box>
-            <CreateFolderModal
-                isOpen={isFolderModalOpen}
-                onClose={() => setIsFolderModalOpen(false)}
-            /></>
-
-    );
+                </div>
+            </div>
+            <CreateFolderModal isOpen={isFolderModalOpen} onClose={() => setIsFolderModalOpen(false)} /></>;
 };
-
 export default WorkflowFolderEmptyState;

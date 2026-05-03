@@ -1,90 +1,58 @@
-import { Box, Flex, Badge, Spinner, Text } from "@chakra-ui/react";
 import WPModal from "@ZAPComponents/Modal/WPModal";
 import { __ } from "@wordpress/i18n";
-
-const ConnectionDetails = ({ isOpen, onClose, connection }) => {
-  return (
-    <WPModal
-      title={__("Connection Details", "zaplane")}
-      isOpen={isOpen}
-      onRequestClose={onClose}
-    >
+const ConnectionDetails = ({
+  isOpen,
+  onClose,
+  connection
+}) => {
+  return <WPModal title={__("Connection Details", "zaplane")} isOpen={isOpen} onRequestClose={onClose} size="medium">
       {!connection ? (
-        <Flex justify="center" align="center" py={12}>
-          <Spinner size="lg" />
-        </Flex>
+        <div className="flex justify-center items-center py-12">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#6366F1]" />
+        </div>
       ) : (
-        <Box>
-          <Box
-            p={5}
-            borderRadius="lg"
-            bg="var(--zaplane-background)"
-            borderWidth="1px"
-            mb={5}
-            boxShadow="sm"
-          >
-            <Flex justify="space-between" align="center">
-              <Box>
-                <Text className="zaplane-label" fontSize="xl" fontWeight="semibold">
+        <div className="flex flex-col gap-6">
+          {/* Hero Section */}
+          <div className="p-6 rounded-[12px] bg-white border border-[#E5E7EB] shadow-sm">
+            <div className="flex justify-between items-center">
+              <div className="flex flex-col gap-1">
+                <h3 className="text-[18px] font-bold text-[#111827]">
                   {__(connection.name, "zaplane")}
-                </Text>
-                <Text className="zaplane-label" fontSize="sm" color="gray.500">
+                </h3>
+                <span className="text-[14px] text-[#6B7280] font-medium uppercase tracking-wider">
                   {__(connection.app, "zaplane")}
-                </Text>
-              </Box>
-              <Badge
-                px={4}
-                py={1.5}
-                fontSize="sm"
-                borderRadius="full"
-                colorPalette={connection.status === "active" ? "green" : "gray"}
-                textTransform="capitalize"
-              >
+                </span>
+              </div>
+              <span className={`px-4 py-1.5 text-[12px] font-bold rounded-full uppercase tracking-wide ${
+                connection.status === "active" 
+                  ? "bg-[#ECFDF5] text-[#10B981] border border-[#A7F3D0]" 
+                  : "bg-[#F3F4F6] text-[#6B7280] border border-[#E5E7EB]"
+              }`}>
                 {__(connection.status, "zaplane")}
-              </Badge>
-            </Flex>
-          </Box>
-          <Flex gap={4} wrap="wrap">
-            <Box flex="1 1 45%" p={4} borderRadius="lg" borderWidth="1px" bg="gray.50">
-              <Text className="zaplane-label">
-                {__('AUTH TYPE', 'zaplane')}
-              </Text>
-              <Text className="zaplane-label" fontSize="md" fontWeight="medium">
-                {__(connection.auth_type, 'zaplane')}
-              </Text>
-            </Box>
+              </span>
+            </div>
+          </div>
 
-            <Box flex="1 1 45%" p={4} borderRadius="lg" borderWidth="1px" bg="gray.50">
-              <Text  className="zaplane-label">
-                {__('CREATED AT', 'zaplane')}
-              </Text>
-              <Text fontSize="md" fontWeight="medium" className="zaplane-label" >
-                {__(connection.created_at, "zaplane")}
-              </Text>
-            </Box>
-
-            <Box flex="1 1 45%" p={4} borderRadius="lg" borderWidth="1px" bg="gray.50">
-              <Text className="zaplane-label">
-                {__('LAST USED', 'zaplane')}
-              </Text>
-              <Text className="zaplane-label" fontSize="md" fontWeight="medium">
-                {__(connection.last_used_at || "--", "zaplane")}
-              </Text>
-            </Box>
-
-            <Box flex="1 1 45%" p={4} borderRadius="lg" borderWidth="1px" bg="gray.50">
-              <Text  className="zaplane-label">
-                {__('LAST TESTED', 'zaplane')}
-              </Text>
-              <Text fontSize="md" fontWeight="medium" className="zaplane-label">
-                {connection.last_tested_at || "--"}
-              </Text>
-            </Box>
-          </Flex>
-        </Box>
+          {/* Details Grid */}
+          <div className="grid grid-cols-2 gap-4">
+            {[
+              { label: __('AUTH TYPE', 'zaplane'), value: connection.auth_type },
+              { label: __('CREATED AT', 'zaplane'), value: connection.created_at },
+              { label: __('LAST USED', 'zaplane'), value: connection.last_used_at || "--" },
+              { label: __('LAST TESTED', 'zaplane'), value: connection.last_tested_at || "--" },
+            ].map((item, idx) => (
+              <div key={idx} className="p-5 rounded-[12px] bg-[#F9FAFB] border border-[#F3F4F6] flex flex-col gap-2">
+                <span className="text-[11px] font-bold text-[#9CA3AF] uppercase tracking-widest">
+                  {item.label}
+                </span>
+                <span className="text-[14px] font-semibold text-[#374151]">
+                  {__(item.value, 'zaplane')}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
       )}
-    </WPModal>
-  );
+    </WPModal>;
 };
-
 export default ConnectionDetails;

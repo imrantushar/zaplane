@@ -95,7 +95,7 @@ export const deleteWorkFlow = createAsyncThunk(
 
 			thunkAPI.dispatch(
 				showNotification({
-					message: 'workflow Deleted',
+					message: 'Workflow Deleted',
 					isShow: true,
 					type: 'success',
 				})

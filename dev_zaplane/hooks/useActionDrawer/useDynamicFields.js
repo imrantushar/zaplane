@@ -18,24 +18,25 @@ export const useDynamicFields = ({
    *                    field produces a new key and triggers a fresh fetch
    */
   const getKey = useCallback(
-    (field) => {
+    (field, search = "") => {
       const deps = field.dynamic?.depends_on || [];
-      if (deps.length === 0) {
-        return `${mode}:${selectedItem?.id}:${field.key}`;
-      }
-      const depSuffix = deps
-        .map((dep) => `${dep}=${values?.[dep] ?? ""}`)
-        .join(":");
-      return `${mode}:${selectedItem?.id}:${field.key}:${depSuffix}`;
+      const base = deps.length === 0
+        ? `${mode}:${selectedItem?.id}:${field.key}`
+        : `${mode}:${selectedItem?.id}:${field.key}:${deps
+            .map((dep) => `${dep}=${values?.[dep] ?? ""}`)
+            .join(":")}`;
+      
+      return search ? `${base}:search:${search}` : base;
     },
     [mode, selectedItem, values]
   );
 
-  const fetchDynamicOptions = useCallback(async (field) => {
+  const fetchDynamicOptions = useCallback(async (field, search = "") => {
     if (!field.dynamic) return;
 
-    const key = getKey(field);
-    if (dynamicOptions[key]) return;
+    const key = getKey(field, search);
+    // Remove early return for !search to allow fresh "reset" fetches
+    // if (!search && dynamicOptions[key]) return; 
 
     setLoadingFields((p) => ({ ...p, [key]: true }));
 
@@ -46,7 +47,12 @@ export const useDynamicFields = ({
         if (values?.[dep]) depParams[dep] = values[dep];
       });
 
-      const res = await fetchDynamic({ ...field.dynamic, ...depParams });
+      const res = await fetchDynamic({ 
+        ...field.dynamic, 
+        ...depParams, 
+        search,
+        limit: 20 
+      });
 
       const mapped = Object.values(res || {}).map((i) => ({
         value: i[field.dynamic.select[0]],

@@ -1,35 +1,32 @@
-import { Image, Text, Flex } from "@chakra-ui/react";
 import { plugin_root_url } from "@ZAPUtils/helper";
-
-const ZAPIcon = ({ icon, name,isAction=false }) => {
-  const isSvg = icon?.endsWith(".svg");
-
-  return (
-    <Flex
-      w={isAction ? '40px': "32px"}
-      h={isAction ? '40px': "32px"}
-      justifyContent="center"
-      alignItems="center"
-      bg={!isAction && "#F6F7F8"}
-      p='7px'
-      borderRadius="4px"
-      border="1px solid var(--zaplane-border-color)"
-    >
+const ZAPIcon = ({
+  icon,
+  name,
+  isAction = false
+}) => {
+  const isSvg = icon?.endsWith(".svg") || icon?.includes("http");
+  const size = isAction ? '40px' : '32px';
+  const imgSize = isAction ? '20px' : '18px';
+  
+  return <div 
+    style={{
+        width: size, 
+        height: size, 
+        background: isAction ? '#FFFFFF' : '#F6F7F8', 
+        flexShrink: 0,
+        borderColor: 'var(--zaplane-border-color)'
+    }} 
+    className="flex justify-center items-center p-2 rounded-[4px] border shadow-sm"
+  >
       {isSvg ? (
-        <Image
-          src={`${plugin_root_url}assets/images/icons/${icon}`}
-          alt={name}
-          boxSize={isAction ? '20px': "16px"}
+        <img 
+          src={icon?.includes("http") ? icon : `${plugin_root_url}assets/images/icons/${icon}`} 
+          alt={name} 
+          style={{width: imgSize, height: imgSize, objectFit: 'contain'}} 
         />
       ) : (
-        <Text
-          as="span"
-          m="0"
-          className={`zaplane-icon zaplane-icon--${icon}`}
-        />
+        <span className={`zaplane-icon zaplane-icon--${icon} m-0`} style={{fontSize: imgSize}} />
       )}
-    </Flex>
-  );
+    </div>;
 };
-
 export default ZAPIcon;
