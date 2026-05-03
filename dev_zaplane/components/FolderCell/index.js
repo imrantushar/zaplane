@@ -6,7 +6,7 @@ import { getFolders, createFolder, addWorkflowToFolder, removeWorkflowFromFolder
 import WPModal from "@ZAPComponents/Modal/WPModal";
 import { getWorkFlow } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow";
 import ZAPMenu from "@ZAPComponents/ZapMenu";
-import { primaryBtn } from "../../../assets/scss/chakra/recipe";
+import { outlineBtn, primaryBtn } from "../../../assets/scss/chakra/recipe";
 const FolderCell = ({
   row,
   isFolder = false
@@ -108,58 +108,60 @@ const FolderCell = ({
     );
   }
   return <>
-            {selectedFolder ? <ZAPMenu items={menuItems} trigger={<div onClick={e => e.stopPropagation()} className="flex flex-row items-center gap-2 px-4 h-[36px] rounded-full border border-[#E5E7EB] bg-white group hover:border-[#D1D5DB] transition-all cursor-pointer max-w-[160px]">
-                            <LuFolderOpen size={14} className="text-[#6B7280] shrink-0" />
-                            <span className="text-[13px] font-semibold text-[#111827] truncate flex-[1]">
-                                {selectedFolder.title}
-                            </span>
-                            <div 
-                              onClick={e => {
-                                e.stopPropagation();
-                                handleRemove();
-                              }} 
-                              className="flex items-center justify-center w-[18px] h-[18px] rounded-full bg-gray-50 hover:bg-gray-100 shrink-0 transition-colors"
-                              title={__("Remove from folder", "zaplane")}
-                            >
-                                <LuMinus size={11} className="text-[#6B7280]" />
-                            </div>
-                        </div>} /> : <ZAPMenu items={menuItems} trigger={<button 
-                            onClick={e => e.stopPropagation()} 
-                            className="flex items-center gap-2 px-4 h-[36px] rounded-full border border-[#E5E7EB] bg-white text-[13px] font-semibold text-[#374151] hover:bg-[#F9FAFB] hover:border-[#D1D5DB] transition-all"
-                            aria-label={__("Add to folder", "zaplane")}
-                        >
-                            <LuFolderOpen size={14} className="text-[#6B7280]" />
-                            {__("Add", "zaplane")}
-                        </button>} />}
+    {selectedFolder ? <ZAPMenu items={menuItems} trigger={<div onClick={e => e.stopPropagation()} className="flex flex-row items-center gap-2 px-4 h-[36px] rounded-full border border-[#E5E7EB] bg-white group hover:border-[#D1D5DB] transition-all cursor-pointer max-w-[160px]">
+      <LuFolderOpen size={14} className="text-[#6B7280] shrink-0" />
+      <span className="text-[13px] font-semibold text-[#111827] truncate flex-[1]">
+        {selectedFolder.title}
+      </span>
+      <div
+        onClick={e => {
+          e.stopPropagation();
+          handleRemove();
+        }}
+        className="flex items-center justify-center w-[18px] h-[18px] rounded-full bg-gray-50 hover:bg-gray-100 shrink-0 transition-colors"
+        title={__("Remove from folder", "zaplane")}
+      >
+        <LuMinus size={11} className="text-[#6B7280]" />
+      </div>
+    </div>} /> : <ZAPMenu items={menuItems} trigger={<button
+      onClick={e => e.stopPropagation()}
+      className="flex items-center gap-2 px-4 h-[36px] rounded-full border border-[#E5E7EB] bg-white text-[13px] font-semibold text-[#374151] hover:bg-[#F9FAFB] hover:border-[#D1D5DB] transition-all"
+      aria-label={__("Add to folder", "zaplane")}
+    >
+      <LuFolderOpen size={14} className="text-[#6B7280]" />
+      {__("Add", "zaplane")}
+    </button>} />}
 
-            <WPModal isOpen={modalOpen} title={__("Create Folder", "zaplane")} onRequestClose={() => {
+    <WPModal isOpen={modalOpen} title={__("Create Folder", "zaplane")} onRequestClose={() => {
       setModalOpen(false);
       setFolderName("");
     }} shouldCloseOnClickOutside size="medium" suffix="create-folder">
-                <span className="zaplane-label mb-4">
-                    {__("Streamline your workflows by organizing them into folders.", "zaplane")}
-                </span>
+      <div className="flex flex-col gap-4">
+        <span className="zaplane-label mb-4">
+          {__("Streamline your workflows by organizing them into folders.", "zaplane")}
+        </span>
 
-                <input placeholder={__("Folder Name", "zaplane")} value={folderName} onChange={e => setFolderName(e.target.value)} onKeyDown={e => {
-        if (e.key === "Enter") handleCreateFolder();
-        if (e.key === "Escape") {
-          setModalOpen(false);
-          setFolderName("");
-        }
-      }} autoFocus className="zaplane-input mb-5" />
+        <input placeholder={__("Folder Name", "zaplane")} value={folderName} onChange={e => setFolderName(e.target.value)} onKeyDown={e => {
+          if (e.key === "Enter") handleCreateFolder();
+          if (e.key === "Escape") {
+            setModalOpen(false);
+            setFolderName("");
+          }
+        }} autoFocus className="zaplane-input mb-5" />
 
-                <div className="flex flex-row items-center justify-end gap-3">
-                    <button variant="outline" size="sm" onClick={() => {
-          setModalOpen(false);
-          setFolderName("");
-        }}>
-                        {__("Cancel", "zaplane")}
-                    </button>
-                    <button style={primaryBtn} disabled={!folderName.trim()} onClick={handleCreateFolder}>
-                        {__("Create", "zaplane")}
-                    </button>
-                </div>
-            </WPModal>
-        </>;
+        <div className="flex flex-row items-center justify-end gap-3">
+          <button style={outlineBtn} onClick={() => {
+            setModalOpen(false);
+            setFolderName("");
+          }}>
+            {__("Cancel", "zaplane")}
+          </button>
+          <button style={primaryBtn} disabled={!folderName.trim()} onClick={handleCreateFolder}>
+            {__("Create", "zaplane")}
+          </button>
+        </div>
+      </div>
+    </WPModal>
+  </>;
 };
 export default FolderCell;
