@@ -67,7 +67,7 @@ class Brevo extends IntegrationBase
         $emails_field = [
             'key'         => 'emails',
             'label'       => 'Email Address(es)',
-            'type'        => 'text',
+            'type'        => 'email',
             'required'    => true,
             'description' => 'Comma-separated list for multiple addresses.',
         ];
@@ -77,7 +77,7 @@ class Brevo extends IntegrationBase
                 [
                     'key'      => 'email',
                     'label'    => 'Email',
-                    'type'     => 'text',
+                    'type'     => 'email',
                     'required' => true,
                 ],
                 [
@@ -121,7 +121,7 @@ class Brevo extends IntegrationBase
                 [
                     'key'      => 'email',
                     'label'    => 'Email',
-                    'type'     => 'text',
+                    'type'     => 'email',
                     'required' => true,
                 ],
             ];
