@@ -315,5 +315,9 @@ return [
 			'file'  => 'discord.php',
 			'class' => \Zaplane\Integrations\Discord::class
 		],
+		'jotform'        => [
+			'file'  => 'jotform.php',
+			'class' => \Zaplane\Integrations\Jotform::class
+		],
 	],
 ];
