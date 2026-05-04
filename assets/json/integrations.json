@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-05-03 13:13:32",
+    "generated_at": "2026-05-04 06:39:27",
     "apps": {
         "cartflows": {
             "slug": "cartflows",
@@ -23802,7 +23802,7 @@
                             "key": "webhook_endpoint",
                             "label": "Webhook Endpoint URL",
                             "type": "copy",
-                            "value": "https://localhost:10016/index.php?rest_route=/zaplane/v1/incoming/fillout",
+                            "value": "https://localhost:10016/wp-json/zaplane/v1/incoming/fillout",
                             "readonly": true,
                             "help": "Copy this URL \u2192 Fillout Dashboard \u2192 Your Form \u2192 Integrate \u2192 Webhooks \u2192 Add Webhook \u2192 Paste & Save."
                         }
@@ -23846,7 +23846,7 @@
                             "key": "webhook_endpoint",
                             "label": "Webhook Endpoint URL",
                             "type": "copy",
-                            "value": "https://localhost:10016/index.php?rest_route=/zaplane/v1/incoming/typeform",
+                            "value": "https://localhost:10016/wp-json/zaplane/v1/incoming/typeform",
                             "readonly": true,
                             "help": "Copy this URL \u2192 Typeform Dashboard \u2192 Your Form \u2192 Connect \u2192 Webhooks \u2192 Add a webhook \u2192 Paste & Save."
                         }
@@ -24672,8 +24672,8 @@
             "name": "MakeForms",
             "icon": "makeforms.svg",
             "category": "app",
-            "requires_connection": true,
-            "auth_type": "token_key",
+            "requires_connection": false,
+            "auth_type": "none",
             "supports_webhook": true,
             "triggers": {
                 "form_submitted": {
@@ -24682,24 +24682,10 @@
                     "hook": "zaplane_makeforms_webhook_form_submitted",
                     "schema": [
                         {
-                            "key": "form_id",
-                            "label": "Form",
-                            "type": "select",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "makeforms",
-                                "query": "form_query",
-                                "select": [
-                                    "value",
-                                    "label"
-                                ]
-                            }
-                        },
-                        {
                             "key": "webhook_endpoint",
                             "label": "Webhook Endpoint URL",
                             "type": "copy",
-                            "value": "https://localhost:10016/index.php?rest_route=/zaplane/v1/incoming/makeforms",
+                            "value": "https://localhost:10016/wp-json/zaplane/v1/incoming/makeforms",
                             "readonly": true,
                             "help": "Copy this URL \u2192 MakeForms Dashboard \u2192 Your Form \u2192 Connect \u2192 Webhooks \u2192 Add a webhook \u2192 Paste & Save."
                         }
