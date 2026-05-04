@@ -8,6 +8,7 @@ const VariableEditor = ({
   setFieldValue,
   field,
   variables,
+  variableContext,
   label,
   placeholder,
   containerStyle
@@ -23,12 +24,12 @@ const VariableEditor = ({
     if (!editorRef.current) return;
     if (!initialized.current) {
       if (value) {
-        editorRef.current.innerHTML = renderVariableHTML(value, variables);
+        editorRef.current.innerHTML = renderVariableHTML(value, variables, variableContext);
       }
       initialized.current = true;
     }
     setIsEmpty(!value || value.trim() === "");
-  }, [value, variables]);
+  }, [value, variables, variableContext]);
 
   // remove variable
   useEffect(() => {
@@ -80,12 +81,13 @@ const VariableEditor = ({
         <div ref={editorRef} onInput={handleInput} className={`zaplane-variable-editor ${isEmpty ? "zaplane-empty" : ""}`} contentEditable suppressContentEditableWarning onKeyDown={handleKeyDown} onClick={handleCursorSave} onKeyUp={handleCursorSave} onBlur={() => syncValue(editorRef, field.key, setFieldValue)} data-placeholder={placeholder} />
       </div>
 
-      <VariablePopover isOpen={isPopoverOpen} prefix="zaplane-variables-popover" onClose={() => setPopoverOpen(false)} data={variables} onSelectVariable={variable => {
+      <VariablePopover isOpen={isPopoverOpen} prefix="zaplane-variables-popover" onClose={() => setPopoverOpen(false)} data={variables} contextData={variableContext} onSelectVariable={variable => {
       if (!activeRange) return;
       insertVariableAtRange({
         range: activeRange,
         variableKey: variable.key || variable.replace("{{", "").replace("}}", ""),
         variables,
+        variableContext,
         editorRef,
         setActiveRange,
         setPopoverOpen,
