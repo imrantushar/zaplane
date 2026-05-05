@@ -315,5 +315,9 @@ return [
 			'file'  => 'discord.php',
 			'class' => \Zaplane\Integrations\Discord::class
 		],
+		'paperform'        => [
+			'file'  => 'paperform.php',
+			'class' => \Zaplane\Integrations\Paperform::class
+		],
 	],
 ];
