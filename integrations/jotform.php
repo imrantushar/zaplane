@@ -164,7 +164,7 @@ class Jotform extends IntegrationBase {
 					'jotform_answers'       => self::parse_answers( $payload['answers'] ?? [] ),
 					'jotform_ip'            => $payload['ip'] ?? '',
 				];
-		}
+		}//end switch
 
 		return false;
 	}
@@ -219,25 +219,82 @@ class Jotform extends IntegrationBase {
 						'type'     => 'select',
 						'required' => true,
 						'options'  => [
-							[ 'label' => 'Header',          'value' => 'control_head' ],
-							[ 'label' => 'Full Name',       'value' => 'control_fullname' ],
-							[ 'label' => 'Email',           'value' => 'control_email' ],
-							[ 'label' => 'Address',         'value' => 'control_address' ],
-							[ 'label' => 'Phone',           'value' => 'control_phone' ],
-							[ 'label' => 'Date Picker',     'value' => 'control_datetime' ],
-							[ 'label' => 'Signature',       'value' => 'control_signature' ],
-							[ 'label' => 'Short Text',      'value' => 'control_textbox' ],
-							[ 'label' => 'Long Text',       'value' => 'control_textarea' ],
-							[ 'label' => 'Dropdown',        'value' => 'control_dropdown' ],
-							[ 'label' => 'Single Choice',   'value' => 'control_radio' ],
-							[ 'label' => 'Multiple Choice', 'value' => 'control_checkbox' ],
-							[ 'label' => 'Number',          'value' => 'control_number' ],
-							[ 'label' => 'Image',           'value' => 'control_image' ],
-							[ 'label' => 'File Upload',     'value' => 'control_fileupload' ],
-							[ 'label' => 'Time',            'value' => 'control_time' ],
-							[ 'label' => 'Captcha',         'value' => 'control_captcha' ],
-							[ 'label' => 'Spinner',         'value' => 'control_spinner' ],
-							[ 'label' => 'Submit',          'value' => 'control_button' ],
+							[
+								'label' => 'Header',
+								'value' => 'control_head'
+							],
+							[
+								'label' => 'Full Name',
+								'value' => 'control_fullname'
+							],
+							[
+								'label' => 'Email',
+								'value' => 'control_email'
+							],
+							[
+								'label' => 'Address',
+								'value' => 'control_address'
+							],
+							[
+								'label' => 'Phone',
+								'value' => 'control_phone'
+							],
+							[
+								'label' => 'Date Picker',
+								'value' => 'control_datetime'
+							],
+							[
+								'label' => 'Signature',
+								'value' => 'control_signature'
+							],
+							[
+								'label' => 'Short Text',
+								'value' => 'control_textbox'
+							],
+							[
+								'label' => 'Long Text',
+								'value' => 'control_textarea'
+							],
+							[
+								'label' => 'Dropdown',
+								'value' => 'control_dropdown'
+							],
+							[
+								'label' => 'Single Choice',
+								'value' => 'control_radio'
+							],
+							[
+								'label' => 'Multiple Choice',
+								'value' => 'control_checkbox'
+							],
+							[
+								'label' => 'Number',
+								'value' => 'control_number'
+							],
+							[
+								'label' => 'Image',
+								'value' => 'control_image'
+							],
+							[
+								'label' => 'File Upload',
+								'value' => 'control_fileupload'
+							],
+							[
+								'label' => 'Time',
+								'value' => 'control_time'
+							],
+							[
+								'label' => 'Captcha',
+								'value' => 'control_captcha'
+							],
+							[
+								'label' => 'Spinner',
+								'value' => 'control_spinner'
+							],
+							[
+								'label' => 'Submit',
+								'value' => 'control_button'
+							],
 						],
 					],
 					[
@@ -360,7 +417,7 @@ class Jotform extends IntegrationBase {
 				return self::success( [
 					'jotform_deleted_form_id' => $form_id,
 				] );
-		}
+		}//end switch
 
 		return [
 			'port' => 'main',
@@ -476,7 +533,7 @@ class Jotform extends IntegrationBase {
 					'error' => $e->getMessage(),
 				];
 			}
-		}
+		}//end foreach
 
 		return $added;
 	}
@@ -586,7 +643,7 @@ class Jotform extends IntegrationBase {
 			}
 		} catch ( \Throwable $error ) {
 			unset( $error );
-		}
+		}//end try
 
 		return [];
 	}
