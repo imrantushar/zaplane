@@ -232,15 +232,15 @@ return [
 			'class' => \Zaplane\Integrations\Kadenceblocks::class
 			],
 		'eventscalendar'      => [
-			'file' => 'eventscalendar.php', 
+			'file' => 'eventscalendar.php',
 			'class' => \Zaplane\Integrations\Eventscalendar::class
 			],
 		'buddyboss'      => [
-			'file' => 'buddyboss.php', 
+			'file' => 'buddyboss.php',
 			'class' => \Zaplane\Integrations\Buddyboss::class
 		],
 		'ultimatemember'      => [
-			'file' => 'ultimatemember.php', 
+			'file' => 'ultimatemember.php',
 			'class' => \Zaplane\Integrations\Ultimatemember::class
 		],
 		'bitform'      => [
@@ -260,15 +260,15 @@ return [
 			'class' => \Zaplane\Integrations\Paymattic::class
 		],
 		'bookingcalendar'      => [
-			'file' => 'bookingcalendar.php', 
+			'file' => 'bookingcalendar.php',
 			'class' => \Zaplane\Integrations\Bookingcalendar::class
 		],
 		'weforms'      => [
-			'file' => 'weforms.php', 
+			'file' => 'weforms.php',
 			'class' => \Zaplane\Integrations\Weforms::class
 		],
 		'suremembers'      => [
-			'file' => 'suremembers.php', 
+			'file' => 'suremembers.php',
 			'class' => \Zaplane\Integrations\Suremembers::class
 		],
 		'arform'      => [
@@ -314,6 +314,10 @@ return [
 		'discord'        => [
 			'file'  => 'discord.php',
 			'class' => \Zaplane\Integrations\Discord::class
+		],
+		'mailerlite'        => [
+			'file'  => 'mailerlite.php',
+			'class' => \Zaplane\Integrations\Mailerlite::class
 		],
 	],
 ];
