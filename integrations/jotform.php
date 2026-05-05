@@ -42,7 +42,7 @@ class Jotform extends IntegrationBase {
 				'type'     => 'password',
 				'label'    => 'API Key',
 				'required' => true,
-				'help'     => 'Go To Jotform (jotform.com/myaccount/api) → Myaccount → API → Create New Key',
+				'help'     => 'Go To Jotform (jotform.com/myaccount/api) → Myaccount → API → Create New Key → Set Permission to "Full Access" → Copy Key',
 			],
 		];
 	}
@@ -117,27 +117,19 @@ class Jotform extends IntegrationBase {
 
 	public static function get_trigger_config_schema( string $trigger ): array {
 		if ( 'form_submitted' === $trigger ) {
-			return [
+			return array_merge(
+				self::field_form_query(),
 				[
-					'key'      => 'form_id',
-					'label'    => 'Form',
-					'type'     => 'select',
-					'required' => true,
-					'dynamic'  => [
-						'integration' => 'jotform',
-						'query'       => 'form_query',
-						'select'      => [ 'value', 'label' ],
+					[
+						'key'      => 'webhook_endpoint',
+						'label'    => 'Webhook Endpoint URL',
+						'type'     => 'copy',
+						'value'    => self::get_webhook_url(),
+						'readonly' => true,
+						'help'     => 'Copy this URL → Jotform → Your Form → Settings → Integrations → Webhooks → Paste & Save.',
 					],
-				],
-				[
-					'key'      => 'webhook_endpoint',
-					'label'    => 'Webhook Endpoint URL',
-					'type'     => 'copy',
-					'value'    => self::get_webhook_url(),
-					'readonly' => true,
-					'help'     => 'Copy this URL → Jotform → Your Form → Settings → Integrations → Webhooks → Paste & Save.',
-				],
-			];
+				]
+			);
 		}
 
 		return [];
@@ -179,73 +171,110 @@ class Jotform extends IntegrationBase {
 
 	public static function get_actions(): array {
 		return [
-			'create_form' => [ 'label' => 'Create Form' ],
+			'create_form'           => [ 'label' => 'Create Form' ],
+			'add_questions_to_form' => [ 'label' => 'Add Questions to Form' ],
+			'delete_form'           => [ 'label' => 'Delete Form' ],
+		];
+	}
+
+	private static function field_form_query(): array {
+		return [
+			[
+				'key'      => 'form_id',
+				'label'    => 'Form',
+				'type'     => 'select',
+				'required' => true,
+				'dynamic'  => [
+					'integration' => 'jotform',
+					'query'       => 'form_query',
+					'select'      => [ 'value', 'label' ],
+				],
+			],
+		];
+	}
+
+	private static function field_question(): array {
+		return [
+			[
+				'key'      => 'questions',
+				'label'    => 'Questions',
+				'type'     => 'repeater',
+				'required' => false,
+				'fields'   => [
+					[
+						'key'      => 'label',
+						'label'    => 'Label',
+						'type'     => 'text',
+						'required' => true,
+					],
+					[
+						'key'      => 'slug',
+						'label'    => 'Slug',
+						'type'     => 'text',
+						'required' => true,
+					],
+					[
+						'key'      => 'type',
+						'label'    => 'Type',
+						'type'     => 'select',
+						'required' => true,
+						'options'  => [
+							[ 'label' => 'Header',          'value' => 'control_head' ],
+							[ 'label' => 'Full Name',       'value' => 'control_fullname' ],
+							[ 'label' => 'Email',           'value' => 'control_email' ],
+							[ 'label' => 'Address',         'value' => 'control_address' ],
+							[ 'label' => 'Phone',           'value' => 'control_phone' ],
+							[ 'label' => 'Date Picker',     'value' => 'control_datetime' ],
+							[ 'label' => 'Signature',       'value' => 'control_signature' ],
+							[ 'label' => 'Short Text',      'value' => 'control_textbox' ],
+							[ 'label' => 'Long Text',       'value' => 'control_textarea' ],
+							[ 'label' => 'Dropdown',        'value' => 'control_dropdown' ],
+							[ 'label' => 'Single Choice',   'value' => 'control_radio' ],
+							[ 'label' => 'Multiple Choice', 'value' => 'control_checkbox' ],
+							[ 'label' => 'Number',          'value' => 'control_number' ],
+							[ 'label' => 'Image',           'value' => 'control_image' ],
+							[ 'label' => 'File Upload',     'value' => 'control_fileupload' ],
+							[ 'label' => 'Time',            'value' => 'control_time' ],
+							[ 'label' => 'Captcha',         'value' => 'control_captcha' ],
+							[ 'label' => 'Spinner',         'value' => 'control_spinner' ],
+							[ 'label' => 'Submit',          'value' => 'control_button' ],
+						],
+					],
+					[
+						'key'      => 'order',
+						'label'    => 'Order',
+						'type'     => 'text',
+						'required' => false,
+					],
+				],
+			],
 		];
 	}
 
 	public static function get_action_config_schema( string $action ): array {
 		if ( 'create_form' === $action ) {
-			return [
+			return array_merge(
 				[
-					'key'      => 'form_title',
-					'label'    => 'Form Title',
-					'type'     => 'text',
-					'required' => true,
-				],
-				[
-					'key'      => 'questions',
-					'label'    => 'Questions',
-					'type'     => 'repeater',
-					'required' => false,
-					'fields'   => [
-						[
-							'key'      => 'label',
-							'label'    => 'Label',
-							'type'     => 'text',
-							'required' => true,
-						],
-						[
-							'key'      => 'slug',
-							'label'    => 'Slug',
-							'type'     => 'text',
-							'required' => true,
-						],
-						[
-							'key'      => 'type',
-							'label'    => 'Type',
-							'type'     => 'select',
-							'required' => true,
-							'options'  => [
-								[ 'label' => 'Header',          'value' => 'control_head' ],
-								[ 'label' => 'Full Name',       'value' => 'control_fullname' ],
-								[ 'label' => 'Email',           'value' => 'control_email' ],
-								[ 'label' => 'Address',         'value' => 'control_address' ],
-								[ 'label' => 'Phone',           'value' => 'control_phone' ],
-								[ 'label' => 'Date Picker',     'value' => 'control_datetime' ],
-								[ 'label' => 'Signature',       'value' => 'control_signature' ],
-								[ 'label' => 'Short Text',      'value' => 'control_textbox' ],
-								[ 'label' => 'Long Text',       'value' => 'control_textarea' ],
-								[ 'label' => 'Dropdown',        'value' => 'control_dropdown' ],
-								[ 'label' => 'Single Choice',   'value' => 'control_radio' ],
-								[ 'label' => 'Multiple Choice', 'value' => 'control_checkbox' ],
-								[ 'label' => 'Number',          'value' => 'control_number' ],
-								[ 'label' => 'Image',           'value' => 'control_image' ],
-								[ 'label' => 'File Upload',     'value' => 'control_fileupload' ],
-								[ 'label' => 'Time',            'value' => 'control_time' ],
-								[ 'label' => 'Captcha',         'value' => 'control_captcha' ],
-								[ 'label' => 'Spinner',         'value' => 'control_spinner' ],
-								[ 'label' => 'Submit',          'value' => 'control_button' ],
-							],
-						],
-						[
-							'key'      => 'order',
-							'label'    => 'Order',
-							'type'     => 'text',
-							'required' => false,
-						],
+					[
+						'key'      => 'form_title',
+						'label'    => 'Form Title',
+						'type'     => 'text',
+						'required' => true,
 					],
 				],
-			];
+				self::field_question()
+			);
+		}
+
+		if ( 'add_questions_to_form' === $action ) {
+			return array_merge(
+				self::field_form_query(),
+				self::field_question()
+			);
+		}
+
+		if ( 'delete_form' === $action ) {
+			return self::field_form_query();
 		}
 
 		return [];
@@ -285,40 +314,7 @@ class Jotform extends IntegrationBase {
 					return self::error( 'Form created but ID not returned.' );
 				}
 
-				$added_questions = [];
-
-				foreach ( $questions as $index => $question ) {
-					$label = trim( $question['label'] ?? '' );
-					$slug  = trim( $question['slug'] ?? '' );
-					$type  = trim( $question['type'] ?? 'control_textbox' );
-					$order = trim( $question['order'] ?? (string) ( $index + 1 ) );
-
-					if ( empty( $label ) || empty( $slug ) ) {
-						continue;
-					}
-
-					try {
-						$result = self::jotform_request( $api_key, 'POST', '/form/' . $form_id . '/questions', [
-							'type'  => $type,
-							'text'  => $label,
-							'name'  => $slug,
-							'order' => $order,
-						] );
-
-						$added_questions[] = [
-							'label' => $label,
-							'slug'  => $slug,
-							'type'  => $type,
-							'qid'   => $result['content']['qid'] ?? '',
-						];
-					} catch ( \Exception $e ) {
-						$added_questions[] = [
-							'label' => $label,
-							'slug'  => $slug,
-							'error' => $e->getMessage(),
-						];
-					}
-				}
+				$added_questions = self::add_questions( $api_key, $form_id, $questions );
 
 				return self::success( [
 					'jotform_created_form_id'    => $form_id,
@@ -326,6 +322,43 @@ class Jotform extends IntegrationBase {
 					'jotform_created_form_url'   => 'https://www.jotform.com/build/' . $form_id,
 					'jotform_questions_added'    => count( $added_questions ),
 					'jotform_questions'          => $added_questions,
+				] );
+
+			case 'add_questions_to_form':
+				$form_id   = trim( $config['form_id'] ?? '' );
+				$questions = $config['questions'] ?? [];
+
+				if ( empty( $form_id ) ) {
+					return self::error( 'Form ID is required.' );
+				}
+
+				if ( empty( $questions ) ) {
+					return self::error( 'At least one question is required.' );
+				}
+
+				$added_questions = self::add_questions( $api_key, $form_id, $questions );
+
+				return self::success( [
+					'jotform_form_id'         => $form_id,
+					'jotform_questions_added' => count( $added_questions ),
+					'jotform_questions'       => $added_questions,
+				] );
+
+			case 'delete_form':
+				$form_id = trim( $config['form_id'] ?? '' );
+
+				if ( empty( $form_id ) ) {
+					return self::error( 'Form ID is required.' );
+				}
+
+				try {
+					self::jotform_request( $api_key, 'DELETE', '/form/' . $form_id );
+				} catch ( \Exception $e ) {
+					return self::error( $e->getMessage() );
+				}
+
+				return self::success( [
+					'jotform_deleted_form_id' => $form_id,
 				] );
 		}
 
@@ -408,6 +441,44 @@ class Jotform extends IntegrationBase {
 
 	public static function verify_webhook_signature( \WP_REST_Request $request ): bool {
 		return true;
+	}
+
+	private static function add_questions( string $api_key, string $form_id, array $questions ): array {
+		$added = [];
+
+		foreach ( $questions as $index => $question ) {
+			$label = trim( $question['label'] ?? '' );
+			$slug  = trim( $question['slug'] ?? '' );
+			$type  = trim( $question['type'] ?? 'control_textbox' );
+			$order = trim( $question['order'] ?? (string) ( $index + 1 ) );
+
+			if ( empty( $label ) || empty( $slug ) ) {
+				continue;
+			}
+
+			try {
+				$result  = self::jotform_request( $api_key, 'POST', '/form/' . $form_id . '/questions', [
+					'type'  => $type,
+					'text'  => $label,
+					'name'  => $slug,
+					'order' => $order,
+				] );
+				$added[] = [
+					'label' => $label,
+					'slug'  => $slug,
+					'type'  => $type,
+					'qid'   => $result['content']['qid'] ?? '',
+				];
+			} catch ( \Exception $e ) {
+				$added[] = [
+					'label' => $label,
+					'slug'  => $slug,
+					'error' => $e->getMessage(),
+				];
+			}
+		}
+
+		return $added;
 	}
 
 	private static function fetch_forms( string $api_key ): array {
