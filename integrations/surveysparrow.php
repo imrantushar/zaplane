@@ -108,10 +108,10 @@ class Surveysparrow extends IntegrationBase {
 		];
 	}
 
-	public static function get_trigger_config_schema( string $trigger ): array {
-		if ( 'form_submitted' !== $trigger ) {
+    public static function get_trigger_config_schema( string $trigger ): array {
+		if ( 'form_submitted' === $trigger ) {
 			return [
-                [
+				[
                     'key'      => 'survey_id',
                     'label'    => 'Survey',
                     'type'     => 'select',
@@ -122,7 +122,7 @@ class Surveysparrow extends IntegrationBase {
                         'select'      => [ 'value', 'label' ],
                     ],
                 ],
-                [
+				[
                     'key'      => 'webhook_endpoint',
                     'label'    => 'Webhook Endpoint URL',
                     'type'     => 'copy',
@@ -130,50 +130,49 @@ class Surveysparrow extends IntegrationBase {
                     'readonly' => true,
                     'help'     => 'Copy this URL → open your Survey in SurveySparrow → Build → Integrations → Webhook → New Webhook → paste the URL → Save.',
                 ],
-            ];
-		}
+			];
+		}//end if
 
 		return [];
 	}
 
 	public static function resolve_trigger( array $node, array $args ) {
-		$event = $node['event'] ?? '';
 
-		if ( 'form_submitted' !== $event ) {
-			return false;
-		}
+		switch ( $node['event'] ) {
+			case 'form_submitted':
 
-		$payload    = $args[0] ?? [];
-		$submission = $payload['submission'] ?? [];
-		$survey     = $payload['survey']     ?? [];
+                $payload    = $args[0] ?? [];
+                $submission = $payload['submission'] ?? [];
+                $survey     = $payload['survey']     ?? [];
+                if ( empty( $submission ) || empty( $survey ) ) {
+                    return false;
+                }
 
-		if ( empty( $submission ) || empty( $survey ) ) {
-			return false;
-		}
+                $survey_id = (int) ( $survey['id'] ?? 0 );
+                if ( $survey_id <= 0 ) {
+                    return false;
+                }
 
-		$survey_id = (int) ( $survey['id'] ?? 0 );
-		if ( $survey_id <= 0 ) {
-			return false;
-		}
+                $selected_raw = $node['data']['config']['survey_id'] ?? 'any';
+                $selected     = (string) $selected_raw;
 
-		$selected_raw = $node['data']['config']['survey_id'] ?? 'any';
-		$selected     = (string) $selected_raw;
+                if ( '' !== $selected && 'any' !== $selected && (int) $selected !== $survey_id ) {
+                    return false;
+                }
 
-		if ( '' !== $selected && 'any' !== $selected && (int) $selected !== $survey_id ) {
-			return false;
-		}
+                return [
+                    'ss_survey_id'     => $survey_id,
+                    'ss_survey_name'   => sanitize_text_field( $survey['name'] ?? '' ),
+                    'ss_submission_id' => $submission['id'] ?? '',
+                    'ss_submitted_at'  => $submission['submitted_at'] ?? '',
+                    'ss_contact'       => $submission['contact'] ?? [],
+                    'ss_answers'       => self::parse_answers( $submission['answers'] ?? [] ),
+                    'ss_variables'     => $submission['variables'] ?? [],
+                ];
+        }//end switch
 
-		return [
-			'ss_survey_id'     => $survey_id,
-			'ss_survey_name'   => sanitize_text_field( $survey['name'] ?? '' ),
-			'ss_submission_id' => $submission['id'] ?? '',
-			'ss_submitted_at'  => $submission['submitted_at'] ?? '',
-			'ss_contact'       => $submission['contact'] ?? [],
-			'ss_answers'       => self::parse_answers( $submission['answers'] ?? [] ),
-			'ss_variables'     => $submission['variables'] ?? [],
-		];
+		return false;
 	}
-
 	public static function get_dynamic_queries(): array {
 		return [
 			'survey_query' => [ self::class, 'query_survey' ],
@@ -253,7 +252,11 @@ class Surveysparrow extends IntegrationBase {
 	}
 
 	public static function verify_webhook_signature( \WP_REST_Request $request ): bool {
-		$signature = $request->get_header( 'x-appnest-signature' );
+		$signature = $request->get_header( 'x-surveysparrow-signature' );
+		
+		if ( empty( $signature ) ) {
+			$signature = $request->get_header( 'x-appnest-signature' );
+		}
 
 		if ( empty( $signature ) ) {
 			return true;

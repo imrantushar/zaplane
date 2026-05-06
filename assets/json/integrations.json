@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-05-06 05:46:46",
+    "generated_at": "2026-05-06 13:02:14",
     "apps": {
         "cartflows": {
             "slug": "cartflows",
@@ -24701,7 +24701,7 @@
                             "type": "copy",
                             "value": "https://localhost:10016/wp-json/zaplane/v1/incoming/surveysparrow",
                             "readonly": true,
-                            "help": "Copy this URL \u2192 SurveySparrow \u2192 Settings \u2192 Apps & Integrations \u2192 Developer Portal \u2192 WEBHOOK tab \u2192 + New Webhook \u2192 Paste URL \u2192 Select event: onSubmissionComplete \u2192 Save."
+                            "help": "Copy this URL \u2192 open your Survey in SurveySparrow \u2192 Build \u2192 Integrations \u2192 Webhook \u2192 New Webhook \u2192 paste the URL \u2192 Save."
                         }
                     ],
                     "outputs": [
