@@ -28,7 +28,7 @@
     z-index: 999;
 }
 .zaplane-table--history-table,.zaplane-table--version-table{
-    padding: 0;
+    padding: 0 !important;
 }
 .zaplane-button-actve{
     background: var(--zaplane-second-primary);

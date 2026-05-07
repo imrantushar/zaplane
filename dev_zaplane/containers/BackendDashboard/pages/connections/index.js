@@ -1,227 +1,132 @@
-import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import {
-    Box,
-    Button,
-    VStack,
-    Text,
-    Input,
-    Heading,
-    Flex,
-} from "@chakra-ui/react";
 import { __ } from "@wordpress/i18n";
 import { FaSlack } from "react-icons/fa";
-import Select from "react-select";
-
-import {
-    fetchConnections,
-    fetchAuthFields,
-    initOAuth,
-    createTokenConnection,
-} from "@ZAPRedux/Slices/connectionsSlice/connectionsSlice";
-
-import WPModal from "@ZAPComponents/Modal/WPModal";
-import TopBar from "@ZAPComponents/TopBar";
-import { primaryBtn } from "../../../../../assets/scss/chakra/recipe";
-import ConnectionTable from "./ConnectionTable";
-import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
-import { formatLabel } from "@ZAPUtils/helper";
 import ZAPInput from "@ZAPComponents/ZAPInput";
-
-
+import ConnectionTable from "./ConnectionTable";
+import { primaryBtn } from "../../../../../assets/scss/chakra/recipe";
+import { formatLabel } from "@ZAPUtils/helper";
+import ZAPDrawer from "@ZAPComponents/Drawer";
+import useConnection from "@ZAPHooks/useConnection/useConnection";
+import ZAPLoading from "@ZAPComponents/Loading";
+import PageLayout from "@ZAPComponents/PageLayout";
+import DrawerItemList from "@ZAPComponents/SearchableDrawerList/DrawerItemList";
+import SearchableDrawerList from "@ZAPComponents/SearchableDrawerList";
 const Connections = () => {
-    const dispatch = useDispatch();
-
-    const { authFields } = useSelector(
-        (state) => state.connections || []
-    );
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [detailsOpen, setDetailsOpen] = useState(false);
-    const [selectedApp, setSelectedApp] = useState(null);
-    const [selectedAuthType, setSelectedAuthType] = useState(null);
-    const [credentials, setCredentials] = useState({});
-    const [loadingOAuth, setLoadingOAuth] = useState(false);
-
-
-    useEffect(() => {
-        if (!selectedApp) return;
-
-        dispatch(
-            fetchAuthFields({
-                app: selectedApp.value,
-                authType: selectedAuthType || undefined,
-            })
-        );
-    }, [selectedApp, selectedAuthType, dispatch]);
-
-
-
-    const handleConnect = async () => {
-        if (!selectedApp || !selectedAuthType) return;
-
-        if (selectedAuthType === "oauth2") {
-            try {
-                setLoadingOAuth(true);
-
-                const res = await dispatch(
-                    initOAuth({
-                        app: selectedApp.value,
-                        name: selectedApp.label,
-                        credentials,
-                    })
-                ).unwrap();
-
-                const popup = window.open(
-                    res.auth_url,
-                    "oauth_popup",
-                    "width=600,height=700"
-                );
-
-                const handler = (event) => {
-                    if (event.data?.type === "zaplane_oauth_callback") {
-                        window.removeEventListener("message", handler);
-                        popup?.close();
-
-                        if (event.data.data?.success) {
-                            dispatch(fetchConnections());
-                            setIsModalOpen(false);
-                        }
-                    }
-                };
-
-                window.addEventListener("message", handler);
-            } catch (e) {
-                console.error(e);
-            } finally {
-                setLoadingOAuth(false);
-            }
-        } else {
-            await dispatch(
-                createTokenConnection({
-                    app: selectedApp.value,
-                    name: selectedApp.label,
-                    authType: selectedAuthType,
-                    credentials,
-                })
-            );
-            dispatch(fetchConnections());
-            setIsModalOpen(false);
-        }
-    };
-
-    const authTypes = authFields?.available_auth_types || {};
-
-    return (
-        <>
-            <TopBar
-                render={() => (
-                    <Box>
-                        <ZAPLabel
-                            label={__('Flows', 'zaplane')}
-                            variant="bold"
-                        />
-                        <Text className="zaplane-sub-title" color="var(--zaplane-text-muted)">
-                            {__("Connections between your apps", "zaplane")}
-                        </Text>
-                    </Box>
-                )}
-                rightContent={() => (
-                    <Button
-                        {...primaryBtn}
-                        leftIcon={<FaSlack />}
-                        onClick={() => setIsModalOpen(true)}
-                    >
-                        {__("Create credential", "zaplane")}
-                    </Button>
-                )}
-            />
-            <div className="zaplane-page-content">
-                <ConnectionTable />
-            </div>
-
-            <WPModal
-                title={__("Create credential", "zaplane")}
-                isOpen={isModalOpen}
-                onRequestClose={() => setIsModalOpen(false)}
-                size="medium"
+    const {
+        isDrawerOpen,
+        drawerStep,
+        selectedAuthType,
+        credentials,
+        loadingOAuth,
+        authFields,
+        authTypes,
+        appList,
+        drawerTitle,
+        openDrawer,
+        closeDrawer,
+        selectApp,
+        goBack,
+        selectAuthType,
+        updateCredential,
+        saveConnection,
+        loading,
+        search,
+        setDrawerSearch,
+        searchList
+    } = useConnection();
+    return <PageLayout
+        title="Connections"
+        heading="Connections"
+        actions={
+            <button
+                style={primaryBtn}
+                onClick={openDrawer}
             >
-                <Box px={4}>
-                    <VStack spacing={4} align="stretch">
-                        <Text className="zaplane-label">{__("Select an app or service to connect", "zaplane")}</Text>
+                {__("Create credential", "zaplane")}
+            </button>
+        }
+    >
+        <ConnectionTable />
 
-                        <Select
-                            value={selectedApp}
-                            onChange={(val) => {
-                                setSelectedApp(val);
-                                setSelectedAuthType(null);
-                                setCredentials({});
-                            }}
-                            options={[{ value: "slack", label: "Slack" }]}
+        <ZAPDrawer
+            open={isDrawerOpen}
+            onClose={closeDrawer}
+            title={__(drawerTitle, "zaplane")}
+            size="md"
+            placement="end"
+            closeOnOverlayClick
+            arrowClose={drawerStep === "configure"}
+            arrowOnClick={goBack}
+            footer={drawerStep === "configure" && selectedAuthType ? (
+                <div className="flex items-center justify-end gap-3">
+                    <button
+                        className="px-6 py-2 border border-[var(--zaplane-border-color)] rounded-lg text-[var(--zaplane-font-color)] font-medium hover:bg-gray-50 transition-colors"
+                        onClick={closeDrawer}
+                    >
+                        {__("Cancel", "zaplane")}
+                    </button>
+                    <button
+                        className="bg-[var(--zaplane-primary)] hover:opacity-90 text-white font-medium py-2 px-6 rounded-lg transition-all shadow-md active:scale-95 disabled:opacity-50"
+                        onClick={saveConnection}
+                        disabled={!selectedAuthType}
+                    >
+                        {__("Save Connection", "zaplane")}
+                    </button>
+                </div>
+            ) : null}
+        >
+            {drawerStep === "select" &&
+                <SearchableDrawerList
+                    search={search}
+                    setSearch={setDrawerSearch}
+                    searchList={searchList}
+                    list={appList}
+                    onSelect={selectApp}
+                />}
 
-                        />
-                        {Object.keys(authTypes).map((key) => (
-                            <Button
-                                key={key}
-                                className={`${selectedAuthType === key && 'zaplane-button-actve'}`}
-                                variant={selectedAuthType === key ? "solid" : "outline"}
-                                onClick={() => {
-                                    setSelectedAuthType(key);
-                                    setCredentials({});
-                                }}
-                            >
-                                {formatLabel(key)}
-                            </Button>
-                        ))}
-                        {authFields?.auth_fields && selectedAuthType && (
-                            <VStack spacing={3} align="stretch" pt={3}>
-                                {Object.entries(authFields.auth_fields).map(
-                                    ([fieldKey, field]) => {
-                                        const value = credentials[fieldKey] || "";
+            {drawerStep === "configure" && (
+                <div className="flex flex-col gap-8">
+                    {Object.keys(authTypes).length > 1 && (
+                        <div className="flex bg-gray-50/50 p-1.5 rounded-xl gap-2">
+                            {Object.keys(authTypes).map(key => (
+                                <button
+                                    key={key}
+                                    className={`flex-1 py-2.5 px-4 rounded-lg font-medium transition-all duration-200 ${selectedAuthType === key
+                                        ? "bg-[var(--zaplane-second-primary)] text-[var(--zaplane-primary)] shadow-sm"
+                                        : "bg-white text-gray-500 border border-gray-100 hover:bg-gray-50"
+                                        }`}
+                                    onClick={() => selectAuthType(key)}
+                                >
+                                    {formatLabel(key)}
+                                </button>
+                            ))}
+                        </div>
+                    )}
 
-                                        return (
-                                            <Flex flexDirection="column" gap={"4px"} key={fieldKey}>
-                                                <ZAPInput
-                                                    label={field.label}
-                                                    type={field.type === "password" ? "password" : "text"}
-                                                    placeholder={field.placeholder || ""}
-                                                    value={value}
-                                                    onChange={(e) =>
-                                                        setCredentials((prev) => ({
-                                                            ...prev,
-                                                            [fieldKey]: e.target.value,
-                                                        }))
-                                                    }
-                                                />
-                                                {field.help && (
-                                                    <Text fontSize="sm" mt='7px' className="zaplane-sub-title" color="var(--zaplane-text-muted)">
-                                                        {__(field.help, "zaplane")}
-                                                    </Text>
-                                                )}
-                                            </Flex>
-                                        );
-                                    }
-                                )}
-                            </VStack>
-                        )}
-
-                        {selectedAuthType &&
-                            <Button
-                                mt="16px"
-                                {...primaryBtn}
-                                width="220px"
-                                onClick={handleConnect}
-                                isLoading={loadingOAuth}
-                                isDisabled={!selectedAuthType}
-                            >
-                                {__("Save Connection", "zaplane")}
-                            </Button>
-                        }
-
-                    </VStack>
-                </Box>
-            </WPModal>
-        </>
-    );
+                    {authFields?.auth_fields && selectedAuthType ? (
+                        <div className="flex flex-col gap-6">
+                            {Object.entries(authFields.auth_fields).map(([fieldKey, field]) => (
+                                <div key={fieldKey} className="flex flex-col gap-2">
+                                    <ZAPInput
+                                        label={field.label}
+                                        type={field.type === "password" ? "password" : "text"}
+                                        placeholder={field.placeholder || ""}
+                                        value={credentials[fieldKey] || ""}
+                                        onChange={e => updateCredential(fieldKey, e.target.value)}
+                                    />
+                                    {field.help && (
+                                        <span className="text-[13px] text-[var(--zaplane-text-muted)] leading-relaxed mt-0.5">
+                                            {__(field.help, "zaplane")}
+                                        </span>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="py-12"><ZAPLoading /></div>
+                    )}
+                </div>
+            )}
+        </ZAPDrawer>
+    </PageLayout>;
 };
-
 export default Connections;

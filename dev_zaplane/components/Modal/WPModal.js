@@ -1,19 +1,8 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { Modal } from '@wordpress/components';
 import './styles.scss'
 
-const propTypes = {
-	title: PropTypes.string,
-	isOpen: PropTypes.bool,
-	onRequestClose: PropTypes.func,
-	isFullScreen: PropTypes.bool,
-	disableFooter: PropTypes.bool,
-	shouldCloseOnClickOutside: PropTypes.bool,
-	buttonUpdate: PropTypes.object,
-	suffix: PropTypes.string,
-	size: PropTypes.string,
-};
+
 
 export default function WPModal( {
 	children,
@@ -38,7 +27,7 @@ export default function WPModal( {
 						suffix && ' zaplane-wp-modal--' + suffix
 					}` }
 				>
-					<div className="zaplane-wp-modal__content">
+					<div className="zaplane-wp-modal__content zaplane-scope">
 						{ children }
 					</div>
 				</Modal>
@@ -47,4 +36,3 @@ export default function WPModal( {
 	);
 }
 
-WPModal.propTypes = propTypes;

@@ -1,83 +1,65 @@
-import React, { useMemo } from "react";
-import { Box, Text } from "@chakra-ui/react";
-import {
-    LineChart,
-    Line,
-    XAxis,
-    YAxis,
-    CartesianGrid,
-    Tooltip,
-    ResponsiveContainer,
-} from "recharts";
+import React from "react";
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { __ } from "@wordpress/i18n";
-import './styles.scss'
-import ZAPDivider from "@ZAPComponents/ZAPDivider";
+import { useSelector } from "react-redux";
+const TotalExecutions = () => {
+  const {
+    summary
+  } = useSelector(state => state.dashboard);
+  const monthly_executions = summary?.monthly_executions || [];
+  return (
+    <div className="bg-white rounded-[8px] border border-[#E2E8F0] w-full h-[388px] flex flex-col">
+      <div className="p-6">
+        <span className="text-[#4A5568] text-[16px] font-[500]">
+          {__("Total Executions", "zaplane")}
+        </span>
+      </div>
 
+      <div className="flex-1 px-4 pb-6">
+        <ResponsiveContainer width="100%" height="100%">
+          <AreaChart data={monthly_executions} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+            <defs>
+              <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#3182CE" stopOpacity={0.1} />
+                <stop offset="95%" stopColor="#3182CE" stopOpacity={0} />
+              </linearGradient>
+            </defs>
 
-const TotalExecutions = ({ data }) => {
-    const chartData = useMemo(() => {
-        const months = [
-            "January",
-            "February",
-            "March",
-            "April",
-            "May",
-            "June",
-            "July",
-            "August",
-            "September",
-            "October",
-            "November",
-            "December",
-        ];
-        const result = months.map((month) => ({
-            month,
-            value: 0,
-        }));
+            <CartesianGrid strokeDasharray="0" vertical={false} stroke="#EDF2F7" />
 
-        data?.runs?.forEach((item) => {
-            if (!item.started_at) return;
+            <XAxis 
+              dataKey="month" 
+              tick={{ fontSize: 12, fill: '#718096' }} 
+              axisLine={false} 
+              tickLine={false} 
+              dy={10}
+            />
 
-            const date = new Date(item.started_at);
-            const monthIndex = date.getMonth();
+            <YAxis 
+              allowDecimals={false} 
+              tick={{ fontSize: 12, fill: '#718096' }} 
+              axisLine={false} 
+              tickLine={false} 
+            />
 
-            result[monthIndex].value += 1;
-        });
+            <Tooltip 
+              contentStyle={{ borderRadius: '8px', border: '1px solid #E2E8F0', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}
+            />
 
-        return result;
-    }, [data]);
-
-    return (
-        <Box
-            bg="var(--zaplane-background)"
-            borderRadius="lg"
-            boxShadow="md"
-            w="100%"
-            h="388px"
-        >
-            <Text className="zaplane-label" fontSize='14px' p="24px">
-                {__("Total Executions", "zaplane")}
-            </Text>
-            <ZAPDivider />
-            <Box h="315px">
-                <ResponsiveContainer style={{padding:"24px",marginLeft:'-42px'}} width="106%" height="100%">
-                    <LineChart data={chartData}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="month" />
-                        <YAxis allowDecimals={false} />
-                        <Tooltip />
-                        <Line
-                            type="monotone"
-                            dataKey="value"
-                            stroke="#1A202C"
-                            strokeWidth={2}
-                            dot={{ r: 5 }}
-                        />
-                    </LineChart>
-                </ResponsiveContainer>
-            </Box>
-        </Box>
-    );
+            <Area 
+              type="monotone" 
+              dataKey="runs" 
+              name="Runs" 
+              stroke="#3182CE" 
+              fill="url(#colorValue)" 
+              strokeWidth={3} 
+              dot={false} 
+              activeDot={{ r: 6, strokeWidth: 0, fill: '#3182CE' }}
+            />
+          </AreaChart>
+        </ResponsiveContainer>
+      </div>
+    </div>
+  );
 };
-
-export default TotalExecutions;
+export default TotalExecutions;

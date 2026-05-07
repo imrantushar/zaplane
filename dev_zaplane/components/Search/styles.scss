@@ -1,11 +1,9 @@
 .zaplane-search-component {
 	position: relative;
-	display: inline-block;
 	input.zaplane-search-component__input {
 		height: 38px;
 		padding-left: 40px;
 		padding-right: 20px;
-		max-width: 300px;
 		width: 100%;
 		border: 1px solid var(--zaplane-border-color);
 		&:hover, &:focus {
@@ -14,7 +12,7 @@
 	}
 	&__search {
 		position: absolute;
-		top: 8px;
+		top: -20px;
 		left: 14px;
 		bottom: 0;
 		cursor: pointer;
@@ -45,4 +43,5 @@
 			border: 0;
 		}
 	}
+	
 }

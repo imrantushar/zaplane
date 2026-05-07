@@ -2,90 +2,88 @@
 
 namespace Zaplane\Framework\Console;
 
-if (!defined('ABSPATH')) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
-class Kernel
-{
-    protected static ?self $instance = null;
-    protected array $commands = [];
+class Kernel {
 
-    public static function getInstance(): self
-    {
-        if (self::$instance === null) {
-            self::$instance = new self();
-        }
-        return self::$instance;
-    }
+	protected static ?self $instance = null;
+	protected array $commands = [];
 
-    private function __construct()
-    {
-        $this->registerCommands();
-    }
+	public static function getInstance(): self {
+		if ( self::$instance === null ) {
+			self::$instance = new self();
+		}
+		return self::$instance;
+	}
 
-    protected function registerCommands(): void
-    {
-        // Framework commands (built-in)
-        $this->commands = [
-            Commands\MigrateCommand::class,
-            Commands\MigrateFreshCommand::class,
-            Commands\MigrateRollbackCommand::class,
-            Commands\MigrateStatusCommand::class,
-            Commands\MakeMigrationCommand::class,
-            Commands\MakeModelCommand::class,
-        ];
+	private function __construct() {
+		$this->registerCommands();
+	}
 
-        // Auto-register custom commands from includes/commands/
-        $this->registerCustomCommands();
-    }
+	protected function registerCommands(): void {
 
-    protected function registerCustomCommands(): void
-    {
-        $commandsPath = ZAPLANE_ROOT_DIR_PATH . 'includes/commands/';
+		$this->commands = [
+			Commands\MigrateCommand::class,
+			Commands\MigrateFreshCommand::class,
+			Commands\MigrateRollbackCommand::class,
+			Commands\MigrateStatusCommand::class,
+			Commands\MakeMigrationCommand::class,
+			Commands\MakeModelCommand::class,
+		];
 
-        if (!is_dir($commandsPath)) {
-            return;
-        }
+		$this->registerCustomCommands();
+	}
 
-        $files = glob($commandsPath . '*-command.php');
+	protected function registerCustomCommands(): void {
+		$commandsPath = ZAPLANE_ROOT_DIR_PATH . 'includes/commands/';
 
-        foreach ($files as $file) {
-            $filename = basename($file, '.php');
-            $className = str_replace('-', '', ucwords($filename, '-'));
-            $fullClassName = "Zaplane\\Commands\\{$className}";
+		if ( ! is_dir( $commandsPath ) ) {
+			return;
+		}
 
-            if (class_exists($fullClassName)) {
-                $this->commands[] = $fullClassName;
-            }
-        }
-    }
+		$files = glob( $commandsPath . '*-command.php' );
 
-    public function boot(): void
-    {
-        if (!defined('WP_CLI') || !WP_CLI) {
-            return;
-        }
+		foreach ( $files as $file ) {
+			$filename = basename( $file, '.php' );
+			$className = str_replace( '-', '', ucwords( $filename, '-' ) );
+			$fullClassName = "Zaplane\\Commands\\{$className}";
 
-        foreach ($this->commands as $commandClass) {
-            $command = new $commandClass();
-            $this->registerWPCLI($command);
-        }
-    }
+			if ( class_exists( $fullClassName ) ) {
+				$this->commands[] = $fullClassName;
+			}
+		}
+	}
 
-    protected function registerWPCLI(Command $command): void
-    {
-        $signature = $command->getSignature();
-        $parts = explode(' ', $signature);
-        $name = array_shift($parts);
+	public function boot(): void {
+		if ( ! defined( 'WP_CLI' ) || ! WP_CLI ) {
+			return;
+		}
 
-        \WP_CLI::add_command("zaplane {$name}", function ($args, $assoc_args) use ($command) {
-            $command->handle($args, $assoc_args);
-        }, [
-            'shortdesc' => $command->getDescription(),
-        ]);
-    }
+		foreach ( $this->commands as $commandClass ) {
+			$command = new $commandClass();
+			$this->registerWPCLI( $command );
+		}
+	}
 
-    public function getCommands(): array
-    {
-        return $this->commands;
-    }
+	protected function registerWPCLI( Command $command ): void {
+		$signature = $command->getSignature();
+		$parts = explode( ' ', $signature );
+		$name = array_shift( $parts );
+
+		\WP_CLI::add_command(
+			"zaplane {$name}",
+			function ( $args, $assoc_args ) use ( $command ) {
+				$command->handle( $args, $assoc_args );
+			},
+			[
+				'shortdesc' => $command->getDescription(),
+			]
+		);
+	}
+
+	public function getCommands(): array {
+		return $this->commands;
+	}
 }

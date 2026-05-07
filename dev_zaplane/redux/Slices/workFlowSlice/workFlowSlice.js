@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
-import { createWorkflows, deleteWorkFlow, getSingleWorkFlow, getWorkFlow, updateWorkFlow, updateWorkFlowStatus } from './actions/workFlow';
+import { createWorkflows, deleteWorkFlow, getSingleWorkFlow, getWorkFlow, updateWorkFlow, updateWorkFlowStatus, updateWorkFlowTitle } from './actions/workFlow';
 import { getRunWorkFlow, getSingleRun } from './actions/workFlowRuns';
 import { getAllVersion, getPreviewOldVersion, versionActive } from './actions/workFlowVersion';
 import { nodeLogsRunDetails, getNodeLogDetails } from './actions/workFlowLogs';
@@ -20,7 +20,9 @@ const workflowsSlice = createSlice({
 		versions: [],
 		nodeDetails: [],
 		isLoading: true,
-		singleNodeExecution: null,
+		singleNodeExecution: {
+
+		},
 		apiCountdown: 0,
 		apiRequestRunning: false,
 		workflowVariables: [],
@@ -32,7 +34,7 @@ const workflowsSlice = createSlice({
 	},
 	reducers: {
 		resetSingleNodeExecution(state) {
-			state.singleNodeExecution = null;
+			// state.singleNodeExecution = null;
 			state.isLoading = false;
 		},
 		startApiCountdown(state, action) {
@@ -87,6 +89,12 @@ const workflowsSlice = createSlice({
 					)
 					: [];
 			})
+			.addCase(updateWorkFlowTitle.fulfilled, (state, action) => {
+				const { id, title } = action.payload || {};
+				if (Number(state.workFlow?.workflow?.id) === Number(id)) {
+					state.workFlow.workflow.title = title;
+				}
+			})
 			.addCase(getRunWorkFlow.fulfilled, (state, action) => {
 				// action.payload now has { data, currentPage, itemPerPage, totalItems, totalPages }
 				const { data, currentPage, itemPerPage, totalItems, totalPages } = action.payload;
@@ -134,7 +142,11 @@ const workflowsSlice = createSlice({
 			})
 			.addCase(workFLowSingeNodeExction.fulfilled, (state, action) => {
 				state.isLoading = false;
-				state.singleNodeExecution = action.payload?.data || null;
+				const node_id = action?.payload?.data?.node?.id
+				if (!state.singleNodeExecution[node_id]) {
+					state.singleNodeExecution[node_id] = {}
+				}
+				state.singleNodeExecution[node_id] = action.payload.data
 			})
 
 

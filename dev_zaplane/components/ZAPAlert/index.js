@@ -1,4 +1,17 @@
-import { Alert } from "@chakra-ui/react";
+
+const alertStyles = {
+  info: "bg-blue-50 border-blue-300 text-blue-800",
+  success: "bg-green-50 border-green-300 text-green-800",
+  warning: "bg-yellow-50 border-yellow-400 text-yellow-800",
+  error: "bg-red-50 border-red-300 text-red-800",
+};
+
+const alertIcons = {
+  info: "ℹ️",
+  success: "✅",
+  warning: "⚠️",
+  error: "❌",
+};
 
 const ZAPAlert = ({
   status = "info",
@@ -7,30 +20,26 @@ const ZAPAlert = ({
   children,
   ...rest
 }) => {
+  const colorClasses = alertStyles[status] || alertStyles.info;
+  const icon = alertIcons[status] || alertIcons.info;
+
   return (
-    <Alert.Root
-      status={status}
-      borderRadius="md"
+    <div
+      role="alert"
+      className={`flex gap-3 items-start rounded-md border px-4 py-3 text-sm ${colorClasses}`}
       {...rest}
     >
-      <Alert.Indicator />
-
-      <Alert.Content>
+      <span className="flex-shrink-0">{icon}</span>
+      <div className="flex flex-col gap-1">
         {title && (
-          <Alert.Title fontSize="sm" fontWeight="semibold">
-            {title}
-          </Alert.Title>
+          <p className="font-semibold text-sm">{title}</p>
         )}
-
         {description && (
-          <Alert.Description fontSize="sm">
-            {description}
-          </Alert.Description>
+          <p className="text-sm">{description}</p>
         )}
-
         {children}
-      </Alert.Content>
-    </Alert.Root>
+      </div>
+    </div>
   );
 };
 

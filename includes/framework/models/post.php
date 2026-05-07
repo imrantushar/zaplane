@@ -2,107 +2,99 @@
 
 namespace Zaplane\Framework\Models;
 
-if (!defined('ABSPATH')) exit;
+use Zaplane\Framework\Database\ORM\Collection;
 
-class Post extends WpModel
-{
-    protected static string $table = 'posts';
-    protected static string $primaryKey = 'ID';
-    protected static bool $timestamps = false;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
-    protected static array $fillable = [
-        'post_author',
-        'post_date',
-        'post_date_gmt',
-        'post_content',
-        'post_title',
-        'post_excerpt',
-        'post_status',
-        'comment_status',
-        'ping_status',
-        'post_password',
-        'post_name',
-        'to_ping',
-        'pinged',
-        'post_modified',
-        'post_modified_gmt',
-        'post_content_filtered',
-        'post_parent',
-        'guid',
-        'menu_order',
-        'post_type',
-        'post_mime_type',
-        'comment_count',
-    ];
+class Post extends WpModel {
 
-    protected static array $casts = [
-        'ID' => 'integer',
-        'post_author' => 'integer',
-        'post_parent' => 'integer',
-        'menu_order' => 'integer',
-        'comment_count' => 'integer',
-    ];
+	protected static string $table = 'posts';
+	protected static string $primaryKey = 'ID';
+	protected static bool $timestamps = false;
 
-    public function author(): ?User
-    {
-        return User::find($this->post_author);
-    }
+	protected static array $fillable = [
+		'post_author',
+		'post_date',
+		'post_date_gmt',
+		'post_content',
+		'post_title',
+		'post_excerpt',
+		'post_status',
+		'comment_status',
+		'ping_status',
+		'post_password',
+		'post_name',
+		'to_ping',
+		'pinged',
+		'post_modified',
+		'post_modified_gmt',
+		'post_content_filtered',
+		'post_parent',
+		'guid',
+		'menu_order',
+		'post_type',
+		'post_mime_type',
+		'comment_count',
+	];
 
-    public function parent(): ?self
-    {
-        if (!$this->post_parent) {
-            return null;
-        }
-        return static::find($this->post_parent);
-    }
+	protected static array $casts = [
+		'ID' => 'integer',
+		'post_author' => 'integer',
+		'post_parent' => 'integer',
+		'menu_order' => 'integer',
+		'comment_count' => 'integer',
+	];
 
-    public function children(): array
-    {
-        return static::where('post_parent', $this->ID)->get();
-    }
+	public function author(): ?User {
+		return User::find( $this->post_author );
+	}
 
-    public function getMeta(string $key, bool $single = true)
-    {
-        return get_post_meta($this->ID, $key, $single);
-    }
+	public function parent(): ?self {
+		if ( ! $this->post_parent ) {
+			return null;
+		}
+		return static::find( $this->post_parent );
+	}
 
-    public function setMeta(string $key, $value): bool
-    {
-        return (bool) update_post_meta($this->ID, $key, $value);
-    }
+	public function children(): array {
+		return static::where( 'post_parent', $this->ID )->get();
+	}
 
-    public function deleteMeta(string $key, $value = ''): bool
-    {
-        return delete_post_meta($this->ID, $key, $value);
-    }
+	public function getMeta( string $key, bool $single = true ) {
+		return get_post_meta( $this->ID, $key, $single );
+	}
 
-    public function isPublished(): bool
-    {
-        return $this->post_status === 'publish';
-    }
+	public function setMeta( string $key, $value ): bool {
+		return (bool) update_post_meta( $this->ID, $key, $value );
+	}
 
-    public function isDraft(): bool
-    {
-        return $this->post_status === 'draft';
-    }
+	public function deleteMeta( string $key, $value = '' ): bool {
+		return delete_post_meta( $this->ID, $key, $value );
+	}
 
-    public function isTrash(): bool
-    {
-        return $this->post_status === 'trash';
-    }
+	public function isPublished(): bool {
+		return 'publish' === $this->post_status;
+	}
 
-    public static function published(): array
-    {
-        return static::where('post_status', 'publish')->get();
-    }
+	public function isDraft(): bool {
+		return 'draft' === $this->post_status;
+	}
 
-    public static function ofType(string $type): array
-    {
-        return static::where('post_type', $type)->get();
-    }
+	public function isTrash(): bool {
+		return 'trash' === $this->post_status;
+	}
 
-    public static function byAuthor(int $authorId): array
-    {
-        return static::where('post_author', $authorId)->get();
-    }
+	public static function published(): Collection {
+		return static::where( 'post_status', 'publish' )->get();
+	}
+
+	public static function ofType( string $type ): Collection {
+		return static::where( 'post_type', $type )->get();
+	}
+
+	public static function byAuthor( int $authorId ): Collection {
+		return static::where( 'post_author', $authorId )->get();
+	}
 }

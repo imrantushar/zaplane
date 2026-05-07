@@ -1,14 +1,8 @@
 import React from "react";
-import {
-  Table,
-  Text,
-  HStack,
-  Flex,
-} from "@chakra-ui/react";
+
 import ZAPLoading from "@ZAPComponents/Loading";
 import { __ } from "@wordpress/i18n";
 import CustomTableMessage from "@ZAPComponents/Oops/CustomTableMessage";
-
 const ZAPTable = ({
   data = [],
   columns = [],
@@ -18,94 +12,51 @@ const ZAPTable = ({
   variant = "line",
   size = "sm",
   isLoading = false,
-  noDataText = __(
-    'Please, create data to see the available list here.',
-    'easy-content-manager'
-  )
+  noDataText = __('Please, create data to see the available list here.', 'zaplane')
 }) => {
   const colSpan = columns.length + (actionsRenderer ? 1 : 0);
-
-  return (
-    <Flex
-      direction="column"
-      bg="white"
-      borderColor="var(--zaplane-border-color)"
-      borderRadius="lg"
-      boxShadow="sm"
-      overflow="hidden"
-    >
-      <Table.Root size={size} variant={variant} marginBottom={data.length > 0 ? "25px" : "0"}>
-        {caption && <Table.Caption>{caption}</Table.Caption>}
-        <Table.Header>
-          <Table.Row>
-            {columns.map((col, i) => (
-              <Table.ColumnHeader
-                key={i}
-                textAlign={col.textAlign || "left"}
-                w={col.width}
-                py="20px"
-              >
+  return <div className="flex flex-col bg-white border border-[var(--zaplane-border-color)] rounded-lg overflow-hidden shadow-sm">
+      <table className="min-w-full" style={{marginBottom: data.length > 0 ? "25px" : "0"}}>
+        {caption && <caption>{caption}</caption>}
+        <thead style={{background:'var(--zaplane-secondary-color)'}}>
+          <tr>
+            {columns.map((col, i) => <th key={i} style={{textAlign: col.textAlign || "left", width: col.width}} className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200 whitespace-nowrap">
                 {__(col.label, 'zaplane')}
-              </Table.ColumnHeader>
-            ))}
-            {actionsRenderer && (
-              <Table.ColumnHeader textAlign="center">
+              </th>)}
+            {actionsRenderer && <th style={{textAlign:'center'}} className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200">
                 {__('Actions', 'zaplane')}
-              </Table.ColumnHeader>
-            )}
-          </Table.Row>
-        </Table.Header>
+              </th>}
+          </tr>
+        </thead>
 
-        <Table.Body>
-          {isLoading && (
-            <Table.Row>
-              <Table.Cell colSpan={colSpan}>
-                <Flex justify="center" py={6}>
+        <tbody>
+          {isLoading && <tr>
+              <td colSpan={colSpan}>
+                <div className="flex justify-center py-6">
                   <ZAPLoading />
-                </Flex>
-              </Table.Cell>
-            </Table.Row>
-          )}
-          {!isLoading &&
-            Array.isArray(data) &&
-            data.map((row) => (
-              <Table.Row key={row[rowKey]}>
-                {columns.map((col, i) => (
-                  <Table.Cell key={i} textAlign={col.textAlign || "left"}>
+                </div>
+              </td>
+            </tr>}
+          {!isLoading && Array.isArray(data) && data.map(row => <tr key={row[rowKey]} className="border-b border-gray-100 hover:bg-gray-50">
+                {columns.map((col, i) => <td key={i} style={{textAlign: col.textAlign || "left"}} className="px-4 py-3 text-sm">
                     {col.render ? col.render(row) : row[col.key] || "--"}
-                  </Table.Cell>
-                ))}
+                  </td>)}
 
-                {actionsRenderer && (
-                  <Table.Cell textAlign="center">
-                    <HStack justify="center" spacing="1">
+                {actionsRenderer && <td style={{textAlign:'center'}} className="px-4 py-3 text-sm">
+                    <div className="flex justify-center flex-row items-center gap-1">
                       {actionsRenderer(row)}
-                    </HStack>
-                  </Table.Cell>
-                )}
-              </Table.Row>
-            ))}
-          {!isLoading && Array.isArray(data) && data.length === 0 && (
-            <Table.Row>
-              <Table.Cell colSpan={colSpan} textAlign="center">
-                <Text className="zaplane-label">
-
-                  <CustomTableMessage
-                    title={__(
-                      'No Data Available!!!',
-                      'easy-content-manager'
-                    )}
-                    subText={noDataText}
-                  />
-                </Text>
-              </Table.Cell>
-            </Table.Row>
-          )}
-        </Table.Body>
-      </Table.Root>
-    </Flex>
-
-  );
+                    </div>
+                  </td>}
+              </tr>)}
+          {!isLoading && Array.isArray(data) && data.length === 0 && <tr>
+              <td colSpan={colSpan} style={{textAlign:'center'}}>
+                <span>
+                  <CustomTableMessage title={__('No Data Available!!!', 'zaplane')} subText={noDataText} />
+                </span>
+              </td>
+            </tr>}
+        </tbody>
+      </table>
+    </div>;
 };
-
 export default ZAPTable;
