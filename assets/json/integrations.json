@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-05-03 12:59:41",
+    "generated_at": "2026-05-07 08:38:16",
     "apps": {
         "cartflows": {
             "slug": "cartflows",
@@ -23802,7 +23802,7 @@
                             "key": "webhook_endpoint",
                             "label": "Webhook Endpoint URL",
                             "type": "copy",
-                            "value": "https://localhost:10016/index.php?rest_route=/zaplane/v1/incoming/fillout",
+                            "value": "https://localhost:10016/wp-json/zaplane/v1/incoming/fillout",
                             "readonly": true,
                             "help": "Copy this URL \u2192 Fillout Dashboard \u2192 Your Form \u2192 Integrate \u2192 Webhooks \u2192 Add Webhook \u2192 Paste & Save."
                         }
@@ -23846,7 +23846,7 @@
                             "key": "webhook_endpoint",
                             "label": "Webhook Endpoint URL",
                             "type": "copy",
-                            "value": "https://localhost:10016/index.php?rest_route=/zaplane/v1/incoming/typeform",
+                            "value": "https://localhost:10016/wp-json/zaplane/v1/incoming/typeform",
                             "readonly": true,
                             "help": "Copy this URL \u2192 Typeform Dashboard \u2192 Your Form \u2192 Connect \u2192 Webhooks \u2192 Add a webhook \u2192 Paste & Save."
                         }
@@ -24666,6 +24666,50 @@
                     ]
                 }
             }
+        },
+        "tallyforms": {
+            "slug": "tallyforms",
+            "name": "Tally Forms",
+            "icon": "tallyforms.svg",
+            "category": "app",
+            "requires_connection": true,
+            "auth_type": "api_key",
+            "supports_webhook": true,
+            "triggers": {
+                "form_submitted": {
+                    "key": "form_submitted",
+                    "label": "Form Submitted",
+                    "hook": "zaplane_tallyforms_webhook_form_submitted",
+                    "schema": [
+                        {
+                            "key": "form_id",
+                            "label": "Form",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "tallyforms",
+                                "query": "form_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "webhook_endpoint",
+                            "label": "Webhook Endpoint URL",
+                            "type": "copy",
+                            "value": "https://localhost:10016/wp-json/zaplane/v1/incoming/tallyforms",
+                            "readonly": true,
+                            "help": "Copy this URL \u2192 Tally Dashboard \u2192 Your Form \u2192 Integrations \u2192 Webhooks \u2192 Connect \u2192 Paste & Save."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": []
         }
     },
     "tools": {

@@ -315,5 +315,9 @@ return [
 			'file'  => 'discord.php',
 			'class' => \Zaplane\Integrations\Discord::class
 		],
+		'tallyforms'        => [
+			'file'  => 'tallyforms.php',
+			'class' => \Zaplane\Integrations\Tallyforms::class
+		],
 	],
 ];
