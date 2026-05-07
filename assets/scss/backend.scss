@@ -1,54 +1,10 @@
+@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 .zaplane-scope {
-    // Scoped preflight: neutralise WP admin global styles inside zaplane only.
-    // This is what Tailwind's preflight would do globally — we do it locally instead.
     *, *::before, *::after {
         box-sizing: border-box;
-        border-width: 0;
-        border-style: solid;
-        border-color: currentColor;
-    }
-
-    // WP admin injects border + background on all <button> elements globally.
-    // Reset those here so zaplane's own Tailwind utility classes win cleanly.
-    button,
-    [type='button'],
-    [type='reset'],
-    [type='submit'] {
-        -webkit-appearance: button;
-        background-color: transparent;
-        background-image: none;
-        border: none;
-        padding: 0;
-        cursor: pointer;
-    }
-
-    // WP admin sets line-height and font on inputs — reset to inherit so
-    // zaplane's typography classes apply predictably.
-    input,
-    select,
-    textarea {
-        font-family: inherit;
-        font-size: 100%;
-        font-weight: inherit;
-        line-height: inherit;
-        color: inherit;
-        margin: 0;
-        padding: 0;
-        background-color: transparent;
-    }
-
-    // WP admin can set display:table on some elements — normalise media.
-    img, svg, video, canvas, audio, iframe, embed, object {
-        display: block;
-        vertical-align: middle;
-    }
-
-    img, video {
-        max-width: 100%;
-        height: auto;
     }
 }
 
