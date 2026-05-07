@@ -839,7 +839,8 @@ svg.react-flow__connectionline {
   border: 1px solid var(--zaplane-border-color);
   border-radius: 12px;
   box-shadow: var(--zaplane-shadow);
-  z-index: 9999;
+  z-index: 10001 !important;
+  pointer-events: auto;
   left: 510px !important;
   right: unset !important;
   position: fixed !important;
@@ -848,6 +849,7 @@ svg.react-flow__connectionline {
   transition: all 0.2s ease-in-out;
 }
 .zaplane-popover .components-popover__content {
+  pointer-events: auto;
   padding: 24px;
   width: 100%;
   max-height: -moz-fit-content !important;
@@ -2430,6 +2432,9 @@ video {
 .zaplane-scope .bottom-6 {
   bottom: 1.5rem;
 }
+.zaplane-scope .bottom-full {
+  bottom: 100%;
+}
 .zaplane-scope .left-0 {
   right: 0px;
 }
@@ -2783,6 +2788,9 @@ video {
 }
 .zaplane-scope .border-collapse {
   border-collapse: collapse;
+}
+.zaplane-scope .origin-bottom-right {
+  transform-origin: bottom left;
 }
 .zaplane-scope .origin-top-right {
   transform-origin: top left;
