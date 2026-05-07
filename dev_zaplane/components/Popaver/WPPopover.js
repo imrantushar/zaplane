@@ -10,7 +10,7 @@ const WPPopover = ({ isOpen, onClose, title, children,prefix}) => {
       position="bottom center"
       onFocusOutside={onClose}
     >
-      <div className="zaplane-popover-inner">
+      <div className="zaplane-popover-inner zaplane-scope">
         {title && (
           <div className="zaplane-popover-title">
             {title}
