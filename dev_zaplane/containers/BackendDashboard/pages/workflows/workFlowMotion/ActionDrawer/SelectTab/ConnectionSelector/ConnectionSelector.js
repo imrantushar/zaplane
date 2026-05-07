@@ -4,7 +4,7 @@ import Select, { components } from "react-select";
 import { fetchConnectionsByApp } from "@ZAPRedux/Slices/workFlowSlice/actions/connectionsSlice";
 import ConnectionPopaver from "./ConnectionPopaver";
 import { __ } from "@wordpress/i18n";
-import { secondPrimaryBtn } from "../../../../../../../../../assets/scss/chakra/recipe";
+import { primaryBtn } from "../../../../../../../../../assets/scss/chakra/recipe";
 const ConnectionSelector = ({
   appSlug,
   values,
@@ -33,7 +33,7 @@ const ConnectionSelector = ({
   const CustomMenuList = props => <components.MenuList {...props}>
             {props.children}
             <div className="flex p-2">
-                <button style={secondPrimaryBtn} size="sm" width="100%" onClick={() => setPopoverOpen(true)}>
+                <button style={primaryBtn} size="sm" width="100%" onClick={() => setPopoverOpen(true)}>
                     {__("Create New Connection", "zaplane")}
                 </button>
             </div>
