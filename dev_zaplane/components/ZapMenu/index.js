@@ -9,8 +9,13 @@ const ZAPMenu = ({
   items = [],
   isIcon = false,
   variant = "outline",
-  trigger
+  trigger,
+  menuPlacement = "bottom"
 }) => {
+  const menuClassName = menuPlacement === "top"
+    ? "absolute right-0 bottom-full mb-2 z-[99999] w-56 origin-bottom-right rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none transition duration-100 ease-out data-[closed]:scale-95 data-[closed]:opacity-0"
+    : "absolute right-0 mt-2 z-[99999] w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none transition duration-100 ease-out data-[closed]:scale-95 data-[closed]:opacity-0";
+
   return (
     <Menu as="div" className="relative inline-block text-left">
       <MenuButton as={React.Fragment}>
@@ -31,7 +36,7 @@ const ZAPMenu = ({
 
       <MenuItems
         transition
-        className="absolute right-0 mt-2 z-[99999] w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none transition duration-100 ease-out data-[closed]:scale-95 data-[closed]:opacity-0"
+        className={menuClassName}
       >
         <div className="py-1">
           {items.map((item, index) => {
