@@ -19,6 +19,7 @@ use Zaplane\Framework\Classes\OAuthHandler;
 use Zaplane\Framework\Core\Automation;
 use Zaplane\Framework\Core\IntegrationLoader;
 use Zaplane\Framework\Core\ModuleManager;
+use Zaplane\Framework\Maintenance\RunRetention;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -114,6 +115,8 @@ final class Zaplane {
 
 		$automation = $this->container->get( 'automation' );
 		$automation->boot();
+
+		RunRetention::bootstrap();
 
 		do_action( 'zaplane_init' );
 	}
