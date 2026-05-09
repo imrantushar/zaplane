@@ -12,6 +12,7 @@ import notificationReducer from './Slices/notificationSlice/notificationSlice';
 import recipeReducer from './Slices/recipeSlice/recipeSlice';
 import folderReducer from './Slices/folderSlice/folderSlice';
 import workerReducer from './Slices/workerSlice/workerSlice';
+import cloudReducer from './Slices/cloudSlice/cloudSlice';
 
 import logger from 'redux-logger'
 /**
@@ -34,7 +35,8 @@ export const store = configureStore({
         dashboard:dashboardReducer,
         recipes: recipeReducer,
         folder: folderReducer,
-        worker: workerReducer
+        worker: workerReducer,
+        cloud: cloudReducer
         // Future reducers will be added here (e.g., points, settings)
     },
     middleware: (getDefaultMiddleware) =>

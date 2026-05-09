@@ -6,9 +6,11 @@ import { useQuery } from '@ZAPUtils/helper';
 
 import General from './sections/general';
 import BackgroundWorker from './sections/background-worker';
+import CloudConnection from './sections/cloud-connection';
 
 const SECTIONS = [
 	{ id: 'general', label: 'General', component: General },
+	{ id: 'cloud', label: 'Cloud Connection', component: CloudConnection },
 	{ id: 'worker', label: 'Background Worker', component: BackgroundWorker },
 ];
 

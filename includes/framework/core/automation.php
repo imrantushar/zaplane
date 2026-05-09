@@ -153,6 +153,17 @@ class Automation {
 				continue;
 			}
 
+			/**
+			 * Fires after an integration successfully resolves a trigger payload.
+			 * EventForwarder uses this to ship paired-site events to the cloud
+			 * without modifying local execution.
+			 *
+			 * @param string $event   WP hook name (current_filter() at trigger time).
+			 * @param array  $payload Resolved trigger payload.
+			 * @param array  $trigger Workflow trigger row (workflow_id, graph_node, app, etc).
+			 */
+			do_action( 'zaplane/trigger_event_resolved', $event, $payload, $trigger );
+
 			$this->start_trigger_run( $trigger, $payload );
 		}
 	}

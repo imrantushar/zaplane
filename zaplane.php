@@ -20,6 +20,8 @@ use Zaplane\Framework\Core\Automation;
 use Zaplane\Framework\Core\IntegrationLoader;
 use Zaplane\Framework\Core\ModuleManager;
 use Zaplane\Framework\Maintenance\RunRetention;
+use Zaplane\Framework\Cloud\Heartbeat;
+use Zaplane\Framework\Cloud\EventForwarder;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -117,6 +119,8 @@ final class Zaplane {
 		$automation->boot();
 
 		RunRetention::bootstrap();
+		Heartbeat::bootstrap();
+		EventForwarder::bootstrap();
 
 		do_action( 'zaplane_init' );
 	}
