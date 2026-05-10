@@ -97,8 +97,6 @@ const abandonedCartSlice = createSlice({
         pagination: { page: 1, per_page: 20, total: 0, total_pages: 0 },
         report: null,
         settings: null,
-        gemcrm_tags: [],
-        gemcrm_lists: [],
         wc_order_statuses: [],
         user_roles: [],
         isLoading: false,
@@ -143,8 +141,6 @@ const abandonedCartSlice = createSlice({
             .addCase(fetchSettings.fulfilled, (state, action) => {
                 state.isSettingsLoading = false;
                 state.settings = action.payload?.settings || null;
-                state.gemcrm_tags = action.payload?.gemcrm_tags || [];
-                state.gemcrm_lists = action.payload?.gemcrm_lists || [];
                 state.wc_order_statuses = action.payload?.wc_order_statuses || [];
                 state.user_roles = action.payload?.user_roles || [];
             })

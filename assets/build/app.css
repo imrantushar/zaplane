@@ -2357,9 +2357,6 @@ video {
   border-color: rgb(226 232 240 / var(--tw-border-opacity, 1));
 }.zaplane-scope .border-transparent {
   border-color: transparent;
-}.zaplane-scope .border-yellow-200 {
-  --tw-border-opacity: 1;
-  border-color: rgb(254 240 138 / var(--tw-border-opacity, 1));
 }.zaplane-scope .border-yellow-400 {
   --tw-border-opacity: 1;
   border-color: rgb(250 204 21 / var(--tw-border-opacity, 1));

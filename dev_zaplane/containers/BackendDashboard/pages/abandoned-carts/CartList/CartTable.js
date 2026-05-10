@@ -9,7 +9,7 @@ import {
 import ListTable from '@ZAPComponents/ListTable';
 import ZAPLabel from '@ZAPComponents/Labels/ZAPLabel';
 import ZAPTooltip from '@ZAPComponents/ZAPTooltip';
-import { TrashIcon } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
 
 const STATUS_COLORS = {
     draft: '#f59e0b',
@@ -133,7 +133,7 @@ const CartTable = ({ onRefresh }) => {
                             disabled={deletingId === row.id}
                             className="flex px-2 py-1 justify-center items-center rounded border text-red-500 hover:bg-red-50 border-red-200 disabled:opacity-40"
                         >
-                            <TrashIcon size={14} />
+                            <Trash2 size={14} />
                         </button>
                     </ZAPTooltip>
                 </div>

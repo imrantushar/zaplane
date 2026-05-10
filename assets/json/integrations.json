@@ -6708,6 +6708,33 @@
                     "outputs": [
                         "main"
                     ]
+                },
+                "cart_abandoned": {
+                    "key": "cart_abandoned",
+                    "label": "Cart Abandoned",
+                    "hook": "zaplane/abandoned_cart/started",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "cart_recovered": {
+                    "key": "cart_recovered",
+                    "label": "Cart Recovered",
+                    "hook": "zaplane/abandoned_cart/recovered",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "cart_lost": {
+                    "key": "cart_lost",
+                    "label": "Cart Lost",
+                    "hook": "zaplane/abandoned_cart/lost",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
                 }
             },
             "actions": {
@@ -9632,6 +9659,144 @@
                     "outputs": [
                         "main"
                     ]
+                },
+                "get_abandoned_cart": {
+                    "key": "get_abandoned_cart",
+                    "label": "Get Abandoned Cart by ID",
+                    "schema": [
+                        {
+                            "key": "cart_id",
+                            "label": "Cart ID",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_abandoned_cart_by_email": {
+                    "key": "get_abandoned_cart_by_email",
+                    "label": "Get Abandoned Cart by Email",
+                    "schema": [
+                        {
+                            "key": "email",
+                            "label": "Email Address",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_abandoned_carts": {
+                    "key": "get_abandoned_carts",
+                    "label": "Get Abandoned Carts List",
+                    "schema": [
+                        {
+                            "key": "status",
+                            "label": "Status Filter",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "All",
+                                    "value": ""
+                                },
+                                {
+                                    "label": "Draft",
+                                    "value": "draft"
+                                },
+                                {
+                                    "label": "Processing",
+                                    "value": "processing"
+                                },
+                                {
+                                    "label": "Recovered",
+                                    "value": "recovered"
+                                },
+                                {
+                                    "label": "Lost",
+                                    "value": "lost"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "limit",
+                            "label": "Limit",
+                            "type": "number",
+                            "default": 20
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_abandoned_cart_status": {
+                    "key": "update_abandoned_cart_status",
+                    "label": "Update Abandoned Cart Status",
+                    "schema": [
+                        {
+                            "key": "cart_id",
+                            "label": "Cart ID",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "status",
+                            "label": "New Status",
+                            "type": "select",
+                            "required": true,
+                            "options": [
+                                {
+                                    "label": "Draft",
+                                    "value": "draft"
+                                },
+                                {
+                                    "label": "Processing (Abandoned)",
+                                    "value": "processing"
+                                },
+                                {
+                                    "label": "Recovered",
+                                    "value": "recovered"
+                                },
+                                {
+                                    "label": "Lost",
+                                    "value": "lost"
+                                },
+                                {
+                                    "label": "Opt Out",
+                                    "value": "opt_out"
+                                },
+                                {
+                                    "label": "Skipped",
+                                    "value": "skipped"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_abandoned_cart_report": {
+                    "key": "get_abandoned_cart_report",
+                    "label": "Get Abandoned Cart Report",
+                    "schema": [
+                        {
+                            "key": "date_from",
+                            "label": "Date From (YYYY-MM-DD)",
+                            "type": "text"
+                        },
+                        {
+                            "key": "date_to",
+                            "label": "Date To (YYYY-MM-DD)",
+                            "type": "text"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
                 }
             }
         },
@@ -11014,7 +11179,7 @@
                                 ]
                             },
                             "required": true,
-                            "help": "Find it in Mailchimp \u2192 Audience \u2192 Settings \u2192 Audience name and defaults."
+                            "help": "Find it in Mailchimp → Audience → Settings → Audience name and defaults."
                         },
                         {
                             "key": "email",
@@ -11119,7 +11284,7 @@
                                 ]
                             },
                             "required": true,
-                            "help": "Find it in Mailchimp \u2192 Audience \u2192 Settings \u2192 Audience name and defaults."
+                            "help": "Find it in Mailchimp → Audience → Settings → Audience name and defaults."
                         },
                         {
                             "key": "email",
@@ -11150,7 +11315,7 @@
                                 ]
                             },
                             "required": true,
-                            "help": "Find it in Mailchimp \u2192 Audience \u2192 Settings \u2192 Audience name and defaults."
+                            "help": "Find it in Mailchimp → Audience → Settings → Audience name and defaults."
                         },
                         {
                             "key": "email",
@@ -11189,7 +11354,7 @@
                                 ]
                             },
                             "required": true,
-                            "help": "Find it in Mailchimp \u2192 Audience \u2192 Settings \u2192 Audience name and defaults."
+                            "help": "Find it in Mailchimp → Audience → Settings → Audience name and defaults."
                         },
                         {
                             "key": "email",
@@ -11228,7 +11393,7 @@
                                 ]
                             },
                             "required": true,
-                            "help": "Find it in Mailchimp \u2192 Audience \u2192 Settings \u2192 Audience name and defaults."
+                            "help": "Find it in Mailchimp → Audience → Settings → Audience name and defaults."
                         },
                         {
                             "key": "email",
@@ -19007,21 +19172,21 @@
                             "label": "Subject",
                             "type": "expression",
                             "required": true,
-                            "placeholder": "Your subject line\u2026"
+                            "placeholder": "Your subject line…"
                         },
                         {
                             "key": "body",
                             "label": "Email Body",
                             "type": "richtext",
                             "required": true,
-                            "placeholder": "Write your email here\u2026"
+                            "placeholder": "Write your email here…"
                         },
                         {
                             "key": "pre_header",
                             "label": "Pre-header Text",
                             "type": "expression",
                             "required": false,
-                            "placeholder": "Short preview text shown in inbox\u2026"
+                            "placeholder": "Short preview text shown in inbox…"
                         },
                         {
                             "key": "from_email",
@@ -22757,7 +22922,7 @@
                             "label": "Question",
                             "placeholder": "What do you prefer?",
                             "required": true,
-                            "help": "The poll question (1\u2013300 characters)."
+                            "help": "The poll question (1–300 characters)."
                         },
                         {
                             "key": "options",
@@ -22765,7 +22930,7 @@
                             "label": "Options",
                             "placeholder": "Option A\nOption B\nOption C",
                             "required": true,
-                            "help": "One option per line (2\u201310 options required)."
+                            "help": "One option per line (2–10 options required)."
                         },
                         {
                             "key": "is_anonymous",
@@ -23259,7 +23424,7 @@
                             "options": [
                                 {
                                     "value": "true",
-                                    "label": "Yes \u2014 send cancellation emails"
+                                    "label": "Yes — send cancellation emails"
                                 },
                                 {
                                     "value": "false",
@@ -23303,15 +23468,15 @@
                                 },
                                 {
                                     "value": "OPEN",
-                                    "label": "Open \u2014 anyone with the link"
+                                    "label": "Open — anyone with the link"
                                 },
                                 {
                                     "value": "TRUSTED",
-                                    "label": "Trusted \u2014 organisation members"
+                                    "label": "Trusted — organisation members"
                                 },
                                 {
                                     "value": "RESTRICTED",
-                                    "label": "Restricted \u2014 invited members only"
+                                    "label": "Restricted — invited members only"
                                 }
                             ],
                             "help": "Who can join this Meet space."
@@ -23553,7 +23718,7 @@
                             "options": [
                                 {
                                     "value": "true",
-                                    "label": "Yes \u2014 send cancellation email"
+                                    "label": "Yes — send cancellation email"
                                 },
                                 {
                                     "value": "false",
@@ -23804,7 +23969,7 @@
                             "type": "copy",
                             "value": "https://localhost:10016/index.php?rest_route=/zaplane/v1/incoming/fillout",
                             "readonly": true,
-                            "help": "Copy this URL \u2192 Fillout Dashboard \u2192 Your Form \u2192 Integrate \u2192 Webhooks \u2192 Add Webhook \u2192 Paste & Save."
+                            "help": "Copy this URL → Fillout Dashboard → Your Form → Integrate → Webhooks → Add Webhook → Paste & Save."
                         }
                     ],
                     "outputs": [
@@ -23848,7 +24013,7 @@
                             "type": "copy",
                             "value": "https://localhost:10016/index.php?rest_route=/zaplane/v1/incoming/typeform",
                             "readonly": true,
-                            "help": "Copy this URL \u2192 Typeform Dashboard \u2192 Your Form \u2192 Connect \u2192 Webhooks \u2192 Add a webhook \u2192 Paste & Save."
+                            "help": "Copy this URL → Typeform Dashboard → Your Form → Connect → Webhooks → Add a webhook → Paste & Save."
                         }
                     ],
                     "outputs": [

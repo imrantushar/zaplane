@@ -16,8 +16,6 @@ const CartSettings = () => {
         settings: savedSettings,
         isSettingsLoading,
         isSaving,
-        gemcrm_tags,
-        gemcrm_lists,
         wc_order_statuses,
         user_roles,
     } = useSelector((state) => state.abandonedCart);
@@ -32,8 +30,24 @@ const CartSettings = () => {
     useEffect(() => {
         if (savedSettings) {
             setLocalSettings({ ...savedSettings });
+        } else if (!isSettingsLoading && !savedSettings) {
+            setLocalSettings({
+                status: false,
+                cart_off_time: 30,
+                mark_as_lost_after_minutes: 10080,
+                cool_off_period: 10080,
+                status_of_new_contact: 'transactional',
+                mark_as_recovered_when_order_status_changed_to: ['processing', 'completed'],
+                gdpr_consent_in_woo_checkout_page: false,
+                gdpr_msg: 'By continuing, you agree that we may save your cart data.',
+                disabled_user_roles: [],
+                abandoned_list: [],
+                abandoned_tags: [],
+                lost_list: [],
+                lost_tags: [],
+            });
         }
-    }, [savedSettings]);
+    }, [savedSettings, isSettingsLoading]);
 
     const handleChange = (key, value) => {
         setLocalSettings((prev) => ({ ...prev, [key]: value }));
@@ -83,8 +97,6 @@ const CartSettings = () => {
                 <TaggingSettings
                     settings={localSettings}
                     onChange={handleChange}
-                    gemcrm_tags={gemcrm_tags}
-                    gemcrm_lists={gemcrm_lists}
                 />
             ),
         },

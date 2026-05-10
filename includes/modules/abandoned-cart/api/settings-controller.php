@@ -38,11 +38,9 @@ class SettingsController extends WP_REST_Controller {
 		$settings = AbandonedCartHelper::get_settings();
 
 		return rest_ensure_response( [
-			'settings'       => $settings,
-			'gemcrm_tags'    => AbandonedCartHelper::get_gemcrm_tags(),
-			'gemcrm_lists'   => AbandonedCartHelper::get_gemcrm_lists(),
+			'settings'          => $settings,
 			'wc_order_statuses' => $this->get_wc_order_statuses(),
-			'user_roles'     => $this->get_user_roles(),
+			'user_roles'        => $this->get_user_roles(),
 		] );
 	}
 

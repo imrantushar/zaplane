@@ -11,6 +11,7 @@ use Zaplane\Integrations\Woo\AttributeActionsTrait;
 use Zaplane\Integrations\Woo\CartActionsTrait;
 use Zaplane\Integrations\Woo\CouponActionsTrait;
 use Zaplane\Integrations\Woo\ReviewActionsTrait;
+use Zaplane\Integrations\Woo\AbandonedCartActionsTrait;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -27,6 +28,7 @@ class Woocommerce extends IntegrationBase {
 	use CartActionsTrait;
 	use CouponActionsTrait;
 	use ReviewActionsTrait;
+	use AbandonedCartActionsTrait;
 
 	public static function get_slug(): string {
 		return 'woocommerce';
@@ -128,6 +130,18 @@ class Woocommerce extends IntegrationBase {
 				'label' => 'Product Removed from Cart',
 				'hook' => 'woocommerce_cart_item_removed'
 			],
+			'cart_abandoned' => [
+				'label' => 'Cart Abandoned',
+				'hook'  => 'zaplane/abandoned_cart/started',
+			],
+			'cart_recovered' => [
+				'label' => 'Cart Recovered',
+				'hook'  => 'zaplane/abandoned_cart/recovered',
+			],
+			'cart_lost' => [
+				'label' => 'Cart Lost',
+				'hook'  => 'zaplane/abandoned_cart/lost',
+			],
 		];
 	}
 
@@ -196,6 +210,11 @@ class Woocommerce extends IntegrationBase {
 				return self::build_cart_add_payload( $args );
 			case 'product_removed_from_cart':
 				return self::build_cart_item_payload( $args );
+			case 'cart_abandoned':
+			case 'cart_recovered':
+			case 'cart_lost':
+				$payload = self::abandoned_cart_trigger_payload( $args );
+				return $payload ? $payload : false;
 		}//end switch
 
 		return false;
@@ -289,6 +308,11 @@ class Woocommerce extends IntegrationBase {
 			'get_coupon_totals_by_discount_type' => [ 'label' => 'Get Coupon Totals By Discount Type' ],
 			'get_reviews_all' => [ 'label' => 'Get All Reviews' ],
 			'top_selling_products_report' => [ 'label' => 'Top Selling Products Report' ],
+			'get_abandoned_cart' => [ 'label' => 'Get Abandoned Cart by ID' ],
+			'get_abandoned_cart_by_email' => [ 'label' => 'Get Abandoned Cart by Email' ],
+			'get_abandoned_carts' => [ 'label' => 'Get Abandoned Carts List' ],
+			'update_abandoned_cart_status' => [ 'label' => 'Update Abandoned Cart Status' ],
+			'get_abandoned_cart_report' => [ 'label' => 'Get Abandoned Cart Report' ],
 		];
 	}
 
@@ -1099,6 +1123,77 @@ class Woocommerce extends IntegrationBase {
 					'label' => 'Limit',
 					'type' => 'number',
 					'default' => 10
+				],
+			],
+			'get_abandoned_cart' => [
+				[
+					'key'      => 'cart_id',
+					'label'    => 'Cart ID',
+					'type'     => 'text',
+					'required' => true,
+				],
+			],
+			'get_abandoned_cart_by_email' => [
+				[
+					'key'      => 'email',
+					'label'    => 'Email Address',
+					'type'     => 'text',
+					'required' => true,
+				],
+			],
+			'get_abandoned_carts' => [
+				[
+					'key'     => 'status',
+					'label'   => 'Status Filter',
+					'type'    => 'select',
+					'options' => [
+						[ 'label' => 'All', 'value' => '' ],
+						[ 'label' => 'Draft', 'value' => 'draft' ],
+						[ 'label' => 'Processing (Abandoned)', 'value' => 'processing' ],
+						[ 'label' => 'Recovered', 'value' => 'recovered' ],
+						[ 'label' => 'Lost', 'value' => 'lost' ],
+						[ 'label' => 'Opt Out', 'value' => 'opt_out' ],
+					],
+				],
+				[
+					'key'     => 'limit',
+					'label'   => 'Limit',
+					'type'    => 'number',
+					'default' => 20,
+				],
+			],
+			'update_abandoned_cart_status' => [
+				[
+					'key'      => 'cart_id',
+					'label'    => 'Cart ID',
+					'type'     => 'text',
+					'required' => true,
+				],
+				[
+					'key'      => 'status',
+					'label'    => 'New Status',
+					'type'     => 'select',
+					'required' => true,
+					'options'  => [
+						[ 'label' => 'Draft', 'value' => 'draft' ],
+						[ 'label' => 'Processing', 'value' => 'processing' ],
+						[ 'label' => 'Recovered', 'value' => 'recovered' ],
+						[ 'label' => 'Lost', 'value' => 'lost' ],
+						[ 'label' => 'Opt Out', 'value' => 'opt_out' ],
+						[ 'label' => 'Skipped', 'value' => 'skipped' ],
+					],
+				],
+			],
+			'get_abandoned_cart_report' => [
+				[
+					'key'   => 'date_from',
+					'label' => 'Date From (YYYY-MM-DD)',
+					'type'  => 'text',
+				],
+				[
+					'key'   => 'date_to',
+					'label' => 'Date To (YYYY-MM-DD)',
+					'type'  => 'text',
 				],
 			],
 		];

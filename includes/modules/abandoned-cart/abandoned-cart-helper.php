@@ -95,7 +95,7 @@ class AbandonedCartHelper {
 			return [];
 		}
 		try {
-			$tags = \GemCrm\Database\Models\Tag::all();
+			$tags = \GemCrm\Database\Models\Tag::index();
 			if ( ! $tags ) {
 				return [];
 			}
@@ -110,7 +110,7 @@ class AbandonedCartHelper {
 			return [];
 		}
 		try {
-			$lists = \GemCrm\Database\Models\ListModel::all();
+			$lists = \GemCrm\Database\Models\ListModel::index();
 			if ( ! $lists ) {
 				return [];
 			}

@@ -1,21 +1,8 @@
 import React from 'react';
 import { __ } from '@wordpress/i18n';
-import ZAPSelect from '@ZAPComponents/ZAPSelect';
+import GemCRMAsyncSelect from '@ZAPComponents/GemCRMAsyncSelect';
 
-const TaggingSettings = ({ settings, onChange, gemcrm_tags, gemcrm_lists }) => {
-    const tagOptions = (gemcrm_tags || []).map((t) => ({ value: t.id, label: t.title }));
-    const listOptions = (gemcrm_lists || []).map((l) => ({ value: l.id, label: l.title }));
-
-    const hasGemCrm = tagOptions.length > 0 || listOptions.length > 0;
-
-    if (!hasGemCrm) {
-        return (
-            <div className="bg-yellow-50 border border-yellow-200 rounded p-4 text-sm text-yellow-800">
-                {__('GemCRM plugin is not active or has no tags/lists. Install and activate GemCRM to configure tagging.', 'zaplane')}
-            </div>
-        );
-    }
-
+const TaggingSettings = ({ settings, onChange }) => {
     return (
         <div className="flex flex-col gap-6">
             <div>
@@ -23,21 +10,19 @@ const TaggingSettings = ({ settings, onChange, gemcrm_tags, gemcrm_lists }) => {
                     {__('When Cart is Abandoned (Processing)', 'zaplane')}
                 </h3>
                 <div className="grid grid-cols-2 gap-4">
-                    <ZAPSelect
+                    <GemCRMAsyncSelect
+                        endpoint="tags"
                         label={__('Apply Tags', 'zaplane')}
-                        options={tagOptions}
                         value={settings.abandoned_tags || []}
                         onChange={(values) => onChange('abandoned_tags', values)}
-                        isMulti
-                        placeholder={__('Select tags…', 'zaplane')}
+                        placeholder={__('Search tags…', 'zaplane')}
                     />
-                    <ZAPSelect
+                    <GemCRMAsyncSelect
+                        endpoint="lists"
                         label={__('Apply to Lists', 'zaplane')}
-                        options={listOptions}
                         value={settings.abandoned_list || []}
                         onChange={(values) => onChange('abandoned_list', values)}
-                        isMulti
-                        placeholder={__('Select lists…', 'zaplane')}
+                        placeholder={__('Search lists…', 'zaplane')}
                     />
                 </div>
             </div>
@@ -49,21 +34,19 @@ const TaggingSettings = ({ settings, onChange, gemcrm_tags, gemcrm_lists }) => {
                     {__('When Cart is Lost', 'zaplane')}
                 </h3>
                 <div className="grid grid-cols-2 gap-4">
-                    <ZAPSelect
+                    <GemCRMAsyncSelect
+                        endpoint="tags"
                         label={__('Apply Tags', 'zaplane')}
-                        options={tagOptions}
                         value={settings.lost_tags || []}
                         onChange={(values) => onChange('lost_tags', values)}
-                        isMulti
-                        placeholder={__('Select tags…', 'zaplane')}
+                        placeholder={__('Search tags…', 'zaplane')}
                     />
-                    <ZAPSelect
+                    <GemCRMAsyncSelect
+                        endpoint="lists"
                         label={__('Apply to Lists', 'zaplane')}
-                        options={listOptions}
                         value={settings.lost_list || []}
                         onChange={(values) => onChange('lost_list', values)}
-                        isMulti
-                        placeholder={__('Select lists…', 'zaplane')}
+                        placeholder={__('Search lists…', 'zaplane')}
                     />
                 </div>
             </div>
