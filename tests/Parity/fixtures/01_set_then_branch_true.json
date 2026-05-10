@@ -1,0 +1,24 @@
+{
+  "name": "set_then_branch_true",
+  "graph": {
+    "nodes": [
+      { "id": "trigger-1", "type": "trigger", "data": { "app": "webhook" } },
+      { "id": "set-1",     "type": "action",  "data": { "app": "set",       "config": { "assignments": { "amount": 50, "currency": "USD" } } } },
+      { "id": "if-1",      "type": "action",  "data": { "app": "condition", "config": { "field": "amount", "operator": ">", "value": 10 } } },
+      { "id": "tail-true",  "type": "action", "data": { "app": "set", "config": { "assignments": { "branch_taken": "yes" } } } },
+      { "id": "tail-false", "type": "action", "data": { "app": "set", "config": { "assignments": { "branch_taken": "no"  } } } }
+    ],
+    "edges": [
+      { "id": "e1", "source": "trigger-1", "target": "set-1" },
+      { "id": "e2", "source": "set-1",     "target": "if-1" },
+      { "id": "e3", "source": "if-1",      "target": "tail-true",  "sourceHandle": "true" },
+      { "id": "e4", "source": "if-1",      "target": "tail-false", "sourceHandle": "false" }
+    ]
+  },
+  "input": {},
+  "expected_outputs": [
+    { "node_id": "set-1", "output": { "amount": 50, "currency": "USD" } },
+    { "node_id": "if-1",  "output": { "_branch": "true", "matched": true } },
+    { "node_id": "tail-true", "output": { "amount": 50, "currency": "USD", "_branch": "true", "matched": true, "branch_taken": "yes" } }
+  ]
+}

@@ -132,6 +132,7 @@ final class Zaplane {
 		EventForwarder::bootstrap();
 		WorkflowSync::bootstrap();
 		\Zaplane\Framework\Cloud\DegradedMode::bootstrap();
+		\Zaplane\Framework\Maintenance\OAuthRefresher::bootstrap();
 
 		do_action( 'zaplane_init' );
 	}

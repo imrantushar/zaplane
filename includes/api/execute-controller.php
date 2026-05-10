@@ -98,6 +98,25 @@ class ExecuteController extends WP_REST_Controller {
 		$integration_slug = (string) ( $body['integration'] ?? '' );
 		$action_slug      = (string) ( $body['action'] ?? '' );
 		$idempotency_key  = (string) ( $body['idempotency_key'] ?? '' );
+		$test_mode        = (bool) ( $body['_test_mode'] ?? false );
+
+		// "Test with mocked outputs" — cloud sends `_test_mode=true` from
+		// the visual-builder Test-step button so the plugin returns a
+		// synthetic response instead of actually firing the integration
+		// (no Slack messages, no LearnDash enrolls, etc).
+		if ( $test_mode ) {
+			return rest_ensure_response( [
+				'ok'      => true,
+				'mocked'  => true,
+				'output'  => [
+					'_mocked'              => true,
+					'would_have_called'    => $integration_slug . ( $action_slug ? '.' . $action_slug : '' ),
+					'with_config'          => (array) ( $body['config'] ?? [] ),
+					'echo_input'           => (array) ( $body['input'] ?? [] ),
+					'note'                 => 'Plugin executed in test mode — no real side effects fired.',
+				],
+			] );
+		}
 
 		// Idempotency: skip if we already processed this key.
 		if ( '' !== $idempotency_key ) {
