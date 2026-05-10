@@ -31,6 +31,7 @@ class Kernel {
 			Commands\MigrateStatusCommand::class,
 			Commands\MakeMigrationCommand::class,
 			Commands\MakeModelCommand::class,
+			Commands\WorkCommand::class,
 		];
 
 		$this->registerCustomCommands();
