@@ -110,19 +110,31 @@ class WorkCommand extends Command {
 	}
 
 	/**
-	 * Drop a row in the cache (transient) so the plugin admin's "Worker
-	 * health" panel can confirm the daemon is alive without polling AS.
+	 * Heartbeat. The admin's WorkerStatus reader expects this exact
+	 * option key + shape (`updated_at`, `state`, etc), so we use the
+	 * same option name. Stored as a regular option, not a transient, so
+	 * visibility doesn't depend on the cache driver.
+	 *
+	 * Maps daemon states → reader's vocabulary:
+	 *   - first tick → `starting`
+	 *   - draining or idle while alive → `running`
+	 *   - clean shutdown → `stopped`
 	 */
 	private function writeHeartbeat( string $state ): void {
 		$pid = function_exists( 'getmypid' ) ? getmypid() : null;
-		set_transient( 'zaplane_worker_heartbeat', [
-			'state'        => $state,
-			'pid'          => $pid,
-			'last_seen'    => time(),
-			'started_at'   => $this->startedAt,
-			'processed'    => $this->processed,
-			'memory_mb'    => round( memory_get_usage( true ) / 1024 / 1024, 1 ),
-		], 120 );
+		$reported = match ( $state ) {
+			'stopped' => 'stopped',
+			default   => $this->processed === 0 && ( time() - $this->startedAt ) < 5 ? 'starting' : 'running',
+		};
+		update_option( 'zaplane_worker_status', [
+			'state'      => $reported,
+			'pid'        => $pid,
+			'updated_at' => time(),
+			'started_at' => $this->startedAt,
+			'processed'  => $this->processed,
+			'memory_mb'  => round( memory_get_usage( true ) / 1024 / 1024, 1 ),
+			'host'       => function_exists( 'gethostname' ) ? gethostname() : null,
+		], false );
 	}
 
 	private function installSignalHandlers(): void {

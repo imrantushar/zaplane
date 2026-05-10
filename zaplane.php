@@ -75,6 +75,14 @@ final class Zaplane {
 
 	private function load_dependencies(): void {
 		require_once ZAPLANE_ROOT_DIR_PATH . 'vendor/autoload.php';
+		// Strauss-prefixed vendor packages live under `vendor-prefixed/`
+		// with classes rewritten to the `Zaplane\Vendor\` namespace, so
+		// our bundled Guzzle/Symfony/etc don't clash with another
+		// plugin's copies. Optional — present once `composer strauss`
+		// has run; absent on a clean checkout.
+		if ( file_exists( ZAPLANE_ROOT_DIR_PATH . 'vendor-prefixed/autoload.php' ) ) {
+			require_once ZAPLANE_ROOT_DIR_PATH . 'vendor-prefixed/autoload.php';
+		}
 		require_once ZAPLANE_ROOT_DIR_PATH . 'vendor/woocommerce/action-scheduler/action-scheduler.php';
 		require_once ZAPLANE_INCLUDES_DIR_PATH . 'autoload.php';
 		require_once ZAPLANE_FRAMEWORK_DIR_PATH . 'functions.php';
@@ -123,6 +131,7 @@ final class Zaplane {
 		Heartbeat::bootstrap();
 		EventForwarder::bootstrap();
 		WorkflowSync::bootstrap();
+		\Zaplane\Framework\Cloud\DegradedMode::bootstrap();
 
 		do_action( 'zaplane_init' );
 	}

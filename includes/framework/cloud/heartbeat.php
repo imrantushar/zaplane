@@ -85,6 +85,15 @@ class Heartbeat {
 			'error'      => $result['error'] ?? '',
 			'finished_at' => time(),
 		], false );
+
+		// Feed the degraded-mode tracker so EventForwarder knows
+		// whether to forward (cloud healthy) or buffer + run locally
+		// (cloud silent for >10 min).
+		if ( $result['ok'] ) {
+			DegradedMode::record_success();
+		} else {
+			DegradedMode::record_failure( (string) ( $result['error'] ?? '' ) );
+		}
 	}
 
 	public static function get_last_run(): array {

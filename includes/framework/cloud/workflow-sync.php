@@ -83,8 +83,16 @@ class WorkflowSync {
 		], false );
 
 		if ( ! $res['ok'] ) {
+			DegradedMode::record_failure( (string) ( $res['error'] ?? '' ) );
 			throw new \RuntimeException( 'Workflow sync failed: ' . $res['error'] );
 		}
+
+		// Successful sync = a fresh round-trip + a known-good copy of
+		// every workflow definition. Both feed the degraded-mode
+		// fallback path: the timer resets and the local engine has a
+		// snapshot to run from if the cloud goes silent later.
+		DegradedMode::record_success();
+		DegradedMode::snapshot_workflows( $workflows );
 
 		return [
 			'ok'       => true,

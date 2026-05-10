@@ -38,9 +38,17 @@ class EventForwarder {
 	}
 
 	public static function should_skip_local( bool $skip ): bool {
-		// If something else already decided to skip, respect that. Otherwise
-		// skip when paired so cloud is the only executor.
-		return $skip || Bridge::is_paired();
+		// If something else already decided to skip, respect that.
+		// Otherwise skip when paired AND cloud is healthy. Once degraded
+		// mode kicks in, the local engine takes over so automations don't
+		// freeze during a cloud outage.
+		if ( $skip ) {
+			return true;
+		}
+		if ( ! Bridge::is_paired() ) {
+			return false;
+		}
+		return ! DegradedMode::is_degraded();
 	}
 
 	/**
@@ -48,9 +56,6 @@ class EventForwarder {
 	 */
 	public static function on_event_resolved( string $event, array $payload, array $trigger ): void {
 		if ( ! Bridge::is_paired() ) {
-			return;
-		}
-		if ( ! function_exists( 'as_enqueue_async_action' ) ) {
 			return;
 		}
 
@@ -66,6 +71,17 @@ class EventForwarder {
 			'fired_at' => time(),
 		];
 
+		// Cloud is degraded → buffer locally, the local engine handles
+		// the run, and we'll replay this envelope back to the cloud
+		// once heartbeats succeed again.
+		if ( DegradedMode::is_degraded() ) {
+			DegradedMode::buffer_event( $envelope );
+			return;
+		}
+
+		if ( ! function_exists( 'as_enqueue_async_action' ) ) {
+			return;
+		}
 		as_enqueue_async_action( self::HOOK_FORWARD, [ 'envelope' => $envelope ], self::GROUP );
 	}
 
@@ -103,18 +119,23 @@ class EventForwarder {
 			15
 		);
 
-		// Surface failures in the daemon's failure inbox via PHP error log,
-		// so the existing /worker/failures view picks them up. Action
-		// Scheduler will also retry on its own.
-		if ( ! $res['ok'] ) {
-			error_log( sprintf(
-				'[zaplane] event forward failed: status=%d error=%s event_type=%s',
-				$res['status'],
-				$res['error'],
-				$envelope['event_type'] ?? ''
-			) );
-			throw new \RuntimeException( 'Event forward failed: ' . $res['error'] );
+		// Track cloud health. A 2xx counts as a successful round-trip
+		// and resets the degraded-mode timer; failures bump fail_count
+		// and (eventually) trip degraded mode after DEGRADED_AFTER_SECONDS.
+		if ( $res['ok'] ) {
+			DegradedMode::record_success();
+			return;
 		}
+		DegradedMode::record_failure( (string) ( $res['error'] ?? '' ) );
+		DegradedMode::buffer_event( $envelope );
+
+		error_log( sprintf(
+			'[zaplane] event forward failed: status=%d error=%s event_type=%s',
+			$res['status'],
+			$res['error'],
+			$envelope['event_type'] ?? ''
+		) );
+		throw new \RuntimeException( 'Event forward failed: ' . $res['error'] );
 	}
 
 	private static function generate_site_event_id( string $event, array $trigger ): string {

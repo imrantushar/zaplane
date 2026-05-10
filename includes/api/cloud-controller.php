@@ -170,7 +170,13 @@ class CloudController extends WP_REST_Controller {
 	}
 
 	public function get_status() {
-		return rest_ensure_response( Bridge::public_summary() );
+		$summary = Bridge::public_summary();
+		// Surface the degraded-mode tracker so the admin banner can warn
+		// the user when we've fallen back to local execution.
+		if ( class_exists( '\\Zaplane\\Framework\\Cloud\\DegradedMode' ) ) {
+			$summary['degraded'] = \Zaplane\Framework\Cloud\DegradedMode::status();
+		}
+		return rest_ensure_response( $summary );
 	}
 
 	public function pair( WP_REST_Request $request ) {

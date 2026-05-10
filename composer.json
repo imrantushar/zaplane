@@ -18,12 +18,20 @@
         "wp-coding-standards/wpcs": "2.3.0",
         "phpunit/phpunit": "^9.5",
         "yoast/phpunit-polyfills": "^1.0",
-        "phpcompatibility/phpcompatibility-wp": "*"
+        "phpcompatibility/phpcompatibility-wp": "*",
+        "brianhenryie/strauss": "^0.20"
     },
     "scripts": {
         "format": "phpcbf",
         "lint": "phpcs",
-        "test": "vendor/bin/phpunit"
+        "test": "vendor/bin/phpunit",
+        "strauss": "vendor/bin/strauss",
+        "post-install-cmd": [
+            "@strauss"
+        ],
+        "post-update-cmd": [
+            "@strauss"
+        ]
     },
     "config": {
         "platform": {
@@ -32,6 +40,36 @@
         "allow-plugins": {
             "dealerdirect/phpcodesniffer-composer-installer": true,
             "composer/installers": true
+        }
+    },
+    "extra": {
+        "strauss": {
+            "//": "Vendor-namespace scoping. Every Composer dependency is rewritten under `Zaplane\\Vendor\\` so when this plugin runs alongside another plugin that bundles a different Guzzle / Symfony / Monolog version, the two copies don't fight. Run via `composer strauss` (also fires automatically on install/update).",
+            "target_directory": "vendor-prefixed/",
+            "namespace_prefix": "Zaplane\\Vendor\\",
+            "classmap_prefix": "Zaplane_Vendor_",
+            "constant_prefix": "ZAPLANE_VENDOR_",
+            "include_modified_date": false,
+            "delete_vendor_packages": false,
+            "delete_vendor_files": false,
+            "exclude_from_prefix": {
+                "packages": [
+                    "woocommerce/action-scheduler",
+                    "storeengine/wordpress-sdk"
+                ],
+                "namespaces": [
+                    "ActionScheduler",
+                    "Zaplane"
+                ]
+            },
+            "packages": [
+                "_FUTURE_DEPS_": "When you `composer require guzzlehttp/guzzle` or any other vendor library, Strauss picks it up automatically — no need to list each one. This array is here to opt OUT specific packages, not to opt them in."
+            ]
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Zaplane\\Vendor\\": "vendor-prefixed/"
         }
     }
 }
