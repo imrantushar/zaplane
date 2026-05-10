@@ -12,6 +12,7 @@ import { __ } from '@wordpress/i18n';
 import RecipesPage from './pages/recipes';
 import Folders from './pages/Folders';
 import Folder from './pages/Folders/Folder';
+import AbandonedCarts from './pages/abandoned-carts';
 
 
 
@@ -38,6 +39,8 @@ const renderSwitch = (page, id, action, path) => {
 			return <Folders />;
 		case 'zaplane-settings':
 			return <Setting />;
+		case 'zaplane-abandoned-carts':
+			return <AbandonedCarts />;
 
 		default:
 			return <>{__('No page found', 'zaplane')}</>;
