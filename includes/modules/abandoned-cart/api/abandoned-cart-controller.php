@@ -186,7 +186,7 @@ class AbandonedCartController extends WP_REST_Controller {
 			$summary[ $status . '_revenue' ] = [
 				'orders'    => $count,
 				'amount'    => $amount,
-				'formatted' => $formatted,
+				'formatted' => trim( str_replace("\xC2\xA0", ' ', html_entity_decode( $formatted ) ) ),
 			];
 		}
 
@@ -217,7 +217,7 @@ class AbandonedCartController extends WP_REST_Controller {
 				'total_abandoned_carts'  => $total_carts,
 				'total_recovered_carts'  => $total_recovered,
 				'total_revenue'          => $total_revenue,
-				'currency_symbol'        => $symbol,
+				'currency_symbol'        => trim( str_replace("\xC2\xA0", ' ', html_entity_decode( $symbol ) ) ),
 			],
 		] );
 	}
