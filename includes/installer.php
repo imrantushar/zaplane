@@ -26,10 +26,10 @@ class Installer {
 	}
 
 	public function run(): void {
-		$current_db_version = get_option( $this->db_version_option, '0.0.0' );
+		$this->migrate();
 
+		$current_db_version = get_option( $this->db_version_option, '0.0.0' );
 		if ( version_compare( $current_db_version, $this->plugin_version, '<' ) ) {
-			$this->migrate();
 			update_option( $this->db_version_option, $this->plugin_version );
 		}
 

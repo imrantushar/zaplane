@@ -55,7 +55,7 @@ final class Zaplane {
 	}
 
 	public function define_constants(): void {
-		define( 'ZAPLANE_VERSION', '0.0.1' );
+		define( 'ZAPLANE_VERSION', '0.0.2' );
 		define( 'ZAPLANE_ALLOW_LOGS', true );
 		define( 'ZAPLANE_PLUGIN_SLUG', 'zaplane' );
 		define( 'ZAPLANE_PLUGIN_FILE', __FILE__ );

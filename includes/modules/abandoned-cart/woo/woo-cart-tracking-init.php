@@ -4,7 +4,7 @@ namespace Zaplane\Modules\AbandonedCart\Woo;
 
 use Zaplane\Modules\AbandonedCart\AbandonedCartModel;
 use Zaplane\Modules\AbandonedCart\AbandonedCartHelper;
-
+use WC_AJAX;
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -21,6 +21,7 @@ class WooCartTrackingInit {
 			return;
 		}
 
+		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_tracking_script' ] );
 		add_action( 'woocommerce_after_checkout_form', [ $this, 'enqueue_tracking_script' ] );
 		add_action( 'woocommerce_blocks_enqueue_checkout_block_scripts_after', [ $this, 'enqueue_tracking_script' ] );
 
@@ -47,7 +48,7 @@ class WooCartTrackingInit {
 
 		wp_enqueue_script(
 			'zaplane-ab-cart-woo',
-			ZAPLANE_ASSETS_URI . 'js/abandoned-cart-woo.js',
+			ZAPLANE_ASSETS_URI . 'js/abandoned-cart-woo.js?'.rand(1,10000),
 			[ 'jquery' ],
 			ZAPLANE_VERSION,
 			true
@@ -56,12 +57,12 @@ class WooCartTrackingInit {
 		$settings = AbandonedCartHelper::get_settings();
 
 		wp_localize_script( 'zaplane-ab-cart-woo', 'ZaplaneAbCart', [
-			'wc_ajaxurl'       => WC_AJAX::get_endpoint( '%%endpoint%%' ),
-			'nonce'            => wp_create_nonce( 'zaplane_ab_cart_nonce' ),
-			'gdpr_message'     => $settings['gdpr_msg'],
-			'is_gdpr_enabled'  => $settings['gdpr_consent_in_woo_checkout_page'] ? '1' : '0',
-			'update_action'    => self::AJAX_UPDATE,
-			'optout_action'    => self::AJAX_OPTOUT,
+			'wc_ajaxurl'      => WC_AJAX::get_endpoint( '%%endpoint%%' ),
+			'nonce'           => wp_create_nonce( 'zaplane_ab_cart_nonce' ),
+			'gdpr_message'    => $settings['gdpr_msg'],
+			'is_gdpr_enabled' => $settings['gdpr_consent_in_woo_checkout_page'] ? '1' : '0',
+			'update_action'   => self::AJAX_UPDATE,
+			'optout_action'   => self::AJAX_OPTOUT,
 		] );
 	}
 
@@ -152,8 +153,10 @@ class WooCartTrackingInit {
 		if ( ! $checkout_key ) {
 			return;
 		}
+
+		// cart may already be promoted to 'processing' by the cron runner
 		AbandonedCartModel::where( 'checkout_key', $checkout_key )
-			->where( 'status', 'draft' )
+			->whereIn( 'status', [ 'draft', 'processing' ] )
 			->update( [
 				'order_id'   => $order_id,
 				'updated_at' => current_time( 'mysql' ),
@@ -169,10 +172,30 @@ class WooCartTrackingInit {
 	}
 
 	public function handle_order_status_changed( int $order_id, string $old_status, string $new_status, $order ): void {
-		$settings        = AbandonedCartHelper::get_settings();
+		$settings         = AbandonedCartHelper::get_settings();
 		$recover_statuses = (array) ( $settings['mark_as_recovered_when_order_status_changed_to'] ?? [ 'processing', 'completed' ] );
 
+		// primary lookup: by linked order_id
 		$cart = AbandonedCartModel::where( 'order_id', $order_id )->first();
+
+		// fallback: match by billing email (handles unlinked carts — cleared cookies, blocks checkout, etc.)
+		if ( ! $cart && $order instanceof \WC_Order ) {
+			$email = $order->get_billing_email();
+			if ( $email ) {
+				$cart = AbandonedCartModel::where( 'email', $email )
+					->whereIn( 'status', [ 'draft', 'processing' ] )
+					->orderBy( 'created_at', 'desc' )
+					->first();
+
+				if ( $cart ) {
+					AbandonedCartModel::where( 'id', $cart->id )->update( [
+						'order_id'   => $order_id,
+						'updated_at' => current_time( 'mysql' ),
+					] );
+				}
+			}
+		}
+
 		if ( ! $cart ) {
 			return;
 		}
