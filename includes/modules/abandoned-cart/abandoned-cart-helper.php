@@ -72,19 +72,21 @@ class AbandonedCartHelper {
 		if ( ! $user_id ) {
 			return false;
 		}
-		$settings       = self::get_settings();
-		$cool_off_mins  = absint( $settings['cool_off_period'] );
+		$settings      = self::get_settings();
+		$cool_off_mins = absint( $settings['cool_off_period'] );
 		if ( ! $cool_off_mins ) {
 			return false;
 		}
-		$threshold = date( 'Y-m-d H:i:s', time() - ( $cool_off_mins * MINUTE_IN_SECONDS ) ); // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date
+
+		// WC_Order_Query uses '>TIMESTAMP' syntax for date_created comparisons.
+		$since = time() - ( $cool_off_mins * MINUTE_IN_SECONDS );
 
 		$recent_orders = wc_get_orders( [
-			'customer' => $user_id,
-			'status'   => [ 'wc-processing', 'wc-completed' ],
-			'date_after' => $threshold,
-			'limit'    => 1,
-			'return'   => 'ids',
+			'customer'     => $user_id,
+			'status'       => [ 'wc-processing', 'wc-completed' ],
+			'date_created' => '>' . $since,
+			'limit'        => 1,
+			'return'       => 'ids',
 		] );
 
 		return ! empty( $recent_orders );
