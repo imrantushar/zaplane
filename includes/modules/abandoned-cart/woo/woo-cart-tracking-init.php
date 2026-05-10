@@ -154,9 +154,15 @@ class WooCartTrackingInit {
 			return;
 		}
 
-		// cart may already be promoted to 'processing' by the cron runner
+		// Draft = ordered before the cart was ever considered abandoned → delete it entirely.
 		AbandonedCartModel::where( 'checkout_key', $checkout_key )
-			->whereIn( 'status', [ 'draft', 'processing' ] )
+			->where( 'status', 'draft' )
+			->delete();
+
+		// Processing = cart was already promoted to "abandoned" → link the order so the
+		// status-change handler can mark it recovered.
+		AbandonedCartModel::where( 'checkout_key', $checkout_key )
+			->where( 'status', 'processing' )
 			->update( [
 				'order_id'   => $order_id,
 				'updated_at' => current_time( 'mysql' ),
@@ -178,12 +184,12 @@ class WooCartTrackingInit {
 		// primary lookup: by linked order_id
 		$cart = AbandonedCartModel::where( 'order_id', $order_id )->first();
 
-		// fallback: match by billing email (handles unlinked carts — cleared cookies, blocks checkout, etc.)
+		// fallback: match by billing email — only 'processing' carts (actually abandoned ones)
 		if ( ! $cart && $order instanceof \WC_Order ) {
 			$email = $order->get_billing_email();
 			if ( $email ) {
 				$cart = AbandonedCartModel::where( 'email', $email )
-					->whereIn( 'status', [ 'draft', 'processing' ] )
+					->where( 'status', 'processing' )
 					->orderBy( 'created_at', 'desc' )
 					->first();
 
