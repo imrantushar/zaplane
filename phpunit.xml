@@ -14,6 +14,9 @@
         <testsuite name="Utils">
             <directory suffix="Test.php">./tests/Utils</directory>
         </testsuite>
+        <testsuite name="Parity">
+            <directory suffix="Test.php">./tests/Parity</directory>
+        </testsuite>
     </testsuites>
     <filter>
         <whitelist processUncoveredFilesFromWhitelist="true">
