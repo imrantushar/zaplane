@@ -66,13 +66,26 @@ class Pairing {
 
 		Heartbeat::schedule();
 
+		// Best-effort initial workflow sync. We don't want the pair call
+		// to fail if the cloud is briefly unavailable or sync errors —
+		// the recurring sync will catch up on the next interval.
+		try {
+			WorkflowSync::sync_all();
+		} catch ( \Throwable $e ) {
+			// Logged on the option; not fatal for pairing.
+		}
+
 		return [ 'ok' => true, 'summary' => Bridge::public_summary() ];
 	}
 
 	public static function disconnect(): void {
 		Heartbeat::unschedule();
+		if ( function_exists( 'as_unschedule_all_actions' ) ) {
+			as_unschedule_all_actions( WorkflowSync::HOOK, [], WorkflowSync::GROUP );
+		}
 		Bridge::clear();
 		delete_option( 'zaplane_cloud_heartbeat_last' );
+		delete_option( 'zaplane_cloud_workflow_sync_last' );
 	}
 
 	/**

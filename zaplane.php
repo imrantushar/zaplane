@@ -22,6 +22,7 @@ use Zaplane\Framework\Core\ModuleManager;
 use Zaplane\Framework\Maintenance\RunRetention;
 use Zaplane\Framework\Cloud\Heartbeat;
 use Zaplane\Framework\Cloud\EventForwarder;
+use Zaplane\Framework\Cloud\WorkflowSync;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -121,6 +122,7 @@ final class Zaplane {
 		RunRetention::bootstrap();
 		Heartbeat::bootstrap();
 		EventForwarder::bootstrap();
+		WorkflowSync::bootstrap();
 
 		do_action( 'zaplane_init' );
 	}

@@ -155,14 +155,28 @@ class Automation {
 
 			/**
 			 * Fires after an integration successfully resolves a trigger payload.
-			 * EventForwarder uses this to ship paired-site events to the cloud
-			 * without modifying local execution.
+			 * EventForwarder uses this to ship paired-site events to the cloud.
 			 *
 			 * @param string $event   WP hook name (current_filter() at trigger time).
 			 * @param array  $payload Resolved trigger payload.
 			 * @param array  $trigger Workflow trigger row (workflow_id, graph_node, app, etc).
 			 */
 			do_action( 'zaplane/trigger_event_resolved', $event, $payload, $trigger );
+
+			/**
+			 * Allow other components (e.g. EventForwarder when paired with the
+			 * cloud) to short-circuit local execution. When this filter
+			 * returns true, the workflow runs in the cloud only.
+			 *
+			 * @param bool   $skip   Default false (run locally).
+			 * @param string $event  WP hook name.
+			 * @param array  $payload
+			 * @param array  $trigger
+			 */
+			$skip_local = apply_filters( 'zaplane/skip_local_run', false, $event, $payload, $trigger );
+			if ( $skip_local ) {
+				continue;
+			}
 
 			$this->start_trigger_run( $trigger, $payload );
 		}

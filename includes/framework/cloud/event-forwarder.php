@@ -27,6 +27,20 @@ class EventForwarder {
 	public static function bootstrap(): void {
 		add_action( 'zaplane/trigger_event_resolved', [ self::class, 'on_event_resolved' ], 10, 3 );
 		add_action( self::HOOK_FORWARD, [ self::class, 'process_forward' ], 10, 1 );
+
+		// Cloud-primary execution: when paired, don't run workflows locally —
+		// the cloud is the source of truth. The plugin still records the
+		// run row in its local DB at start_trigger_run time? No — by
+		// returning true here we skip start_trigger_run entirely, so the
+		// local `wp_zaplane_runs` table stays empty for cloud-handled
+		// events. Customer's history lives in the cloud's runs page.
+		add_filter( 'zaplane/skip_local_run', [ self::class, 'should_skip_local' ], 10, 1 );
+	}
+
+	public static function should_skip_local( bool $skip ): bool {
+		// If something else already decided to skip, respect that. Otherwise
+		// skip when paired so cloud is the only executor.
+		return $skip || Bridge::is_paired();
 	}
 
 	/**
