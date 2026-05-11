@@ -11,7 +11,8 @@ const VariableEditor = ({
   variableContext,
   label,
   placeholder,
-  containerStyle
+  containerStyle,
+  required = false
 }) => {
   const editorRef = useRef(null);
   const [isPopoverOpen, setPopoverOpen] = useState(false);
@@ -76,7 +77,7 @@ const VariableEditor = ({
   };
   return <>
       <div className="zaplane-label" style={{display:'flex', flexDirection:'column', gap:'8px', ...containerStyle}}>
-        <span>{__(label, "zaplane")}</span>
+        <span>{__(label, "zaplane")}{required && <span className="text-red-500 ml-0.5">*</span>}</span>
 
         <div ref={editorRef} onInput={handleInput} className={`zaplane-variable-editor ${isEmpty ? "zaplane-empty" : ""}`} contentEditable suppressContentEditableWarning onKeyDown={handleKeyDown} onClick={handleCursorSave} onKeyUp={handleCursorSave} onBlur={() => syncValue(editorRef, field.key, setFieldValue)} data-placeholder={placeholder} />
       </div>

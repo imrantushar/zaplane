@@ -13,7 +13,8 @@ const ZAPSelect = ({
   placeholder,
   isClearable = false,
   isMulti = false,
-  containerStyle = {}
+  containerStyle = {},
+  required = false
 }) => {
 
   // Handle selected value properly
@@ -41,7 +42,7 @@ const ZAPSelect = ({
     >
       {label && (
         <span className="zaplane-label">
-          {__(label, "zaplane")}
+          {__(label, "zaplane")}{required && <span className="text-red-500 ml-0.5">*</span>}
         </span>
       )}
 
