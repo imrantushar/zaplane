@@ -75,7 +75,8 @@ class AbandonedCart extends IntegrationBase {
 			'discounts'    => 0.00,
 			'fees'         => 0.00,
 			'currency'     => 'USD',
-			'checkout_key' => 'abc123uuid',
+			'checkout_key'  => 'abc123uuid',
+			'recovery_link' => home_url( '/?zaplane=1&route=abandoned-cart&checkout_key=abc123uuid' ),
 			'contact_id'   => 42,
 			'order_id'     => null,
 			'click_counts' => 0,
@@ -340,7 +341,15 @@ class AbandonedCart extends IntegrationBase {
 			'discounts'    => $cart->discounts,
 			'fees'         => $cart->fees,
 			'currency'     => $cart->currency,
-			'checkout_key' => $cart->checkout_key,
+			'checkout_key'  => $cart->checkout_key,
+			'recovery_link' => add_query_arg(
+				[
+					'zaplane'      => '1',
+					'route'        => 'abandoned-cart',
+					'checkout_key' => $cart->checkout_key,
+				],
+				home_url( '/' )
+			),
 			'cart_hash'    => $cart->cart_hash,
 			'is_optout'    => $cart->is_optout,
 			'user_id'      => $cart->user_id,
