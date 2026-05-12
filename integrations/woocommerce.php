@@ -301,12 +301,14 @@ class Woocommerce extends IntegrationBase {
 				[
 					'key' => 'customer_id',
 					'label' => 'Customer ID',
-					'type' => 'expression'
+					'type' => 'expression',
+					'required' => true,
 				],
 				[
 					'key' => 'order_status',
 					'label' => 'Order Status',
 					'type' => 'select',
+					'required' => true,
 					'options' => self::order_status_options()
 				],
 				[
@@ -331,6 +333,7 @@ class Woocommerce extends IntegrationBase {
 					'key' => 'order_status',
 					'label' => 'Order Status',
 					'type' => 'select',
+					'required' => true,
 					'options' => self::order_status_options()
 				],
 				[
@@ -398,6 +401,7 @@ class Woocommerce extends IntegrationBase {
 					'key' => 'order_status',
 					'label' => 'Order Status',
 					'type' => 'select',
+					'required' => true,
 					'options' => self::order_status_options()
 				],
 			],
@@ -524,6 +528,7 @@ class Woocommerce extends IntegrationBase {
 					'key' => 'product_status',
 					'label' => 'Status',
 					'type' => 'select',
+					'required' => true,
 					'options' => self::product_status_options()
 				],
 				[
@@ -630,6 +635,7 @@ class Woocommerce extends IntegrationBase {
 					'key' => 'product_status',
 					'label' => 'Status',
 					'type' => 'select',
+					'required' => true,
 					'options' => self::product_status_options()
 				],
 			],
@@ -644,6 +650,7 @@ class Woocommerce extends IntegrationBase {
 					'key' => 'product_status',
 					'label' => 'Status',
 					'type' => 'select',
+					'required' => true,
 					'options' => self::product_status_options()
 				],
 				[
@@ -1098,7 +1105,7 @@ class Woocommerce extends IntegrationBase {
 					'key' => 'limit',
 					'label' => 'Limit',
 					'type' => 'number',
-					'default' => 10
+					'required' => true
 				],
 			],
 		];
@@ -1106,11 +1113,6 @@ class Woocommerce extends IntegrationBase {
 		return $schemas[ $action ] ?? [];
 	}
 
-	/**
-	 * =====================================================
-	 * DYNAMIC DATA QUERIES (API)
-	 * =====================================================
-	 */
 	public static function get_dynamic_queries(): array {
 		return [
 			'orders' => [ self::class, 'query_dynamic_orders' ],

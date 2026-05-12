@@ -300,15 +300,13 @@ class Discord extends IntegrationBase {
 						'key'      => 'max_age',
 						'type'     => 'number',
 						'label'    => 'Max Age (seconds, 0 = never expires)',
-						'required' => false,
-						'default'  => 86400,
+						'required' => true,
 					],
 					[
 						'key'      => 'max_uses',
 						'type'     => 'number',
 						'label'    => 'Max Uses (0 = unlimited)',
-						'required' => false,
-						'default'  => 0,
+						'required' => true,
 					],
 					[
 						'key'      => 'temporary',
@@ -348,8 +346,7 @@ class Discord extends IntegrationBase {
 						'key'      => 'limit',
 						'type'     => 'number',
 						'label'    => 'Message Limit',
-						'required' => false,
-						'default'  => 10,
+						'required' => true,
 						'min'      => 1,
 						'max'      => 100,
 					],
@@ -376,8 +373,7 @@ class Discord extends IntegrationBase {
 						'key'      => 'limit',
 						'type'     => 'number',
 						'label'    => 'Member Limit',
-						'required' => false,
-						'default'  => 100,
+						'required' => true,
 						'min'      => 1,
 						'max'      => 1000,
 					],
@@ -507,7 +503,7 @@ class Discord extends IntegrationBase {
 				return self::error( __( 'Channel not found.', 'zaplane' ), $input );
 
 			case 'create_a_channel_invite':
-				$channel_id = $config['channel_id'] ?? '';
+				$channel_id = $config['channel_id'] ?? '86400';
 				return self::success( array_merge( $input, [
 					'channel' => self::api_request( $bot_token, 'POST', "/channels/{$channel_id}/invites", [
 						'max_age'   => (int) ( $config['max_age'] ?? 86400 ),
@@ -555,7 +551,7 @@ class Discord extends IntegrationBase {
 				] ) );
 
 			case 'get_many_message':
-				$channel_id = $config['channel_id'] ?? '';
+				$channel_id = $config['channel_id'] ?? '10';
 				$limit      = max( 1, min( 100, (int) ( $config['limit'] ?? 10 ) ) );
 				return self::success( array_merge( $input, [
 					'messages' => self::api_request( $bot_token, 'GET', "/channels/{$channel_id}/messages?limit={$limit}" ),

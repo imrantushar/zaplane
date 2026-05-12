@@ -219,7 +219,7 @@ class Cartflows extends IntegrationBase {
 						'query'       => 'checkout_steps',
 						'select'      => [ 'name', 'label' ],
 					],
-					'required' => false,
+					'required' => true,
 				],
 			];
 		}
@@ -531,7 +531,7 @@ class Cartflows extends IntegrationBase {
 				'label' => 'Apply Filters Hook',
 			],
 			'remove_action' => [
-				'label' => 'Remove All Hook Callbacks',
+				'label' => 'Remove Hook Callbacks',
 			],
 			'has_action' => [
 				'label' => 'Has Hook Callback',

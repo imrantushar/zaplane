@@ -189,6 +189,7 @@ class EasyDigitalDownload extends IntegrationBase {
 					'key' => 'user_id',
 					'label' => 'User ID',
 					'type' => 'select',
+					'required' => true,
 					'dynamic' => [
 						'integration' => 'easydigitaldownload',
 						'query' => 'users',
@@ -199,6 +200,7 @@ class EasyDigitalDownload extends IntegrationBase {
 					'key' => 'customer_status',
 					'label' => 'Status',
 					'type' => 'select',
+					'required' => true,
 					'options' => [
 						[
 							'label' => 'Active',
@@ -234,6 +236,7 @@ class EasyDigitalDownload extends IntegrationBase {
 					'key' => 'type',
 					'label' => 'Type',
 					'type' => 'select',
+					'required' => true,
 					'options' => [
 						[
 							'label' => 'Percent',
@@ -249,6 +252,7 @@ class EasyDigitalDownload extends IntegrationBase {
 					'key' => 'discount_status',
 					'label' => 'Status',
 					'type' => 'select',
+					'required' => true,
 					'options' => [
 						[
 							'label' => 'Active',
@@ -287,6 +291,7 @@ class EasyDigitalDownload extends IntegrationBase {
 					'key' => 'payment_status',
 					'label' => 'Status',
 					'type' => 'select',
+					'required' => true,
 					'options' => [
 						[
 							'label' => 'Pending',
@@ -367,6 +372,7 @@ class EasyDigitalDownload extends IntegrationBase {
 					'key' => 'download_status',
 					'label' => 'Status',
 					'type' => 'select',
+					'required' => true,
 					'options' => [
 						[
 							'label' => 'Draft',
@@ -410,6 +416,7 @@ class EasyDigitalDownload extends IntegrationBase {
 					'key' => 'download_status',
 					'label' => 'Status',
 					'type' => 'select',
+					'required' => true,
 					'options' => [
 						[
 							'label' => 'Draft',
@@ -455,11 +462,6 @@ class EasyDigitalDownload extends IntegrationBase {
 		return $schemas[ $action ] ?? [];
 	}
 
-	/**
-	 * =====================================================
-	 * DYNAMIC DATA QUERIES (API)
-	 * =====================================================
-	 */
 	public static function get_dynamic_queries(): array {
 		return [
 			'downloads' => [ self::class, 'query_downloads' ],

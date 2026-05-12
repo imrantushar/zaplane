@@ -72,7 +72,6 @@ class Profilebuilder extends IntegrationBase
                     return [];
                 }
 
-                // 🔒 sensitive field remove
                 unset($form_data['pass1'], $form_data['pass2'], $form_data['password']);
 
                 return [

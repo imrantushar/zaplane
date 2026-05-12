@@ -78,7 +78,7 @@ class Paymattic extends IntegrationBase {
 					[ 'label' => 'Refunded', 'value' => 'refunded' ],
 					[ 'label' => 'Partially Refunded', 'value' => 'partially_refunded' ],
 				],
-				'required' => false,
+				'required' => true,
 			];
 		}
 
@@ -145,7 +145,7 @@ class Paymattic extends IntegrationBase {
 					'key'     => 'limit',
 					'label'   => 'Limit',
 					'type'    => 'number',
-					'default' => 50,
+					'required' => true
 				],
 				[
 					'key'   => 'search',
@@ -176,7 +176,7 @@ class Paymattic extends IntegrationBase {
 						'query'       => 'forms',
 						'select'      => [ 'name', 'label' ],
 					],
-					'required' => false,
+					'required' => true,
 				],
 				[
 					'key'      => 'payment_status',
@@ -189,19 +189,19 @@ class Paymattic extends IntegrationBase {
 						[ 'label' => 'Failed', 'value' => 'failed' ],
 						[ 'label' => 'Refunded', 'value' => 'refunded' ],
 					],
-					'required' => false,
+					'required' => true,
 				],
 				[
 					'key'     => 'limit',
 					'label'   => 'Limit',
 					'type'    => 'number',
-					'default' => 20,
+					'required' => true
 				],
 				[
 					'key'     => 'page',
 					'label'   => 'Page',
 					'type'    => 'number',
-					'default' => 1,
+					'required' => true
 				],
 				[
 					'key'   => 'search',
