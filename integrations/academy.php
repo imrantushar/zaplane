@@ -6,7 +6,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use Zaplane\Framework\Classes\IntegrationBase;
-use Academy\Traits\Lessons;
 
 class Academy extends IntegrationBase {
 
@@ -407,22 +406,34 @@ class Academy extends IntegrationBase {
 	}
 
 	public static function query_lesson() {
+
 		$options = [
 			[
 				'label' => 'Any lesson',
-				'name' => 'any'
+				'name'  => 'any'
 			],
 		];
 
 		if ( class_exists( 'Academy' ) ) {
 
-			$lessons = Lessons::get_lessons();
+			$lessons = \Academy\Lesson\LessonApi\Lesson::get(
+				0,
+				-1,
+				0,
+				'',
+				'',
+				true
+			);
 
 			if ( ! empty( $lessons ) ) {
+
 				foreach ( $lessons as $lesson ) {
+
+					$lesson_data = (object) $lesson->get_data();
+
 					$options[] = [
-						'label' => $lesson->lesson_title,
-						'name'  => $lesson->ID,
+						'label' => $lesson_data->lesson_title,
+						'name'  => $lesson_data->ID,
 					];
 				}
 			}
