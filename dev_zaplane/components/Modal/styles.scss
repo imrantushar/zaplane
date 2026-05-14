@@ -1,6 +1,11 @@
 .zaplane-wp-modal{
        width: 600px;
        min-height: 220px;
+       .components-button{
+              background: var(--zaplane-body-background);
+       }
 
-
+.components-button:hover:not(:disabled,[aria-disabled=true]){
+       color: var(--zaplane-primary);
+}
 }

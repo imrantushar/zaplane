@@ -6,6 +6,7 @@ use WP_REST_Controller;
 use WP_Error;
 use Zaplane\Framework\Classes\Container;
 use Zaplane\Framework\Classes\Expression;
+use Zaplane\Framework\Classes\GlobalContext;
 use Zaplane\Framework\Core\Automation;
 use Zaplane\Models\Run;
 use Zaplane\Models\NodeRun;
@@ -88,6 +89,7 @@ class RunController extends WP_REST_Controller {
 			'callback' => [ $this, 'execute_single_node' ],
 			'permission_callback' => [ $this, 'permissions' ]
 		]);
+
 	}
 
 	public function permissions() {
@@ -160,13 +162,19 @@ class RunController extends WP_REST_Controller {
 
 		$nodeRuns = NodeRun::forRun( $id )->map(function ( $nodeRun ) use ( $graphNodes ) {
 			$data = $nodeRun->toArray();
-			$graphNode = $graphNodes[ $nodeRun->node_key ] ?? null;
 
-			$data['node'] = $graphNode ? [
-				'app' => $graphNode['data']['app'] ?? null,
-				'event' => $graphNode['data']['event'] ?? null,
-				'label' => $graphNode['data']['label'] ?? null,
-			] : null;
+			// Prefer the snapshot stored at execution time; fall back to current
+			// graph for node runs created before node_meta_json was introduced.
+			if ( ! empty( $nodeRun->node_meta_json ) ) {
+				$data['node'] = $nodeRun->node_meta_json;
+			} else {
+				$graphNode    = $graphNodes[ $nodeRun->node_key ] ?? null;
+				$data['node'] = $graphNode ? [
+					'app'   => $graphNode['data']['app'] ?? null,
+					'event' => $graphNode['data']['event'] ?? null,
+					'label' => $graphNode['data']['label'] ?? null,
+				] : null;
+			}
 
 			return $data;
 		})->toArray();
@@ -305,7 +313,9 @@ class RunController extends WP_REST_Controller {
 		$workflowVersionId = (int) ( $req['workflow_version_id'] ?? 0 );
 		$input             = $req['input'] ?? [];
 
-		if ( $targetNode && is_array( $input ) ) {
+		// For action nodes, merge input into config so expression fields receive values.
+		// Trigger nodes skip this — their input is the raw hook args, not config.
+		if ( $targetNode && is_array( $input ) && 'trigger' !== ( $targetNode['type'] ?? '' ) ) {
 			$targetNode['data']['config'] = array_merge( $targetNode['data']['config'] ?? [], $input );
 		}
 
@@ -334,12 +344,17 @@ class RunController extends WP_REST_Controller {
 		]);
 
 		$nodeRun = NodeRun::create([
-			'run_id' => $run->id,
-			'node_key' => (int) $targetNode['id'],
+			'run_id'             => $run->id,
+			'node_key'           => (int) $targetNode['id'],
+			'node_meta_json'     => [
+				'app'   => $targetNode['data']['app'] ?? null,
+				'event' => $targetNode['data']['event'] ?? null,
+				'label' => $targetNode['data']['label'] ?? null,
+			],
 			'parent_node_run_id' => null,
-			'status' => 'running',
-			'input_json' => $input,
-			'started_at' => current_time( 'mysql' ),
+			'status'             => 'running',
+			'input_json'         => $input,
+			'started_at'         => current_time( 'mysql' ),
 		]);
 
 		$connectionId = $targetNode['data']['connection_id'] ?? null;
@@ -358,11 +373,29 @@ class RunController extends WP_REST_Controller {
 			$out = $prevNodeRun->getOutput();
 			$testContext[ (string) $nodeKey ] = is_array( $out ) ? $out : [ 'value' => $out ];
 		}
+
+		// Only inject global context groups that this node's config actually references.
+		// Test execution: $run = null so GlobalContext falls back to wp_get_current_user() (admin).
+		$prefixes = GlobalContext::detect_prefixes( $targetNode['data']['config'] ?? [] );
+		if ( $prefixes ) {
+			$testContext = array_merge( $testContext, GlobalContext::build( $prefixes ) );
+		}
+
 		$effectiveInput = $input + $testContext;
 
 		try {
 			if ( 'trigger' === $targetNode['type'] ) {
-				$output = $input;
+				$app         = strtolower( $targetNode['data']['app'] ?? '' );
+				$integration = $this->container->get( 'integrations' )->get( $app );
+
+				if ( ! $integration ) {
+					throw new \Exception( 'Integration not found: ' . ( $targetNode['data']['app'] ?? 'unknown' ) );
+				}
+
+				// $input is the simulated hook args (positional array from the frontend).
+				// resolve_trigger() returns the structured payload or false when filtered.
+				$resolved = $integration::resolve_trigger( $targetNode['data'], array_values( $input ) );
+				$output   = ( false !== $resolved ) ? $resolved : [];
 			} else {
 				$integration = $this->container->get( 'integrations' )->get( strtolower( $targetNode['data']['app'] ) );
 

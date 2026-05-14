@@ -1,126 +1,132 @@
-import { Box, HStack, Text } from "@chakra-ui/react";
 import { __ } from "@wordpress/i18n";
 import ListTable from "@ZAPComponents/ListTable";
 import { formatDateTime, formatLabel, getDuration } from "@ZAPUtils/helper";
 import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
-
-const RecentLogs = ({ data = [] }) => {
-  const isSuccess = (status) => status === "completed";
-
-  const columns = [
-    {
-      name: (
-        <Text className="zaplane-label">
+const RecentLogs = ({
+  data = []
+}) => {
+  const isSuccess = status => status === "completed";
+  const columns = [{
+    name: <span>
           {__("App Name", "zaplane")}
-        </Text>
-      ),
-      cell: (row) => {
-        return (
-          <Box >
-            <ZAPLabel label={row?.node?.app} type={"simple"}/>
-            <Text className="zaplane-sub-title" color="var(--zaplane-text-muted)">
+        </span>,
+    cell: row => {
+      return <div>
+            <ZAPLabel label={row?.node?.app} type={"simple"} />
+            <span className="zaplane-sub-title text-var(--zaplane-text-muted)">
               {__(formatLabel(row?.node?.event), 'zaplane')}
-            </Text>
-          </Box>
-        );
-      },
-      // columnWidth: "180px",
-      textAlign: "start",
+            </span>
+          </div>;
     },
-    {
-      name: (
-        <Text className="zaplane-label" ml='-23px'>
+    // columnWidth: "180px",
+    textAlign: "start"
+  }, {
+    name: <span className="zaplane-label ml-[-23px]">
           {__("CREATED AT", "zaplane")}
-        </Text>
-      ),
-      cell: (row) => {
-        const { date, time } = formatDateTime(row.started_at);
-
-        return (
-          <Box >
-            <ZAPLabel label={date} type={"simple"}/>
-            <Text className="zaplane-sub-title" ml='-45px' color="var(--zaplane-text-muted)">
+        </span>,
+    cell: row => {
+      const {
+        date,
+        time
+      } = formatDateTime(row.started_at);
+      return <div>
+            <ZAPLabel label={date} type={"simple"} />
+            <span className="zaplane-sub-title ml-[-38px] text-var(--zaplane-text-muted)">
               {__(time, 'zaplane')}
-            </Text>
-          </Box>
-        );
-      },
-      // columnWidth: "180px",
-    },
-    {
-      name: (
-        <Text className="zaplane-label" ml='-23px'>
+            </span>
+          </div>;
+    }
+    // columnWidth: "180px",
+  }, {
+    name: <span className="zaplane-label ml-[-23px]">
           {__("Updated At", "zaplane")}
-        </Text>
-      ),
-      cell: (row) => {
-        const { date, time } = formatDateTime(row.finished_at);
-
-        return (
-          <Box textAlign="center">
-            <ZAPLabel label={date} type={"simple"}/>
-            <Text className="zaplane-sub-title" ml='-45px' color="var(--zaplane-text-muted)">
+        </span>,
+    cell: row => {
+      const {
+        date,
+        time
+      } = formatDateTime(row.finished_at);
+      return <div className="text-center">
+            <ZAPLabel label={date} type={"simple"} />
+            <span className="zaplane-sub-title ml-[-38px] text-var(--zaplane-text-muted)">
               {__(time, 'zaplane')}
-            </Text>
-          </Box>
-        );
-      },
-      columnWidth: "160px",
-      textAlign: "center",
+            </span>
+          </div>;
     },
-    {
-      name: (
-        <Text className="zaplane-label">
+    columnWidth: "160px",
+    textAlign: "center"
+  }, {
+    name: <span>
           {__("DURATION / SIZE", "zaplane")}
-        </Text>
-      ),
-      cell: (row) => (
-        <ZAPLabel label={getDuration(row.started_at, row.finished_at)} type={"simple"}/>
-      ),
-      // columnWidth: "180px",
-    },
-    {
-      name: (
-        <Text className="zaplane-label">
+        </span>,
+    cell: row => <ZAPLabel label={getDuration(row.started_at, row.finished_at)} type={"simple"} />
+    // columnWidth: "180px",
+  }, {
+    name: <span>
           {__("STATUS", "zaplane")}
-        </Text>
-      ),
-      cell: (row) => (
-        <HStack spacing={2} justifyContent={"center"}>
-          <Box
-            w="8px"
-            h="8px"
-            borderRadius="full"
-            bg={isSuccess(row.status) ? "green.500" : "red.500"}
-          />
-          <ZAPLabel label={isSuccess(row.status)
-                ? __("Success", "zaplane")
-                : __("Failed", "zaplane")} type={"simple"}/>
-        </HStack>
-      ),
-      // columnWidth: "160px",
-    },
-  ]
+        </span>,
+    cell: row => <div className="flex flex-row items-center gap-2 justify-center">
+          <div bg={isSuccess(row.status) ? "green.500" : "red.500"} className="w-[8px] h-[8px] rounded-full" />
+          <ZAPLabel label={isSuccess(row.status) ? __("Success", "zaplane") : __("Failed", "zaplane")} type={"simple"} />
+        </div>
+    // columnWidth: "160px",
+  }];
+  const EmptyState = () => (
+    <div className="flex flex-col items-center justify-center p-12 text-center">
+      <div className="mb-6 opacity-40">
+        {/* Simple SVG illustration matching the mockup pattern */}
+        <svg width="240" height="120" viewBox="0 0 240 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="20" cy="20" r="4" fill="#68D391" />
+          <circle cx="35" cy="20" r="4" fill="#F6AD55" />
+          <circle cx="50" cy="20" r="4" fill="#FC8181" />
+          <rect x="20" y="40" width="40" height="4" rx="2" fill="#EDF2F7" />
+          <rect x="80" y="40" width="40" height="4" rx="2" fill="#EDF2F7" />
+          <rect x="140" y="40" width="40" height="4" rx="2" fill="#EDF2F7" />
+          <rect x="200" y="40" width="20" height="4" rx="2" fill="#EDF2F7" />
+          <circle cx="30" cy="65" r="8" fill="#E2E8F0" />
+          <rect x="50" y="65" width="30" height="4" rx="2" fill="#EDF2F7" />
+          <rect x="100" y="65" width="30" height="4" rx="2" fill="#EDF2F7" />
+          <rect x="150" y="65" width="30" height="4" rx="2" fill="#EDF2F7" />
+          <rect x="200" y="65" width="20" height="4" rx="2" fill="#EDF2F7" />
+          <circle cx="30" cy="95" r="8" fill="#E2E8F0" />
+          <rect x="50" y="95" width="30" height="4" rx="2" fill="#EDF2F7" />
+          <rect x="100" y="95" width="30" height="4" rx="2" fill="#EDF2F7" />
+          <rect x="150" y="95" width="30" height="4" rx="2" fill="#EDF2F7" />
+          <rect x="200" y="95" width="20" height="4" rx="2" fill="#EDF2F7" />
+        </svg>
+      </div>
+      <h3 className="text-[#2D3748] text-[20px] font-[600] mb-2">{__("No Data Available!!!", "zaplane")}</h3>
+      <p className="text-[#718096] text-[14px]">{__("Please, create data to see the available list here.", "zaplane")}</p>
+    </div>
+  );
+
+  const tableData = Array.isArray(data.runs) ? data.runs.slice(0, 5) : [];
 
   return (
-    <Box width="100%" background='#fff' borderRadius='4px' boxShadow='md'>
-      <Text className="zaplane-heading" p='24px 24px 0 24px'>
-        {__("Recent Logs", "zaplane")}
-      </Text>
+    <div className="bg-white rounded-[8px] border border-[#E2E8F0] w-full min-h-[400px] flex flex-col">
+      <div className="p-6">
+        <span className="text-[#4A5568] text-[16px] font-[500]">
+          {__("Recently Created Flow", "zaplane")}
+        </span>
+      </div>
 
-      <ListTable
-        columns={columns}
-        data={Array.isArray(data.runs) ? data.runs.slice(0, 5) : []}
-        isRowSelectable={false}
-        showSubHeader={false}
-        showColumnFilter={false}
-        
-        noDataText={__("No logs found", "zaplane")}
-        totalItems={data?.runs?.length || 0}
-        dataFetchingStatus={false}
-        suffix="recent-logs-table"
-      />
-    </Box>
+      <div className="flex-1">
+        {tableData.length > 0 ? (
+          <ListTable 
+            columns={columns} 
+            data={tableData} 
+            isRowSelectable={false} 
+            showSubHeader={false} 
+            showColumnFilter={false} 
+            totalItems={data?.runs?.length || 0} 
+            dataFetchingStatus={false} 
+            suffix="recent-logs-table" 
+          />
+        ) : (
+          <EmptyState />
+        )}
+      </div>
+    </div>
   );
 };
 

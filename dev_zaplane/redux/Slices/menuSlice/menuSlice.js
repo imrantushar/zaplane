@@ -24,7 +24,7 @@ export const fetchAdminMenuItems = createAsyncThunk(
 const menuSlice = createSlice( {
 	name: 'menus',
 	initialState: {
-		data: JSON.parse( menu ),
+		data: menu ? JSON.parse( menu ) : [],
 		loading: false,
 	},
 	extraReducers: ( builder ) => {

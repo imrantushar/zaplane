@@ -200,6 +200,7 @@ class ConnectionsController extends WP_REST_Controller {
 	public function create_item( $request ) {
 		$user_id = get_current_user_id();
 		$app = $request->get_param( 'app' );
+		$icon = $request->get_param( 'icon' );
 		$name = $request->get_param( 'name' );
 		$auth_type = $request->get_param( 'auth_type' );
 		$credentials = $request->get_param( 'credentials' );
@@ -215,7 +216,7 @@ class ConnectionsController extends WP_REST_Controller {
 		$manager = $this->get_connection_manager();
 
 		try {
-			$result = $manager->create( $user_id, $app, $name, $auth_type, $credentials );
+			$result = $manager->create( $user_id, $app, $name, $auth_type, $credentials, $icon );
 		} catch ( \Zaplane\Framework\Exceptions\ConnectionException $e ) {
 			return new WP_Error(
 				'connection_test_failed',
@@ -237,6 +238,7 @@ class ConnectionsController extends WP_REST_Controller {
 			[
 				'id'          => $connection_id,
 				'app'         => $connection['app'],
+				'icon'        => $connection['icon'] ?? null,
 				'name'        => $connection['name'],
 				'status'      => $connection['status'],
 				'test_result' => $result['test_result'],
@@ -270,6 +272,11 @@ class ConnectionsController extends WP_REST_Controller {
 		$name = $request->get_param( 'name' );
 		if ( null !== $name ) {
 			$update_data['name'] = $name;
+		}
+
+		$icon = $request->get_param( 'icon' );
+		if ( null !== $icon ) {
+			$update_data['icon'] = $icon;
 		}
 
 		$status = $request->get_param( 'status' );
@@ -455,6 +462,10 @@ class ConnectionsController extends WP_REST_Controller {
 				'type'              => 'string',
 				'sanitize_callback' => 'sanitize_text_field',
 			],
+			'icon'        => [
+				'type'              => 'string',
+				'sanitize_callback' => 'sanitize_text_field',
+			],
 			'name'        => [
 				'required'          => true,
 				'type'              => 'string',
@@ -476,6 +487,10 @@ class ConnectionsController extends WP_REST_Controller {
 	private function get_update_args(): array {
 		return [
 			'name'        => [
+				'type'              => 'string',
+				'sanitize_callback' => 'sanitize_text_field',
+			],
+			'icon'        => [
 				'type'              => 'string',
 				'sanitize_callback' => 'sanitize_text_field',
 			],

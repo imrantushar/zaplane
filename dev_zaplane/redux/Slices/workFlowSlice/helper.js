@@ -17,6 +17,7 @@ export async function fetchDynamic({
     where = {},
     search = "",
     limit = 20,
+    ...params
 }) {
     const { data } = await API.post(namespace + "dynamic", {
         integration,
@@ -25,6 +26,7 @@ export async function fetchDynamic({
         where,
         search,
         limit,
+        ...params,
     });
 
     return data;

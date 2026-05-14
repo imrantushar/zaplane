@@ -6,7 +6,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use Zaplane\Framework\Classes\IntegrationBase;
-use Academy\Traits\Lessons;
 
 class Academy extends IntegrationBase {
 
@@ -124,11 +123,59 @@ class Academy extends IntegrationBase {
 	}
 
 
+	public static function get_trigger_sample_output( string $trigger ): array {
+		$samples = [
+			'user_enroll_course'           => [
+				'success'    => true,
+				'course_id'  => 1,
+				'enroll_id'  => 1,
+				'user_id'    => 1,
+				'user_email' => 'student@example.com',
+				'first_name' => 'Jane',
+				'last_name'  => 'Smith',
+				'username'   => 'janesmith',
+			],
+			'course_complete'              => [
+				'success'      => true,
+				'course_id'    => 1,
+				'course_title' => 'Sample Course',
+				'course_url'   => 'https://example.com/course/sample-course',
+				'user_id'      => 1,
+				'user_email'   => 'student@example.com',
+				'first_name'   => 'Jane',
+				'last_name'    => 'Smith',
+			],
+			'lesson_complete'              => [
+				'success'   => true,
+				'lesson_id' => 1,
+				'user_id'   => 1,
+			],
+			'academy_quiz_course_attempt'  => [
+				'success' => true,
+				'quiz_id' => 1,
+				'user_id' => 1,
+				'score'   => 8,
+				'total'   => 10,
+			],
+			'quiz_target'                  => [
+				'success'     => true,
+				'quiz_id'     => 1,
+				'user_id'     => 1,
+				'score'       => 8,
+				'total_marks' => 10,
+				'percentage'  => 80.00,
+			],
+		];
+
+		return $samples[ $trigger ] ?? [];
+	}
+
 	public static function resolve_trigger( array $node, array $args ) {
 		switch ( $node['event'] ) {
 			case 'user_enroll_course':
 				$course_id = $args[0] ?? null;
 				$enroll_id = $args[1] ?? null;
+				$user_id   = $args[2] ?? null;
 
 				if ( ! $course_id || ! $enroll_id ) {
 					return false;
@@ -140,10 +187,17 @@ class Academy extends IntegrationBase {
 					return false;
 				}
 
+				$user = $user_id ? get_userdata( (int) $user_id ) : null;
+
 				return [
-					'success'   => true,
-					'course_id' => $course_id,
-					'enroll_id' => $enroll_id,
+					'success'    => true,
+					'course_id'  => (int) $course_id,
+					'enroll_id'  => (int) $enroll_id,
+					'user_id'    => $user ? (int) $user->ID : null,
+					'user_email' => $user ? $user->user_email : null,
+					'first_name' => $user ? $user->first_name : null,
+					'last_name'  => $user ? $user->last_name : null,
+					'username'   => $user ? $user->user_login : null,
 				];
 
 			case 'course_complete':
@@ -352,22 +406,34 @@ class Academy extends IntegrationBase {
 	}
 
 	public static function query_lesson() {
+
 		$options = [
 			[
 				'label' => 'Any lesson',
-				'name' => 'any'
+				'name'  => 'any'
 			],
 		];
 
 		if ( class_exists( 'Academy' ) ) {
 
-			$lessons = Lessons::get_lessons();
+			$lessons = \Academy\Lesson\LessonApi\Lesson::get(
+				0,
+				-1,
+				0,
+				'',
+				'',
+				true
+			);
 
 			if ( ! empty( $lessons ) ) {
+
 				foreach ( $lessons as $lesson ) {
+
+					$lesson_data = (object) $lesson->get_data();
+
 					$options[] = [
-						'label' => $lesson->lesson_title,
-						'name'  => $lesson->ID,
+						'label' => $lesson_data->lesson_title,
+						'name'  => $lesson_data->ID,
 					];
 				}
 			}

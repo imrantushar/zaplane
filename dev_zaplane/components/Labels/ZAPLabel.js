@@ -1,137 +1,75 @@
 import React, { useState } from 'react';
 import { __ } from '@wordpress/i18n';
-import { Text, Button } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
-
-import { clearBtn } from '../../../assets/scss/chakra/recipe';
 import { sliceString } from '@ZAPUtils/helper';
-
 const ZAPLabel = ({
-	type = "title",
-	label = "",
-	fontSize = "",
-	fontWeight = "",
-	textTransform = "",
-	margin = "0",
-	padding = "",
-	color = "",
-	bg = "",
-	borderRadius = "",
-	href = null,
-	textAlign = "",
-	borderBottomWidth = "",
-	borderColor = "",
-	icon,
-	whiteSpace = "",
-	lineClamp = "",
-	truncate,
-	lineHeight,
-	enableSlice = false,
-	sliceLength = 100,
-	sliceMore = '...',
-	textOverflow='',
+  type = "title",
+  label = "",
+  fontSize = "",
+  fontWeight = "",
+  textTransform = "",
+  margin = "0",
+  padding = "",
+  color = "",
+  bg = "",
+  borderRadius = "",
+  href = null,
+  textAlign = "",
+  borderBottomWidth = "",
+  borderColor = "",
+  icon,
+  whiteSpace = "",
+  lineClamp = "",
+  truncate,
+  lineHeight,
+  enableSlice = false,
+  sliceLength = 100,
+  sliceMore = '...',
+  textOverflow = '',
+  onClick
 }) => {
-	const [isExpanded, setIsExpanded] = useState(false);
-
-	const variantStyles = {
-		heading: {
-			fontSize: "20px",
-			fontWeight: "200",
-			color: "var(--zaplane-font-color)",
-		},
-		title: {
-			fontSize: "sm",
-			fontWeight: "medium",
-			color: "var(--zaplane-font-color)",
-		},
-		subtitle: {
-			fontSize: "sm",
-			fontWeight: "normal",
-			color: "gray.600",
-		},
-		miniTitle: {
-			fontSize: "xs",
-			fontWeight: "normal",
-			color: "gray.600",
-		},
-		basic: {
-			fontSize: "14px",
-			fontWeight: "500",
-			color: "var(--zaplane-font-color)",
-		},
-		simple: {
-			fontSize: "14px",
-			fontWeight: "400",
-			color: "var(--zaplane-font-color)",
-			lineHeight:'20px'
-		},
-		simpleLight: {
-			fontSize: "12px",
-			fontWeight: "400",
-			color: "var(--zaplane-gray-color)",
-		},
-		bold: {
-			fontSize: "20px",
-			lineHeight:'30px',
-			fontWeight: "500",
-			color: "var(--zaplane-font-color)",
-		},
-		boldLight: {
-			fontSize: "16px",
-			fontWeight: "500",
-			color: "var(--zaplane-gray-color)",
-		},
-		inputLabel: {
-			fontSize: "14px",                 
-			fontWeight: "500",              
-			color: "var(--zaplane-font-color)", 
-		    lineHeight:'20px',
-			margin:'0'
-			
-		}
-		
-	};
-
-	const styles = variantStyles[type] || variantStyles?.title;
-
-	const textProps = {
-		fontSize: fontSize || styles?.fontSize,
-		fontWeight: fontWeight || styles?.fontWeight,
-		textTransform: textTransform,
-		color: color || styles?.color,
-		bg: bg,
-		borderRadius: borderRadius,
-		margin: margin,
-		padding: padding,
-		fontFamily: "var(--zaplane-font)",
-		textAlign: textAlign,
-		borderBottomWidth: borderBottomWidth,
-		borderColor: borderColor,
-		whiteSpace: whiteSpace,
-		truncate: truncate,
-		lineClamp: lineClamp,
-		lineHeight: lineHeight,
-		textOverflow:textOverflow
-	};
-
-
-	
-
-	return (
-		<>
-			{ href ? (
-				<Button { ...clearBtn }>
-					<Link to={ href } color="var(--zaplane-font-color)">
-						<Text { ...textProps } _hover={ { color: '#4F46E5' } }>
-							{ `${ label }` }
-						</Text>
-					</Link>
-				</Button>
-			) : (
-				<Text { ...textProps }>{ `${ label }` }</Text>
-			) }
-		</>
-	);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const variantStyles = {
+    heading: { fontSize: "20px", fontWeight: "200", color: "var(--zaplane-font-color)" },
+    title: { fontSize: "14px", fontWeight: "500", color: "var(--zaplane-font-color)" },
+    subtitle: { fontSize: "14px", fontWeight: "400", color: "#4B5563" },
+    miniTitle: { fontSize: "12px", fontWeight: "400", color: "#4B5563" },
+    basic: { fontSize: "14px", fontWeight: "500", color: "var(--zaplane-font-color)" },
+    simple: { fontSize: "14px", fontWeight: "400", color: "var(--zaplane-font-color)", lineHeight: '20px' },
+    simpleLight: { fontSize: "12px", fontWeight: "400", color: "var(--zaplane-gray-color)" },
+    bold: { fontSize: "20px", lineHeight: '30px', fontWeight: "500", color: "var(--zaplane-font-color)" },
+    boldLight: { fontSize: "16px", fontWeight: "500", color: "var(--zaplane-gray-color)" },
+    inputLabel: { fontSize: "14px", fontWeight: "500", color: "var(--zaplane-font-color)", lineHeight: '20px', margin: '0' }
+  };
+  const styles = variantStyles[type] || variantStyles.title;
+  const textStyle = {
+    fontSize: fontSize || styles.fontSize,
+    fontWeight: fontWeight || styles.fontWeight,
+    textTransform: textTransform || undefined,
+    color: color || styles.color,
+    background: bg || undefined,
+    borderRadius: borderRadius || undefined,
+    margin: margin,
+    padding: padding || undefined,
+    fontFamily: "var(--zaplane-font)",
+    textAlign: textAlign || undefined,
+    borderBottom: borderBottomWidth ? `${borderBottomWidth} solid ${borderColor || 'currentColor'}` : undefined,
+    whiteSpace: whiteSpace || undefined,
+    lineHeight: lineHeight || undefined,
+    textOverflow: textOverflow || undefined,
+    overflow: (truncate || textOverflow) ? 'hidden' : undefined,
+    cursor: onClick ? 'pointer' : undefined,
+  };
+  return <>
+    {href ? (
+      <button style={{background:'transparent', padding:0, border:'none', cursor:'pointer'}} onClick={onClick}>
+        <Link to={href} style={{color: "var(--zaplane-font-color)"}}>
+          <span style={textStyle}>{`${label}`}</span>
+        </Link>
+      </button>
+    ) : (
+      <span style={textStyle} onClick={onClick}>{`${label}`}</span>
+    )}
+  </>;
 };
-
 export default ZAPLabel;

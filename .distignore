@@ -4,6 +4,7 @@
 .gitignore
 .DS_Store
 .claude
+.codex
 
 # Dev tooling
 .eslintrc.js
@@ -22,7 +23,7 @@ package-lock.json
 jsconfig.json
 phpunit.xml
 node_modules
-vendor
+CLAUDE.md
 
 # Dev-only code
 tests

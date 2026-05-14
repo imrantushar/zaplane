@@ -5,6 +5,7 @@ namespace Zaplane\Framework\Core;
 use Zaplane\Framework\Classes\Container;
 use Zaplane\Framework\Classes\ConnectionManager;
 use Zaplane\Framework\Classes\Expression;
+use Zaplane\Framework\Classes\GlobalContext;
 use Zaplane\Framework\Classes\Query;
 use Zaplane\Framework\Exceptions\WorkflowException;
 use Zaplane\Framework\Exceptions\IntegrationException;
@@ -161,41 +162,49 @@ class Automation {
 
 		$run = Run::create([
 			'workflow_version_id' => $trigger['workflow_version_id'],
-			'workflow_id' => $trigger['workflow_id'],
-			'trigger_data' => $payload,
-			'status' => 'running',
-			'start_node_key' => $nodeKey,
-			'target_node_key' => null,
-			'started_at' => current_time( 'mysql' ),
+			'workflow_id'         => $trigger['workflow_id'],
+			// Capture the current WordPress user synchronously at hook-fire time.
+			// Action Scheduler runs nodes async (no logged-in user), so we store the
+			// user ID here and re-hydrate it in GlobalContext::build_wp() at execution time.
+			'trigger_data'        => array_merge( $payload, [ '__wp_user_id' => get_current_user_id() ] ),
+			'status'              => 'running',
+			'start_node_key'      => $nodeKey,
+			'target_node_key'     => null,
+			'started_at'          => current_time( 'mysql' ),
 		]);
 
-		$this->spawn_node_run( $run->id, $nodeKey, $payload, null );
+		// NodeRun gets the clean payload — __wp_user_id must not appear in node outputs.
+		$this->spawn_node_run( $run->id, $nodeKey, $payload, null, $this->extract_node_meta( $trigger['graph_node'] ) );
 	}
 
-	public function spawn_node_run( int $run_id, int $node_key, array $input, ?int $parent ) {
+	public function spawn_node_run( int $run_id, int $node_key, array $input, ?int $parent, ?array $node_meta = null ) {
 		$nodeRun = NodeRun::create([
-			'run_id' => $run_id,
-			'node_key' => $node_key,
+			'run_id'             => $run_id,
+			'node_key'           => $node_key,
+			'node_meta_json'     => $node_meta,
 			'parent_node_run_id' => $parent,
-			'status' => 'pending',
-			'input_json' => $input,
-			'started_at' => current_time( 'mysql' ),
+			'status'             => 'pending',
+			'input_json'         => $input,
+			'started_at'         => current_time( 'mysql' ),
 		]);
 
 		self::enqueue_node_run( $nodeRun->id );
 	}
 
-	public static function enqueue_node_run( int $node_run_id ): void {
-		if ( function_exists( 'as_enqueue_async_action' ) ) {
-			as_enqueue_async_action(
-				'zaplane_execute_node_run',
-				[ 'node_run_id' => $node_run_id ],
-				'zaplane'
-			);
-			return;
-		}
+	private function extract_node_meta( array $node ): array {
+		return [
+			'app'   => $node['data']['app'] ?? null,
+			'event' => $node['data']['event'] ?? null,
+			'label' => $node['data']['label'] ?? null,
+		];
+	}
 
-		do_action( 'zaplane_execute_node_run', $node_run_id );
+	public static function enqueue_node_run( int $node_run_id ): void {
+		as_enqueue_async_action(
+			'zaplane_execute_node_run',
+			[ 'node_run_id' => $node_run_id ],
+			'zaplane'
+		);
 	}
 
 	public function resume_delayed_run( int $run_id, int $node_run_id, int $node_key, array $output ) {
@@ -243,7 +252,7 @@ class Automation {
 
 		$app = strtolower( $node['data']['app'] ?? '' );
 
-		$context = $this->buildNodeContext( $run->id );
+		$context = $this->buildNodeContext( $run->id, $run, $node );
 		$resolveData = $input + $context;
 
 		$node['_run_id'] = $run->id;
@@ -294,7 +303,8 @@ class Automation {
 						$run->id,
 						$nodeRun->node_key,
 						$iteratorInput,
-						$nodeRun->parent_node_run_id
+						$nodeRun->parent_node_run_id,
+						$nodeRun->node_meta_json
 					);
 				}
 
@@ -340,6 +350,11 @@ class Automation {
 		$port = $output['port'] ?? null;
 		$childInput = $port ? ( $output['data'] ?? $output ) : $output;
 
+		$graphNodeMap = [];
+		foreach ( $graph['nodes'] ?? [] as $n ) {
+			$graphNodeMap[ (int) $n['id'] ] = $n;
+		}
+
 		foreach ( $graph['edges'] as $edge ) {
 			if ( (int) $edge['source'] !== $nodeRun->node_key ) {
 				continue;
@@ -352,11 +367,15 @@ class Automation {
 				}
 			}
 
+			$targetKey  = (int) $edge['target'];
+			$targetNode = $graphNodeMap[ $targetKey ] ?? null;
+
 			$this->spawn_node_run(
 				$nodeRun->run_id,
-				(int) $edge['target'],
+				$targetKey,
 				$childInput,
-				$nodeRun->id
+				$nodeRun->id,
+				$targetNode ? $this->extract_node_meta( $targetNode ) : null
 			);
 		}
 	}
@@ -393,7 +412,7 @@ class Automation {
 
 
 
-	private function buildNodeContext( int $run_id ): array {
+	private function buildNodeContext( int $run_id, ?Run $run = null, array $node = [] ): array {
 		$nodeRuns = NodeRun::where( 'run_id', $run_id )
 			->where( 'status', 'completed' )
 			->orderBy( 'id', 'asc' )
@@ -405,6 +424,13 @@ class Automation {
 			$output = $nr->getOutput();
 
 			$context[ (string) $nr->node_key ] = is_array( $output ) ? $output : [ 'value' => $output ];
+		}
+
+		// Only inject global context groups that this node's config actually references.
+		// e.g. if config has {{wp.user_email}} we build the 'wp' group; if not, we skip it.
+		$prefixes = GlobalContext::detect_prefixes( $node['data']['config'] ?? [] );
+		if ( $prefixes ) {
+			$context = array_merge( $context, GlobalContext::build( $prefixes, $run ) );
 		}
 
 		return $context;

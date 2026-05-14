@@ -1,60 +1,83 @@
-import { getBezierPath } from "@xyflow/react";
-import { Box, Center } from "@chakra-ui/react";
 import { FaPlus } from "react-icons/fa";
+const FloatingEdge = ({
+  openDrawerFromAdd,
+  canvasLayout
+}) => {
+  const isLR = canvasLayout === "LR";
 
-const FloatingEdge = ({  openDrawerFromAdd, canvasLayout }) => {
- 
-  const isLR = canvasLayout === "LR"
-  const [edgePath] = getBezierPath({
-    sourcePosition: isLR ? "right" : "bottom",
-    targetPosition: isLR ? "left" : "top",
-  });
+  // Configuration for positioning
+  const lineLength = 40; // length of the dashed line
+  const buttonSize = 32;
 
+  const containerStyle = {
+    position: "absolute",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    pointerEvents: "none",
+    zIndex: 10,
+    // Position relative to the node's handles
+    ...(isLR ? {
+      top: "50%",
+      right: `-${lineLength + buttonSize}px`,
+      transform: "translateY(-50%)",
+      flexDirection: "row",
+      width: `${lineLength + buttonSize}px`,
+      height: `${buttonSize}px`,
+    } : {
+      bottom: `-${lineLength + buttonSize}px`,
+      left: "50%",
+      transform: "translateX(-50%)",
+      flexDirection: "column",
+      width: `${buttonSize}px`,
+      height: `${lineLength + buttonSize}px`,
+    })
+  };
+
+  const lineStyle = {
+    ...(isLR ? {
+      width: `${lineLength}px`,
+      height: "0px",
+      borderTop: "2px dashed #D1D5DB",
+    } : {
+      width: "0px",
+      height: `${lineLength}px`,
+      borderLeft: "2px dashed #D1D5DB",
+    })
+  };
+
+  const buttonStyle = {
+    width: `${buttonSize}px`,
+    height: `${buttonSize}px`,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#ffffff",
+    border: "1.5px dashed #D1D5DB",
+    borderRadius: "50%",
+    cursor: "pointer",
+    transition: "all 0.2s ease",
+    color: "#6B7280",
+    boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
+    pointerEvents: "auto",
+  };
 
   return (
-    <>
-      {/* Dashed Edge */}
-      <path
-        d={edgePath}
-        fill="none"
-        stroke="#bdbdbd"
-        strokeWidth={2}
-        strokeDasharray="6 6"
-      />
-
-      <foreignObject
-        width={32}
-        height={32}
-       
+    <div style={containerStyle} className="zaplane-floating-edge-container">
+      <div style={lineStyle} className="zaplane-floating-edge-line" />
+      <div 
+        onClick={(e) => {
+          e.stopPropagation();
+          openDrawerFromAdd();
+        }}
+        style={buttonStyle}
+        className="zaplane-add-node-button hover:border-indigo-400 hover:text-indigo-500 hover:scale-110"
       >
-        <Center
-          as="button"
-          onClick={openDrawerFromAdd}
-          w="32px"
-          h="32px"
-          borderRadius="full"
-          border="2px dashed var(--zaplane-border-color)"
-          cursor="pointer"
-          position="absolute"
-          top={isLR ? "13px" : "110px"}
-          right={isLR ? "-80px" : "73px"}
-          _hover={{
-            borderColor: "var(--zaplane-primary-color)",
-            bg: "var(--zaplane-background)",
-          }}
-        >
-          <Box as={FaPlus} fontSize="12px" color="var(--zaplane-primary-color)" />
-          <Box as="span"
-            top={isLR ? "11px" : "-49px"}
-            left={isLR ? "-45px" : "11px"}
-            border="2px dashed var(--zaplane-border-color)"
-            width={isLR ? "42px" : "1px"}
-            height={isLR ? "0" : "49px"}
-            position="absolute" />
-        </Center>
-      </foreignObject>
-    </>
+        <FaPlus size={12} />
+      </div>
+    </div>
   );
 };
+
 
 export default FloatingEdge;

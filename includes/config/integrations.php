@@ -27,7 +27,18 @@ return [
 			'file' => 'variable.php',
 			'class' => \Zaplane\Integrations\Variable::class
 		],
-
+		'cartflows'            => [
+			'file' => 'cartflows.php',
+			'class' => \Zaplane\Integrations\Cartflows::class
+		],
+		'dokan'                => [
+			'file' => 'dokan.php',
+			'class' => \Zaplane\Integrations\Dokan::class
+		],
+		'funnelkit'            => [
+			'file' => 'funnelkit.php',
+			'class' => \Zaplane\Integrations\Funnelkit::class
+		],
 		'wordpress'            => [
 			'file' => 'wordpress.php',
 			'class' => \Zaplane\Integrations\Wordpress::class
@@ -35,6 +46,18 @@ return [
 		'woocommerce'          => [
 			'file' => 'woocommerce.php',
 			'class' => \Zaplane\Integrations\Woocommerce::class
+		],
+		'woomemberships'       => [
+			'file' => 'woo-memberships.php',
+			'class' => \Zaplane\Integrations\WooMemberships::class
+		],
+		'woosubscriptions'     => [
+			'file' => 'woo-subscriptions.php',
+			'class' => \Zaplane\Integrations\WooSubscriptions::class
+		],
+		'woobookings'          => [
+			'file' => 'woo-bookings.php',
+			'class' => \Zaplane\Integrations\WooBookings::class
 		],
 		'slack'                => [
 			'file' => 'Slack.php',
@@ -51,6 +74,10 @@ return [
 		'mailchimp'            => [
 			'file' => 'mailchimp.php',
 			'class' => \Zaplane\Integrations\Mailchimp::class
+		],
+		'activecampaign'         => [
+			'file' => 'active-campaign.php',
+			'class' => \Zaplane\Integrations\ActiveCampaign::class
 		],
 		'hubspot'              => [
 			'file' => 'hubspot.php',
@@ -91,6 +118,10 @@ return [
 		'fluentsmtp'           => [
 			'file' => 'fluent-smtp.php',
 			'class' => \Zaplane\Integrations\FluentSmtp::class
+		],
+		'fluentcart'           => [
+			'file' => 'fluent-cart.php',
+			'class' => \Zaplane\Integrations\FluentCart::class
 		],
 		'gravityforms'         => [
 			'file' => 'gravityforms.php',
@@ -164,6 +195,14 @@ return [
 			'file' => 'academy.php',
 			'class' => \Zaplane\Integrations\Academy::class
 		],
+		'gemcrm'             => [
+			'file' => 'gemcrm.php',
+			'class' => \Zaplane\Integrations\Gemcrm::class
+		],
+		'lifter'            => [
+			'file' => 'lifter.php',
+			'class' => \Zaplane\Integrations\Lifter::class
+		],
 		'jetengine'            => [
 			'file' => 'jetengine.php',
 			'class' => \Zaplane\Integrations\Jetengine::class
@@ -171,6 +210,10 @@ return [
 		'wpuserfrontend'            => [
 			'file' => 'wpuserfrontend.php',
 			'class' => \Zaplane\Integrations\Wpuserfrontend::class
+		],
+		'wpfunnels'            => [
+			'file' => 'wpfunnels.php',
+			'class' => \Zaplane\Integrations\Wpfunnels::class
 		],
 		'metabox'            => [
 			'file' => 'metabox.php',
@@ -187,10 +230,90 @@ return [
 		'kadenceblocks'      => [
 			'file' => 'kadenceblocks.php',
 			'class' => \Zaplane\Integrations\Kadenceblocks::class
+			],
+		'eventscalendar'      => [
+			'file' => 'eventscalendar.php', 
+			'class' => \Zaplane\Integrations\Eventscalendar::class
+			],
+		'buddyboss'      => [
+			'file' => 'buddyboss.php', 
+			'class' => \Zaplane\Integrations\Buddyboss::class
 		],
-		'avadaform'      => [
-			'file' => 'avadaform.php',
-			'class' => \Zaplane\Integrations\Avadaform::class
+		'ultimatemember'      => [
+			'file' => 'ultimatemember.php', 
+			'class' => \Zaplane\Integrations\Ultimatemember::class
+		],
+		'bitform'      => [
+			'file' => 'bitform.php',
+			'class' => \Zaplane\Integrations\Bitform::class
+		],
+		'sureform'      => [
+			'file' => 'sureform.php',
+			'class' => \Zaplane\Integrations\Sureform::class
+		],
+		'suremail'      => [
+			'file' => 'suremail.php',
+			'class' => \Zaplane\Integrations\Suremail::class
+		],
+		'paymattic'      => [
+			'file' => 'paymattic.php',
+			'class' => \Zaplane\Integrations\Paymattic::class
+		],
+		'bookingcalendar'      => [
+			'file' => 'bookingcalendar.php', 
+			'class' => \Zaplane\Integrations\Bookingcalendar::class
+		],
+		'weforms'      => [
+			'file' => 'weforms.php', 
+			'class' => \Zaplane\Integrations\Weforms::class
+		],
+		'suremembers'      => [
+			'file' => 'suremembers.php', 
+			'class' => \Zaplane\Integrations\Suremembers::class
+		],
+		'arform'      => [
+			'file' => 'arform.php',
+			'class' => \Zaplane\Integrations\ARForm::class
+		],
+		'paidmembershippro'      => [
+			'file' => 'paidmembershippro.php',
+			'class' => \Zaplane\Integrations\Paidmembershippro::class
+		],
+		'whatsapp'  => [
+			'file'  => 'whatsapp.php',
+			'class' => \Zaplane\Integrations\Whatsapp::class
+		],
+		'telegram'  => [
+			'file'  => 'telegram.php',
+			'class' => \Zaplane\Integrations\Telegram::class
+		],
+		'gmail'       => [
+			'file'  => 'gmail.php',
+			'class' => \Zaplane\Integrations\Gmail::class
+		],
+		'google-meet' => [
+			'file'  => 'google-meet.php',
+			'class' => \Zaplane\Integrations\GoogleMeet::class
+		],
+		'zoom'        => [
+			'file'  => 'zoom.php',
+			'class' => \Zaplane\Integrations\Zoom::class
+		],
+		'gamipress'        => [
+			'file'  => 'gamipress.php',
+			'class' => \Zaplane\Integrations\Gamipress::class
+		],
+		'fillout'        => [
+			'file'  => 'fillout.php',
+			'class' => \Zaplane\Integrations\Fillout::class
+		],
+		'typeform'        => [
+			'file'  => 'typeform.php',
+			'class' => \Zaplane\Integrations\Typeform::class
+		],
+		'discord'        => [
+			'file'  => 'discord.php',
+			'class' => \Zaplane\Integrations\Discord::class
 		],
 	],
 ];
