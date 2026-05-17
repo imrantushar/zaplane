@@ -57,9 +57,9 @@ class Gemcrm extends IntegrationBase {
 				return [
 					[
 						'key'         => 'tag_id',
-						'label'       => 'Tag (optional)',
+						'label'       => 'Tag',
 						'type'        => 'select',
-						'required'    => false,
+						'required'    => true,
 						'placeholder' => 'Leave empty to trigger for any tag',
 						'dynamic'     => [
 							'integration' => 'gemcrm',
@@ -74,9 +74,9 @@ class Gemcrm extends IntegrationBase {
 				return [
 					[
 						'key'         => 'list_id',
-						'label'       => 'List (optional)',
+						'label'       => 'List',
 						'type'        => 'select',
-						'required'    => false,
+						'required'    => true,
 						'placeholder' => 'Leave empty to trigger for any list',
 						'dynamic'     => [
 							'integration' => 'gemcrm',
@@ -168,8 +168,10 @@ class Gemcrm extends IntegrationBase {
 					return false;
 				}
 
-				// If the user configured a specific tag filter, enforce it.
-				$filter_tag_id = isset( $node['data']['config']['tag_id'] ) ? (int) $node['data']['config']['tag_id'] : null;
+				$filter_tag_id = ! empty( $node['config']['tag_id'] )
+					? (int) $node['config']['tag_id']
+					: null;
+
 				if ( $filter_tag_id && ! in_array( $filter_tag_id, array_map( 'intval', (array) $tag_ids ), true ) ) {
 					return false;
 				}
@@ -188,8 +190,10 @@ class Gemcrm extends IntegrationBase {
 					return false;
 				}
 
-				// If the user configured a specific list filter, enforce it.
-				$filter_list_id = isset( $node['data']['config']['list_id'] ) ? (int) $node['data']['config']['list_id'] : null;
+				$filter_list_id = ! empty( $node['config']['list_id'] )
+					? (int) $node['config']['list_id']
+					: null;
+
 				if ( $filter_list_id && ! in_array( $filter_list_id, array_map( 'intval', (array) $list_ids ), true ) ) {
 					return false;
 				}
@@ -467,7 +471,7 @@ class Gemcrm extends IntegrationBase {
 			[
 				'key'      => 'phone',
 				'label'    => 'Phone',
-				'type'     => 'expression',
+				'type'     => 'number',
 				'required' => false,
 			],
 			[

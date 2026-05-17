@@ -1576,7 +1576,7 @@ class Wordpress extends IntegrationBase {
 				[
 					'key'      => 'post_title',
 					'label'    => 'Post Title',
-					'type'     => 'expression',
+					'type'     => 'text',
 					'required' => true,
 				],
 				[
@@ -1652,17 +1652,17 @@ class Wordpress extends IntegrationBase {
 				[
 					'key'   => 'post_date',
 					'label' => 'Post Date',
-					'type'  => 'expression',
+					'type'  => 'date',
 				],
 				[
 					'key'   => 'post_date_gmt',
 					'label' => 'Post Date GMT',
-					'type'  => 'expression',
+					'type'  => 'time',
 				],
 				[
 					'key'   => 'post_name',
 					'label' => 'Post Slug',
-					'type'  => 'expression',
+					'type'  => 'text',
 				],
 				[
 					'key'         => 'post_parent',

@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-05-13 09:18:15",
+    "generated_at": "2026-05-17 12:11:12",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -165,9 +165,9 @@
                     "schema": [
                         {
                             "key": "tag_id",
-                            "label": "Tag (optional)",
+                            "label": "Tag",
                             "type": "select",
-                            "required": false,
+                            "required": true,
                             "placeholder": "Leave empty to trigger for any tag",
                             "dynamic": {
                                 "integration": "gemcrm",
@@ -190,9 +190,9 @@
                     "schema": [
                         {
                             "key": "tag_id",
-                            "label": "Tag (optional)",
+                            "label": "Tag",
                             "type": "select",
-                            "required": false,
+                            "required": true,
                             "placeholder": "Leave empty to trigger for any tag",
                             "dynamic": {
                                 "integration": "gemcrm",
@@ -215,9 +215,9 @@
                     "schema": [
                         {
                             "key": "list_id",
-                            "label": "List (optional)",
+                            "label": "List",
                             "type": "select",
-                            "required": false,
+                            "required": true,
                             "placeholder": "Leave empty to trigger for any list",
                             "dynamic": {
                                 "integration": "gemcrm",
@@ -240,9 +240,9 @@
                     "schema": [
                         {
                             "key": "list_id",
-                            "label": "List (optional)",
+                            "label": "List",
                             "type": "select",
-                            "required": false,
+                            "required": true,
                             "placeholder": "Leave empty to trigger for any list",
                             "dynamic": {
                                 "integration": "gemcrm",
@@ -286,7 +286,7 @@
                         {
                             "key": "phone",
                             "label": "Phone",
-                            "type": "expression",
+                            "type": "number",
                             "required": false
                         },
                         {
@@ -468,7 +468,7 @@
                         {
                             "key": "phone",
                             "label": "Phone",
-                            "type": "expression",
+                            "type": "number",
                             "required": false
                         },
                         {
@@ -1705,7 +1705,7 @@
         },
         "beaverbuilder": {
             "slug": "beaverbuilder",
-            "name": "Beaverbuilder",
+            "name": "Beaver Builder",
             "icon": "beaverbuilder.svg",
             "category": "app",
             "requires_connection": false,
@@ -1778,18 +1778,18 @@
             },
             "actions": []
         },
-        "bookingcalendar": {
-            "slug": "bookingcalendar",
-            "name": "Booking Calendar",
-            "icon": "wpbookingcalender.svg",
+        "bookingcalendarcontactform": {
+            "slug": "bookingcalendarcontactform",
+            "name": "Booking Calendar Contact Form",
+            "icon": "bookingcalendarcontactform.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
             "triggers": {
-                "dexbccf_process_data": {
-                    "key": "dexbccf_process_data",
-                    "label": "Booking Calendar Contact Form",
+                "form_submitted": {
+                    "key": "form_submitted",
+                    "label": "Form Submitted",
                     "hook": "dexbccf_process_data",
                     "schema": [],
                     "outputs": [
@@ -3402,7 +3402,7 @@
         },
         "coblocks": {
             "slug": "coblocks",
-            "name": "Coblocks",
+            "name": "CoBlocks",
             "icon": "coblocks.svg",
             "category": "app",
             "requires_connection": false,
@@ -4228,16 +4228,16 @@
         },
         "divi": {
             "slug": "divi",
-            "name": "Divi",
+            "name": "Divi Builder",
             "icon": "divi.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
             "triggers": {
-                "divi_contact_form_submitted": {
-                    "key": "divi_contact_form_submitted",
-                    "label": "Divi Contact Form Submitted",
+                "form_submitted": {
+                    "key": "form_submitted",
+                    "label": "Form Submitted",
                     "hook": "et_pb_contact_form_submit",
                     "schema": [],
                     "outputs": [
@@ -5404,7 +5404,7 @@
                             "key": "webhook_endpoint",
                             "label": "Webhook Endpoint URL",
                             "type": "copy",
-                            "value": "https://kodezen.local/wp-json/zaplane/v1/incoming/fillout",
+                            "value": "https://kodezen.local/index.php?rest_route=/zaplane/v1/incoming/fillout",
                             "readonly": true,
                             "help": "Copy this URL \u2192 Fillout Dashboard \u2192 Your Form \u2192 Integrate \u2192 Webhooks \u2192 Add Webhook \u2192 Paste & Save."
                         }
@@ -6984,12 +6984,14 @@
                         {
                             "key": "first_name",
                             "label": "First Name",
-                            "type": "text"
+                            "type": "text",
+                            "required": true
                         },
                         {
                             "key": "last_name",
                             "label": "Last Name",
-                            "type": "text"
+                            "type": "text",
+                            "required": true
                         },
                         {
                             "key": "email",
@@ -14613,7 +14615,7 @@
                             "key": "webhook_endpoint",
                             "label": "Webhook Endpoint URL",
                             "type": "copy",
-                            "value": "https://kodezen.local/wp-json/zaplane/v1/incoming/typeform",
+                            "value": "https://kodezen.local/index.php?rest_route=/zaplane/v1/incoming/typeform",
                             "readonly": true,
                             "help": "Copy this URL \u2192 Typeform Dashboard \u2192 Your Form \u2192 Connect \u2192 Webhooks \u2192 Add a webhook \u2192 Paste & Save."
                         }
@@ -20307,7 +20309,7 @@
                         {
                             "key": "post_title",
                             "label": "Post Title",
-                            "type": "expression",
+                            "type": "text",
                             "required": true
                         },
                         {
@@ -20410,17 +20412,17 @@
                         {
                             "key": "post_date",
                             "label": "Post Date",
-                            "type": "expression"
+                            "type": "date"
                         },
                         {
                             "key": "post_date_gmt",
                             "label": "Post Date GMT",
-                            "type": "expression"
+                            "type": "time"
                         },
                         {
                             "key": "post_name",
                             "label": "Post Slug",
-                            "type": "expression"
+                            "type": "text"
                         },
                         {
                             "key": "post_parent",

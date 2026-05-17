@@ -257,10 +257,6 @@ $registry = [
 		'file'  => 'paymattic.php',
 		'class' => \Zaplane\Integrations\Paymattic::class,
 	],
-	'bookingcalendar'     => [
-		'file'  => 'bookingcalendar.php',
-		'class' => \Zaplane\Integrations\Bookingcalendar::class,
-	],
 	'weforms'             => [
 		'file'  => 'weforms.php',
 		'class' => \Zaplane\Integrations\Weforms::class,
@@ -312,6 +308,10 @@ $registry = [
 	'discord'             => [
 		'file'  => 'discord.php',
 		'class' => \Zaplane\Integrations\Discord::class,
+	],
+	'bookingcalendarcontactform'  => [
+		'file'  => 'bookingcalendarcontactform.php',
+		'class' => \Zaplane\Integrations\Bookingcalendarcontactform::class,
 	],
 ];
 
