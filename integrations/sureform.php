@@ -146,8 +146,9 @@ class Sureform extends IntegrationBase
         );
 
         foreach ($forms as $form) {
+            $label = !empty(trim($form->post_title)) ? $form->post_title : '(no title)';
             $options[] = [
-                'label' => $form->post_title,
+                'label' => $label,
                 'value' => $form->ID,
             ];
         }
