@@ -37,6 +37,14 @@ trait AbandonedCartActionsTrait {
 			'recovered_at' => $cart->recovered_at,
 			'created_at'   => $cart->created_at,
 			'updated_at'   => $cart->updated_at,
+			'recovery_link' => add_query_arg(
+				[     
+					'zaplane'      => '1',
+					'route'        => 'abandoned-cart',
+					'checkout_key' => $cart->checkout_key,
+				],
+				home_url( '/' )
+			),
 		];
 	}
 

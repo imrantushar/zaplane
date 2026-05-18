@@ -1231,5 +1231,12 @@ class Woocommerce extends IntegrationBase {
 			'port' => 'main',
 			'data' => $input
 		];
+	} 
+
+	public static function get_trigger_sample_output( string $trigger ): array { 
+		if ( in_array( $trigger, [ 'cart_abandoned', 'cart_recovered', 'cart_lost' ], true ) ) {
+			return \Zaplane\Integrations\AbandonedCart::get_trigger_sample_output( $trigger );
+		}
+		return [];
 	}
 }
