@@ -2,6 +2,10 @@
 
 namespace Zaplane\Modules\AbandonedCart;
 
+use Zaplane\Framework\Core\Automation;
+use Zaplane\Framework\Classes\Query;
+use Zaplane\Integrations\AbandonedCart;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -102,7 +106,25 @@ class AbandonedCartRunner {
 		$cart->abandoned_at = current_time( 'mysql' );
 		$cart->contact_id   = $contact_id;
 
-		do_action( 'zaplane/abandoned_cart/started', $cart );
+		// Directly trigger all active abandoned-cart workflows. This bypasses
+		// the WP hook system so runs start immediately and reliably even when
+		// called from async contexts (Action Scheduler). do_action is skipped
+		// intentionally to prevent trigger_router from creating duplicate runs.
+		self::fire_workflows( 'zaplane/abandoned_cart/started', $cart );
+	}
+
+	private static function fire_workflows( string $event, AbandonedCartModel $cart ): void {
+		$automation = Automation::get_instance();
+		if ( ! $automation ) {
+			return;
+		}
+
+		$payload = AbandonedCart::resolve_trigger( [ 'event' => 'cart_abandoned' ], [ $cart ] );
+		if ( ! $payload ) {
+			return;
+		}
+
+		$automation->trigger_event( $event, $payload );
 	}
 
 	public static function run_lost(): void {

@@ -157,7 +157,7 @@ class Automation {
 		}
 	}
 
-	private function start_trigger_run( array $trigger, array $payload ) {
+	protected function start_trigger_run( array $trigger, array $payload ): int {
 		$nodeKey = (int) $trigger['id'];
 
 		$run = Run::create([
@@ -175,6 +175,64 @@ class Automation {
 
 		// NodeRun gets the clean payload — __wp_user_id must not appear in node outputs.
 		$this->spawn_node_run( $run->id, $nodeKey, $payload, null, $this->extract_node_meta( $trigger['graph_node'] ) );
+
+		return $run->id;
+	}
+
+	public static function get_instance(): ?self {
+		return self::$instance;
+	}
+
+	/**
+	 * Directly start runs for every active workflow that listens on $event,
+	 * using an already-resolved $payload. Bypasses the WP hook system so it
+	 * works reliably even when called from async contexts (Action Scheduler).
+	 */
+	public function trigger_event( string $event, array $payload ): void {
+		foreach ( Query::get_active_workflows_for_event( $event ) as $trigger ) {
+			$this->start_trigger_run( $trigger, $payload );
+		}
+	}
+
+	/**
+	 * Programmatically start a workflow run with custom trigger data, bypassing
+	 * the normal WordPress hook system. The workflow must have an active version.
+	 *
+	 * Returns the Run ID on success, or false if the workflow or its active
+	 * version/trigger node could not be found.
+	 */
+	public function run_workflow( int $workflow_id, array $data = [] ): int|false {
+		$workflow = \Zaplane\Models\Workflow::find( $workflow_id );
+		if ( ! $workflow ) {
+			return false;
+		}
+
+		$version = $workflow->activeVersion();
+		if ( ! $version ) {
+			return false;
+		}
+
+		$triggerNode = null;
+		foreach ( $version->getGraph()['nodes'] ?? [] as $node ) {
+			if ( ( $node['type'] ?? '' ) === 'trigger' ) {
+				$triggerNode = $node;
+				break;
+			}
+		}
+
+		if ( ! $triggerNode ) {
+			return false;
+		}
+
+		$trigger = [
+			'workflow_version_id' => $version->id,
+			'workflow_id'         => $workflow->id,
+			'id'                  => $triggerNode['id'],
+			'app'                 => $triggerNode['data']['app'] ?? '',
+			'graph_node'          => $triggerNode,
+		];
+
+		return $this->start_trigger_run( $trigger, $data );
 	}
 
 	public function spawn_node_run( int $run_id, int $node_key, array $input, ?int $parent, ?array $node_meta = null ) {

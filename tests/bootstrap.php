@@ -32,3 +32,5 @@ global $wpdb;
 $wpdb = new \Zaplane\Tests\WPDBMock();
 
 require_once ZAPLANE_INCLUDES_DIR_PATH . 'autoload.php';
+require_once ZAPLANE_INCLUDES_DIR_PATH . 'framework/functions.php';
+require_once ZAPLANE_INCLUDES_DIR_PATH . 'utils/functions.php';
