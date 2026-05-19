@@ -19,6 +19,7 @@ use Zaplane\Framework\Classes\OAuthHandler;
 use Zaplane\Framework\Core\Automation;
 use Zaplane\Framework\Core\IntegrationLoader;
 use Zaplane\Framework\Core\ModuleManager;
+use Zaplane\Integrations\Gemcrm;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -118,7 +119,9 @@ final class Zaplane {
 		do_action( 'zaplane_init' );
 	}
 
-	public function deactivate_plugin(): void {}
+	public function deactivate_plugin(): void {
+		Gemcrm::unschedule_birthday_cron();
+	}
 }
 
 // Bootstrap plugin

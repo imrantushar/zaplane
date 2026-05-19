@@ -4,6 +4,7 @@ namespace Zaplane\Integrations;
 
 use Zaplane\Framework\Classes\IntegrationBase;
 use Zaplane\Integrations\Gemcrm\QueryTrait;
+use Zaplane\Integrations\Gemcrm\BirthdayCronTrait;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -12,6 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Gemcrm extends IntegrationBase {
 
 	use QueryTrait;
+	use BirthdayCronTrait;
 
 	public static function get_slug(): string {
 		return 'gemcrm';
@@ -46,6 +48,10 @@ class Gemcrm extends IntegrationBase {
 			'contact_list_removed' => [
 				'label' => 'Contact Removed From List',
 				'hook'  => 'gemcrm/contact/list/removed',
+			],
+			'contact_birthday' => [
+				'label' => 'Contact Birthday',
+				'hook'  => 'zaplane_gemcrm_contact_birthday',
 			],
 		];
 	}
@@ -85,6 +91,22 @@ class Gemcrm extends IntegrationBase {
 						],
 					],
 				];
+
+			case 'contact_birthday':
+				return [
+					[
+						'key'         => 'purchase_tag_id',
+						'label'       => 'Apply Tag on Purchase (optional)',
+						'type'        => 'select',
+						'required'    => false,
+						'placeholder' => 'Leave empty to skip tag on purchase',
+						'dynamic'     => [
+							'integration' => 'gemcrm',
+							'query'       => 'gemcrm_tag_query',
+							'select'      => [ 'value', 'label' ],
+						],
+					],
+				];
 		}
 
 		return [];
@@ -119,6 +141,10 @@ class Gemcrm extends IntegrationBase {
 			'contact_tag_removed'   => [ 'contact_id' => 1, 'tag_ids' => [ 1 ] ],
 			'contact_list_attached' => [ 'contact_id' => 1, 'list_ids' => [ 1 ] ],
 			'contact_list_removed'  => [ 'contact_id' => 1, 'list_ids' => [ 1 ] ],
+			'contact_birthday'      => array_merge( $contact_base, [
+				'dob'               => '1990-03-15',
+				'_zaplane_birthday' => true,
+			] ),
 		];
 
 		return $samples[ $trigger ] ?? [];
@@ -197,6 +223,26 @@ class Gemcrm extends IntegrationBase {
 				return [
 					'contact_id' => (int) $contact_id,
 					'list_ids'   => array_map( 'intval', (array) $list_ids ),
+				];
+
+			case 'contact_birthday':
+				$data = $args[0] ?? [];
+
+				if ( empty( $data ) || empty( $data['id'] ) ) {
+					return false;
+				}
+
+				return [
+					'contact_id'        => (int) ( $data['id'] ?? 0 ),
+					'first_name'        => $data['first_name'] ?? '',
+					'last_name'         => $data['last_name'] ?? '',
+					'email'             => $data['email'] ?? '',
+					'phone'             => $data['phone'] ?? '',
+					'dob'               => $data['meta']['dob'] ?? '',
+					'meta'              => $data['meta'] ?? [],
+					'lists'             => $data['lists'] ?? [],
+					'tags'              => $data['tags'] ?? [],
+					'_zaplane_birthday' => true,
 				];
 		}//end switch
 
