@@ -179,9 +179,9 @@ return [
 			'file' => 'groundhogg.php',
 			'class' => \Zaplane\Integrations\Groundhogg::class
 		],
-		'bricks'               => [
-			'file' => 'bricks.php',
-			'class' => \Zaplane\Integrations\Bricks::class
+		'bricksbuilder'               => [
+			'file' => 'bricksbuilder.php',
+			'class' => \Zaplane\Integrations\Bricksbuilder::class
 		],
 		'elementor'            => [
 			'file' => 'elementor.php',
