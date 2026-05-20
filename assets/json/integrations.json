@@ -11179,7 +11179,7 @@
                                 ]
                             },
                             "required": true,
-                            "help": "Find it in Mailchimp → Audience → Settings → Audience name and defaults."
+                            "help": "Find it in Mailchimp \u2192 Audience \u2192 Settings \u2192 Audience name and defaults."
                         },
                         {
                             "key": "email",
@@ -11284,7 +11284,7 @@
                                 ]
                             },
                             "required": true,
-                            "help": "Find it in Mailchimp → Audience → Settings → Audience name and defaults."
+                            "help": "Find it in Mailchimp \u2192 Audience \u2192 Settings \u2192 Audience name and defaults."
                         },
                         {
                             "key": "email",
@@ -11315,7 +11315,7 @@
                                 ]
                             },
                             "required": true,
-                            "help": "Find it in Mailchimp → Audience → Settings → Audience name and defaults."
+                            "help": "Find it in Mailchimp \u2192 Audience \u2192 Settings \u2192 Audience name and defaults."
                         },
                         {
                             "key": "email",
@@ -11354,7 +11354,7 @@
                                 ]
                             },
                             "required": true,
-                            "help": "Find it in Mailchimp → Audience → Settings → Audience name and defaults."
+                            "help": "Find it in Mailchimp \u2192 Audience \u2192 Settings \u2192 Audience name and defaults."
                         },
                         {
                             "key": "email",
@@ -11393,7 +11393,7 @@
                                 ]
                             },
                             "required": true,
-                            "help": "Find it in Mailchimp → Audience → Settings → Audience name and defaults."
+                            "help": "Find it in Mailchimp \u2192 Audience \u2192 Settings \u2192 Audience name and defaults."
                         },
                         {
                             "key": "email",
@@ -18542,6 +18542,31 @@
                     "outputs": [
                         "main"
                     ]
+                },
+                "contact_birthday": {
+                    "key": "contact_birthday",
+                    "label": "Contact Birthday",
+                    "hook": "zaplane_gemcrm_contact_birthday",
+                    "schema": [
+                        {
+                            "key": "purchase_tag_id",
+                            "label": "Apply Tag on Purchase (optional)",
+                            "type": "select",
+                            "required": false,
+                            "placeholder": "Leave empty to skip tag on purchase",
+                            "dynamic": {
+                                "integration": "gemcrm",
+                                "query": "gemcrm_tag_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
                 }
             },
             "actions": {
@@ -19172,21 +19197,21 @@
                             "label": "Subject",
                             "type": "expression",
                             "required": true,
-                            "placeholder": "Your subject line…"
+                            "placeholder": "Your subject line\u2026"
                         },
                         {
                             "key": "body",
                             "label": "Email Body",
                             "type": "richtext",
                             "required": true,
-                            "placeholder": "Write your email here…"
+                            "placeholder": "Write your email here\u2026"
                         },
                         {
                             "key": "pre_header",
                             "label": "Pre-header Text",
                             "type": "expression",
                             "required": false,
-                            "placeholder": "Short preview text shown in inbox…"
+                            "placeholder": "Short preview text shown in inbox\u2026"
                         },
                         {
                             "key": "from_email",
@@ -22922,7 +22947,7 @@
                             "label": "Question",
                             "placeholder": "What do you prefer?",
                             "required": true,
-                            "help": "The poll question (1–300 characters)."
+                            "help": "The poll question (1\u2013300 characters)."
                         },
                         {
                             "key": "options",
@@ -22930,7 +22955,7 @@
                             "label": "Options",
                             "placeholder": "Option A\nOption B\nOption C",
                             "required": true,
-                            "help": "One option per line (2–10 options required)."
+                            "help": "One option per line (2\u201310 options required)."
                         },
                         {
                             "key": "is_anonymous",
@@ -23424,7 +23449,7 @@
                             "options": [
                                 {
                                     "value": "true",
-                                    "label": "Yes — send cancellation emails"
+                                    "label": "Yes \u2014 send cancellation emails"
                                 },
                                 {
                                     "value": "false",
@@ -23468,15 +23493,15 @@
                                 },
                                 {
                                     "value": "OPEN",
-                                    "label": "Open — anyone with the link"
+                                    "label": "Open \u2014 anyone with the link"
                                 },
                                 {
                                     "value": "TRUSTED",
-                                    "label": "Trusted — organisation members"
+                                    "label": "Trusted \u2014 organisation members"
                                 },
                                 {
                                     "value": "RESTRICTED",
-                                    "label": "Restricted — invited members only"
+                                    "label": "Restricted \u2014 invited members only"
                                 }
                             ],
                             "help": "Who can join this Meet space."
@@ -23718,7 +23743,7 @@
                             "options": [
                                 {
                                     "value": "true",
-                                    "label": "Yes — send cancellation email"
+                                    "label": "Yes \u2014 send cancellation email"
                                 },
                                 {
                                     "value": "false",
@@ -23969,7 +23994,7 @@
                             "type": "copy",
                             "value": "https://localhost:10016/index.php?rest_route=/zaplane/v1/incoming/fillout",
                             "readonly": true,
-                            "help": "Copy this URL → Fillout Dashboard → Your Form → Integrate → Webhooks → Add Webhook → Paste & Save."
+                            "help": "Copy this URL \u2192 Fillout Dashboard \u2192 Your Form \u2192 Integrate \u2192 Webhooks \u2192 Add Webhook \u2192 Paste & Save."
                         }
                     ],
                     "outputs": [
@@ -24013,7 +24038,7 @@
                             "type": "copy",
                             "value": "https://localhost:10016/index.php?rest_route=/zaplane/v1/incoming/typeform",
                             "readonly": true,
-                            "help": "Copy this URL → Typeform Dashboard → Your Form → Connect → Webhooks → Add a webhook → Paste & Save."
+                            "help": "Copy this URL \u2192 Typeform Dashboard \u2192 Your Form \u2192 Connect \u2192 Webhooks \u2192 Add a webhook \u2192 Paste & Save."
                         }
                     ],
                     "outputs": [

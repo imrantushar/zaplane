@@ -116,6 +116,8 @@ final class Zaplane {
 		$automation = $this->container->get( 'automation' );
 		$automation->boot();
 
+		( new BirthdayRecipeSeeder() )->run();
+
 		do_action( 'zaplane_init' );
 	}
 

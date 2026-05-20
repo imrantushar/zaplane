@@ -32,7 +32,7 @@ class BirthdayCronModule implements ModuleInterface {
 
 		add_action( 'zaplane_gemcrm_birthday_check', [ Gemcrm::class, 'handle_birthday_check' ] );
 		add_action( 'zaplane_gemcrm_birthday_process_batch', function ( array $args ) {
-			Gemcrm::handle_birthday_batch( $args['contact_ids'] ?? [] );
+			Gemcrm::handle_birthday_batch( $args ?? [] );
 		} );
 
 		add_action( 'woocommerce_order_status_completed', [ $this, 'handle_birthday_purchase' ], 10, 1 );

@@ -11,13 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 class BirthdayRecipeSeeder {
 
 	public function run(): void {
-		if ( get_option( 'zaplane_birthday_recipe_seeded' ) ) {
-			return;
-		}
-
 		$this->seed_birthday_discount();
-
-		update_option( 'zaplane_birthday_recipe_seeded', '1' );
 	}
 
 	private function seed_birthday_discount(): void {
