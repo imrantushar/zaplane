@@ -481,6 +481,10 @@ class Automation {
 		foreach ( $nodeRuns as $nr ) {
 			$output = $nr->getOutput();
 
+			if ( is_array( $output ) && isset( $output['port'], $output['data'] ) ) {
+				$output = $output['data'];
+			}
+
 			$context[ (string) $nr->node_key ] = is_array( $output ) ? $output : [ 'value' => $output ];
 		}
 
