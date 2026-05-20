@@ -5,6 +5,7 @@ namespace Zaplane;
 use Zaplane\Framework\Database\ORM\Migrator;
 use Zaplane\Database\Seeders\DefaultRecipesSeeder;
 use Zaplane\Database\Seeders\BirthdayRecipeSeeder;
+use Zaplane\Database\Seeders\InactiveCustomerRecipeSeeder;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -31,6 +32,7 @@ class Installer {
 		$this->migrate();
 		( new DefaultRecipesSeeder() )->run();
 		( new BirthdayRecipeSeeder() )->run();
+		( new InactiveCustomerRecipeSeeder() )->run();
 
 		$current_db_version = get_option( $this->db_version_option, '0.0.0' );
 		if ( version_compare( $current_db_version, $this->plugin_version, '<' ) ) {

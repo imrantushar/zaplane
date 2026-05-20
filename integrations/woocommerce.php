@@ -12,6 +12,7 @@ use Zaplane\Integrations\Woo\CartActionsTrait;
 use Zaplane\Integrations\Woo\CouponActionsTrait;
 use Zaplane\Integrations\Woo\ReviewActionsTrait;
 use Zaplane\Integrations\Woo\AbandonedCartActionsTrait;
+use Zaplane\Integrations\Woo\InactiveCustomerCronTrait;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -29,6 +30,7 @@ class Woocommerce extends IntegrationBase {
 	use CouponActionsTrait;
 	use ReviewActionsTrait;
 	use AbandonedCartActionsTrait;
+	use InactiveCustomerCronTrait;
 
 	public static function get_slug(): string {
 		return 'woocommerce';
@@ -142,6 +144,48 @@ class Woocommerce extends IntegrationBase {
 				'label' => 'Cart Lost',
 				'hook'  => 'zaplane/abandoned_cart/lost',
 			],
+			'inactive_customer' => [
+				'label' => 'Inactive Customer',
+				'hook'  => 'zaplane_woo_inactive_customer',
+			],
+		];
+	}
+
+	public static function get_trigger_config_schema( string $trigger ): array {
+		if ( 'inactive_customer' !== $trigger ) {
+			return [];
+		}
+
+		return [
+			[
+				'key'         => 'days',
+				'label'       => 'Days Since Last Order',
+				'type'        => 'expression',
+				'required'    => true,
+				'placeholder' => 'e.g. 30',
+			],
+			[
+				'key'      => 'tag_ids',
+				'label'    => 'Apply Tags to Contact (optional)',
+				'type'     => 'multi-select',
+				'required' => false,
+				'dynamic'  => [
+					'integration' => 'gemcrm',
+					'query'       => 'gemcrm_tag_query',
+					'select'      => [ 'value', 'label' ],
+				],
+			],
+			[
+				'key'      => 'list_ids',
+				'label'    => 'Add Contact to Lists (optional)',
+				'type'     => 'multi-select',
+				'required' => false,
+				'dynamic'  => [
+					'integration' => 'gemcrm',
+					'query'       => 'gemcrm_list_query',
+					'select'      => [ 'value', 'label' ],
+				],
+			],
 		];
 	}
 
@@ -215,6 +259,9 @@ class Woocommerce extends IntegrationBase {
 			case 'cart_lost':
 				$payload = self::abandoned_cart_trigger_payload( $args );
 				return $payload ? $payload : false;
+			case 'inactive_customer':
+				$data = $args[0] ?? [];
+				return is_array( $data ) && ! empty( $data['email'] ) ? $data : false;
 		}//end switch
 
 		return false;
@@ -1233,10 +1280,26 @@ class Woocommerce extends IntegrationBase {
 		];
 	} 
 
-	public static function get_trigger_sample_output( string $trigger ): array { 
+	public static function get_trigger_sample_output( string $trigger ): array {
 		if ( in_array( $trigger, [ 'cart_abandoned', 'cart_recovered', 'cart_lost' ], true ) ) {
 			return \Zaplane\Integrations\AbandonedCart::get_trigger_sample_output( $trigger );
 		}
+
+		if ( 'inactive_customer' === $trigger ) {
+			return [
+				'user_id'         => 1,
+				'email'           => 'john.doe@example.com',
+				'first_name'      => 'John',
+				'last_name'       => 'Doe',
+				'phone'           => '+1234567890',
+				'last_order_date' => '2024-01-01',
+				'contact_id'      => 1,
+				'days'            => 30,
+				'tag_ids'         => [],
+				'list_ids'        => [],
+			];
+		}
+
 		return [];
 	}
 }

@@ -6735,6 +6735,51 @@
                     "outputs": [
                         "main"
                     ]
+                },
+                "inactive_customer": {
+                    "key": "inactive_customer",
+                    "label": "Inactive Customer",
+                    "hook": "zaplane_woo_inactive_customer",
+                    "schema": [
+                        {
+                            "key": "days",
+                            "label": "Days Since Last Order",
+                            "type": "expression",
+                            "required": true,
+                            "placeholder": "e.g. 30"
+                        },
+                        {
+                            "key": "tag_ids",
+                            "label": "Apply Tags to Contact (optional)",
+                            "type": "multi-select",
+                            "required": false,
+                            "dynamic": {
+                                "integration": "gemcrm",
+                                "query": "gemcrm_tag_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "list_ids",
+                            "label": "Add Contact to Lists (optional)",
+                            "type": "multi-select",
+                            "required": false,
+                            "dynamic": {
+                                "integration": "gemcrm",
+                                "query": "gemcrm_list_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
                 }
             },
             "actions": {
