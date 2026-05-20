@@ -12,6 +12,7 @@ import notificationReducer from './Slices/notificationSlice/notificationSlice';
 import recipeReducer from './Slices/recipeSlice/recipeSlice';
 import folderReducer from './Slices/folderSlice/folderSlice';
 import abandonedCartReducer from './Slices/abandonedCartSlice/abandonedCartSlice';
+import feedbackReducer from './Slices/feedbackSlice/feedbackSlice';
 
 import logger from 'redux-logger'
 /**
@@ -35,6 +36,7 @@ export const store = configureStore({
         recipes: recipeReducer,
         folder: folderReducer,
         abandonedCart: abandonedCartReducer,
+        feedback: feedbackReducer,
         // Future reducers will be added here (e.g., points, settings)
     },
     middleware: (getDefaultMiddleware) =>

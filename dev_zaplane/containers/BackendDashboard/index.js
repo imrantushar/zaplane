@@ -13,6 +13,7 @@ import RecipesPage from './pages/recipes';
 import Folders from './pages/Folders';
 import Folder from './pages/Folders/Folder';
 import AbandonedCarts from './pages/abandoned-carts';
+import FeedbackPage from './pages/feedback';
 
 
 
@@ -41,6 +42,8 @@ const renderSwitch = (page, id, action, path) => {
 			return <Setting />;
 		case 'zaplane-abandoned-carts':
 			return <AbandonedCarts />;
+		case 'zaplane-feedback':
+			return <FeedbackPage />;
 
 		default:
 			return <>{__('No page found', 'zaplane')}</>;

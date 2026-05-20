@@ -39,6 +39,7 @@ class API implements ModuleInterface {
 		( new \Zaplane\API\ImportExportController( $this->container ) )->register_routes();
 		( new \Zaplane\API\FolderController( $this->container ) )->register_routes();
 		( new \Zaplane\API\RecipeController( $this->container ) )->register_routes();
+		( new \Zaplane\API\FeedbackController() )->register_routes();
 		( new \Zaplane\Modules\AbandonedCart\API\SettingsController() )->register_routes();
 		( new \Zaplane\Modules\AbandonedCart\API\AbandonedCartController() )->register_routes();
 

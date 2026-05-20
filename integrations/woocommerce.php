@@ -1300,6 +1300,24 @@ class Woocommerce extends IntegrationBase {
 			];
 		}
 
+		if ( in_array( $trigger, self::$order_status_events, true ) ) {
+			return [
+				'order_id'          => 123,
+				'order_number'      => '123',
+				'order_key'         => 'wc_order_abc123',
+				'status'            => 'completed',
+				'total'             => 49.99,
+				'currency'          => 'USD',
+				'customer_id'       => 1,
+				'email'             => 'customer@example.com',
+				'first_name'        => 'Jane',
+				'last_name'         => 'Smith',
+				'feedback_page_url' => home_url( '/feedback/?order_id=123&key=wc_order_abc123' ),
+				'old_status'        => 'processing',
+				'new_status'        => 'completed',
+			];
+		}
+
 		return [];
 	}
 }

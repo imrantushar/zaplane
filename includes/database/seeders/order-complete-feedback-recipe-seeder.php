@@ -65,9 +65,9 @@ class OrderCompleteFeedbackRecipeSeeder {
 						'name'   => 'Send Feedback Request Email',
 						'config' => [
 							'recipient_type' => 'custom',
-							'custom_email'   => '{{1.billing_email}}',
-							'subject'        => 'How was your order, {{1.billing_first_name}}? Share your feedback!',
-							'body'           => '<p>Hi {{1.billing_first_name}},</p><p>Thank you for your order #{{1.order_number}}! We hope you\'re enjoying your purchase.</p><p>We\'d love to hear what you think. It only takes a minute:</p><p><a href="{{site_url}}/feedback/?order_id={{1.order_id}}">Leave Your Feedback</a></p><p>Your feedback helps us improve and serve you better.</p><p>Thank you for shopping with us!</p>',
+							'custom_email'   => '{{1.email}}',
+							'subject'        => 'How was your order, {{1.first_name}}? Share your feedback!',
+							'body'           => '<p>Hi {{1.first_name}},</p><p>Thank you for your order #{{1.order_number}}! We hope you\'re enjoying your purchase.</p><p>We\'d love to hear what you think. It only takes a minute:</p><p><a href="{{1.feedback_page_url}}">Leave Your Feedback</a></p><p>Your feedback helps us improve and serve you better.</p><p>Thank you for shopping with us!</p>',
 						],
 					],
 				],
@@ -83,7 +83,7 @@ class OrderCompleteFeedbackRecipeSeeder {
 						'name'   => 'Add Feedback Request Note to Order',
 						'config' => [
 							'order_id'         => '{{1.order_id}}',
-							'note'             => 'Feedback request email sent to {{1.billing_email}}. Feedback link: {{site_url}}/feedback/?order_id={{1.order_id}}',
+							'note'             => 'Feedback request email sent to {{1.email}}. Feedback link: {{1.feedback_page_url}}',
 							'is_customer_note' => false,
 						],
 					],

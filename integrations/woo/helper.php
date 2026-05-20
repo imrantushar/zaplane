@@ -19,13 +19,30 @@ trait Helper {
 
 	protected static function build_order_payload( \WC_Order $order, array $extra = [] ): array {
 		return array_merge([
-			'order_id' => $order->get_id(),
-			'order_number' => $order->get_order_number(),
-			'status' => $order->get_status(),
-			'total' => $order->get_total(),
-			'currency' => $order->get_currency(),
-			'customer_id' => $order->get_customer_id(),
+			'order_id'          => $order->get_id(),
+			'order_number'      => $order->get_order_number(),
+			'order_key'         => $order->get_order_key(),
+			'status'            => $order->get_status(),
+			'total'             => $order->get_total(),
+			'currency'          => $order->get_currency(),
+			'customer_id'       => $order->get_customer_id(),
+			'email'             => $order->get_billing_email(),
+			'first_name'        => $order->get_billing_first_name(),
+			'last_name'         => $order->get_billing_last_name(),
+			'feedback_page_url' => self::build_feedback_page_url( $order ),
 		], $extra);
+	}
+
+	private static function build_feedback_page_url( \WC_Order $order ): string {
+		$page_id = (int) get_option( 'zaplane_feedback_page_id', 0 );
+		$base    = $page_id ? get_permalink( $page_id ) : home_url( '/feedback/' );
+		if ( ! $base ) {
+			$base = home_url( '/feedback/' );
+		}
+		return add_query_arg( [
+			'order_id' => $order->get_id(),
+			'key'      => $order->get_order_key(),
+		], $base );
 	}
 
 	protected static function build_product_payload( \WC_Product $product, array $extra = [] ): array {
