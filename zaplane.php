@@ -23,6 +23,7 @@ use Zaplane\Database\Seeders\BirthdayRecipeSeeder;
 use Zaplane\Database\Seeders\InactiveCustomerRecipeSeeder;
 use Zaplane\Database\Seeders\OrderCompleteFeedbackRecipeSeeder;
 use Zaplane\Database\Seeders\PostPurchaseUpsellRecipeSeeder;
+use Zaplane\Database\Seeders\ProductRecommendationRecipeSeeder;
 use Zaplane\Integrations\Gemcrm;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -124,6 +125,7 @@ final class Zaplane {
 		( new InactiveCustomerRecipeSeeder() )->run();
 		( new OrderCompleteFeedbackRecipeSeeder() )->run();
 		( new PostPurchaseUpsellRecipeSeeder() )->run();
+		( new ProductRecommendationRecipeSeeder() )->run();
 
 		do_action( 'zaplane_init' );
 	}

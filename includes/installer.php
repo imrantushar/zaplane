@@ -8,6 +8,7 @@ use Zaplane\Database\Seeders\BirthdayRecipeSeeder;
 use Zaplane\Database\Seeders\InactiveCustomerRecipeSeeder;
 use Zaplane\Database\Seeders\OrderCompleteFeedbackRecipeSeeder;
 use Zaplane\Database\Seeders\PostPurchaseUpsellRecipeSeeder;
+use Zaplane\Database\Seeders\ProductRecommendationRecipeSeeder;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -38,6 +39,7 @@ class Installer {
 		( new InactiveCustomerRecipeSeeder() )->run();
 		( new OrderCompleteFeedbackRecipeSeeder() )->run();
 		( new PostPurchaseUpsellRecipeSeeder() )->run();
+		( new ProductRecommendationRecipeSeeder() )->run();
 
 		$current_db_version = get_option( $this->db_version_option, '0.0.0' );
 		if ( version_compare( $current_db_version, $this->plugin_version, '<' ) ) {
