@@ -19,6 +19,7 @@ use Zaplane\Framework\Classes\OAuthHandler;
 use Zaplane\Framework\Core\Automation;
 use Zaplane\Framework\Core\IntegrationLoader;
 use Zaplane\Framework\Core\ModuleManager;
+use Zaplane\Database\Seeders\BirthdayRecipeSeeder;
 use Zaplane\Integrations\Gemcrm;
 
 if ( ! defined( 'ABSPATH' ) ) {
