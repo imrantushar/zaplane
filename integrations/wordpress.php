@@ -89,11 +89,6 @@ class Wordpress extends IntegrationBase {
 				'label' => 'Save Post',
 				'hook' => 'save_post'
 			],
-			'post_revision'               => [
-				'label' => 'Revision Creation',
-				'hook' => '_wp_put_post_revision'
-			],
-
 			'add_attachment'              => [
 				'label' => 'Add Attachment',
 				'hook' => 'add_attachment'
@@ -134,7 +129,6 @@ class Wordpress extends IntegrationBase {
 				'label' => 'Image Sizes',
 				'hook' => 'image_size_names_choose'
 			],
-
 			'user_register'          => [
 				'label' => 'User Registered',
 				'hook' => 'user_register'
@@ -200,15 +194,10 @@ class Wordpress extends IntegrationBase {
 				'label' => 'User Logged Out',
 				'hook' => 'wp_logout'
 			],
-			'wp_authenticate'        => [
-				'label' => 'WP Authenticate',
-				'hook' => 'wp_authenticate'
-			],
 			'validate_reset'              => [
 				'label' => 'Validate Reset',
 				'hook' => 'validate_password_reset'
 			],
-
 			'comment_post'           => [
 				'label' => 'Comment Added',
 				'hook' => 'comment_post'
@@ -220,10 +209,6 @@ class Wordpress extends IntegrationBase {
 			'edit_comment'           => [
 				'label' => 'Edit Comment',
 				'hook' => 'edit_comment'
-			],
-			'delete_comment'         => [
-				'label' => 'Delete Comment',
-				'hook' => 'delete_comment'
 			],
 			'trashed_comment'        => [
 				'label' => 'Comment Trashed',
@@ -237,11 +222,10 @@ class Wordpress extends IntegrationBase {
 				'label' => 'Comment Status Changed',
 				'hook' => 'transition_comment_status'
 			],
-			'pre_comment_approved'   => [
-				'label' => 'Pre-Approve Comment',
-				'hook' => 'pre_comment_approved'
+			'delete_comment'         => [
+				'label' => 'Delete Comment',
+				'hook' => 'delete_comment'
 			],
-
 			'create_term'            => [
 				'label' => 'Create Term',
 				'hook' => 'create_term'
@@ -418,11 +402,11 @@ class Wordpress extends IntegrationBase {
 					'options' => [
 						[
 							'label' => 'Approved',
-							'value' => '1'
+							'value' => 'approve'
 						],
 						[
 							'label' => 'Pending',
-							'value' => '0'
+							'value' => 'pending'
 						],
 						[
 							'label' => 'Spam',
@@ -442,11 +426,11 @@ class Wordpress extends IntegrationBase {
 					'options' => [
 						[
 							'label' => 'Approved',
-							'value' => '1'
+							'value' => 'approve'
 						],
 						[
 							'label' => 'Pending',
-							'value' => '0'
+							'value' => 'pending'
 						],
 						[
 							'label' => 'Spam',
@@ -527,7 +511,6 @@ class Wordpress extends IntegrationBase {
 
 	private static function get_user_filterable_triggers(): array {
 		return [
-			'user_register',
 			'set_user_role',
 			'profile_update',
 			'wp_update_user',
@@ -565,8 +548,6 @@ class Wordpress extends IntegrationBase {
 
 	private static function get_term_filterable_triggers(): array {
 		return [
-			'create_term',
-			'created_term',
 			'edit_term',
 			'edited_term',
 			'saved_term',
@@ -913,13 +894,14 @@ class Wordpress extends IntegrationBase {
 				return self::resolve_comment_payload( $args[0] ?? 0 );
 
 			case 'transition_comment_status':
-				$comment = Comment::find( $args[1] ?? 0 );
-				if ( ! $comment ) {
+				$comment = $args[2] ?? null;
+
+				if (!$comment instanceof \WP_Comment) {
 					return false;
 				}
 
-				return array_merge($comment->toArray(), [
-					'old_status' => $args[2] ?? '',
+				return array_merge($comment->to_array(), [
+					'old_status' => $args[1] ?? '',
 					'new_status' => $args[0] ?? '',
 				]);
 

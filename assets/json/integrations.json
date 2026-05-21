@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-05-17 12:11:12",
+    "generated_at": "2026-05-21 12:32:43",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -4815,7 +4815,7 @@
         },
         "easydigitaldownload": {
             "slug": "easydigitaldownload",
-            "name": "Easydigitaldownload",
+            "name": "Easy Digital Downloads",
             "icon": "easydigitaldownload.svg",
             "category": "app",
             "requires_connection": false,
@@ -5305,7 +5305,7 @@
         },
         "essentialblocks": {
             "slug": "essentialblocks",
-            "name": "Essentialblocks",
+            "name": "Essential Blocks",
             "icon": "essentialblocks.svg",
             "category": "app",
             "requires_connection": false,
@@ -5326,7 +5326,7 @@
         },
         "eventscalendar": {
             "slug": "eventscalendar",
-            "name": "Events Calendar",
+            "name": "The Events Calendar",
             "icon": "events-calendar.svg",
             "category": "app",
             "requires_connection": false,
@@ -5404,7 +5404,7 @@
                             "key": "webhook_endpoint",
                             "label": "Webhook Endpoint URL",
                             "type": "copy",
-                            "value": "https://kodezen.local/index.php?rest_route=/zaplane/v1/incoming/fillout",
+                            "value": "https://kodezen.local/wp-json/zaplane/v1/incoming/fillout",
                             "readonly": true,
                             "help": "Copy this URL \u2192 Fillout Dashboard \u2192 Your Form \u2192 Integrate \u2192 Webhooks \u2192 Add Webhook \u2192 Paste & Save."
                         }
@@ -9520,7 +9520,7 @@
                         {
                             "key": "phone",
                             "label": "Phone",
-                            "type": "text",
+                            "type": "number",
                             "placeholder": "+18884827768 or {{phone}}",
                             "help": "Optional. Used to auto-build fields if Fields (JSON) is empty."
                         },
@@ -9616,16 +9616,16 @@
         },
         "kadenceblocks": {
             "slug": "kadenceblocks",
-            "name": "Kadence Block",
+            "name": "Kadence Blocks",
             "icon": "kadence-block.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
             "triggers": {
-                "kadence_blocks_advanced_form_submission": {
-                    "key": "kadence_blocks_advanced_form_submission",
-                    "label": "Advanced Form Submission",
+                "form_submission": {
+                    "key": "form_submission",
+                    "label": "Form Submission",
                     "hook": "kadence_blocks_advanced_form_submission",
                     "schema": [],
                     "outputs": [
@@ -9917,7 +9917,7 @@
                                 "integration": "lifter",
                                 "query": "course",
                                 "select": [
-                                    "name",
+                                    "value",
                                     "label"
                                 ]
                             },
@@ -9941,7 +9941,7 @@
                                 "integration": "lifter",
                                 "query": "quiz",
                                 "select": [
-                                    "name",
+                                    "value",
                                     "label"
                                 ]
                             },
@@ -9965,7 +9965,7 @@
                                 "integration": "lifter",
                                 "query": "lesson",
                                 "select": [
-                                    "name",
+                                    "value",
                                     "label"
                                 ]
                             },
@@ -9989,7 +9989,7 @@
                                 "integration": "lifter",
                                 "query": "course",
                                 "select": [
-                                    "name",
+                                    "value",
                                     "label"
                                 ]
                             },
@@ -14615,7 +14615,7 @@
                             "key": "webhook_endpoint",
                             "label": "Webhook Endpoint URL",
                             "type": "copy",
-                            "value": "https://kodezen.local/index.php?rest_route=/zaplane/v1/incoming/typeform",
+                            "value": "https://kodezen.local/wp-json/zaplane/v1/incoming/typeform",
                             "readonly": true,
                             "help": "Copy this URL \u2192 Typeform Dashboard \u2192 Your Form \u2192 Connect \u2192 Webhooks \u2192 Add a webhook \u2192 Paste & Save."
                         }
@@ -19326,15 +19326,6 @@
                         "main"
                     ]
                 },
-                "post_revision": {
-                    "key": "post_revision",
-                    "label": "Revision Creation",
-                    "hook": "_wp_put_post_revision",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
                 "add_attachment": {
                     "key": "add_attachment",
                     "label": "Add Attachment",
@@ -19429,23 +19420,7 @@
                     "key": "user_register",
                     "label": "User Registered",
                     "hook": "user_register",
-                    "schema": [
-                        {
-                            "key": "user_id",
-                            "label": "User",
-                            "type": "select",
-                            "dynamic": {
-                                "integration": "wordpress",
-                                "query": "users_with_any",
-                                "select": [
-                                    "ID",
-                                    "name"
-                                ]
-                            },
-                            "default": "any",
-                            "required": true
-                        }
-                    ],
+                    "schema": [],
                     "outputs": [
                         "main"
                     ]
@@ -19809,15 +19784,6 @@
                         "main"
                     ]
                 },
-                "wp_authenticate": {
-                    "key": "wp_authenticate",
-                    "label": "WP Authenticate",
-                    "hook": "wp_authenticate",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
                 "validate_reset": {
                     "key": "validate_reset",
                     "label": "Validate Reset",
@@ -19865,15 +19831,6 @@
                     "key": "edit_comment",
                     "label": "Edit Comment",
                     "hook": "edit_comment",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "delete_comment": {
-                    "key": "delete_comment",
-                    "label": "Delete Comment",
-                    "hook": "delete_comment",
                     "schema": [],
                     "outputs": [
                         "main"
@@ -19940,11 +19897,11 @@
                             "options": [
                                 {
                                     "label": "Approved",
-                                    "value": "1"
+                                    "value": "approve"
                                 },
                                 {
                                     "label": "Pending",
-                                    "value": "0"
+                                    "value": "pending"
                                 },
                                 {
                                     "label": "Spam",
@@ -19964,11 +19921,11 @@
                             "options": [
                                 {
                                     "label": "Approved",
-                                    "value": "1"
+                                    "value": "approve"
                                 },
                                 {
                                     "label": "Pending",
-                                    "value": "0"
+                                    "value": "pending"
                                 },
                                 {
                                     "label": "Spam",
@@ -19985,10 +19942,10 @@
                         "main"
                     ]
                 },
-                "pre_comment_approved": {
-                    "key": "pre_comment_approved",
-                    "label": "Pre-Approve Comment",
-                    "hook": "pre_comment_approved",
+                "delete_comment": {
+                    "key": "delete_comment",
+                    "label": "Delete Comment",
+                    "hook": "delete_comment",
                     "schema": [],
                     "outputs": [
                         "main"
@@ -19998,23 +19955,7 @@
                     "key": "create_term",
                     "label": "Create Term",
                     "hook": "create_term",
-                    "schema": [
-                        {
-                            "key": "term_id",
-                            "label": "Term",
-                            "type": "select",
-                            "dynamic": {
-                                "integration": "wordpress",
-                                "query": "terms_with_any",
-                                "select": [
-                                    "term_id",
-                                    "name"
-                                ]
-                            },
-                            "default": "any",
-                            "required": true
-                        }
-                    ],
+                    "schema": [],
                     "outputs": [
                         "main"
                     ]
@@ -20023,23 +19964,7 @@
                     "key": "created_term",
                     "label": "Term Created",
                     "hook": "created_term",
-                    "schema": [
-                        {
-                            "key": "term_id",
-                            "label": "Term",
-                            "type": "select",
-                            "dynamic": {
-                                "integration": "wordpress",
-                                "query": "terms_with_any",
-                                "select": [
-                                    "term_id",
-                                    "name"
-                                ]
-                            },
-                            "default": "any",
-                            "required": true
-                        }
-                    ],
+                    "schema": [],
                     "outputs": [
                         "main"
                     ]
