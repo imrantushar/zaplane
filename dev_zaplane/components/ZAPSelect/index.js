@@ -13,6 +13,7 @@ const ZAPSelect = ({
   placeholder,
   isClearable = false,
   isMulti = false,
+  isRequired = false,
   containerStyle = {}
 }) => {
 
@@ -42,6 +43,7 @@ const ZAPSelect = ({
       {label && (
         <span className="zaplane-label">
           {__(label, "zaplane")}
+          {isRequired && <span className="text-red-500 ml-[2px]">*</span>}
         </span>
       )}
 

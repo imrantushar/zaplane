@@ -239,7 +239,7 @@ class Gemcrm extends IntegrationBase {
 					[
 						'key'      => 'tag_id',
 						'label'    => 'Tag',
-						'type'     => 'select',
+						'type'     => 'multi-select',
 						'required' => true,
 						'dynamic'  => [
 							'integration' => 'gemcrm',
@@ -702,20 +702,22 @@ class Gemcrm extends IntegrationBase {
 		}
 
 		$contact_id = (int) ( $config['contact_id'] ?? 0 );
-		$tag_id     = (int) ( $config['tag_id'] ?? 0 );
+		$tag_ids    = array_filter( array_map( 'intval', (array) ( $config['tag_id'] ?? [] ) ) );
 
 		if ( ! $contact_id ) {
 			return self::action_error( 'Contact ID is required', $input );
 		}
-		if ( ! $tag_id ) {
+		if ( empty( $tag_ids ) ) {
 			return self::action_error( 'Tag is required', $input );
 		}
 
-		\GemCrm\Database\Models\Tag::attach_single( $contact_id, $tag_id );
+		foreach ( $tag_ids as $tag_id ) {
+			\GemCrm\Database\Models\Tag::attach_single( $contact_id, $tag_id );
+		}
 
 		return self::action_success( array_merge( $input, [
 			'contact_id' => $contact_id,
-			'tag_id'     => $tag_id,
+			'tag_ids'    => $tag_ids,
 		] ) );
 	}
 
@@ -748,20 +750,22 @@ class Gemcrm extends IntegrationBase {
 		}
 
 		$contact_id = (int) ( $config['contact_id'] ?? 0 );
-		$tag_id     = (int) ( $config['tag_id'] ?? 0 );
+		$tag_ids    = array_filter( array_map( 'intval', (array) ( $config['tag_id'] ?? [] ) ) );
 
 		if ( ! $contact_id ) {
 			return self::action_error( 'Contact ID is required', $input );
 		}
-		if ( ! $tag_id ) {
+		if ( empty( $tag_ids ) ) {
 			return self::action_error( 'Tag is required', $input );
 		}
 
-		\GemCrm\Database\Models\Tag::detach_single( $contact_id, $tag_id );
+		foreach ( $tag_ids as $tag_id ) {
+			\GemCrm\Database\Models\Tag::detach_single( $contact_id, $tag_id );
+		}
 
 		return self::action_success( array_merge( $input, [
 			'contact_id' => $contact_id,
-			'tag_id'     => $tag_id,
+			'tag_ids'    => $tag_ids,
 		] ) );
 	}
 

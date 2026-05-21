@@ -28,6 +28,7 @@ const SelectTab = ({
         }}
         placeholder={__("Select Action Type", "zaplane")}
         isClearable
+        isRequired
         containerStyle={{ marginBottom: "8px" }}
       />
       {selectedIntegration?.requires_connection === true && (

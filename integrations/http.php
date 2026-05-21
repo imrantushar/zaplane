@@ -62,7 +62,7 @@ class Http extends IntegrationBase {
 			[
 				'key' => 'headers',
 				'label' => 'Headers (JSON)',
-				'type' => 'textarea'
+				'type' => 'json'
 			],
 			[
 				'key' => 'body',
