@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-05-21 12:32:43",
+    "generated_at": "2026-05-21 18:15:35",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -5404,7 +5404,7 @@
                             "key": "webhook_endpoint",
                             "label": "Webhook Endpoint URL",
                             "type": "copy",
-                            "value": "https://kodezen.local/wp-json/zaplane/v1/incoming/fillout",
+                            "value": "https://kodezen-academy.local/index.php/wp-json/zaplane/v1/incoming/fillout",
                             "readonly": true,
                             "help": "Copy this URL \u2192 Fillout Dashboard \u2192 Your Form \u2192 Integrate \u2192 Webhooks \u2192 Add Webhook \u2192 Paste & Save."
                         }
@@ -14615,7 +14615,7 @@
                             "key": "webhook_endpoint",
                             "label": "Webhook Endpoint URL",
                             "type": "copy",
-                            "value": "https://kodezen.local/wp-json/zaplane/v1/incoming/typeform",
+                            "value": "https://kodezen-academy.local/index.php/wp-json/zaplane/v1/incoming/typeform",
                             "readonly": true,
                             "help": "Copy this URL \u2192 Typeform Dashboard \u2192 Your Form \u2192 Connect \u2192 Webhooks \u2192 Add a webhook \u2192 Paste & Save."
                         }
@@ -14787,9 +14787,9 @@
             "auth_type": "none",
             "supports_webhook": false,
             "triggers": {
-                "weforms_entry_submission": {
-                    "key": "weforms_entry_submission",
-                    "label": "We Form Submission",
+                "forms_submission": {
+                    "key": "forms_submission",
+                    "label": "Form Submission",
                     "hook": "weforms_entry_submission",
                     "schema": [],
                     "outputs": [
@@ -20588,27 +20588,7 @@
                 "get_users": {
                     "key": "get_users",
                     "label": "Get All Users",
-                    "schema": [
-                        {
-                            "key": "search",
-                            "label": "Search",
-                            "type": "text"
-                        },
-                        {
-                            "key": "role",
-                            "label": "Role",
-                            "type": "select",
-                            "dynamic": {
-                                "integration": "wordpress",
-                                "query": "roles",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            },
-                            "required": false
-                        }
-                    ],
+                    "schema": [],
                     "outputs": [
                         "main"
                     ]

@@ -2303,14 +2303,6 @@ class Wordpress extends IntegrationBase {
 
 			'activate_user'          => self::field_user_id(),
 			'deactivate_user'        => self::field_user_id(),
-			'get_users' => [
-				[
-					'key' => 'search',
-					'label' => 'Search',
-					'type' => 'text',
-				],
-				...self::field_role( false ),
-			],
 			'get_users_by_role'      => self::field_role(),
 			'get_user_by_id'         => self::field_user_id(),
 			'get_user_by_email'      => [
