@@ -81,6 +81,7 @@ const ActionFieldRenderer = ({
           label={field.label}
           value={value || ""}
           inputRef={inputRef}
+          isRequired={!!field.required}
           onChange={(e) => { setFieldValue(field.key, e.target.value); clearError(); }}
         />
         <ErrorMsg />
@@ -101,6 +102,7 @@ const ActionFieldRenderer = ({
             field={field}
             setFieldValue={setFieldValue}
             placeholder={__('Type "@" here to add dynamic', "zaplane")}
+            isRequired={!!field.required}
           />
           <ErrorMsg />
         </div>
@@ -140,6 +142,7 @@ const ActionFieldRenderer = ({
             onChange={(opt) => { setFieldValue(field.key, opt?.value); clearError(); }}
             placeholder={field.placeholder || `Select ${field.label}`}
             isClearable
+            isRequired={!!field.required}
             isLoading={field.dynamic ? loadingFields[key] : false}
             onMenuOpen={
               field.dynamic ? () => fetchDynamicOptions(field, searchTerm) : undefined
@@ -171,6 +174,7 @@ const ActionFieldRenderer = ({
             placeholder={field.placeholder || `Select ${field.label}`}
             isClearable
             isMulti
+            isRequired={!!field.required}
             isLoading={field.dynamic ? loadingFields[key] : false}
             onMenuOpen={
               field.dynamic ? () => fetchDynamicOptions(field, searchTerm) : undefined
@@ -182,6 +186,21 @@ const ActionFieldRenderer = ({
         </div>
       );
     }
+
+    case "json":
+      return (
+        <div>
+          <label className="zaplane-label">{__(field.label, "zaplane")}{field.required && <span style={{ color: 'red', marginLeft: '2px' }}>*</span>}</label>
+          <textarea
+            value={value || ""}
+            onChange={(e) => { setFieldValue(field.key, e.target.value); clearError(); }}
+            placeholder={'{ "Header-Name": "value" }'}
+            rows={5}
+            style={{ width: "100%", fontFamily: "monospace", fontSize: "13px", padding: "8px", borderRadius: "6px", border: "1px solid var(--zaplane-border-color)", resize: "vertical", boxSizing: "border-box" }}
+          />
+          <ErrorMsg />
+        </div>
+      );
 
     case "condition_group":
       return (

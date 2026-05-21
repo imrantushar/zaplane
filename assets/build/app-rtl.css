@@ -1953,6 +1953,8 @@ video {
   margin-right: -38px;
 }.zaplane-scope .ml-\[-40px\] {
   margin-right: -40px;
+}.zaplane-scope .ml-\[2px\] {
+  margin-right: 2px;
 }.zaplane-scope .mr-1 {
   margin-left: 0.25rem;
 }.zaplane-scope .mr-2 {
@@ -2248,6 +2250,8 @@ video {
   white-space: nowrap;
 }.zaplane-scope .whitespace-nowrap {
   white-space: nowrap;
+}.zaplane-scope .break-all {
+  word-break: break-all;
 }.zaplane-scope .rounded {
   border-radius: 0.25rem;
 }.zaplane-scope .rounded-\[10px\] {

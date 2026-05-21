@@ -53,14 +53,14 @@ const LogDetails = ({
                   </DisclosureButton>
                   <DisclosurePanel className="px-2 pt-4 pb-2 text-sm text-gray-500">
                     <div className="flex flex-col gap-4 items-stretch">
-                      <div className="p-3 border rounded-md bg-gray-50">
+                      <div className="p-3 border rounded-md bg-gray-50" style={{ overflowWrap: 'break-word', wordBreak: 'break-all', overflowX: 'auto' }}>
                         <span className="zaplane-label font-bold mb-2 block">
                           {__('Input', 'zaplane')}
                         </span>
                         <ReactJson src={input} name="root" collapsed={1} enableClipboard={false} displayDataTypes={false} />
                       </div>
 
-                      <div className="p-3 border rounded-md bg-gray-50">
+                      <div className="p-3 border rounded-md bg-gray-50" style={{ overflowWrap: 'break-word', wordBreak: 'break-all', overflowX: 'auto' }}>
                         <span className="font-bold mb-2 block text-gray-800">
                           {__('Output', 'zaplane')}
                         </span>
