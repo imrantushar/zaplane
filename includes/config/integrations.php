@@ -27,10 +27,6 @@ return [
 			'file' => 'variable.php',
 			'class' => \Zaplane\Integrations\Variable::class
 		],
-		'cartflows'            => [
-			'file' => 'cartflows.php',
-			'class' => \Zaplane\Integrations\Cartflows::class
-		],
 		'dokan'                => [
 			'file' => 'dokan.php',
 			'class' => \Zaplane\Integrations\Dokan::class
@@ -178,10 +174,6 @@ return [
 		'groundhogg'           => [
 			'file' => 'groundhogg.php',
 			'class' => \Zaplane\Integrations\Groundhogg::class
-		],
-		'bricksbuilder'               => [
-			'file' => 'bricksbuilder.php',
-			'class' => \Zaplane\Integrations\Bricksbuilder::class
 		],
 		'elementor'            => [
 			'file' => 'elementor.php',
