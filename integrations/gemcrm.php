@@ -330,7 +330,6 @@ class Gemcrm extends IntegrationBase {
 
 	private static function send_email_fields(): array {
 		return [
-			// ── Recipient ────────────────────────────────────────────────────
 			[
 				'key'      => 'recipient_type',
 				'label'    => 'Send To',
@@ -343,7 +342,6 @@ class Gemcrm extends IntegrationBase {
 					[ 'value' => 'custom',  'label' => 'Custom Email'     ],
 				],
 			],
-			// Shown when recipient_type = contact
 			[
 				'key'        => 'contact_id',
 				'label'      => 'Contact',
@@ -356,7 +354,6 @@ class Gemcrm extends IntegrationBase {
 					'select'      => [ 'value', 'label' ],
 				],
 			],
-			// Shown when recipient_type = list
 			[
 				'key'        => 'list_id',
 				'label'      => 'Contact List',
@@ -369,7 +366,6 @@ class Gemcrm extends IntegrationBase {
 					'select'      => [ 'value', 'label' ],
 				],
 			],
-			// Shown when recipient_type = custom
 			[
 				'key'        => 'custom_email',
 				'label'      => 'Email Address',
@@ -379,7 +375,6 @@ class Gemcrm extends IntegrationBase {
 				'depends_on' => [ 'recipient_type' => 'custom' ],
 				'placeholder' => 'someone@example.com or use @ to pick a variable',
 			],
-			// ── Content ──────────────────────────────────────────────────────
 			[
 				'key'      => 'subject',
 				'label'    => 'Subject',
@@ -390,7 +385,7 @@ class Gemcrm extends IntegrationBase {
 			[
 				'key'         => 'body',
 				'label'       => 'Email Body',
-				'type'        => 'richtext',  // frontend renders a rich text / HTML editor
+				'type'        => 'richtext',
 				'required'    => true,
 				'placeholder' => 'Write your email here…',
 			],
@@ -401,7 +396,6 @@ class Gemcrm extends IntegrationBase {
 				'required' => false,
 				'placeholder' => 'Short preview text shown in inbox…',
 			],
-			// ── Sender ───────────────────────────────────────────────────────
 			[
 				'key'      => 'from_email',
 				'label'    => 'From Email',

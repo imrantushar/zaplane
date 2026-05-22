@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-05-03 12:59:41",
+    "generated_at": "2026-05-19 12:26:38",
     "apps": {
         "cartflows": {
             "slug": "cartflows",
@@ -82,7 +82,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -106,7 +106,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -130,7 +130,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -154,7 +154,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -196,7 +196,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -220,7 +220,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -244,7 +244,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -295,7 +295,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -391,7 +391,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -415,7 +415,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -439,7 +439,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -694,7 +694,7 @@
                 },
                 "remove_action": {
                     "key": "remove_action",
-                    "label": "Remove All Hook Callbacks",
+                    "label": "Remove Hook Callbacks",
                     "schema": [
                         {
                             "key": "hook_name",
@@ -758,7 +758,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -782,7 +782,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -806,7 +806,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         },
                         {
                             "key": "product_id",
@@ -820,7 +820,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -844,7 +844,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         },
                         {
                             "key": "product_id",
@@ -858,7 +858,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -882,7 +882,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         },
                         {
                             "key": "product_id",
@@ -896,7 +896,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -920,7 +920,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -944,7 +944,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -968,7 +968,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -992,7 +992,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -1016,7 +1016,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -1040,7 +1040,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -1064,7 +1064,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -1088,7 +1088,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -1112,7 +1112,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -1152,13 +1152,13 @@
                             "key": "limit",
                             "label": "Limit",
                             "type": "number",
-                            "default": 20
+                            "required": true
                         },
                         {
                             "key": "page",
                             "label": "Page",
                             "type": "number",
-                            "default": 1
+                            "required": true
                         },
                         {
                             "key": "search",
@@ -1209,7 +1209,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         },
                         {
                             "key": "withdraw_status",
@@ -1238,13 +1238,13 @@
                             "key": "limit",
                             "label": "Limit",
                             "type": "number",
-                            "default": 20
+                            "required": true
                         },
                         {
                             "key": "page",
                             "label": "Page",
                             "type": "number",
-                            "default": 1
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -1346,6 +1346,7 @@
                             "key": "funnel_id",
                             "label": "Funnel",
                             "type": "select",
+                            "required": true,
                             "dynamic": {
                                 "integration": "funnelkit",
                                 "query": "funnels",
@@ -1370,6 +1371,7 @@
                             "key": "funnel_id",
                             "label": "Funnel",
                             "type": "select",
+                            "required": true,
                             "dynamic": {
                                 "integration": "funnelkit",
                                 "query": "funnels",
@@ -1394,6 +1396,7 @@
                             "key": "funnel_id",
                             "label": "Funnel",
                             "type": "select",
+                            "required": true,
                             "dynamic": {
                                 "integration": "funnelkit",
                                 "query": "funnels",
@@ -1418,6 +1421,7 @@
                             "key": "funnel_id",
                             "label": "Funnel",
                             "type": "select",
+                            "required": true,
                             "dynamic": {
                                 "integration": "funnelkit",
                                 "query": "funnels",
@@ -1442,6 +1446,7 @@
                             "key": "step_id",
                             "label": "Step",
                             "type": "select",
+                            "required": true,
                             "dynamic": {
                                 "integration": "funnelkit",
                                 "query": "steps",
@@ -1466,6 +1471,7 @@
                             "key": "step_id",
                             "label": "Step",
                             "type": "select",
+                            "required": true,
                             "dynamic": {
                                 "integration": "funnelkit",
                                 "query": "steps",
@@ -1490,6 +1496,7 @@
                             "key": "step_id",
                             "label": "Step",
                             "type": "select",
+                            "required": true,
                             "dynamic": {
                                 "integration": "funnelkit",
                                 "query": "steps",
@@ -1514,6 +1521,7 @@
                             "key": "funnel_id",
                             "label": "Funnel",
                             "type": "select",
+                            "required": true,
                             "dynamic": {
                                 "integration": "funnelkit",
                                 "query": "funnels",
@@ -1538,6 +1546,7 @@
                             "key": "funnel_id",
                             "label": "Funnel",
                             "type": "select",
+                            "required": true,
                             "dynamic": {
                                 "integration": "funnelkit",
                                 "query": "funnels",
@@ -1562,6 +1571,7 @@
                             "key": "funnel_id",
                             "label": "Funnel",
                             "type": "select",
+                            "required": true,
                             "dynamic": {
                                 "integration": "funnelkit",
                                 "query": "funnels",
@@ -1596,6 +1606,7 @@
                             "key": "funnel_id",
                             "label": "Funnel",
                             "type": "select",
+                            "required": true,
                             "dynamic": {
                                 "integration": "funnelkit",
                                 "query": "funnels",
@@ -1954,6 +1965,7 @@
                             "key": "post_status",
                             "label": "Post Status",
                             "type": "select",
+                            "required": true,
                             "options": [
                                 {
                                     "label": "Publish",
@@ -2004,12 +2016,13 @@
                                     "post_type"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         },
                         {
                             "key": "post_status",
                             "label": "Post Status",
                             "type": "select",
+                            "required": true,
                             "options": [
                                 {
                                     "label": "Publish",
@@ -2215,7 +2228,7 @@
                                 ]
                             },
                             "default": "any",
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -2240,7 +2253,7 @@
                                 ]
                             },
                             "default": "any",
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -2265,7 +2278,7 @@
                                 ]
                             },
                             "default": "any",
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -2290,7 +2303,7 @@
                                 ]
                             },
                             "default": "any",
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -2315,7 +2328,7 @@
                                 ]
                             },
                             "default": "any",
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -2340,7 +2353,7 @@
                                 ]
                             },
                             "default": "any",
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -2365,7 +2378,7 @@
                                 ]
                             },
                             "default": "any",
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -2390,7 +2403,7 @@
                                 ]
                             },
                             "default": "any",
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -2415,7 +2428,7 @@
                                 ]
                             },
                             "default": "any",
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -2440,7 +2453,7 @@
                                 ]
                             },
                             "default": "any",
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -2465,7 +2478,7 @@
                                 ]
                             },
                             "default": "any",
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -2490,7 +2503,7 @@
                                 ]
                             },
                             "default": "any",
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -2515,7 +2528,7 @@
                                 ]
                             },
                             "default": "any",
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -2540,7 +2553,7 @@
                                 ]
                             },
                             "default": "any",
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -2574,7 +2587,7 @@
                                 ]
                             },
                             "default": "any",
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -2608,7 +2621,7 @@
                                 ]
                             },
                             "default": "any",
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -2668,7 +2681,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -2692,7 +2705,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -2708,6 +2721,7 @@
                             "key": "from_status",
                             "label": "From Status",
                             "type": "select",
+                            "required": true,
                             "options": [
                                 {
                                     "label": "Approved",
@@ -2731,6 +2745,7 @@
                             "key": "to_status",
                             "label": "To Status",
                             "type": "select",
+                            "required": true,
                             "options": [
                                 {
                                     "label": "Approved",
@@ -2782,7 +2797,7 @@
                                 ]
                             },
                             "default": "any",
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -2807,7 +2822,7 @@
                                 ]
                             },
                             "default": "any",
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -2832,7 +2847,7 @@
                                 ]
                             },
                             "default": "any",
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -2857,7 +2872,7 @@
                                 ]
                             },
                             "default": "any",
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -2882,7 +2897,7 @@
                                 ]
                             },
                             "default": "any",
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -2907,7 +2922,7 @@
                                 ]
                             },
                             "default": "any",
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -3158,7 +3173,7 @@
                             "key": "post_tags",
                             "label": "Select Post Tags",
                             "type": "select",
-                            "required": true,
+                            "required": false,
                             "multiple": true,
                             "dynamic": {
                                 "integration": "wordpress",
@@ -3353,7 +3368,8 @@
                         {
                             "key": "user_email",
                             "label": "Email",
-                            "type": "email"
+                            "type": "email",
+                            "required": true
                         },
                         {
                             "key": "user_pass",
@@ -4169,7 +4185,7 @@
                             "key": "limit",
                             "label": "Limit",
                             "type": "number",
-                            "default": 20
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -4778,7 +4794,7 @@
                             "key": "limit",
                             "label": "Limit",
                             "type": "number",
-                            "default": 20
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -5376,7 +5392,7 @@
                             "key": "post_tags",
                             "label": "Select Post Tags",
                             "type": "select",
-                            "required": true,
+                            "required": false,
                             "multiple": true,
                             "dynamic": {
                                 "integration": "wordpress",
@@ -5516,6 +5532,7 @@
                             "key": "post_status",
                             "label": "Status",
                             "type": "select",
+                            "required": true,
                             "options": [
                                 {
                                     "label": "Publish",
@@ -6718,12 +6735,14 @@
                         {
                             "key": "customer_id",
                             "label": "Customer ID",
-                            "type": "expression"
+                            "type": "expression",
+                            "required": true
                         },
                         {
                             "key": "order_status",
                             "label": "Order Status",
                             "type": "select",
+                            "required": true,
                             "options": [
                                 {
                                     "label": "Pending",
@@ -6797,6 +6816,7 @@
                             "key": "order_status",
                             "label": "Order Status",
                             "type": "select",
+                            "required": true,
                             "options": [
                                 {
                                     "label": "Pending",
@@ -6969,6 +6989,7 @@
                             "key": "order_status",
                             "label": "Order Status",
                             "type": "select",
+                            "required": true,
                             "options": [
                                 {
                                     "label": "Pending",
@@ -7013,13 +7034,13 @@
                             "key": "limit",
                             "label": "Limit",
                             "type": "number",
-                            "default": 20
+                            "required": true
                         },
                         {
                             "key": "page",
                             "label": "Page",
                             "type": "number",
-                            "default": 1
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -7034,13 +7055,13 @@
                             "key": "limit",
                             "label": "Limit",
                             "type": "number",
-                            "default": 20
+                            "required": true
                         },
                         {
                             "key": "page",
                             "label": "Page",
                             "type": "number",
-                            "default": 1
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -7091,13 +7112,13 @@
                             "key": "limit",
                             "label": "Limit",
                             "type": "number",
-                            "default": 20
+                            "required": true
                         },
                         {
                             "key": "page",
                             "label": "Page",
                             "type": "number",
-                            "default": 1
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -7118,13 +7139,13 @@
                             "key": "limit",
                             "label": "Limit",
                             "type": "number",
-                            "default": 20
+                            "required": true
                         },
                         {
                             "key": "page",
                             "label": "Page",
                             "type": "number",
-                            "default": 1
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -7153,13 +7174,13 @@
                             "key": "limit",
                             "label": "Limit",
                             "type": "number",
-                            "default": 20
+                            "required": true
                         },
                         {
                             "key": "page",
                             "label": "Page",
                             "type": "number",
-                            "default": 1
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -7287,13 +7308,13 @@
                             "key": "limit",
                             "label": "Limit",
                             "type": "number",
-                            "default": 20
+                            "required": true
                         },
                         {
                             "key": "page",
                             "label": "Page",
                             "type": "number",
-                            "default": 1
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -7397,6 +7418,7 @@
                             "key": "product_status",
                             "label": "Status",
                             "type": "select",
+                            "required": true,
                             "options": [
                                 {
                                     "label": "Publish",
@@ -7543,6 +7565,7 @@
                             "key": "product_status",
                             "label": "Status",
                             "type": "select",
+                            "required": true,
                             "options": [
                                 {
                                     "label": "Publish",
@@ -7594,6 +7617,7 @@
                             "key": "product_status",
                             "label": "Status",
                             "type": "select",
+                            "required": true,
                             "options": [
                                 {
                                     "label": "Publish",
@@ -7700,13 +7724,13 @@
                             "key": "limit",
                             "label": "Limit",
                             "type": "number",
-                            "default": 20
+                            "required": true
                         },
                         {
                             "key": "page",
                             "label": "Page",
                             "type": "number",
-                            "default": 1
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -7742,13 +7766,13 @@
                             "key": "limit",
                             "label": "Limit",
                             "type": "number",
-                            "default": 20
+                            "required": true
                         },
                         {
                             "key": "page",
                             "label": "Page",
                             "type": "number",
-                            "default": 1
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -7763,13 +7787,13 @@
                             "key": "limit",
                             "label": "Limit",
                             "type": "number",
-                            "default": 20
+                            "required": true
                         },
                         {
                             "key": "page",
                             "label": "Page",
                             "type": "number",
-                            "default": 1
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -7784,13 +7808,13 @@
                             "key": "limit",
                             "label": "Limit",
                             "type": "number",
-                            "default": 20
+                            "required": true
                         },
                         {
                             "key": "page",
                             "label": "Page",
                             "type": "number",
-                            "default": 1
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -7805,13 +7829,13 @@
                             "key": "limit",
                             "label": "Limit",
                             "type": "number",
-                            "default": 20
+                            "required": true
                         },
                         {
                             "key": "page",
                             "label": "Page",
                             "type": "number",
-                            "default": 1
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -7826,13 +7850,13 @@
                             "key": "limit",
                             "label": "Limit",
                             "type": "number",
-                            "default": 20
+                            "required": true
                         },
                         {
                             "key": "page",
                             "label": "Page",
                             "type": "number",
-                            "default": 1
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -7847,13 +7871,13 @@
                             "key": "limit",
                             "label": "Limit",
                             "type": "number",
-                            "default": 20
+                            "required": true
                         },
                         {
                             "key": "page",
                             "label": "Page",
                             "type": "number",
-                            "default": 1
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -7868,13 +7892,13 @@
                             "key": "limit",
                             "label": "Limit",
                             "type": "number",
-                            "default": 20
+                            "required": true
                         },
                         {
                             "key": "page",
                             "label": "Page",
                             "type": "number",
-                            "default": 1
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -8243,13 +8267,13 @@
                             "key": "limit",
                             "label": "Limit",
                             "type": "number",
-                            "default": 20
+                            "required": true
                         },
                         {
                             "key": "page",
                             "label": "Page",
                             "type": "number",
-                            "default": 1
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -8392,13 +8416,13 @@
                             "key": "limit",
                             "label": "Limit",
                             "type": "number",
-                            "default": 20
+                            "required": true
                         },
                         {
                             "key": "page",
                             "label": "Page",
                             "type": "number",
-                            "default": 1
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -8541,13 +8565,13 @@
                             "key": "limit",
                             "label": "Limit",
                             "type": "number",
-                            "default": 20
+                            "required": true
                         },
                         {
                             "key": "page",
                             "label": "Page",
                             "type": "number",
-                            "default": 1
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -8690,13 +8714,13 @@
                             "key": "limit",
                             "label": "Limit",
                             "type": "number",
-                            "default": 20
+                            "required": true
                         },
                         {
                             "key": "page",
                             "label": "Page",
                             "type": "number",
-                            "default": 1
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -8839,13 +8863,13 @@
                             "key": "limit",
                             "label": "Limit",
                             "type": "number",
-                            "default": 20
+                            "required": true
                         },
                         {
                             "key": "page",
                             "label": "Page",
                             "type": "number",
-                            "default": 1
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -9543,13 +9567,13 @@
                             "key": "limit",
                             "label": "Limit",
                             "type": "number",
-                            "default": 20
+                            "required": true
                         },
                         {
                             "key": "page",
                             "label": "Page",
                             "type": "number",
-                            "default": 1
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -9605,13 +9629,13 @@
                             "key": "limit",
                             "label": "Limit",
                             "type": "number",
-                            "default": 20
+                            "required": true
                         },
                         {
                             "key": "page",
                             "label": "Page",
                             "type": "number",
-                            "default": 1
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -9626,7 +9650,7 @@
                             "key": "limit",
                             "label": "Limit",
                             "type": "number",
-                            "default": 10
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -10593,297 +10617,6 @@
                 }
             }
         },
-        "slack": {
-            "slug": "slack",
-            "name": "Slack",
-            "icon": "slack.svg",
-            "category": "app",
-            "requires_connection": true,
-            "auth_type": "both",
-            "supports_webhook": true,
-            "triggers": {
-                "message_received": {
-                    "key": "message_received",
-                    "label": "Message Received",
-                    "hook": "slack_webhook_message",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "app_mention": {
-                    "key": "app_mention",
-                    "label": "App Mentioned",
-                    "hook": "slack_webhook_app_mention",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "reaction_added": {
-                    "key": "reaction_added",
-                    "label": "Reaction Added",
-                    "hook": "slack_webhook_reaction_added",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "channel_created": {
-                    "key": "channel_created",
-                    "label": "Channel Created",
-                    "hook": "slack_webhook_channel_created",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "file_shared": {
-                    "key": "file_shared",
-                    "label": "File Shared",
-                    "hook": "slack_webhook_file_shared",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                }
-            },
-            "actions": {
-                "send_message": {
-                    "key": "send_message",
-                    "label": "Send Message",
-                    "schema": [
-                        {
-                            "key": "channel",
-                            "type": "text",
-                            "label": "Channel",
-                            "placeholder": "#general or channel ID",
-                            "required": true
-                        },
-                        {
-                            "key": "text",
-                            "type": "textarea",
-                            "label": "Message",
-                            "placeholder": "Enter your message... Use {{variable}} for dynamic values",
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "send_dm": {
-                    "key": "send_dm",
-                    "label": "Send Direct Message",
-                    "schema": [
-                        {
-                            "key": "user_id",
-                            "type": "text",
-                            "label": "User ID",
-                            "placeholder": "Slack user ID (e.g. U012AB3CD)",
-                            "required": true
-                        },
-                        {
-                            "key": "text",
-                            "type": "textarea",
-                            "label": "Message",
-                            "placeholder": "Enter your message... Use {{variable}} for dynamic values",
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "create_channel": {
-                    "key": "create_channel",
-                    "label": "Create Channel",
-                    "schema": [
-                        {
-                            "key": "name",
-                            "type": "text",
-                            "label": "Channel Name",
-                            "placeholder": "my-new-channel",
-                            "required": true,
-                            "help": "Lowercase letters, numbers and hyphens only."
-                        },
-                        {
-                            "key": "is_private",
-                            "type": "select",
-                            "label": "Visibility",
-                            "options": [
-                                {
-                                    "value": "false",
-                                    "label": "Public"
-                                },
-                                {
-                                    "value": "true",
-                                    "label": "Private"
-                                }
-                            ]
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "invite_to_channel": {
-                    "key": "invite_to_channel",
-                    "label": "Invite User to Channel",
-                    "schema": [
-                        {
-                            "key": "channel",
-                            "type": "text",
-                            "label": "Channel ID",
-                            "placeholder": "C012AB3CD",
-                            "required": true
-                        },
-                        {
-                            "key": "user_ids",
-                            "type": "text",
-                            "label": "User IDs",
-                            "placeholder": "U012AB3CD,U012AB3CE",
-                            "required": true,
-                            "help": "Comma-separated Slack user IDs."
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "set_topic": {
-                    "key": "set_topic",
-                    "label": "Set Channel Topic",
-                    "schema": [
-                        {
-                            "key": "channel",
-                            "type": "text",
-                            "label": "Channel ID",
-                            "placeholder": "C012AB3CD",
-                            "required": true
-                        },
-                        {
-                            "key": "topic",
-                            "type": "text",
-                            "label": "Topic",
-                            "placeholder": "New channel topic...",
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "add_reaction": {
-                    "key": "add_reaction",
-                    "label": "Add Reaction",
-                    "schema": [
-                        {
-                            "key": "channel",
-                            "type": "text",
-                            "label": "Channel ID",
-                            "placeholder": "C012AB3CD",
-                            "required": true
-                        },
-                        {
-                            "key": "timestamp",
-                            "type": "text",
-                            "label": "Message Timestamp",
-                            "placeholder": "{{slack_message_ts}}",
-                            "required": true,
-                            "help": "The ts of the message to react to."
-                        },
-                        {
-                            "key": "emoji",
-                            "type": "text",
-                            "label": "Emoji Name",
-                            "placeholder": "thumbsup",
-                            "required": true,
-                            "help": "Emoji name without colons (e.g. thumbsup)."
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "get_user_info": {
-                    "key": "get_user_info",
-                    "label": "Get User Info",
-                    "schema": [
-                        {
-                            "key": "user_id",
-                            "type": "text",
-                            "label": "User ID",
-                            "placeholder": "U012AB3CD or {{user_id}}",
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                }
-            }
-        },
-        "trello": {
-            "slug": "trello",
-            "name": "Trello",
-            "icon": "trello-icon.svg",
-            "category": "app",
-            "requires_connection": false,
-            "auth_type": "none",
-            "supports_webhook": false,
-            "triggers": {
-                "card_created": {
-                    "key": "card_created",
-                    "label": "Card Created",
-                    "hook": "trello_webhook",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                }
-            },
-            "actions": {
-                "create_card": {
-                    "key": "create_card",
-                    "label": "Create Card",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                }
-            }
-        },
-        "stripe": {
-            "slug": "stripe",
-            "name": "Stripe",
-            "icon": "stripe.svg",
-            "category": "app",
-            "requires_connection": false,
-            "auth_type": "none",
-            "supports_webhook": false,
-            "triggers": {
-                "payment_succeeded": {
-                    "key": "payment_succeeded",
-                    "label": "Payment Succeeded",
-                    "hook": "stripe_webhook",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                }
-            },
-            "actions": {
-                "charge_customer": {
-                    "key": "charge_customer",
-                    "label": "Charge Customer",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                }
-            }
-        },
         "mailchimp": {
             "slug": "mailchimp",
             "name": "Mailchimp",
@@ -11262,6 +10995,7 @@
                             "key": "form_id",
                             "label": "Form",
                             "type": "select",
+                            "required": true,
                             "dynamic": {
                                 "integration": "activecampaign",
                                 "query": "forms",
@@ -11277,6 +11011,7 @@
                             "label": "Contact Email",
                             "type": "text",
                             "placeholder": "name@example.com",
+                            "required": true,
                             "help": "Optional. Only continue when the submitted contact email matches this value."
                         },
                         {
@@ -11300,6 +11035,7 @@
                             "key": "form_id",
                             "label": "Form",
                             "type": "select",
+                            "required": true,
                             "dynamic": {
                                 "integration": "activecampaign",
                                 "query": "forms",
@@ -11315,6 +11051,7 @@
                             "label": "Contact Email",
                             "type": "text",
                             "placeholder": "name@example.com",
+                            "required": true,
                             "help": "Optional. Only continue when the submitted contact email matches this value."
                         },
                         {
@@ -11338,6 +11075,7 @@
                             "key": "form_id",
                             "label": "Form",
                             "type": "select",
+                            "required": true,
                             "dynamic": {
                                 "integration": "activecampaign",
                                 "query": "forms",
@@ -11353,6 +11091,7 @@
                             "label": "Contact Email",
                             "type": "text",
                             "placeholder": "name@example.com",
+                            "required": true,
                             "help": "Optional. Only continue when the submitted contact email matches this value."
                         },
                         {
@@ -11789,6 +11528,7 @@
                             "key": "mode",
                             "label": "Mode",
                             "type": "select",
+                            "required": true,
                             "options": [
                                 {
                                     "label": "Live",
@@ -11837,6 +11577,7 @@
                             "key": "mode",
                             "label": "Mode",
                             "type": "select",
+                            "required": true,
                             "options": [
                                 {
                                     "label": "Live",
@@ -11866,13 +11607,13 @@
                             "key": "limit",
                             "label": "Limit",
                             "type": "number",
-                            "default": 20
+                            "required": true
                         },
                         {
                             "key": "page",
                             "label": "Page",
                             "type": "number",
-                            "default": 1
+                            "required": true
                         },
                         {
                             "key": "query",
@@ -11883,6 +11624,7 @@
                             "key": "mode",
                             "label": "Mode",
                             "type": "select",
+                            "required": true,
                             "options": [
                                 {
                                     "label": "Live",
@@ -11926,6 +11668,7 @@
                             "key": "mode",
                             "label": "Mode",
                             "type": "select",
+                            "required": true,
                             "options": [
                                 {
                                     "label": "Live",
@@ -11960,6 +11703,7 @@
                             "key": "mode",
                             "label": "Mode",
                             "type": "select",
+                            "required": true,
                             "options": [
                                 {
                                     "label": "Live",
@@ -12008,6 +11752,7 @@
                             "key": "mode",
                             "label": "Mode",
                             "type": "select",
+                            "required": true,
                             "options": [
                                 {
                                     "label": "Live",
@@ -12037,13 +11782,13 @@
                             "key": "limit",
                             "label": "Limit",
                             "type": "number",
-                            "default": 20
+                            "required": true
                         },
                         {
                             "key": "page",
                             "label": "Page",
                             "type": "number",
-                            "default": 1
+                            "required": true
                         },
                         {
                             "key": "query",
@@ -12054,6 +11799,7 @@
                             "key": "mode",
                             "label": "Mode",
                             "type": "select",
+                            "required": true,
                             "options": [
                                 {
                                     "label": "Live",
@@ -12097,6 +11843,7 @@
                             "key": "mode",
                             "label": "Mode",
                             "type": "select",
+                            "required": true,
                             "options": [
                                 {
                                     "label": "Live",
@@ -12137,6 +11884,7 @@
                             "key": "product_status",
                             "label": "Status",
                             "type": "select",
+                            "required": true,
                             "options": [
                                 {
                                     "label": "Published",
@@ -12191,12 +11939,13 @@
                             "key": "recurring_interval_count",
                             "label": "Recurring Interval Count",
                             "type": "number",
-                            "default": 1
+                            "required": true
                         },
                         {
                             "key": "mode",
                             "label": "Mode",
                             "type": "select",
+                            "required": true,
                             "options": [
                                 {
                                     "label": "Live",
@@ -12231,6 +11980,7 @@
                             "key": "mode",
                             "label": "Mode",
                             "type": "select",
+                            "required": true,
                             "options": [
                                 {
                                     "label": "Live",
@@ -12279,6 +12029,7 @@
                             "key": "mode",
                             "label": "Mode",
                             "type": "select",
+                            "required": true,
                             "options": [
                                 {
                                     "label": "Live",
@@ -12322,6 +12073,7 @@
                             "key": "mode",
                             "label": "Mode",
                             "type": "select",
+                            "required": true,
                             "options": [
                                 {
                                     "label": "Live",
@@ -12346,13 +12098,13 @@
                             "key": "limit",
                             "label": "Limit",
                             "type": "number",
-                            "default": 20
+                            "required": true
                         },
                         {
                             "key": "page",
                             "label": "Page",
                             "type": "number",
-                            "default": 1
+                            "required": true
                         },
                         {
                             "key": "query",
@@ -12363,6 +12115,7 @@
                             "key": "mode",
                             "label": "Mode",
                             "type": "select",
+                            "required": true,
                             "options": [
                                 {
                                     "label": "Live",
@@ -12406,6 +12159,7 @@
                             "key": "mode",
                             "label": "Mode",
                             "type": "select",
+                            "required": true,
                             "options": [
                                 {
                                     "label": "Live",
@@ -12440,6 +12194,7 @@
                             "key": "mode",
                             "label": "Mode",
                             "type": "select",
+                            "required": true,
                             "options": [
                                 {
                                     "label": "Live",
@@ -12488,6 +12243,7 @@
                             "key": "mode",
                             "label": "Mode",
                             "type": "select",
+                            "required": true,
                             "options": [
                                 {
                                     "label": "Live",
@@ -12531,6 +12287,7 @@
                             "key": "mode",
                             "label": "Mode",
                             "type": "select",
+                            "required": true,
                             "options": [
                                 {
                                     "label": "Live",
@@ -12555,13 +12312,13 @@
                             "key": "limit",
                             "label": "Limit",
                             "type": "number",
-                            "default": 20
+                            "required": true
                         },
                         {
                             "key": "page",
                             "label": "Page",
                             "type": "number",
-                            "default": 1
+                            "required": true
                         },
                         {
                             "key": "query",
@@ -12572,6 +12329,7 @@
                             "key": "mode",
                             "label": "Mode",
                             "type": "select",
+                            "required": true,
                             "options": [
                                 {
                                     "label": "Live",
@@ -12615,6 +12373,7 @@
                             "key": "mode",
                             "label": "Mode",
                             "type": "select",
+                            "required": true,
                             "options": [
                                 {
                                     "label": "Live",
@@ -12649,6 +12408,7 @@
                             "key": "mode",
                             "label": "Mode",
                             "type": "select",
+                            "required": true,
                             "options": [
                                 {
                                     "label": "Live",
@@ -12697,6 +12457,7 @@
                             "key": "mode",
                             "label": "Mode",
                             "type": "select",
+                            "required": true,
                             "options": [
                                 {
                                     "label": "Live",
@@ -12726,13 +12487,13 @@
                             "key": "limit",
                             "label": "Limit",
                             "type": "number",
-                            "default": 20
+                            "required": true
                         },
                         {
                             "key": "page",
                             "label": "Page",
                             "type": "number",
-                            "default": 1
+                            "required": true
                         },
                         {
                             "key": "query",
@@ -12743,6 +12504,7 @@
                             "key": "mode",
                             "label": "Mode",
                             "type": "select",
+                            "required": true,
                             "options": [
                                 {
                                     "label": "Live",
@@ -12786,6 +12548,7 @@
                             "key": "mode",
                             "label": "Mode",
                             "type": "select",
+                            "required": true,
                             "options": [
                                 {
                                     "label": "Live",
@@ -13530,12 +13293,14 @@
                         {
                             "key": "username",
                             "label": "Username",
-                            "type": "text"
+                            "type": "text",
+                            "required": true
                         },
                         {
                             "key": "password",
                             "label": "Password",
-                            "type": "text"
+                            "type": "text",
+                            "required": true
                         },
                         {
                             "key": "first_name",
@@ -13792,7 +13557,8 @@
                         {
                             "key": "price",
                             "label": "Price",
-                            "type": "number"
+                            "type": "number",
+                            "required": true
                         },
                         {
                             "key": "period",
@@ -15553,7 +15319,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         },
                         {
                             "key": "customer_id",
@@ -15567,7 +15333,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -15592,7 +15358,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         },
                         {
                             "key": "customer_id",
@@ -15606,7 +15372,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -15631,7 +15397,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         },
                         {
                             "key": "customer_id",
@@ -15645,7 +15411,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -15670,7 +15436,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         },
                         {
                             "key": "customer_id",
@@ -15684,7 +15450,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -15709,7 +15475,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         },
                         {
                             "key": "customer_id",
@@ -15723,7 +15489,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -15748,7 +15514,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         },
                         {
                             "key": "customer_id",
@@ -15762,7 +15528,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -15787,7 +15553,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         },
                         {
                             "key": "customer_id",
@@ -15801,7 +15567,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -15826,7 +15592,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         },
                         {
                             "key": "customer_id",
@@ -15840,7 +15606,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -15865,7 +15631,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         },
                         {
                             "key": "customer_id",
@@ -15879,7 +15645,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -15904,7 +15670,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         },
                         {
                             "key": "customer_id",
@@ -15918,7 +15684,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -15943,7 +15709,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         },
                         {
                             "key": "customer_id",
@@ -15957,7 +15723,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -15982,7 +15748,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         },
                         {
                             "key": "customer_id",
@@ -15996,7 +15762,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -16021,7 +15787,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         },
                         {
                             "key": "customer_id",
@@ -16035,7 +15801,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -16060,7 +15826,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         },
                         {
                             "key": "customer_id",
@@ -16074,7 +15840,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -16099,7 +15865,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         },
                         {
                             "key": "order_id",
@@ -16113,7 +15879,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         },
                         {
                             "key": "customer_id",
@@ -16127,7 +15893,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -16152,7 +15918,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         },
                         {
                             "key": "order_id",
@@ -16166,7 +15932,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         },
                         {
                             "key": "customer_id",
@@ -16180,7 +15946,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -16205,7 +15971,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         },
                         {
                             "key": "order_id",
@@ -16219,7 +15985,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         },
                         {
                             "key": "customer_id",
@@ -16233,7 +15999,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -16258,7 +16024,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         },
                         {
                             "key": "order_id",
@@ -16272,7 +16038,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         },
                         {
                             "key": "customer_id",
@@ -16286,7 +16052,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -16311,7 +16077,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         },
                         {
                             "key": "order_id",
@@ -16325,7 +16091,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         },
                         {
                             "key": "customer_id",
@@ -16339,7 +16105,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -16364,7 +16130,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -16389,7 +16155,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -16414,7 +16180,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -16439,7 +16205,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -16481,13 +16247,13 @@
                             "key": "limit",
                             "label": "Limit",
                             "type": "number",
-                            "default": 20
+                            "required": true
                         },
                         {
                             "key": "page",
                             "label": "Page",
                             "type": "number",
-                            "default": 1
+                            "required": true
                         },
                         {
                             "key": "search",
@@ -16520,7 +16286,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         },
                         {
                             "key": "payment_status",
@@ -16534,7 +16300,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -16574,13 +16340,13 @@
                             "key": "limit",
                             "label": "Limit",
                             "type": "number",
-                            "default": 20
+                            "required": true
                         },
                         {
                             "key": "page",
                             "label": "Page",
                             "type": "number",
-                            "default": 1
+                            "required": true
                         },
                         {
                             "key": "search",
@@ -16599,7 +16365,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -16639,13 +16405,13 @@
                             "key": "limit",
                             "label": "Limit",
                             "type": "number",
-                            "default": 20
+                            "required": true
                         },
                         {
                             "key": "page",
                             "label": "Page",
                             "type": "number",
-                            "default": 1
+                            "required": true
                         },
                         {
                             "key": "search",
@@ -16664,7 +16430,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         },
                         {
                             "key": "subscription_status",
@@ -16678,7 +16444,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -16718,13 +16484,13 @@
                             "key": "limit",
                             "label": "Limit",
                             "type": "number",
-                            "default": 20
+                            "required": true
                         },
                         {
                             "key": "page",
                             "label": "Page",
                             "type": "number",
-                            "default": 1
+                            "required": true
                         },
                         {
                             "key": "search",
@@ -16883,7 +16649,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -17420,6 +17186,7 @@
                             "key": "user_id",
                             "label": "User ID",
                             "type": "select",
+                            "required": true,
                             "dynamic": {
                                 "integration": "easydigitaldownload",
                                 "query": "users",
@@ -17433,6 +17200,7 @@
                             "key": "customer_status",
                             "label": "Status",
                             "type": "select",
+                            "required": true,
                             "options": [
                                 {
                                     "label": "Active",
@@ -17475,6 +17243,7 @@
                             "key": "type",
                             "label": "Type",
                             "type": "select",
+                            "required": true,
                             "options": [
                                 {
                                     "label": "Percent",
@@ -17490,6 +17259,7 @@
                             "key": "discount_status",
                             "label": "Status",
                             "type": "select",
+                            "required": true,
                             "options": [
                                 {
                                     "label": "Active",
@@ -17538,6 +17308,7 @@
                             "key": "payment_status",
                             "label": "Status",
                             "type": "select",
+                            "required": true,
                             "options": [
                                 {
                                     "label": "Pending",
@@ -17635,6 +17406,7 @@
                             "key": "download_status",
                             "label": "Status",
                             "type": "select",
+                            "required": true,
                             "options": [
                                 {
                                     "label": "Draft",
@@ -17688,6 +17460,7 @@
                             "key": "download_status",
                             "label": "Status",
                             "type": "select",
+                            "required": true,
                             "options": [
                                 {
                                     "label": "Draft",
@@ -17927,27 +17700,20 @@
             },
             "actions": []
         },
-        "bricks": {
-            "slug": "bricks",
-            "name": "Bricks",
-            "icon": "bricksb-builder.svg",
+        "bricksbuilder": {
+            "slug": "bricksbuilder",
+            "name": "Bricks Builder",
+            "icon": "bricks-builder.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
             "triggers": {
-                "bricks_form_submit": {
-                    "key": "bricks_form_submit",
-                    "label": "Bricks Form Submitted",
+                "form_submit": {
+                    "key": "form_submit",
+                    "label": "Form Submit",
                     "hook": "bricks/form/custom_action",
-                    "schema": [
-                        {
-                            "key": "form_action",
-                            "label": "Form action",
-                            "type": "text",
-                            "required": true
-                        }
-                    ],
+                    "schema": [],
                     "outputs": {
                         "main": "Main output"
                     }
@@ -19365,7 +19131,8 @@
                                     "name",
                                     "label"
                                 ]
-                            }
+                            },
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -19399,7 +19166,8 @@
                                     "name",
                                     "label"
                                 ]
-                            }
+                            },
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -19423,7 +19191,8 @@
                                     "name",
                                     "label"
                                 ]
-                            }
+                            },
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -19447,7 +19216,8 @@
                                     "name",
                                     "label"
                                 ]
-                            }
+                            },
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -19471,7 +19241,8 @@
                                     "name",
                                     "label"
                                 ]
-                            }
+                            },
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -19495,7 +19266,8 @@
                                     "name",
                                     "label"
                                 ]
-                            }
+                            },
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -19519,7 +19291,8 @@
                                     "name",
                                     "label"
                                 ]
-                            }
+                            },
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -19543,7 +19316,8 @@
                                     "name",
                                     "label"
                                 ]
-                            }
+                            },
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -19567,7 +19341,8 @@
                                     "name",
                                     "label"
                                 ]
-                            }
+                            },
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -19601,7 +19376,8 @@
                                     "name",
                                     "label"
                                 ]
-                            }
+                            },
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -19625,7 +19401,8 @@
                                     "name",
                                     "label"
                                 ]
-                            }
+                            },
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -21490,7 +21267,7 @@
                                     "value": "partially_refunded"
                                 }
                             ],
-                            "required": false
+                            "required": true
                         }
                     ],
                     "outputs": {
@@ -21557,7 +21334,7 @@
                             "key": "limit",
                             "label": "Limit",
                             "type": "number",
-                            "default": 50
+                            "required": true
                         },
                         {
                             "key": "search",
@@ -21610,7 +21387,7 @@
                                     "label"
                                 ]
                             },
-                            "required": false
+                            "required": true
                         },
                         {
                             "key": "payment_status",
@@ -21638,19 +21415,19 @@
                                     "value": "refunded"
                                 }
                             ],
-                            "required": false
+                            "required": true
                         },
                         {
                             "key": "limit",
                             "label": "Limit",
                             "type": "number",
-                            "default": 20
+                            "required": true
                         },
                         {
                             "key": "page",
                             "label": "Page",
                             "type": "number",
-                            "default": 1
+                            "required": true
                         },
                         {
                             "key": "search",
@@ -21915,30 +21692,6 @@
                     "key": "submit_form",
                     "label": "Form Submit",
                     "hook": "arfliteentryexecute",
-                    "schema": [
-                        {
-                            "key": "form_id",
-                            "label": "Form",
-                            "type": "select",
-                            "dynamic": {
-                                "integration": "arform",
-                                "query": "forms",
-                                "select": [
-                                    "value",
-                                    "label"
-                                ]
-                            },
-                            "required": true
-                        }
-                    ],
-                    "outputs": {
-                        "main": "Main output"
-                    }
-                },
-                "submit_form_full": {
-                    "key": "submit_form_full",
-                    "label": "Form Submit (Full Version)",
-                    "hook": "arfentryexecute",
                     "schema": [
                         {
                             "key": "form_id",
@@ -23802,7 +23555,7 @@
                             "key": "webhook_endpoint",
                             "label": "Webhook Endpoint URL",
                             "type": "copy",
-                            "value": "https://localhost:10016/index.php?rest_route=/zaplane/v1/incoming/fillout",
+                            "value": "https://localhost:10003/wp-json/zaplane/v1/incoming/fillout",
                             "readonly": true,
                             "help": "Copy this URL \u2192 Fillout Dashboard \u2192 Your Form \u2192 Integrate \u2192 Webhooks \u2192 Add Webhook \u2192 Paste & Save."
                         }
@@ -23846,7 +23599,7 @@
                             "key": "webhook_endpoint",
                             "label": "Webhook Endpoint URL",
                             "type": "copy",
-                            "value": "https://localhost:10016/index.php?rest_route=/zaplane/v1/incoming/typeform",
+                            "value": "https://localhost:10003/wp-json/zaplane/v1/incoming/typeform",
                             "readonly": true,
                             "help": "Copy this URL \u2192 Typeform Dashboard \u2192 Your Form \u2192 Connect \u2192 Webhooks \u2192 Add a webhook \u2192 Paste & Save."
                         }
@@ -24186,15 +23939,13 @@
                             "key": "max_age",
                             "type": "number",
                             "label": "Max Age (seconds, 0 = never expires)",
-                            "required": false,
-                            "default": 86400
+                            "required": true
                         },
                         {
                             "key": "max_uses",
                             "type": "number",
                             "label": "Max Uses (0 = unlimited)",
-                            "required": false,
-                            "default": 0
+                            "required": true
                         },
                         {
                             "key": "temporary",
@@ -24375,8 +24126,7 @@
                             "key": "limit",
                             "type": "number",
                             "label": "Message Limit",
-                            "required": false,
-                            "default": 10,
+                            "required": true,
                             "min": 1,
                             "max": 100
                         }
@@ -24460,8 +24210,7 @@
                             "key": "limit",
                             "type": "number",
                             "label": "Member Limit",
-                            "required": false,
-                            "default": 100,
+                            "required": true,
                             "min": 1,
                             "max": 1000
                         }
@@ -24666,6 +24415,42 @@
                     ]
                 }
             }
+        },
+        "avadaform": {
+            "slug": "avadaform",
+            "name": "Avada Form",
+            "icon": "avadaform.svg",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": {
+                "submit_form": {
+                    "key": "submit_form",
+                    "label": "Form Submit",
+                    "hook": "fusion_form_submission_data",
+                    "schema": [
+                        {
+                            "key": "form_id",
+                            "label": "Form",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "avadaform",
+                                "query": "forms",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": {
+                        "main": "Main output"
+                    }
+                }
+            },
+            "actions": []
         }
     },
     "tools": {

@@ -61,6 +61,7 @@ class ActiveCampaign extends IntegrationBase {
 				'key'      => 'form_id',
 				'label'    => 'Form',
 				'type'     => 'select',
+				'required' => true,
 				'dynamic'  => [
 					'integration' => 'activecampaign',
 					'query'       => 'forms',
@@ -73,6 +74,7 @@ class ActiveCampaign extends IntegrationBase {
 				'label'       => 'Contact Email',
 				'type'        => 'text',
 				'placeholder' => 'name@example.com',
+				'required' => true,
 				'help'        => 'Optional. Only continue when the submitted contact email matches this value.',
 			],
 		];

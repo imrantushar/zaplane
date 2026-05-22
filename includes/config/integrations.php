@@ -27,10 +27,6 @@ return [
 			'file' => 'variable.php',
 			'class' => \Zaplane\Integrations\Variable::class
 		],
-		'cartflows'            => [
-			'file' => 'cartflows.php',
-			'class' => \Zaplane\Integrations\Cartflows::class
-		],
 		'dokan'                => [
 			'file' => 'dokan.php',
 			'class' => \Zaplane\Integrations\Dokan::class
@@ -179,10 +175,6 @@ return [
 			'file' => 'groundhogg.php',
 			'class' => \Zaplane\Integrations\Groundhogg::class
 		],
-		'bricks'               => [
-			'file' => 'bricks.php',
-			'class' => \Zaplane\Integrations\Bricks::class
-		],
 		'elementor'            => [
 			'file' => 'elementor.php',
 			'class' => \Zaplane\Integrations\Elementor::class
@@ -232,15 +224,15 @@ return [
 			'class' => \Zaplane\Integrations\Kadenceblocks::class
 			],
 		'eventscalendar'      => [
-			'file' => 'eventscalendar.php', 
+			'file' => 'eventscalendar.php',
 			'class' => \Zaplane\Integrations\Eventscalendar::class
 			],
 		'buddyboss'      => [
-			'file' => 'buddyboss.php', 
+			'file' => 'buddyboss.php',
 			'class' => \Zaplane\Integrations\Buddyboss::class
 		],
 		'ultimatemember'      => [
-			'file' => 'ultimatemember.php', 
+			'file' => 'ultimatemember.php',
 			'class' => \Zaplane\Integrations\Ultimatemember::class
 		],
 		'bitform'      => [
@@ -260,15 +252,15 @@ return [
 			'class' => \Zaplane\Integrations\Paymattic::class
 		],
 		'bookingcalendar'      => [
-			'file' => 'bookingcalendar.php', 
+			'file' => 'bookingcalendar.php',
 			'class' => \Zaplane\Integrations\Bookingcalendar::class
 		],
 		'weforms'      => [
-			'file' => 'weforms.php', 
+			'file' => 'weforms.php',
 			'class' => \Zaplane\Integrations\Weforms::class
 		],
 		'suremembers'      => [
-			'file' => 'suremembers.php', 
+			'file' => 'suremembers.php',
 			'class' => \Zaplane\Integrations\Suremembers::class
 		],
 		'arform'      => [
@@ -314,6 +306,10 @@ return [
 		'discord'        => [
 			'file'  => 'discord.php',
 			'class' => \Zaplane\Integrations\Discord::class
+		],
+		'avadaform'        => [
+			'file'  => 'avadaform.php',
+			'class' => \Zaplane\Integrations\Avadaform::class
 		],
 	],
 ];

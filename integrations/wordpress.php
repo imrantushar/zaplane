@@ -345,6 +345,7 @@ class Wordpress extends IntegrationBase {
 					'key'   => 'post_status',
 					'label' => 'Post Status',
 					'type'  => 'select',
+					'required' => true,
 					'options' => [
 						['label' => 'Publish', 'value' => 'publish'],
 						['label' => 'Draft', 'value' => 'draft'],
@@ -376,12 +377,13 @@ class Wordpress extends IntegrationBase {
 						'select'      => [ 'name', 'label' ],
 						'depends_on'  => ['post_type'],
 					],
-					'required' => false,
+					'required' => true,
 				],
 				[
 					'key'   => 'post_status',
 					'label' => 'Post Status',
 					'type'  => 'select',
+					'required' => true,
 					'options' => [
 						['label' => 'Publish', 'value' => 'publish'],
 						['label' => 'Draft', 'value' => 'draft'],
@@ -401,7 +403,7 @@ class Wordpress extends IntegrationBase {
 						'query' => 'post_types',
 						'select' => [ 'name', 'label' ],
 					],
-					'required' => false,
+					'required' => true,
 				],
 			];
 		}
@@ -412,6 +414,7 @@ class Wordpress extends IntegrationBase {
 					'key' => 'from_status',
 					'label' => 'From Status',
 					'type' => 'select',
+					'required' => true,
 					'options' => [
 						[
 							'label' => 'Approved',
@@ -435,6 +438,7 @@ class Wordpress extends IntegrationBase {
 					'key' => 'to_status',
 					'label' => 'To Status',
 					'type' => 'select',
+					'required' => true,
 					'options' => [
 						[
 							'label' => 'Approved',
@@ -554,7 +558,7 @@ class Wordpress extends IntegrationBase {
 					'select'      => [ 'ID', 'name' ],
 				],
 				'default' => 'any',
-				'required' => false,
+				'required' => true,
 			],
 		];
 	}
@@ -582,7 +586,7 @@ class Wordpress extends IntegrationBase {
 					'select'      => [ 'term_id', 'name' ],
 				],
 				'default' => 'any',
-				'required' => false,
+				'required' => true,
 			],
 		];
 	}
@@ -706,8 +710,6 @@ class Wordpress extends IntegrationBase {
 
 		return $comment->toArray();
 	}
-
-
 
 	public static function resolve_trigger( array $node, array $args ) {
 
@@ -1178,8 +1180,6 @@ class Wordpress extends IntegrationBase {
 		);
 	}
 
-
-
 	public static function get_actions(): array {
 		return [
 			'create_post'                   => [ 'label' => 'Create Post' ],
@@ -1353,6 +1353,7 @@ class Wordpress extends IntegrationBase {
 				'key' => 'post_status',
 				'label' => 'Status',
 				'type' => 'select',
+				'required' => true,
 				'options' => [
 					[
 						'label' => 'Publish',
@@ -1630,7 +1631,7 @@ class Wordpress extends IntegrationBase {
 					'key'      => 'post_tags',
 					'label'    => 'Select Post Tags',
 					'type'     => 'select',
-					'required' => true,
+					'required' => false,
 					'multiple' => true,
 					'dynamic'  => [
 						'integration' => 'wordpress',
@@ -1780,7 +1781,7 @@ class Wordpress extends IntegrationBase {
 					'key'      => 'post_tags',
 					'label'    => 'Select Post Tags',
 					'type'     => 'select',
-					'required' => true,
+					'required' => false,
 					'multiple' => true,
 					'dynamic'  => [
 						'integration' => 'wordpress',
@@ -2269,7 +2270,8 @@ class Wordpress extends IntegrationBase {
 				[
 					'key' => 'user_email',
 					'label' => 'Email',
-					'type' => 'email'
+					'type' => 'email',
+					'required' => true
 				],
 				[
 					'key' => 'user_pass',
@@ -2496,7 +2498,7 @@ class Wordpress extends IntegrationBase {
 					'key' => 'limit',
 					'label' => 'Limit',
 					'type' => 'number',
-					'default' => 20,
+					'required' => true,
 				],
 			],
 			'get_term_by_field'      => [
@@ -2765,7 +2767,7 @@ class Wordpress extends IntegrationBase {
 					'key' => 'limit',
 					'label' => 'Limit',
 					'type' => 'number',
-					'default' => 20,
+					'required' => true,
 				],
 			],
 			'get_category'           => self::field_category_id(),
@@ -2950,8 +2952,6 @@ class Wordpress extends IntegrationBase {
 		return $schemas[ $action ] ?? [];
 	}
 
-
-
 	public static function execute_node( array $node, array $input ): array {
 
 		$config = $node['data']['config'] ?? [];
@@ -2968,8 +2968,6 @@ class Wordpress extends IntegrationBase {
 			'data' => $input
 		];
 	}
-
-
 
 	public static function get_dynamic_queries(): array {
 		return [

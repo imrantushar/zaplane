@@ -147,6 +147,7 @@ class Wpfunnels extends IntegrationBase {
 						'query'       => 'steps',
 						'select'      => [ 'name', 'label' ],
 					],
+					'required' => true,
 				],
 			];
 		}
@@ -167,6 +168,7 @@ class Wpfunnels extends IntegrationBase {
 						'query'       => 'funnels',
 						'select'      => [ 'name', 'label' ],
 					],
+					'required' => true,
 				],
 			];
 		}
@@ -298,4 +300,3 @@ class Wpfunnels extends IntegrationBase {
 		];
 	}
 }
-

@@ -13,7 +13,6 @@ const ZAPInput = ({
   isRequired = false
 }) => {
   const isTextarea = type === "textarea";
-  console.log(type,'type');
   return <div style={{display:'flex', flexDirection:'column', gap:'8px', ...containerStyle}}>
       {label && <span className='zaplane-label'>{__(label, "zaplane")}{isRequired && <span style={{ color: 'red', marginLeft: '2px' }}>*</span>}</span>}
       {isTextarea ? <textarea className="zaplane-textarea" placeholder={__(placeholder, "zaplane")} value={value} onChange={onChange} onKeyDown={onKeyDown} style={{...inputStyle}} /> :

@@ -79,6 +79,7 @@ const ActionFieldRenderer = ({
         <ZAPInput
           type={field.type}
           label={field.label}
+          required={!!field.required}
           value={value || ""}
           inputRef={inputRef}
           isRequired={!!field.required}
@@ -95,6 +96,7 @@ const ActionFieldRenderer = ({
         <div>
           <VariableEditor
             label={field.label}
+            required={!!field.required}
             value={value || ""}
             setValue={(val) => { setFieldValue(field.key, val); clearError(); }}
             variables={workflowVariables?.data || []}
@@ -113,6 +115,7 @@ const ActionFieldRenderer = ({
         <div>
           <ZAPDatePicker
             label={field.label}
+            required={!!field.required}
             value={value}
             onChange={(date) => {
               setFieldValue(field.key, date?.toISOString().split("T")[0]);
@@ -137,6 +140,7 @@ const ActionFieldRenderer = ({
         <div>
           <ZAPSelect
             label={field.label}
+            required={!!field.required}
             options={options}
             value={value}
             onChange={(opt) => { setFieldValue(field.key, opt?.value); clearError(); }}
@@ -168,6 +172,7 @@ const ActionFieldRenderer = ({
         <div>
           <ZAPSelect
             label={field.label}
+            required={!!field.required}
             options={options}
             value={value || []}
             onChange={(vals) => { setFieldValue(field.key, vals); clearError(); }}
