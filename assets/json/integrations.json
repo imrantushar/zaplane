@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-05-22 10:54:18",
+    "generated_at": "2026-05-22 11:04:28",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -4658,7 +4658,7 @@
                             "key": "webhook_endpoint",
                             "label": "Webhook Endpoint URL",
                             "type": "copy",
-                            "value": "https://almsdev.test/index.php?rest_route=/zaplane/v1/incoming/fillout",
+                            "value": "https://kodezen.local/wp-json/zaplane/v1/incoming/fillout",
                             "readonly": true,
                             "help": "Copy this URL \u2192 Fillout Dashboard \u2192 Your Form \u2192 Integrate \u2192 Webhooks \u2192 Add Webhook \u2192 Paste & Save."
                         }
@@ -13839,7 +13839,7 @@
                             "key": "webhook_endpoint",
                             "label": "Webhook Endpoint URL",
                             "type": "copy",
-                            "value": "https://almsdev.test/index.php?rest_route=/zaplane/v1/incoming/typeform",
+                            "value": "https://kodezen.local/wp-json/zaplane/v1/incoming/typeform",
                             "readonly": true,
                             "help": "Copy this URL \u2192 Typeform Dashboard \u2192 Your Form \u2192 Connect \u2192 Webhooks \u2192 Add a webhook \u2192 Paste & Save."
                         }
