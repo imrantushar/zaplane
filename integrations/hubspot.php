@@ -79,7 +79,7 @@ class Hubspot extends IntegrationBase {
 				array(
 					'key'         => 'phone',
 					'label'       => 'Phone',
-					'type'        => 'text',
+					'type'        => 'number',
 					'placeholder' => '+18884827768 or {{phone}}',
 					'help'        => 'Optional. Used to auto-build fields if Fields (JSON) is empty.',
 				),

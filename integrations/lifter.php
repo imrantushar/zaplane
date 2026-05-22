@@ -46,13 +46,6 @@ class Lifter extends IntegrationBase
         ];
     }
 
-
-    public static function get_trigger_accepted_args(string $trigger): int
-    {
-        $triggers = self::get_triggers();
-        return $triggers[$trigger]['accepted_args'] ?? 1;
-    }
-
     public static function get_trigger_config_schema(string $trigger): array
     {
         if (in_array($trigger, ['user_enroll_course', 'course_complete'], true)) {
@@ -64,7 +57,7 @@ class Lifter extends IntegrationBase
                     'dynamic' => [
                             'integration' => 'lifter',
                             'query'       => 'course',
-                            'select'      => ['name', 'label'],
+                            'select'      => ['value', 'label'],
                         ],
                     'required' => true,
                 ],
@@ -80,7 +73,7 @@ class Lifter extends IntegrationBase
                     'dynamic' => [
                             'integration' => 'lifter',
                             'query'       => 'quiz',
-                            'select'      => ['name', 'label'],
+                            'select'      => ['value', 'label'],
                         ],
                     'required' => true,
                 ],
@@ -96,7 +89,7 @@ class Lifter extends IntegrationBase
                     'dynamic' => [
                             'integration' => 'lifter',
                             'query'       => 'lesson',
-                            'select'      => ['name', 'label'],
+                            'select'      => ['value', 'label'],
                         ],
                     'required' => true,
                 ],
@@ -258,21 +251,6 @@ class Lifter extends IntegrationBase
         }
 
         return false;
-    }
-
-    public static function get_actions(): array
-    {
-        return [];
-    }
-
-    public static function get_action_config_schema(string $action): array
-    {
-        return [];
-    }
-
-    public static function execute_node(array $node, array $input): array
-    {
-        return ['port' => 'main', 'data' => $input];
     }
 
     public static function get_dynamic_queries(): array

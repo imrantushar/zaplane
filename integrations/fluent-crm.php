@@ -185,38 +185,54 @@ class FluentCrm extends IntegrationBase {
 
 			case 'added_tag':
 			case 'removed_tag':
-				$contact = $args[0] ?? null;
-				$tag_ids = $args[1] ?? [];
+				$tag_ids = $args[0] ?? [];
+				$contact = $args[1] ?? null;
+
 				if ( ! $contact || empty( $tag_ids ) ) {
 					return false;
 				}
-				$tags = [];
-				if ( ! empty( $contact->tags ) ) {
-					foreach ( $contact->tags as $tag ) {
-						$tags[] = array_merge( self::resolve_tag_payload( $tag ), [ 'pivot' => self::resolve_pivot_payload( $tag ) ], );
+
+				$selected_tag_id = $node['config']['tag_id'] ?? null;
+
+				if ( ! empty( $selected_tag_id ) && $selected_tag_id !== 'any' ) {
+					$selected_ids = self::normalize_ids( $selected_tag_id );
+					$added_ids    = self::normalize_ids( $tag_ids );
+
+					if ( empty( array_intersect( $selected_ids, $added_ids ) ) ) {
+						return false;
 					}
 				}
+
 				return [
-					'success' => true,
-					'contact' => $tag_ids
+					'success'  => true,
+					'contact'  => self::resolve_contact_payload( $contact ),
+					'tag_ids'  => $tag_ids,
 				];
 
 			case 'added_list':
 			case 'removed_list':
-				$contact  = $args[0] ?? null;
-				$list_ids = $args[1] ?? [];
+				$list_ids = $args[0] ?? [];
+				$contact  = $args[1] ?? null;
+
 				if ( ! $contact || empty( $list_ids ) ) {
 					return false;
 				}
-				$lists = [];
-				if ( ! empty( $contact->lists ) ) {
-					foreach ( $contact->lists as $list ) {
-						$lists[] = self::resolve_list_payload( $list );
+
+				$selected_list_id = $node['config']['list_id'] ?? null;
+
+				if ( ! empty( $selected_list_id ) && $selected_list_id !== 'any' ) {
+					$selected_ids = self::normalize_ids( $selected_list_id );
+					$added_ids    = self::normalize_ids( $list_ids );
+
+					if ( empty( array_intersect( $selected_ids, $added_ids ) ) ) {
+						return false;
 					}
 				}
+
 				return [
-					'success' => true,
-					'contact' => $list_ids
+					'success'  => true,
+					'contact'  => self::resolve_contact_payload( $contact ),
+					'list_ids' => $list_ids,
 				];
 
 			case 'created_contact':
@@ -242,16 +258,14 @@ class FluentCrm extends IntegrationBase {
 
 			case 'company_updated':
 				$company    = $args[0] ?? null;
-				$old_status = $args[1] ?? [];
-				$new_status = $args[2] ?? [];
+				$new_status = $args[1] ?? [];
 				if ( ! $company ) {
 					return false;
 				}
 				return [
 					'success' => true,
-					'company' => self::resolve_company_payload( $company ),
-					'old_status' => $old_status,
-					'new_status' => $new_status
+					'old_status' => self::resolve_company_payload( $company ),
+					'new_status' => $new_status,
 				];
 		}//end switch
 		return false;
@@ -483,12 +497,14 @@ class FluentCrm extends IntegrationBase {
 				[
 					'key' => 'first_name',
 					'label' => 'First Name',
-					'type' => 'text'
+					'type' => 'text',
+					'required' => true,
 				],
 				[
 					'key' => 'last_name',
 					'label' => 'Last Name',
-					'type' => 'text'
+					'type' => 'text',
+					'required' => true,
 				],
 				...self::contact_email(),
 				[

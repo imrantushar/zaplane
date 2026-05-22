@@ -11,7 +11,7 @@ class Eventscalendar extends IntegrationBase {
     public static function get_slug(): string { return 'eventscalendar'; }
 
 	public static function get_name(): string {
-		return 'Events Calendar';
+		return 'The Events Calendar';
 	}
 
 	public static function get_icon(): string {
@@ -95,9 +95,5 @@ class Eventscalendar extends IntegrationBase {
         }
 
         return false;
-    }
-
-    public static function execute_node(array $node, array $input): array {
-        return ['port' => 'main', 'data' => $input];
     }
 }
