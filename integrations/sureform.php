@@ -11,7 +11,6 @@ use Zaplane\Framework\Classes\IntegrationBase;
 class Sureform extends IntegrationBase
 {
 
-
     public static function get_slug(): string
     {
         return 'sureform';
@@ -90,28 +89,6 @@ class Sureform extends IntegrationBase
             'message'   => $payload['message'] ?? '',
             'to_emails' => $payload['to_emails'] ?? [],
             'success'   => $payload['success'] ?? false,
-        ];
-    }
-
-
-    public static function get_actions(): array
-    {
-        return [];
-    }
-
-    public static function get_action_config_schema(string $action): array
-    {
-
-        $schemas = [];
-
-        return $schemas[$action] ?? [];
-    }
-
-    public static function execute_node(array $node, array $input): array
-    {
-        return [
-            'port' => 'main',
-            'data' => $input
         ];
     }
 

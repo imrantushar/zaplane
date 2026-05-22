@@ -64,17 +64,14 @@ class ARForm extends IntegrationBase
 
     public static function resolve_trigger(array $node, array $args)
     {
-        // Check that this is the correct event
         $event = $node['event'] ?? '';
         if (! in_array($event, ['submit_form'], true)) {
             return null;
         }
 
-        // Retrieve the configured form ID from the node's configuration
         $config             = $node['config'] ?? [];
         $configured_form_id = $config['form_id'] ?? 'any';
 
-        // The hook passes 4 arguments: $params, $arflite_errors, $form, $item_meta_values
         if (count($args) < 4) {
             return null;
         }
@@ -84,7 +81,6 @@ class ARForm extends IntegrationBase
         $form             = $args[2];
         $item_meta_values = $args[3];
 
-        // Extract the actual form ID — use ->id directly (matches ARForms internals)
         $actual_form_id = 0;
         if (is_object($form) && isset($form->id)) {
             $actual_form_id = (int) $form->id;
@@ -100,35 +96,15 @@ class ARForm extends IntegrationBase
             return null;
         }
 
-        // Check if the trigger should run for this specific form
         if ($configured_form_id !== 'any' && (int) $configured_form_id !== $actual_form_id) {
             return null;
         }
 
-        // Build the payload
         return [
             'form_id'          => $actual_form_id,
             'params'           => $params,
             'item_meta_values' => $item_meta_values,
             'arflite_errors'   => $arflite_errors,
-        ];
-    }
-
-    public static function get_actions(): array
-    {
-        return [];
-    }
-
-    public static function get_action_config_schema(string $action): array
-    {
-        return [];
-    }
-
-    public static function execute_node(array $node, array $input): array
-    {
-        return [
-            'port' => 'main',
-            'data' => $input,
         ];
     }
 

@@ -92,29 +92,6 @@ class Bitform extends IntegrationBase
         ];
     }
 
-
-
-    public static function get_actions(): array
-    {
-        return [];
-    }
-
-    public static function get_action_config_schema(string $action): array
-    {
-
-        $schemas = [];
-
-        return $schemas[$action] ?? [];
-    }
-
-    public static function execute_node(array $node, array $input): array
-    {
-        return [
-            'port' => 'main',
-            'data' => $input
-        ];
-    }
-
     public static function get_dynamic_queries(): array
     {
         return [
