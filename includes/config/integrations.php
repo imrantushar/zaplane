@@ -25,10 +25,10 @@ $registry = [
 		'file'  => 'variable.php',
 		'class' => \Zaplane\Integrations\Variable::class,
 	],
-	'cartflows'           => [
-		'file'  => 'cartflows.php',
-		'class' => \Zaplane\Integrations\Cartflows::class,
-	],
+	// 'cartflows'           => [
+	// 	'file'  => 'cartflows.php',
+	// 	'class' => \Zaplane\Integrations\Cartflows::class,
+	// ],
 	'dokan'               => [
 		'file'  => 'dokan.php',
 		'class' => \Zaplane\Integrations\Dokan::class,
@@ -173,10 +173,10 @@ $registry = [
 		'file'  => 'groundhogg.php',
 		'class' => \Zaplane\Integrations\Groundhogg::class,
 	],
-	'bricks'              => [
-		'file'  => 'bricks.php',
-		'class' => \Zaplane\Integrations\Bricks::class,
-	],
+	// 'bricks'              => [
+	// 	'file'  => 'bricks.php',
+	// 	'class' => \Zaplane\Integrations\Bricks::class,
+	// ],
 	'elementor'           => [
 		'file'  => 'elementor.php',
 		'class' => \Zaplane\Integrations\Elementor::class,
@@ -313,18 +313,18 @@ $registry = [
 		'file'  => 'avadaform.php',
 		'class' => \Zaplane\Integrations\Avadaform::class
 	],
-	'bookingcalendar'      => [
-		'file' => 'bookingcalendar.php',
-		'class' => \Zaplane\Integrations\Bookingcalendar::class
-	],
+	// 'bookingcalendar'      => [
+	// 	'file' => 'bookingcalendar.php',
+	// 	'class' => \Zaplane\Integrations\Bookingcalendar::class
+	// ],
 	'dokan' => [
 		'file' => 'dokan.php',
 		'class' => \Zaplane\Integrations\Dokan::class
 	],
-	'cartflows'           => [
-		'file'  => 'cartflows.php',
-		'class' => \Zaplane\Integrations\Cartflows::class,
-	],
+	// 'cartflows'           => [
+	// 	'file'  => 'cartflows.php',
+	// 	'class' => \Zaplane\Integrations\Cartflows::class,
+	// ],
 ];
 
 $priority = [
