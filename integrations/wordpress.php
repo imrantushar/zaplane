@@ -1655,13 +1655,13 @@ class Wordpress extends IntegrationBase {
 				[
 					'key'         => 'post_password',
 					'label'       => 'Post Password',
-					'type'        => 'expression',
+					'type'        => 'password',
 					'description' => 'Only visible to those who know the password.',
 				],
 				[
 					'key'    => 'featured_image_url',
 					'label'  => 'Post Featured Image URL',
-					'type'   => 'expression',
+					'type'   => 'url',
 					'toggle' => 'use_featured_image_id',
 				],
 				[

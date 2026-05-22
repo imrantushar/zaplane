@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-05-21 18:15:35",
+    "generated_at": "2026-05-22 10:34:18",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -5404,7 +5404,7 @@
                             "key": "webhook_endpoint",
                             "label": "Webhook Endpoint URL",
                             "type": "copy",
-                            "value": "https://kodezen-academy.local/index.php/wp-json/zaplane/v1/incoming/fillout",
+                            "value": "https://kodezen.local/wp-json/zaplane/v1/incoming/fillout",
                             "readonly": true,
                             "help": "Copy this URL \u2192 Fillout Dashboard \u2192 Your Form \u2192 Integrate \u2192 Webhooks \u2192 Add Webhook \u2192 Paste & Save."
                         }
@@ -12688,36 +12688,6 @@
             },
             "actions": []
         },
-        "stripe": {
-            "slug": "stripe",
-            "name": "Stripe",
-            "icon": "stripe.svg",
-            "category": "app",
-            "requires_connection": false,
-            "auth_type": "none",
-            "supports_webhook": false,
-            "triggers": {
-                "payment_succeeded": {
-                    "key": "payment_succeeded",
-                    "label": "Payment Succeeded",
-                    "hook": "stripe_webhook",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                }
-            },
-            "actions": {
-                "charge_customer": {
-                    "key": "charge_customer",
-                    "label": "Charge Customer",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                }
-            }
-        },
         "surecart": {
             "slug": "surecart",
             "name": "Surecart",
@@ -14615,7 +14585,7 @@
                             "key": "webhook_endpoint",
                             "label": "Webhook Endpoint URL",
                             "type": "copy",
-                            "value": "https://kodezen-academy.local/index.php/wp-json/zaplane/v1/incoming/typeform",
+                            "value": "https://kodezen.local/wp-json/zaplane/v1/incoming/typeform",
                             "readonly": true,
                             "help": "Copy this URL \u2192 Typeform Dashboard \u2192 Your Form \u2192 Connect \u2192 Webhooks \u2192 Add a webhook \u2192 Paste & Save."
                         }
@@ -14791,7 +14761,22 @@
                     "key": "forms_submission",
                     "label": "Form Submission",
                     "hook": "weforms_entry_submission",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "form_id",
+                            "label": "Forms",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "weforms",
+                                "query": "form_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -20358,13 +20343,13 @@
                         {
                             "key": "post_password",
                             "label": "Post Password",
-                            "type": "expression",
+                            "type": "password",
                             "description": "Only visible to those who know the password."
                         },
                         {
                             "key": "featured_image_url",
                             "label": "Post Featured Image URL",
-                            "type": "expression",
+                            "type": "url",
                             "toggle": "use_featured_image_id"
                         },
                         {

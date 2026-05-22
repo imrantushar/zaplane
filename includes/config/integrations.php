@@ -65,10 +65,6 @@ $registry = [
 		'file'  => 'trello.php',
 		'class' => \Zaplane\Integrations\Trello::class,
 	],
-	'stripe'              => [
-		'file'  => 'stripe.php',
-		'class' => \Zaplane\Integrations\Stripe::class,
-	],
 	'mailchimp'           => [
 		'file'  => 'mailchimp.php',
 		'class' => \Zaplane\Integrations\Mailchimp::class,
