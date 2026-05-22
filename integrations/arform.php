@@ -38,17 +38,12 @@ class ARForm extends IntegrationBase
                 'hook'  => 'arfliteentryexecute',
                 'args'  => 4,
             ],
-            'submit_form_full' => [
-                'label' => 'Form Submit (Full Version)',
-                'hook'  => 'arfentryexecute',
-                'args'  => 4,
-            ],
         ];
     }
 
     public static function get_trigger_config_schema(string $trigger): array
     {
-        if (! in_array($trigger, ['submit_form', 'submit_form_full'], true)) {
+        if (! in_array($trigger, ['submit_form'], true)) {
             return [];
         }
 
@@ -71,7 +66,7 @@ class ARForm extends IntegrationBase
     {
         // Check that this is the correct event
         $event = $node['event'] ?? '';
-        if (! in_array($event, ['submit_form', 'submit_form_full'], true)) {
+        if (! in_array($event, ['submit_form'], true)) {
             return null;
         }
 

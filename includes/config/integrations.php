@@ -309,6 +309,22 @@ $registry = [
 		'file'  => 'bookingcalendarcontactform.php',
 		'class' => \Zaplane\Integrations\Bookingcalendarcontactform::class,
 	],
+	'avadaform'        => [
+		'file'  => 'avadaform.php',
+		'class' => \Zaplane\Integrations\Avadaform::class
+	],
+	'bookingcalendar'      => [
+		'file' => 'bookingcalendar.php',
+		'class' => \Zaplane\Integrations\Bookingcalendar::class
+	],
+	'dokan' => [
+		'file' => 'dokan.php',
+		'class' => \Zaplane\Integrations\Dokan::class
+	],
+	'cartflows'           => [
+		'file'  => 'cartflows.php',
+		'class' => \Zaplane\Integrations\Cartflows::class,
+	],
 ];
 
 $priority = [
