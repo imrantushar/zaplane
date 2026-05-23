@@ -23,7 +23,10 @@ class Webhook extends IntegrationBase {
 
 	public static function get_triggers(): array {
 		return [
-			'incoming' => [ 'label' => 'Incoming Webhook' ]
+			'incoming' => [
+				'label' => 'Incoming Webhook',
+				'hook'  => 'rest_api_init', // fires via REST route, not a WP action; this is documentation
+			],
 		];
 	}
 

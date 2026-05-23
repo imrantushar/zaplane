@@ -733,6 +733,12 @@ namespace {
 		}
 	}
 
+	if ( ! function_exists( 'wp_remote_retrieve_headers' ) ) {
+		function wp_remote_retrieve_headers( $response ) {
+			return is_array( $response ) ? ( $response['headers'] ?? [] ) : [];
+		}
+	}
+
 	// ── Posts ─────────────────────────────────────────────────────────────────
 
 	if ( ! class_exists( 'WP_Query' ) ) {

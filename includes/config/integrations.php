@@ -303,11 +303,7 @@ $registry = [
 	],
 	'avadaform'        => [
 		'file'  => 'avadaform.php',
-		'class' => \Zaplane\Integrations\Avadaform::class
-	],
-	'dokan' => [
-		'file' => 'dokan.php',
-		'class' => \Zaplane\Integrations\Dokan::class
+		'class' => \Zaplane\Integrations\Avadaform::class,
 	],
 ];
 
