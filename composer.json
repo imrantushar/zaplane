@@ -18,7 +18,8 @@
         "wp-coding-standards/wpcs": "2.3.0",
         "phpunit/phpunit": "^9.6",
         "yoast/phpunit-polyfills": "^1.0",
-        "phpcompatibility/phpcompatibility-wp": "*"
+        "phpcompatibility/phpcompatibility-wp": "*",
+        "mockery/mockery": "^1.5"
     },
     "scripts": {
         "format": "phpcbf",

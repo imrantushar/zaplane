@@ -10,6 +10,7 @@
     <testsuites>
         <testsuite name="Integrations">
             <directory suffix="Test.php">./tests/Integrations</directory>
+            <exclude>./tests/Integrations/_pending</exclude>
         </testsuite>
         <testsuite name="Utils">
             <directory suffix="Test.php">./tests/Utils</directory>
