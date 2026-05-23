@@ -21,6 +21,29 @@ class Webhook extends IntegrationBase {
 		return true;
 	}
 
+	/**
+	 * Path-as-secret model: the workflow-specific path embedded in the
+	 * URL is the credential. Anything that reaches this code already
+	 * matched a registered workflow path. We additionally reject
+	 * obviously-wrong request shapes so half-broken probes don't
+	 * accidentally fire a trigger.
+	 *
+	 * A real HMAC scheme can layer on top via the
+	 * `zaplane_webhook_verify_signature` filter — return false to
+	 * reject, true to accept, null/no-op to fall back to the default.
+	 */
+	public static function verify_webhook_signature( \WP_REST_Request $request ): bool {
+		$override = apply_filters( 'zaplane_webhook_verify_signature', null, $request );
+		if ( true === $override ) {
+			return true;
+		}
+		if ( false === $override ) {
+			return false;
+		}
+		$method = strtoupper( (string) $request->get_method() );
+		return in_array( $method, [ 'POST', 'PUT', 'PATCH' ], true );
+	}
+
 	public static function get_triggers(): array {
 		return [
 			'incoming' => [

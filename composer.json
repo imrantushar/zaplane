@@ -24,7 +24,14 @@
     "scripts": {
         "format": "phpcbf",
         "lint": "phpcs",
-        "test": "vendor/bin/phpunit"
+        "test": "vendor/bin/phpunit",
+        "test:integrations": "vendor/bin/phpunit --testsuite=Integrations",
+        "test:utils": "vendor/bin/phpunit --testsuite=Utils",
+        "test:smoke": "vendor/bin/phpunit --filter=ParityTest",
+        "test:release": [
+            "@composer test:utils",
+            "@composer test:integrations"
+        ]
     },
     "config": {
         "platform": {

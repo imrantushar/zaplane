@@ -79,6 +79,33 @@ class Http extends IntegrationBase {
 		$url = $c['url'] ?? '';
 		$body = $c['body'] ?? '';
 
+		// SSRF guard: only http/https are allowed, and a filter lets sites
+		// add their own block list (e.g. RFC1918 / 169.254/16 / 127.0.0.0/8).
+		$parsed = is_string( $url ) && '' !== $url ? wp_parse_url( $url ) : null;
+		$scheme = strtolower( (string) ( $parsed['scheme'] ?? '' ) );
+		if ( ! in_array( $scheme, [ 'http', 'https' ], true ) ) {
+			return [
+				'port' => 'main',
+				'data' => [
+					'status'  => 0,
+					'error'   => "HTTP request refused: scheme `{$scheme}` is not in the allowlist (http, https).",
+					'body'    => null,
+					'headers' => [],
+				],
+			];
+		}
+		if ( apply_filters( 'zaplane_http_block_request', false, $url, $parsed ) ) {
+			return [
+				'port' => 'main',
+				'data' => [
+					'status'  => 0,
+					'error'   => 'HTTP request refused by the zaplane_http_block_request filter.',
+					'body'    => null,
+					'headers' => [],
+				],
+			];
+		}
+
 		$headers = $c['headers'] ?? [];
 		if ( is_string( $headers ) ) {
 			$decoded = json_decode( $headers, true );

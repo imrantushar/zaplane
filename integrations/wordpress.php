@@ -35,7 +35,7 @@ class Wordpress extends IntegrationBase {
 	use Helper;
 
 	public static function get_slug(): string {
-		return 'WordPress';
+		return 'wordpress';
 	}
 
 	public static function get_name(): string {
@@ -44,6 +44,10 @@ class Wordpress extends IntegrationBase {
 
 	public static function get_icon(): string {
 		return 'wordpress.svg';
+	}
+
+	public static function get_output_ports(): array {
+		return [ 'main', 'error' ];
 	}
 
 	public static function get_triggers(): array {
@@ -88,6 +92,14 @@ class Wordpress extends IntegrationBase {
 			'save_post'              => [
 				'label' => 'Save Post',
 				'hook' => 'save_post'
+			],
+			'post_revision'          => [
+				'label' => 'Post Revision Saved',
+				'hook'  => '_wp_put_post_revision',
+			],
+			'wp_authenticate'        => [
+				'label' => 'User Authenticate Attempt',
+				'hook'  => 'wp_authenticate',
 			],
 			'add_attachment'              => [
 				'label' => 'Add Attachment',
@@ -221,6 +233,10 @@ class Wordpress extends IntegrationBase {
 			'transition_comment_status' => [
 				'label' => 'Comment Status Changed',
 				'hook' => 'transition_comment_status'
+			],
+			'pre_comment_approved'   => [
+				'label' => 'Comment Pre-Approval',
+				'hook'  => 'pre_comment_approved',
 			],
 			'delete_comment'         => [
 				'label' => 'Delete Comment',
@@ -511,6 +527,7 @@ class Wordpress extends IntegrationBase {
 
 	private static function get_user_filterable_triggers(): array {
 		return [
+			'user_register',
 			'set_user_role',
 			'profile_update',
 			'wp_update_user',
@@ -548,6 +565,7 @@ class Wordpress extends IntegrationBase {
 
 	private static function get_term_filterable_triggers(): array {
 		return [
+			'create_term',
 			'edit_term',
 			'edited_term',
 			'saved_term',
@@ -709,7 +727,7 @@ class Wordpress extends IntegrationBase {
 				$post_id = isset( $args[0] ) ? (int) $args[0] : 0;
 
 				if ( ! $post_id ) {
-					return;
+					return false;
 				}
 
 				if ( $parent_id = wp_is_post_revision( $post_id ) ) {
@@ -718,7 +736,7 @@ class Wordpress extends IntegrationBase {
 
 				$post = get_post( $post_id );
 				if ( ! $post ) {
-					return;
+					return false;
 				}
 
 				if (
@@ -726,7 +744,7 @@ class Wordpress extends IntegrationBase {
 					wp_is_post_revision( $post_id ) ||
 					$post->post_status === 'auto-draft'
 				) {
-					return;
+					return false;
 				}
 
 				$selected_type = $config['post_type'] ?? 'post';
@@ -734,11 +752,11 @@ class Wordpress extends IntegrationBase {
 				$current_type  = ( $post->post_type === 'attachment' ) ? 'media' : $post->post_type;
 
 				if ( $selected_type !== $current_type ) {
-					return;
+					return false;
 				}
 
 				if ( ! empty( $selected_id ) && $selected_id !== 'any' && (int) $selected_id !== $post_id ) {
-					return;
+					return false;
 				}
 
 				return self::resolve_post_payload( $post_id );
@@ -894,16 +912,30 @@ class Wordpress extends IntegrationBase {
 				return self::resolve_comment_payload( $args[0] ?? 0 );
 
 			case 'transition_comment_status':
-				$comment = $args[2] ?? null;
+				$new_status = $args[0] ?? '';
+				$comment    = $args[1] ?? null;
+				$old_status = $args[2] ?? '';
 
-				if (!$comment instanceof \WP_Comment) {
-					return false;
+				$comment_data = [];
+				if ( $comment instanceof \WP_Comment ) {
+					$comment_data = $comment->to_array();
+				} elseif ( is_numeric( $comment ) ) {
+					$payload = self::resolve_comment_payload( (int) $comment );
+					if ( is_array( $payload ) ) {
+						$comment_data = $payload;
+					}
 				}
 
-				return array_merge($comment->to_array(), [
-					'old_status' => $args[1] ?? '',
-					'new_status' => $args[0] ?? '',
-				]);
+				return array_merge( $comment_data, [
+					'old_status' => $old_status,
+					'new_status' => $new_status,
+				] );
+
+			case 'pre_comment_approved':
+				return [
+					'approved'   => $args[0] ?? null,
+					'comment_id' => $args[1] ?? 0,
+				];
 
 			case 'wp_set_comment_status':
 				return self::resolve_comment_payload( $args[0] ?? 0 );

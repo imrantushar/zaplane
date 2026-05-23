@@ -29,6 +29,28 @@ class EventscalendarTest extends IntegrationTestCase {
             'user_email'   => 'john@example.com',
             'display_name' => 'John Doe',
         ] );
+
+        global $zaplane_wp_posts;
+        $zaplane_wp_posts = [
+            101 => (object) [
+                'ID'         => 101,
+                'post_title' => 'John Doe',
+                'post_type'  => 'tribe_rsvp_attendees',
+            ],
+            201 => (object) [
+                'ID'         => 201,
+                'post_title' => 'Test Event',
+                'post_type'  => 'tribe_events',
+            ],
+        ];
+        $GLOBALS['zaplane_wp_posts_strict'] = true;
+    }
+
+    protected function tearDown(): void {
+        global $zaplane_wp_posts;
+        $zaplane_wp_posts = [];
+        unset( $GLOBALS['zaplane_wp_posts_strict'] );
+        parent::tearDown();
     }
 
     protected function getTriggerTests(): array {

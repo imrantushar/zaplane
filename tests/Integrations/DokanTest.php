@@ -50,6 +50,27 @@ class DokanTest extends IntegrationTestCase {
 			'post_date'     => '2026-04-11 10:00:00',
 			'post_modified' => '2026-04-11 10:10:00',
 		] );
+
+		global $zaplane_wp_posts;
+		$zaplane_wp_posts = $zaplane_wp_posts ?? [];
+		$zaplane_wp_posts[9101] = (object) [
+			'ID'            => 9101,
+			'post_type'     => 'product',
+			'post_author'   => 801,
+			'post_title'    => 'Dokan Product One',
+			'post_status'   => 'publish',
+			'post_date'     => '2026-04-10 10:00:00',
+			'post_modified' => '2026-04-10 10:10:00',
+		];
+		$zaplane_wp_posts[9102] = (object) [
+			'ID'            => 9102,
+			'post_type'     => 'product',
+			'post_author'   => 802,
+			'post_title'    => 'Dokan Product Two',
+			'post_status'   => 'draft',
+			'post_date'     => '2026-04-11 10:00:00',
+			'post_modified' => '2026-04-11 10:10:00',
+		];
 	}
 
 	protected function getTriggerTests(): array {

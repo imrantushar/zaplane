@@ -132,6 +132,9 @@ namespace Zaplane\Tests {
 				'user_activation_key' => '',
 				'user_status'         => 0,
 				'display_name'        => 'User ' . $id,
+				'first_name'          => 'Test',
+				'last_name'           => 'User',
+				'nickname'            => 'user' . $id,
 			];
 		}
 
@@ -323,6 +326,19 @@ namespace {
 	use Zaplane\Tests\WPMocks;
 
 	$mock_dir = __DIR__ . '/mocks/';
+
+	// Some mock files (e.g. wpuserfrontend.php) provide richer fixtures
+	// (get_userdata with display_name "John Doe", WP_Post class) that must
+	// win over the more bare-bones definitions in alphabetically earlier
+	// mock files such as buddyboss.php. Load these priority files first so
+	// their function_exists-guarded definitions register first.
+	$priority_mocks = [ 'wpuserfrontend.php' ];
+	foreach ( $priority_mocks as $priority_file ) {
+		$path = $mock_dir . $priority_file;
+		if ( file_exists( $path ) ) {
+			require_once $path;
+		}
+	}
 
 	foreach (glob($mock_dir . '*.php') as $file) {
 		require_once $file;
@@ -525,6 +541,7 @@ namespace {
 	// ── WP_User ───────────────────────────────────────────────────────────────
 
 	if ( ! class_exists( 'WP_User' ) ) {
+		#[\AllowDynamicProperties]
 		class WP_User {
 			public int    $ID    = 0;
 			public array  $roles = [];
@@ -535,6 +552,10 @@ namespace {
 				if ( $id ) {
 					$this->ID = $id;
 					$data = WPMocks::getUser( $id );
+					if ( ! $data ) {
+						WPMocks::setUser( $id, [] );
+						$data = WPMocks::getUser( $id );
+					}
 					if ( $data ) {
 						foreach ( get_object_vars( $data ) as $k => $v ) {
 							$this->$k = $v;
@@ -739,6 +760,35 @@ namespace {
 		}
 	}
 
+	if ( ! function_exists( 'wp_parse_url' ) ) {
+		function wp_parse_url( $url, $component = -1 ) {
+			return $component === -1 ? parse_url( $url ) : parse_url( $url, $component );
+		}
+	}
+
+	if ( ! function_exists( 'is_plugin_active' ) ) {
+		function is_plugin_active( $plugin ) {
+			// Default to "active" so query_forms helpers don't short-circuit
+			// in tests. Override per-test by setting
+			// $GLOBALS['zaplane_is_plugin_active'] to an array keyed by plugin
+			// (or a boolean to apply to all plugins).
+			if ( isset( $GLOBALS['zaplane_is_plugin_active'] ) ) {
+				$override = $GLOBALS['zaplane_is_plugin_active'];
+				if ( is_array( $override ) ) {
+					if ( array_key_exists( $plugin, $override ) ) {
+						return (bool) $override[ $plugin ];
+					}
+					if ( array_key_exists( '*', $override ) ) {
+						return (bool) $override['*'];
+					}
+				} else {
+					return (bool) $override;
+				}
+			}
+			return true;
+		}
+	}
+
 	// ── Posts ─────────────────────────────────────────────────────────────────
 
 	if ( ! class_exists( 'WP_Query' ) ) {
@@ -767,6 +817,16 @@ namespace {
 
 	if ( ! function_exists( 'get_posts' ) ) {
 		function get_posts( $args = [] ): array {
+			// Tests may override via $GLOBALS['zaplane_get_posts']. Value may be:
+			//   - a plain array (returned for every call)
+			//   - a callable( array $args ): array
+			if ( isset( $GLOBALS['zaplane_get_posts'] ) ) {
+				$override = $GLOBALS['zaplane_get_posts'];
+				if ( is_callable( $override ) ) {
+					return (array) $override( $args );
+				}
+				return (array) $override;
+			}
 			return [];
 		}
 	}

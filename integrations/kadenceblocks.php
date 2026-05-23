@@ -22,9 +22,9 @@ class Kadenceblocks extends IntegrationBase {
 
     public static function get_triggers(): array {
         return [
-            'form_submission' => [
+            'kadence_blocks_advanced_form_submission' => [
                 'label' => 'Form Submission',
-                'hook' => 'kadence_blocks_advanced_form_submission'
+                'hook'  => 'kadence_blocks_advanced_form_submission',
             ],
         ];
     }
@@ -33,7 +33,7 @@ class Kadenceblocks extends IntegrationBase {
 
         switch ($node['event']) {
 
-            case 'form_submission':
+            case 'kadence_blocks_advanced_form_submission':
                 $fields = $args[1] ?? [];
                 $result = [];
                 foreach ($fields as $field) {
