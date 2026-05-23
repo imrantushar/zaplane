@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-05-22 13:19:40",
+    "generated_at": "2026-05-23 09:27:18",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -14560,7 +14560,7 @@
             "triggers": {
                 "new_order": {
                     "key": "new_order",
-                    "label": "New Order",
+                    "label": "New Order Created",
                     "hook": "woocommerce_new_order",
                     "schema": [],
                     "outputs": [
@@ -14651,7 +14651,7 @@
                 "new_coupon": {
                     "key": "new_coupon",
                     "label": "New Coupon Created",
-                    "hook": "woocommerce_new_coupon",
+                    "hook": "woocommerce_update_coupon",
                     "schema": [],
                     "outputs": [
                         "main"
@@ -14660,7 +14660,7 @@
                 "create_customer": {
                     "key": "create_customer",
                     "label": "Create Customer",
-                    "hook": "woocommerce_created_customer",
+                    "hook": "user_register",
                     "schema": [],
                     "outputs": [
                         "main"
@@ -14669,7 +14669,7 @@
                 "update_customer": {
                     "key": "update_customer",
                     "label": "Update Customer",
-                    "hook": "woocommerce_update_customer",
+                    "hook": "profile_update",
                     "schema": [],
                     "outputs": [
                         "main"
@@ -14678,7 +14678,7 @@
                 "delete_customer": {
                     "key": "delete_customer",
                     "label": "Delete Customer",
-                    "hook": "woocommerce_delete_customer",
+                    "hook": "delete_user",
                     "schema": [],
                     "outputs": [
                         "main"
@@ -14687,7 +14687,7 @@
                 "create_product": {
                     "key": "create_product",
                     "label": "Create Product",
-                    "hook": "woocommerce_new_product",
+                    "hook": "wp_after_insert_post",
                     "schema": [],
                     "outputs": [
                         "main"
@@ -14696,7 +14696,7 @@
                 "update_product": {
                     "key": "update_product",
                     "label": "Update Product",
-                    "hook": "woocommerce_update_product",
+                    "hook": "wp_after_insert_post",
                     "schema": [],
                     "outputs": [
                         "main"
@@ -14705,7 +14705,7 @@
                 "delete_product": {
                     "key": "delete_product",
                     "label": "Delete Product",
-                    "hook": "before_delete_post",
+                    "hook": "transition_post_status",
                     "schema": [],
                     "outputs": [
                         "main"
@@ -14714,7 +14714,7 @@
                 "restore_product": {
                     "key": "restore_product",
                     "label": "Restore Product",
-                    "hook": "untrashed_post",
+                    "hook": "transition_post_status",
                     "schema": [],
                     "outputs": [
                         "main"
@@ -14723,7 +14723,7 @@
                 "product_status_updated": {
                     "key": "product_status_updated",
                     "label": "Product Status Updated",
-                    "hook": "woocommerce_product_set_stock_status",
+                    "hook": "transition_post_status",
                     "schema": [],
                     "outputs": [
                         "main"
