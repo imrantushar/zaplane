@@ -450,31 +450,31 @@ trait Helper {
 		return [
 			[
 				'label' => 'Pending',
-				'value' => 'wc_order_pending'
+				'value' => 'pending'
 			],
 			[
 				'label' => 'Processing',
-				'value' => 'wc_order_processing'
+				'value' => 'processing'
 			],
 			[
 				'label' => 'On-hold',
-				'value' => 'wc_order_on-hold'
+				'value' => 'on-hold'
 			],
 			[
 				'label' => 'Completed',
-				'value' => 'wc_order_completed'
+				'value' => 'completed'
 			],
 			[
 				'label' => 'Cancelled',
-				'value' => 'wc_order_cancelled'
+				'value' => 'cancelled'
 			],
 			[
 				'label' => 'Refunded',
-				'value' => 'wc_order_refunded'
+				'value' => 'refunded'
 			],
 			[
 				'label' => 'Failed',
-				'value' => 'wc_order_failed'
+				'value' => 'failed'
 			],
 		];
 	}
