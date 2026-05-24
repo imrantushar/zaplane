@@ -27,10 +27,6 @@ return [
 			'file' => 'variable.php',
 			'class' => \Zaplane\Integrations\Variable::class
 		],
-		'dokan'                => [
-			'file' => 'dokan.php',
-			'class' => \Zaplane\Integrations\Dokan::class
-		],
 		'funnelkit'            => [
 			'file' => 'funnelkit.php',
 			'class' => \Zaplane\Integrations\Funnelkit::class
