@@ -1,8 +1,8 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-	// corePlugins: {
-	// 	preflight: false,
-	// },
+	corePlugins: {
+		preflight: false,
+	},
 	content: [
 		'./dev_zaplane/**/*.{js,jsx,ts,tsx}',
 		'./assets/scss/**/*.scss',
