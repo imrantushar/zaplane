@@ -3206,6 +3206,9 @@ h2.react-datepicker__current-month {
   --tw-text-opacity: 1;
   color: rgb(133 77 14 / var(--tw-text-opacity, 1));
 }
+.zaplane-scope .underline {
+  text-decoration-line: underline;
+}
 .zaplane-scope .opacity-0 {
   opacity: 0;
 }
@@ -3306,8 +3309,132 @@ h2.react-datepicker__current-month {
 .zaplane-scope .ease-out {
   transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
 }
+.zaplane-scope {
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
+  -moz-tab-size: 4;
+  -o-tab-size: 4;
+     tab-size: 4;
+  font-feature-settings: normal;
+  font-variation-settings: normal;
+}
 .zaplane-scope *, .zaplane-scope *::before, .zaplane-scope *::after {
   box-sizing: border-box;
+  border-width: 0;
+  border-style: none;
+  border-color: currentColor;
+  --tw-ring-inset: ;
+  --tw-ring-offset-width: 0px;
+  --tw-ring-offset-color: #fff;
+  --tw-ring-color: rgb(59 130 246 / 0.5);
+  --tw-ring-offset-shadow: 0 0 #0000;
+  --tw-ring-shadow: 0 0 #0000;
+  --tw-shadow: 0 0 #0000;
+  --tw-shadow-colored: 0 0 #0000;
+}
+.zaplane-scope hr {
+  height: 0;
+  color: inherit;
+  border-top-width: 1px;
+}
+.zaplane-scope abbr:where([title]) {
+  -webkit-text-decoration: underline dotted;
+  text-decoration: underline dotted;
+}
+.zaplane-scope b, .zaplane-scope strong {
+  font-weight: bolder;
+}
+.zaplane-scope code, .zaplane-scope kbd, .zaplane-scope samp, .zaplane-scope pre {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 1em;
+}
+.zaplane-scope small {
+  font-size: 80%;
+}
+.zaplane-scope sub, .zaplane-scope sup {
+  font-size: 75%;
+  line-height: 0;
+  position: relative;
+  vertical-align: baseline;
+}
+.zaplane-scope sub {
+  bottom: -0.25em;
+}
+.zaplane-scope sup {
+  top: -0.5em;
+}
+.zaplane-scope [type=search] {
+  -webkit-appearance: textfield;
+  outline-offset: -2px;
+}
+.zaplane-scope input::-moz-placeholder, .zaplane-scope textarea::-moz-placeholder {
+  opacity: 1;
+  color: #9ca3af;
+}
+.zaplane-scope input::placeholder,
+.zaplane-scope textarea::placeholder {
+  opacity: 1;
+  color: #9ca3af;
+}
+.zaplane-scope textarea {
+  resize: vertical;
+}
+.zaplane-scope summary {
+  display: list-item;
+}
+.zaplane-scope :disabled {
+  cursor: default;
+}
+.zaplane-scope [hidden] {
+  display: none;
+}
+.zaplane-scope [role=button] {
+  cursor: pointer;
+}
+.zaplane-scope h1, .zaplane-scope h2, .zaplane-scope h3, .zaplane-scope h4, .zaplane-scope h5, .zaplane-scope h6 {
+  font-size: inherit;
+  font-weight: inherit;
+  overflow-wrap: break-word;
+}
+.zaplane-scope p {
+  overflow-wrap: break-word;
+}
+.zaplane-scope button, .zaplane-scope input, .zaplane-scope optgroup, .zaplane-scope select, .zaplane-scope textarea {
+  font-family: inherit;
+  font-size: 100%;
+  font-weight: inherit;
+  line-height: inherit;
+  color: inherit;
+  margin: 0;
+  padding: 0;
+}
+.zaplane-scope button, .zaplane-scope [type=button], .zaplane-scope [type=reset], .zaplane-scope [type=submit] {
+  -webkit-appearance: button;
+  background-color: transparent;
+  background-image: none;
+  cursor: pointer;
+}
+.zaplane-scope a {
+  color: inherit;
+  text-decoration: inherit;
+}
+.zaplane-scope img, .zaplane-scope svg, .zaplane-scope video, .zaplane-scope canvas, .zaplane-scope audio, .zaplane-scope iframe, .zaplane-scope embed, .zaplane-scope object {
+  display: block;
+  vertical-align: middle;
+}
+.zaplane-scope img, .zaplane-scope video {
+  max-width: 100%;
+  height: auto;
+}
+.zaplane-scope ol, .zaplane-scope ul, .zaplane-scope menu {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.zaplane-scope table {
+  border-collapse: collapse;
+  border-spacing: 0;
 }
 
 .toplevel_page_zaplane #adminmenuwrap *, .toplevel_page_zaplane #adminmenuwrap *::before, .toplevel_page_zaplane #adminmenuwrap *::after,
