@@ -3400,7 +3400,7 @@ h2.react-datepicker__current-month {
 .zaplane-scope p {
   overflow-wrap: break-word;
 }
-.zaplane-scope button, .zaplane-scope input, .zaplane-scope optgroup, .zaplane-scope select, .zaplane-scope textarea {
+.zaplane-scope button, .zaplane-scope optgroup, .zaplane-scope select, .zaplane-scope textarea {
   font-family: inherit;
   font-size: 100%;
   font-weight: inherit;
@@ -3408,6 +3408,9 @@ h2.react-datepicker__current-month {
   color: inherit;
   margin: 0;
   padding: 0;
+}
+.zaplane-scope input {
+  padding: 8px 12px;
 }
 .zaplane-scope button, .zaplane-scope [type=button], .zaplane-scope [type=reset], .zaplane-scope [type=submit] {
   -webkit-appearance: button;

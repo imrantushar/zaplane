@@ -7,7 +7,9 @@ import { store } from '@ZAPRedux/store';
 const ZaplaneWrapper = ({ children }) => (
 	<Provider store={store}>
 		<Router>
-			{children}
+			<div className="zaplane-scope">
+				{children}
+			</div>
 		</Router>
 	</Provider>
 );
