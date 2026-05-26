@@ -42,11 +42,4 @@ class Metform extends IntegrationBase {
 
 		return false;
 	}
-
-	public static function execute_node( array $node, array $input ): array {
-		return [
-			'port' => 'main',
-			'data' => $input
-		];
-	}
 }

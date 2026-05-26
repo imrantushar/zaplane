@@ -148,6 +148,7 @@ class Funnelkit extends IntegrationBase {
 					'key'      => 'step_id',
 					'label'    => 'Step',
 					'type'     => 'select',
+					'required' => true,
 					'dynamic'  => [
 						'integration' => 'funnelkit',
 						'query'       => 'steps',
@@ -174,6 +175,7 @@ class Funnelkit extends IntegrationBase {
 					'key'      => 'funnel_id',
 					'label'    => 'Funnel',
 					'type'     => 'select',
+					'required' => true,
 					'dynamic'  => [
 						'integration' => 'funnelkit',
 						'query'       => 'funnels',

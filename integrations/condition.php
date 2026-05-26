@@ -200,11 +200,20 @@ class Condition extends IntegrationBase {
 
 
 	protected static function compare( $left, $right, string $op ): bool {
+		// Numeric strings are coerced to numbers before comparison so a user
+		// who types "5" still equals an integer 5 — but we avoid PHP's loose
+		// `==` which would treat "0e123" === "0e456" as equal (both are
+		// scientific-notation zeros).
+		if ( in_array( $op, [ '==', '!=' ], true ) && is_string( $left ) && is_string( $right )
+			&& is_numeric( $left ) && is_numeric( $right ) ) {
+			$left  = 0 + $left;
+			$right = 0 + $right;
+		}
 		switch ( $op ) {
 			case '==':
-				return $left == $right; // phpcs:ignore: WordPress.PHP.StrictComparisons.LooseComparison
+				return $left === $right;
 			case '!=':
-				return $left != $right; // phpcs:ignore: WordPress.PHP.StrictComparisons.LooseComparison
+				return $left !== $right;
 			case '<':
 				return $left < $right;
 			case '>':

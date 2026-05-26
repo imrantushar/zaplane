@@ -35,7 +35,7 @@ class Wordpress extends IntegrationBase {
 	use Helper;
 
 	public static function get_slug(): string {
-		return 'WordPress';
+		return 'wordpress';
 	}
 
 	public static function get_name(): string {
@@ -44,6 +44,10 @@ class Wordpress extends IntegrationBase {
 
 	public static function get_icon(): string {
 		return 'wordpress.svg';
+	}
+
+	public static function get_output_ports(): array {
+		return [ 'main', 'error' ];
 	}
 
 	public static function get_triggers(): array {
@@ -89,11 +93,14 @@ class Wordpress extends IntegrationBase {
 				'label' => 'Save Post',
 				'hook' => 'save_post'
 			],
-			'post_revision'               => [
-				'label' => 'Revision Creation',
-				'hook' => '_wp_put_post_revision'
+			'post_revision'          => [
+				'label' => 'Post Revision Saved',
+				'hook'  => '_wp_put_post_revision',
 			],
-
+			'wp_authenticate'        => [
+				'label' => 'User Authenticate Attempt',
+				'hook'  => 'wp_authenticate',
+			],
 			'add_attachment'              => [
 				'label' => 'Add Attachment',
 				'hook' => 'add_attachment'
@@ -134,7 +141,6 @@ class Wordpress extends IntegrationBase {
 				'label' => 'Image Sizes',
 				'hook' => 'image_size_names_choose'
 			],
-
 			'user_register'          => [
 				'label' => 'User Registered',
 				'hook' => 'user_register'
@@ -200,15 +206,10 @@ class Wordpress extends IntegrationBase {
 				'label' => 'User Logged Out',
 				'hook' => 'wp_logout'
 			],
-			'wp_authenticate'        => [
-				'label' => 'WP Authenticate',
-				'hook' => 'wp_authenticate'
-			],
 			'validate_reset'              => [
 				'label' => 'Validate Reset',
 				'hook' => 'validate_password_reset'
 			],
-
 			'comment_post'           => [
 				'label' => 'Comment Added',
 				'hook' => 'comment_post'
@@ -220,10 +221,6 @@ class Wordpress extends IntegrationBase {
 			'edit_comment'           => [
 				'label' => 'Edit Comment',
 				'hook' => 'edit_comment'
-			],
-			'delete_comment'         => [
-				'label' => 'Delete Comment',
-				'hook' => 'delete_comment'
 			],
 			'trashed_comment'        => [
 				'label' => 'Comment Trashed',
@@ -238,10 +235,13 @@ class Wordpress extends IntegrationBase {
 				'hook' => 'transition_comment_status'
 			],
 			'pre_comment_approved'   => [
-				'label' => 'Pre-Approve Comment',
-				'hook' => 'pre_comment_approved'
+				'label' => 'Comment Pre-Approval',
+				'hook'  => 'pre_comment_approved',
 			],
-
+			'delete_comment'         => [
+				'label' => 'Delete Comment',
+				'hook' => 'delete_comment'
+			],
 			'create_term'            => [
 				'label' => 'Create Term',
 				'hook' => 'create_term'
@@ -345,6 +345,7 @@ class Wordpress extends IntegrationBase {
 					'key'   => 'post_status',
 					'label' => 'Post Status',
 					'type'  => 'select',
+					'required' => true,
 					'options' => [
 						['label' => 'Publish', 'value' => 'publish'],
 						['label' => 'Draft', 'value' => 'draft'],
@@ -376,12 +377,13 @@ class Wordpress extends IntegrationBase {
 						'select'      => [ 'name', 'label' ],
 						'depends_on'  => ['post_type'],
 					],
-					'required' => false,
+					'required' => true,
 				],
 				[
 					'key'   => 'post_status',
 					'label' => 'Post Status',
 					'type'  => 'select',
+					'required' => true,
 					'options' => [
 						['label' => 'Publish', 'value' => 'publish'],
 						['label' => 'Draft', 'value' => 'draft'],
@@ -401,7 +403,7 @@ class Wordpress extends IntegrationBase {
 						'query' => 'post_types',
 						'select' => [ 'name', 'label' ],
 					],
-					'required' => false,
+					'required' => true,
 				],
 			];
 		}
@@ -412,14 +414,15 @@ class Wordpress extends IntegrationBase {
 					'key' => 'from_status',
 					'label' => 'From Status',
 					'type' => 'select',
+					'required' => true,
 					'options' => [
 						[
 							'label' => 'Approved',
-							'value' => '1'
+							'value' => 'approve'
 						],
 						[
 							'label' => 'Pending',
-							'value' => '0'
+							'value' => 'pending'
 						],
 						[
 							'label' => 'Spam',
@@ -435,14 +438,15 @@ class Wordpress extends IntegrationBase {
 					'key' => 'to_status',
 					'label' => 'To Status',
 					'type' => 'select',
+					'required' => true,
 					'options' => [
 						[
 							'label' => 'Approved',
-							'value' => '1'
+							'value' => 'approve'
 						],
 						[
 							'label' => 'Pending',
-							'value' => '0'
+							'value' => 'pending'
 						],
 						[
 							'label' => 'Spam',
@@ -554,7 +558,7 @@ class Wordpress extends IntegrationBase {
 					'select'      => [ 'ID', 'name' ],
 				],
 				'default' => 'any',
-				'required' => false,
+				'required' => true,
 			],
 		];
 	}
@@ -562,7 +566,6 @@ class Wordpress extends IntegrationBase {
 	private static function get_term_filterable_triggers(): array {
 		return [
 			'create_term',
-			'created_term',
 			'edit_term',
 			'edited_term',
 			'saved_term',
@@ -582,7 +585,7 @@ class Wordpress extends IntegrationBase {
 					'select'      => [ 'term_id', 'name' ],
 				],
 				'default' => 'any',
-				'required' => false,
+				'required' => true,
 			],
 		];
 	}
@@ -707,8 +710,6 @@ class Wordpress extends IntegrationBase {
 		return $comment->toArray();
 	}
 
-
-
 	public static function resolve_trigger( array $node, array $args ) {
 
 		$config = $node['config'] ?? [];
@@ -726,7 +727,7 @@ class Wordpress extends IntegrationBase {
 				$post_id = isset( $args[0] ) ? (int) $args[0] : 0;
 
 				if ( ! $post_id ) {
-					return;
+					return false;
 				}
 
 				if ( $parent_id = wp_is_post_revision( $post_id ) ) {
@@ -735,7 +736,7 @@ class Wordpress extends IntegrationBase {
 
 				$post = get_post( $post_id );
 				if ( ! $post ) {
-					return;
+					return false;
 				}
 
 				if (
@@ -743,7 +744,7 @@ class Wordpress extends IntegrationBase {
 					wp_is_post_revision( $post_id ) ||
 					$post->post_status === 'auto-draft'
 				) {
-					return;
+					return false;
 				}
 
 				$selected_type = $config['post_type'] ?? 'post';
@@ -751,11 +752,11 @@ class Wordpress extends IntegrationBase {
 				$current_type  = ( $post->post_type === 'attachment' ) ? 'media' : $post->post_type;
 
 				if ( $selected_type !== $current_type ) {
-					return;
+					return false;
 				}
 
 				if ( ! empty( $selected_id ) && $selected_id !== 'any' && (int) $selected_id !== $post_id ) {
-					return;
+					return false;
 				}
 
 				return self::resolve_post_payload( $post_id );
@@ -911,15 +912,30 @@ class Wordpress extends IntegrationBase {
 				return self::resolve_comment_payload( $args[0] ?? 0 );
 
 			case 'transition_comment_status':
-				$comment = Comment::find( $args[1] ?? 0 );
-				if ( ! $comment ) {
-					return false;
+				$new_status = $args[0] ?? '';
+				$comment    = $args[1] ?? null;
+				$old_status = $args[2] ?? '';
+
+				$comment_data = [];
+				if ( $comment instanceof \WP_Comment ) {
+					$comment_data = $comment->to_array();
+				} elseif ( is_numeric( $comment ) ) {
+					$payload = self::resolve_comment_payload( (int) $comment );
+					if ( is_array( $payload ) ) {
+						$comment_data = $payload;
+					}
 				}
 
-				return array_merge($comment->toArray(), [
-					'old_status' => $args[2] ?? '',
-					'new_status' => $args[0] ?? '',
-				]);
+				return array_merge( $comment_data, [
+					'old_status' => $old_status,
+					'new_status' => $new_status,
+				] );
+
+			case 'pre_comment_approved':
+				return [
+					'approved'   => $args[0] ?? null,
+					'comment_id' => $args[1] ?? 0,
+				];
 
 			case 'wp_set_comment_status':
 				return self::resolve_comment_payload( $args[0] ?? 0 );
@@ -1178,8 +1194,6 @@ class Wordpress extends IntegrationBase {
 		);
 	}
 
-
-
 	public static function get_actions(): array {
 		return [
 			'create_post'                   => [ 'label' => 'Create Post' ],
@@ -1353,6 +1367,7 @@ class Wordpress extends IntegrationBase {
 				'key' => 'post_status',
 				'label' => 'Status',
 				'type' => 'select',
+				'required' => true,
 				'options' => [
 					[
 						'label' => 'Publish',
@@ -1575,7 +1590,7 @@ class Wordpress extends IntegrationBase {
 				[
 					'key'      => 'post_title',
 					'label'    => 'Post Title',
-					'type'     => 'expression',
+					'type'     => 'text',
 					'required' => true,
 				],
 				[
@@ -1630,7 +1645,7 @@ class Wordpress extends IntegrationBase {
 					'key'      => 'post_tags',
 					'label'    => 'Select Post Tags',
 					'type'     => 'select',
-					'required' => true,
+					'required' => false,
 					'multiple' => true,
 					'dynamic'  => [
 						'integration' => 'wordpress',
@@ -1651,17 +1666,17 @@ class Wordpress extends IntegrationBase {
 				[
 					'key'   => 'post_date',
 					'label' => 'Post Date',
-					'type'  => 'expression',
+					'type'  => 'date',
 				],
 				[
 					'key'   => 'post_date_gmt',
 					'label' => 'Post Date GMT',
-					'type'  => 'expression',
+					'type'  => 'time',
 				],
 				[
 					'key'   => 'post_name',
 					'label' => 'Post Slug',
-					'type'  => 'expression',
+					'type'  => 'text',
 				],
 				[
 					'key'         => 'post_parent',
@@ -1672,13 +1687,13 @@ class Wordpress extends IntegrationBase {
 				[
 					'key'         => 'post_password',
 					'label'       => 'Post Password',
-					'type'        => 'expression',
+					'type'        => 'password',
 					'description' => 'Only visible to those who know the password.',
 				],
 				[
 					'key'    => 'featured_image_url',
 					'label'  => 'Post Featured Image URL',
-					'type'   => 'expression',
+					'type'   => 'url',
 					'toggle' => 'use_featured_image_id',
 				],
 				[
@@ -1780,7 +1795,7 @@ class Wordpress extends IntegrationBase {
 					'key'      => 'post_tags',
 					'label'    => 'Select Post Tags',
 					'type'     => 'select',
-					'required' => true,
+					'required' => false,
 					'multiple' => true,
 					'dynamic'  => [
 						'integration' => 'wordpress',
@@ -2269,7 +2284,8 @@ class Wordpress extends IntegrationBase {
 				[
 					'key' => 'user_email',
 					'label' => 'Email',
-					'type' => 'email'
+					'type' => 'email',
+					'required' => true
 				],
 				[
 					'key' => 'user_pass',
@@ -2319,14 +2335,6 @@ class Wordpress extends IntegrationBase {
 
 			'activate_user'          => self::field_user_id(),
 			'deactivate_user'        => self::field_user_id(),
-			'get_users' => [
-				[
-					'key' => 'search',
-					'label' => 'Search',
-					'type' => 'text',
-				],
-				...self::field_role( false ),
-			],
 			'get_users_by_role'      => self::field_role(),
 			'get_user_by_id'         => self::field_user_id(),
 			'get_user_by_email'      => [
@@ -2496,7 +2504,7 @@ class Wordpress extends IntegrationBase {
 					'key' => 'limit',
 					'label' => 'Limit',
 					'type' => 'number',
-					'default' => 20,
+					'required' => true,
 				],
 			],
 			'get_term_by_field'      => [
@@ -2765,7 +2773,7 @@ class Wordpress extends IntegrationBase {
 					'key' => 'limit',
 					'label' => 'Limit',
 					'type' => 'number',
-					'default' => 20,
+					'required' => true,
 				],
 			],
 			'get_category'           => self::field_category_id(),
@@ -2950,8 +2958,6 @@ class Wordpress extends IntegrationBase {
 		return $schemas[ $action ] ?? [];
 	}
 
-
-
 	public static function execute_node( array $node, array $input ): array {
 
 		$config = $node['data']['config'] ?? [];
@@ -2968,8 +2974,6 @@ class Wordpress extends IntegrationBase {
 			'data' => $input
 		];
 	}
-
-
 
 	public static function get_dynamic_queries(): array {
 		return [

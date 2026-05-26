@@ -13,9 +13,15 @@ class Elementor extends IntegrationBase {
 	public static function get_slug(): string {
 		return 'elementor';
 	}
+
+	public static function get_name(): string {
+		return 'Elementor';
+	}
+
 	public static function get_icon(): string {
 		return 'elementor.svg';
 	}
+
 	public static function get_triggers(): array {
 		return [
 			'elementor_pro/forms/new_record' => [
