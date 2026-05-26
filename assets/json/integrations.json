@@ -1,6 +1,6 @@
 {
-    "version": "0.0.1",
-    "generated_at": "2026-05-25 12:47:41",
+    "version": "0.0.2",
+    "generated_at": "2026-05-26 14:01:22",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -1654,8 +1654,32 @@
             "triggers": {
                 "submit_form": {
                     "key": "submit_form",
-                    "label": "Form Submit",
+                    "label": "Form Submit (Lite)",
                     "hook": "arfliteentryexecute",
+                    "schema": [
+                        {
+                            "key": "form_id",
+                            "label": "Form",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "arform",
+                                "query": "forms",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": {
+                        "main": "Main output"
+                    }
+                },
+                "submit_form_full": {
+                    "key": "submit_form_full",
+                    "label": "Form Submit (Full version)",
+                    "hook": "arfentryexecute",
                     "schema": [
                         {
                             "key": "form_id",
@@ -3489,8 +3513,8 @@
             "auth_type": "none",
             "supports_webhook": false,
             "triggers": {
-                "form_submitted": {
-                    "key": "form_submitted",
+                "divi_contact_form_submitted": {
+                    "key": "divi_contact_form_submitted",
                     "label": "Form Submitted",
                     "hook": "et_pb_contact_form_submit",
                     "schema": [],
@@ -4658,7 +4682,7 @@
                             "key": "webhook_endpoint",
                             "label": "Webhook Endpoint URL",
                             "type": "copy",
-                            "value": "https://kodezen.local/wp-json/zaplane/v1/incoming/fillout",
+                            "value": "https://almsdev.test/wp-json/zaplane/v1/incoming/fillout",
                             "readonly": true,
                             "help": "Copy this URL \u2192 Fillout Dashboard \u2192 Your Form \u2192 Integrate \u2192 Webhooks \u2192 Add Webhook \u2192 Paste & Save."
                         }
@@ -8743,6 +8767,332 @@
             },
             "actions": []
         },
+        "jotform": {
+            "slug": "jotform",
+            "name": "Jotform",
+            "icon": "jotform.svg",
+            "category": "app",
+            "requires_connection": true,
+            "auth_type": "token_key",
+            "supports_webhook": true,
+            "triggers": {
+                "form_submitted": {
+                    "key": "form_submitted",
+                    "label": "Form Submitted",
+                    "hook": "zaplane_jotform_webhook_form_submitted",
+                    "schema": [
+                        {
+                            "key": "form_id",
+                            "label": "Form",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "jotform",
+                                "query": "form_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "webhook_endpoint",
+                            "label": "Webhook Endpoint URL",
+                            "type": "copy",
+                            "value": "https://almsdev.test/wp-json/zaplane/v1/incoming/jotform",
+                            "readonly": true,
+                            "help": "Copy this URL \u2192 Jotform \u2192 Your Form \u2192 Settings \u2192 Integrations \u2192 Webhooks \u2192 Paste & Save."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": {
+                "create_form": {
+                    "key": "create_form",
+                    "label": "Create Form",
+                    "schema": [
+                        {
+                            "key": "form_title",
+                            "label": "Form Title",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "questions",
+                            "label": "Questions",
+                            "type": "repeater",
+                            "required": false,
+                            "fields": [
+                                {
+                                    "key": "label",
+                                    "label": "Label",
+                                    "type": "text",
+                                    "required": true
+                                },
+                                {
+                                    "key": "slug",
+                                    "label": "Slug",
+                                    "type": "text",
+                                    "required": true
+                                },
+                                {
+                                    "key": "type",
+                                    "label": "Type",
+                                    "type": "select",
+                                    "required": true,
+                                    "options": [
+                                        {
+                                            "label": "Header",
+                                            "value": "control_head"
+                                        },
+                                        {
+                                            "label": "Full Name",
+                                            "value": "control_fullname"
+                                        },
+                                        {
+                                            "label": "Email",
+                                            "value": "control_email"
+                                        },
+                                        {
+                                            "label": "Address",
+                                            "value": "control_address"
+                                        },
+                                        {
+                                            "label": "Phone",
+                                            "value": "control_phone"
+                                        },
+                                        {
+                                            "label": "Date Picker",
+                                            "value": "control_datetime"
+                                        },
+                                        {
+                                            "label": "Signature",
+                                            "value": "control_signature"
+                                        },
+                                        {
+                                            "label": "Short Text",
+                                            "value": "control_textbox"
+                                        },
+                                        {
+                                            "label": "Long Text",
+                                            "value": "control_textarea"
+                                        },
+                                        {
+                                            "label": "Dropdown",
+                                            "value": "control_dropdown"
+                                        },
+                                        {
+                                            "label": "Single Choice",
+                                            "value": "control_radio"
+                                        },
+                                        {
+                                            "label": "Multiple Choice",
+                                            "value": "control_checkbox"
+                                        },
+                                        {
+                                            "label": "Number",
+                                            "value": "control_number"
+                                        },
+                                        {
+                                            "label": "Image",
+                                            "value": "control_image"
+                                        },
+                                        {
+                                            "label": "File Upload",
+                                            "value": "control_fileupload"
+                                        },
+                                        {
+                                            "label": "Time",
+                                            "value": "control_time"
+                                        },
+                                        {
+                                            "label": "Captcha",
+                                            "value": "control_captcha"
+                                        },
+                                        {
+                                            "label": "Spinner",
+                                            "value": "control_spinner"
+                                        },
+                                        {
+                                            "label": "Submit",
+                                            "value": "control_button"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "key": "order",
+                                    "label": "Order",
+                                    "type": "text",
+                                    "required": false
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add_questions_to_form": {
+                    "key": "add_questions_to_form",
+                    "label": "Add Questions to Form",
+                    "schema": [
+                        {
+                            "key": "form_id",
+                            "label": "Form",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "jotform",
+                                "query": "form_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "questions",
+                            "label": "Questions",
+                            "type": "repeater",
+                            "required": false,
+                            "fields": [
+                                {
+                                    "key": "label",
+                                    "label": "Label",
+                                    "type": "text",
+                                    "required": true
+                                },
+                                {
+                                    "key": "slug",
+                                    "label": "Slug",
+                                    "type": "text",
+                                    "required": true
+                                },
+                                {
+                                    "key": "type",
+                                    "label": "Type",
+                                    "type": "select",
+                                    "required": true,
+                                    "options": [
+                                        {
+                                            "label": "Header",
+                                            "value": "control_head"
+                                        },
+                                        {
+                                            "label": "Full Name",
+                                            "value": "control_fullname"
+                                        },
+                                        {
+                                            "label": "Email",
+                                            "value": "control_email"
+                                        },
+                                        {
+                                            "label": "Address",
+                                            "value": "control_address"
+                                        },
+                                        {
+                                            "label": "Phone",
+                                            "value": "control_phone"
+                                        },
+                                        {
+                                            "label": "Date Picker",
+                                            "value": "control_datetime"
+                                        },
+                                        {
+                                            "label": "Signature",
+                                            "value": "control_signature"
+                                        },
+                                        {
+                                            "label": "Short Text",
+                                            "value": "control_textbox"
+                                        },
+                                        {
+                                            "label": "Long Text",
+                                            "value": "control_textarea"
+                                        },
+                                        {
+                                            "label": "Dropdown",
+                                            "value": "control_dropdown"
+                                        },
+                                        {
+                                            "label": "Single Choice",
+                                            "value": "control_radio"
+                                        },
+                                        {
+                                            "label": "Multiple Choice",
+                                            "value": "control_checkbox"
+                                        },
+                                        {
+                                            "label": "Number",
+                                            "value": "control_number"
+                                        },
+                                        {
+                                            "label": "Image",
+                                            "value": "control_image"
+                                        },
+                                        {
+                                            "label": "File Upload",
+                                            "value": "control_fileupload"
+                                        },
+                                        {
+                                            "label": "Time",
+                                            "value": "control_time"
+                                        },
+                                        {
+                                            "label": "Captcha",
+                                            "value": "control_captcha"
+                                        },
+                                        {
+                                            "label": "Spinner",
+                                            "value": "control_spinner"
+                                        },
+                                        {
+                                            "label": "Submit",
+                                            "value": "control_button"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "key": "order",
+                                    "label": "Order",
+                                    "type": "text",
+                                    "required": false
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_form": {
+                    "key": "delete_form",
+                    "label": "Delete Form",
+                    "schema": [
+                        {
+                            "key": "form_id",
+                            "label": "Form",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "jotform",
+                                "query": "form_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
+        },
         "kadenceblocks": {
             "slug": "kadenceblocks",
             "name": "Kadence Blocks",
@@ -8752,8 +9102,8 @@
             "auth_type": "none",
             "supports_webhook": false,
             "triggers": {
-                "form_submission": {
-                    "key": "form_submission",
+                "kadence_blocks_advanced_form_submission": {
+                    "key": "kadence_blocks_advanced_form_submission",
                     "label": "Form Submission",
                     "hook": "kadence_blocks_advanced_form_submission",
                     "schema": [],
@@ -13684,7 +14034,7 @@
                             "key": "webhook_endpoint",
                             "label": "Webhook Endpoint URL",
                             "type": "copy",
-                            "value": "https://kodezen.local/wp-json/zaplane/v1/incoming/typeform",
+                            "value": "https://almsdev.test/wp-json/zaplane/v1/incoming/typeform",
                             "readonly": true,
                             "help": "Copy this URL \u2192 Typeform Dashboard \u2192 Your Form \u2192 Connect \u2192 Webhooks \u2192 Add a webhook \u2192 Paste & Save."
                         }
@@ -13845,8 +14195,8 @@
             "auth_type": "none",
             "supports_webhook": false,
             "triggers": {
-                "forms_submission": {
-                    "key": "forms_submission",
+                "weforms_entry_submission": {
+                    "key": "weforms_entry_submission",
                     "label": "Form Submission",
                     "hook": "weforms_entry_submission",
                     "schema": [
@@ -17569,7 +17919,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "post_updated": {
@@ -17626,7 +17977,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "transition_post_status": {
@@ -17635,7 +17987,8 @@
                     "hook": "transition_post_status",
                     "schema": [],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "wp_insert_post": {
@@ -17644,7 +17997,8 @@
                     "hook": "wp_insert_post",
                     "schema": [],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "wp_after_insert_post": {
@@ -17653,7 +18007,8 @@
                     "hook": "wp_after_insert_post",
                     "schema": [],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "wp_trash_post": {
@@ -17662,7 +18017,8 @@
                     "hook": "wp_trash_post",
                     "schema": [],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "untrashed_post": {
@@ -17671,7 +18027,8 @@
                     "hook": "untrashed_post",
                     "schema": [],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "delete_post": {
@@ -17680,7 +18037,8 @@
                     "hook": "delete_post",
                     "schema": [],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "deleted_post": {
@@ -17689,7 +18047,8 @@
                     "hook": "before_delete_post",
                     "schema": [],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "save_post": {
@@ -17698,7 +18057,28 @@
                     "hook": "save_post",
                     "schema": [],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
+                    ]
+                },
+                "post_revision": {
+                    "key": "post_revision",
+                    "label": "Post Revision Saved",
+                    "hook": "_wp_put_post_revision",
+                    "schema": [],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "wp_authenticate": {
+                    "key": "wp_authenticate",
+                    "label": "User Authenticate Attempt",
+                    "hook": "wp_authenticate",
+                    "schema": [],
+                    "outputs": [
+                        "main",
+                        "error"
                     ]
                 },
                 "add_attachment": {
@@ -17707,7 +18087,8 @@
                     "hook": "add_attachment",
                     "schema": [],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "edit_attachment": {
@@ -17716,7 +18097,8 @@
                     "hook": "edit_attachment",
                     "schema": [],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "save_attachment": {
@@ -17725,7 +18107,8 @@
                     "hook": "attachment_fields_to_save",
                     "schema": [],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "attachment_updated": {
@@ -17734,7 +18117,8 @@
                     "hook": "attachment_updated",
                     "schema": [],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "attachment_count": {
@@ -17743,7 +18127,8 @@
                     "hook": "wp_count_attachments",
                     "schema": [],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "attachment_metadata": {
@@ -17752,7 +18137,8 @@
                     "hook": "wp_generate_attachment_metadata",
                     "schema": [],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "delete_attachment": {
@@ -17761,7 +18147,8 @@
                     "hook": "delete_attachment",
                     "schema": [],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "media_edit": {
@@ -17770,7 +18157,8 @@
                     "hook": "edit_attachment",
                     "schema": [],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "media_upload_tabs": {
@@ -17779,7 +18167,8 @@
                     "hook": "media_upload_tabs",
                     "schema": [],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "image_sizes": {
@@ -17788,16 +18177,34 @@
                     "hook": "image_size_names_choose",
                     "schema": [],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "user_register": {
                     "key": "user_register",
                     "label": "User Registered",
                     "hook": "user_register",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "users_with_any",
+                                "select": [
+                                    "ID",
+                                    "name"
+                                ]
+                            },
+                            "default": "any",
+                            "required": true
+                        }
+                    ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "set_user_role": {
@@ -17822,7 +18229,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "profile_update": {
@@ -17847,7 +18255,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "wp_update_user": {
@@ -17872,7 +18281,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "remove_user_from_blog": {
@@ -17897,7 +18307,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "delete_user": {
@@ -17922,7 +18333,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "wpmu_delete_user": {
@@ -17947,7 +18359,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "wpmu_new_user": {
@@ -17972,7 +18385,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "wpmu_activate_user": {
@@ -17997,7 +18411,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "create_application_password": {
@@ -18022,7 +18437,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "update_application_password": {
@@ -18047,7 +18463,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "delete_application_password": {
@@ -18072,7 +18489,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "add_user_role": {
@@ -18097,7 +18515,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "wp_login": {
@@ -18122,7 +18541,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "wp_login_failed": {
@@ -18131,7 +18551,8 @@
                     "hook": "wp_login_failed",
                     "schema": [],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "wp_logout": {
@@ -18156,7 +18577,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "validate_reset": {
@@ -18181,7 +18603,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "comment_post": {
@@ -18190,7 +18613,8 @@
                     "hook": "comment_post",
                     "schema": [],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "wp_insert_comment": {
@@ -18199,7 +18623,8 @@
                     "hook": "wp_insert_comment",
                     "schema": [],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "edit_comment": {
@@ -18208,7 +18633,8 @@
                     "hook": "edit_comment",
                     "schema": [],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "trashed_comment": {
@@ -18232,7 +18658,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "untrashed_comment": {
@@ -18256,7 +18683,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "transition_comment_status": {
@@ -18314,7 +18742,18 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
+                    ]
+                },
+                "pre_comment_approved": {
+                    "key": "pre_comment_approved",
+                    "label": "Comment Pre-Approval",
+                    "hook": "pre_comment_approved",
+                    "schema": [],
+                    "outputs": [
+                        "main",
+                        "error"
                     ]
                 },
                 "delete_comment": {
@@ -18323,16 +18762,34 @@
                     "hook": "delete_comment",
                     "schema": [],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "create_term": {
                     "key": "create_term",
                     "label": "Create Term",
                     "hook": "create_term",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "term_id",
+                            "label": "Term",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "terms_with_any",
+                                "select": [
+                                    "term_id",
+                                    "name"
+                                ]
+                            },
+                            "default": "any",
+                            "required": true
+                        }
+                    ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "created_term": {
@@ -18341,7 +18798,8 @@
                     "hook": "created_term",
                     "schema": [],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "edit_term": {
@@ -18366,7 +18824,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "edited_term": {
@@ -18391,7 +18850,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "saved_term": {
@@ -18416,7 +18876,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "delete_term": {
@@ -18441,7 +18902,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "activated_plugin": {
@@ -18465,7 +18927,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "deactivate_plugin": {
@@ -18474,7 +18937,8 @@
                     "hook": "deactivate_plugin",
                     "schema": [],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "switch_theme": {
@@ -18498,7 +18962,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "add_option": {
@@ -18507,7 +18972,8 @@
                     "hook": "add_option",
                     "schema": [],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "update_option": {
@@ -18516,7 +18982,8 @@
                     "hook": "update_option",
                     "schema": [],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "delete_option": {
@@ -18525,7 +18992,8 @@
                     "hook": "delete_option",
                     "schema": [],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "upgrader_process_complete": {
@@ -18534,7 +19002,8 @@
                     "hook": "upgrader_process_complete",
                     "schema": [],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "generate_rewrite_rules": {
@@ -18543,7 +19012,8 @@
                     "hook": "generate_rewrite_rules",
                     "schema": [],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "switch_blog": {
@@ -18552,7 +19022,8 @@
                     "hook": "switch_blog",
                     "schema": [],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "customize_register": {
@@ -18561,7 +19032,8 @@
                     "hook": "customize_register",
                     "schema": [],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "rest_api_init": {
@@ -18570,7 +19042,8 @@
                     "hook": "rest_api_init",
                     "schema": [],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "update_blog_public": {
@@ -18579,7 +19052,8 @@
                     "hook": "update_blog_public",
                     "schema": [],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "update_blog_status": {
@@ -18588,7 +19062,8 @@
                     "hook": "update_blog_status",
                     "schema": [],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "wpmu_new_blog": {
@@ -18597,7 +19072,8 @@
                     "hook": "wpmu_new_blog",
                     "schema": [],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 }
             },
@@ -18797,7 +19273,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "update_option": {
@@ -18805,7 +19282,8 @@
                     "label": "Update Option",
                     "schema": [],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "create_user": {
@@ -18859,7 +19337,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "update_user": {
@@ -18921,7 +19400,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "delete_user": {
@@ -18957,7 +19437,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "get_users": {
@@ -18965,7 +19446,8 @@
                     "label": "Get All Users",
                     "schema": [],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "get_users_by_role": {
@@ -18988,7 +19470,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "get_user_by_id": {
@@ -19011,7 +19494,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "get_user_by_email": {
@@ -19026,7 +19510,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "get_user_by_field": {
@@ -19066,7 +19551,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "get_user_meta_all": {
@@ -19089,7 +19575,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "get_user_meta_single": {
@@ -19118,7 +19605,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "update_user_meta": {
@@ -19152,7 +19640,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "send_password_reset_email": {
@@ -19167,7 +19656,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "authenticate_user": {
@@ -19198,7 +19688,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "logout_user": {
@@ -19212,7 +19703,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "activate_user": {
@@ -19235,7 +19727,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "deactivate_user": {
@@ -19258,7 +19751,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "create_role": {
@@ -19284,7 +19778,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "delete_role": {
@@ -19307,7 +19802,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "add_user_role": {
@@ -19344,7 +19840,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "remove_user_role": {
@@ -19381,7 +19878,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "update_user_role": {
@@ -19418,7 +19916,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "get_roles": {
@@ -19432,7 +19931,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "get_caps": {
@@ -19446,7 +19946,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "get_role_caps": {
@@ -19469,7 +19970,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "add_role_caps": {
@@ -19498,7 +20000,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "remove_role_caps": {
@@ -19527,7 +20030,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "get_user_caps": {
@@ -19550,7 +20054,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "add_user_caps": {
@@ -19579,7 +20084,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "remove_user_caps": {
@@ -19608,7 +20114,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "get_term": {
@@ -19645,7 +20152,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "get_terms_by_taxonomy": {
@@ -19684,7 +20192,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "get_term_by_field": {
@@ -19734,7 +20243,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "create_term": {
@@ -19789,7 +20299,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "update_term": {
@@ -19857,7 +20368,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "delete_term": {
@@ -19894,7 +20406,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "register_taxonomy": {
@@ -19920,7 +20433,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "unregister_taxonomy": {
@@ -19943,7 +20457,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "get_taxonomies": {
@@ -19957,7 +20472,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "get_taxonomy": {
@@ -19980,7 +20496,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "add_taxonomy_to_post": {
@@ -20020,7 +20537,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "remove_taxonomy_from_post": {
@@ -20055,7 +20573,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "bulk_assign_terms_to_posts": {
@@ -20095,7 +20614,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "bulk_remove_terms_from_posts": {
@@ -20130,7 +20650,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "create_category": {
@@ -20168,7 +20689,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "update_category": {
@@ -20219,7 +20741,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "delete_category": {
@@ -20242,7 +20765,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "add_category_to_post": {
@@ -20268,7 +20792,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "get_categories": {
@@ -20293,7 +20818,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "get_category": {
@@ -20316,7 +20842,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "create_post_tag": {
@@ -20324,7 +20851,8 @@
                     "label": "Create Post Tag",
                     "schema": [],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "update_post_tag": {
@@ -20332,7 +20860,8 @@
                     "label": "Update Post Tag",
                     "schema": [],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "delete_post_tag": {
@@ -20340,7 +20869,8 @@
                     "label": "Delete Post Tag",
                     "schema": [],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "add_tags_to_post": {
@@ -20348,7 +20878,8 @@
                     "label": "Add Tags to Post",
                     "schema": [],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "remove_tags_from_post": {
@@ -20356,7 +20887,8 @@
                     "label": "Remove Tags from Post",
                     "schema": [],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "get_post_tags": {
@@ -20364,7 +20896,8 @@
                     "label": "Get Post Tag (All)",
                     "schema": [],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "get_post_tag": {
@@ -20372,7 +20905,8 @@
                     "label": "Get Post Tag (Single)",
                     "schema": [],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "create_site": {
@@ -20380,7 +20914,8 @@
                     "label": "Create New Site",
                     "schema": [],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "delete_site": {
@@ -20388,7 +20923,8 @@
                     "label": "Delete Site",
                     "schema": [],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "add_user_to_site": {
@@ -20396,7 +20932,8 @@
                     "label": "Add User to Site",
                     "schema": [],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "remove_user_from_site": {
@@ -20404,7 +20941,8 @@
                     "label": "Remove User from Site",
                     "schema": [],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "untrash_post": {
@@ -20419,7 +20957,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "untrash_comment": {
@@ -20434,7 +20973,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "update_comment_count": {
@@ -20449,7 +20989,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "set_comment_status": {
@@ -20488,7 +21029,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "get_post_comments_all": {
@@ -20496,7 +21038,8 @@
                     "label": "Get Post Comments (All)",
                     "schema": [],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "get_post_comments_single": {
@@ -20511,7 +21054,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "get_user_comments": {
@@ -20519,7 +21063,8 @@
                     "label": "Get User Comments",
                     "schema": [],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "get_user_comments_email": {
@@ -20534,7 +21079,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "get_comment_metadata_all": {
@@ -20549,7 +21095,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "get_comment_metadata_single": {
@@ -20570,7 +21117,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "create_comment": {
@@ -20603,7 +21151,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "reply_comment": {
@@ -20636,7 +21185,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "delete_comment": {
@@ -20651,7 +21201,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "add_plugin_theme_option": {
@@ -20671,7 +21222,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "update_option_advanced": {
@@ -20691,7 +21243,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "delete_option": {
@@ -20706,7 +21259,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "generate_attachment_metadata": {
@@ -20721,7 +21275,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "regenerate_image_sizes": {
@@ -20736,7 +21291,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "set_featured_image": {
@@ -20757,7 +21313,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "update_title": {
@@ -20792,7 +21349,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "update_post": {
@@ -20996,7 +21554,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "update_status": {
@@ -21049,7 +21608,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "duplicate_post": {
@@ -21084,7 +21644,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "schedule_post": {
@@ -21121,7 +21682,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "unschedule_post": {
@@ -21136,7 +21698,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "update_post_feature_image": {
@@ -21157,7 +21720,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "change_post_author": {
@@ -21178,7 +21742,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "trash_post": {
@@ -21207,7 +21772,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "restore_post": {
@@ -21236,7 +21802,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "delete_trash_post": {
@@ -21265,7 +21832,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "delete_post": {
@@ -21294,7 +21862,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "get_posts_all": {
@@ -21302,7 +21871,8 @@
                     "label": "Get Post (All)",
                     "schema": [],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "get_post_single": {
@@ -21317,7 +21887,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "get_posts_by_post_type": {
@@ -21340,7 +21911,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "get_posts_by_metadata": {
@@ -21363,7 +21935,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "get_posts_metadata_all": {
@@ -21378,7 +21951,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "get_post_metadata_single": {
@@ -21399,7 +21973,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "get_post_permalink": {
@@ -21414,7 +21989,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "get_post_content": {
@@ -21429,7 +22005,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "get_post_excerpt": {
@@ -21444,7 +22021,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "get_post_status": {
@@ -21459,7 +22037,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "get_post_type_all": {
@@ -21467,7 +22046,8 @@
                     "label": "Get Post Type (All)",
                     "schema": [],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "get_post_type_single": {
@@ -21482,7 +22062,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "register_post_type": {
@@ -21629,7 +22210,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "unregister_post_type": {
@@ -21652,7 +22234,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "add_post_type_support": {
@@ -21715,7 +22298,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "approve_comment": {
@@ -21730,7 +22314,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "unapproved_comment": {
@@ -21745,7 +22330,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "mark_comment_spam": {
@@ -21760,7 +22346,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "unmark_comment_spam": {
@@ -21775,7 +22362,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "trash_comment": {
@@ -21790,7 +22378,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "restore_comment": {
@@ -21805,7 +22394,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "delete_trash_comment": {
@@ -21820,7 +22410,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "activate_plugin": {
@@ -21843,7 +22434,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "deactivate_plugin": {
@@ -21866,7 +22458,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "switch_theme": {
@@ -21889,7 +22482,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "add_media_image": {
@@ -21928,7 +22522,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "delete_media": {
@@ -21950,7 +22545,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "rename_media": {
@@ -21971,7 +22567,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "get_media_all": {
@@ -21979,7 +22576,8 @@
                     "label": "Get Media (All)",
                     "schema": [],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "get_media_by_title": {
@@ -21994,7 +22592,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 },
                 "get_media_by_id": {
@@ -22009,7 +22608,8 @@
                         }
                     ],
                     "outputs": [
-                        "main"
+                        "main",
+                        "error"
                     ]
                 }
             }
