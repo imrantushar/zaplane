@@ -41,14 +41,6 @@ $registry = [
 		'file'  => 'woocommerce.php',
 		'class' => \Zaplane\Integrations\Woocommerce::class,
 	],
-	'woomemberships'      => [
-		'file'  => 'woo-memberships.php',
-		'class' => \Zaplane\Integrations\WooMemberships::class,
-	],
-	'woosubscriptions'    => [
-		'file'  => 'woo-subscriptions.php',
-		'class' => \Zaplane\Integrations\WooSubscriptions::class,
-	],
 	'woobookings'         => [
 		'file'  => 'woo-bookings.php',
 		'class' => \Zaplane\Integrations\WooBookings::class,
@@ -57,10 +49,6 @@ $registry = [
 		'file'  => 'slack.php',
 		'class' => \Zaplane\Integrations\Slack::class,
 	],
-	'trello'              => [
-		'file'  => 'trello.php',
-		'class' => \Zaplane\Integrations\Trello::class,
-	],
 	'mailchimp'           => [
 		'file'  => 'mailchimp.php',
 		'class' => \Zaplane\Integrations\Mailchimp::class,
@@ -68,10 +56,6 @@ $registry = [
 	'activecampaign'      => [
 		'file'  => 'active-campaign.php',
 		'class' => \Zaplane\Integrations\ActiveCampaign::class,
-	],
-	'hubspot'             => [
-		'file'  => 'hubspot.php',
-		'class' => \Zaplane\Integrations\Hubspot::class,
 	],
 	'surecart'            => [
 		'file'  => 'surecart.php',
@@ -84,10 +68,6 @@ $registry = [
 	'http'                => [
 		'file'  => 'http.php',
 		'class' => \Zaplane\Integrations\Http::class,
-	],
-	'webhook'             => [
-		'file'  => 'webhook.php',
-		'class' => \Zaplane\Integrations\Webhook::class,
 	],
 	'learndash'           => [
 		'file'  => 'learndash.php',

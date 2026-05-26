@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "generated_at": "2026-05-22 13:19:40",
+    "generated_at": "2026-05-25 12:47:41",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -8707,131 +8707,6 @@
             },
             "actions": []
         },
-        "hubspot": {
-            "slug": "hubspot",
-            "name": "HubSpot",
-            "icon": "hubspot.svg",
-            "category": "app",
-            "requires_connection": false,
-            "auth_type": "none",
-            "supports_webhook": false,
-            "triggers": [],
-            "actions": {
-                "submit_form": {
-                    "key": "submit_form",
-                    "label": "Submit Form",
-                    "schema": [
-                        {
-                            "key": "portal_id",
-                            "label": "Portal ID",
-                            "type": "select",
-                            "dynamic": {
-                                "integration": "hubspot",
-                                "query": "portals",
-                                "select": [
-                                    "id",
-                                    "label"
-                                ]
-                            },
-                            "required": true
-                        },
-                        {
-                            "key": "form_guid",
-                            "label": "Form GUID",
-                            "type": "select",
-                            "dynamic": {
-                                "integration": "hubspot",
-                                "query": "forms",
-                                "select": [
-                                    "id",
-                                    "label"
-                                ]
-                            },
-                            "required": true,
-                            "help": "Shows HubSpot forms already embedded on this WordPress site through the official HubSpot plugin."
-                        },
-                        {
-                            "key": "email",
-                            "label": "Email",
-                            "type": "text",
-                            "placeholder": "name@example.com or {{email}}",
-                            "help": "Optional. Used to auto-build fields if Fields (JSON) is empty."
-                        },
-                        {
-                            "key": "firstname",
-                            "label": "First Name",
-                            "type": "text",
-                            "placeholder": "John or {{first_name}}",
-                            "help": "Optional. Used to auto-build fields if Fields (JSON) is empty."
-                        },
-                        {
-                            "key": "lastname",
-                            "label": "Last Name",
-                            "type": "text",
-                            "placeholder": "Doe or {{last_name}}",
-                            "help": "Optional. Used to auto-build fields if Fields (JSON) is empty."
-                        },
-                        {
-                            "key": "phone",
-                            "label": "Phone",
-                            "type": "number",
-                            "placeholder": "+18884827768 or {{phone}}",
-                            "help": "Optional. Used to auto-build fields if Fields (JSON) is empty."
-                        },
-                        {
-                            "key": "fields",
-                            "label": "Fields (JSON)",
-                            "type": "textarea",
-                            "placeholder": "{\"email\":\"name@example.com\",\"firstname\":\"John\"}",
-                            "help": "Optional. JSON object (field name to value) or array of field objects. If empty, simple fields above will be used."
-                        },
-                        {
-                            "key": "context",
-                            "label": "Context (JSON)",
-                            "type": "textarea",
-                            "placeholder": "{\"pageUri\":\"https://example.com\",\"pageName\":\"Landing\"}",
-                            "help": "Optional. Include hutk, pageUri, pageName, ipAddress, etc."
-                        },
-                        {
-                            "key": "legal_consent_options",
-                            "label": "Legal Consent (JSON)",
-                            "type": "textarea",
-                            "placeholder": "{\"consent\":{\"consentToProcess\":true,\"text\":\"...\",\"communications\":[{\"value\":true,\"subscriptionTypeId\":123,\"text\":\"...\"}]}}",
-                            "help": "Optional. GDPR/consent data."
-                        },
-                        {
-                            "key": "submitted_at",
-                            "label": "Submitted At (ms)",
-                            "type": "text",
-                            "placeholder": "1700000000000",
-                            "help": "Optional timestamp in milliseconds."
-                        },
-                        {
-                            "key": "skip_validation",
-                            "label": "Skip Validation",
-                            "type": "select",
-                            "options": [
-                                {
-                                    "value": "",
-                                    "label": "Default"
-                                },
-                                {
-                                    "value": "true",
-                                    "label": "True"
-                                },
-                                {
-                                    "value": "false",
-                                    "label": "False"
-                                }
-                            ]
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                }
-            }
-        },
         "jetengine": {
             "slug": "jetengine",
             "name": "JetEngine",
@@ -13663,36 +13538,6 @@
                 }
             }
         },
-        "trello": {
-            "slug": "trello",
-            "name": "Trello",
-            "icon": "trello-icon.svg",
-            "category": "app",
-            "requires_connection": false,
-            "auth_type": "none",
-            "supports_webhook": false,
-            "triggers": {
-                "card_created": {
-                    "key": "card_created",
-                    "label": "Card Created",
-                    "hook": "trello_webhook",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                }
-            },
-            "actions": {
-                "create_card": {
-                    "key": "create_card",
-                    "label": "Create Card",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                }
-            }
-        },
         "tutor": {
             "slug": "tutor",
             "name": "Tutor LMS",
@@ -13990,17 +13835,6 @@
                     ]
                 }
             }
-        },
-        "webhook": {
-            "slug": "webhook",
-            "name": "Webhook",
-            "icon": "webhook.svg",
-            "category": "app",
-            "requires_connection": false,
-            "auth_type": "none",
-            "supports_webhook": true,
-            "triggers": [],
-            "actions": []
         },
         "weforms": {
             "slug": "weforms",
@@ -14551,7 +14385,7 @@
         },
         "woocommerce": {
             "slug": "woocommerce",
-            "name": "Woocommerce",
+            "name": "WooCommerce",
             "icon": "woo.svg",
             "category": "app",
             "requires_connection": false,
@@ -14560,7 +14394,7 @@
             "triggers": {
                 "new_order": {
                     "key": "new_order",
-                    "label": "New Order",
+                    "label": "New Order Created",
                     "hook": "woocommerce_new_order",
                     "schema": [],
                     "outputs": [
@@ -14651,7 +14485,7 @@
                 "new_coupon": {
                     "key": "new_coupon",
                     "label": "New Coupon Created",
-                    "hook": "woocommerce_new_coupon",
+                    "hook": "woocommerce_update_coupon",
                     "schema": [],
                     "outputs": [
                         "main"
@@ -14660,7 +14494,7 @@
                 "create_customer": {
                     "key": "create_customer",
                     "label": "Create Customer",
-                    "hook": "woocommerce_created_customer",
+                    "hook": "user_register",
                     "schema": [],
                     "outputs": [
                         "main"
@@ -14669,7 +14503,7 @@
                 "update_customer": {
                     "key": "update_customer",
                     "label": "Update Customer",
-                    "hook": "woocommerce_update_customer",
+                    "hook": "profile_update",
                     "schema": [],
                     "outputs": [
                         "main"
@@ -14678,7 +14512,7 @@
                 "delete_customer": {
                     "key": "delete_customer",
                     "label": "Delete Customer",
-                    "hook": "woocommerce_delete_customer",
+                    "hook": "delete_user",
                     "schema": [],
                     "outputs": [
                         "main"
@@ -14687,7 +14521,7 @@
                 "create_product": {
                     "key": "create_product",
                     "label": "Create Product",
-                    "hook": "woocommerce_new_product",
+                    "hook": "wp_after_insert_post",
                     "schema": [],
                     "outputs": [
                         "main"
@@ -14696,7 +14530,7 @@
                 "update_product": {
                     "key": "update_product",
                     "label": "Update Product",
-                    "hook": "woocommerce_update_product",
+                    "hook": "wp_after_insert_post",
                     "schema": [],
                     "outputs": [
                         "main"
@@ -14704,8 +14538,8 @@
                 },
                 "delete_product": {
                     "key": "delete_product",
-                    "label": "Delete Product",
-                    "hook": "before_delete_post",
+                    "label": "Trash Product",
+                    "hook": "transition_post_status",
                     "schema": [],
                     "outputs": [
                         "main"
@@ -14714,7 +14548,7 @@
                 "restore_product": {
                     "key": "restore_product",
                     "label": "Restore Product",
-                    "hook": "untrashed_post",
+                    "hook": "transition_post_status",
                     "schema": [],
                     "outputs": [
                         "main"
@@ -14723,7 +14557,7 @@
                 "product_status_updated": {
                     "key": "product_status_updated",
                     "label": "Product Status Updated",
-                    "hook": "woocommerce_product_set_stock_status",
+                    "hook": "transition_post_status",
                     "schema": [],
                     "outputs": [
                         "main"
@@ -14776,31 +14610,31 @@
                             "options": [
                                 {
                                     "label": "Pending",
-                                    "value": "wc_order_pending"
+                                    "value": "pending"
                                 },
                                 {
                                     "label": "Processing",
-                                    "value": "wc_order_processing"
+                                    "value": "processing"
                                 },
                                 {
                                     "label": "On-hold",
-                                    "value": "wc_order_on-hold"
+                                    "value": "on-hold"
                                 },
                                 {
                                     "label": "Completed",
-                                    "value": "wc_order_completed"
+                                    "value": "completed"
                                 },
                                 {
                                     "label": "Cancelled",
-                                    "value": "wc_order_cancelled"
+                                    "value": "cancelled"
                                 },
                                 {
                                     "label": "Refunded",
-                                    "value": "wc_order_refunded"
+                                    "value": "refunded"
                                 },
                                 {
                                     "label": "Failed",
-                                    "value": "wc_order_failed"
+                                    "value": "failed"
                                 }
                             ]
                         },
@@ -14850,31 +14684,31 @@
                             "options": [
                                 {
                                     "label": "Pending",
-                                    "value": "wc_order_pending"
+                                    "value": "pending"
                                 },
                                 {
                                     "label": "Processing",
-                                    "value": "wc_order_processing"
+                                    "value": "processing"
                                 },
                                 {
                                     "label": "On-hold",
-                                    "value": "wc_order_on-hold"
+                                    "value": "on-hold"
                                 },
                                 {
                                     "label": "Completed",
-                                    "value": "wc_order_completed"
+                                    "value": "completed"
                                 },
                                 {
                                     "label": "Cancelled",
-                                    "value": "wc_order_cancelled"
+                                    "value": "cancelled"
                                 },
                                 {
                                     "label": "Refunded",
-                                    "value": "wc_order_refunded"
+                                    "value": "refunded"
                                 },
                                 {
                                     "label": "Failed",
-                                    "value": "wc_order_failed"
+                                    "value": "failed"
                                 }
                             ]
                         },
@@ -14943,31 +14777,31 @@
                             "options": [
                                 {
                                     "label": "Pending",
-                                    "value": "wc_order_pending"
+                                    "value": "pending"
                                 },
                                 {
                                     "label": "Processing",
-                                    "value": "wc_order_processing"
+                                    "value": "processing"
                                 },
                                 {
                                     "label": "On-hold",
-                                    "value": "wc_order_on-hold"
+                                    "value": "on-hold"
                                 },
                                 {
                                     "label": "Completed",
-                                    "value": "wc_order_completed"
+                                    "value": "completed"
                                 },
                                 {
                                     "label": "Cancelled",
-                                    "value": "wc_order_cancelled"
+                                    "value": "cancelled"
                                 },
                                 {
                                     "label": "Refunded",
-                                    "value": "wc_order_refunded"
+                                    "value": "refunded"
                                 },
                                 {
                                     "label": "Failed",
-                                    "value": "wc_order_failed"
+                                    "value": "failed"
                                 }
                             ],
                             "required": true
@@ -15023,31 +14857,31 @@
                             "options": [
                                 {
                                     "label": "Pending",
-                                    "value": "wc_order_pending"
+                                    "value": "pending"
                                 },
                                 {
                                     "label": "Processing",
-                                    "value": "wc_order_processing"
+                                    "value": "processing"
                                 },
                                 {
                                     "label": "On-hold",
-                                    "value": "wc_order_on-hold"
+                                    "value": "on-hold"
                                 },
                                 {
                                     "label": "Completed",
-                                    "value": "wc_order_completed"
+                                    "value": "completed"
                                 },
                                 {
                                     "label": "Cancelled",
-                                    "value": "wc_order_cancelled"
+                                    "value": "cancelled"
                                 },
                                 {
                                     "label": "Refunded",
-                                    "value": "wc_order_refunded"
+                                    "value": "refunded"
                                 },
                                 {
                                     "label": "Failed",
-                                    "value": "wc_order_failed"
+                                    "value": "failed"
                                 }
                             ]
                         }
@@ -15058,7 +14892,7 @@
                 },
                 "get_refunded_orders": {
                     "key": "get_refunded_orders",
-                    "label": "Get a List of Refunded Orders",
+                    "label": "Get Refunded Orders",
                     "schema": [
                         {
                             "key": "limit",
@@ -15079,7 +14913,7 @@
                 },
                 "get_orders_all": {
                     "key": "get_orders_all",
-                    "label": "Get Order (All)",
+                    "label": "Get All Orders",
                     "schema": [
                         {
                             "key": "limit",
@@ -15100,7 +14934,7 @@
                 },
                 "get_orders_by_status": {
                     "key": "get_orders_by_status",
-                    "label": "Get Order (By Status)",
+                    "label": "Get Orders by Status",
                     "schema": [
                         {
                             "key": "order_status",
@@ -15109,31 +14943,31 @@
                             "options": [
                                 {
                                     "label": "Pending",
-                                    "value": "wc_order_pending"
+                                    "value": "pending"
                                 },
                                 {
                                     "label": "Processing",
-                                    "value": "wc_order_processing"
+                                    "value": "processing"
                                 },
                                 {
                                     "label": "On-hold",
-                                    "value": "wc_order_on-hold"
+                                    "value": "on-hold"
                                 },
                                 {
                                     "label": "Completed",
-                                    "value": "wc_order_completed"
+                                    "value": "completed"
                                 },
                                 {
                                     "label": "Cancelled",
-                                    "value": "wc_order_cancelled"
+                                    "value": "cancelled"
                                 },
                                 {
                                     "label": "Refunded",
-                                    "value": "wc_order_refunded"
+                                    "value": "refunded"
                                 },
                                 {
                                     "label": "Failed",
-                                    "value": "wc_order_failed"
+                                    "value": "failed"
                                 }
                             ],
                             "required": true
@@ -15157,7 +14991,7 @@
                 },
                 "get_orders_by_billing_email": {
                     "key": "get_orders_by_billing_email",
-                    "label": "Get Order (By Billing Email Address)",
+                    "label": "Get Orders by Billing Email",
                     "schema": [
                         {
                             "key": "billing_email",
@@ -15184,7 +15018,7 @@
                 },
                 "get_orders_by_customer_id": {
                     "key": "get_orders_by_customer_id",
-                    "label": "Get Order (By Customer Id)",
+                    "label": "Get Orders by Customer ID",
                     "schema": [
                         {
                             "key": "customer_id",
@@ -15219,7 +15053,7 @@
                 },
                 "get_order_single": {
                     "key": "get_order_single",
-                    "label": "Get Order (Single)",
+                    "label": "Get Single Order",
                     "schema": [
                         {
                             "key": "order_id",
@@ -15233,6 +15067,99 @@
                                     "label"
                                 ]
                             },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add_order_note": {
+                    "key": "add_order_note",
+                    "label": "Add Order Note",
+                    "schema": [
+                        {
+                            "key": "order_id",
+                            "label": "Order ID",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "woocommerce",
+                                "query": "orders",
+                                "select": [
+                                    "id",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "note",
+                            "label": "Note",
+                            "type": "textarea",
+                            "required": true
+                        },
+                        {
+                            "key": "is_customer_note",
+                            "label": "Customer Note",
+                            "type": "boolean"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_customers_all": {
+                    "key": "get_customers_all",
+                    "label": "Get All Customers",
+                    "schema": [
+                        {
+                            "key": "limit",
+                            "label": "Limit",
+                            "type": "number",
+                            "required": true
+                        },
+                        {
+                            "key": "page",
+                            "label": "Page",
+                            "type": "number",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_customer_single": {
+                    "key": "get_customer_single",
+                    "label": "Get Single Customer",
+                    "schema": [
+                        {
+                            "key": "customer_id",
+                            "label": "Customer ID",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "woocommerce",
+                                "query": "customers",
+                                "select": [
+                                    "id",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_customer_by_email": {
+                    "key": "get_customer_by_email",
+                    "label": "Get Customer by Email",
+                    "schema": [
+                        {
+                            "key": "email",
+                            "label": "Customer Email",
+                            "type": "text",
                             "required": true
                         }
                     ],
@@ -15296,102 +15223,9 @@
                         "main"
                     ]
                 },
-                "add_order_note": {
-                    "key": "add_order_note",
-                    "label": "Add Order Note",
-                    "schema": [
-                        {
-                            "key": "order_id",
-                            "label": "Order ID",
-                            "type": "select",
-                            "dynamic": {
-                                "integration": "woocommerce",
-                                "query": "orders",
-                                "select": [
-                                    "id",
-                                    "label"
-                                ]
-                            },
-                            "required": true
-                        },
-                        {
-                            "key": "note",
-                            "label": "Note",
-                            "type": "textarea",
-                            "required": true
-                        },
-                        {
-                            "key": "is_customer_note",
-                            "label": "Customer Note",
-                            "type": "boolean"
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "get_customers_all": {
-                    "key": "get_customers_all",
-                    "label": "Get Customer (All)",
-                    "schema": [
-                        {
-                            "key": "limit",
-                            "label": "Limit",
-                            "type": "number",
-                            "required": true
-                        },
-                        {
-                            "key": "page",
-                            "label": "Page",
-                            "type": "number",
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "get_customer_single": {
-                    "key": "get_customer_single",
-                    "label": "Get Customer (Single)",
-                    "schema": [
-                        {
-                            "key": "customer_id",
-                            "label": "Customer ID",
-                            "type": "select",
-                            "dynamic": {
-                                "integration": "woocommerce",
-                                "query": "customers",
-                                "select": [
-                                    "id",
-                                    "label"
-                                ]
-                            },
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "get_customer_by_email": {
-                    "key": "get_customer_by_email",
-                    "label": "Get Customer (By Email Address)",
-                    "schema": [
-                        {
-                            "key": "email",
-                            "label": "Customer Email",
-                            "type": "text",
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
                 "create_customer": {
                     "key": "create_customer",
-                    "label": "Create New Customer",
+                    "label": "Create Customer",
                     "schema": [
                         {
                             "key": "email",
@@ -15746,6 +15580,151 @@
                         "main"
                     ]
                 },
+                "update_product_stock": {
+                    "key": "update_product_stock",
+                    "label": "Update Product Stock",
+                    "schema": [
+                        {
+                            "key": "product_id",
+                            "label": "Product ID",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "woocommerce",
+                                "query": "products",
+                                "select": [
+                                    "id",
+                                    "name"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "stock_quantity",
+                            "label": "Stock Quantity",
+                            "type": "expression"
+                        },
+                        {
+                            "key": "manage_stock",
+                            "label": "Manage Stock",
+                            "type": "boolean"
+                        },
+                        {
+                            "key": "stock_status",
+                            "label": "Stock Status",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "In Stock",
+                                    "value": "instock"
+                                },
+                                {
+                                    "label": "Out of Stock",
+                                    "value": "outofstock"
+                                },
+                                {
+                                    "label": "On Backorder",
+                                    "value": "onbackorder"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_product_status": {
+                    "key": "update_product_status",
+                    "label": "Update Product Status",
+                    "schema": [
+                        {
+                            "key": "product_id",
+                            "label": "Product ID",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "woocommerce",
+                                "query": "products",
+                                "select": [
+                                    "id",
+                                    "name"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "product_status",
+                            "label": "Status",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Publish",
+                                    "value": "wc_product_publish"
+                                },
+                                {
+                                    "label": "Draft",
+                                    "value": "wc_product_draft"
+                                },
+                                {
+                                    "label": "Pending",
+                                    "value": "wc_product_pending"
+                                },
+                                {
+                                    "label": "Private",
+                                    "value": "wc_product_private"
+                                }
+                            ],
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_product_permanently": {
+                    "key": "delete_product_permanently",
+                    "label": "Delete Product Permanently",
+                    "schema": [
+                        {
+                            "key": "product_id",
+                            "label": "Product ID",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "woocommerce",
+                                "query": "products",
+                                "select": [
+                                    "id",
+                                    "name"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_product_soft": {
+                    "key": "delete_product_soft",
+                    "label": "Soft Delete Product",
+                    "schema": [
+                        {
+                            "key": "product_id",
+                            "label": "Product ID",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "woocommerce",
+                                "query": "products",
+                                "select": [
+                                    "id",
+                                    "name"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
                 "get_products_all": {
                     "key": "get_products_all",
                     "label": "Get All Products",
@@ -15769,7 +15748,7 @@
                 },
                 "get_products_by_category": {
                     "key": "get_products_by_category",
-                    "label": "Get All Products (By Category)",
+                    "label": "Get Products by Category",
                     "schema": [
                         {
                             "key": "category_id",
@@ -15811,7 +15790,7 @@
                 },
                 "get_products_simple": {
                     "key": "get_products_simple",
-                    "label": "Get All Simple Products",
+                    "label": "Get Simple Products",
                     "schema": [
                         {
                             "key": "limit",
@@ -15832,7 +15811,7 @@
                 },
                 "get_products_variable": {
                     "key": "get_products_variable",
-                    "label": "Get All Variable Products",
+                    "label": "Get Variable Products",
                     "schema": [
                         {
                             "key": "limit",
@@ -15853,7 +15832,7 @@
                 },
                 "get_products_grouped": {
                     "key": "get_products_grouped",
-                    "label": "Get All Grouped Products",
+                    "label": "Get Grouped Products",
                     "schema": [
                         {
                             "key": "limit",
@@ -15874,7 +15853,7 @@
                 },
                 "get_products_external": {
                     "key": "get_products_external",
-                    "label": "Get All External or Affiliate Products",
+                    "label": "Get External/Affiliate Products",
                     "schema": [
                         {
                             "key": "limit",
@@ -15895,7 +15874,7 @@
                 },
                 "get_products_variation": {
                     "key": "get_products_variation",
-                    "label": "Get All Variation Products",
+                    "label": "Get Variation Products",
                     "schema": [
                         {
                             "key": "limit",
@@ -15916,7 +15895,7 @@
                 },
                 "get_products_subscription": {
                     "key": "get_products_subscription",
-                    "label": "Get All Subscription Products",
+                    "label": "Get Subscription Products",
                     "schema": [
                         {
                             "key": "limit",
@@ -15973,104 +15952,6 @@
                         "main"
                     ]
                 },
-                "update_product_stock": {
-                    "key": "update_product_stock",
-                    "label": "Update Product Stock",
-                    "schema": [
-                        {
-                            "key": "product_id",
-                            "label": "Product ID",
-                            "type": "select",
-                            "dynamic": {
-                                "integration": "woocommerce",
-                                "query": "products",
-                                "select": [
-                                    "id",
-                                    "name"
-                                ]
-                            },
-                            "required": true
-                        },
-                        {
-                            "key": "stock_quantity",
-                            "label": "Stock Quantity",
-                            "type": "expression"
-                        },
-                        {
-                            "key": "manage_stock",
-                            "label": "Manage Stock",
-                            "type": "boolean"
-                        },
-                        {
-                            "key": "stock_status",
-                            "label": "Stock Status",
-                            "type": "select",
-                            "options": [
-                                {
-                                    "label": "In Stock",
-                                    "value": "instock"
-                                },
-                                {
-                                    "label": "Out of Stock",
-                                    "value": "outofstock"
-                                },
-                                {
-                                    "label": "On Backorder",
-                                    "value": "onbackorder"
-                                }
-                            ]
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "delete_product_permanently": {
-                    "key": "delete_product_permanently",
-                    "label": "Delete Product (Permanently)",
-                    "schema": [
-                        {
-                            "key": "product_id",
-                            "label": "Product ID",
-                            "type": "select",
-                            "dynamic": {
-                                "integration": "woocommerce",
-                                "query": "products",
-                                "select": [
-                                    "id",
-                                    "name"
-                                ]
-                            },
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "delete_product_soft": {
-                    "key": "delete_product_soft",
-                    "label": "Delete Product (Soft Delete)",
-                    "schema": [
-                        {
-                            "key": "product_id",
-                            "label": "Product ID",
-                            "type": "select",
-                            "dynamic": {
-                                "integration": "woocommerce",
-                                "query": "products",
-                                "select": [
-                                    "id",
-                                    "name"
-                                ]
-                            },
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
                 "get_products_totals": {
                     "key": "get_products_totals",
                     "label": "Get Products Totals",
@@ -16101,53 +15982,6 @@
                                     "name"
                                 ]
                             },
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "update_product_status": {
-                    "key": "update_product_status",
-                    "label": "Update Product Status",
-                    "schema": [
-                        {
-                            "key": "product_id",
-                            "label": "Product ID",
-                            "type": "select",
-                            "dynamic": {
-                                "integration": "woocommerce",
-                                "query": "products",
-                                "select": [
-                                    "id",
-                                    "name"
-                                ]
-                            },
-                            "required": true
-                        },
-                        {
-                            "key": "product_status",
-                            "label": "Status",
-                            "type": "select",
-                            "options": [
-                                {
-                                    "label": "Publish",
-                                    "value": "wc_product_publish"
-                                },
-                                {
-                                    "label": "Draft",
-                                    "value": "wc_product_draft"
-                                },
-                                {
-                                    "label": "Pending",
-                                    "value": "wc_product_pending"
-                                },
-                                {
-                                    "label": "Private",
-                                    "value": "wc_product_private"
-                                }
-                            ],
                             "required": true
                         }
                     ],
@@ -16281,7 +16115,7 @@
                 },
                 "get_product_category_all": {
                     "key": "get_product_category_all",
-                    "label": "Get Product Category (All)",
+                    "label": "Get All Product Categories",
                     "schema": [
                         {
                             "key": "hide_empty",
@@ -16312,7 +16146,7 @@
                 },
                 "get_product_category_single": {
                     "key": "get_product_category_single",
-                    "label": "Get Product Category (Single)",
+                    "label": "Get Single Product Category",
                     "schema": [
                         {
                             "key": "term_id",
@@ -16430,7 +16264,7 @@
                 },
                 "get_product_tag_all": {
                     "key": "get_product_tag_all",
-                    "label": "Get Product Tag (All)",
+                    "label": "Get All Product Tags",
                     "schema": [
                         {
                             "key": "hide_empty",
@@ -16461,7 +16295,7 @@
                 },
                 "get_product_tag_single": {
                     "key": "get_product_tag_single",
-                    "label": "Get Product Tag (Single)",
+                    "label": "Get Single Product Tag",
                     "schema": [
                         {
                             "key": "term_id",
@@ -16579,7 +16413,7 @@
                 },
                 "get_product_type_all": {
                     "key": "get_product_type_all",
-                    "label": "Get Product Type (All)",
+                    "label": "Get All Product Types",
                     "schema": [
                         {
                             "key": "hide_empty",
@@ -16610,7 +16444,7 @@
                 },
                 "get_product_type_single": {
                     "key": "get_product_type_single",
-                    "label": "Get Product Type (Single)",
+                    "label": "Get Single Product Type",
                     "schema": [
                         {
                             "key": "term_id",
@@ -16728,7 +16562,7 @@
                 },
                 "get_product_brand_all": {
                     "key": "get_product_brand_all",
-                    "label": "Get Product Brand (All)",
+                    "label": "Get All Product Brands",
                     "schema": [
                         {
                             "key": "hide_empty",
@@ -16759,7 +16593,7 @@
                 },
                 "get_product_brand_single": {
                     "key": "get_product_brand_single",
-                    "label": "Get Product Brand (Single)",
+                    "label": "Get Single Product Brand",
                     "schema": [
                         {
                             "key": "term_id",
@@ -16785,7 +16619,7 @@
                 },
                 "create_product_shipping_class": {
                     "key": "create_product_shipping_class",
-                    "label": "Create Product Shipping Class",
+                    "label": "Create Shipping Class",
                     "schema": [
                         {
                             "key": "name",
@@ -16810,7 +16644,7 @@
                 },
                 "update_product_shipping_class": {
                     "key": "update_product_shipping_class",
-                    "label": "Update Product Shipping Class",
+                    "label": "Update Shipping Class",
                     "schema": [
                         {
                             "key": "term_id",
@@ -16851,7 +16685,7 @@
                 },
                 "delete_product_shipping_class": {
                     "key": "delete_product_shipping_class",
-                    "label": "Delete Product Shipping Class",
+                    "label": "Delete Shipping Class",
                     "schema": [
                         {
                             "key": "term_id",
@@ -16877,7 +16711,7 @@
                 },
                 "get_product_shipping_class_all": {
                     "key": "get_product_shipping_class_all",
-                    "label": "Get Product Shipping Class (All)",
+                    "label": "Get All Shipping Classes",
                     "schema": [
                         {
                             "key": "hide_empty",
@@ -16908,7 +16742,7 @@
                 },
                 "get_product_shipping_class_single": {
                     "key": "get_product_shipping_class_single",
-                    "label": "Get Product Shipping Class (Single)",
+                    "label": "Get Single Shipping Class",
                     "schema": [
                         {
                             "key": "term_id",
@@ -17535,7 +17369,7 @@
                 },
                 "get_applied_coupons_from_cart": {
                     "key": "get_applied_coupons_from_cart",
-                    "label": "Get Applied Coupons from Cart",
+                    "label": "Get Applied Cart Coupons",
                     "schema": [
                         {
                             "key": "include_totals",
@@ -17591,7 +17425,7 @@
                 },
                 "get_coupons_all": {
                     "key": "get_coupons_all",
-                    "label": "Get Coupon (All)",
+                    "label": "Get All Coupons",
                     "schema": [
                         {
                             "key": "limit",
@@ -17612,7 +17446,7 @@
                 },
                 "get_coupon_single": {
                     "key": "get_coupon_single",
-                    "label": "Get Coupon (Single)",
+                    "label": "Get Single Coupon",
                     "schema": [
                         {
                             "key": "coupon_id",
@@ -17639,7 +17473,7 @@
                 },
                 "get_coupon_totals_by_discount_type": {
                     "key": "get_coupon_totals_by_discount_type",
-                    "label": "Get Coupon Totals By Discount Type",
+                    "label": "Get Coupon Totals by Discount Type",
                     "schema": [
                         {
                             "key": "include_empty_types",
@@ -17681,704 +17515,6 @@
                             "label": "Limit",
                             "type": "number",
                             "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                }
-            }
-        },
-        "woomemberships": {
-            "slug": "woomemberships",
-            "name": "WooCommerce Memberships",
-            "icon": "woocommerce-membership.svg",
-            "category": "app",
-            "requires_connection": false,
-            "auth_type": "none",
-            "supports_webhook": false,
-            "triggers": {
-                "membership_saved": {
-                    "key": "membership_saved",
-                    "label": "Membership Saved",
-                    "hook": "wc_memberships_user_membership_saved",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "membership_created": {
-                    "key": "membership_created",
-                    "label": "Membership Created",
-                    "hook": "wc_memberships_user_membership_created",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "membership_cancelled": {
-                    "key": "membership_cancelled",
-                    "label": "Membership Cancelled",
-                    "hook": "wc_memberships_cancelled_user_membership",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "membership_status_changed": {
-                    "key": "membership_status_changed",
-                    "label": "Membership Status Updated",
-                    "hook": "wc_memberships_user_membership_status_changed",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "membership_note_added": {
-                    "key": "membership_note_added",
-                    "label": "Membership Note Added",
-                    "hook": "wc_memberships_new_user_membership_note",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                }
-            },
-            "actions": {
-                "create_membership": {
-                    "key": "create_membership",
-                    "label": "Create Membership",
-                    "schema": [
-                        {
-                            "key": "plan_id",
-                            "label": "Plan ID",
-                            "type": "expression",
-                            "required": true
-                        },
-                        {
-                            "key": "user_id",
-                            "label": "User ID",
-                            "type": "expression",
-                            "required": true
-                        },
-                        {
-                            "key": "product_id",
-                            "label": "Product ID",
-                            "type": "expression"
-                        },
-                        {
-                            "key": "order_id",
-                            "label": "Order ID",
-                            "type": "expression"
-                        },
-                        {
-                            "key": "membership_status",
-                            "label": "Membership Status",
-                            "type": "select",
-                            "options": [
-                                {
-                                    "label": "Active",
-                                    "value": "wcm-active"
-                                },
-                                {
-                                    "label": "Complimentary",
-                                    "value": "wcm-complimentary"
-                                },
-                                {
-                                    "label": "Pending",
-                                    "value": "wcm-pending"
-                                },
-                                {
-                                    "label": "Paused",
-                                    "value": "wcm-paused"
-                                },
-                                {
-                                    "label": "Cancelled",
-                                    "value": "wcm-cancelled"
-                                },
-                                {
-                                    "label": "Expired",
-                                    "value": "wcm-expired"
-                                }
-                            ]
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "get_memberships_all": {
-                    "key": "get_memberships_all",
-                    "label": "Get Memberships (All)",
-                    "schema": [
-                        {
-                            "key": "user_id",
-                            "label": "User ID",
-                            "type": "expression"
-                        },
-                        {
-                            "key": "membership_status",
-                            "label": "Membership Status",
-                            "type": "select",
-                            "options": [
-                                {
-                                    "label": "Active",
-                                    "value": "wcm-active"
-                                },
-                                {
-                                    "label": "Complimentary",
-                                    "value": "wcm-complimentary"
-                                },
-                                {
-                                    "label": "Pending",
-                                    "value": "wcm-pending"
-                                },
-                                {
-                                    "label": "Paused",
-                                    "value": "wcm-paused"
-                                },
-                                {
-                                    "label": "Cancelled",
-                                    "value": "wcm-cancelled"
-                                },
-                                {
-                                    "label": "Expired",
-                                    "value": "wcm-expired"
-                                }
-                            ]
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "get_membership_single": {
-                    "key": "get_membership_single",
-                    "label": "Get Membership (Single)",
-                    "schema": [
-                        {
-                            "key": "membership_id",
-                            "label": "Membership ID",
-                            "type": "expression",
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "update_membership_status": {
-                    "key": "update_membership_status",
-                    "label": "Update Membership Status",
-                    "schema": [
-                        {
-                            "key": "membership_id",
-                            "label": "Membership ID",
-                            "type": "expression",
-                            "required": true
-                        },
-                        {
-                            "key": "membership_status",
-                            "label": "Membership Status",
-                            "type": "select",
-                            "options": [
-                                {
-                                    "label": "Active",
-                                    "value": "wcm-active"
-                                },
-                                {
-                                    "label": "Complimentary",
-                                    "value": "wcm-complimentary"
-                                },
-                                {
-                                    "label": "Pending",
-                                    "value": "wcm-pending"
-                                },
-                                {
-                                    "label": "Paused",
-                                    "value": "wcm-paused"
-                                },
-                                {
-                                    "label": "Cancelled",
-                                    "value": "wcm-cancelled"
-                                },
-                                {
-                                    "label": "Expired",
-                                    "value": "wcm-expired"
-                                }
-                            ],
-                            "required": true
-                        },
-                        {
-                            "key": "note",
-                            "label": "Note",
-                            "type": "text"
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "cancel_membership": {
-                    "key": "cancel_membership",
-                    "label": "Cancel Membership",
-                    "schema": [
-                        {
-                            "key": "membership_id",
-                            "label": "Membership ID",
-                            "type": "expression",
-                            "required": true
-                        },
-                        {
-                            "key": "note",
-                            "label": "Note",
-                            "type": "text"
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "pause_membership": {
-                    "key": "pause_membership",
-                    "label": "Pause Membership",
-                    "schema": [
-                        {
-                            "key": "membership_id",
-                            "label": "Membership ID",
-                            "type": "expression",
-                            "required": true
-                        },
-                        {
-                            "key": "note",
-                            "label": "Note",
-                            "type": "text"
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "activate_membership": {
-                    "key": "activate_membership",
-                    "label": "Activate Membership",
-                    "schema": [
-                        {
-                            "key": "membership_id",
-                            "label": "Membership ID",
-                            "type": "expression",
-                            "required": true
-                        },
-                        {
-                            "key": "note",
-                            "label": "Note",
-                            "type": "text"
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "add_membership_note": {
-                    "key": "add_membership_note",
-                    "label": "Add Membership Note",
-                    "schema": [
-                        {
-                            "key": "membership_id",
-                            "label": "Membership ID",
-                            "type": "expression",
-                            "required": true
-                        },
-                        {
-                            "key": "note",
-                            "label": "Note",
-                            "type": "text",
-                            "required": true
-                        },
-                        {
-                            "key": "notify_member",
-                            "label": "Notify Member",
-                            "type": "boolean"
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                }
-            }
-        },
-        "woosubscriptions": {
-            "slug": "woosubscriptions",
-            "name": "WooCommerce Subscriptions",
-            "icon": "woo.svg",
-            "category": "app",
-            "requires_connection": false,
-            "auth_type": "none",
-            "supports_webhook": false,
-            "triggers": {
-                "subscription_created": {
-                    "key": "subscription_created",
-                    "label": "Subscription Created",
-                    "hook": "woocommerce_new_subscription",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "subscription_status_updated": {
-                    "key": "subscription_status_updated",
-                    "label": "Subscription Status Updated",
-                    "hook": "woocommerce_subscription_status_updated",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "subscription_payment_complete": {
-                    "key": "subscription_payment_complete",
-                    "label": "Subscription Payment Complete",
-                    "hook": "woocommerce_subscription_payment_complete",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "subscription_payment_failed": {
-                    "key": "subscription_payment_failed",
-                    "label": "Subscription Payment Failed",
-                    "hook": "woocommerce_subscription_payment_failed",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "renewal_payment_complete": {
-                    "key": "renewal_payment_complete",
-                    "label": "Renewal Payment Complete",
-                    "hook": "woocommerce_subscription_renewal_payment_complete",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "renewal_payment_failed": {
-                    "key": "renewal_payment_failed",
-                    "label": "Renewal Payment Failed",
-                    "hook": "woocommerce_subscription_renewal_payment_failed",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                }
-            },
-            "actions": {
-                "create_subscription": {
-                    "key": "create_subscription",
-                    "label": "Create Subscription",
-                    "schema": [
-                        {
-                            "key": "customer_id",
-                            "label": "Customer ID",
-                            "type": "number"
-                        },
-                        {
-                            "key": "parent_order_id",
-                            "label": "Parent Order ID",
-                            "type": "number"
-                        },
-                        {
-                            "key": "subscription_status",
-                            "label": "Subscription Status",
-                            "type": "select",
-                            "options": [
-                                {
-                                    "label": "Active",
-                                    "value": "wc_subscription_active"
-                                },
-                                {
-                                    "label": "Pending",
-                                    "value": "wc_subscription_pending"
-                                },
-                                {
-                                    "label": "On Hold",
-                                    "value": "wc_subscription_on-hold"
-                                },
-                                {
-                                    "label": "Cancelled",
-                                    "value": "wc_subscription_cancelled"
-                                },
-                                {
-                                    "label": "Pending Cancel",
-                                    "value": "wc_subscription_pending-cancel"
-                                },
-                                {
-                                    "label": "Expired",
-                                    "value": "wc_subscription_expired"
-                                }
-                            ]
-                        },
-                        {
-                            "key": "billing_period",
-                            "label": "Billing Period",
-                            "type": "select",
-                            "options": [
-                                {
-                                    "label": "Day",
-                                    "value": "day"
-                                },
-                                {
-                                    "label": "Week",
-                                    "value": "week"
-                                },
-                                {
-                                    "label": "Month",
-                                    "value": "month"
-                                },
-                                {
-                                    "label": "Year",
-                                    "value": "year"
-                                }
-                            ]
-                        },
-                        {
-                            "key": "billing_interval",
-                            "label": "Billing Interval",
-                            "type": "number"
-                        },
-                        {
-                            "key": "total",
-                            "label": "Total",
-                            "type": "expression"
-                        },
-                        {
-                            "key": "currency",
-                            "label": "Currency",
-                            "type": "text"
-                        },
-                        {
-                            "key": "start_date",
-                            "label": "Start Date (Y-m-d H:i:s)",
-                            "type": "expression"
-                        },
-                        {
-                            "key": "trial_end_date",
-                            "label": "Trial End Date (Y-m-d H:i:s)",
-                            "type": "expression"
-                        },
-                        {
-                            "key": "next_payment_date",
-                            "label": "Next Payment Date (Y-m-d H:i:s)",
-                            "type": "expression"
-                        },
-                        {
-                            "key": "end_date",
-                            "label": "End Date (Y-m-d H:i:s)",
-                            "type": "expression"
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "get_subscriptions_all": {
-                    "key": "get_subscriptions_all",
-                    "label": "Get Subscriptions (All)",
-                    "schema": [
-                        {
-                            "key": "limit",
-                            "label": "Limit",
-                            "type": "number",
-                            "default": 20
-                        },
-                        {
-                            "key": "page",
-                            "label": "Page",
-                            "type": "number",
-                            "default": 1
-                        },
-                        {
-                            "key": "subscription_status",
-                            "label": "Subscription Status",
-                            "type": "select",
-                            "options": [
-                                {
-                                    "label": "Active",
-                                    "value": "wc_subscription_active"
-                                },
-                                {
-                                    "label": "Pending",
-                                    "value": "wc_subscription_pending"
-                                },
-                                {
-                                    "label": "On Hold",
-                                    "value": "wc_subscription_on-hold"
-                                },
-                                {
-                                    "label": "Cancelled",
-                                    "value": "wc_subscription_cancelled"
-                                },
-                                {
-                                    "label": "Pending Cancel",
-                                    "value": "wc_subscription_pending-cancel"
-                                },
-                                {
-                                    "label": "Expired",
-                                    "value": "wc_subscription_expired"
-                                }
-                            ]
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "get_subscription_single": {
-                    "key": "get_subscription_single",
-                    "label": "Get Subscription (Single)",
-                    "schema": [
-                        {
-                            "key": "subscription_id",
-                            "label": "Subscription ID",
-                            "type": "number",
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "update_subscription_status": {
-                    "key": "update_subscription_status",
-                    "label": "Update Subscription Status",
-                    "schema": [
-                        {
-                            "key": "subscription_id",
-                            "label": "Subscription ID",
-                            "type": "number",
-                            "required": true
-                        },
-                        {
-                            "key": "subscription_status",
-                            "label": "Subscription Status",
-                            "type": "select",
-                            "options": [
-                                {
-                                    "label": "Active",
-                                    "value": "wc_subscription_active"
-                                },
-                                {
-                                    "label": "Pending",
-                                    "value": "wc_subscription_pending"
-                                },
-                                {
-                                    "label": "On Hold",
-                                    "value": "wc_subscription_on-hold"
-                                },
-                                {
-                                    "label": "Cancelled",
-                                    "value": "wc_subscription_cancelled"
-                                },
-                                {
-                                    "label": "Pending Cancel",
-                                    "value": "wc_subscription_pending-cancel"
-                                },
-                                {
-                                    "label": "Expired",
-                                    "value": "wc_subscription_expired"
-                                }
-                            ],
-                            "required": true
-                        },
-                        {
-                            "key": "note",
-                            "label": "Note",
-                            "type": "text"
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "cancel_subscription": {
-                    "key": "cancel_subscription",
-                    "label": "Cancel Subscription",
-                    "schema": [
-                        {
-                            "key": "subscription_id",
-                            "label": "Subscription ID",
-                            "type": "number",
-                            "required": true
-                        },
-                        {
-                            "key": "note",
-                            "label": "Note",
-                            "type": "text"
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "suspend_subscription": {
-                    "key": "suspend_subscription",
-                    "label": "Suspend Subscription",
-                    "schema": [
-                        {
-                            "key": "subscription_id",
-                            "label": "Subscription ID",
-                            "type": "number",
-                            "required": true
-                        },
-                        {
-                            "key": "note",
-                            "label": "Note",
-                            "type": "text"
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "reactivate_subscription": {
-                    "key": "reactivate_subscription",
-                    "label": "Reactivate Subscription",
-                    "schema": [
-                        {
-                            "key": "subscription_id",
-                            "label": "Subscription ID",
-                            "type": "number",
-                            "required": true
-                        },
-                        {
-                            "key": "note",
-                            "label": "Note",
-                            "type": "text"
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "add_subscription_note": {
-                    "key": "add_subscription_note",
-                    "label": "Add Subscription Note",
-                    "schema": [
-                        {
-                            "key": "subscription_id",
-                            "label": "Subscription ID",
-                            "type": "number",
-                            "required": true
-                        },
-                        {
-                            "key": "note",
-                            "label": "Note",
-                            "type": "text",
-                            "required": true
-                        },
-                        {
-                            "key": "is_customer_note",
-                            "label": "Customer Note",
-                            "type": "boolean"
                         }
                     ],
                     "outputs": [
@@ -22923,36 +22059,6 @@
             "auth_type": "none",
             "supports_webhook": false,
             "triggers": {
-                "loaded": {
-                    "key": "loaded",
-                    "label": "WPFunnels Loaded",
-                    "hook": "wpfunnels/loaded",
-                    "schema": [],
-                    "outputs": [
-                        "main",
-                        "error"
-                    ]
-                },
-                "init": {
-                    "key": "init",
-                    "label": "WPFunnels Initialized",
-                    "hook": "wpfunnels/init",
-                    "schema": [],
-                    "outputs": [
-                        "main",
-                        "error"
-                    ]
-                },
-                "pro_init": {
-                    "key": "pro_init",
-                    "label": "WPFunnels Pro Initialized",
-                    "hook": "wpfunnels/pro_init",
-                    "schema": [],
-                    "outputs": [
-                        "main",
-                        "error"
-                    ]
-                },
                 "import_complete": {
                     "key": "import_complete",
                     "label": "Import Complete",
@@ -22967,22 +22073,7 @@
                     "key": "after_funnel_creation",
                     "label": "After Funnel Creation",
                     "hook": "wpfunnels_after_funnel_creation",
-                    "schema": [
-                        {
-                            "key": "funnel_id",
-                            "label": "Funnel",
-                            "type": "select",
-                            "dynamic": {
-                                "integration": "wpfunnels",
-                                "query": "funnels",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            },
-                            "required": true
-                        }
-                    ],
+                    "schema": [],
                     "outputs": [
                         "main",
                         "error"

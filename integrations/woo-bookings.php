@@ -220,7 +220,6 @@ class WooBookings extends IntegrationBase {
 		}
 
 		$event = (string) ( $node['data']['event'] ?? ( $node['config']['action'] ?? '' ) );
-		
 		$config = $node['data']['config'] ?? ( $node['config']['data'] ?? [] );
 		if ( ! is_array( $config ) ) {
 			$config = [];
