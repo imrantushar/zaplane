@@ -34,8 +34,13 @@ class ARForm extends IntegrationBase
     {
         return [
             'submit_form' => [
-                'label' => 'Form Submit',
+                'label' => 'Form Submit (Lite)',
                 'hook'  => 'arfliteentryexecute',
+                'args'  => 4,
+            ],
+            'submit_form_full' => [
+                'label' => 'Form Submit (Full version)',
+                'hook'  => 'arfentryexecute',
                 'args'  => 4,
             ],
         ];
@@ -43,7 +48,7 @@ class ARForm extends IntegrationBase
 
     public static function get_trigger_config_schema(string $trigger): array
     {
-        if (! in_array($trigger, ['submit_form'], true)) {
+        if (! in_array($trigger, ['submit_form', 'submit_form_full'], true)) {
             return [];
         }
 
@@ -65,7 +70,7 @@ class ARForm extends IntegrationBase
     public static function resolve_trigger(array $node, array $args)
     {
         $event = $node['event'] ?? '';
-        if (! in_array($event, ['submit_form'], true)) {
+        if (! in_array($event, ['submit_form', 'submit_form_full'], true)) {
             return null;
         }
 
@@ -137,6 +142,10 @@ class ARForm extends IntegrationBase
 
             if (! empty($forms)) {
                 foreach ($forms as $form) {
+                    $form = is_array($form) ? (object) $form : $form;
+                    if (! isset($form->name) || ! isset($form->id)) {
+                        continue;
+                    }
                     $options[] = [
                         'label' => $form->name,
                         'value' => $form->id,

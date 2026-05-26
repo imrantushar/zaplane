@@ -173,67 +173,52 @@ class SureformTest extends MockeryTestCase
     /** @test */
     public function query_forms_returns_empty_array_when_plugin_not_active()
     {
-        // Mock is_plugin_active to return false
-        $mock = Mockery::mock('alias:is_plugin_active');
-        $mock->shouldReceive('is_plugin_active')
-            ->with('sureforms/sureforms.php')
-            ->once()
-            ->andReturn(false);
-
-        $result = Sureform::query_forms();
-        $this->assertSame([], $result);
+        // Globally stubbed is_plugin_active in WPMocks defaults to true; use the
+        // documented override hook to flip it for this test only.
+        $GLOBALS['zaplane_is_plugin_active'] = [ 'sureforms/sureforms.php' => false ];
+        try {
+            $result = Sureform::query_forms();
+            $this->assertSame([], $result);
+        } finally {
+            unset( $GLOBALS['zaplane_is_plugin_active'] );
+        }
     }
 
     /** @test */
     public function query_forms_returns_only_any_form_when_no_forms_exist()
     {
-        // Mock is_plugin_active to return true
-        $isActiveMock = Mockery::mock('alias:is_plugin_active');
-        $isActiveMock->shouldReceive('is_plugin_active')
-            ->with('sureforms/sureforms.php')
-            ->andReturn(true);
-
-        // Mock get_posts to return empty array
-        $getPostsMock = Mockery::mock('alias:get_posts');
-        $getPostsMock->shouldReceive('get_posts')
-            ->with(Mockery::on(function ($args) {
-                return $args['post_type'] === 'sureforms_form';
-            }))
-            ->once()
-            ->andReturn([]);
-
-        $result = Sureform::query_forms();
-
-        $expected = [['label' => 'Any form', 'value' => 'any']];
-        $this->assertSame($expected, $result);
+        $GLOBALS['zaplane_is_plugin_active'] = [ 'sureforms/sureforms.php' => true ];
+        $GLOBALS['zaplane_get_posts'] = function ( $args ) {
+            $this->assertSame( 'sureforms_form', $args['post_type'] ?? null );
+            return [];
+        };
+        try {
+            $result = Sureform::query_forms();
+            $expected = [['label' => 'Any form', 'value' => 'any']];
+            $this->assertSame($expected, $result);
+        } finally {
+            unset( $GLOBALS['zaplane_is_plugin_active'], $GLOBALS['zaplane_get_posts'] );
+        }
     }
 
     /** @test */
     public function query_forms_returns_forms_list_including_any_form()
     {
-        // Mock is_plugin_active
-        $isActiveMock = Mockery::mock('alias:is_plugin_active');
-        $isActiveMock->shouldReceive('is_plugin_active')
-            ->with('sureforms/sureforms.php')
-            ->andReturn(true);
-
-        // Mock get_posts to return two fake form posts
+        $GLOBALS['zaplane_is_plugin_active'] = [ 'sureforms/sureforms.php' => true ];
         $form1 = (object) ['ID' => 10, 'post_title' => 'Newsletter'];
         $form2 = (object) ['ID' => 20, 'post_title' => 'Contact'];
-
-        $getPostsMock = Mockery::mock('alias:get_posts');
-        $getPostsMock->shouldReceive('get_posts')
-            ->once()
-            ->andReturn([$form1, $form2]);
-
-        $result = Sureform::query_forms();
-
-        $expected = [
-            ['label' => 'Any form', 'value' => 'any'],
-            ['label' => 'Newsletter', 'value' => 10],
-            ['label' => 'Contact', 'value' => 20],
-        ];
-        $this->assertSame($expected, $result);
+        $GLOBALS['zaplane_get_posts'] = [ $form1, $form2 ];
+        try {
+            $result = Sureform::query_forms();
+            $expected = [
+                ['label' => 'Any form', 'value' => 'any'],
+                ['label' => 'Newsletter', 'value' => 10],
+                ['label' => 'Contact', 'value' => 20],
+            ];
+            $this->assertSame($expected, $result);
+        } finally {
+            unset( $GLOBALS['zaplane_is_plugin_active'], $GLOBALS['zaplane_get_posts'] );
+        }
     }
 
     /** @test */

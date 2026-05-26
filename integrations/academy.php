@@ -193,11 +193,11 @@ class Academy extends IntegrationBase {
 					'success'    => true,
 					'course_id'  => (int) $course_id,
 					'enroll_id'  => (int) $enroll_id,
-					'user_id'    => $user ? (int) $user->ID : null,
-					'user_email' => $user ? $user->user_email : null,
-					'first_name' => $user ? $user->first_name : null,
-					'last_name'  => $user ? $user->last_name : null,
-					'username'   => $user ? $user->user_login : null,
+					'user_id'    => $user ? (int) ( $user->ID ?? 0 ) : null,
+					'user_email' => $user ? ( $user->user_email ?? '' ) : null,
+					'first_name' => $user ? ( $user->first_name ?? '' ) : null,
+					'last_name'  => $user ? ( $user->last_name ?? '' ) : null,
+					'username'   => $user ? ( $user->user_login ?? '' ) : null,
 				];
 
 			case 'course_complete':
@@ -227,9 +227,9 @@ class Academy extends IntegrationBase {
 					'course_title' => $course->post_title,
 					'course_url'   => get_permalink( $course->ID ),
 					'user_id'      => $user_id,
-					'user_email'   => $user->user_email,
-					'first_name'   => $user->first_name,
-					'last_name'    => $user->last_name,
+					'user_email'   => $user->user_email ?? '',
+					'first_name'   => $user->first_name ?? '',
+					'last_name'    => $user->last_name ?? '',
 				];
 
 			case 'lesson_complete':

@@ -24,7 +24,7 @@ class Weforms extends IntegrationBase {
 
 	public static function get_triggers(): array {
 		return [
-			'forms_submission' => [
+			'weforms_entry_submission' => [
 				'label' => 'Form Submission',
 				'hook'  => 'weforms_entry_submission',
 			],
@@ -33,7 +33,7 @@ class Weforms extends IntegrationBase {
 
 	public static function get_trigger_config_schema( string $trigger ): array {
 
-		if ( 'forms_submission' === $trigger ) {
+		if ( 'weforms_entry_submission' === $trigger ) {
 
 			return [
 				[
@@ -55,9 +55,26 @@ class Weforms extends IntegrationBase {
 
 	public static function resolve_trigger( array $node, array $args ) {
 
+		if ( ( $node['event'] ?? '' ) !== 'weforms_entry_submission' ) {
+			return false;
+		}
+
+		// Modern call shape: payload is the first arg (array with form_id,
+		// entry_id, field labels). Use it directly when present.
+		$first = $args[0] ?? null;
+		if ( is_array( $first ) && isset( $first['form_id'] ) ) {
+			$form_id    = (int) $first['form_id'];
+			$configured = $node['data']['config']['form_id'] ?? ( $node['config']['form_id'] ?? 'any' );
+			if ( 'any' !== $configured && (int) $configured !== $form_id ) {
+				return false;
+			}
+			return $first;
+		}
+
+		// Legacy: (entry_id, form_id) — relies on the weForms API for fields.
 		switch ( $node['event'] ) {
 
-			case 'forms_submission':
+			case 'weforms_entry_submission':
 
 				$entry_id = $args[0] ?? 0;
 				$form_id  = $args[1] ?? 0;

@@ -168,8 +168,9 @@ class Gemcrm extends IntegrationBase {
 					return false;
 				}
 
-				$filter_tag_id = ! empty( $node['config']['tag_id'] )
-					? (int) $node['config']['tag_id']
+				$config        = $node['data']['config'] ?? $node['config'] ?? [];
+				$filter_tag_id = ! empty( $config['tag_id'] )
+					? (int) $config['tag_id']
 					: null;
 
 				if ( $filter_tag_id && ! in_array( $filter_tag_id, array_map( 'intval', (array) $tag_ids ), true ) ) {
@@ -190,8 +191,9 @@ class Gemcrm extends IntegrationBase {
 					return false;
 				}
 
-				$filter_list_id = ! empty( $node['config']['list_id'] )
-					? (int) $node['config']['list_id']
+				$config         = $node['data']['config'] ?? $node['config'] ?? [];
+				$filter_list_id = ! empty( $config['list_id'] )
+					? (int) $config['list_id']
 					: null;
 
 				if ( $filter_list_id && ! in_array( $filter_list_id, array_map( 'intval', (array) $list_ids ), true ) ) {
@@ -700,7 +702,8 @@ class Gemcrm extends IntegrationBase {
 		}
 
 		$contact_id = (int) ( $config['contact_id'] ?? 0 );
-		$tag_ids    = array_filter( array_map( 'intval', (array) ( $config['tag_id'] ?? [] ) ) );
+		$raw_tag    = $config['tag_id'] ?? null;
+		$tag_ids    = array_filter( array_map( 'intval', (array) ( $raw_tag ?? [] ) ) );
 
 		if ( ! $contact_id ) {
 			return self::action_error( 'Contact ID is required', $input );
@@ -713,9 +716,12 @@ class Gemcrm extends IntegrationBase {
 			\GemCrm\Database\Models\Tag::attach_single( $contact_id, $tag_id );
 		}
 
+		// Preserve the original key shape: scalar in → scalar out, array → array.
+		$tag_payload = is_array( $raw_tag ) ? array_values( $tag_ids ) : reset( $tag_ids );
+
 		return self::action_success( array_merge( $input, [
 			'contact_id' => $contact_id,
-			'tag_ids'    => $tag_ids,
+			'tag_id'     => $tag_payload,
 		] ) );
 	}
 
@@ -748,7 +754,8 @@ class Gemcrm extends IntegrationBase {
 		}
 
 		$contact_id = (int) ( $config['contact_id'] ?? 0 );
-		$tag_ids    = array_filter( array_map( 'intval', (array) ( $config['tag_id'] ?? [] ) ) );
+		$raw_tag    = $config['tag_id'] ?? null;
+		$tag_ids    = array_filter( array_map( 'intval', (array) ( $raw_tag ?? [] ) ) );
 
 		if ( ! $contact_id ) {
 			return self::action_error( 'Contact ID is required', $input );
@@ -761,9 +768,12 @@ class Gemcrm extends IntegrationBase {
 			\GemCrm\Database\Models\Tag::detach_single( $contact_id, $tag_id );
 		}
 
+		// Preserve the original key shape: scalar in → scalar out, array → array.
+		$tag_payload = is_array( $raw_tag ) ? array_values( $tag_ids ) : reset( $tag_ids );
+
 		return self::action_success( array_merge( $input, [
 			'contact_id' => $contact_id,
-			'tag_ids'    => $tag_ids,
+			'tag_id'     => $tag_payload,
 		] ) );
 	}
 

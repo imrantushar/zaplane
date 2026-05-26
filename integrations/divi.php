@@ -25,18 +25,18 @@ class Divi extends IntegrationBase {
 	public static function get_triggers(): array {
 		return [
 
-			'form_submitted' => [
+			'divi_contact_form_submitted' => [
 				'label' => 'Form Submitted',
-				'hook' => 'et_pb_contact_form_submit'
+				'hook'  => 'et_pb_contact_form_submit',
 			],
 		];
 	}
 
 	public static function resolve_trigger( array $node, array $args ) {
-		
+
 		switch ( $node['event'] ) {
 
-			case 'form_submitted':
+			case 'divi_contact_form_submitted':
 				$form_fields = $args[0] ?? [];
 				$form_meta = $args[2] ?? [];
 

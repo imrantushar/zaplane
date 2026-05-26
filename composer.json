@@ -18,12 +18,20 @@
         "wp-coding-standards/wpcs": "2.3.0",
         "phpunit/phpunit": "^9.6",
         "yoast/phpunit-polyfills": "^1.0",
-        "phpcompatibility/phpcompatibility-wp": "*"
+        "phpcompatibility/phpcompatibility-wp": "*",
+        "mockery/mockery": "^1.5"
     },
     "scripts": {
         "format": "phpcbf",
         "lint": "phpcs",
-        "test": "vendor/bin/phpunit"
+        "test": "vendor/bin/phpunit",
+        "test:integrations": "vendor/bin/phpunit --testsuite=Integrations",
+        "test:utils": "vendor/bin/phpunit --testsuite=Utils",
+        "test:smoke": "vendor/bin/phpunit --filter=ParityTest",
+        "test:release": [
+            "@composer test:utils",
+            "@composer test:integrations"
+        ]
     },
     "config": {
         "platform": {

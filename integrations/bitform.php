@@ -58,15 +58,15 @@ class Bitform extends IntegrationBase
         ];
     }
 
-    public static function resolve_trigger(array $node, array $args): ?array
+    public static function resolve_trigger(array $node, array $args)
     {
         $event = $node['event'] ?? '';
         if ('submit_form' !== $event) {
-            return null;
+            return false;
         }
 
         if (count($args) < 4) {
-            return null;
+            return false;
         }
 
         $formId   = (int) $args[0];
@@ -75,14 +75,14 @@ class Bitform extends IntegrationBase
         $files    = $args[3];
 
         if ($formId === 0) {
-            return null;
+            return false;
         }
 
-        $config            = $node['config'] ?? [];
+        $config            = $node['config'] ?? ($node['data']['config'] ?? []);
         $configured_form_id = $config['form_id'] ?? 'any';
 
         if ($configured_form_id !== 'any' && (int) $configured_form_id !== $formId) {
-            return null;
+            return false;
         }
 
         return [
@@ -101,16 +101,16 @@ class Bitform extends IntegrationBase
 
     public static function query_forms(): array
     {
-        if (! class_exists('BitCode\BitForm\API\BitForm_Public\BitForm_Public')) {
-            return [];
-        }
-
         $options = [
             [
                 'label' => 'Any form',
                 'value' => 'any',
             ],
         ];
+
+        if (! class_exists('BitCode\BitForm\API\BitForm_Public\BitForm_Public')) {
+            return $options;
+        }
 
         foreach (\BitCode\BitForm\API\BitForm_Public\BitForm_Public::getForms() as $form) {
             $options[] = [

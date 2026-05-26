@@ -16,29 +16,36 @@ class WpfunnelsTest extends IntegrationTestCase {
 
 		\WpfunnelsTestStore::reset();
 
+		global $zaplane_wp_posts;
+		$zaplane_wp_posts = $zaplane_wp_posts ?? [];
+
 		foreach ( \WpfunnelsTestStore::getFunnels() as $funnel ) {
-			WPMocks::setPost(
-				(int) $funnel['id'],
-				[
-					'post_type'     => 'wpfunnels',
-					'post_title'    => $funnel['title'],
-					'post_status'   => $funnel['status'],
-					'post_date'     => '2026-04-01 10:00:00',
-					'post_modified' => '2026-04-01 11:00:00',
-				]
+			$post_data = [
+				'post_type'     => 'wpfunnels',
+				'post_title'    => $funnel['title'],
+				'post_status'   => $funnel['status'],
+				'post_date'     => '2026-04-01 10:00:00',
+				'post_modified' => '2026-04-01 11:00:00',
+			];
+			WPMocks::setPost( (int) $funnel['id'], $post_data );
+			$zaplane_wp_posts[ (int) $funnel['id'] ] = (object) array_merge(
+				[ 'ID' => (int) $funnel['id'] ],
+				$post_data
 			);
 		}
 
 		foreach ( \WpfunnelsTestStore::getSteps() as $step ) {
-			WPMocks::setPost(
-				(int) $step['id'],
-				[
-					'post_type'     => 'wpfunnel_steps',
-					'post_title'    => $step['title'],
-					'post_status'   => $step['status'],
-					'post_date'     => '2026-04-01 10:05:00',
-					'post_modified' => '2026-04-01 10:06:00',
-				]
+			$post_data = [
+				'post_type'     => 'wpfunnel_steps',
+				'post_title'    => $step['title'],
+				'post_status'   => $step['status'],
+				'post_date'     => '2026-04-01 10:05:00',
+				'post_modified' => '2026-04-01 10:06:00',
+			];
+			WPMocks::setPost( (int) $step['id'], $post_data );
+			$zaplane_wp_posts[ (int) $step['id'] ] = (object) array_merge(
+				[ 'ID' => (int) $step['id'] ],
+				$post_data
 			);
 		}
 	}
