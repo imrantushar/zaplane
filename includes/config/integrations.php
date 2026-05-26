@@ -109,6 +109,10 @@ $registry = [
 		'file'  => 'wpforms.php',
 		'class' => \Zaplane\Integrations\Wpforms::class,
 	],
+	'jotform'        => [
+		'file'  => 'jotform.php',
+		'class' => \Zaplane\Integrations\Jotform::class
+	],
 	'contact-form-7'      => [
 		'file'  => 'contact-form.php',
 		'class' => \Zaplane\Integrations\ContactForm::class,
