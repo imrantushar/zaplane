@@ -1,6 +1,6 @@
 {
-    "version": "0.0.2",
-    "generated_at": "2026-05-26 14:01:22",
+    "version": "0.0.3",
+    "generated_at": "2026-06-07 08:12:25",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -4682,7 +4682,7 @@
                             "key": "webhook_endpoint",
                             "label": "Webhook Endpoint URL",
                             "type": "copy",
-                            "value": "https://almsdev.test/wp-json/zaplane/v1/incoming/fillout",
+                            "value": "https://kodezen.local/wp-json/zaplane/v1/incoming/fillout",
                             "readonly": true,
                             "help": "Copy this URL \u2192 Fillout Dashboard \u2192 Your Form \u2192 Integrate \u2192 Webhooks \u2192 Add Webhook \u2192 Paste & Save."
                         }
@@ -8411,7 +8411,7 @@
                             "label": "Attendees",
                             "placeholder": "alice@example.com,bob@example.com",
                             "required": false,
-                            "help": "Comma-separated email addresses. Attendees will receive a calendar invite."
+                            "help": "Comma-separated email addresses."
                         },
                         {
                             "key": "send_notifications",
@@ -8434,7 +8434,7 @@
                             "type": "text",
                             "label": "Calendar",
                             "required": false,
-                            "help": "Calendar ID to use (default: primary). Pick from the dynamic dropdown.",
+                            "help": "Calendar ID (default: primary). Pick from the dynamic dropdown.",
                             "dynamic": {
                                 "integration": "google-meet",
                                 "query": "google_calendars",
@@ -8459,7 +8459,7 @@
                             "label": "Event ID",
                             "placeholder": "{{google_event_id}}",
                             "required": true,
-                            "help": "The Google Calendar event ID. Use {{google_event_id}} from a Create Meeting node."
+                            "help": "Google Calendar event ID. Use {{google_event_id}} from a Create Meeting node."
                         },
                         {
                             "key": "summary",
@@ -8510,7 +8510,7 @@
                             "type": "text",
                             "label": "Calendar",
                             "required": false,
-                            "help": "Calendar ID to use (default: primary). Pick from the dynamic dropdown.",
+                            "help": "Calendar ID (default: primary). Pick from the dynamic dropdown.",
                             "dynamic": {
                                 "integration": "google-meet",
                                 "query": "google_calendars",
@@ -8535,7 +8535,7 @@
                             "label": "Event ID",
                             "placeholder": "{{google_event_id}}",
                             "required": true,
-                            "help": "The Google Calendar event ID to cancel."
+                            "help": "Google Calendar event ID to cancel."
                         },
                         {
                             "key": "send_notifications",
@@ -8558,7 +8558,7 @@
                             "type": "text",
                             "label": "Calendar",
                             "required": false,
-                            "help": "Calendar ID to use (default: primary). Pick from the dynamic dropdown.",
+                            "help": "Calendar ID (default: primary). Pick from the dynamic dropdown.",
                             "dynamic": {
                                 "integration": "google-meet",
                                 "query": "google_calendars",
@@ -8617,7 +8617,7 @@
                             "label": "Space Name",
                             "placeholder": "{{google_space_name}}",
                             "required": true,
-                            "help": "The Meet space resource name (e.g. spaces/jQCFfuBOdKE). Use {{google_space_name}} from a Create Space node."
+                            "help": "Meet space resource name (e.g. spaces/jQCFfuBOdKE). Use {{google_space_name}} from a Create Space node."
                         }
                     ],
                     "outputs": [
@@ -8799,7 +8799,7 @@
                             "key": "webhook_endpoint",
                             "label": "Webhook Endpoint URL",
                             "type": "copy",
-                            "value": "https://almsdev.test/wp-json/zaplane/v1/incoming/jotform",
+                            "value": "https://kodezen.local/wp-json/zaplane/v1/incoming/jotform",
                             "readonly": true,
                             "help": "Copy this URL \u2192 Jotform \u2192 Your Form \u2192 Settings \u2192 Integrations \u2192 Webhooks \u2192 Paste & Save."
                         }
@@ -14034,7 +14034,7 @@
                             "key": "webhook_endpoint",
                             "label": "Webhook Endpoint URL",
                             "type": "copy",
-                            "value": "https://almsdev.test/wp-json/zaplane/v1/incoming/typeform",
+                            "value": "https://kodezen.local/wp-json/zaplane/v1/incoming/typeform",
                             "readonly": true,
                             "help": "Copy this URL \u2192 Typeform Dashboard \u2192 Your Form \u2192 Connect \u2192 Webhooks \u2192 Add a webhook \u2192 Paste & Save."
                         }
