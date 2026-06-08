@@ -64,11 +64,8 @@ class RecipeE2eRunner {
 		$workflow = null;
 		$run      = null;
 		try {
-			// 1. Seed data and resolve {{vars}}.
-			$vars = [];
-			if ( ! empty( $recipe['setup']['factory'] ) ) {
-				$vars = RecipeFactories::run( (string) $recipe['setup']['factory'], (array) ( $recipe['setup']['args'] ?? [] ) );
-			}
+			// 1. Seed data (factory or action) and resolve {{vars}}.
+			$vars   = RecipeRunner::seed_vars( $recipe );
 			$config = RecipeRunner::interpolate_value( (array) ( $node['config'] ?? [] ), $vars );
 			$input  = array_values( RecipeRunner::interpolate_value( (array) ( $node['input'] ?? [] ), $vars ) );
 
@@ -113,6 +110,8 @@ class RecipeE2eRunner {
 			RecipeRunner::evaluate( $result, 'trigger', (array) ( $recipe['expect'] ?? [] ), $payload );
 
 			self::cancel_orphan_actions( $dispatched );
+		} catch ( RecipeSkip $e ) {
+			$result->skip( $e->getMessage() );
 		} catch ( \Throwable $e ) {
 			$result->abort( 'E2E error: ' . $e->getMessage() );
 		}

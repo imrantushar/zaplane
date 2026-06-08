@@ -46,6 +46,8 @@ class RecipeFactories {
 
 	/** @return array<string, callable> */
 	public static function all(): array {
+		self::load_integration_factories();
+
 		$factories = [
 			'create_post'     => [ self::class, 'create_post' ],
 			'create_user'     => [ self::class, 'create_user' ],
@@ -53,6 +55,24 @@ class RecipeFactories {
 		];
 
 		return apply_filters( 'zaplane_recipe_factories', $factories );
+	}
+
+	/**
+	 * Auto-load integration-specific factories that live next to their recipes:
+	 * recipes-test/<integration>/factories.php. Each such file registers its
+	 * factories via the `zaplane_recipe_factories` filter, so a recipe folder is
+	 * self-contained (recipes + the data factories they need).
+	 */
+	private static function load_integration_factories(): void {
+		static $loaded = false;
+		if ( $loaded ) {
+			return;
+		}
+		$loaded = true;
+
+		foreach ( glob( ZAPLANE_ROOT_DIR_PATH . 'recipes-test/*/factories.php' ) ?: [] as $file ) {
+			require_once $file;
+		}
 	}
 
 	public static function create_post( array $args ): array {

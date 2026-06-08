@@ -1,0 +1,17 @@
+{
+  "name": "academy-user_enroll_course",
+  "integration": "academy",
+  "required_plugins": ["academy/academy.php"],
+  "setup": { "factory": "create_academy_enrollment", "args": {} },
+  "node": {
+    "kind": "trigger",
+    "event": "user_enroll_course",
+    "config": {},
+    "input": ["{{course_id}}", "{{enroll_id}}", "{{user_id}}"]
+  },
+  "expect": {
+    "not_false": true,
+    "has_keys": ["success", "course_id", "enroll_id", "user_id"],
+    "data": { "success": true }
+  }
+}

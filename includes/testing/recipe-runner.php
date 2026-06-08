@@ -162,14 +162,8 @@ class RecipeRunner {
 		}
 
 		try {
-			// Seed data via the optional factory.
-			$vars = [];
-			if ( ! empty( $recipe['setup']['factory'] ) ) {
-				$vars = RecipeFactories::run(
-					(string) $recipe['setup']['factory'],
-					(array) ( $recipe['setup']['args'] ?? [] )
-				);
-			}
+			// Seed data via the optional factory or action.
+			$vars = self::seed_vars( $recipe );
 
 			// Build the node + input with vars interpolated.
 			$event      = (string) ( $node['event'] ?? '' );
@@ -194,6 +188,8 @@ class RecipeRunner {
 			}
 
 			self::assert_expectations( $result, $kind, $recipe['expect'] ?? [] );
+		} catch ( RecipeSkip $e ) {
+			return $result->skip( $e->getMessage() );
 		} catch ( \Throwable $e ) {
 			$result->abort( 'Run error: ' . $e->getMessage() );
 		}
@@ -222,8 +218,58 @@ class RecipeRunner {
 	 * meaningfully (the args are placeholders), so the CLI skips them.
 	 */
 	public static function is_unfilled( array $recipe ): bool {
+		// A factory (even a stub) means it's being worked on — let it run so a stub
+		// can SKIP with its own "implement me" message instead of a generic skip.
+		if ( ! empty( $recipe['setup']['factory'] ) ) {
+			return false;
+		}
 		$blob = wp_json_encode( $recipe['node'] ?? [] );
 		return is_string( $blob ) && (bool) preg_match( '/\{\{\s*arg\d+\s*\}\}/', $blob );
+	}
+
+	/**
+	 * Produce the variable map a recipe's `input`/`config` reference, from its
+	 * `setup`. Two ways, no custom PHP needed for the action case:
+	 *   - setup.action  → run the integration's OWN action (e.g. woocommerce
+	 *                     create_order) and expose its output data as vars.
+	 *   - setup.factory → a named factory (generic or recipes-test/<x>/factories.php).
+	 */
+	public static function seed_vars( array $recipe ): array {
+		$setup = $recipe['setup'] ?? [];
+
+		if ( ! empty( $setup['action'] ) && is_array( $setup['action'] ) ) {
+			return self::seed_via_action( $setup['action'] );
+		}
+		if ( ! empty( $setup['factory'] ) ) {
+			return RecipeFactories::run( (string) $setup['factory'], (array) ( $setup['args'] ?? [] ) );
+		}
+		return [];
+	}
+
+	/** Run an integration action purely to create seed data; return its output data as vars. */
+	private static function seed_via_action( array $action ): array {
+		$slug     = (string) ( $action['app'] ?? '' );
+		$instance = '' !== $slug ? IntegrationLoader::get( $slug ) : null;
+		if ( ! $instance ) {
+			throw new \RuntimeException( "setup.action: unknown integration '{$slug}'" );
+		}
+
+		$class = get_class( $instance );
+		$node  = [
+			'data' => [
+				'app'    => $slug,
+				'event'  => (string) ( $action['event'] ?? '' ),
+				'config' => (array) ( $action['config'] ?? [] ),
+			],
+		];
+
+		$out = $class::execute_node( $node, [] );
+		if ( is_array( $out ) && 'error' === ( $out['port'] ?? '' ) ) {
+			throw new \RuntimeException( 'setup.action failed: ' . wp_json_encode( $out['data'] ?? $out ) );
+		}
+
+		$data = is_array( $out ) ? ( $out['data'] ?? $out ) : [];
+		return is_array( $data ) ? $data : [];
 	}
 
 	/**
@@ -291,19 +337,40 @@ class RecipeRunner {
 			return $value;
 		}
 
-		// Whole-string token: preserve the variable's native type.
-		if ( preg_match( '/^\{\{\s*([\w.]+)\s*\}\}$/', $value, $m ) && array_key_exists( $m[1], $vars ) ) {
-			return $vars[ $m[1] ];
+		// Whole-string token: preserve the variable's native type. Supports dot
+		// paths (e.g. {{order.order_id}}) for nested data from action seeding.
+		if ( preg_match( '/^\{\{\s*([\w.]+)\s*\}\}$/', $value, $m ) ) {
+			[ $found, $val ] = self::var_lookup( $vars, $m[1] );
+			if ( $found ) {
+				return $val;
+			}
 		}
 
 		// Inline tokens: substitute as strings.
 		return preg_replace_callback(
 			'/\{\{\s*([\w.]+)\s*\}\}/',
 			static function ( $m ) use ( $vars ) {
-				return array_key_exists( $m[1], $vars ) ? (string) $vars[ $m[1] ] : $m[0];
+				[ $found, $val ] = self::var_lookup( $vars, $m[1] );
+				return $found ? (string) $val : $m[0];
 			},
 			$value
 		);
+	}
+
+	/** Look up a var by key, supporting dot paths into nested arrays. @return array{0:bool,1:mixed} */
+	private static function var_lookup( array $vars, string $key ): array {
+		if ( array_key_exists( $key, $vars ) ) {
+			return [ true, $vars[ $key ] ];
+		}
+		$cur = $vars;
+		foreach ( explode( '.', $key ) as $seg ) {
+			if ( is_array( $cur ) && array_key_exists( $seg, $cur ) ) {
+				$cur = $cur[ $seg ];
+			} else {
+				return [ false, null ];
+			}
+		}
+		return [ true, $cur ];
 	}
 
 	/**

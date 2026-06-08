@@ -147,20 +147,32 @@ class RecipeCommand extends Command {
 					$this->line();
 				}
 
-				if ( $result && $result->passed ) {
+				$is_skip = $result && $result->skipped;
+				if ( $is_skip ) {
+					++$skipped;
+				} elseif ( $result && $result->passed ) {
 					++$passed;
 				} else {
 					++$failed;
+				}
+
+				$notes = 'no result';
+				if ( $is_skip ) {
+					$notes = $result->skip_reason ?? 'skipped';
+				} elseif ( $result && $result->passed ) {
+					$notes = $note;
+				} elseif ( $result ) {
+					$notes = $result->failure_summary();
 				}
 
 				$rows[] = [
 					$result ? $result->name : basename( $file, '.json' ),
 					$result ? $result->integration : '—',
 					$result ? $result->status_label() : 'FAIL',
-					$result && $result->passed ? $note : ( $result ? $result->failure_summary() : 'no result' ),
+					$notes,
 				];
 
-				if ( $fail_fast && ( ! $result || ! $result->passed ) ) {
+				if ( $fail_fast && ! $is_skip && ( ! $result || ! $result->passed ) ) {
 					$aborted = true;
 					break;
 				}
@@ -363,13 +375,19 @@ class RecipeCommand extends Command {
 		}
 
 		// Pre-fill `input` with one {{argN}} placeholder per positional hook arg the
-		// trigger reads (detected from its resolve_trigger). Replace each token with a
-		// literal value or a {{var}} produced by setup.factory.
-		$input = [];
+		// trigger reads (detected from its resolve_trigger), and — when there ARE
+		// args — scaffold a matching stub factory so you only fill the data-creation
+		// body instead of hand-writing factories.php from scratch.
+		$input   = [];
+		$factory = '';
 		if ( 'trigger' === $kind ) {
 			$arity = $this->detect_input_arity( $class, $event );
 			for ( $i = 0; $i < $arity; $i++ ) {
 				$input[] = "{{arg{$i}}}";
+			}
+			if ( $arity > 0 ) {
+				$factory = "create_{$integration}_{$event}";
+				$this->scaffold_factory_stub( $dir, $integration, $factory, $arity );
 			}
 		}
 
@@ -377,7 +395,7 @@ class RecipeCommand extends Command {
 			'name'             => "{$integration}-{$event}",
 			'integration'      => $integration,
 			'required_plugins' => array_values( (array) $class::get_required_plugins() ),
-			'setup'            => [ 'factory' => '', 'args' => new \stdClass() ],
+			'setup'            => [ 'factory' => $factory, 'args' => new \stdClass() ],
 			'node'             => [
 				'kind'   => $kind,
 				'event'  => $event,
@@ -389,6 +407,45 @@ class RecipeCommand extends Command {
 
 		file_put_contents( $path, wp_json_encode( $recipe, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES ) . "\n" );
 		return 'created';
+	}
+
+	/**
+	 * Append a ready-to-fill stub factory to recipes-test/<integration>/factories.php
+	 * (creating the file if needed). The stub throws RecipeSkip so the recipe SKIPs
+	 * with a clear "implement me" message until you fill in the data-creation body —
+	 * which is the only part you write by hand.
+	 */
+	protected function scaffold_factory_stub( string $dir, string $integration, string $factory, int $arity ): void {
+		$path = $dir . 'factories.php';
+
+		if ( file_exists( $path ) && false !== strpos( (string) file_get_contents( $path ), "'{$factory}'" ) ) {
+			return; // already scaffolded.
+		}
+
+		if ( ! file_exists( $path ) ) {
+			$header  = "<?php\n";
+			$header .= "/**\n * Recipe data factories for the {$integration} integration.\n";
+			$header .= " * Auto-scaffolded by `wp zaplane recipe generate`. Fill in each stub's body.\n */\n\n";
+			$header .= "if ( ! defined( 'ABSPATH' ) ) {\n\texit;\n}\n";
+			file_put_contents( $path, $header );
+		}
+
+		$returns = [];
+		for ( $i = 0; $i < $arity; $i++ ) {
+			$returns[] = "\t\t\t\t'arg{$i}' => null, // TODO: real value the trigger expects at hook arg {$i}";
+		}
+		$returns = implode( "\n", $returns );
+
+		$block  = "\nadd_filter(\n\t'zaplane_recipe_factories',\n\tfunction ( array \$factories ) {\n";
+		$block .= "\t\t\$factories['{$factory}'] = function ( array \$args ) {\n";
+		$block .= "\t\t\t// TODO: create the real data this trigger needs (posts, users, orders, …),\n";
+		$block .= "\t\t\t// then delete the throw below and return the values for {{arg0}}..{{argN}}.\n";
+		$block .= "\t\t\tthrow new \\Zaplane\\Testing\\RecipeSkip( \"Stub factory '{$factory}' — implement it in recipes-test/{$integration}/factories.php\" );\n\n";
+		$block .= "\t\t\t// phpcs:ignore Squiz.PHP.NonExecutableCode.Unreachable\n";
+		$block .= "\t\t\treturn [\n{$returns}\n\t\t\t];\n";
+		$block .= "\t\t};\n\t\treturn \$factories;\n\t}\n);\n";
+
+		file_put_contents( $path, $block, FILE_APPEND );
 	}
 
 	protected function list_recipes(): void {

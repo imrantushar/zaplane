@@ -32,9 +32,20 @@ class RecipeResult {
 	/** Fatal error that aborted the run before assertions, if any. */
 	public ?string $error = null;
 
+	/** Set when the recipe opted out of running (e.g. an unimplemented stub factory). */
+	public bool $skipped = false;
+	public ?string $skip_reason = null;
+
 	public function __construct( string $name, string $integration ) {
 		$this->name        = $name;
 		$this->integration = $integration;
+	}
+
+	/** Mark the recipe as skipped (not run) — neither pass nor fail. */
+	public function skip( string $reason ): self {
+		$this->skipped     = true;
+		$this->skip_reason = $reason;
+		return $this;
 	}
 
 	public function fail( string $reason ): void {
@@ -52,11 +63,17 @@ class RecipeResult {
 
 	/** Call once all assertions have run; passes only when no failures recorded. */
 	public function finalize(): self {
+		if ( $this->skipped ) {
+			return $this;
+		}
 		$this->passed = empty( $this->failures );
 		return $this;
 	}
 
 	public function status_label(): string {
+		if ( $this->skipped ) {
+			return 'SKIP';
+		}
 		return $this->passed ? 'PASS' : 'FAIL';
 	}
 
@@ -77,6 +94,8 @@ class RecipeResult {
 				'failures'    => $this->failures,
 				'error'       => $this->error,
 				'log_lines'   => $this->log_lines,
+				'skipped'     => $this->skipped,
+				'skip_reason' => $this->skip_reason,
 			]
 		);
 	}
@@ -110,11 +129,13 @@ class RecipeResult {
 			return null;
 		}
 
-		$result            = new self( $data['name'] ?? 'unnamed', $data['integration'] ?? '' );
-		$result->passed    = ! empty( $data['passed'] );
-		$result->failures  = (array) ( $data['failures'] ?? [] );
-		$result->error     = $data['error'] ?? null;
-		$result->log_lines = (array) ( $data['log_lines'] ?? [] );
+		$result              = new self( $data['name'] ?? 'unnamed', $data['integration'] ?? '' );
+		$result->passed      = ! empty( $data['passed'] );
+		$result->failures    = (array) ( $data['failures'] ?? [] );
+		$result->error       = $data['error'] ?? null;
+		$result->log_lines   = (array) ( $data['log_lines'] ?? [] );
+		$result->skipped     = ! empty( $data['skipped'] );
+		$result->skip_reason = $data['skip_reason'] ?? null;
 		return $result;
 	}
 }

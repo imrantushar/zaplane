@@ -143,6 +143,22 @@ touching integration files.
 
 ---
 
+## Seeding data without writing a factory (`setup.action`)
+
+Most CRM/commerce integrations already have an **action** that creates the entity
+their trigger fires on (WooCommerce has `create_order`, `create_customer`,
+`create_product`, …). Point `setup.action` at it and the runner runs that action
+to seed data — **no custom factory code at all**. Its output `data` becomes your
+vars (dot-paths supported):
+
+```json
+"setup": { "action": { "app": "woocommerce", "event": "create_order", "config": { "status": "processing" } } },
+"node":  { "kind": "trigger", "event": "new_order", "input": ["{{order.order_id}}"] }
+```
+
+Use `setup.factory` (below) only when the integration has **no** suitable action
+(e.g. Academy) or you need a PHP object passed as a hook arg in `--e2e` mode.
+
 ## Variables and factories
 
 A `setup.factory` seeds real data and returns a flat variable map. Reference it
@@ -158,19 +174,63 @@ Built-in factories (`Zaplane\Testing\RecipeFactories`):
 | `create_user` | `user_id`, `user_login`, `user_email` |
 | `create_wc_order` | `order_id`, `total`, `status` |
 
-Add your own without touching core:
+Add your own without touching core. Integration-specific factories live **next
+to their recipes** in `recipes-test/<integration>/factories.php`, which the
+runner auto-loads — so a recipe folder is self-contained (recipes + the data
+they need). Example `recipes-test/academy/factories.php`:
 
 ```php
+<?php
 add_filter( 'zaplane_recipe_factories', function ( array $f ) {
-    $f['create_gem_contact'] = function ( array $args ) {
-        $contact = \GemCrm\Database\Models\Contact::create( [ 'email' => $args['email'] ?? 'r@example.test' ] );
-        return [ 'contact_id' => $contact->id ];
+    $f['create_academy_enrollment'] = function ( array $args ) {
+        $course_id = wp_insert_post( [ 'post_type' => 'academy_courses', 'post_status' => 'publish', 'post_title' => 'Recipe Course' ], true );
+        $user_id   = wp_insert_user( [ 'user_login' => 'u' . uniqid(), 'user_email' => uniqid() . '@example.test', 'user_pass' => wp_generate_password() ] );
+        $enroll_id = \Academy\Helper::do_enroll( (int) $course_id, (int) $user_id );
+        return [ 'course_id' => (int) $course_id, 'user_id' => (int) $user_id, 'enroll_id' => (int) $enroll_id ];
     };
     return $f;
 } );
 ```
 
+Then the recipe references those vars:
+
+```json
+"setup": { "factory": "create_academy_enrollment", "args": {} },
+"input": ["{{course_id}}", "{{enroll_id}}", "{{user_id}}"]
+```
+
+This is the **correct** way to fill a scaffold — real data, real assertions.
+(Leaving `{{argN}}` placeholders makes the recipe SKIP; using a bare literal like
+`$arg0` makes it *false-pass* with garbage, since only `{{var}}` tokens are
+interpolated.)
+
 ---
+
+## What `generate` scaffolds for you
+
+For a trigger that reads hook args, `recipe generate` writes **both** the recipe
+**and** a matching stub factory in `recipes-test/<integration>/factories.php`,
+already wired together — so you never hand-write the factory boilerplate:
+
+```jsonc
+// recipes-test/academy/user_enroll_course.json
+"setup": { "factory": "create_academy_user_enroll_course", "args": {} },
+"node":  { "input": ["{{arg0}}", "{{arg1}}", "{{arg2}}"] }
+```
+
+```php
+// recipes-test/academy/factories.php  (auto-created)
+$factories['create_academy_user_enroll_course'] = function ( array $args ) {
+    // TODO: create the real data, delete the throw, return arg0..argN.
+    throw new \Zaplane\Testing\RecipeSkip( "Stub factory … — implement it" );
+    return [ 'arg0' => null, 'arg1' => null, 'arg2' => null ];
+};
+```
+
+Until you implement it the recipe **SKIPs** (not fails) with a clear message
+pointing at the file. Your only job: replace the TODO body with the 2–4 lines
+that create the data and return the `argN` values. That's the whole workflow —
+`generate`, fill the body, run.
 
 ## Filling in `input` after `generate`
 

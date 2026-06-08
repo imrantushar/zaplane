@@ -52,6 +52,13 @@ class RecipeRunnerTest extends TestCase {
 	}
 
 	/** @test */
+	public function dot_path_resolves_nested_vars(): void {
+		$vars = [ 'order' => [ 'order_id' => 99, 'status' => 'processing' ] ];
+		$this->assertSame( 99, TestableRecipeRunner::pub_interpolate( '{{order.order_id}}', $vars ) );
+		$this->assertSame( 'x-processing', TestableRecipeRunner::pub_interpolate( 'x-{{order.status}}', $vars ) );
+	}
+
+	/** @test */
 	public function not_false_fails_when_trigger_filtered_out(): void {
 		$result = new RecipeResult( 'r', 'wordpress' );
 		$result->output = false;
@@ -130,6 +137,23 @@ class RecipeRunnerTest extends TestCase {
 	public function filled_recipe_is_not_flagged_unfilled(): void {
 		$this->assertFalse( RecipeRunner::is_unfilled( [ 'node' => [ 'input' => [ '{{order_id}}', 5 ] ] ] ) );
 		$this->assertFalse( RecipeRunner::is_unfilled( [ 'node' => [ 'input' => [] ] ] ) );
+	}
+
+	/** @test */
+	public function recipe_with_a_factory_is_not_prefiltered_unfilled(): void {
+		// Has {{argN}} placeholders but a factory is wired → let it run (the stub
+		// can SKIP itself with a specific message) instead of generic pre-skip.
+		$recipe = [ 'setup' => [ 'factory' => 'create_x' ], 'node' => [ 'input' => [ '{{arg0}}' ] ] ];
+		$this->assertFalse( RecipeRunner::is_unfilled( $recipe ) );
+	}
+
+	/** @test */
+	public function skip_state_overrides_pass_in_finalize(): void {
+		$result = new \Zaplane\Testing\RecipeResult( 'r', 'x' );
+		$result->skip( 'stub' )->finalize();
+		$this->assertTrue( $result->skipped );
+		$this->assertFalse( $result->passed );
+		$this->assertSame( 'SKIP', $result->status_label() );
 	}
 
 	/** @test */
