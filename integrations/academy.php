@@ -64,7 +64,6 @@ class Academy extends IntegrationBase {
 		}
 
 		if ( in_array( $trigger, [ 'academy_quiz_course_attempt' ], true ) ) {
-
 			return [
 				[
 					'key'      => 'quiz_id',
@@ -100,10 +99,9 @@ class Academy extends IntegrationBase {
 					'required' => true,
 				],
 			];
-		}//end if
+		}
 
 		if ( in_array( $trigger, [ 'lesson_complete' ], true ) ) {
-
 			return [
 				[
 					'key'      => 'lesson_id',
@@ -121,7 +119,6 @@ class Academy extends IntegrationBase {
 
 		return [];
 	}
-
 
 	public static function get_trigger_sample_output( string $trigger ): array {
 		$samples = [
@@ -276,11 +273,11 @@ class Academy extends IntegrationBase {
 				}
 
 				return [
-					'success'  => true,
-					'quiz_id'  => $quiz_id,
-					'user_id'  => $user_id,
-					'score'    => $attempt->earned_marks ?? 0,
-					'total'    => $attempt->total_marks ?? 0,
+					'success' => true,
+					'quiz_id' => $quiz_id,
+					'user_id' => $user_id,
+					'score'   => $attempt->earned_marks ?? 0,
+					'total'   => $attempt->total_marks ?? 0,
 				];
 
 			case 'quiz_target':
@@ -324,80 +321,382 @@ class Academy extends IntegrationBase {
 					'percentage'  => round( $percentage, 2 ),
 				];
 		}//end switch
+
 		return false;
 	}
 
+	// -------------------------------------------------------------------------
+	// ACTIONS
+	// -------------------------------------------------------------------------
+
 	public static function get_actions(): array {
-		return [];
+		return [
+			'enroll_user_in_course'    => [
+				'label' => 'Enroll user in a course',
+			],
+			'unenroll_user_from_course' => [
+				'label' => 'Unenroll user from a course',
+			],
+			'mark_lesson_complete'     => [
+				'label' => 'Mark a lesson as complete for a user',
+			],
+		];
 	}
 
 	public static function get_action_config_schema( string $action ): array {
+		$schemas = [
 
-		$schemas = [];
+			'enroll_user_in_course' => [
+				[
+					'key'      => 'user_id',
+					'label'    => 'User ID',
+					'type'     => 'text',
+					'required' => true,
+				],
+				[
+					'key'      => 'course_id',
+					'label'    => 'Course',
+					'type'     => 'select',
+					'dynamic'  => [
+						'integration' => 'academy',
+						'query'       => 'acourse_no_any',
+						'select'      => [ 'name', 'label' ],
+					],
+					'required' => true,
+				],
+			],
+
+			'unenroll_user_from_course' => [
+				[
+					'key'      => 'user_id',
+					'label'    => 'User ID',
+					'type'     => 'text',
+					'required' => true,
+				],
+				[
+					'key'      => 'course_id',
+					'label'    => 'Course',
+					'type'     => 'select',
+					'dynamic'  => [
+						'integration' => 'academy',
+						'query'       => 'acourse_no_any',
+						'select'      => [ 'name', 'label' ],
+					],
+					'required' => true,
+				],
+			],
+
+			'mark_lesson_complete' => [
+				[
+					'key'      => 'user_id',
+					'label'    => 'User ID',
+					'type'     => 'text',
+					'required' => true,
+				],
+				[
+					'key'      => 'lesson_id',
+					'label'    => 'Lesson',
+					'type'     => 'select',
+					'dynamic'  => [
+						'integration' => 'academy',
+						'query'       => 'lesson_no_any',
+						'select'      => [ 'name', 'label' ],
+					],
+					'required' => true,
+				],
+				[
+					'key'      => 'course_id',
+					'label'    => 'Course',
+					'type'     => 'select',
+					'dynamic'  => [
+						'integration' => 'academy',
+						'query'       => 'acourse_no_any',
+						'select'      => [ 'name', 'label' ],
+					],
+					'required' => true,
+				],
+			],
+		];
+
 		return $schemas[ $action ] ?? [];
 	}
 
 	public static function execute_node( array $node, array $input ): array {
+		$action = $node['action'] ?? null;
+
+		switch ( $action ) {
+
+			case 'enroll_user_in_course':
+				return self::action_enroll_user( $node, $input );
+
+			case 'unenroll_user_from_course':
+				return self::action_unenroll_user( $node, $input );
+
+			case 'mark_lesson_complete':
+				return self::action_mark_lesson_complete( $node, $input );
+		}
+
+		// Default pass-through (trigger nodes).
 		return [
 			'port' => 'main',
-			'data' => $input
+			'data' => $input,
 		];
 	}
+
+	// -------------------------------------------------------------------------
+	// Action: Enroll user in a course
+	// -------------------------------------------------------------------------
+
+	private static function action_enroll_user( array $node, array $input ): array {
+		$user_id   = (int) ( $node['data']['config']['user_id']   ?? 0 );
+		$course_id = (int) ( $node['data']['config']['course_id'] ?? 0 );
+
+		if ( ! $user_id || ! $course_id ) {
+			return [
+				'port'  => 'main',
+				'data'  => array_merge( $input, [
+					'success' => false,
+					'message' => 'user_id and course_id are required.',
+				] ),
+			];
+		}
+
+		if ( ! get_userdata( $user_id ) ) {
+			return [
+				'port' => 'main',
+				'data' => array_merge( $input, [
+					'success' => false,
+					'message' => 'User not found.',
+				] ),
+			];
+		}
+
+		if ( ! get_post( $course_id ) ) {
+			return [
+				'port' => 'main',
+				'data' => array_merge( $input, [
+					'success' => false,
+					'message' => 'Course not found.',
+				] ),
+			];
+		}
+
+		// Check if the user is already enrolled to avoid duplicates.
+		$existing = get_posts( [
+			'post_type'      => 'academy_enrollment',
+			'post_status'    => 'publish',
+			'posts_per_page' => 1,
+			'author'         => $user_id,
+			'meta_query'     => [
+				[
+					'key'   => '_academy_course_id',
+					'value' => $course_id,
+					'type'  => 'NUMERIC',
+				],
+			],
+		] );
+
+		if ( ! empty( $existing ) ) {
+			return [
+				'port' => 'main',
+				'data' => array_merge( $input, [
+					'success'   => false,
+					'message'   => 'User is already enrolled in this course.',
+					'enroll_id' => $existing[0]->ID,
+					'user_id'   => $user_id,
+					'course_id' => $course_id,
+				] ),
+			];
+		}
+
+		$enroll_id = wp_insert_post( [
+			'post_type'   => 'academy_enrollment',
+			'post_status' => 'publish',
+			'post_author' => $user_id,
+			'post_title'  => 'Enrollment: user ' . $user_id . ' — course ' . $course_id,
+		] );
+
+		if ( is_wp_error( $enroll_id ) ) {
+			return [
+				'port' => 'main',
+				'data' => array_merge( $input, [
+					'success' => false,
+					'message' => $enroll_id->get_error_message(),
+				] ),
+			];
+		}
+
+		update_post_meta( $enroll_id, '_academy_course_id', $course_id );
+
+		// Fire the same hook the plugin uses so other integrations stay in sync.
+		do_action( 'academy/course/after_enroll', $course_id, $enroll_id, $user_id );
+
+		return [
+			'port' => 'main',
+			'data' => array_merge( $input, [
+				'success'   => true,
+				'enroll_id' => $enroll_id,
+				'user_id'   => $user_id,
+				'course_id' => $course_id,
+			] ),
+		];
+	}
+
+	// -------------------------------------------------------------------------
+	// Action: Unenroll user from a course
+	// -------------------------------------------------------------------------
+
+	private static function action_unenroll_user( array $node, array $input ): array {
+		$user_id   = (int) ( $node['data']['config']['user_id']   ?? 0 );
+		$course_id = (int) ( $node['data']['config']['course_id'] ?? 0 );
+
+		if ( ! $user_id || ! $course_id ) {
+			return [
+				'port' => 'main',
+				'data' => array_merge( $input, [
+					'success' => false,
+					'message' => 'user_id and course_id are required.',
+				] ),
+			];
+		}
+
+		$enrollments = get_posts( [
+			'post_type'      => 'academy_enrollment',
+			'post_status'    => 'any',
+			'posts_per_page' => -1,
+			'author'         => $user_id,
+			'meta_query'     => [
+				[
+					'key'   => '_academy_course_id',
+					'value' => $course_id,
+					'type'  => 'NUMERIC',
+				],
+			],
+		] );
+
+		if ( empty( $enrollments ) ) {
+			return [
+				'port' => 'main',
+				'data' => array_merge( $input, [
+					'success' => false,
+					'message' => 'No enrollment record found for this user and course.',
+				] ),
+			];
+		}
+
+		$deleted_ids = [];
+		foreach ( $enrollments as $enrollment ) {
+			$result = wp_delete_post( $enrollment->ID, true );
+			if ( $result ) {
+				$deleted_ids[] = $enrollment->ID;
+			}
+		}
+
+		// Allow other plugins / Zaplane flows to react.
+		do_action( 'academy/course/after_unenroll', $course_id, $user_id, $deleted_ids );
+
+		return [
+			'port' => 'main',
+			'data' => array_merge( $input, [
+				'success'     => true,
+				'user_id'     => $user_id,
+				'course_id'   => $course_id,
+				'deleted_ids' => $deleted_ids,
+			] ),
+		];
+	}
+
+	// -------------------------------------------------------------------------
+	// Action: Mark lesson complete for a user
+	// -------------------------------------------------------------------------
+
+	private static function action_mark_lesson_complete( array $node, array $input ): array {
+		$user_id   = (int) ( $node['data']['config']['user_id']   ?? 0 );
+		$lesson_id = (int) ( $node['data']['config']['lesson_id'] ?? 0 );
+		$course_id = (int) ( $node['data']['config']['course_id'] ?? 0 );
+
+		if ( ! $user_id || ! $lesson_id || ! $course_id ) {
+			return [
+				'port' => 'main',
+				'data' => array_merge( $input, [
+					'success' => false,
+					'message' => 'user_id, lesson_id, and course_id are required.',
+				] ),
+			];
+		}
+
+		// Academy LMS tracks completed topics in user meta as a serialized array
+		// keyed by course_id: _academy_completed_topics_{course_id} => [ lesson_id, ... ]
+		$meta_key         = '_academy_completed_topics_' . $course_id;
+		$completed_topics = get_user_meta( $user_id, $meta_key, true );
+
+		if ( ! is_array( $completed_topics ) ) {
+			$completed_topics = [];
+		}
+
+		if ( in_array( $lesson_id, $completed_topics, true ) ) {
+			return [
+				'port' => 'main',
+				'data' => array_merge( $input, [
+					'success'   => false,
+					'message'   => 'Lesson is already marked as complete for this user.',
+					'user_id'   => $user_id,
+					'lesson_id' => $lesson_id,
+					'course_id' => $course_id,
+				] ),
+			];
+		}
+
+		$completed_topics[] = $lesson_id;
+		update_user_meta( $user_id, $meta_key, $completed_topics );
+
+		// Fire the hook Academy uses for lesson completion so other flows fire too.
+		do_action( 'academy/frontend/after_mark_topic_complete', $lesson_id, $user_id );
+
+		return [
+			'port' => 'main',
+			'data' => array_merge( $input, [
+				'success'   => true,
+				'user_id'   => $user_id,
+				'lesson_id' => $lesson_id,
+				'course_id' => $course_id,
+			] ),
+		];
+	}
+
+	// -------------------------------------------------------------------------
+	// Dynamic queries
+	// -------------------------------------------------------------------------
 
 	public static function get_dynamic_queries(): array {
 		return [
-			'acourse' => [ self::class, 'query_courses' ],
-			'quiz' => [ self::class, 'query_quiz' ],
-			'lesson' => [ self::class, 'query_lesson' ],
+			'acourse'        => [ self::class, 'query_courses' ],
+			'acourse_no_any' => [ self::class, 'query_courses_no_any' ],
+			'quiz'           => [ self::class, 'query_quiz' ],
+			'lesson'         => [ self::class, 'query_lesson' ],
+			'lesson_no_any'  => [ self::class, 'query_lesson_no_any' ],
 		];
 	}
 
-	public static function query_courses() {
-
-			$options = [
-				[
-					'label' => 'Any course',
-					'name' => 'any'
-				],
-			];
-
-			if ( class_exists( 'Academy' ) ) {
-				$courses = get_posts([
-					'post_type'      => 'academy_courses',
-					'post_status'    => 'publish',
-					'posts_per_page' => -1,
-				]);
-
-				foreach ( $courses as $course ) {
-					$options[] = [
-						'label' => $course->post_title,
-						'name' => $course->ID
-					];
-				}
-			}
-
-			return $options;
-	}
-
-	public static function query_quiz() {
-
+	public static function query_courses(): array {
 		$options = [
 			[
-				'label' => 'Any Quiz',
-				'name' => 'any'
+				'label' => 'Any course',
+				'name'  => 'any',
 			],
 		];
+
 		if ( class_exists( 'Academy' ) ) {
-			$quizzes = get_posts([
-				'post_type'      => 'academy_quiz',
+			$courses = get_posts( [
+				'post_type'      => 'academy_courses',
 				'post_status'    => 'publish',
 				'posts_per_page' => -1,
-			]);
+			] );
 
-			foreach ( $quizzes as $quiz ) {
+			foreach ( $courses as $course ) {
 				$options[] = [
-					'label' => $quiz->post_title,
-					'name' => $quiz->ID,
+					'label' => $course->post_title,
+					'name'  => $course->ID,
 				];
 			}
 		}
@@ -405,33 +704,96 @@ class Academy extends IntegrationBase {
 		return $options;
 	}
 
-	public static function query_lesson() {
+	/**
+	 * Same as query_courses() but without the "Any course" option.
+	 * Used by action config schemas where a specific course must be chosen.
+	 */
+	public static function query_courses_no_any(): array {
+		$options = [];
 
+		if ( class_exists( 'Academy' ) ) {
+			$courses = get_posts( [
+				'post_type'      => 'academy_courses',
+				'post_status'    => 'publish',
+				'posts_per_page' => -1,
+			] );
+
+			foreach ( $courses as $course ) {
+				$options[] = [
+					'label' => $course->post_title,
+					'name'  => $course->ID,
+				];
+			}
+		}
+
+		return $options;
+	}
+
+	public static function query_quiz(): array {
 		$options = [
 			[
-				'label' => 'Any lesson',
-				'name'  => 'any'
+				'label' => 'Any Quiz',
+				'name'  => 'any',
 			],
 		];
 
 		if ( class_exists( 'Academy' ) ) {
+			$quizzes = get_posts( [
+				'post_type'      => 'academy_quiz',
+				'post_status'    => 'publish',
+				'posts_per_page' => -1,
+			] );
 
-			$lessons = \Academy\Lesson\LessonApi\Lesson::get(
-				0,
-				-1,
-				0,
-				'',
-				'',
-				true
-			);
+			foreach ( $quizzes as $quiz ) {
+				$options[] = [
+					'label' => $quiz->post_title,
+					'name'  => $quiz->ID,
+				];
+			}
+		}
+
+		return $options;
+	}
+
+	public static function query_lesson(): array {
+		$options = [
+			[
+				'label' => 'Any lesson',
+				'name'  => 'any',
+			],
+		];
+
+		if ( class_exists( 'Academy' ) ) {
+			$lessons = \Academy\Lesson\LessonApi\Lesson::get( 0, -1, 0, '', '', true );
 
 			if ( ! empty( $lessons ) ) {
-
 				foreach ( $lessons as $lesson ) {
-
 					$lesson_data = (object) $lesson->get_data();
+					$options[]   = [
+						'label' => $lesson_data->lesson_title,
+						'name'  => $lesson_data->ID,
+					];
+				}
+			}
+		}
 
-					$options[] = [
+		return $options;
+	}
+
+	/**
+	 * Same as query_lesson() but without the "Any lesson" option.
+	 * Used by action config schemas where a specific lesson must be chosen.
+	 */
+	public static function query_lesson_no_any(): array {
+		$options = [];
+
+		if ( class_exists( 'Academy' ) ) {
+			$lessons = \Academy\Lesson\LessonApi\Lesson::get( 0, -1, 0, '', '', true );
+
+			if ( ! empty( $lessons ) ) {
+				foreach ( $lessons as $lesson ) {
+					$lesson_data = (object) $lesson->get_data();
+					$options[]   = [
 						'label' => $lesson_data->lesson_title,
 						'name'  => $lesson_data->ID,
 					];
