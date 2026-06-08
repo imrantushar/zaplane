@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { __ } from "@wordpress/i18n";
-import { getRunsList } from "@ZAPRedux/Slices/logsSlice/logsSlice";
+import { getRunsList, clearRuns } from "@ZAPRedux/Slices/logsSlice/logsSlice";
+import Button from "@ZAPComponents/Button";
 import { nodeLogsRunDetails } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlowLogs";
 import LogDetails from "@ZAPComponents/LogDetails";
 import ZAPDrawer from "@ZAPComponents/Drawer";
@@ -39,6 +40,16 @@ const Logs = () => {
   };
   const handlePerPageChange = itemsPerPage => {
     handleRefresh(currentPage, itemsPerPage);
+  };
+  const handleClearLogs = async () => {
+    // eslint-disable-next-line no-alert
+    if (!window.confirm(__("Are you sure you want to clear all logs? This cannot be undone.", "zaplane"))) {
+      return;
+    }
+    const result = await dispatch(clearRuns());
+    if (!result?.error) {
+      handleRefresh(1, perPage);
+    }
   };
   const columns = [{
     name: <span>
@@ -134,7 +145,7 @@ const Logs = () => {
   //     return <ZAPLoading />;
   // }
 
-  return <PageLayout title="Logs" heading="Logs">
+  return <PageLayout title="Logs" heading="Logs" actions={<Button label={__("Clear logs", "zaplane")} size="sm" suffix=" p-[8px]" preset="border" onClick={handleClearLogs} isDisabled={loading || totalItems === 0} />}>
     <ListTable columns={columns} isRowSelectable={false} data={data || []} showSubHeader={false} showColumnFilter={false} showPagination={totalItems >= 20} noDataText={__("No logs found", "zaplane")} totalItems={totalItems} dataFetchingStatus={loading} suffix="logs-table" currentPageNumber={currentPage} perPage={perPage} rowsPerPage={itemPerPage} onChangePage={handlePageChange} onChangeItemsPerPage={handlePerPageChange} />
     <ZAPDrawer open={drawerOpen} arrowClose onClose={() => {
       setDrawerOpen(false);

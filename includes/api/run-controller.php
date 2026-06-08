@@ -48,6 +48,12 @@ class RunController extends WP_REST_Controller {
 			],
 		]);
 
+		register_rest_route($ns, '/runs', [
+			'methods' => 'DELETE',
+			'callback' => [ $this, 'clear_runs' ],
+			'permission_callback' => [ $this, 'permissions' ]
+		]);
+
 		register_rest_route($ns, '/runs/(?P<id>\d+)', [
 			'methods' => 'GET',
 			'callback' => [ $this, 'get_run' ],
@@ -94,6 +100,15 @@ class RunController extends WP_REST_Controller {
 
 	public function permissions() {
 		return current_user_can( 'manage_options' );
+	}
+
+	public function clear_runs( $request ) {
+		// Logs are runs + their node-runs (no separate logs table).
+		// Delete node-runs first, then the runs.
+		NodeRun::query()->delete();
+		Run::query()->delete();
+
+		return rest_ensure_response( [ 'deleted' => true ] );
 	}
 
 	public function list_runs( $request ) {
