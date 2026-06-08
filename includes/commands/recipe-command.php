@@ -10,6 +10,7 @@ namespace Zaplane\Commands;
 use Zaplane\Framework\Console\Command;
 use Zaplane\Framework\Core\IntegrationLoader;
 use Zaplane\Testing\RecipeRunner;
+use Zaplane\Testing\RecipeE2eRunner;
 use Zaplane\Testing\RecipeResult;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -35,7 +36,7 @@ class RecipeCommand extends Command {
 				$this->list_recipes();
 				break;
 			case 'exec':
-				$this->exec_recipe( $args[1] ?? null );
+				$this->exec_recipe( $args[1] ?? null, $assoc_args );
 				break;
 			default:
 				$this->error( "Unknown subcommand '{$sub}'. Use: run | generate | list" );
@@ -44,6 +45,7 @@ class RecipeCommand extends Command {
 
 	protected function run_recipes( ?string $filter, array $assoc_args ): void {
 		$keep_active = isset( $assoc_args['keep-active'] );
+		$e2e         = isset( $assoc_args['e2e'] );
 		$files       = RecipeRunner::discover( $filter );
 
 		if ( empty( $files ) ) {
@@ -51,17 +53,34 @@ class RecipeCommand extends Command {
 			return;
 		}
 
-		$this->info( sprintf( 'Running %d recipe(s)...', count( $files ) ) );
+		$mode = $e2e ? 'end-to-end (real workflow + engine)' : 'direct';
+		$this->info( sprintf( 'Running %d recipe(s) — %s mode...', count( $files ), $mode ) );
 		$this->line();
 
+		$flags  = [ 'e2e' => $e2e, 'keep_workflow' => isset( $assoc_args['keep-workflow'] ) ];
 		$rows   = [];
 		$failed = 0;
 
 		foreach ( $files as $file ) {
-			[ $result, $note ] = $this->run_one( $file, $keep_active );
+			// E2E only applies to trigger recipes — actions aren't fired by hooks.
+			if ( $e2e && ! $this->is_trigger_recipe( $file ) ) {
+				$rows[] = [ basename( $file, '.json' ), '—', 'SKIP', 'action recipe — E2E only runs triggers' ];
+				continue;
+			}
+
+			[ $result, $note ] = $this->run_one( $file, $keep_active, $flags );
 
 			if ( ! $result || ! $result->passed ) {
 				++$failed;
+			}
+
+			// In E2E mode show the workflow/run/node-run log the engine produced.
+			if ( $e2e && $result && ! empty( $result->log_lines ) ) {
+				$this->line( '▸ ' . ( $result->name ?? basename( $file ) ) );
+				foreach ( $result->log_lines as $log ) {
+					$this->line( '  ' . $log );
+				}
+				$this->line();
 			}
 
 			$rows[] = [
@@ -91,7 +110,7 @@ class RecipeCommand extends Command {
 	 *
 	 * @return array{0: ?RecipeResult, 1: string} [ result, note ]
 	 */
-	protected function run_one( string $file, bool $keep_active ): array {
+	protected function run_one( string $file, bool $keep_active, array $flags = [] ): array {
 		try {
 			$recipe = RecipeRunner::load_file( $file );
 		} catch ( \Throwable $e ) {
@@ -109,7 +128,7 @@ class RecipeCommand extends Command {
 		}
 
 		try {
-			$result = $this->fire_in_subprocess( $file );
+			$result = $this->fire_in_subprocess( $file, $flags );
 		} finally {
 			if ( ! $keep_active && ! empty( $activated ) ) {
 				RecipeRunner::deactivate_plugins( $activated );
@@ -122,11 +141,15 @@ class RecipeCommand extends Command {
 
 	/**
 	 * Fire one recipe in a child WP-CLI process via `recipe exec` and parse the
-	 * marked result line from its output.
+	 * marked result line from its output. The child process is used so the
+	 * dependency plugin (just activated by the parent) boots normally.
 	 */
-	protected function fire_in_subprocess( string $file ): RecipeResult {
+	protected function fire_in_subprocess( string $file, array $flags = [] ): RecipeResult {
+		$extra  = ! empty( $flags['e2e'] ) ? ' --e2e' : '';
+		$extra .= ! empty( $flags['keep_workflow'] ) ? ' --keep-workflow' : '';
+
 		$run = \WP_CLI::runcommand(
-			'zaplane recipe exec ' . escapeshellarg( $file ),
+			'zaplane recipe exec ' . escapeshellarg( $file ) . $extra,
 			[
 				'launch'     => true,
 				'return'     => 'all',
@@ -150,13 +173,29 @@ class RecipeCommand extends Command {
 	 * Internal: fire a single recipe in *this* process (deps assumed loaded)
 	 * and print the result as a marked line for the parent to parse.
 	 */
-	protected function exec_recipe( ?string $file ): void {
+	protected function is_trigger_recipe( string $file ): bool {
+		try {
+			$recipe = RecipeRunner::load_file( $file );
+		} catch ( \Throwable $e ) {
+			return false;
+		}
+		return 'trigger' === ( $recipe['node']['kind'] ?? '' );
+	}
+
+	protected function exec_recipe( ?string $file, array $assoc_args = [] ): void {
 		if ( ! $file || ! is_file( $file ) ) {
 			$this->error( 'recipe exec requires a valid recipe file path.' );
 			return;
 		}
 
-		$result = RecipeRunner::fire( RecipeRunner::load_file( $file ) );
+		$recipe = RecipeRunner::load_file( $file );
+
+		if ( isset( $assoc_args['e2e'] ) ) {
+			$result = RecipeE2eRunner::run( $recipe, [ 'keep_workflow' => isset( $assoc_args['keep-workflow'] ) ] );
+		} else {
+			$result = RecipeRunner::fire( $recipe );
+		}
+
 		$this->line( $result->to_wire() );
 	}
 

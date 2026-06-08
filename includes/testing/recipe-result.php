@@ -26,6 +26,9 @@ class RecipeResult {
 	/** @var string[] Plugin basenames this run activated (so callers can report/restore). */
 	public array $activated_plugins = [];
 
+	/** @var string[] Human-readable execution log (E2E mode: workflow/run/node-run trace). */
+	public array $log_lines = [];
+
 	/** Fatal error that aborted the run before assertions, if any. */
 	public ?string $error = null;
 
@@ -73,6 +76,7 @@ class RecipeResult {
 				'passed'      => $this->passed,
 				'failures'    => $this->failures,
 				'error'       => $this->error,
+				'log_lines'   => $this->log_lines,
 			]
 		);
 	}
@@ -91,10 +95,11 @@ class RecipeResult {
 			return null;
 		}
 
-		$result           = new self( $data['name'] ?? 'unnamed', $data['integration'] ?? '' );
-		$result->passed   = ! empty( $data['passed'] );
-		$result->failures = (array) ( $data['failures'] ?? [] );
-		$result->error    = $data['error'] ?? null;
+		$result            = new self( $data['name'] ?? 'unnamed', $data['integration'] ?? '' );
+		$result->passed    = ! empty( $data['passed'] );
+		$result->failures  = (array) ( $data['failures'] ?? [] );
+		$result->error     = $data['error'] ?? null;
+		$result->log_lines = (array) ( $data['log_lines'] ?? [] );
 		return $result;
 	}
 }

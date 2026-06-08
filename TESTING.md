@@ -372,6 +372,7 @@ wp zaplane recipe run                   # run every recipe under recipes-test/
 wp zaplane recipe run woocommerce       # run one integration's recipes
 wp zaplane recipe run recipes-test/woocommerce/new-order.json   # one file
 wp zaplane recipe run woocommerce --keep-active                 # don't restore plugin state
+wp zaplane recipe run woocommerce --e2e                         # real workflow + engine + Run/NodeRun logs
 wp zaplane recipe generate gemcrm --event=contact_created       # scaffold a starter recipe
 ```
 

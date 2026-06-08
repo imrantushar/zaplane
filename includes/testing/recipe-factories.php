@@ -70,7 +70,12 @@ class RecipeFactories {
 			throw new \RuntimeException( 'create_post failed: ' . $post_id->get_error_message() );
 		}
 
-		return [ 'post_id' => (int) $post_id ];
+		// `post` is the WP_Post object, for recipes that pass it as a hook arg
+		// (E2E firing of `publish_post` => [ $post_id, $post ]).
+		return [
+			'post_id' => (int) $post_id,
+			'post'    => get_post( (int) $post_id ),
+		];
 	}
 
 	public static function create_user( array $args ): array {
@@ -117,6 +122,9 @@ class RecipeFactories {
 			'order_id' => (int) $order->get_id(),
 			'total'    => (float) $order->get_total(),
 			'status'   => $order->get_status(),
+			// The full WC_Order object, for recipes that must pass it as a hook arg
+			// (e.g. E2E firing of `woocommerce_new_order` => [ $order_id, $order ]).
+			'order'    => $order,
 		];
 	}
 }

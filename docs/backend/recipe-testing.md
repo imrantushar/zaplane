@@ -121,6 +121,7 @@ touching integration files.
 | `node.event` | The trigger/action id from `get_triggers()`/`get_actions()`. |
 | `node.config` | Action params / trigger filters. |
 | `node.input` | Triggers: **positional hook args**. Actions: the input payload. |
+| `node.then` | (E2E only, optional) downstream action chain — array of `{ "app", "event", "config" }`. |
 | `expect` | Assertions (all optional, all must hold). |
 
 ### `expect` assertions
@@ -194,6 +195,48 @@ wp zaplane make:integration acmecrm --plugin=acme-crm/acme-crm.php \
 Then fill in the generated stubs and `wp zaplane recipe run acmecrm`.
 
 ---
+
+## End-to-end mode (`--e2e`) — real workflow + engine
+
+By default `recipe run` calls `resolve_trigger()`/`execute_node()` directly. With
+`--e2e` it runs the **whole engine**, exactly like production:
+
+1. inserts a real **active workflow** (trigger node → optional action chain),
+2. fires the integration's **actual WordPress hook** (`do_action`),
+3. lets the engine create real **Run + NodeRun** log records and walk the graph,
+4. asserts against those logs, and
+5. tears the temporary workflow/run back down.
+
+By default the temp workflow + run are **deleted** after the assertion, so nothing
+lingers in the admin UI. Pass **`--keep-workflow`** to keep them for inspection —
+the workflow is left **paused** (visible under Workflows, with its run/logs, but it
+won't fire on real site events).
+
+```bash
+wp zaplane recipe run woocommerce --e2e
+```
+
+```text
+▸ woocommerce-new-order
+  workflow #8 inserted (woocommerce.new_order, hook: woocommerce_new_order)
+  run #3 started
+    node #1 (woocommerce.new_order) [completed] -> {"order_id":119,"status":"processing",...}
+  run #3 finished: completed
+```
+
+Notes:
+
+- **E2E only applies to trigger recipes.** Action recipes are skipped (`SKIP`)
+  because they aren't fired by a hook.
+- **`input` must match the real hook signature.** A live `do_action` runs *every*
+  listener on that hook (other plugins too), so pass all the args WordPress fires,
+  not just what `resolve_trigger` needs — e.g. `woocommerce_new_order` fires
+  `[$order_id, $order]`, so the recipe uses `"input": ["{{order_id}}", "{{order}}"]`.
+  Factories expose objects for this (`create_wc_order` returns `order`,
+  `create_post` returns `post`). The extra args are harmless in direct mode.
+- **Multi-node workflows:** add a `node.then` array of action specs
+  (`{ "app", "event", "config" }`) to test a trigger → action chain; each node's
+  output is logged.
 
 ## Running in CI
 

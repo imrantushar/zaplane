@@ -7,7 +7,7 @@
     "kind": "trigger",
     "event": "publish_post",
     "config": {},
-    "input": ["{{post_id}}"]
+    "input": ["{{post_id}}", "{{post}}"]
   },
   "expect": {
     "not_false": true,

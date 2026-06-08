@@ -35,8 +35,13 @@ class RecipeRunner {
 	 * @return string[] Absolute file paths.
 	 */
 	public static function discover( ?string $filter = null ): array {
-		if ( $filter && is_file( $filter ) ) {
-			return [ $filter ];
+		if ( $filter ) {
+			// A direct .json path: try as given, then relative to the plugin root.
+			foreach ( [ $filter, ZAPLANE_ROOT_DIR_PATH . ltrim( $filter, '/' ) ] as $candidate ) {
+				if ( is_file( $candidate ) ) {
+					return [ $candidate ];
+				}
+			}
 		}
 
 		$base = self::base_dir();
@@ -194,6 +199,21 @@ class RecipeRunner {
 		}
 
 		return $result->finalize();
+	}
+
+	/**
+	 * Evaluate a recipe's `expect` block against an already-captured output.
+	 * Public so the E2E runner can assert the engine's node output with the same
+	 * rules as direct mode.
+	 */
+	public static function evaluate( RecipeResult $result, string $kind, array $expect, $output ): void {
+		$result->output = $output;
+		self::assert_expectations( $result, $kind, $expect );
+	}
+
+	/** Public wrapper around the {{var}} interpolation, for the E2E runner. */
+	public static function interpolate_value( $value, array $vars ) {
+		return self::interpolate( $value, $vars );
 	}
 
 	/**

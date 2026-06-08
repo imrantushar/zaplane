@@ -7,7 +7,7 @@
     "kind": "trigger",
     "event": "new_order",
     "config": {},
-    "input": ["{{order_id}}"]
+    "input": ["{{order_id}}", "{{order}}"]
   },
   "expect": {
     "not_false": true,
