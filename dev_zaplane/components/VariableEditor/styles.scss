@@ -1,8 +1,6 @@
 .zaplane-variable-editor {
   border: 1px solid var(--zaplane-border-color) !important;
   border-radius: 6px;
-  color: #454F59;
-  font-weight: 400;
   min-height: 40px;
   padding: 8px;
   white-space: pre-wrap;
@@ -36,8 +34,7 @@
 // }
 .zaplane-variable-editor.zaplane-empty::before {
   content: attr(data-placeholder);
-  color: var(--zaplane-placeholder);
-  font-weight: 400;
+  color: #A0AEC0;
   pointer-events: none;
   position: absolute;
 }

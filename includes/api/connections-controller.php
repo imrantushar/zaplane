@@ -16,7 +16,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class ConnectionsController extends WP_REST_Controller {
 
-
 	protected Container $container;
 
 	public function __construct( Container $container ) {
@@ -103,7 +102,7 @@ class ConnectionsController extends WP_REST_Controller {
 					],
 					'credentials' => [
 						'type'        => 'object',
-						'description' => 'OAuth credentials (client_id, client_secret) if user-provided',
+						'description' => 'OAuth credentials (client_id, client_secret)',
 					],
 				],
 			]
@@ -157,60 +156,45 @@ class ConnectionsController extends WP_REST_Controller {
 
 	public function item_permissions_check( $request ) {
 		if ( ! is_user_logged_in() ) {
-			return new WP_Error(
-				'rest_forbidden',
-				'You must be logged in.',
-				[ 'status' => 401 ]
-			);
+			return new WP_Error( 'rest_forbidden', 'You must be logged in.', [ 'status' => 401 ] );
 		}
 
 		$connection_id = (int) $request->get_param( 'id' );
-		$user_id = get_current_user_id();
-
-		$manager = $this->get_connection_manager();
+		$user_id       = get_current_user_id();
+		$manager       = $this->get_connection_manager();
 
 		if ( ! $manager->user_owns_connection( $connection_id, $user_id ) ) {
-			return new WP_Error(
-				'rest_forbidden',
-				'You do not own this connection.',
-				[ 'status' => 403 ]
-			);
+			return new WP_Error( 'rest_forbidden', 'You do not own this connection.', [ 'status' => 403 ] );
 		}
 
 		return true;
 	}
 
 	public function get_items( $request ) {
-		$user_id = get_current_user_id();
-		$app = $request->get_param( 'app' );
-		$page = max( 1, (int) ( $request->get_param( 'page' ) ?? 1 ) );
+		$user_id  = get_current_user_id();
+		$app      = $request->get_param( 'app' );
+		$page     = max( 1, (int) ( $request->get_param( 'page' )     ?? 1 ) );
 		$per_page = max( 1, min( 100, (int) ( $request->get_param( 'per_page' ) ?? 20 ) ) );
 
 		$manager = $this->get_connection_manager();
-		$result = $manager->get_user_connections( $user_id, $app, $page, $per_page );
+		$result  = $manager->get_user_connections( $user_id, $app, $page, $per_page );
 
-		return rest_ensure_response(
-			[
-				'data'       => $result['data'],
-				'pagination' => $result['pagination'],
-			]
-		);
+		return rest_ensure_response( [
+			'data'       => $result['data'],
+			'pagination' => $result['pagination'],
+		] );
 	}
 
 	public function create_item( $request ) {
-		$user_id = get_current_user_id();
-		$app = $request->get_param( 'app' );
-		$icon = $request->get_param( 'icon' );
-		$name = $request->get_param( 'name' );
-		$auth_type = $request->get_param( 'auth_type' );
+		$user_id     = get_current_user_id();
+		$app         = $request->get_param( 'app' );
+		$icon        = $request->get_param( 'icon' );
+		$name        = $request->get_param( 'name' );
+		$auth_type   = $request->get_param( 'auth_type' );
 		$credentials = $request->get_param( 'credentials' );
 
 		if ( ! is_array( $credentials ) ) {
-			return new WP_Error(
-				'invalid_credentials',
-				'Credentials must be an object',
-				[ 'status' => 400 ]
-			);
+			return new WP_Error( 'invalid_credentials', 'Credentials must be an object', [ 'status' => 400 ] );
 		}
 
 		$manager = $this->get_connection_manager();
@@ -218,46 +202,31 @@ class ConnectionsController extends WP_REST_Controller {
 		try {
 			$result = $manager->create( $user_id, $app, $name, $auth_type, $credentials, $icon );
 		} catch ( \Zaplane\Framework\Exceptions\ConnectionException $e ) {
-			return new WP_Error(
-				'connection_test_failed',
-				$e->getMessage(),
-				[ 'status' => 400 ]
-			);
+			return new WP_Error( 'connection_test_failed', $e->getMessage(), [ 'status' => 400 ] );
 		} catch ( \Zaplane\Framework\Exceptions\IntegrationException $e ) {
-			return new WP_Error(
-				'integration_not_found',
-				$e->getMessage(),
-				[ 'status' => 404 ]
-			);
+			return new WP_Error( 'integration_not_found', $e->getMessage(), [ 'status' => 404 ] );
 		}
 
 		$connection_id = $result['id'];
-		$connection = $manager->get( $connection_id );
+		$connection    = $manager->get( $connection_id );
 
-		return rest_ensure_response(
-			[
-				'id'          => $connection_id,
-				'app'         => $connection['app'],
-				'icon'        => $connection['icon'] ?? null,
-				'name'        => $connection['name'],
-				'status'      => $connection['status'],
-				'test_result' => $result['test_result'],
-			]
-		);
+		return rest_ensure_response( [
+			'id'          => $connection_id,
+			'app'         => $connection['app'],
+			'icon'        => $connection['icon'] ?? null,
+			'name'        => $connection['name'],
+			'status'      => $connection['status'],
+			'test_result' => $result['test_result'],
+		] );
 	}
 
 	public function get_item( $request ) {
 		$connection_id = (int) $request->get_param( 'id' );
-
-		$manager = $this->get_connection_manager();
-		$connection = $manager->get( $connection_id );
+		$manager       = $this->get_connection_manager();
+		$connection    = $manager->get( $connection_id );
 
 		if ( ! $connection ) {
-			return new WP_Error(
-				'not_found',
-				'Connection not found',
-				[ 'status' => 404 ]
-			);
+			return new WP_Error( 'not_found', 'Connection not found', [ 'status' => 404 ] );
 		}
 
 		return rest_ensure_response( $connection );
@@ -265,9 +234,8 @@ class ConnectionsController extends WP_REST_Controller {
 
 	public function update_item( $request ) {
 		$connection_id = (int) $request->get_param( 'id' );
-		$manager = $this->get_connection_manager();
-
-		$update_data = [];
+		$manager       = $this->get_connection_manager();
+		$update_data   = [];
 
 		$name = $request->get_param( 'name' );
 		if ( null !== $name ) {
@@ -293,102 +261,79 @@ class ConnectionsController extends WP_REST_Controller {
 			$manager->update_credentials( $connection_id, $credentials );
 		}
 
-		$connection = $manager->get( $connection_id );
-
-		return rest_ensure_response( $connection );
+		return rest_ensure_response( $manager->get( $connection_id ) );
 	}
 
 	public function delete_item( $request ) {
 		$connection_id = (int) $request->get_param( 'id' );
-
-		$manager = $this->get_connection_manager();
-		$deleted = $manager->delete( $connection_id );
+		$manager       = $this->get_connection_manager();
+		$deleted       = $manager->delete( $connection_id );
 
 		if ( ! $deleted ) {
-			return new WP_Error(
-				'delete_failed',
-				'Failed to delete connection',
-				[ 'status' => 500 ]
-			);
+			return new WP_Error( 'delete_failed', 'Failed to delete connection', [ 'status' => 500 ] );
 		}
 
-		return rest_ensure_response(
-			[
-				'deleted' => true,
-				'id'      => $connection_id,
-			]
-		);
+		return rest_ensure_response( [ 'deleted' => true, 'id' => $connection_id ] );
 	}
 
 	public function test_connection( $request ) {
 		$connection_id = (int) $request->get_param( 'id' );
-
-		$manager = $this->get_connection_manager();
-		$result = $manager->test( $connection_id );
+		$manager       = $this->get_connection_manager();
+		$result        = $manager->test( $connection_id );
 
 		return rest_ensure_response( $result );
 	}
 
 	public function init_oauth( $request ) {
-		$user_id = get_current_user_id();
-		$app = $request->get_param( 'app' );
-		$name = $request->get_param( 'name' );
+		$user_id     = get_current_user_id();
+		$app         = $request->get_param( 'app' );
+		$name        = $request->get_param( 'name' );
 		$credentials = $request->get_param( 'credentials' ) ?? [];
-
-		$oauth = $this->get_oauth_handler();
+		$oauth       = $this->get_oauth_handler();
 
 		try {
 			$result = $oauth->init_flow( $app, $user_id, $name, $credentials );
 			return rest_ensure_response( $result );
 		} catch ( \Exception $e ) {
-			return new WP_Error(
-				'oauth_init_failed',
-				$e->getMessage(),
-				[ 'status' => 400 ]
-			);
+			return new WP_Error( 'oauth_init_failed', $e->getMessage(), [ 'status' => 400 ] );
 		}
 	}
 
 	public function oauth_callback( $request ) {
-
 		$error = $request->get_param( 'error' );
 		if ( $error ) {
-			$error_description = $request->get_param( 'error_description' ) ?? 'OAuth authorization was denied';
-			return $this->oauth_redirect_response( false, $error_description );
+			$desc = $request->get_param( 'error_description' ) ?? 'OAuth authorization was denied';
+			$this->send_oauth_html( false, $desc );
 		}
 
 		$state = $request->get_param( 'state' );
-		$code = $request->get_param( 'code' );
+		$code  = $request->get_param( 'code' );
 
 		if ( ! $code ) {
-			return $this->oauth_redirect_response( false, 'No authorization code received' );
+			$this->send_oauth_html( false, 'No authorization code received' );
 		}
 
-		$oauth = $this->get_oauth_handler();
+		$oauth  = $this->get_oauth_handler();
 		$result = $oauth->handle_callback( $state, $code );
 
 		if ( is_wp_error( $result ) ) {
-			return $this->oauth_redirect_response( false, $result->get_error_message() );
+			$this->send_oauth_html( false, $result->get_error_message() );
 		}
 
-		return $this->oauth_redirect_response( true, 'Connection created successfully', $result );
+		$this->send_oauth_html( true, 'Connection created successfully', $result );
 	}
 
 	public function get_auth_fields( $request ) {
-		$app = $request->get_param( 'app' );
-		$auth_type = $request->get_param( 'auth_type' );
-
+		$app        = $request->get_param( 'app' );
+		$auth_type  = $request->get_param( 'auth_type' );
 		$integration = IntegrationLoader::get( $app );
 
 		if ( ! $integration ) {
-			return new WP_Error(
-				'not_found',
-				'Integration not found',
-				[ 'status' => 404 ]
-			);
+			return new WP_Error( 'not_found', 'Integration not found', [ 'status' => 404 ] );
 		}
 
 		$main_auth_type = $integration::get_auth_type();
+
 		$response = [
 			'app'                 => $app,
 			'auth_type'           => $main_auth_type,
@@ -397,7 +342,7 @@ class ConnectionsController extends WP_REST_Controller {
 
 		if ( 'both' === $main_auth_type ) {
 			$response['available_auth_types'] = $integration::get_available_auth_types();
-			$response['auth_fields'] = $integration::get_auth_fields( $auth_type );
+			$response['auth_fields']          = $integration::get_auth_fields( $auth_type );
 		} else {
 			$response['auth_fields'] = $integration::get_auth_fields();
 		}
@@ -405,46 +350,55 @@ class ConnectionsController extends WP_REST_Controller {
 		return rest_ensure_response( $response );
 	}
 
-	private function oauth_redirect_response( bool $success, string $message, ?int $connection_id = null ): WP_REST_Response {
+	private function send_oauth_html( bool $success, string $message, ?int $connection_id = null ): void {
 		$data = [
 			'success'       => $success,
 			'message'       => $message,
 			'connection_id' => $connection_id,
 		];
 
-		$json_data = wp_json_encode( $data );
+		$json = wp_json_encode( $data );
 
-		$html = "<!DOCTYPE html>\n"
-			. "<html>\n"
-			. "<head>\n"
-			. "\t<title>OAuth Callback</title>\n"
-			. "</head>\n"
-			. "<body>\n"
-			. "\t<p>{$message}</p>\n"
-			. "\t<script>\n"
-			. "\t\t(function() {\n"
-			. "\t\t\tvar data = {$json_data};\n"
-			. "\t\t\tif (window.opener) {\n"
-			. "\t\t\t\twindow.opener.postMessage({ type: 'zaplane_oauth_callback', data: data }, '*');\n"
-			. "\t\t\t\twindow.close();\n"
-			. "\t\t\t} else {\n"
-			. "\t\t\t\tvar adminUrl = '/wp-admin/admin.php?page=zaplane';\n"
-			. "\t\t\t\tadminUrl += '&oauth_success=' + (data.success ? '1' : '0');\n"
-			. "\t\t\t\tadminUrl += '&oauth_message=' + encodeURIComponent(data.message);\n"
-			. "\t\t\t\tif (data.connection_id) {\n"
-			. "\t\t\t\t\tadminUrl += '&connection_id=' + data.connection_id;\n"
-			. "\t\t\t\t}\n"
-			. "\t\t\t\twindow.location.href = adminUrl;\n"
-			. "\t\t\t}\n"
-			. "\t\t})();\n"
-			. "\t</script>\n"
-			. "</body>\n"
+		// Build a minimal but valid HTML page
+		$html = '<!DOCTYPE html>'
+			. '<html lang="en">'
+			. '<head>'
+			. '<meta charset="utf-8">'
+			. '<meta name="robots" content="noindex">'
+			. '<title>OAuth Callback</title>'
+			. '</head>'
+			. '<body>'
+			. '<p>' . esc_html( $message ) . '</p>'
+			. '<script>'
+			. '(function () {'
+			. '  var d = ' . $json . ';'
+			. '  if (window.opener && !window.opener.closed) {'
+			// Notify the parent tab
+			. '    window.opener.postMessage({ type: "zaplane_oauth_callback", data: d }, window.location.origin);'
+			. '    window.close();'
+			. '  } else {'
+			// No opener — redirect to the admin page with result params
+			. '    var url = "/wp-admin/admin.php?page=zaplane";'
+			. '    url += "&oauth_success=" + (d.success ? "1" : "0");'
+			. '    url += "&oauth_message=" + encodeURIComponent(d.message);'
+			. '    if (d.connection_id) { url += "&connection_id=" + d.connection_id; }'
+			. '    window.location.href = url;'
+			. '  }'
+			. '})();'
+			. '</script>'
+			. '</body>'
 			. '</html>';
 
-		$response = new WP_REST_Response( $html );
-		$response->set_headers( [ 'Content-Type' => 'text/html; charset=utf-8' ] );
+		// Send raw HTML — do NOT use WP_REST_Response here
+		if ( ! headers_sent() ) {
+			header( 'Content-Type: text/html; charset=utf-8' );
+			header( 'X-Robots-Tag: noindex' );
+			header( 'Cache-Control: no-store, no-cache, must-revalidate' );
+		}
 
-		return $response;
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo $html;
+		exit;
 	}
 
 	private function get_connection_manager(): ConnectionManager {
@@ -454,6 +408,7 @@ class ConnectionsController extends WP_REST_Controller {
 	private function get_oauth_handler(): OAuthHandler {
 		return $this->container->get( 'oauth' );
 	}
+
 
 	private function get_create_args(): array {
 		return [

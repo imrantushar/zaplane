@@ -181,7 +181,7 @@ abstract class IntegrationBase {
 
 
 
-	public static function refresh_oauth_token( string $refresh_token ): array {
+	public static function refresh_oauth_token( array $credentials ): array {
 		return [];
 	}
 

@@ -92,18 +92,20 @@ class OAuthHandler {
 			throw OAuthException::noAccessToken( esc_html( $app ) );
 		}
 
-		$create_result = $this->connections->create(
-			$user_id,
-			$app,
-			$name,
-			'oauth2',
-			$credentials
-		);
-		$connection_id = $create_result['id'];
+			$merged_credentials = array_merge( $credentials, $tokens );
 
-		if ( isset( $tokens['expires_in'] ) ) {
-			$this->connections->set_oauth_expiry( $connection_id, (int) $tokens['expires_in'] );
-		}
+			$create_result = $this->connections->create(
+				$user_id,
+				$app,
+				$name,
+				'oauth2',
+				$merged_credentials
+			);
+			$connection_id = $create_result['id'];
+
+			if ( isset( $tokens['expires_in'] ) ) {
+				$this->connections->set_oauth_expiry( $connection_id, (int) $tokens['expires_in'] );
+			}
 
 		delete_transient( self::STATE_TRANSIENT_PREFIX . $state );
 

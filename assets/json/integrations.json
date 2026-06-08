@@ -1,6 +1,6 @@
 {
     "version": "0.0.3",
-    "generated_at": "2026-06-07 08:12:25",
+    "generated_at": "2026-06-08 03:29:15",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -8411,7 +8411,7 @@
                             "label": "Attendees",
                             "placeholder": "alice@example.com,bob@example.com",
                             "required": false,
-                            "help": "Comma-separated email addresses."
+                            "help": "Comma-separated email addresses. Attendees will receive a calendar invite."
                         },
                         {
                             "key": "send_notifications",
@@ -8434,7 +8434,7 @@
                             "type": "text",
                             "label": "Calendar",
                             "required": false,
-                            "help": "Calendar ID (default: primary). Pick from the dynamic dropdown.",
+                            "help": "Calendar ID to use (default: primary). Pick from the dynamic dropdown.",
                             "dynamic": {
                                 "integration": "google-meet",
                                 "query": "google_calendars",
@@ -8459,7 +8459,7 @@
                             "label": "Event ID",
                             "placeholder": "{{google_event_id}}",
                             "required": true,
-                            "help": "Google Calendar event ID. Use {{google_event_id}} from a Create Meeting node."
+                            "help": "The Google Calendar event ID. Use {{google_event_id}} from a Create Meeting node."
                         },
                         {
                             "key": "summary",
@@ -8510,7 +8510,7 @@
                             "type": "text",
                             "label": "Calendar",
                             "required": false,
-                            "help": "Calendar ID (default: primary). Pick from the dynamic dropdown.",
+                            "help": "Calendar ID to use (default: primary). Pick from the dynamic dropdown.",
                             "dynamic": {
                                 "integration": "google-meet",
                                 "query": "google_calendars",
@@ -8535,7 +8535,7 @@
                             "label": "Event ID",
                             "placeholder": "{{google_event_id}}",
                             "required": true,
-                            "help": "Google Calendar event ID to cancel."
+                            "help": "The Google Calendar event ID to cancel."
                         },
                         {
                             "key": "send_notifications",
@@ -8558,7 +8558,7 @@
                             "type": "text",
                             "label": "Calendar",
                             "required": false,
-                            "help": "Calendar ID (default: primary). Pick from the dynamic dropdown.",
+                            "help": "Calendar ID to use (default: primary). Pick from the dynamic dropdown.",
                             "dynamic": {
                                 "integration": "google-meet",
                                 "query": "google_calendars",
@@ -8617,7 +8617,7 @@
                             "label": "Space Name",
                             "placeholder": "{{google_space_name}}",
                             "required": true,
-                            "help": "Meet space resource name (e.g. spaces/jQCFfuBOdKE). Use {{google_space_name}} from a Create Space node."
+                            "help": "The Meet space resource name (e.g. spaces/jQCFfuBOdKE). Use {{google_space_name}} from a Create Space node."
                         }
                     ],
                     "outputs": [
