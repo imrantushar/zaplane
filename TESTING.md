@@ -354,6 +354,46 @@ for the recipe.
 
 ---
 
+## Live recipe testing (CLI)
+
+The PHPUnit suite above runs against **mocks**. It proves the integration
+*contract* but never proves an integration works against the **real**
+dependency plugin (real WooCommerce, real GemCRM) with real data.
+
+The **recipe CLI** is the live counterpart. A recipe is a small JSON file
+describing one integration + the trigger/action to fire + input + expected
+output. When you run it, the CLI **auto-activates the dependency plugin** if it
+isn't active, fires the trigger/action against the real plugin, asserts the
+result, then restores plugin state.
+
+```bash
+wp zaplane recipe list                 # discovered recipes + plugin active/inactive
+wp zaplane recipe run                   # run every recipe under recipes-test/
+wp zaplane recipe run woocommerce       # run one integration's recipes
+wp zaplane recipe run recipes-test/woocommerce/new-order.json   # one file
+wp zaplane recipe run woocommerce --keep-active                 # don't restore plugin state
+wp zaplane recipe generate gemcrm --event=contact_created       # scaffold a starter recipe
+```
+
+Recipes live under `recipes-test/<integration>/<name>.json`. The runner
+(`Zaplane\Testing\RecipeRunner`) is CLI-agnostic; its interpolation/assertion
+logic is unit-tested in `tests/Testing/RecipeRunnerTest.php`.
+
+Auto-activation relies on a **central plugin map** keyed by integration slug —
+[includes/config/integration-plugins.php](includes/config/integration-plugins.php)
+— so declaring a dependency is a one-line edit, not a change to each integration
+file. Full developer guide:
+[docs/backend/recipe-testing.md](docs/backend/recipe-testing.md).
+
+### Scaffolding a whole new integration
+
+`wp zaplane make:integration <slug> [--plugin=<basename>] [--trigger=<e>] [--action=<e>]`
+generates the integration class (with `get_required_plugins()`), the registry
+entry, a PHPUnit stub, and a starter recipe in one shot — then fill the stubs
+and `wp zaplane recipe run <slug>`.
+
+---
+
 ## Smoke before you ship
 
 Before tagging a release, run:

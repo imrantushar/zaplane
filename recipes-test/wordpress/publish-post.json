@@ -1,0 +1,17 @@
+{
+  "name": "wordpress-publish-post",
+  "integration": "wordpress",
+  "required_plugins": [],
+  "setup": { "factory": "create_post", "args": { "status": "publish", "type": "post" } },
+  "node": {
+    "kind": "trigger",
+    "event": "publish_post",
+    "config": {},
+    "input": ["{{post_id}}"]
+  },
+  "expect": {
+    "not_false": true,
+    "has_keys": ["ID", "post_title", "post_status"],
+    "data": { "post_status": "publish", "post_type": "post" }
+  }
+}

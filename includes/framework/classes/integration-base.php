@@ -14,6 +14,26 @@ abstract class IntegrationBase {
 		return ucfirst( static::get_slug() );
 	}
 
+	/**
+	 * Plugin basenames this integration needs active to function, e.g.
+	 * [ 'woocommerce/woocommerce.php' ]. Empty means it only relies on WP core.
+	 *
+	 * By default this reads the central map in config/integration-plugins.php
+	 * keyed by slug — so you declare dependencies in ONE place instead of editing
+	 * every integration. Override this method only when the dependency is
+	 * conditional/dynamic. Filterable via `zaplane_integration_required_plugins`.
+	 *
+	 * Used by the recipe testing CLI to auto-activate dependencies before a live
+	 * run, and available for the admin UI to surface "requires X".
+	 */
+	public static function get_required_plugins(): array {
+		$slug = static::get_slug();
+		$map  = function_exists( 'zaplane_config' ) ? (array) zaplane_config( 'integration-plugins', [] ) : [];
+		$required = isset( $map[ $slug ] ) ? (array) $map[ $slug ] : [];
+
+		return array_values( (array) apply_filters( 'zaplane_integration_required_plugins', $required, $slug ) );
+	}
+
 	public static function get_icon(): string {
 		return '';
 	}

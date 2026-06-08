@@ -1,0 +1,135 @@
+<?php
+
+namespace Zaplane\Tests\Testing;
+
+use PHPUnit\Framework\TestCase;
+use Zaplane\Testing\RecipeRunner;
+use Zaplane\Testing\RecipeResult;
+
+/**
+ * Exposes RecipeRunner's protected logic (interpolation + assertions) for
+ * direct unit testing. The live activate-plugin + fire path is covered by the
+ * `wp zaplane recipe run` CLI verification, not the mock suite.
+ */
+class TestableRecipeRunner extends RecipeRunner {
+
+	public static function pub_interpolate( $value, array $vars ) {
+		return self::interpolate( $value, $vars );
+	}
+
+	public static function pub_assert( RecipeResult $result, string $kind, array $expect ): void {
+		self::assert_expectations( $result, $kind, $expect );
+	}
+}
+
+class RecipeRunnerTest extends TestCase {
+
+	/** @test */
+	public function whole_token_preserves_native_type(): void {
+		$out = TestableRecipeRunner::pub_interpolate( '{{order_id}}', [ 'order_id' => 42 ] );
+		$this->assertSame( 42, $out );
+	}
+
+	/** @test */
+	public function inline_token_is_substituted_as_string(): void {
+		$out = TestableRecipeRunner::pub_interpolate( 'Order #{{order_id}}', [ 'order_id' => 42 ] );
+		$this->assertSame( 'Order #42', $out );
+	}
+
+	/** @test */
+	public function interpolation_recurses_into_arrays(): void {
+		$out = TestableRecipeRunner::pub_interpolate(
+			[ 'input' => [ '{{post_id}}' ], 'config' => [ 'label' => 'p{{post_id}}' ] ],
+			[ 'post_id' => 7 ]
+		);
+		$this->assertSame( [ 'input' => [ 7 ], 'config' => [ 'label' => 'p7' ] ], $out );
+	}
+
+	/** @test */
+	public function unknown_token_is_left_intact(): void {
+		$out = TestableRecipeRunner::pub_interpolate( '{{missing}}', [ 'order_id' => 1 ] );
+		$this->assertSame( '{{missing}}', $out );
+	}
+
+	/** @test */
+	public function not_false_fails_when_trigger_filtered_out(): void {
+		$result = new RecipeResult( 'r', 'wordpress' );
+		$result->output = false;
+		TestableRecipeRunner::pub_assert( $result, 'trigger', [ 'not_false' => true ] );
+		$this->assertNotEmpty( $result->failures );
+	}
+
+	/** @test */
+	public function trigger_has_keys_and_partial_data_pass(): void {
+		$result = new RecipeResult( 'r', 'wordpress' );
+		$result->output = [ 'ID' => 5, 'post_title' => 'Hi', 'post_status' => 'publish' ];
+		TestableRecipeRunner::pub_assert(
+			$result,
+			'trigger',
+			[ 'not_false' => true, 'has_keys' => [ 'ID', 'post_status' ], 'data' => [ 'post_status' => 'publish' ] ]
+		);
+		$this->assertSame( [], $result->failures );
+	}
+
+	/** @test */
+	public function missing_key_is_reported(): void {
+		$result = new RecipeResult( 'r', 'wordpress' );
+		$result->output = [ 'ID' => 5 ];
+		TestableRecipeRunner::pub_assert( $result, 'trigger', [ 'has_keys' => [ 'post_status' ] ] );
+		$this->assertCount( 1, $result->failures );
+	}
+
+	/** @test */
+	public function action_port_and_data_keys_are_checked(): void {
+		$result = new RecipeResult( 'r', 'wordpress' );
+		$result->output = [ 'port' => 'main', 'data' => [ 'post_id' => 99 ] ];
+		TestableRecipeRunner::pub_assert(
+			$result,
+			'action',
+			[ 'port' => 'main', 'has_keys' => [ 'post_id' ] ]
+		);
+		$this->assertSame( [], $result->failures );
+	}
+
+	/** @test */
+	public function action_wrong_port_fails(): void {
+		$result = new RecipeResult( 'r', 'wordpress' );
+		$result->output = [ 'port' => 'error', 'data' => [] ];
+		TestableRecipeRunner::pub_assert( $result, 'action', [ 'port' => 'main' ] );
+		$this->assertNotEmpty( $result->failures );
+	}
+
+	/** @test */
+	public function scalar_values_compare_loosely_for_json(): void {
+		$result = new RecipeResult( 'r', 'woocommerce' );
+		$result->output = [ 'order_id' => 7, 'total' => '50.00' ];
+		// Recipe JSON numbers vs WC string totals should still match.
+		TestableRecipeRunner::pub_assert( $result, 'trigger', [ 'data' => [ 'total' => 50 ] ] );
+		$this->assertSame( [], $result->failures );
+	}
+
+	/** @test */
+	public function load_file_parses_and_defaults_name(): void {
+		$path = sys_get_temp_dir() . '/zaplane-recipe-' . md5( uniqid( 'r', true ) ) . '.json';
+		file_put_contents( $path, '{"integration":"wordpress","node":{"kind":"trigger","event":"publish_post"}}' );
+
+		$recipe = RecipeRunner::load_file( $path );
+		unlink( $path );
+
+		$this->assertSame( 'wordpress', $recipe['integration'] );
+		$this->assertNotEmpty( $recipe['name'] ); // defaulted from filename.
+	}
+
+	/** @test */
+	public function load_file_rejects_invalid_json(): void {
+		$path = sys_get_temp_dir() . '/zaplane-bad-' . md5( uniqid( 'r', true ) ) . '.json';
+		file_put_contents( $path, '{ not json' );
+
+		$this->expectException( \RuntimeException::class );
+		try {
+			RecipeRunner::load_file( $path );
+		} finally {
+			unlink( $path );
+		}
+	}
+}
