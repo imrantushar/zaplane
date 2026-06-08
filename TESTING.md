@@ -373,8 +373,15 @@ wp zaplane recipe run woocommerce       # run one integration's recipes
 wp zaplane recipe run recipes-test/woocommerce/new-order.json   # one file
 wp zaplane recipe run woocommerce --keep-active                 # don't restore plugin state
 wp zaplane recipe run woocommerce --e2e                         # real workflow + engine + Run/NodeRun logs
+wp zaplane recipe run --fail-fast                               # stop on first failure
 wp zaplane recipe generate gemcrm --event=contact_created       # scaffold a starter recipe
+wp zaplane recipe generate academy                              # scaffold ALL triggers at once
 ```
+
+Runs are fast: recipes are grouped by their dependency plugin and each group
+shares **one** WP-CLI subprocess (the plugin boots once for all its recipes).
+Unfilled `generate` scaffolds (input still has `{{argN}}` placeholders) are
+**skipped**, not run, so a freshly generated folder won't show false results.
 
 Recipes live under `recipes-test/<integration>/<name>.json`. The runner
 (`Zaplane\Testing\RecipeRunner`) is CLI-agnostic; its interpolation/assertion
@@ -395,13 +402,21 @@ and `wp zaplane recipe run <slug>`.
 
 ---
 
-## Smoke before you ship
+## Pre-release checklist
 
-Before tagging a release, run:
+Run these in order before tagging a release — fast gates first, live checks last:
 
 ```bash
-composer test:smoke      # ParityTest only — must pass
-composer test:release    # full suite under processIsolation — ~8 minutes
+# 1. Mock gate (no WP install needed) — contract + units. CI runs this.
+composer test:smoke      # ParityTest only — registry/case/slug drift (<1s, must pass)
+composer test:all        # smoke + Utils + Testing + Integrations (~8 min under isolation)
+
+# 2. Live gate (real WP site) — integrations work against real plugins.
+wp zaplane recipe run            # direct mode — fast, non-zero exit on failure
+wp zaplane recipe run --e2e      # full engine: inserts workflow, fires hook, checks Run/NodeRun logs
 ```
 
-Both must be green. CI runs the same.
+`composer test:all` is the single mock-side gate (smoke + the full suite).
+`wp zaplane recipe run` is the live gate — green here means each integration
+actually works end-to-end on a real site, which is what your users experience.
+Use `--fail-fast` to stop at the first failure while debugging.

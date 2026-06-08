@@ -81,6 +81,21 @@ class RecipeResult {
 		);
 	}
 
+	/** Rebuild every result from a batch subprocess's stdout, in output order. @return self[] */
+	public static function all_from_wire( string $stdout ): array {
+		$out = [];
+		foreach ( explode( "\n", $stdout ) as $line ) {
+			if ( false === strpos( $line, self::WIRE_PREFIX ) ) {
+				continue;
+			}
+			$result = self::from_wire( $line );
+			if ( $result ) {
+				$out[] = $result;
+			}
+		}
+		return $out;
+	}
+
 	/** Rebuild a result from a subprocess's marked stdout line. Null if absent. */
 	public static function from_wire( string $stdout ): ?self {
 		$pos = strrpos( $stdout, self::WIRE_PREFIX );

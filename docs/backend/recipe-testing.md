@@ -26,9 +26,15 @@ wp zaplane recipe run
 wp zaplane recipe run woocommerce
 wp zaplane recipe run recipes-test/woocommerce/new-order.json
 
-# Scaffold a starter recipe for an integration's trigger/action
-wp zaplane recipe generate gemcrm --event=contact_created --kind=trigger
+# Scaffold recipes
+wp zaplane recipe generate gemcrm --event=contact_created   # one event
+wp zaplane recipe generate academy                          # ALL triggers at once
+wp zaplane recipe generate woocommerce --kind=all           # all triggers AND actions
 ```
+
+`generate` writes one `recipes-test/<integration>/<event>.json` per event.
+Omit `--event` to scaffold **every** registered trigger (or action, or `--kind=all`
+for both) in one go; existing files are skipped, not overwritten.
 
 Recipes live in `recipes-test/<integration>/<name>.json`. A non-zero exit on any
 failure makes `recipe run` CI-friendly.
@@ -166,6 +172,46 @@ add_filter( 'zaplane_recipe_factories', function ( array $f ) {
 
 ---
 
+## Filling in `input` after `generate`
+
+`recipe generate` only **scaffolds** a recipe — it can't know what data your
+trigger needs, so it leaves `setup.factory` empty and pre-fills `node.input`
+with one `{{argN}}` placeholder per positional hook arg the trigger reads (it
+detects these from the trigger's `resolve_trigger`; if it can't tell, `input`
+stays `[]` and you add them yourself). A generated trigger looks like:
+
+```json
+"setup": { "factory": "", "args": {} },
+"node": { "kind": "trigger", "event": "user_enroll_course", "input": ["{{arg0}}", "{{arg1}}", "{{arg2}}"] }
+```
+
+Those placeholders are **not** real values yet — replace each one. To find what
+each arg is, read the event's `case` in the integration's `resolve_trigger()`;
+e.g. Academy's `user_enroll_course` (hook `academy/course/after_enroll`) reads
+`$args[0]=course_id`, `$args[1]=enroll_id`, `$args[2]=user_id`. Then fill `input`
+one of two ways:
+
+**Literal values** — ids that already exist on the site:
+
+```json
+"input": [12, 34, 1]
+```
+
+**Dynamic values** — seed real data with a `setup.factory` that returns variables, and reference them with `{{var}}`:
+
+```json
+"setup": { "factory": "create_academy_enrollment", "args": {} },
+"input": ["{{course_id}}", "{{enroll_id}}", "{{user_id}}"]
+```
+
+Register the factory once via the `zaplane_recipe_factories` filter (see
+*Variables and factories*); it creates a course + enrollment and returns
+`[ 'course_id' => …, 'enroll_id' => …, 'user_id' => … ]`.
+
+> In `--e2e` mode `input` must be the FULL hook signature (every listener runs),
+> so include all args the real `do_action` fires, not just the ones the recipe
+> asserts on.
+
 ## Adding a recipe for an existing integration
 
 1. Make sure the dependency is in
@@ -238,14 +284,22 @@ Notes:
   (`{ "app", "event", "config" }`) to test a trigger → action chain; each node's
   output is logged.
 
-## Running in CI
+## Running in CI / before release
 
 ```bash
-wp zaplane recipe run            # exits non-zero on any failure
+composer test:all                # mock gate: smoke + Utils + Testing + Integrations
+wp zaplane recipe run            # live gate: exits non-zero on any failure
+wp zaplane recipe run --e2e      # optional: full engine + Run/NodeRun logs
 ```
 
-Activate heavy plugins once and pass `--keep-active` if you don't want the
-per-recipe activate/restore churn:
+Performance & flags:
+
+- Recipes are **grouped by dependency plugin** and each group shares one
+  subprocess — the plugin boots once for all of its recipes, not once per recipe.
+- Unfilled `generate` scaffolds (input still has `{{argN}}`) are **skipped**.
+- `--fail-fast` stops at the first failure.
+- `--keep-active` skips the activate/restore churn when you've pre-activated the
+  plugin yourself:
 
 ```bash
 wp plugin activate woocommerce

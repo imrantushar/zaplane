@@ -33,6 +33,10 @@
             "@composer test:utils",
             "@composer test:testing",
             "@composer test:integrations"
+        ],
+        "test:all": [
+            "@composer test:smoke",
+            "@composer test:release"
         ]
     },
     "config": {

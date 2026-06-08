@@ -121,6 +121,18 @@ class RecipeRunnerTest extends TestCase {
 	}
 
 	/** @test */
+	public function unfilled_scaffold_is_detected(): void {
+		$this->assertTrue( RecipeRunner::is_unfilled( [ 'node' => [ 'input' => [ '{{arg0}}', '{{arg1}}' ] ] ] ) );
+		$this->assertTrue( RecipeRunner::is_unfilled( [ 'node' => [ 'config' => [ 'x' => '{{arg2}}' ] ] ] ) );
+	}
+
+	/** @test */
+	public function filled_recipe_is_not_flagged_unfilled(): void {
+		$this->assertFalse( RecipeRunner::is_unfilled( [ 'node' => [ 'input' => [ '{{order_id}}', 5 ] ] ] ) );
+		$this->assertFalse( RecipeRunner::is_unfilled( [ 'node' => [ 'input' => [] ] ] ) );
+	}
+
+	/** @test */
 	public function load_file_rejects_invalid_json(): void {
 		$path = sys_get_temp_dir() . '/zaplane-bad-' . md5( uniqid( 'r', true ) ) . '.json';
 		file_put_contents( $path, '{ not json' );

@@ -38,6 +38,9 @@ class RecipeCommand extends Command {
 			case 'exec':
 				$this->exec_recipe( $args[1] ?? null, $assoc_args );
 				break;
+			case 'exec-batch':
+				$this->exec_batch( array_slice( $args, 1 ), $assoc_args );
+				break;
 			default:
 				$this->error( "Unknown subcommand '{$sub}'. Use: run | generate | list" );
 		}
@@ -46,6 +49,7 @@ class RecipeCommand extends Command {
 	protected function run_recipes( ?string $filter, array $assoc_args ): void {
 		$keep_active = isset( $assoc_args['keep-active'] );
 		$e2e         = isset( $assoc_args['e2e'] );
+		$fail_fast   = isset( $assoc_args['fail-fast'] );
 		$files       = RecipeRunner::discover( $filter );
 
 		if ( empty( $files ) ) {
@@ -53,103 +57,145 @@ class RecipeCommand extends Command {
 			return;
 		}
 
+		$flags = [ 'e2e' => $e2e, 'keep_workflow' => isset( $assoc_args['keep-workflow'] ) ];
+
 		$mode = $e2e ? 'end-to-end (real workflow + engine)' : 'direct';
 		$this->info( sprintf( 'Running %d recipe(s) — %s mode...', count( $files ), $mode ) );
 		$this->line();
 
-		$flags  = [ 'e2e' => $e2e, 'keep_workflow' => isset( $assoc_args['keep-workflow'] ) ];
-		$rows   = [];
-		$failed = 0;
+		$rows    = [];
+		$passed  = 0;
+		$failed  = 0;
+		$skipped = 0;
 
+		// Classify recipes, skipping ones that can't run, then group the runnable
+		// ones by their required-plugin set so each group shares ONE subprocess
+		// (the plugin boots once for all of its recipes — the main speed win).
+		$groups = [];
 		foreach ( $files as $file ) {
-			// E2E only applies to trigger recipes — actions aren't fired by hooks.
-			if ( $e2e && ! $this->is_trigger_recipe( $file ) ) {
-				$rows[] = [ basename( $file, '.json' ), '—', 'SKIP', 'action recipe — E2E only runs triggers' ];
+			try {
+				$recipe = RecipeRunner::load_file( $file );
+			} catch ( \Throwable $e ) {
+				$rows[] = [ basename( $file ), '—', 'FAIL', $e->getMessage() ];
+				++$failed;
 				continue;
 			}
 
-			[ $result, $note ] = $this->run_one( $file, $keep_active, $flags );
+			$name = $recipe['name'] ?? basename( $file, '.json' );
+			$slug = $recipe['integration'] ?? '—';
 
-			if ( ! $result || ! $result->passed ) {
-				++$failed;
+			if ( $e2e && 'trigger' !== ( $recipe['node']['kind'] ?? '' ) ) {
+				$rows[] = [ $name, $slug, 'SKIP', 'action recipe — E2E only runs triggers' ];
+				++$skipped;
+				continue;
 			}
 
-			// In E2E mode show the workflow/run/node-run log the engine produced.
-			if ( $e2e && $result && ! empty( $result->log_lines ) ) {
-				$this->line( '▸ ' . ( $result->name ?? basename( $file ) ) );
-				foreach ( $result->log_lines as $log ) {
-					$this->line( '  ' . $log );
+			if ( RecipeRunner::is_unfilled( $recipe ) ) {
+				$rows[] = [ $name, $slug, 'SKIP', 'scaffold not filled in ({{argN}} placeholders)' ];
+				++$skipped;
+				continue;
+			}
+
+			$req = RecipeRunner::required_plugins( $recipe );
+			sort( $req );
+			$sig = implode( '|', $req );
+			if ( ! isset( $groups[ $sig ] ) ) {
+				$groups[ $sig ] = [ 'plugins' => $req, 'files' => [] ];
+			}
+			$groups[ $sig ]['files'][] = $file;
+		}
+
+		// Run each plugin-group: activate once → one subprocess for all → restore.
+		$aborted = false;
+		foreach ( $groups as $group ) {
+			if ( $aborted ) {
+				break;
+			}
+
+			try {
+				$activated = RecipeRunner::activate_plugins( $group['plugins'] );
+			} catch ( \Throwable $e ) {
+				foreach ( $group['files'] as $file ) {
+					$rows[] = [ basename( $file, '.json' ), '—', 'FAIL', $e->getMessage() ];
+					++$failed;
 				}
-				$this->line();
+				if ( $fail_fast ) {
+					$aborted = true;
+				}
+				continue;
 			}
 
-			$rows[] = [
-				$result ? $result->name : basename( $file ),
-				$result ? $result->integration : '—',
-				$result ? $result->status_label() : 'FAIL',
-				$result && $result->passed ? $note : ( $result ? $result->failure_summary() : $note ),
-			];
+			try {
+				$results = $this->exec_batch_subprocess( $group['files'], $flags );
+			} finally {
+				if ( ! $keep_active && ! empty( $activated ) ) {
+					RecipeRunner::deactivate_plugins( $activated );
+				}
+			}
+
+			$note = empty( $activated ) ? '' : 'activated: ' . implode( ', ', $activated );
+
+			foreach ( $group['files'] as $i => $file ) {
+				$result = $results[ $i ] ?? null;
+
+				// In E2E mode show the workflow/run/node-run log the engine produced.
+				if ( $e2e && $result && ! empty( $result->log_lines ) ) {
+					$this->line( '▸ ' . $result->name );
+					foreach ( $result->log_lines as $log ) {
+						$this->line( '  ' . $log );
+					}
+					$this->line();
+				}
+
+				if ( $result && $result->passed ) {
+					++$passed;
+				} else {
+					++$failed;
+				}
+
+				$rows[] = [
+					$result ? $result->name : basename( $file, '.json' ),
+					$result ? $result->integration : '—',
+					$result ? $result->status_label() : 'FAIL',
+					$result && $result->passed ? $note : ( $result ? $result->failure_summary() : 'no result' ),
+				];
+
+				if ( $fail_fast && ( ! $result || ! $result->passed ) ) {
+					$aborted = true;
+					break;
+				}
+			}
 		}
 
 		$this->table( [ 'Recipe', 'Integration', 'Status', 'Notes' ], $rows );
 		$this->line();
 
-		$passed = count( $files ) - $failed;
+		$summary = sprintf( '%d passed, %d skipped, %d failed.', $passed, $skipped, $failed );
+		if ( $aborted && $failed > 0 ) {
+			$summary .= ' (stopped early — --fail-fast)';
+		}
+
 		if ( $failed > 0 ) {
-			$this->error( sprintf( '%d passed, %d failed.', $passed, $failed ) );
-			return; // Command::error() exits non-zero under WP-CLI.
+			$this->error( $summary ); // exits non-zero under WP-CLI.
+			return;
 		}
-
-		$this->success( sprintf( 'All %d recipe(s) passed.', $passed ) );
+		$this->success( $summary );
 	}
 
 	/**
-	 * Run one recipe file: activate any inactive dependency plugins, fire the
-	 * recipe in a fresh WP-CLI subprocess (so heavy plugins like WooCommerce
-	 * load normally on plugins_loaded), then restore plugin state.
+	 * Run a whole plugin-group of recipes in ONE child WP-CLI process. The plugin
+	 * (just activated by the parent) boots once for all of them, instead of once
+	 * per recipe. Results are returned positionally aligned to $files.
 	 *
-	 * @return array{0: ?RecipeResult, 1: string} [ result, note ]
+	 * @return array<int, ?RecipeResult>
 	 */
-	protected function run_one( string $file, bool $keep_active, array $flags = [] ): array {
-		try {
-			$recipe = RecipeRunner::load_file( $file );
-		} catch ( \Throwable $e ) {
-			return [ null, $e->getMessage() ];
-		}
-
-		$required = RecipeRunner::required_plugins( $recipe );
-
-		try {
-			$activated = RecipeRunner::activate_plugins( $required );
-		} catch ( \Throwable $e ) {
-			$result = new RecipeResult( $recipe['name'] ?? basename( $file, '.json' ), $recipe['integration'] ?? '' );
-			$result->abort( $e->getMessage() );
-			return [ $result, $result->failure_summary() ];
-		}
-
-		try {
-			$result = $this->fire_in_subprocess( $file, $flags );
-		} finally {
-			if ( ! $keep_active && ! empty( $activated ) ) {
-				RecipeRunner::deactivate_plugins( $activated );
-			}
-		}
-
-		$note = empty( $activated ) ? '' : 'activated: ' . implode( ', ', $activated );
-		return [ $result, $note ];
-	}
-
-	/**
-	 * Fire one recipe in a child WP-CLI process via `recipe exec` and parse the
-	 * marked result line from its output. The child process is used so the
-	 * dependency plugin (just activated by the parent) boots normally.
-	 */
-	protected function fire_in_subprocess( string $file, array $flags = [] ): RecipeResult {
+	protected function exec_batch_subprocess( array $files, array $flags = [] ): array {
 		$extra  = ! empty( $flags['e2e'] ) ? ' --e2e' : '';
 		$extra .= ! empty( $flags['keep_workflow'] ) ? ' --keep-workflow' : '';
+		$paths  = implode( ' ', array_map( 'escapeshellarg', $files ) );
 
 		$run = \WP_CLI::runcommand(
-			'zaplane recipe exec ' . escapeshellarg( $file ) . $extra,
+			"zaplane recipe exec-batch {$paths}{$extra}",
 			[
 				'launch'     => true,
 				'return'     => 'all',
@@ -157,29 +203,45 @@ class RecipeCommand extends Command {
 			]
 		);
 
-		$result = RecipeResult::from_wire( (string) ( $run->stdout ?? '' ) );
-		if ( $result ) {
-			return $result;
-		}
+		$results = RecipeResult::all_from_wire( (string) ( $run->stdout ?? '' ) );
 
-		// No marked line — surface whatever the child emitted.
-		$recipe  = RecipeRunner::load_file( $file );
-		$fallback = new RecipeResult( $recipe['name'] ?? basename( $file, '.json' ), $recipe['integration'] ?? '' );
-		$stderr   = trim( (string) ( $run->stderr ?? '' ) );
-		return $fallback->abort( $stderr ?: 'Subprocess produced no result.' );
+		$out = [];
+		foreach ( $files as $i => $file ) {
+			if ( isset( $results[ $i ] ) ) {
+				$out[ $i ] = $results[ $i ];
+				continue;
+			}
+			$fallback  = new RecipeResult( basename( $file, '.json' ), '' );
+			$stderr    = trim( (string) ( $run->stderr ?? '' ) );
+			$out[ $i ] = $fallback->abort( $stderr ?: 'Subprocess produced no result (batch may have crashed).' );
+		}
+		return $out;
 	}
 
 	/**
-	 * Internal: fire a single recipe in *this* process (deps assumed loaded)
-	 * and print the result as a marked line for the parent to parse.
+	 * Best-effort count of positional hook args a trigger event reads, by scanning
+	 * the `case '<event>':` block of its resolve_trigger() for the highest
+	 * `$args[N]` index. Returns 0 when it can't tell (e.g. the case delegates to a
+	 * helper) — then you fill `input` by reading the integration yourself.
 	 */
-	protected function is_trigger_recipe( string $file ): bool {
+	protected function detect_input_arity( string $class, string $event ): int {
 		try {
-			$recipe = RecipeRunner::load_file( $file );
+			$file = ( new \ReflectionClass( $class ) )->getFileName();
+			$src  = $file ? (string) file_get_contents( $file ) : '';
 		} catch ( \Throwable $e ) {
-			return false;
+			return 0;
 		}
-		return 'trigger' === ( $recipe['node']['kind'] ?? '' );
+
+		$pattern = "/case\s+'" . preg_quote( $event, '/' ) . "'\s*:(.*?)(?=\n\s*case\s+'|\n\s*default\s*:|\n\s*\}\s*\n)/s";
+		if ( ! preg_match( $pattern, $src, $m ) ) {
+			return 0;
+		}
+
+		if ( ! preg_match_all( '/\$args\[(\d+)\]/', $m[1], $idx ) || empty( $idx[1] ) ) {
+			return 0;
+		}
+
+		return max( array_map( 'intval', $idx[1] ) ) + 1;
 	}
 
 	protected function exec_recipe( ?string $file, array $assoc_args = [] ): void {
@@ -188,20 +250,38 @@ class RecipeCommand extends Command {
 			return;
 		}
 
-		$recipe = RecipeRunner::load_file( $file );
+		$this->exec_batch( [ $file ], $assoc_args );
+	}
 
-		if ( isset( $assoc_args['e2e'] ) ) {
-			$result = RecipeE2eRunner::run( $recipe, [ 'keep_workflow' => isset( $assoc_args['keep-workflow'] ) ] );
-		} else {
-			$result = RecipeRunner::fire( $recipe );
+	/**
+	 * Internal: fire each recipe in *this* process (deps assumed already loaded)
+	 * and print one marked result line per recipe for the parent to parse. Each
+	 * recipe is isolated in try/catch so one failure can't drop the rest.
+	 */
+	protected function exec_batch( array $files, array $assoc_args = [] ): void {
+		$e2e  = isset( $assoc_args['e2e'] );
+		$keep = isset( $assoc_args['keep-workflow'] );
+
+		foreach ( $files as $file ) {
+			if ( ! is_file( $file ) ) {
+				continue;
+			}
+			try {
+				$recipe = RecipeRunner::load_file( $file );
+				$result = $e2e
+					? RecipeE2eRunner::run( $recipe, [ 'keep_workflow' => $keep ] )
+					: RecipeRunner::fire( $recipe );
+			} catch ( \Throwable $e ) {
+				$result = new RecipeResult( basename( $file, '.json' ), '' );
+				$result->abort( $e->getMessage() );
+			}
+			$this->line( $result->to_wire() );
 		}
-
-		$this->line( $result->to_wire() );
 	}
 
 	protected function generate_recipe( ?string $integration, array $assoc_args ): void {
 		if ( ! $integration ) {
-			$this->error( 'Usage: wp zaplane recipe generate <integration> [--event=<e>] [--kind=trigger|action]' );
+			$this->error( 'Usage: wp zaplane recipe generate <integration> [--event=<e>] [--kind=trigger|action|all]' );
 			return;
 		}
 
@@ -213,27 +293,84 @@ class RecipeCommand extends Command {
 		$class = get_class( $instance );
 
 		$kind = $assoc_args['kind'] ?? 'trigger';
-		if ( ! in_array( $kind, [ 'trigger', 'action' ], true ) ) {
-			$this->error( "--kind must be 'trigger' or 'action'." );
+		if ( ! in_array( $kind, [ 'trigger', 'action', 'all' ], true ) ) {
+			$this->error( "--kind must be 'trigger', 'action', or 'all'." );
+			return;
+		}
+		$kinds = 'all' === $kind ? [ 'trigger', 'action' ] : [ $kind ];
+
+		// Build the (kind, event) work list.
+		$targets = [];
+		foreach ( $kinds as $k ) {
+			$events = 'trigger' === $k ? $class::get_triggers() : $class::get_actions();
+
+			if ( isset( $assoc_args['event'] ) ) {
+				if ( isset( $events[ $assoc_args['event'] ] ) ) {
+					$targets[] = [ $k, $assoc_args['event'] ];
+				}
+				continue;
+			}
+
+			// No --event: generate one recipe per registered event of this kind.
+			foreach ( array_keys( $events ) as $event ) {
+				$targets[] = [ $k, $event ];
+			}
+		}
+
+		if ( empty( $targets ) ) {
+			$hint = isset( $assoc_args['event'] ) ? "event '{$assoc_args['event']}' not found" : "no {$kind}s declared";
+			$this->error( "Nothing to generate for '{$integration}' ({$hint})." );
 			return;
 		}
 
-		$events = 'trigger' === $kind ? $class::get_triggers() : $class::get_actions();
-		if ( empty( $events ) ) {
-			$this->error( "Integration '{$integration}' declares no {$kind}s." );
-			return;
+		$dir = RecipeRunner::base_dir() . $integration . '/';
+		if ( ! is_dir( $dir ) ) {
+			wp_mkdir_p( $dir );
 		}
 
-		$event = $assoc_args['event'] ?? array_key_first( $events );
-		if ( ! isset( $events[ $event ] ) ) {
-			$this->error( "Unknown {$kind} '{$event}'. Available: " . implode( ', ', array_keys( $events ) ) );
-			return;
+		$created = 0;
+		$skipped = 0;
+		foreach ( $targets as [$k, $event] ) {
+			$status = $this->write_recipe_file( $integration, $class, $k, $event, $dir );
+			if ( 'created' === $status ) {
+				++$created;
+				$this->success( "Created recipes-test/{$integration}/{$event}.json ({$k})" );
+			} else {
+				++$skipped;
+				$this->line( "Skipped {$event}.json — already exists" );
+			}
 		}
 
-		$sample = 'trigger' === $kind ? $class::get_trigger_sample_output( $event ) : [];
+		$this->line();
+		$this->success( sprintf( '%d recipe(s) created, %d skipped.', $created, $skipped ) );
+		$this->line( 'Fill in setup.factory + node.input/config, then run:' );
+		$this->line( "  wp zaplane recipe run {$integration}" );
+	}
+
+	/** Write one scaffold recipe file. Returns 'created' or 'exists'. */
+	protected function write_recipe_file( string $integration, string $class, string $kind, string $event, string $dir ): string {
+		$path = $dir . "{$event}.json";
+		if ( file_exists( $path ) ) {
+			return 'exists';
+		}
+
 		$expect = [ 'not_false' => true ];
-		if ( ! empty( $sample ) ) {
-			$expect['has_keys'] = array_slice( array_keys( $sample ), 0, 3 );
+		if ( 'trigger' === $kind ) {
+			$sample = $class::get_trigger_sample_output( $event );
+			if ( ! empty( $sample ) ) {
+				$expect['has_keys'] = array_slice( array_keys( $sample ), 0, 3 );
+			}
+		}
+
+		// Pre-fill `input` with one {{argN}} placeholder per positional hook arg the
+		// trigger reads (detected from its resolve_trigger). Replace each token with a
+		// literal value or a {{var}} produced by setup.factory.
+		$input = [];
+		if ( 'trigger' === $kind ) {
+			$arity = $this->detect_input_arity( $class, $event );
+			for ( $i = 0; $i < $arity; $i++ ) {
+				$input[] = "{{arg{$i}}}";
+			}
 		}
 
 		$recipe = [
@@ -245,28 +382,13 @@ class RecipeCommand extends Command {
 				'kind'   => $kind,
 				'event'  => $event,
 				'config' => new \stdClass(),
-				'input'  => [],
+				'input'  => $input,
 			],
 			'expect'           => $expect,
 		];
 
-		$dir = RecipeRunner::base_dir() . $integration . '/';
-		if ( ! is_dir( $dir ) ) {
-			wp_mkdir_p( $dir );
-		}
-		$path = $dir . "{$event}.json";
-
-		if ( file_exists( $path ) ) {
-			$this->error( 'Recipe already exists: ' . str_replace( ZAPLANE_ROOT_DIR_PATH, '', $path ) );
-			return;
-		}
-
-		$json = wp_json_encode( $recipe, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES );
-		file_put_contents( $path, $json . "\n" );
-
-		$this->success( 'Created ' . str_replace( ZAPLANE_ROOT_DIR_PATH, '', $path ) );
-		$this->line( 'Fill in setup.factory, node.input/config, and expect, then run:' );
-		$this->line( "  wp zaplane recipe run {$integration}" );
+		file_put_contents( $path, wp_json_encode( $recipe, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES ) . "\n" );
+		return 'created';
 	}
 
 	protected function list_recipes(): void {

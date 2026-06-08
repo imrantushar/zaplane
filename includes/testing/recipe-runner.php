@@ -217,6 +217,16 @@ class RecipeRunner {
 	}
 
 	/**
+	 * True when a recipe is still an unfilled `generate` scaffold — its node
+	 * input/config contains `{{argN}}` placeholder tokens. Such recipes can't run
+	 * meaningfully (the args are placeholders), so the CLI skips them.
+	 */
+	public static function is_unfilled( array $recipe ): bool {
+		$blob = wp_json_encode( $recipe['node'] ?? [] );
+		return is_string( $blob ) && (bool) preg_match( '/\{\{\s*arg\d+\s*\}\}/', $blob );
+	}
+
+	/**
 	 * Activate any of the given plugin basenames that aren't already active.
 	 *
 	 * @return string[] The basenames this call activated.
