@@ -3,13 +3,16 @@
 namespace Zaplane\Integrations;
 
 use Zaplane\Framework\Classes\IntegrationBase;
-use Zaplane\Modules\AbandonedCart\AbandonedCartModel;
-use Zaplane\Modules\AbandonedCart\AbandonedCartHelper;
-use Zaplane\Framework\Database\ORM\Schema;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
+
+if ( ! class_exists( 'GemCrm\Addons\AbandonedCart\Database\Models\AbandonedCart' ) ) {
+	return;
+}
+
+use GemCrm\Addons\AbandonedCart\Database\Models\AbandonedCart as AbandonedCartModel;
 
 class AbandonedCart extends IntegrationBase {
 
@@ -43,8 +46,6 @@ class AbandonedCart extends IntegrationBase {
 	}
 
 	public static function resolve_trigger( array $node, array $args ) {
-		$event = $node['data']['event'] ?? $node['event'] ?? '';
-
 		$cart = $args[0] ?? null;
 
 		if ( ! $cart ) {
@@ -64,27 +65,27 @@ class AbandonedCart extends IntegrationBase {
 
 	public static function get_trigger_sample_output( string $trigger ): array {
 		$base = [
-			'id'           => 1,
-			'full_name'    => 'John Doe',
-			'email'        => 'john@example.com',
-			'status'       => 'processing',
-			'total'        => 99.99,
-			'subtotal'     => 89.99,
-			'shipping'     => 5.00,
-			'tax'          => 5.00,
-			'discounts'    => 0.00,
-			'fees'         => 0.00,
-			'currency'     => 'USD',
+			'id'            => 1,
+			'full_name'     => 'John Doe',
+			'email'         => 'john@example.com',
+			'status'        => 'processing',
+			'total'         => 99.99,
+			'subtotal'      => 89.99,
+			'shipping'      => 5.00,
+			'tax'           => 5.00,
+			'discounts'     => 0.00,
+			'fees'          => 0.00,
+			'currency'      => 'USD',
 			'checkout_key'  => 'abc123uuid',
 			'recovery_link' => home_url( '/?zaplane=1&route=abandoned-cart&checkout_key=abc123uuid' ),
-			'contact_id'   => 42,
-			'order_id'     => null,
-			'click_counts' => 0,
-			'provider'     => 'woo',
-			'user_id'      => 5,
-			'abandoned_at' => '2026-01-01 10:00:00',
-			'recovered_at' => null,
-			'created_at'   => '2026-01-01 09:30:00',
+			'contact_id'    => 42,
+			'order_id'      => null,
+			'click_counts'  => 0,
+			'provider'      => 'woo',
+			'user_id'       => 5,
+			'abandoned_at'  => '2026-01-01 10:00:00',
+			'recovered_at'  => null,
+			'created_at'    => '2026-01-01 09:30:00',
 		];
 
 		if ( 'cart_recovered' === $trigger ) {
@@ -243,16 +244,14 @@ class AbandonedCart extends IntegrationBase {
 		$query = AbandonedCartModel::orderBy( 'id', 'desc' );
 
 		if ( $status ) {
-			$query = $query->where( 'status', $status );
+			$query = AbandonedCartModel::where( 'status', $status )->orderBy( 'id', 'desc' );
 		}
 
 		$carts = $query->limit( $limit )->get();
 		$items = [];
 
-		if ( $carts ) {
-			foreach ( $carts as $cart ) {
-				$items[] = self::cart_payload( $cart );
-			}
+		foreach ( $carts as $cart ) {
+			$items[] = self::cart_payload( $cart );
 		}
 
 		return self::respond( [ 'carts' => $items, 'count' => count( $items ) ] );
@@ -284,10 +283,9 @@ class AbandonedCart extends IntegrationBase {
 	private static function action_get_report( array $config, array $input ): array {
 		global $wpdb;
 
-		$table = Schema::getTable( 'abandonned_cart' );
-		$from  = sanitize_text_field( $config['date_from'] ?? '' );
-		$to    = sanitize_text_field( $config['date_to'] ?? '' );
-
+		$table  = $wpdb->prefix . 'gemcrm_abandoned_cart';
+		$from   = sanitize_text_field( $config['date_from'] ?? '' );
+		$to     = sanitize_text_field( $config['date_to'] ?? '' );
 		$where  = '1=1';
 		$params = [];
 
@@ -307,15 +305,15 @@ class AbandonedCart extends IntegrationBase {
 			$st_where  = $where . ' AND status = %s';
 			$st_params = array_merge( $params, [ $st ] );
 			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-			$row = $wpdb->get_row( $wpdb->prepare( "SELECT COUNT(*) as cnt, COALESCE(SUM(total),0) as revenue FROM {$table} WHERE {$st_where}", ...$st_params ), ARRAY_A );
+			$row            = $wpdb->get_row( $wpdb->prepare( "SELECT COUNT(*) as cnt, COALESCE(SUM(total),0) as revenue FROM {$table} WHERE {$st_where}", ...$st_params ), ARRAY_A );
 			$summary[ $st ] = [
 				'count'   => (int) ( $row['cnt'] ?? 0 ),
 				'revenue' => (float) ( $row['revenue'] ?? 0 ),
 			];
 		}
 
-		$recovered = $summary['recovered']['count'];
-		$total_all = array_sum( array_column( $summary, 'count' ) );
+		$recovered     = $summary['recovered']['count'];
+		$total_all     = array_sum( array_column( $summary, 'count' ) );
 		$recovery_rate = $total_all > 0 ? round( ( $recovered / $total_all ) * 100, 2 ) : 0;
 
 		return self::respond( [
@@ -330,17 +328,17 @@ class AbandonedCart extends IntegrationBase {
 
 	private static function cart_payload( AbandonedCartModel $cart ): array {
 		return [
-			'id'           => $cart->id,
-			'full_name'    => $cart->full_name,
-			'email'        => $cart->email,
-			'status'       => $cart->status,
-			'total'        => $cart->total,
-			'subtotal'     => $cart->subtotal,
-			'shipping'     => $cart->shipping,
-			'tax'          => $cart->tax,
-			'discounts'    => $cart->discounts,
-			'fees'         => $cart->fees,
-			'currency'     => $cart->currency,
+			'id'            => $cart->id,
+			'full_name'     => $cart->full_name,
+			'email'         => $cart->email,
+			'status'        => $cart->status,
+			'total'         => $cart->total,
+			'subtotal'      => $cart->subtotal,
+			'shipping'      => $cart->shipping,
+			'tax'           => $cart->tax,
+			'discounts'     => $cart->discounts,
+			'fees'          => $cart->fees,
+			'currency'      => $cart->currency,
 			'checkout_key'  => $cart->checkout_key,
 			'recovery_link' => add_query_arg(
 				[
@@ -350,19 +348,19 @@ class AbandonedCart extends IntegrationBase {
 				],
 				home_url( '/' )
 			),
-			'cart_hash'    => $cart->cart_hash,
-			'is_optout'    => $cart->is_optout,
-			'user_id'      => $cart->user_id,
-			'contact_id'   => $cart->contact_id,
-			'order_id'     => $cart->order_id,
-			'click_counts' => $cart->click_counts,
-			'note'         => $cart->note,
-			'provider'     => $cart->provider,
-			'cart'         => $cart->get_cart_contents(),
-			'abandoned_at' => $cart->abandoned_at,
-			'recovered_at' => $cart->recovered_at,
-			'created_at'   => $cart->created_at,
-			'updated_at'   => $cart->updated_at,
+			'cart_hash'     => $cart->cart_hash,
+			'is_optout'     => $cart->is_optout,
+			'user_id'       => $cart->user_id,
+			'contact_id'    => $cart->contact_id,
+			'order_id'      => $cart->order_id,
+			'click_counts'  => $cart->click_counts,
+			'note'          => $cart->note,
+			'provider'      => $cart->provider,
+			'cart'          => $cart->get_cart_contents(),
+			'abandoned_at'  => $cart->abandoned_at,
+			'recovered_at'  => $cart->recovered_at,
+			'created_at'    => $cart->created_at,
+			'updated_at'    => $cart->updated_at,
 		];
 	}
 

@@ -1,44 +1,56 @@
 <?php
 namespace Zaplane\Integrations\Woo;
 
-use Zaplane\Modules\AbandonedCart\AbandonedCartModel;
-use Zaplane\Framework\Database\ORM\Schema;
-
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
+
+if ( ! class_exists( 'GemCrm\Addons\AbandonedCart\Database\Models\AbandonedCart' ) ) {
+	// Trait methods become no-ops when GemCRM addon is unavailable.
+	trait AbandonedCartActionsTrait {
+		private static function abandoned_cart_trigger_payload( array $args ): ?array { return null; }
+		private static function action_get_abandoned_cart( array $config, array $input ): array { return self::error( 'GemCRM Abandoned Cart addon not active' ); }
+		private static function action_get_abandoned_cart_by_email( array $config, array $input ): array { return self::error( 'GemCRM Abandoned Cart addon not active' ); }
+		private static function action_get_abandoned_carts( array $config, array $input ): array { return self::error( 'GemCRM Abandoned Cart addon not active' ); }
+		private static function action_update_abandoned_cart_status( array $config, array $input ): array { return self::error( 'GemCRM Abandoned Cart addon not active' ); }
+		private static function action_get_abandoned_cart_report( array $config, array $input ): array { return self::error( 'GemCRM Abandoned Cart addon not active' ); }
+	}
+	return;
+}
+
+use GemCrm\Addons\AbandonedCart\Database\Models\AbandonedCart as AbandonedCartModel;
 
 trait AbandonedCartActionsTrait {
 
 	private static function abandoned_cart_payload( AbandonedCartModel $cart ): array {
 		return [
-			'id'           => $cart->id,
-			'full_name'    => $cart->full_name,
-			'email'        => $cart->email,
-			'status'       => $cart->status,
-			'total'        => $cart->total,
-			'subtotal'     => $cart->subtotal,
-			'shipping'     => $cart->shipping,
-			'tax'          => $cart->tax,
-			'discounts'    => $cart->discounts,
-			'fees'         => $cart->fees,
-			'currency'     => $cart->currency,
-			'checkout_key' => $cart->checkout_key,
-			'cart_hash'    => $cart->cart_hash,
-			'is_optout'    => $cart->is_optout,
-			'user_id'      => $cart->user_id,
-			'contact_id'   => $cart->contact_id,
-			'order_id'     => $cart->order_id,
-			'click_counts' => $cart->click_counts,
-			'note'         => $cart->note,
-			'provider'     => $cart->provider,
-			'cart'         => $cart->get_cart_contents(),
-			'abandoned_at' => $cart->abandoned_at,
-			'recovered_at' => $cart->recovered_at,
-			'created_at'   => $cart->created_at,
-			'updated_at'   => $cart->updated_at,
+			'id'            => $cart->id,
+			'full_name'     => $cart->full_name,
+			'email'         => $cart->email,
+			'status'        => $cart->status,
+			'total'         => $cart->total,
+			'subtotal'      => $cart->subtotal,
+			'shipping'      => $cart->shipping,
+			'tax'           => $cart->tax,
+			'discounts'     => $cart->discounts,
+			'fees'          => $cart->fees,
+			'currency'      => $cart->currency,
+			'checkout_key'  => $cart->checkout_key,
+			'cart_hash'     => $cart->cart_hash,
+			'is_optout'     => $cart->is_optout,
+			'user_id'       => $cart->user_id,
+			'contact_id'    => $cart->contact_id,
+			'order_id'      => $cart->order_id,
+			'click_counts'  => $cart->click_counts,
+			'note'          => $cart->note,
+			'provider'      => $cart->provider,
+			'cart'          => $cart->get_cart_contents(),
+			'abandoned_at'  => $cart->abandoned_at,
+			'recovered_at'  => $cart->recovered_at,
+			'created_at'    => $cart->created_at,
+			'updated_at'    => $cart->updated_at,
 			'recovery_link' => add_query_arg(
-				[     
+				[
 					'zaplane'      => '1',
 					'route'        => 'abandoned-cart',
 					'checkout_key' => $cart->checkout_key,
@@ -92,17 +104,15 @@ trait AbandonedCartActionsTrait {
 		$status = sanitize_text_field( $config['status'] ?? '' );
 		$limit  = max( 1, min( 100, (int) ( $config['limit'] ?? 20 ) ) );
 
-		$query = AbandonedCartModel::orderBy( 'id', 'desc' );
 		if ( $status ) {
-			$query = $query->where( 'status', $status );
+			$carts = AbandonedCartModel::where( 'status', $status )->orderBy( 'id', 'desc' )->limit( $limit )->get();
+		} else {
+			$carts = AbandonedCartModel::orderBy( 'id', 'desc' )->limit( $limit )->get();
 		}
 
-		$carts = $query->limit( $limit )->get();
 		$items = [];
-		if ( $carts ) {
-			foreach ( $carts as $cart ) {
-				$items[] = self::abandoned_cart_payload( $cart );
-			}
+		foreach ( $carts as $cart ) {
+			$items[] = self::abandoned_cart_payload( $cart );
 		}
 
 		return self::respond( [ 'carts' => $items, 'count' => count( $items ) ] );
@@ -134,12 +144,12 @@ trait AbandonedCartActionsTrait {
 	private static function action_get_abandoned_cart_report( array $config, array $input ): array {
 		global $wpdb;
 
-		$table = Schema::getTable( 'abandonned_cart' );
-		$from  = sanitize_text_field( $config['date_from'] ?? '' );
-		$to    = sanitize_text_field( $config['date_to'] ?? '' );
-
+		$table  = $wpdb->prefix . 'gemcrm_abandoned_cart';
+		$from   = sanitize_text_field( $config['date_from'] ?? '' );
+		$to     = sanitize_text_field( $config['date_to'] ?? '' );
 		$where  = '1=1';
 		$params = [];
+
 		if ( $from ) {
 			$where   .= ' AND created_at >= %s';
 			$params[] = $from . ' 00:00:00';
@@ -156,7 +166,7 @@ trait AbandonedCartActionsTrait {
 			$st_where  = $where . ' AND status = %s';
 			$st_params = array_merge( $params, [ $st ] );
 			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-			$row = $wpdb->get_row( $wpdb->prepare( "SELECT COUNT(*) as cnt, COALESCE(SUM(total),0) as revenue FROM {$table} WHERE {$st_where}", ...$st_params ), ARRAY_A );
+			$row            = $wpdb->get_row( $wpdb->prepare( "SELECT COUNT(*) as cnt, COALESCE(SUM(total),0) as revenue FROM {$table} WHERE {$st_where}", ...$st_params ), ARRAY_A );
 			$summary[ $st ] = [
 				'count'   => (int) ( $row['cnt'] ?? 0 ),
 				'revenue' => (float) ( $row['revenue'] ?? 0 ),

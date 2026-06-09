@@ -35,12 +35,7 @@ return [
 			'title'       => __( 'Logs', 'zaplane' ),
 			'capability'  => 'manage_options',
 		],
-		ZAPLANE_PLUGIN_SLUG . '-abandoned-carts' => [
-			'parent_slug' => ZAPLANE_PLUGIN_SLUG,
-			'title'       => __( 'Abandoned Carts', 'zaplane' ),
-			'capability'  => 'manage_options',
-		],
-		ZAPLANE_PLUGIN_SLUG . '-feedback' => [
+ZAPLANE_PLUGIN_SLUG . '-feedback' => [
 			'parent_slug' => ZAPLANE_PLUGIN_SLUG,
 			'title'       => __( 'Feedback', 'zaplane' ),
 			'capability'  => 'manage_options',

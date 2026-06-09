@@ -6,6 +6,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+if ( ! function_exists( 'zaplane_register_gemcrm_abandoned_cart_addon' ) ) {
+	function zaplane_register_gemcrm_abandoned_cart_addon( callable $register ): void {
+		if ( class_exists( 'GemCrm\Addons\AbandonedCart\Bootstrap' ) ) {
+			$register( 'gemcrm-abandoned-cart', \GemCrm\Addons\AbandonedCart\Bootstrap::class );
+		}
+	}
+	add_action( 'gemcrm/addon/register', 'zaplane_register_gemcrm_abandoned_cart_addon' );
+}
+
 if ( ! function_exists( 'zaplane_run_workflow' ) ) {
 
 	/**
